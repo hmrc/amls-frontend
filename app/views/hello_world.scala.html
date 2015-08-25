@@ -1,8 +1,10 @@
-@()
-<html>
-  <body>
-    <p>
-      Hello from amls-frontend!
-    </p>
-  </body>
-</html>
+@import config.ApplicationConfig
+@import include.main
+
+@()(implicit request: Request[_])
+
+@main(
+    title = "Hello, World!"
+) {
+    <h1>Hello, World!</h1>
+}

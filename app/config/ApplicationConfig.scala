@@ -1,16 +1,23 @@
 package config
 
-import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
 
-trait ApplicationConfig {
+object ApplicationConfig extends ServicesConfig {
 
-}
+  private def getConfigString(key: String) =
+    getConfString(key, "")
 
-object ApplicationConfig extends ApplicationConfig with ServicesConfig {
+  private lazy val contactHost = baseUrl("contact-frontend")
 
-  private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing key: $key"))
+  lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
-  lazy val basePath = baseUrl("amls")
+  lazy val analyticsToken = Some(getConfigString(s"analytics.token"))
+  lazy val analyticsHost = getConfigString(s"analytics.host")
 
+  lazy val betaFeedbackUrl =
+    contactHost + getConfigString(s"contact-frontend.beta-feedback-url.authenticated")
+  lazy val betaFeedbackUnauthenticatedUrl =
+    contactHost + getConfigString(s"contact-frontend.beta-feedback-url.unauthenticated")
+
+  lazy val reportAProblemUrl = contactHost + getConfigString(s"contact-frontend.report-a-problem-url")
 }

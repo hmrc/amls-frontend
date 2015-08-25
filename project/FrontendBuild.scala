@@ -13,19 +13,24 @@ private object AppDependencies {
   import play.PlayImport._
   import play.core.PlayVersion
 
-  private val playHealthVersion = "0.7.0"
-  private val playMicroServiceVersion = "7.1.0"
-  private val frontendBootstrapVersion = "0.6.0"
+  private val playHealthVersion = "0.7.0"    
+
   private val govukTemplateVersion = "2.6.0"
   private val playUiVersion = "1.8.0"
   
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "play-microservice" % playMicroServiceVersion,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
-    "uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
+
+    // play-frontend replacement libraries
+    "uk.gov.hmrc" %% "frontend-bootstrap" % "1.0.0",
+    "uk.gov.hmrc" %% "play-partials" % "1.6.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "1.5.0",
+    "uk.gov.hmrc" %% "play-config" % "1.1.0",
+    "uk.gov.hmrc" %% "play-json-logger" % "1.0.0",
+
     "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.6",
     "com.codahale.metrics" % "metrics-graphite" % "3.0.1"
   )

@@ -23,7 +23,7 @@ trait AmlsConnector extends ServicesConfig {
 
   def submitLoginDetails(loginDetails: LoginDetails)(implicit headerCarrier: HeaderCarrier) :Future[Option[LoginDetails]] = {
     val baseURI = "amls"
-    val postUrl = s"""localhost:8490/amls/login"""
+    val postUrl = s"""$serviceURL/$baseURI/$login"""
     val jsonData = Json.toJson(loginDetails)
     http.POST[JsValue, HttpResponse](postUrl, jsonData).map(responseTo[Option[LoginDetails]](postUrl))
   }

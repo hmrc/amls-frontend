@@ -9,6 +9,10 @@
 
 <div>
     @form(action=controllers.routes.AmlsController.onSubmit) {
+    @{
+        play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(token)}
+    }
+
     @inputText(loginDetailsForm("name"))
     @inputText(loginDetailsForm("password"))
         <input type="submit" value="Submit" />

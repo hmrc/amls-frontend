@@ -1,13 +1,10 @@
 package controllers
 
-import uk.gov.hmrc.play.controllers.BaseController
-
 import play.api.mvc._
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-
-object HelloWorld extends BaseController {
-  val helloWorld = Action {
-
+object HelloWorld extends FrontendController {
+  val helloWorld = Action { implicit request =>
     Ok(views.html.hello_world())
   }
 }
