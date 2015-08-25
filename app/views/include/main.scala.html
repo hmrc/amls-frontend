@@ -1,0 +1,105 @@
+@import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
+@import layouts.{govuk_template => hmrcGovUkTemplate}
+@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
+
+@(
+    title: String,
+    mainClass: Option[String] = None,
+    mainDataAttributes: Option[Html] = None,
+    bodyClasses: Option[String] = None,
+    sidebar: Html = HtmlFormat.empty,
+    contentHeader: Html = HtmlFormat.empty,
+    serviceInfoContent: Html = HtmlFormat.empty,
+    scriptElem: Option[Html] = None,
+    linkElement : Option[Html] = None,
+    nameBusiness : Option[String] = None
+)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
+
+@head = {
+    @uiLayouts.head(
+        assetsPrefix = appConfig.assetsPrefix,
+        linkElem = linkElement,
+        headScripts = None
+    )
+    <meta name="format-detection" content="telephone=no" />
+}
+
+@logoutLink = {}
+
+@insideHeader = {
+    @uiLayouts.header_nav(
+        navTitle = None,
+        navTitleLink = None,
+        showBetaLink = false,
+        navLinks = None
+    )
+}
+
+@afterHeader = {}
+
+@bodyEnd = {
+    @uiLayouts.footer(
+        analyticsToken = appConfig.analyticsToken,
+        analyticsHost = appConfig.analyticsHost,
+        assetsPrefix = appConfig.assetsPrefix,
+        ssoUrl = None,
+        scriptElem = scriptElem,
+        gaCalls = None
+    )
+}
+
+@footerTop = {}
+@footerLinks = {}
+
+@betaBanner = {
+    @uiLayouts.betaBanner(
+        // TODO: determine what this should be
+        userLoggedIn = true,
+        betaFeedbackUrl = appConfig.betaFeedbackUrl,
+        betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
+        showFeedbackLinkInBetaBanner = true
+    )
+}
+
+@serviceInfo = {
+    @uiLayouts.serviceInfo(
+        betaBanner = betaBanner,
+        includeGridWrapper = false,
+        serviceInfoContent = Some(logoutLink)
+    )
+}
+
+@mainContentHeader = {
+    @if(contentHeader != HtmlFormat.empty) {
+        @uiLayouts.main_content_header(contentHeader)
+    }
+}
+
+@getHelpForm = {
+    @config.CachedStaticHtmlPartialProvider.get(appConfig.reportAProblemUrl)
+}
+
+@content = {
+    @uiLayouts.main_content(
+        article = mainContent,
+        mainClass = mainClass,
+        mainDataAttributes = mainDataAttributes,
+        mainContentHeader = mainContentHeader,
+        serviceInfo = serviceInfo,
+        getHelpForm = getHelpForm,
+        sidebar = sidebar
+    )
+}
+
+@hmrcGovUkTemplate(
+    Some(title),
+    bodyClasses
+)(
+    head,
+    bodyEnd,
+    insideHeader,
+    afterHeader,
+    footerTop,
+    Some(uiLayouts.footer_links()),
+    true
+)(content)
