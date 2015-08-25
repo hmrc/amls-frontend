@@ -1,0 +1,17 @@
+@(loginDetailsForm: Form[models.LoginDetails])(implicit request:Request[_])
+
+@import views.html.helpers._
+@import helper._
+
+<h1 id="page-title" class="heading-48">
+    @Messages("amls.Login.title")
+</h1>
+
+<div>
+    @form(action=controllers.routes.AmlsController.onSubmit) {
+    @inputText(loginDetailsForm("name"))
+    @inputText(loginDetailsForm("password"))
+        <input type="submit" value="Submit" />
+    </div>
+    }
+</div>

@@ -1,3 +1,5 @@
 # microservice specific routes
 
 GET        /hello-world             controllers.HelloWorld.helloWorld
+GET        /login                   controllers.AmlsController.onPageLoad
+POST       /login                   controllers.AmlsController.onSubmit
