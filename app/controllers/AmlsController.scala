@@ -35,11 +35,6 @@ trait AmlsController extends FrontendController {
         } yield {
           Ok(Json.toJson(savedData))
         }
-       /* amlsService.submitLoginDetails(details).map {
-          x => Ok("yes")
-        } recover {
-          case e: Throwable => Ok(s"""${e.getMessage()}\n${e.getStackTrace().mkString("\n")}""")
-        }*/
       }
     )
   }
