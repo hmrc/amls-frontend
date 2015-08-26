@@ -1,5 +1,6 @@
 package controllers
 
+import play.api.libs.json.Json
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import forms.AmlsForms._
@@ -29,25 +30,17 @@ trait AmlsController extends FrontendController {
     loginDetailsForm.bindFromRequest.fold(
       errors => Future.successful(BadRequest(views.html.AmlsLogin(errors))),
       details => {
-        amlsService.submitLoginDetails(details).map {
+        for {
+          savedData <-  amlsService.submitLoginDetails(details)
+        } yield {
+          Ok(Json.toJson(savedData))
+        }
+       /* amlsService.submitLoginDetails(details).map {
           x => Ok("yes")
         } recover {
           case e: Throwable => Ok(s"""${e.getMessage()}\n${e.getStackTrace().mkString("\n")}""")
-        }
+        }*/
       }
     )
   }
-
-//  def onSubmit = Action.async { implicit request =>
-//    loginDetailsForm.bindFromRequest.fold(
-//      formWithErrors => Future.successful(BadRequest(views.html.AmlsLogin(formWithErrors, None))),
-//      details => {
-//        for {
-//          result <- amlsService.submitLoginDetails(details)
-//        } yield {
-//          Future.successful(Ok(s"Customer ${details.name} created successfully"))
-//        }
-//      }
-//    )
-//  }
 }
