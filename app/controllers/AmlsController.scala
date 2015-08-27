@@ -1,14 +1,14 @@
 package controllers
 
-import play.api.libs.json.Json
+import play.api.Logger
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import forms.AmlsForms._
 
 import play.api.mvc._
+import uk.gov.hmrc.play.http.BadRequestException
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 /**
  * Created by user on 19/08/15.
@@ -30,10 +30,14 @@ trait AmlsController extends FrontendController {
     loginDetailsForm.bindFromRequest.fold(
       errors => Future.successful(BadRequest(views.html.AmlsLogin(errors))),
       details => {
-        for {
-          savedData <-  amlsService.submitLoginDetails(details)
-        } yield {
-          Ok(Json.toJson(savedData))
+        amlsService.submitLoginDetails(details).map {
+          response =>
+            response.status match {
+              case OK => Ok(response.json)
+              case status => {
+                throw new BadRequestException("Bad Data")
+              }
+            }
         }
       }
     )

@@ -19,15 +19,12 @@ trait AmlsConnector extends ServicesConfig {
 
   val http: HttpGet with HttpPost = WSHttp
 
-  def responseTo[T](uri: String)(response: HttpResponse)(implicit rds: Reads[T]) = response.json.as[T]
-
-  def submitLoginDetails(loginDetails: LoginDetails)(implicit headerCarrier: HeaderCarrier) :Future[Option[LoginDetails]] = {
+  def submitLoginDetails(loginDetails: LoginDetails)(implicit headerCarrier: HeaderCarrier) :Future[HttpResponse] = {
     val baseURI = "amls"
     val postUrl = s"""$serviceURL/$baseURI/$login"""
     val jsonData = Json.toJson(loginDetails)
-    http.POST[JsValue, HttpResponse](postUrl, jsonData).map(responseTo[Option[LoginDetails]](postUrl))
+    http.POST[JsValue, HttpResponse](postUrl, jsonData)
   }
-
 }
 
 object AmlsConnector extends AmlsConnector
