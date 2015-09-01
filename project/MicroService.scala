@@ -1,6 +1,7 @@
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
+import scoverage.ScoverageSbtPlugin._
 
 trait MicroService {
 
@@ -16,6 +17,16 @@ trait MicroService {
   lazy val appDependencies : Seq[ModuleID] = ???
   lazy val plugins : Seq[Plugins] = Seq(play.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
+
+  lazy val scoverageSettings = {
+    Seq(
+      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*",
+      ScoverageKeys.coverageMinimum := 80,
+      ScoverageKeys.coverageFailOnMinimum := false,
+      ScoverageKeys.coverageHighlighting := true,
+      parallelExecution in Test := false
+    )
+  }
 
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(plugins : _*)
