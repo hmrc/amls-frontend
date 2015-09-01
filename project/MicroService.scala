@@ -30,7 +30,7 @@ trait MicroService {
 
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(plugins : _*)
-    .settings(playSettings : _*)
+    .settings(playSettings ++ scoverageSettings: _*)
     .settings(version := appVersion)
     .settings(scalaSettings: _*)
     .settings(defaultSettings(): _*)
