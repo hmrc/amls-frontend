@@ -1,6 +1,5 @@
 package controllers
 
-import play.api.Logger
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import forms.AmlsForms._
@@ -38,6 +37,8 @@ trait AmlsController extends FrontendController {
                 throw new BadRequestException("Bad Data")
               }
             }
+        } recover {
+          case e: Throwable => Ok(s"""${e.getMessage()}\n${e.getStackTrace().mkString("\n")}""")
         }
       }
     )
