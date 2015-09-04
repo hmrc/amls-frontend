@@ -1,8 +1,3 @@
 ## Login Page
 amls.Login.title= AMLS
-login.name = Name:
-login.Password = Password:
 
-validation.login.label=There is a problem
-validation.login.description=Check your information is correct, in the right place and in the right format.
-validation.login.listIntro=You must:
