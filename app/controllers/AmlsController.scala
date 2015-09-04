@@ -5,13 +5,8 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 import forms.AmlsForms._
 
 import play.api.mvc._
-import uk.gov.hmrc.play.http.BadRequestException
 
 import scala.concurrent.Future
-
-/**
- * Created by user on 19/08/15.
- */
 
 object AmlsController extends AmlsController {
   val amlsService = AmlsService
@@ -30,15 +25,11 @@ trait AmlsController extends FrontendController {
       errors => Future.successful(BadRequest(views.html.AmlsLogin(errors))),
       details => {
         amlsService.submitLoginDetails(details).map {
-          response =>
-            response.status match {
-              case OK => Ok(response.json)
-              case status => {
-                throw new BadRequestException("Bad Data")
-              }
-            }
+          response => Ok(response.json)
         } recover {
-          case e: Throwable => Ok(s"""${e.getMessage()}\n${e.getStackTrace().mkString("\n")}""")
+          case e: Throwable => {
+            BadRequest("Bad Request: " + e.getStackTrace)
+          }
         }
       }
     )
