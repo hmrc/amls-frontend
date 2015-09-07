@@ -31,7 +31,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-config" % "1.1.0",
     "uk.gov.hmrc" %% "play-json-logger" % "1.0.0",
 
-    "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.6",
+    "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.8",
     "com.codahale.metrics" % "metrics-graphite" % "3.0.1"
   )
 
@@ -44,7 +44,7 @@ private object AppDependencies {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
         "uk.gov.hmrc" %% "hmrctest" % "0.4.0" % scope,
-        "org.scalatest" %% "scalatest" % "2.2.1" % scope,
+        "org.scalatest" %% "scalatest" % "2.2.5" % scope,
         "org.pegdown" % "pegdown" % "1.4.2" % scope,
         "org.jsoup" % "jsoup" % "1.7.2" % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
