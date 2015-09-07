@@ -44,6 +44,8 @@ class AmlsControllerSpec extends UnitSpec with ScalaFutures with MockitoSugar wi
       when(amlsService.submitLoginDetails(Matchers.any())(Matchers.any())).thenReturn(Future.successful(HttpResponse(HttpStatus.OK, Some(Json.parse("""{"foo":"bar"}""")))))
       val result: Result = await(onSubmit()(request))
       status(result) shouldBe HttpStatus.OK
+      bodyOf(result) should include ("foo")
+
     }
 
     "fail test when Micro Service throws exception" in new MockAmlsController  {
