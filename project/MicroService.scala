@@ -2,7 +2,7 @@ import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
 import scoverage.ScoverageSbtPlugin._
-
+import wartremover._
 trait MicroService {
 
   import uk.gov.hmrc._
@@ -17,6 +17,26 @@ trait MicroService {
   lazy val appDependencies : Seq[ModuleID] = ???
   lazy val plugins : Seq[Plugins] = Seq(play.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
+
+  def makeExcludedFiles(rootDir:File):Seq[String] = {
+    val excluded = findPlayConfFiles(rootDir) ++ findSbtFiles(rootDir)
+    println(s"[auto-code-review] excluding the following files: ${excluded.mkString(",")}")
+    excluded
+  }
+  def findSbtFiles(rootDir: File): Seq[String] = {
+    if(rootDir.getName == "project") {
+      rootDir.listFiles().map(_.getName).toSeq
+    } else {
+      Seq()
+    }
+  }
+  def findPlayConfFiles(rootDir: File): Seq[String] = {
+    Option { new File(rootDir, "conf").listFiles() }.fold(Seq[String]()) { confFiles =>
+      confFiles
+        .map(_.getName.replace(".routes", ".Routes"))
+    }
+  }
+
 
   lazy val scoverageSettings = {
     Seq(
@@ -40,7 +60,17 @@ trait MicroService {
       libraryDependencies ++= appDependencies,
       parallelExecution in Test := false,
       fork in Test := false,
-      retrieveManaged := true
+      retrieveManaged := true,
+      wartremoverErrors ++= Seq(),
+          wartremoverWarnings ++= Warts.allBut(
+            Wart.NoNeedForMonad,
+            Wart.Nothing,
+            Wart.Any,
+            Wart.NonUnitStatements,
+            Wart.DefaultArguments,
+            Wart.Product
+          ),
+          wartremoverExcluded ++= makeExcludedFiles(baseDirectory.value) :+ "controllers.ref"
     )
     .settings(Repositories.playPublishingSettings : _*)
     .settings(inConfig(TemplateTest)(Defaults.testSettings): _*)
