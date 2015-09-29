@@ -25,14 +25,14 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
 
     // play-frontend replacement libraries
-    "uk.gov.hmrc" %% "frontend-bootstrap" % "1.0.0",
-    "uk.gov.hmrc" %% "play-partials" % "1.6.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "1.5.0",
-    "uk.gov.hmrc" %% "play-config" % "1.1.0",
-    "uk.gov.hmrc" %% "play-json-logger" % "1.0.0",
+    "uk.gov.hmrc" %% "frontend-bootstrap" % "2.0.0",
+    "uk.gov.hmrc" %% "play-partials" % "2.0.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "3.1.0",
+    "uk.gov.hmrc" %% "play-config" % "2.0.0",
+    "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
 
-    "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.8",
-    "com.codahale.metrics" % "metrics-graphite" % "3.0.1"
+    "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.9",
+    "com.codahale.metrics" % "metrics-graphite" % "3.0.2"
   )
 
   trait TestDependencies {
