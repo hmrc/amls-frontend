@@ -1,21 +1,20 @@
 package controllers
 
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import uk.gov.hmrc.play.test.UnitSpec
+import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
 
-class WelcomeControllerSpec extends UnitSpec with ScalaFutures {
+class WelcomeControllerSpec extends PlaySpec with OneServerPerSuite with ScalaFutures {
   "get" should {
     "load the welcome page" in {
       val result: Future[Result] = WelcomeController.get(FakeRequest())
-      whenReady(result) { result =>
-        status(result) shouldBe 200
-        bodyOf(result) should include("start")
-      }
+      status(result) must be(200)
+      contentAsString(result) must include("start")
     }
   }
 }
