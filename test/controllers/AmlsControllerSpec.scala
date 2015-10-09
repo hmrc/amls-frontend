@@ -57,7 +57,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
       }
       "successfully submit to Micro Service" in {
         implicit val request = fakePostRequest
-        when(mockAmlsService.submitLoginDetails(Matchers.any())(Matchers.any())).thenReturn(Future.successful(HttpResponse(HttpStatus.OK, Some(Json.parse( """{"foo":"bar"}""")))))
+        when(mockAmlsService.submitLoginDetails(Matchers.any())(Matchers.any())).thenReturn(Future.successful(HttpResponse(HttpStatus.OK,
+          Some(Json.parse( """{"foo":"bar"}""")))))
         val result = MockAmlsController.onSubmit.apply(request)
         status(result) must be(HttpStatus.OK)
         contentAsString(result) must include("foo")
