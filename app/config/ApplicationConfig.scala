@@ -7,6 +7,7 @@ object ApplicationConfig extends ServicesConfig {
   private def getConfigString(key: String) = getConfString(key, "")
 
   private lazy val contactHost = baseUrl("contact-frontend")
+  lazy val authHost = baseUrl("auth")
 
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 

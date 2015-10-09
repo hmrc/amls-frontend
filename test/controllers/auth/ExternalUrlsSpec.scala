@@ -1,19 +1,17 @@
 package controllers.auth
 
-import org.scalatestplus.play.OneServerPerSuite
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{PlaySpec,OneServerPerSuite}
 
 class ExternalUrlsSpec extends PlaySpec with OneServerPerSuite{
 
   "ExternalUrls" must {
 
     "have companyAuthHost " in {
-      println(ExternalUrls.companyAuthHost)
       ExternalUrls.companyAuthHost must be("http://localhost:9025")
     }
 
     "have loginCallback " in {
-      ExternalUrls.loginCallback must be("http://localhost:9916/ated/home")
+      ExternalUrls.loginCallback must be("http://localhost:9916/anti-money-laundering/login")
     }
 
     "have loginPath " in {
@@ -21,7 +19,7 @@ class ExternalUrlsSpec extends PlaySpec with OneServerPerSuite{
     }
 
     "have signIn " in {
-      ExternalUrls.signIn must be( s"""http://localhost:9025/account/sign-in?continue=http://localhost:9916/ated/home""")
+      ExternalUrls.signIn must be( s"""http://localhost:9025/account/sign-in?continue=http://localhost:9916/anti-money-laundering/login""")
     }
 
     "have signOut " in {
