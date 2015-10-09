@@ -15,9 +15,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AmlsService
-import uk.gov.hmrc.domain.CtUtr
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{CtAccount, Accounts, Authority}
 import uk.gov.hmrc.play.http.HttpResponse
 
 import scala.concurrent.Future

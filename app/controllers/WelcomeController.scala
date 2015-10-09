@@ -3,9 +3,9 @@ package controllers
 import play.api.mvc._
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-object HelloWorld extends FrontendController {
-  def onPageLoad = Action {
+object WelcomeController extends FrontendController {
+  def get = Action {
     implicit request =>
-      Ok(views.html.hello_world())
+      Ok(views.html.welcomePage())
   }
 }
