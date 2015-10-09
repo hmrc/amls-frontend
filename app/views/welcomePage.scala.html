@@ -1,0 +1,48 @@
+@import config.ApplicationConfig
+@import include.main
+
+@()(implicit request: Request[_])
+
+@main(
+title = "Anti Money Laundering Registration"
+) {
+
+    <div class="grid-wrapper">
+        <div class="grid grid-2-3">
+
+            <h1 class="heading-large">
+                    <span class="pre-heading">
+                        Service
+                    </span>
+                Register for Anti-Money Laundering Supervision
+            </h1>
+
+            <p class="lede">Use this service to register with HMRC for Anti-Money Laundering supervision.</p>
+            <p>You can also <a href="#">continue with a previously saved application</a>.</p>
+
+            <p style="margin-bottom : 60px">
+                <button href="gov-gateway" class="button-get-started">Get started</button>
+            </p>
+
+            <h2 class="heading-medium">Before you start</h2>
+            <p>To complete this service you will need to provide us with:</p>
+            <ul class="list-bullet">
+                <li>your details</li>
+                <li>details of each address where you carry on
+                    <a href="#">business activities covered by the Money Laundering Regulations</a></li>
+                <li>details of staff and agents</li>
+            </ul>
+        </div>
+        <div class="grid grid-1-3">
+            <div class="related">
+                <h3 class="heading-medium">Related</h3>
+                <ul>
+                    <li><a href="#">Who needs to register with HMRC?</a></li>
+                    <li><a href="#">The fit and proper test</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+}
