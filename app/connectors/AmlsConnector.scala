@@ -5,6 +5,7 @@ import models.LoginDetails
 import play.api.libs.json.{JsValue, Json, Reads}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import uk.gov.hmrc.play.http._
 
@@ -19,7 +20,7 @@ trait AmlsConnector extends ServicesConfig {
 
   val http: HttpGet with HttpPost = WSHttp
 
-  def submitLoginDetails(loginDetails: LoginDetails)(implicit headerCarrier: HeaderCarrier) :Future[HttpResponse] = {
+  def submitLoginDetails(loginDetails: LoginDetails)(implicit user: AuthContext,  headerCarrier: HeaderCarrier) :Future[HttpResponse] = {
     val baseURI = "amls"
     val postUrl = s"""$serviceURL/$baseURI/$login"""
     val jsonData = Json.toJson(loginDetails)

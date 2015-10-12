@@ -28,7 +28,7 @@
     </appender>
 
     <appender name="CONNECTOR_LOG_FILE" class="ch.qos.logback.core.FileAppender">
-        <file>logs/connector.log</file>
+        <file>logs/connectors.log</file>
         <encoder>
             <pattern>%message%n</pattern>
         </encoder>

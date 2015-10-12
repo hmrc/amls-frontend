@@ -21,21 +21,24 @@ trait AmlsController extends FrontendController with Actions {
         Ok(views.html.AmlsLogin(loginDetailsForm))
   }
 
-  def onSubmit = Action.async { implicit request =>
-    loginDetailsForm.bindFromRequest.fold(
-      errors => Future.successful(BadRequest(views.html.AmlsLogin(errors))),
-      details => {
-        amlsService.submitLoginDetails(details).map {
-          response => Ok(response.json)
-        } recover {
-          case e: Throwable => {
-            BadRequest("Bad Request: " + e.getStackTrace)
+  def onSubmit = AuthorisedFor(AmlsRegime).async {
+    implicit user =>
+      implicit request =>
+        loginDetailsForm.bindFromRequest.fold(
+          errors => Future.successful(BadRequest(views.html.AmlsLogin(errors))),
+          details => {
+            amlsService.submitLoginDetails(details).map { response =>
+              Ok(response.json)
+            }
           }
-        }
-      }
-    )
+        )
+  }
+
+  def unauthorised() = Action { implicit request =>
+    Ok(views.html.unauthorised(request))
   }
 }
+
 object AmlsController extends AmlsController {
   val amlsService = AmlsService
   val authConnector = AMLSAuthConnector
