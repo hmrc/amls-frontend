@@ -70,6 +70,7 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         "respond with a redirect" in {
           getWithUnAuthenticated { result =>
             status(result) must be(SEE_OTHER)
+            redirectLocation(result).get must include("/account/sign-in")
           }
         }
       }

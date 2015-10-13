@@ -29,6 +29,10 @@ trait AmlsController extends FrontendController with Actions {
           details => {
             amlsService.submitLoginDetails(details).map { response =>
               Ok(response.json)
+            } recover {
+              case e: Throwable => {
+                BadRequest("Bad Request: " + e)
+              }
             }
           }
         )
