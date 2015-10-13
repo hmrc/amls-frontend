@@ -8,4 +8,5 @@ object AmlsRegime extends TaxRegime{
     accounts.ct.isDefined || accounts.org.isDefined || accounts.sa.isDefined
   }
   override def authenticationType: AuthenticationProvider = AmlsGovernmentGateway
+  override def unauthorisedLandingPage: Option[String] = Some(controllers.routes.AmlsController.unauthorised().url)
 }
