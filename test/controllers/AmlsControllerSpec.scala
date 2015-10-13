@@ -149,7 +149,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
       SessionKeys.userId -> userId)
     implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
     AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-    when(mockAmlsService.submitLoginDetails(Matchers.any())(Matchers.any(),Matchers.any())).thenReturn(Future.successful(HttpResponse(OK, Some(Json.parse( """{"foo":"bar"}""")))))
+    when(mockAmlsService.submitLoginDetails(Matchers.any())(Matchers.any(),Matchers.any())).thenReturn(Future.successful(HttpResponse(OK,
+      Some(Json.parse( """{"foo":"bar"}""")))))
     val result = MockAmlsController.onSubmit.apply(session)
     test(result)
 
