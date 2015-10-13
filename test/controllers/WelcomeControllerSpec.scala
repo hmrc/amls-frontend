@@ -13,7 +13,7 @@ class WelcomeControllerSpec extends PlaySpec with OneServerPerSuite with ScalaFu
   "get" should {
     "load the welcome page" in {
       val result: Future[Result] = WelcomeController.get(FakeRequest())
-      status(result) must be(200)
+      status(result) must be(OK)
       contentAsString(result) must include("start")
     }
   }

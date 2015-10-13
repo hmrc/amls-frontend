@@ -6,6 +6,7 @@ import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.audit.http.config.{LoadAuditingConfig, AuditingConfig}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.{ControllerConfig, AppName, RunMode}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HttpGet
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 import uk.gov.hmrc.play.http.ws.{WSGet, WSPut, WSPost, WSDelete}
@@ -17,6 +18,11 @@ object AMLSControllerConfig extends ControllerConfig {
 
 object AMLSAuditConnector extends AuditConnector with RunMode {
   override lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(s"$env.auditing")
+}
+
+object AMLSAuthConnector extends AuthConnector {
+  override val serviceUrl: String = ApplicationConfig.authHost
+  override lazy val http: HttpGet = WSHttp
 }
 
 object AMLSAuditFilter extends FrontendAuditFilter with AppName {
