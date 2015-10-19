@@ -4,6 +4,7 @@ import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.play.test.UnitSpec
 import play.api.data.FormError
 import utils.TestHelper._
+import FormValidator._
 
 
 
@@ -109,27 +110,30 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
 //
 //  }
 //
-//  "mandatoryPhoneNumberFormatter" should {
-//    "Return expected mapping validation for various inputs, valid and invalid" in {
-//      import play.api.data.FormError
-//
-//      val formatter = mandatoryPhoneNumberFormatter("blank message", "invalid length", "invalid value")
-//
-//      formatter.bind("a", Map("a" -> ""))  shouldBe Left(Seq(FormError("a", "blank message")))
-//      formatter.bind("a", Map("a" -> "1111111111111111111111111111"))  shouldBe Left(Seq(FormError("a", "invalid length")))
-//      formatter.bind("a", Map("a" -> "$5gggF"))  shouldBe Left(Seq(FormError("a", "invalid value")))
-//      formatter.bind("a", Map("a" -> "+44 0191 6678 899"))  shouldBe Right("0044 0191 6678 899")
-//      formatter.bind("a", Map("a" -> "(0191) 6678 899")) shouldBe Right("(0191) 6678 899")
-//
-//      formatter.bind("a", Map("a" -> "(0191) 6678 899#4456")) shouldBe Right("(0191) 6678 899#4456")
-//      formatter.bind("a", Map("a" -> "(0191) 6678 899*6")) shouldBe Right("(0191) 6678 899*6")
-//      formatter.bind("a", Map("a" -> "(0191) 6678-899")) shouldBe Right("(0191) 6678-899")
-//      formatter.bind("a", Map("a" -> "01912224455")) shouldBe Right("01912224455")
-//      formatter.bind("a", Map("a" -> "01912224455 ext 5544")) shouldBe Right("01912224455 EXT 5544")
-//      formatter.bind("a", Map("a" -> "019122244+55 ext 5544")) shouldBe Left(Seq(FormError("a", "invalid value")))
-//
-//    }
-//  }
+  "mandatoryPhoneNumberFormatter" should {
+    "Return expected mapping validation for valid phone numbers" in {
+
+      val formatter = mandatoryPhoneNumberFormatter("blank message", "invalid length", "invalid value")
+
+      formatter.bind("a", Map("a" -> "+44 0191 6678 899"))  shouldBe Right("0044 0191 6678 899")
+      formatter.bind("a", Map("a" -> "(0191) 6678 899")) shouldBe Right("(0191) 6678 899")
+
+      formatter.bind("a", Map("a" -> "(0191) 6678 899#4456")) shouldBe Right("(0191) 6678 899#4456")
+      formatter.bind("a", Map("a" -> "(0191) 6678 899*6")) shouldBe Right("(0191) 6678 899*6")
+      formatter.bind("a", Map("a" -> "(0191) 6678-899")) shouldBe Right("(0191) 6678-899")
+      formatter.bind("a", Map("a" -> "01912224455")) shouldBe Right("01912224455")
+      formatter.bind("a", Map("a" -> "01912224455 ext 5544")) shouldBe Right("01912224455 EXT 5544")
+    }
+    "Return expected mapping validation for invalid phone numbers" in {
+
+      val formatter = mandatoryPhoneNumberFormatter("blank message", "invalid length", "invalid value")
+
+      formatter.bind("a", Map("a" -> ""))  shouldBe Left(Seq(FormError("a", "blank message")))
+      formatter.bind("a", Map("a" -> "1111111111111111111111111111"))  shouldBe Left(Seq(FormError("a", "invalid length")))
+      formatter.bind("a", Map("a" -> "$5gggF"))  shouldBe Left(Seq(FormError("a", "invalid value")))
+      formatter.bind("a", Map("a" -> "019122244+55 ext 5544")) shouldBe Left(Seq(FormError("a", "invalid value")))
+    }
+  }
 //
 //  "ihtAddress" should {
 //
@@ -220,13 +224,13 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
 
   "amlsMandatoryEmailWithDomain" must {
     "return the email if the email format is correct" in {
-      val formatter = FormValidator.amlsMandatoryEmailWithDomain(
+      val formatter = FormValidator.mandatoryEmailWithDomain(
         "blank message", "invalid length", "invalid value")
       formatter.bind(Map("" -> "aaaa@aaa.com")) shouldBe Right("aaaa@aaa.com")
     }
 
     "return correct form error if the email format is incorrect" in {
-      val formatter = FormValidator.amlsMandatoryEmailWithDomain(
+      val formatter = FormValidator.mandatoryEmailWithDomain(
         "blank message", "invalid length", "invalid value")
 
       isErrorMessageKeyEqual(formatter.bind(Map("" -> "")), "blank message") shouldBe true
