@@ -21,7 +21,7 @@ import play.api.data.FormError
 import uk.gov.hmrc.play.mappers.DateFields._
 import utils.DateTuple._
 
-class DateTupleSpec extends WordSpec with Matchers {
+class DateTupleTest extends WordSpec with Matchers {
   "dateTuple" should {
     def assertError(dateFields: Map[String, String]) {
       val result = dateTuple.bind(dateFields)

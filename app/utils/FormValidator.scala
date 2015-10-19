@@ -3,11 +3,9 @@ package utils
 import org.joda.time.LocalDate
 import play.api.data.Forms._
 import play.api.data.validation._
-import uk.gov.hmrc.play.validators.Validators._
 import play.api.data.Mapping
 import config.AmlsPropertiesReader._
 import play.api.data.FormError
-
 
 
 trait FormValidator {
@@ -27,8 +25,6 @@ trait FormValidator {
     }
   }
 
-  def getProperty(key: String) = propertyResource.getString(key).trim
-
 //  def containsValidPostCodeCharacters(value: String): Boolean =
 //    postCodeFormat.r.findFirstIn(value).isDefined
 
@@ -36,11 +32,24 @@ trait FormValidator {
   //    value.length <=getProperty("validationMaxLengthPostcode").trim.toInt && isPostcodeLengthValid(value)
   //  }
 
-  def validateNinoFormat = {
-    nino: String => {
-      val ninoMinusSpaces = nino.replaceAll("\\s", "")
-      ninoMinusSpaces.length <= getProperty("validationMaxLengthNINO").toInt && ninoMinusSpaces.matches(ninoRegex)
-    }
+  def mandatoryNino(blankValueMessageKey: String, invalidLengthMessageKey: String, invalidValueMessageKey: String) : Mapping[String] = {
+    val blankConstraint = Constraint("Blank")( {
+      t:String => t match {
+        case t if t.length == 0 => Invalid(blankValueMessageKey)
+        case t if t.replaceAll("\\s", "").length > getProperty("validationMaxLengthNINO").toInt =>
+          Invalid(invalidLengthMessageKey)
+        case _ => Valid
+      }
+    } )
+
+    val valueConstraint = Constraint("Value")( {
+      t:String => t match {
+        case t if t.replaceAll("\\s", "").matches(ninoRegex) => Valid
+        case _ => Invalid(invalidValueMessageKey)
+      }
+    } )
+
+    text.verifying(stopOnFirstFail(blankConstraint, valueConstraint))
   }
 
   def mandatoryEmailWithDomain(blankValueMessageKey: String, invalidLengthMessageKey: String, invalidValueMessageKey: String) : Mapping[String] = {
@@ -56,6 +65,11 @@ trait FormValidator {
 
   def emailWithDomain(errorMessageKeyInvalidFormat:String = "error.email") =
     Constraints.pattern(emailFormat.r, "constraint.email", errorMessageKeyInvalidFormat)
+
+  def mandatoryPhoneNumber( blankValueMessageKey: String,
+                            invalidLengthMessageKey: String,
+                            invalidValueMessageKey: String) =
+    Forms.of[String](mandatoryPhoneNumberFormatter(blankValueMessageKey, invalidLengthMessageKey, invalidValueMessageKey))
 
   def mandatoryPhoneNumberFormatter(blankValueMessageKey: String,
                                     invalidLengthMessageKey: String,
@@ -92,15 +106,9 @@ trait FormValidator {
     }
   }
 
-  def mandatoryPhoneNumber( blankValueMessageKey: String,
-                            invalidLengthMessageKey: String,
-                            invalidValueMessageKey: String) =
-    Forms.of[String](mandatoryPhoneNumberFormatter(blankValueMessageKey, invalidLengthMessageKey, invalidValueMessageKey))
-
   def isNotFutureDate = {
     date: LocalDate => !date.isAfter(LocalDate.now())
   }
-
 }
 
 object FormValidator extends FormValidator

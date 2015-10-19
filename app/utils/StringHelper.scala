@@ -1,6 +1,6 @@
 package utils
 
-object stringHelper {
+object StringHelper {
   val StartOfPrefix = 0
   val EndOfPrefix = 2
   val SuffixCharacter = 8

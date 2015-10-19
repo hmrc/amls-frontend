@@ -8,7 +8,6 @@ import FormValidator._
 import org.joda.time.LocalDate
 
 
-
 class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp {
   "isNotFutureDate" must {
     "return false if the date is later than current date" in {
@@ -20,88 +19,28 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
       FormValidator.isNotFutureDate(LocalDate.now().minusDays(1)) shouldBe true
     }
   }
-//
-//  "validateCountryCode" must {
-//    "reject an invalid country code" in {
-//      FormValidator.validateCountryCode("UK") should be(false)
-//    }
-//    "accept a valid country code" in {
-//      FormValidator.validateCountryCode("GB") should be(true)
-//    }
-//  }
-//
+
   "validateNinoFormat" must {
+
     "return true if the nino format is correct" in {
-      val testNino = "AB123456C"
-      val result = FormValidator.validateNinoFormat(testNino)
-      result should be(true)
-    }
+      val formatter = FormValidator.mandatoryNino("blank message", "invalid length", "invalid value")
 
+      formatter.bind(Map("" -> "AB123456C")) shouldBe Right("AB123456C")
+    }
     "return true if the nino format is correct with spaces" in {
-      val testNino = "AB 12 34 56 C"
-      val result = FormValidator.validateNinoFormat(testNino)
-      result should be(true)
-    }
+      val formatter = FormValidator.mandatoryNino("blank message", "invalid length", "invalid value")
 
-    "return false if the nino format is not correct" in {
-      val testNino = "123456789"
-      val result = FormValidator.validateNinoFormat(testNino)
-      result should be(false)
+      formatter.bind(Map("" -> "AB 12 34 56 C")) shouldBe Right("AB 12 34 56 C")
+    }
+    "return false if the nino format is correct" in {
+      val formatter = FormValidator.mandatoryNino("blank message", "invalid length", "invalid value")
+
+      isErrorMessageKeyEqual(formatter.bind(Map("" -> "")), "blank message") shouldBe true
+      isErrorMessageKeyEqual(formatter.bind(Map("" -> "AB123456C45234")), "invalid length") shouldBe true
+      isErrorMessageKeyEqual(formatter.bind(Map("" -> "@&%a")), "invalid value") shouldBe true
     }
   }
 
-//  "existsInKeys" must {
-//    "return true if valid list map key" in {
-//      val result = FormValidator.existsInKeys(TestHelper.MaritalStatusSingle, FieldMappings.maritalStatusMap)
-//      result should be(true)
-//    }
-//
-//    "return false if invalid list map key" in {
-//      val result = FormValidator.existsInKeys("7", FieldMappings.maritalStatusMap)
-//      result should be(false)
-//    }
-//  }
-//
-//  "validateRole" must {
-//    "return true if valid role" in {
-//      val result = FormValidator.validateApplicantRole(TestHelper.RoleLeadExecutor)
-//      result should be(true)
-//    }
-//    "return false if invalid role" in {
-//      val result = FormValidator.validateApplicantRole(TestHelper.RoleDonee)
-//      result should be(false)
-//    }
-//  }
-//
-//  "currency" should {
-//    "Return valid integer based values" in {
-//      optionalCurrency.bind(Map("" -> "0")) shouldBe Right(Some(0))
-//      optionalCurrency.bind(Map("" -> "0.00")) shouldBe Right(Some(0))
-//      optionalCurrency.bind(Map("" -> "   0   ")) shouldBe Right(Some(0))
-//      optionalCurrency.bind(Map("" -> "1234")) shouldBe Right(Some(1234))
-//      optionalCurrency.bind(Map("" -> "1234.01")) shouldBe Right(Some(1234.01))
-//      optionalCurrency.bind(Map("" -> "1234.01")) shouldBe Right(Some(1234.01))
-//      optionalCurrency.bind(Map("" -> "1,234")) shouldBe Right(Some(1234))
-//      optionalCurrency.bind(Map("" -> "1,234.01")) shouldBe Right(Some(1234.01))
-//      optionalCurrency.bind(Map("" -> "1,23,4.01")) shouldBe Right(Some(1234.01))
-//      optionalCurrency.bind(Map("" -> "1234.1")) shouldBe Right(Some(1234.1))
-//      optionalCurrency.bind(Map("" -> "-1234.1")) shouldBe Right(Some(1234.1))
-//      optionalCurrency.bind(Map("" -> "9999999999.00")) shouldBe Right(Some(9999999999.00))
-//    }
-//    "Report an invalid money error" in {
-//      optionalCurrency.bind(Map("" -> "£")) shouldBe Left(List(FormError("", "error.currency")))
-//      optionalCurrency.bind(Map("" -> "a")) shouldBe Left(List(FormError("", "error.currency")))
-//      optionalCurrency.bind(Map("" -> "1234.001")) shouldBe Left(List(FormError("", "error.currency")))
-//      optionalCurrency.bind(Map("" -> "1.234.001")) shouldBe Left(List(FormError("", "error.currency")))
-//      optionalCurrency.bind(Map("" -> "99999999999.00")) shouldBe Left(List(FormError("", "error.currency")))
-//    }
-//
-//    "Report correctly for invalid numeric value" in {
-//      optionalCurrency.bind(Map("" -> "")) shouldBe Right(None)
-//    }
-//
-//  }
-//
   "mandatoryPhoneNumberFormatter" should {
     "Return expected mapping validation for valid phone numbers" in {
 
@@ -128,7 +67,6 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
   }
 //
 //  "ihtAddress" should {
-//
 //
 //    val allBlank = Map(
 //      "addr1key"->"",
@@ -203,16 +141,6 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
 //    }
 //  }
 //
-//
-//
-//  "ihtRadio" should {
-//    val formatter = ihtRadio("no-selection", ListMap("a"->"a"))
-//    "Return a formatter which responds suitably to no item being selected" in {
-//      formatter.bind("radiokey", Map( "option1"->"option1" ))
-//        .left.get.contains(FormError("radiokey", "no-selection")) shouldBe true
-//    }
-//
-//  }
 
   "amlsMandatoryEmailWithDomain" must {
     "return the email if the email format is correct" in {
@@ -230,7 +158,5 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
       isErrorMessageKeyEqual(formatter.bind(Map("" -> "@aaa.com.uk@467")), "invalid value") shouldBe true
     }
   }
-
-
 
 }
