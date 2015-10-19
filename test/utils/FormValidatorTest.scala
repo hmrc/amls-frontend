@@ -5,29 +5,21 @@ import uk.gov.hmrc.play.test.UnitSpec
 import play.api.data.FormError
 import utils.TestHelper._
 import FormValidator._
+import org.joda.time.LocalDate
 
 
 
 class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp {
-//  "isNotFutureDate" must {
-//    "return false the date is later than current date" in {
-//      val testDate = LocalDate.now().plusDays(1)
-//      val result = FormValidator.isNotFutureDate(testDate)
-//      result should be(false)
-//    }
-//
-//    "return true the date is equal to current date" in {
-//      val testDate = LocalDate.now()
-//      val result = FormValidator.isNotFutureDate(testDate)
-//      result should be(true)
-//    }
-//
-//    "return true the date is earlier than current date" in {
-//      val testDate = LocalDate.now().minusDays(1)
-//      val result = FormValidator.isNotFutureDate(testDate)
-//      result should be(true)
-//    }
-//  }
+  "isNotFutureDate" must {
+    "return false if the date is later than current date" in {
+      FormValidator.isNotFutureDate(LocalDate.now().plusDays(1)) shouldBe false
+    }
+
+    "return true if the date is equal to or earlier than the current date" in {
+      FormValidator.isNotFutureDate(LocalDate.now()) shouldBe true
+      FormValidator.isNotFutureDate(LocalDate.now().minusDays(1)) shouldBe true
+    }
+  }
 //
 //  "validateCountryCode" must {
 //    "reject an invalid country code" in {

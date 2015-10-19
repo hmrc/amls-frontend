@@ -97,6 +97,10 @@ trait FormValidator {
                             invalidValueMessageKey: String) =
     Forms.of[String](mandatoryPhoneNumberFormatter(blankValueMessageKey, invalidLengthMessageKey, invalidValueMessageKey))
 
+  def isNotFutureDate = {
+    date: LocalDate => !date.isAfter(LocalDate.now())
+  }
+
 }
 
 object FormValidator extends FormValidator
