@@ -10,11 +10,6 @@ object AmlsPropertiesReader {
   val propertyResource = {
     try {
       new PropertyResourceBundle(value)
-    } catch {
-      case e:Exception => {
-        println("\n********************" + e.getMessage + "\n")
-        throw(e)
-      }
     } finally {
       value.close()
     }
