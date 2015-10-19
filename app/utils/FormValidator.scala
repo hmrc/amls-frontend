@@ -3,8 +3,6 @@ package utils
 import org.joda.time.LocalDate
 import play.api.data.Forms._
 import play.api.data.validation._
-import play.api.data.{FormError, Forms}
-import play.api.data.format.Formatter
 import uk.gov.hmrc.play.validators.Validators._
 import play.api.data.Mapping
 import config.AmlsPropertiesReader._
@@ -37,27 +35,27 @@ trait FormValidator {
     }
   }
 
-  def ihtMandatoryEmailWithDomain(blankValueMessageKey: String, invalidValueMessageKey: String) : Mapping[String] = {
+  def containsValidPostCodeCharacters(value: String): Boolean =
+    postCodeFormat.r.findFirstIn(value).isDefined
+
+
+  def amlsIsPostcodeLengthValid(value: String) = {
+    value.length <=getProperty("validationMaxLengthPostcode").trim.toInt && isPostcodeLengthValid(value)
+  }
+  
+  def amlsMandatoryEmailWithDomain(blankValueMessageKey: String, invalidLengthMessageKey: String, invalidValueMessageKey: String) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {
       t:String => t match {
         case t if t.length == 0 => Invalid(blankValueMessageKey)
-        case t if t.length > getProperty("validationMaxLengthEmail").toInt => Invalid(invalidValueMessageKey)
+        case t if t.length > getProperty("validationMaxLengthEmail").toInt => Invalid(invalidLengthMessageKey)
         case _ => Valid
       }
     } )
-    text.verifying(stopOnFirstFail(blankConstraint, ihtEmailWithDomain(invalidValueMessageKey)))
-  }
-
-  def containsValidPostCodeCharacters(value: String): Boolean =
-    !postCodeFormat.r.findFirstIn(value).isEmpty
-
-
-  def ihtIsPostcodeLengthValid(value: String) = {
-    value.length <=getProperty("validationMaxLengthPostcode").trim.toInt && isPostcodeLengthValid(value)
+    text.verifying(stopOnFirstFail(blankConstraint, amlsEmailWithDomain(invalidValueMessageKey)))
   }
 
   //Play email enables 'a@a', this requires 'a@a.com'
-  def ihtEmailWithDomain(errorMessageKeyInvalidFormat:String = "error.email") =
+  def amlsEmailWithDomain(errorMessageKeyInvalidFormat:String = "error.email") =
     Constraints.pattern(emailFormat.r, "constraint.email", errorMessageKeyInvalidFormat)
 
 }

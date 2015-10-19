@@ -2,6 +2,7 @@ package utils
 
 import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.play.test.UnitSpec
+import play.api.data.FormError
 
 
 
@@ -216,4 +217,27 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
 //
 //  }
 
+  "amlsMandatoryEmailWithDomain" must {
+
+    "return the email if the email format is correct" in {
+      val formatter = FormValidator.amlsMandatoryEmailWithDomain("blank message", "invalid length", "invalid value")
+
+      formatter.bind(Map("" -> "aaaa@aaa.com")) shouldBe Right("aaaa@aaa.com")
+    }
+
+    "return a form error if the email format is incorrect" in {
+      val formatter = FormValidator.amlsMandatoryEmailWithDomain("blank message", "invalid length", "invalid value")
+
+      val result = formatter.bind(Map("" -> "@aaa.com.uk@467"))
+
+      val ff = result match {
+        case Left(_) => true
+        case _ => false
+      }
+
+      ff shouldBe (true)
+
+    }
+
+  }
 }
