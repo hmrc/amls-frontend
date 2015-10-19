@@ -44,7 +44,7 @@ trait MicroService {
     import scoverage.ScoverageSbtPlugin._
     instrumentSettings ++ Seq(
       // Semicolon-separated list of regexs matching classes to exclude
-      ScoverageKeys.excludedPackages in ScoverageCompile := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*;models.*;forms.*;config.*;.*BuildInfo.*;prod.Routes;app.Routes;testOnlyDoNotUseInAppConf.Routes;connectors.*;",
+      ScoverageKeys.excludedPackages in ScoverageCompile := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*;models.*;forms.*;config.*;.*BuildInfo.*;prod.Routes;app.Routes;testOnlyDoNotUseInAppConf.Routes;",
       ScoverageKeys.minimumCoverage := 80,
       ScoverageKeys.failOnMinimumCoverage := false,
       ScoverageKeys.highlighting := true,
