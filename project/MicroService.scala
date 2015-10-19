@@ -1,7 +1,7 @@
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
-import scoverage.ScoverageSbtPlugin._
+import scoverage.ScoverageSbtPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import wartremover._
 
@@ -41,12 +41,14 @@ trait MicroService {
 
 
   lazy val scoverageSettings = {
-    Seq(
-      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;app.*;prod.*;testOnlyDoNotUseInAppConf.*;.*AuthService.*;models/.data/..*;view.*;config.*;uk.gov.hmrc.*;",
-      ScoverageKeys.coverageMinimum := 80,
-      ScoverageKeys.coverageFailOnMinimum := false,
-      ScoverageKeys.coverageHighlighting := true,
-      parallelExecution in Test := false
+    import scoverage.ScoverageSbtPlugin._
+    instrumentSettings ++ Seq(
+      // Semicolon-separated list of regexs matching classes to exclude
+      ScoverageKeys.excludedPackages in ScoverageCompile := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;iht.view.*;iht.models.*;iht.forms.*;iht.config.*;iht.constants.*;.*BuildInfo.*;prod.Routes;app.Routes;testOnlyDoNotUseInAppConf.Routes;iht.connector.*;iht.controllers.wraith.*;iht.controllers.testonly.*;wraith.Routes;taxreturn.Routes;iht.auth.*;iht.controllers.auth.*",
+      ScoverageKeys.minimumCoverage := 80,
+      ScoverageKeys.failOnMinimumCoverage := false,
+      ScoverageKeys.highlighting := true,
+      parallelExecution in ScoverageTest := false
     )
   }
 

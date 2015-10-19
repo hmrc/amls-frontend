@@ -116,7 +116,9 @@ trait DateTuple {
                          invalidNumberTooHighMessageKey: String = "error.invalid.date.format"): Mapping[LocalDate]
   = dateTuple(true,blankValueMessageKey, invalidValueMessageKey, invalidNumberTooHighMessageKey)
     .verifying(blankValueMessageKey,
-      data => data.isDefined).transform(o => o.get, v => Option(v))
+      data => data.isDefined).transform(o =>
+        o.fold(LocalDate.now()) {x=>x},
+        v => Option(v))
 
   def dateTuple(validate: Boolean = true,
                 invalidEmptyMessageKey: String = "error.invalid.date.format",
@@ -149,15 +151,4 @@ trait DateTuple {
     case _ => (None, None, None)
   }
   )
-}
-
-object DateFields {
-  val day = "day"
-  val month = "month"
-  val year = "year"
-}
-
-object DateFormatSymbols {
-  val months = new JDateFormatSymbols().getMonths
-  val monthsWithIndexes = months.zipWithIndex.take(12).map{case (s, i) => ((i + 1).toString, s)}.toSeq
 }
