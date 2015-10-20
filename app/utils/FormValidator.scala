@@ -13,10 +13,10 @@ trait FormValidator {
   import play.api.data.Forms
   import play.api.data.format.Formatter
 
-  val ninoRegex = """^$|^[A-Z,a-z]{2}[0-9]{6}[A-D,a-d]{1}$"""
-  val emailFormat = """(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"""
-  val postCodeFormat = "(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))"
-  val phoneNoFormat = "^[A-Z0-9 \\)\\/\\(\\-\\*#]{1,27}$"
+  val ninoRegex = """^$|^[A-Z,a-z]{2}[0-9]{6}[A-D,a-d]{1}$""".r
+  val emailFormat = """(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?""".r
+  val postCodeFormat = "(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))".r
+  val phoneNoFormat = "^[A-Z0-9 \\)\\/\\(\\-\\*#]{1,27}$".r
 
   def stopOnFirstFail[T](constraints: Constraint[T]*) = Constraint { field: T =>
     constraints.toList dropWhile (_(field) == Valid) match {
@@ -50,7 +50,7 @@ trait FormValidator {
 
     val valueConstraint = Constraint("Value")( {
       t:String => t match {
-        case t if t.replaceAll("\\s", "").matches(ninoRegex) => Valid
+        case t if t.replaceAll("\\s", "").matches(ninoRegex.regex) => Valid
         case _ => Invalid(invalidValueMessageKey)
       }
     } )
@@ -70,7 +70,15 @@ trait FormValidator {
   }
 
   def emailWithDomain(errorMessageKeyInvalidFormat:String = "error.email") =
-    Constraints.pattern(emailFormat.r, "constraint.email", errorMessageKeyInvalidFormat)
+    Constraints.pattern(emailFormat, "constraint.email", errorMessageKeyInvalidFormat)
+
+
+  private def validatePhoneNumber = {
+    s: String => phoneNoFormat.findFirstIn(s) match {
+      case Some(x) => true
+      case None => false
+    }
+  }
 
   def mandatoryPhoneNumber( blankValueMessageKey: String,
                             invalidLengthMessageKey: String,
@@ -105,17 +113,9 @@ trait FormValidator {
     override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
   }
 
-  private def validatePhoneNumber = {
-    s: String => phoneNoFormat.r.findFirstIn(s) match {
-      case Some(x) => true
-      case None => false
-    }
-  }
-
   def isNotFutureDate = {
     date: LocalDate => !date.isAfter(LocalDate.now())
   }
-
 
   private def getAddrDetails(data: Map[String, String],
                              addr1Key: String,
@@ -141,9 +141,6 @@ trait FormValidator {
     }
   }
 
-  private def containsValidPostCodeCharacters(value: String): Boolean =
-    !postCodeFormat.r.findFirstIn(value).isEmpty
-
   private def ihtIsPostcodeLengthValid(value: String) = {
     value.length <=getProperty("validationMaxLengthPostcode").trim.toInt && isPostcodeLengthValid(value)
   }
@@ -164,7 +161,7 @@ trait FormValidator {
                                errors: scala.collection.mutable.ListBuffer[FormError]) = {
     postcode match {
       case a if a.length == 0 => errors += FormError(postcodeKey, blankPostcodeMessageKey)
-      case a if a.length > 0 && !containsValidPostCodeCharacters(a) =>
+      case a if a.length > 0 &&  postCodeFormat.findFirstIn(a).isEmpty =>
         errors +=FormError(postcodeKey, invalidPostcodeMessageKey)
       case a if a.length > 0 && !ihtIsPostcodeLengthValid(a) =>
         errors += FormError(postcodeKey, invalidPostcodeMessageKey)
