@@ -26,21 +26,21 @@ class DateTupleTest extends WordSpec with Matchers {
     def assertError(dateFields: Map[String, String]) {
       val result = dateTuple.bind(dateFields)
       result.isLeft shouldBe true
-      result.left.get shouldBe Seq(FormError("", "error.invalid.date.format"))
+      result.left.getOrElse(Nil) shouldBe Seq(FormError("", "error.invalid.date.format"))
     }
 
     "create a mapping for a valid date" in {
       val dateFields = Map(day -> "1", month -> "2", year -> "2014")
       val result = dateTuple.bind(dateFields)
       result.isRight shouldBe true
-      result.right.get shouldBe Some(new LocalDate(2014, 2, 1))
+      result.right.getOrElse(None) shouldBe Some(new LocalDate(2014, 2, 1))
     }
 
     "return None when all the fields are empty" in {
       val dateFields = Map(day -> "", month -> "", year -> "")
       val result = dateTuple.bind(dateFields)
       result.isRight shouldBe true
-      result.right.get shouldBe None
+      result.right.getOrElse(None) shouldBe None
     }
 
     "return a validation error for invalid date with characters" in {
@@ -71,7 +71,7 @@ class DateTupleTest extends WordSpec with Matchers {
       val dateFields = Map(day -> "1 ", month -> "2 ", year -> "2014")
       val result = dateTuple.bind(dateFields)
       result.isRight shouldBe true
-      result.right.get shouldBe Some(new LocalDate(2014, 2, 1))
+      result.right.getOrElse(None) shouldBe Some(new LocalDate(2014, 2, 1))
     }
   }
 }
