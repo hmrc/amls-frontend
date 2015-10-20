@@ -6,7 +6,7 @@ import play.api.data.validation._
 import play.api.data.Mapping
 import config.AmlsPropertiesReader._
 import play.api.data.FormError
-
+import uk.gov.hmrc.play.validators.Validators.isPostcodeLengthValid
 
 trait FormValidator {
 
@@ -37,13 +37,6 @@ trait FormValidator {
 
     text.verifying(constraint)
   }
-
-//  def containsValidPostCodeCharacters(value: String): Boolean =
-//    postCodeFormat.r.findFirstIn(value).isDefined
-
-  //  def amlsIsPostcodeLengthValid(value: String) = {
-  //    value.length <=getProperty("validationMaxLengthPostcode").trim.toInt && isPostcodeLengthValid(value)
-  //  }
 
   def mandatoryNino(blankValueMessageKey: String, invalidLengthMessageKey: String, invalidValueMessageKey: String) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {
@@ -122,6 +115,116 @@ trait FormValidator {
   def isNotFutureDate = {
     date: LocalDate => !date.isAfter(LocalDate.now())
   }
+
+
+  private def getAddrDetails(data: Map[String, String],
+                             addr1Key: String,
+                             addr2Key: String,
+                             addr3Key:String,
+                             addr4Key:String,
+                             postcodeKey:String,
+                             countryCodeKey: String) = {
+    (data.getOrElse(addr1Key, ""),
+      data.getOrElse(addr2Key, ""),
+      data.getOrElse(addr3Key, ""),
+      data.getOrElse(addr4Key, ""),
+      data.getOrElse(postcodeKey, ""),
+      data.getOrElse(countryCodeKey, ""))
+  }
+
+  private def validateOptionalAddressLine(addrKey:String, addr:String, maxLength:Int,
+                                          invalidAddressLineMessageKey:String,
+                                          errors: scala.collection.mutable.ListBuffer[FormError] ): Unit = {
+    addr match {
+      case a if a.length > maxLength => errors += FormError(addrKey, invalidAddressLineMessageKey)
+      case _ => {}
+    }
+  }
+
+  private def containsValidPostCodeCharacters(value: String): Boolean =
+    !postCodeFormat.r.findFirstIn(value).isEmpty
+
+  private def ihtIsPostcodeLengthValid(value: String) = {
+    value.length <=getProperty("validationMaxLengthPostcode").trim.toInt && isPostcodeLengthValid(value)
+  }
+
+  private def validateMandatoryAddressLine(addrKey:String, addr:String, maxLength:Int,
+                                           blankMessageKey:String,
+                                           invalidAddressLineMessageKey: String,
+                                           errors: scala.collection.mutable.ListBuffer[FormError]): Unit = {
+    addr match {
+      case a if a.length == 0 => errors += FormError(addrKey, blankMessageKey)
+      case a if a.length > maxLength => errors += FormError(addrKey, invalidAddressLineMessageKey)
+      case _ => {}
+    }
+  }
+
+  private def validatePostcode(postcode:String, postcodeKey: String, blankPostcodeMessageKey: String,
+                               invalidPostcodeMessageKey: String,
+                               errors: scala.collection.mutable.ListBuffer[FormError]) = {
+    postcode match {
+      case a if a.length == 0 => errors += FormError(postcodeKey, blankPostcodeMessageKey)
+      case a if a.length > 0 && !containsValidPostCodeCharacters(a) =>
+        errors +=FormError(postcodeKey, invalidPostcodeMessageKey)
+      case a if a.length > 0 && !ihtIsPostcodeLengthValid(a) =>
+        errors += FormError(postcodeKey, invalidPostcodeMessageKey)
+      case _ => {}
+    }
+  }
+
+  def addressFormatter(addr2Key: String, addr3Key:String, addr4Key:String,
+                 postcodeKey:String, countryCodeKey: String, allLinesBlankMessageKey:String,
+                 blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
+                 blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
+                 blankCountryCode: String,
+                 blankBothFirstTwoAddrLinesMessageKey: Option[String] = None) = new Formatter[String] {
+    override def bind(key: String, data: Map[String, String]) = {
+      val errors = new scala.collection.mutable.ListBuffer[FormError]()
+      val addr = getAddrDetails(data, key, addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey)
+
+      if (addr._1.length == 0 && addr._2.length == 0) {
+        errors += FormError(key, allLinesBlankMessageKey)
+        errors += FormError(addr2Key, "")
+      } else if (blankBothFirstTwoAddrLinesMessageKey.isDefined &&
+        addr._1.length==0 && addr._2.length==0) {
+        errors += FormError(key, blankBothFirstTwoAddrLinesMessageKey.getOrElse(""))
+        errors += FormError(addr2Key, "")
+      } else {
+        validateMandatoryAddressLine(key, addr._1,
+          getProperty("validationMaxLengthAddresslines").trim.toInt, blankFirstTwoAddrLinesMessageKey,
+          invalidAddressLineMessageKey, errors)
+        validateMandatoryAddressLine(addr2Key, addr._2,
+          getProperty("validationMaxLengthAddresslines").trim.toInt, blankFirstTwoAddrLinesMessageKey,
+          invalidAddressLineMessageKey, errors)
+        validateOptionalAddressLine(addr3Key, addr._3,
+          getProperty("validationMaxLengthAddresslines").trim.toInt, invalidAddressLineMessageKey, errors)
+        validateOptionalAddressLine(addr4Key, addr._4,
+          getProperty("validationMaxLengthAddresslines").trim.toInt, invalidAddressLineMessageKey, errors)
+      }
+      if (addr._6.length==0 || addr._6 == getProperty("ukIsoCountryCode")) {
+        validatePostcode(addr._5, postcodeKey, blankPostcodeMessageKey, invalidPostcodeMessageKey, errors)
+      }
+      if (errors.isEmpty) {
+        Right(addr._1)
+      } else {
+        Left(errors.toList)
+      }
+    }
+
+    override def unbind(key: String, value: String): Map[String, String] = {
+      Map(key -> value.toString)
+    }
+  }
+
+  def address( addr2Key: String, addr3Key:String, addr4Key:String,
+               postcodeKey:String, countryCodeKey: String, allLinesBlankMessageKey:String,
+               blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
+               blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
+               blankCountryCode: String,
+               blankBothFirstTwoAddrLinesMessageKey: Option[String]) =
+    Forms.of(addressFormatter(addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey,
+      allLinesBlankMessageKey, blankFirstTwoAddrLinesMessageKey, invalidAddressLineMessageKey,
+      blankPostcodeMessageKey, invalidPostcodeMessageKey, blankCountryCode, blankBothFirstTwoAddrLinesMessageKey))
 }
 
 object FormValidator extends FormValidator

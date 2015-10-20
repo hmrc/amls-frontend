@@ -65,82 +65,6 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
       formatter.bind("a", Map("a" -> "019122244+55 ext 5544")) shouldBe Left(Seq(FormError("a", "invalid value")))
     }
   }
-//
-//  "ihtAddress" should {
-//
-//    val allBlank = Map(
-//      "addr1key"->"",
-//      "addr2key"->"",
-//      "addr3key"->"",
-//      "addr4key"->"",
-//      "postcodekey"->"",
-//      "countrycodekey"->""
-//    )
-//
-//    val first2Blank = Map(
-//      "addr1key"->"",
-//      "addr2key"->"",
-//      "postcodekey"->"CA3 9SD",
-//      "countrycodekey"->"GB"
-//    )
-//
-//    val invalidLine2 = Map(
-//      "addr1key"->"addr1",
-//      "addr2key"->"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-//      "addr3key"->"addr3",
-//      "addr4key"->"addr4",
-//      "postcodekey"->"pcode",
-//      "countrycodekey"->"GB"
-//    )
-//
-//    val blankPostcode = Map(
-//      "addr1key"->"addr1",
-//      "addr2key"->"addr2",
-//      "addr3key"->"addr3",
-//      "addr4key"->"addr4",
-//      "postcodekey"->"",
-//      "countrycodekey"->"GB"
-//    )
-//
-//    val invalidPostcode = Map(
-//      "addr1key"->"addr1",
-//      "addr2key"->"addr2",
-//      "addr3key"->"addr3",
-//      "addr4key"->"addr4",
-//      "postcodekey"->"CC!",
-//      "countrycodekey"->"GB"
-//    )
-//
-//    val allowedBlankPostcode = Map(
-//      "addr1key"->"addr1",
-//      "addr2key"->"addr2",
-//      "addr3key"->"addr3",
-//      "addr4key"->"addr4",
-//      "postcodekey"->"",
-//      "countrycodekey"->"IL"
-//    )
-//
-//    val formatter = ihtAddress("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-//      "all-lines-blank","first-two-blank","invalid-line","blank-postcode","invalid-postcode", "blankcountrycode")
-//
-//    "Return a formatter which responds suitably to all lines being blank" in {
-//      formatter.bind("", allBlank).left.get.contains(FormError("", "all-lines-blank")) shouldBe true
-//    }
-//
-//    "Return a formatter which responds suitably to first two lines being blank" in {
-//      formatter.bind("", first2Blank).left.get.contains(FormError("", "all-lines-blank")) shouldBe true
-//    }
-//    "Return a formatter which responds suitably to invalid lines" in {
-//      formatter.bind("", invalidLine2).left.get.contains(FormError("addr2key", "invalid-line")) shouldBe true
-//    }
-//    "Return a formatter which responds suitably to blank postcode" in {
-//      formatter.bind("", blankPostcode).left.get.contains(FormError("postcodekey", "blank-postcode")) shouldBe true
-//    }
-//    "Return a formatter which responds suitably to invalid postcode" in {
-//      formatter.bind("", invalidPostcode).left.get.contains(FormError("postcodekey", "invalid-postcode")) shouldBe true
-//    }
-//  }
-//
 
   "amlsMandatoryEmailWithDomain" must {
     "return the email if the email format is correct" in {
@@ -156,6 +80,71 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
       isErrorMessageKeyEqual(formatter.bind(Map("" -> "")), "blank message") shouldBe true
       isErrorMessageKeyEqual(formatter.bind(Map("" -> "a" * 250)), "invalid length") shouldBe true
       isErrorMessageKeyEqual(formatter.bind(Map("" -> "@aaa.com.uk@467")), "invalid value") shouldBe true
+    }
+  }
+
+  "address" should {
+    val allBlank = Map(
+      "addr1key"->"",
+      "addr2key"->"",
+      "addr3key"->"",
+      "addr4key"->"",
+      "postcodekey"->"",
+      "countrycodekey"->""
+    )
+
+    val first2Blank = Map(
+      "addr1key"->"",
+      "addr2key"->"",
+      "postcodekey"->"CA3 9SD",
+      "countrycodekey"->"GB"
+    )
+
+    val invalidLine2 = Map(
+      "addr1key"->"addr1",
+      "addr2key"->"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "addr3key"->"addr3",
+      "addr4key"->"addr4",
+      "postcodekey"->"pcode",
+      "countrycodekey"->"GB"
+    )
+
+    val blankPostcode = Map(
+      "addr1key"->"addr1",
+      "addr2key"->"addr2",
+      "addr3key"->"addr3",
+      "addr4key"->"addr4",
+      "postcodekey"->"",
+      "countrycodekey"->"GB"
+    )
+
+    val invalidPostcode = Map(
+      "addr1key"->"addr1",
+      "addr2key"->"addr2",
+      "addr3key"->"addr3",
+      "addr4key"->"addr4",
+      "postcodekey"->"CC!",
+      "countrycodekey"->"GB"
+    )
+
+    val formatter = addressFormatter("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
+      "all-lines-blank","first-two-blank","invalid-line","blank-postcode","invalid-postcode", "blankcountrycode")
+
+    "Return a formatter which responds suitably to all lines being blank" in {
+      formatter.bind("", allBlank).left.getOrElse(Nil).contains(FormError("", "all-lines-blank")) shouldBe true
+    }
+
+    "Return a formatter which responds suitably to first two lines being blank" in {
+      formatter.bind("", first2Blank).left.getOrElse(Nil).contains(FormError("", "all-lines-blank")) shouldBe true
+    }
+    "Return a formatter which responds suitably to invalid lines" in {
+      formatter.bind("", invalidLine2).left.getOrElse(Nil).contains(FormError("addr2key", "invalid-line")) shouldBe true
+    }
+    "Return a formatter which responds suitably to blank postcode" in {
+      formatter.bind("", blankPostcode).left.getOrElse(Nil).contains(FormError("postcodekey", "blank-postcode")) shouldBe true
+    }
+    "Return a formatter which responds suitably to invalid postcode" in {
+      formatter.bind("", invalidPostcode).left.getOrElse(Nil).contains(FormError("postcodekey", "invalid-postcode")) shouldBe true
     }
   }
 
