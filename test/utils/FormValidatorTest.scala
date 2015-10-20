@@ -84,15 +84,6 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
   }
 
   "address" should {
-    val allBlank = Map(
-      "addr1key"->"",
-      "addr2key"->"",
-      "addr3key"->"",
-      "addr4key"->"",
-      "postcodekey"->"",
-      "countrycodekey"->""
-    )
-
     val first2Blank = Map(
       "addr1key"->"",
       "addr2key"->"",
@@ -128,14 +119,10 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
     )
 
     val formatter = addressFormatter("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-      "all-lines-blank","first-two-blank","invalid-line","blank-postcode","invalid-postcode", "blankcountrycode")
-
-    "Return a formatter which responds suitably to all lines being blank" in {
-      formatter.bind("", allBlank).left.getOrElse(Nil).contains(FormError("", "all-lines-blank")) shouldBe true
-    }
+      "first-two-blank","invalid-line","blank-postcode","invalid-postcode")
 
     "Return a formatter which responds suitably to first two lines being blank" in {
-      formatter.bind("", first2Blank).left.getOrElse(Nil).contains(FormError("", "all-lines-blank")) shouldBe true
+      formatter.bind("", first2Blank).left.getOrElse(Nil).contains(FormError("", "first-two-blank")) shouldBe true
     }
     "Return a formatter which responds suitably to invalid lines" in {
       formatter.bind("", invalidLine2).left.getOrElse(Nil).contains(FormError("addr2key", "invalid-line")) shouldBe true

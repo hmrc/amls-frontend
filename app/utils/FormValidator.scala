@@ -172,20 +172,34 @@ trait FormValidator {
     }
   }
 
+  /**
+   *
+   * @param addr2Key
+   * @param addr3Key
+   * @param addr4Key
+   * @param postcodeKey
+   * @param countryCodeKey
+   *
+   * @param blankFirstTwoAddrLinesMessageKey Error displayed against either of first two address lines when blank.
+   * @param invalidAddressLineMessageKey Error displayed when address line is invalid, i.e. greater than the max
+   *                                     permissable length.
+   * @param blankPostcodeMessageKey Error displayed when post code is blank.
+   * @param invalidPostcodeMessageKey Error displayed when post code is invalid, i.e. greater than the max
+   *                                  permissable length or contains invalid character.
+   * @param blankBothFirstTwoAddrLinesMessageKey Displayed against first address line if both of the
+   *                                             first two address lines are blank
+   * @return
+   */
   def addressFormatter(addr2Key: String, addr3Key:String, addr4Key:String,
-                 postcodeKey:String, countryCodeKey: String, allLinesBlankMessageKey:String,
+                 postcodeKey:String, countryCodeKey: String,
                  blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
                  blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
-                 blankCountryCode: String,
                  blankBothFirstTwoAddrLinesMessageKey: Option[String] = None) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]) = {
       val errors = new scala.collection.mutable.ListBuffer[FormError]()
       val addr = getAddrDetails(data, key, addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey)
 
-      if (addr._1.length == 0 && addr._2.length == 0) {
-        errors += FormError(key, allLinesBlankMessageKey)
-        errors += FormError(addr2Key, "")
-      } else if (blankBothFirstTwoAddrLinesMessageKey.isDefined &&
+      if (blankBothFirstTwoAddrLinesMessageKey.isDefined &&
         addr._1.length==0 && addr._2.length==0) {
         errors += FormError(key, blankBothFirstTwoAddrLinesMessageKey.getOrElse(""))
         errors += FormError(addr2Key, "")
@@ -217,14 +231,13 @@ trait FormValidator {
   }
 
   def address( addr2Key: String, addr3Key:String, addr4Key:String,
-               postcodeKey:String, countryCodeKey: String, allLinesBlankMessageKey:String,
+               postcodeKey:String, countryCodeKey: String,
                blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
                blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
-               blankCountryCode: String,
-               blankBothFirstTwoAddrLinesMessageKey: Option[String]) =
+               blankBothFirstTwoAddrLinesMessageKey: Option[String] = None) =
     Forms.of(addressFormatter(addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey,
-      allLinesBlankMessageKey, blankFirstTwoAddrLinesMessageKey, invalidAddressLineMessageKey,
-      blankPostcodeMessageKey, invalidPostcodeMessageKey, blankCountryCode, blankBothFirstTwoAddrLinesMessageKey))
+      blankFirstTwoAddrLinesMessageKey, invalidAddressLineMessageKey,
+      blankPostcodeMessageKey, invalidPostcodeMessageKey, blankBothFirstTwoAddrLinesMessageKey))
 }
 
 object FormValidator extends FormValidator
