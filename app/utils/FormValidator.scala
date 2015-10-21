@@ -12,21 +12,15 @@ import scala.collection.mutable.ListBuffer
 
 trait FormValidator {
   private lazy val ninoRegex = """^$|^[A-Z,a-z]{2}[0-9]{6}[A-D,a-d]{1}$""".r
-  private lazy val emailFormat = """(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?""".r
-  private lazy val postCodeFormat = "(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))".r
-  private lazy val phoneNoFormat = "^[A-Z0-9 \\)\\/\\(\\-\\*#]{1,27}$".r
-  private lazy val moneyFormatSimple = """^(\d{1,11}+)$""".r
-  private lazy val sortCodePattern = """^\d{2}(-|\s*)?\d{2}\1\d{2}$""".r
-  private lazy val accountNumberPattern = """^(\d){8}$""".r
-  private lazy val ibanPattern = """^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{11,30}$""".r
+  private lazy val emailRegex = """(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?""".r
+  private lazy val postCodeRegex = "(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))".r
+  private lazy val phoneNoRegex = "^[A-Z0-9 \\)\\/\\(\\-\\*#]{1,27}$".r
+  private lazy val currencyRegex = """^(\d{1,11}+)$""".r
+  private lazy val sortCodeRegex = """^\d{2}(-|\s*)?\d{2}\1\d{2}$""".r
+  private lazy val accountNumberRegex = """^(\d){8}$""".r
+  private lazy val ibanRegex = """^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{11,30}$""".r
 
-  /**
-   * Creates a new Constraint object which evaluates each specified Constraint against
-   * a field value in order until one fails.
-   * @param constraints Any number of Constraint objects.
-   * @tparam T The field type.
-   * @return A new constraint.
-   */
+
   def stopOnFirstFail[T](constraints: Constraint[T]*) = Constraint { field: T =>
     constraints.toList dropWhile (_(field) == Valid) match {
       case Nil => Valid
@@ -78,22 +72,6 @@ trait FormValidator {
     Forms.of[String](mandatoryNinoFormatter(blankValueMessageKey,
       invalidLengthMessageKey, invalidValueMessageKey))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   def mandatoryEmail(blankValueMessageKey: String, invalidLengthMessageKey: String,
                      invalidValueMessageKey: String) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {
@@ -107,7 +85,7 @@ trait FormValidator {
 
     val valueConstraint = Constraint("Value")( {
       t:String => t match {
-        case t if t.matches(emailFormat.regex) => Valid
+        case t if t.matches(emailRegex.regex) => Valid
         case _ => Invalid(invalidValueMessageKey)
       }
     } )
@@ -128,7 +106,7 @@ trait FormValidator {
               if (num.length > getProperty("validationMaxLengthPhoneNo").toInt) {
                 Left(Seq(FormError(key, invalidLengthMessageKey)))
               } else {
-                phoneNoFormat.findFirstIn(num) match {
+                phoneNoRegex.findFirstIn(num) match {
                   case None => Left(Seq(FormError(key, invalidValueMessageKey)))
                   case _ => Right(num)
                 }
@@ -148,19 +126,13 @@ trait FormValidator {
     Forms.of[String](mandatoryPhoneNumberFormatter(blankValueMessageKey,
       invalidLengthMessageKey, invalidValueMessageKey))
 
-  private def getAddrDetails(data: Map[String, String],
-                             addr1Key: String,
-                             addr2Key: String,
-                             addr3Key:String,
-                             addr4Key:String,
-                             postcodeKey:String,
+  private def getAddrDetails(data: Map[String, String], addr1Key: String,
+                             addr2Key: String, addr3Key:String,
+                             addr4Key:String, postcodeKey:String,
                              countryCodeKey: String) = {
-    (data.getOrElse(addr1Key, ""),
-      data.getOrElse(addr2Key, ""),
-      data.getOrElse(addr3Key, ""),
-      data.getOrElse(addr4Key, ""),
-      data.getOrElse(postcodeKey, ""),
-      data.getOrElse(countryCodeKey, ""))
+    (data.getOrElse(addr1Key, ""), data.getOrElse(addr2Key, ""),
+      data.getOrElse(addr3Key, ""), data.getOrElse(addr4Key, ""),
+      data.getOrElse(postcodeKey, ""), data.getOrElse(countryCodeKey, ""))
   }
 
   private def validateOptionalAddressLine(addrKey:String, addr:String, maxLength:Int,
@@ -189,7 +161,7 @@ trait FormValidator {
                                errors: ListBuffer[FormError]) = {
     postcode match {
       case a if a.length == 0 => errors += FormError(postcodeKey, blankPostcodeMessageKey)
-      case a if a.length > 0 &&  postCodeFormat.findFirstIn(a).isEmpty =>
+      case a if a.length > 0 &&  postCodeRegex.findFirstIn(a).isEmpty =>
         errors +=FormError(postcodeKey, invalidPostcodeMessageKey)
       case a if !isPostcodeLengthValid(a) =>
         errors += FormError(postcodeKey, invalidPostcodeMessageKey)
@@ -239,11 +211,6 @@ trait FormValidator {
 
   /**
    * @param blankFirstTwoAddrLinesMessageKey Error displayed against either of first two address lines when blank.
-   * @param invalidAddressLineMessageKey Error displayed when address line is invalid, i.e. greater than the max
-   *                                     permissable length.
-   * @param blankPostcodeMessageKey Error displayed when post code is blank.
-   * @param invalidPostcodeMessageKey Error displayed when post code is invalid, i.e. greater than the max
-   *                                  permissable length or contains invalid character.
    * @param blankBothFirstTwoAddrLinesMessageKey Displayed against first address line if both of the
    *                                             first two address lines are blank
    */
@@ -256,11 +223,10 @@ trait FormValidator {
       blankFirstTwoAddrLinesMessageKey, invalidAddressLineMessageKey,
       blankPostcodeMessageKey, invalidPostcodeMessageKey, blankBothFirstTwoAddrLinesMessageKey))
 
-
   private def cleanMoneyString(moneyString: String) =
-    moneyFormatSimple.findFirstIn(moneyString.replace(",","")).getOrElse("")
+    currencyRegex.findFirstIn(moneyString.replace(",","")).getOrElse("")
 
-  def optionalCurrencyFormatter(invalidFormatMessageKey: String) = new Formatter[Option[BigDecimal]] {
+  private def optionalCurrencyFormatter(invalidFormatMessageKey: String) = new Formatter[Option[BigDecimal]] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[BigDecimal]] = {
       data.get(key) match {
         case Some(num) => {
@@ -289,7 +255,7 @@ trait FormValidator {
     val constraint = Constraint("Blank and invalid")( {
       t: String => t match {
         case "" => Invalid(emptyMessageKey)
-        case x if !x.matches(accountNumberPattern.regex) => Invalid(invalidMessageKey)
+        case x if !x.matches(accountNumberRegex.regex) => Invalid(invalidMessageKey)
         case _ => Valid
       }
     } )
@@ -300,23 +266,36 @@ trait FormValidator {
     val constraint = Constraint("Blank and invalid")( {
       t: String => t match {
         case "" => Invalid(emptyMessageKey)
-        case x if !x.matches(sortCodePattern.regex) => Invalid(invalidMessageKey)
+        case x if !x.matches(sortCodeRegex.regex) => Invalid(invalidMessageKey)
         case _ => Valid
       }
     } )
     text.verifying(constraint)
   }
 
-  def mandatoryIban(emptyMessageKey: String, invalidMessageKey: String): Mapping[String] = {
-    val constraint = Constraint("Blank and invalid")( {
-      t: String => t.replaceAll(" ", "") match {
-        case "" => Invalid(emptyMessageKey)
-        case x if !x.matches(ibanPattern.regex) => Invalid(invalidMessageKey)
-        case _ => Valid
+  private def mandatoryIbanFormatter(blankValueMessageKey: String, invalidValueMessageKey: String) = new Formatter[String] {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
+      data.get(key) match {
+        case Some(n) =>
+          val s = n.trim.replaceAll(" ", "")
+          s match{
+            case p if p.length==0 => Left(Seq(FormError(key, blankValueMessageKey)))
+            case num => {
+              ibanRegex.findFirstIn(num) match {
+                case None => Left(Seq(FormError(key, invalidValueMessageKey)))
+                case _ => Right(num)
+              }
+            }
+          }
+        case _ => Left(Seq(FormError(key, "Nothing to validate")))
       }
-    } )
-    text.verifying(constraint)
+    }
+    override def unbind(key: String, value: String): Map[String, String] = Map(key -> value)
   }
+
+  def mandatoryIban(blankValueMessageKey: String, invalidValueMessageKey: String) =
+    Forms.of[String](mandatoryIbanFormatter(blankValueMessageKey, invalidValueMessageKey))
+
 }
 
 object FormValidator extends FormValidator

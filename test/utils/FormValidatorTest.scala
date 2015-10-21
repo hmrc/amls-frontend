@@ -199,15 +199,22 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
   "mandatoryIban" should {
     "return valid string if correct" in {
       mandatoryIban("blank message", "invalid message").bind(Map("" -> "AL47 2121 1009 0000 0002 3569 8741")) shouldBe
-        Right("AL47 2121 1009 0000 0002 3569 8741")
+        Right("AL47212110090000000235698741")
       mandatoryIban("blank message", "invalid message").bind(Map("" -> "DK50 0040 0440 1162 43")) shouldBe
-        Right("DK50 0040 0440 1162 43")
+        Right("DK5000400440116243")
       mandatoryIban("blank message", "invalid message").bind(Map("" -> "MT84 MALT 0110 0001 2345 MTLC AST0 01S")) shouldBe
-        Right("MT84 MALT 0110 0001 2345 MTLC AST0 01S")
+        Right("MT84MALT011000012345MTLCAST001S")
       mandatoryIban("blank message", "invalid message").bind(Map("" -> "SI56 1910 0000 0123 438")) shouldBe
-        Right("SI56 1910 0000 0123 438")
+        Right("SI56191000000123438")
       mandatoryIban("blank message", "invalid message").bind(Map("" -> "MT84 MALT 0110 0001 2345 MTLC AST0 01SS SS")) shouldBe
-        Right("MT84 MALT 0110 0001 2345 MTLC AST0 01SS SS")
+        Right("MT84MALT011000012345MTLCAST001SSSS")
+    }
+
+    "return valid string if correct and no spaces" in {
+      mandatoryIban("blank message", "invalid message").bind(Map("" -> "AL47212110090000000235698741")) shouldBe
+        Right("AL47212110090000000235698741")
+      mandatoryIban("blank message", "invalid message").bind(Map("" -> "DK5000400440116243")) shouldBe
+        Right("DK5000400440116243")
     }
 
     "report an invalid error" in {
