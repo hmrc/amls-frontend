@@ -5,6 +5,8 @@ import java.util.UUID
 import _root_.builders.AuthBuilder
 import _root_.builders.SessionBuilder
 import config.AMLSAuthConnector
+import connectors.DataCacheConnector
+import models.LoginDetails
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -16,6 +18,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AmlsService
+import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.{SessionKeys, HttpResponse}
 
@@ -28,12 +31,15 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
     "name" -> "test",
     "password" -> "password"
   )
+  val loginDtls: LoginDetails = LoginDetails("testuser", "password")
   val mockAmlsService = mock[AmlsService]
   val mockAuthConnector = mock[AuthConnector]
+  val mockDataCacheConnector = mock[DataCacheConnector]
 
   object MockAmlsController extends AmlsController {
     val authConnector = mockAuthConnector
     val amlsService: AmlsService = mockAmlsService
+    val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
 
   override def beforeEach(): Unit = {
@@ -49,13 +55,33 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
 
     "on load of page " must {
       "Authorised users" must {
-        "load the Sample Login page" in {
+        "must load the Sample Login page" in {
           getWithAuthorisedUser {
             result =>
               status(result) must be(OK)
               contentAsString(result) must include("name")
           }
         }
+
+        "should prepopulate Login page from save4Later" in {
+          getAuthorisedUserWithSave4Later {
+            result =>
+              status(result) must be(OK)
+              contentAsString(result) must include("testuser")
+          }
+        }
+
+        /*"should throw Exception" in {
+           {
+
+
+             val thrown =  intercept[RuntimeException]{getAuthorisedUserWithException {
+             result =>
+              }
+
+             }
+          }
+        }*/
       }
 
       "unauthorised users" must {
@@ -86,6 +112,7 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
             contentAsString(result) must include("foo")
           }
         }
+
         "fail test when Micro Service throws exception" in {
           val userId = s"user-${UUID.randomUUID}"
           implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
@@ -116,18 +143,36 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         val result = MockAmlsController.unauthorised().apply(FakeRequest())
         contentAsString(result) must include("Unauthorised")
       }
-
     }
+  }
 
+  def getAuthorisedUserWithSave4Later(test: Future[Result] => Any) {
+    val userId = s"user-${UUID.randomUUID}"
+    implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+    AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
+    val result = MockAmlsController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
+    test(result)
+  }
+
+  def getAuthorisedUserWithException(test: Future[Result] => Any) {
+    val userId = s"user-${UUID.randomUUID}"
+    implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+    AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.failed(new RuntimeException))
+    val result = MockAmlsController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
+    test(result)
   }
 
   def getWithAuthorisedUser(test: Future[Result] => Any) {
     val userId = s"user-${UUID.randomUUID}"
     implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
     AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
     val result = MockAmlsController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
     test(result)
   }
+
 
   def getWithUnAuthorisedUser(test: Future[Result] => Any) {
     val userId = s"user-${UUID.randomUUID}"
@@ -152,7 +197,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
       SessionKeys.userId -> userId)
     implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
     AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-    when(mockAmlsService.submitLoginDetails(Matchers.any())(Matchers.any(),Matchers.any())).thenReturn(Future.successful(HttpResponse(OK,
+    when(mockDataCacheConnector.saveDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
+    when(mockAmlsService.submitLoginDetails(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(HttpResponse(OK,
       Some(Json.parse( """{"foo":"bar"}""")))))
     val result = MockAmlsController.onSubmit.apply(session)
     test(result)
