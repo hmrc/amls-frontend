@@ -16,6 +16,9 @@ trait FormValidator {
   private lazy val postCodeFormat = "(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))".r
   private lazy val phoneNoFormat = "^[A-Z0-9 \\)\\/\\(\\-\\*#]{1,27}$".r
   private lazy val moneyFormatSimple = """^(\d{1,11}+)$""".r
+  private lazy val sortCodePattern = """^\d{2}(-|\s*)?\d{2}\1\d{2}$""".r
+  private lazy val accountNumberPattern = """^(\d){8}$""".r
+  private lazy val ibanPattern = """^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{11,30}$""".r
 
   /**
    * Creates a new Constraint object which evaluates each specified Constraint against
@@ -253,6 +256,40 @@ trait FormValidator {
   }
 
   def optionalCurrency(invalidFormatMessageKey: String) = Forms.of[Option[BigDecimal]](optionalCurrencyFormatter(invalidFormatMessageKey))
+
+
+  def mandatoryAccountNumber(emptyMessageKey: String, invalidMessageKey: String): Mapping[String] = {
+    val constraint = Constraint("Blank and invalid")( {
+      t: String => t match {
+        case "" => Invalid(emptyMessageKey)
+        case x if !x.matches(accountNumberPattern.regex) => Invalid(invalidMessageKey)
+        case _ => Valid
+      }
+    } )
+    text.verifying(constraint)
+  }
+
+  def mandatorySortCode(emptyMessageKey: String, invalidMessageKey: String): Mapping[String] = {
+    val constraint = Constraint("Blank and invalid")( {
+      t: String => t match {
+        case "" => Invalid(emptyMessageKey)
+        case x if !x.matches(sortCodePattern.regex) => Invalid(invalidMessageKey)
+        case _ => Valid
+      }
+    } )
+    text.verifying(constraint)
+  }
+
+  def mandatoryIban(emptyMessageKey: String, invalidMessageKey: String): Mapping[String] = {
+    val constraint = Constraint("Blank and invalid")( {
+      t: String => t.replaceAll(" ", "") match {
+        case "" => Invalid(emptyMessageKey)
+        case x if !x.matches(ibanPattern.regex) => Invalid(invalidMessageKey)
+        case _ => Valid
+      }
+    } )
+    text.verifying(constraint)
+  }
 }
 
 object FormValidator extends FormValidator
