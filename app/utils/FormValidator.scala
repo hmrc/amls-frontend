@@ -61,7 +61,6 @@ trait FormValidator {
         case _ => Invalid(invalidValueMessageKey)
       }
     } )
-
     text.verifying(stopOnFirstFail(blankConstraint, valueConstraint))
   }
 
@@ -75,11 +74,17 @@ trait FormValidator {
         case _ => Valid
       }
     } )
-    text.verifying(stopOnFirstFail(blankConstraint,
-      Constraints.pattern(emailFormat, "constraint.email", invalidValueMessageKey) ))
+
+    val valueConstraint = Constraint("Value")( {
+      t:String => t match {
+        case t if t.matches(emailFormat.regex) => Valid
+        case _ => Invalid(invalidValueMessageKey)
+      }
+    } )
+    text.verifying(stopOnFirstFail(blankConstraint, valueConstraint))
   }
 
-  def mandatoryPhoneNumberFormatter(blankValueMessageKey: String,
+  private def mandatoryPhoneNumberFormatter(blankValueMessageKey: String,
                                     invalidLengthMessageKey: String,
                                     invalidValueMessageKey: String) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
@@ -162,25 +167,7 @@ trait FormValidator {
     }
   }
 
-  /**
-   *
-   * @param addr2Key
-   * @param addr3Key
-   * @param addr4Key
-   * @param postcodeKey
-   * @param countryCodeKey
-   *
-   * @param blankFirstTwoAddrLinesMessageKey Error displayed against either of first two address lines when blank.
-   * @param invalidAddressLineMessageKey Error displayed when address line is invalid, i.e. greater than the max
-   *                                     permissable length.
-   * @param blankPostcodeMessageKey Error displayed when post code is blank.
-   * @param invalidPostcodeMessageKey Error displayed when post code is invalid, i.e. greater than the max
-   *                                  permissable length or contains invalid character.
-   * @param blankBothFirstTwoAddrLinesMessageKey Displayed against first address line if both of the
-   *                                             first two address lines are blank
-   * @return
-   */
-  def addressFormatter(addr2Key: String, addr3Key:String, addr4Key:String,
+  private def addressFormatter(addr2Key: String, addr3Key:String, addr4Key:String,
                  postcodeKey:String, countryCodeKey: String,
                  blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
                  blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
@@ -220,6 +207,16 @@ trait FormValidator {
     }
   }
 
+  /**
+   * @param blankFirstTwoAddrLinesMessageKey Error displayed against either of first two address lines when blank.
+   * @param invalidAddressLineMessageKey Error displayed when address line is invalid, i.e. greater than the max
+   *                                     permissable length.
+   * @param blankPostcodeMessageKey Error displayed when post code is blank.
+   * @param invalidPostcodeMessageKey Error displayed when post code is invalid, i.e. greater than the max
+   *                                  permissable length or contains invalid character.
+   * @param blankBothFirstTwoAddrLinesMessageKey Displayed against first address line if both of the
+   *                                             first two address lines are blank
+   */
   def address( addr2Key: String, addr3Key:String, addr4Key:String,
                postcodeKey:String, countryCodeKey: String,
                blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
