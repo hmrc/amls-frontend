@@ -7,19 +7,7 @@ import utils.TestHelper._
 import FormValidator._
 import org.joda.time.LocalDate
 
-
 class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp {
-  "isNotFutureDate" must {
-    "return false if the date is later than current date" in {
-      FormValidator.isNotFutureDate(LocalDate.now().plusDays(1)) shouldBe false
-    }
-
-    "return true if the date is equal to or earlier than the current date" in {
-      FormValidator.isNotFutureDate(LocalDate.now()) shouldBe true
-      FormValidator.isNotFutureDate(LocalDate.now().minusDays(1)) shouldBe true
-    }
-  }
-
   "validateNinoFormat" must {
 
     "return true if the nino format is correct" in {
@@ -68,13 +56,13 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
 
   "amlsMandatoryEmailWithDomain" must {
     "return the email if the email format is correct" in {
-      val formatter = FormValidator.mandatoryEmailWithDomain(
+      val formatter = FormValidator.mandatoryEmail(
         "blank message", "invalid length", "invalid value")
       formatter.bind(Map("" -> "aaaa@aaa.com")) shouldBe Right("aaaa@aaa.com")
     }
 
     "return correct form error if the email format is incorrect" in {
-      val formatter = FormValidator.mandatoryEmailWithDomain(
+      val formatter = FormValidator.mandatoryEmail(
         "blank message", "invalid length", "invalid value")
 
       isErrorMessageKeyEqual(formatter.bind(Map("" -> "")), "blank message") shouldBe true
