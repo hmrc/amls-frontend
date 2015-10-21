@@ -8,13 +8,13 @@ import FormValidator._
 class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp {
   "mandatoryNino" should {
     "respond appropriately if the nino format is correct" in {
-      val mapping = FormValidator.mandatoryNino("blank message", "invalid length", "invalid value")
+      val mapping = mandatoryNino("blank message", "invalid length", "invalid value")
       mapping.bind(Map("" -> "AB123456C")) shouldBe Right("AB123456C")
     }
 
     "respond appropriately if the nino format is correct with spaces" in {
-      val mapping = FormValidator.mandatoryNino("blank message", "invalid length", "invalid value")
-      mapping.bind(Map("" -> "AB 12 34 56 C")) shouldBe Right("AB 12 34 56 C")
+      val mapping = mandatoryNino("blank message", "invalid length", "invalid value")
+      mapping.bind(Map("" -> "AB 12 34 56 C")) shouldBe Right("AB123456C")
     }
 
     "respond appropriately if the nino format is incorrect" in {
