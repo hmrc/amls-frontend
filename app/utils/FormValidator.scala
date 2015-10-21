@@ -8,12 +8,14 @@ import uk.gov.hmrc.play.validators.Validators.isPostcodeLengthValid
 import play.api.data.FormError
 import play.api.data.Forms
 import play.api.data.format.Formatter
+import scala.collection.mutable.ListBuffer
 
 trait FormValidator {
-  val ninoRegex = """^$|^[A-Z,a-z]{2}[0-9]{6}[A-D,a-d]{1}$""".r
-  val emailFormat = """(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?""".r
-  val postCodeFormat = "(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))".r
-  val phoneNoFormat = "^[A-Z0-9 \\)\\/\\(\\-\\*#]{1,27}$".r
+  private lazy val ninoRegex = """^$|^[A-Z,a-z]{2}[0-9]{6}[A-D,a-d]{1}$""".r
+  private lazy val emailFormat = """(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?""".r
+  private lazy val postCodeFormat = "(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))".r
+  private lazy val phoneNoFormat = "^[A-Z0-9 \\)\\/\\(\\-\\*#]{1,27}$".r
+  private lazy val moneyFormatSimple = """^(\d{1,11}+)$""".r
 
   /**
    * Creates a new Constraint object which evaluates each specified Constraint against
@@ -29,7 +31,8 @@ trait FormValidator {
     }
   }
 
-  def mandatoryText(blankValueMessageKey:String, invalidLengthMessageKey: String, validationMaxLengthProperty: String): Mapping[String] = {
+  def mandatoryText(blankValueMessageKey:String, invalidLengthMessageKey: String,
+                    validationMaxLengthProperty: String): Mapping[String] = {
     val constraint = Constraint("Blank and length")( {
       t:String => t match {
         case t if t.length == 0 => Invalid(blankValueMessageKey)
@@ -41,7 +44,8 @@ trait FormValidator {
     text.verifying(constraint)
   }
 
-  def mandatoryNino(blankValueMessageKey: String, invalidLengthMessageKey: String, invalidValueMessageKey: String) : Mapping[String] = {
+  def mandatoryNino(blankValueMessageKey: String, invalidLengthMessageKey: String,
+                    invalidValueMessageKey: String) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {
       t:String => t match {
         case t if t.length == 0 => Invalid(blankValueMessageKey)
@@ -61,11 +65,13 @@ trait FormValidator {
     text.verifying(stopOnFirstFail(blankConstraint, valueConstraint))
   }
 
-  def mandatoryEmail(blankValueMessageKey: String, invalidLengthMessageKey: String, invalidValueMessageKey: String) : Mapping[String] = {
+  def mandatoryEmail(blankValueMessageKey: String, invalidLengthMessageKey: String,
+                     invalidValueMessageKey: String) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {
       t:String => t match {
         case t if t.length == 0 => Invalid(blankValueMessageKey)
-        case t if t.length > getProperty("validationMaxLengthEmail").toInt => Invalid(invalidLengthMessageKey)
+        case t if t.length > getProperty("validationMaxLengthEmail").toInt =>
+          Invalid(invalidLengthMessageKey)
         case _ => Valid
       }
     } )
@@ -104,7 +110,8 @@ trait FormValidator {
   def mandatoryPhoneNumber( blankValueMessageKey: String,
                             invalidLengthMessageKey: String,
                             invalidValueMessageKey: String) =
-    Forms.of[String](mandatoryPhoneNumberFormatter(blankValueMessageKey, invalidLengthMessageKey, invalidValueMessageKey))
+    Forms.of[String](mandatoryPhoneNumberFormatter(blankValueMessageKey,
+      invalidLengthMessageKey, invalidValueMessageKey))
 
   private def getAddrDetails(data: Map[String, String],
                              addr1Key: String,
@@ -123,7 +130,7 @@ trait FormValidator {
 
   private def validateOptionalAddressLine(addrKey:String, addr:String, maxLength:Int,
                                           invalidAddressLineMessageKey:String,
-                                          errors: scala.collection.mutable.ListBuffer[FormError] ): Unit = {
+                                          errors: ListBuffer[FormError] ): Unit = {
     addr match {
       case a if a.length > maxLength => errors += FormError(addrKey, invalidAddressLineMessageKey)
       case _ => {}
@@ -133,7 +140,7 @@ trait FormValidator {
   private def validateMandatoryAddressLine(addrKey:String, addr:String, maxLength:Int,
                                            blankMessageKey:String,
                                            invalidAddressLineMessageKey: String,
-                                           errors: scala.collection.mutable.ListBuffer[FormError]): Unit = {
+                                           errors: ListBuffer[FormError]): Unit = {
     addr match {
       case a if a.length == 0 => errors += FormError(addrKey, blankMessageKey)
       case a if a.length > maxLength => errors += FormError(addrKey, invalidAddressLineMessageKey)
@@ -141,9 +148,10 @@ trait FormValidator {
     }
   }
 
-  private def validatePostcode(postcode:String, postcodeKey: String, blankPostcodeMessageKey: String,
+  private def validatePostcode(postcode:String, postcodeKey: String,
+                               blankPostcodeMessageKey: String,
                                invalidPostcodeMessageKey: String,
-                               errors: scala.collection.mutable.ListBuffer[FormError]) = {
+                               errors: ListBuffer[FormError]) = {
     postcode match {
       case a if a.length == 0 => errors += FormError(postcodeKey, blankPostcodeMessageKey)
       case a if a.length > 0 &&  postCodeFormat.findFirstIn(a).isEmpty =>
@@ -220,6 +228,34 @@ trait FormValidator {
     Forms.of(addressFormatter(addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey,
       blankFirstTwoAddrLinesMessageKey, invalidAddressLineMessageKey,
       blankPostcodeMessageKey, invalidPostcodeMessageKey, blankBothFirstTwoAddrLinesMessageKey))
+
+
+  private def cleanMoneyString(moneyString: String) =
+    moneyFormatSimple.findFirstIn(moneyString.replace(",","")).getOrElse("")
+
+  def optionalCurrencyFormatter(invalidFormatMessageKey: String) = new Formatter[Option[BigDecimal]] {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[BigDecimal]] = {
+      data.get(key) match {
+        case Some(num) => {
+          num.trim match{
+            case "" => Right(None)
+            case numTrimmed => {
+              try {
+                val bigDecimalMoney = BigDecimal(cleanMoneyString(numTrimmed))
+                Right(Some(bigDecimalMoney))
+              } catch {
+                case e: NumberFormatException => Left(Seq(FormError(key, invalidFormatMessageKey)))
+              }
+            }
+          }
+        }
+        case _ => Left(Seq(FormError(key, invalidFormatMessageKey)))
+      }
+    }
+    override def unbind(key: String, value: Option[BigDecimal]): Map[String, String] = Map(key -> value.getOrElse("").toString)
+  }
+
+  def optionalCurrency(invalidFormatMessageKey: String) = Forms.of[Option[BigDecimal]](optionalCurrencyFormatter(invalidFormatMessageKey))
 }
 
 object FormValidator extends FormValidator

@@ -5,7 +5,6 @@ import uk.gov.hmrc.play.test.UnitSpec
 import play.api.data.FormError
 import utils.TestHelper._
 import FormValidator._
-import org.joda.time.LocalDate
 
 class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp {
   "validateNinoFormat" must {
@@ -121,6 +120,35 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
     "Return a formatter which responds suitably to invalid postcode" in {
       formatter.bind("", invalidPostcode).left.getOrElse(Nil).contains(FormError("postcodekey", "invalid-postcode")) shouldBe true
     }
+  }
+
+
+  "currency" should {
+    "Return valid integer based values" in {
+
+      optionalCurrency("error.currency").bind(Map("" -> "0")) shouldBe Right(Some(0))
+      optionalCurrency("error.currency").bind(Map("" -> "   0   ")) shouldBe Right(Some(0))
+      optionalCurrency("error.currency").bind(Map("" -> "1234")) shouldBe Right(Some(1234))
+      optionalCurrency("error.currency").bind(Map("" -> "1,234")) shouldBe Right(Some(1234))
+      optionalCurrency("error.currency").bind(Map("" -> "1,23,4")) shouldBe Right(Some(1234))
+      optionalCurrency("error.currency").bind(Map("" -> "99999999999")) shouldBe Right(Some(BigDecimal("99999999999")))
+    }
+    "Report an invalid money error" in {
+      optionalCurrency("error.currency").bind(Map("" -> "£")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "a")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "1234.001")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "1.234.001")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "99999999999999999")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "0.00")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "1234.01")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "1234.1")) shouldBe Left(List(FormError("", "error.currency")))
+      optionalCurrency("error.currency").bind(Map("" -> "-1234")) shouldBe Left(List(FormError("", "error.currency")))
+    }
+
+    "Report correctly for blank value" in {
+      optionalCurrency("error.currency").bind(Map("" -> "")) shouldBe Right(None)
+    }
+
   }
 
 }
