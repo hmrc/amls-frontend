@@ -56,7 +56,8 @@ object AmlsShortLivedHttpCaching extends ShortLivedHttpCaching with AppName with
   override lazy val http = WSHttp
   override lazy val defaultSource = appName
   override lazy val baseUri = baseUrl("cachable.short-lived-cache")
-  override lazy val domain = getConfString("cachable.short-lived-cache.domain", throw new Exception(s"Could not find config 'cachable.short-lived-cache.domain'"))
+  override lazy val domain = getConfString("cachable.short-lived-cache.domain",
+    throw new Exception(s"Could not find config 'cachable.short-lived-cache.domain'"))
 }
 
 object AmlsShortLivedCache extends ShortLivedCache {
