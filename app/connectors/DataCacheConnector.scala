@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 trait DataCacheConnector {
 
-  val shortLivedCache: ShortLivedCache
+  def shortLivedCache: ShortLivedCache
 
   def fetchDataShortLivedCache[T](key: String, cacheId: String)(implicit hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
     shortLivedCache.fetchAndGetEntry[T](key, cacheId)
@@ -29,5 +29,5 @@ trait DataCacheConnector {
 }
 
 object DataCacheConnector extends DataCacheConnector {
-  override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
+  override lazy val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 }
