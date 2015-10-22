@@ -50,7 +50,7 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
       }
     }
 
-    "fetch all data from save4later by utr" in {
+    "fetch all data from save4later" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
       when(mockShortLivedCache.fetch(Matchers.any())(Matchers.any())).thenReturn(Future.successful(Some(returnedCacheMap)))
       val result = TestDataCacheConnector.fetchAll(sourceId)
