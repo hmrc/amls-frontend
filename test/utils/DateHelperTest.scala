@@ -2,11 +2,7 @@ package utils
 
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
-import play.api.data.FormError
 import uk.gov.hmrc.play.test.UnitSpec
-import utils.FormValidator._
-import utils.TestHelper._
-
 
 class DateHelperTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp {
   "isNotFutureDate" must {

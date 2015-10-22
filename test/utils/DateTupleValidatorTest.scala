@@ -19,7 +19,7 @@ import org.joda.time.LocalDate
 import org.scalatest.{Matchers, WordSpec}
 import play.api.data.FormError
 import uk.gov.hmrc.play.mappers.DateFields._
-import utils.DateTuple._
+import utils.validation.DateTupleValidator._
 
 class DateTupleTest extends WordSpec with Matchers {
   "dateTuple" should {

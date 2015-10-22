@@ -1,4 +1,4 @@
-package utils
+package utils.validation
 
 /*
  * Copyright 2015 HM Revenue & Customs
@@ -16,19 +16,18 @@ package utils
  * limitations under the License.
  */
 
+import java.text.{DateFormatSymbols => JDateFormatSymbols}
+
 import org.joda.time.LocalDate
 import play.api.data.Forms._
 import play.api.data.Mapping
-import java.text.{DateFormatSymbols => JDateFormatSymbols}
-import uk.gov.hmrc.play.mappers.DateFields.day
-import uk.gov.hmrc.play.mappers.DateFields.month
-import uk.gov.hmrc.play.mappers.DateFields.year
-import play.api.data.validation.{ValidationResult, Constraint, Invalid, Valid}
+import play.api.data.validation.{Constraint, Invalid, Valid}
+import uk.gov.hmrc.play.mappers.DateFields.{day, month, year}
 
 
-object DateTuple extends DateTuple
+object DateTupleValidator extends DateTupleValidator
 
-trait DateTuple {
+trait DateTupleValidator extends FormValidator {
 
 
   val dateTuple: Mapping[Option[LocalDate]] = dateTuple(validate = true)
@@ -44,6 +43,7 @@ trait DateTuple {
       (data._1, data._2, data._3) match {
         case (None, None, None) => Valid
         case (yearOption, monthOption, dayOption) if validate=> {
+          import utils.StringHelper
           val mthTrimmed = monthOption.getOrElse("").trim
           val dayTrimmed = dayOption.getOrElse("").trim
           val yearTrimmed = yearOption.getOrElse("").trim
@@ -127,7 +127,7 @@ trait DateTuple {
     year -> optional(text),
     month -> optional(text),
     day -> optional(text)
-  ).verifying(FormValidator.stopOnFirstFail(
+  ).verifying(stopOnFirstFail(
     dateWithinRange(invalidNumberTooHighMessageKey, validate),
     fieldEmptyConstraint(invalidEmptyMessageKey, validate),
     invalidCharacterConstraint(invalidValueMessageKey, validate)

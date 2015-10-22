@@ -3,7 +3,13 @@ package utils
 import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.play.test.UnitSpec
 import play.api.data.FormError
-import FormValidator._
+import utils.validation.NinoValidator._
+import utils.validation.CurrencyValidator._
+import utils.validation.EmailValidator._
+import utils.validation.PhoneNumberValidator._
+import utils.validation.TextValidator._
+import utils.validation.AddressValidator._
+import utils.validation.BankDetailsValidator._
 
 class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp {
   "mandatoryNino" should {
