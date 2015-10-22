@@ -1,7 +1,7 @@
 package connectors
 
 import config.AmlsShortLivedCache
-import models.{LoginDetails}
+import models.LoginDetails
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -32,7 +32,8 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
 
     "save form data to save4later" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      when(mockShortLivedCache.cache(Matchers.any(), Matchers.any(), Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(returnedCacheMap))
+      when(mockShortLivedCache.cache(Matchers.any(), Matchers.any(),
+        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(returnedCacheMap))
       val result = TestDataCacheConnector.saveDataShortLivedCache(sourceId, "formId", loginDtls)
       whenReady(result) { dtl =>
         dtl mustBe Some(loginDtls)
@@ -41,7 +42,8 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
 
     "fetch saved data from save4later" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      when(mockShortLivedCache.fetchAndGetEntry[LoginDetails](Matchers.any(), Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
+      when(mockShortLivedCache.fetchAndGetEntry[LoginDetails](Matchers.any(),
+        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
       val result = TestDataCacheConnector.fetchDataShortLivedCache[LoginDetails](sourceId,"formId")
       whenReady(result) { dtl =>
         dtl mustBe Some(loginDtls)

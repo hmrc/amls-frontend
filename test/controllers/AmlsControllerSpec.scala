@@ -18,7 +18,6 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AmlsService
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.{SessionKeys, HttpResponse}
 
@@ -70,18 +69,6 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
               contentAsString(result) must include("testuser")
           }
         }
-
-        /*"should throw Exception" in {
-           {
-
-
-             val thrown =  intercept[RuntimeException]{getAuthorisedUserWithException {
-             result =>
-              }
-
-             }
-          }
-        }*/
       }
 
       "unauthorised users" must {
@@ -149,7 +136,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
     val userId = s"user-${UUID.randomUUID}"
     implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
     AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
+    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(),
+      Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
     val result = MockAmlsController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
     test(result)
   }
@@ -158,7 +146,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
     val userId = s"user-${UUID.randomUUID}"
     implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
     AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.failed(new RuntimeException))
+    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(),
+      Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.failed(new RuntimeException))
     val result = MockAmlsController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
     test(result)
   }
@@ -167,7 +156,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
     val userId = s"user-${UUID.randomUUID}"
     implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
     AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+    when(mockDataCacheConnector.fetchDataShortLivedCache[LoginDetails](Matchers.any(),
+      Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
     val result = MockAmlsController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
     test(result)
   }
@@ -196,7 +186,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
       SessionKeys.userId -> userId)
     implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
     AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-    when(mockDataCacheConnector.saveDataShortLivedCache[LoginDetails](Matchers.any(), Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
+    when(mockDataCacheConnector.saveDataShortLivedCache[LoginDetails](Matchers.any(),
+      Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
     when(mockAmlsService.submitLoginDetails(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(HttpResponse(OK,
       Some(Json.parse( """{"foo":"bar"}""")))))
     val result = MockAmlsController.onSubmit.apply(session)
