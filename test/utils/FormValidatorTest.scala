@@ -71,16 +71,29 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
   }
 
   "address" should {
-    "respond suitably to first two lines being blank" in {
-      val first2Blank = Map(
+    "respond suitably to all mandatory lines being blank" in {
+      val allMandatoryBlank = Map(
         "addr1key"->"",
         "addr2key"->"",
         "postcodekey"->"CA3 9SD",
         "countrycodekey"->"GB"
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "first-two-blank","invalid-line","blank-postcode","invalid-postcode").bind(first2Blank)
-            .left.getOrElse(Nil).contains(FormError("", "first-two-blank")) shouldBe true
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(allMandatoryBlank)
+            .left.getOrElse(Nil).contains(FormError("", "all-mandatory-blank")) shouldBe true
+    }
+
+    "respond suitably to any but not all mandatory lines being blank" in {
+      val anyMandatoryBlank = Map(
+        "addr1key"->"a",
+        "addr2key"->"",
+        "postcodekey"->"CA3 9SD",
+        "countrycodekey"->"GB"
+      )
+      val mapping = address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode")
+        .binder.bind("addr1key", anyMandatoryBlank).left.getOrElse(Nil)
+          .contains(FormError("addr2key", "mandatory-blank")) shouldBe true
     }
 
     "respond suitably to invalid lines" in {
@@ -93,7 +106,7 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
         "countrycodekey"->"GB"
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "first-two-blank","invalid-line","blank-postcode","invalid-postcode").bind(invalidLine2)
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(invalidLine2)
         .left.getOrElse(Nil).contains(FormError("addr2key", "invalid-line")) shouldBe true
     }
 
@@ -107,7 +120,7 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
         "countrycodekey"->"GB"
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "first-two-blank","invalid-line","blank-postcode","invalid-postcode").bind(blankPostcode)
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(blankPostcode)
         .left.getOrElse(Nil).contains(FormError("postcodekey", "blank-postcode")) shouldBe true
     }
 
@@ -121,7 +134,7 @@ class FormValidatorTest extends UnitSpec with MockitoSugar with amls.FakeAmlsApp
         "countrycodekey"->"GB"
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "first-two-blank","invalid-line","blank-postcode","invalid-postcode").bind(invalidPostcode)
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(invalidPostcode)
         .left.getOrElse(Nil).contains(FormError("postcodekey", "invalid-postcode")) shouldBe true
     }
   }

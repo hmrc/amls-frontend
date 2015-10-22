@@ -171,23 +171,23 @@ trait FormValidator {
 
   private def addressFormatter(addr2Key: String, addr3Key:String, addr4Key:String,
                  postcodeKey:String, countryCodeKey: String,
-                 blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
-                 blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
-                 blankBothFirstTwoAddrLinesMessageKey: Option[String] = None) = new Formatter[String] {
+                 blankMandatoryAddrLineMessageKey: String,
+                 blankAllMandatoryAddrLinesMessageKey: String,
+                 invalidAddressLineMessageKey:String,
+                 blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]) = {
       val errors = new scala.collection.mutable.ListBuffer[FormError]()
       val addr = getAddrDetails(data, key, addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey)
-
-      if (blankBothFirstTwoAddrLinesMessageKey.isDefined &&
+      if (blankAllMandatoryAddrLinesMessageKey.length > 0 &&
         addr._1.length==0 && addr._2.length==0) {
-        errors += FormError(key, blankBothFirstTwoAddrLinesMessageKey.getOrElse(""))
+        errors += FormError(key, blankAllMandatoryAddrLinesMessageKey)
         errors += FormError(addr2Key, "")
       } else {
         validateMandatoryAddressLine(key, addr._1,
-          getProperty("validationMaxLengthAddresslines").trim.toInt, blankFirstTwoAddrLinesMessageKey,
+          getProperty("validationMaxLengthAddresslines").trim.toInt, blankMandatoryAddrLineMessageKey,
           invalidAddressLineMessageKey, errors)
         validateMandatoryAddressLine(addr2Key, addr._2,
-          getProperty("validationMaxLengthAddresslines").trim.toInt, blankFirstTwoAddrLinesMessageKey,
+          getProperty("validationMaxLengthAddresslines").trim.toInt, blankMandatoryAddrLineMessageKey,
           invalidAddressLineMessageKey, errors)
         validateOptionalAddressLine(addr3Key, addr._3,
           getProperty("validationMaxLengthAddresslines").trim.toInt, invalidAddressLineMessageKey, errors)
@@ -209,19 +209,14 @@ trait FormValidator {
     }
   }
 
-  /**
-   * @param blankFirstTwoAddrLinesMessageKey Error displayed against either of first two address lines when blank.
-   * @param blankBothFirstTwoAddrLinesMessageKey Displayed against first address line if both of the
-   *                                             first two address lines are blank
-   */
   def address( addr2Key: String, addr3Key:String, addr4Key:String,
                postcodeKey:String, countryCodeKey: String,
-               blankFirstTwoAddrLinesMessageKey: String, invalidAddressLineMessageKey:String,
-               blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
-               blankBothFirstTwoAddrLinesMessageKey: Option[String] = None) =
+               blankMandatoryAddrLineMessageKey: String, blankAllMandatoryAddrLinesMessageKey: String,
+               invalidAddressLineMessageKey:String,
+               blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String) =
     Forms.of(addressFormatter(addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey,
-      blankFirstTwoAddrLinesMessageKey, invalidAddressLineMessageKey,
-      blankPostcodeMessageKey, invalidPostcodeMessageKey, blankBothFirstTwoAddrLinesMessageKey))
+      blankMandatoryAddrLineMessageKey, blankAllMandatoryAddrLinesMessageKey, invalidAddressLineMessageKey,
+      blankPostcodeMessageKey, invalidPostcodeMessageKey))
 
   private def cleanMoneyString(moneyString: String) =
     currencyRegex.findFirstIn(moneyString.replace(",","")).getOrElse("")
