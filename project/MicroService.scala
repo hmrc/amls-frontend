@@ -42,13 +42,13 @@ trait MicroService {
 
   lazy val scoverageSettings = {
     import scoverage.ScoverageSbtPlugin._
-    instrumentSettings ++ Seq(
+    Seq(
       // Semicolon-separated list of regexs matching classes to exclude
-      ScoverageKeys.excludedPackages in ScoverageCompile := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*;models.*;forms.*;config.*;.*BuildInfo.*;prod.Routes;app.Routes;testOnlyDoNotUseInAppConf.Routes;",
-      ScoverageKeys.minimumCoverage := 80,
-      ScoverageKeys.failOnMinimumCoverage := false,
-      ScoverageKeys.highlighting := true,
-      parallelExecution in ScoverageTest := false
+      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*;models.*;forms.*;config.*;.*BuildInfo.*;prod.Routes;app.Routes;testOnlyDoNotUseInAppConf.Routes;",
+      ScoverageKeys.coverageMinimum := 80,
+      ScoverageKeys.coverageFailOnMinimum := false,
+      ScoverageKeys.coverageHighlighting := true,
+      parallelExecution in Test := false
     )
   }
 
