@@ -62,7 +62,8 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         "respond with a redirect" in {
           getWithUnAuthorisedUser { result =>
             status(result) must be(SEE_OTHER)
-            redirectLocation(result).get must include("/unauthorised")
+            redirectLocation(result).fold("") {x=>x} must include("/unauthorised")
+            //redirectLocation(result).get must include("/unauthorised")
           }
         }
       }
@@ -71,7 +72,7 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         "respond with a redirect" in {
           getWithUnAuthenticated { result =>
             status(result) must be(SEE_OTHER)
-            redirectLocation(result).get must include("/account/sign-in")
+            redirectLocation(result).fold("") {x=>x} must include("/account/sign-in")
           }
         }
       }
@@ -98,7 +99,7 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         "respond with a redirect" in {
           submitWithUnAuthorisedUser { result =>
             status(result) must be(SEE_OTHER)
-            redirectLocation(result).get must include("/unauthorised")
+            redirectLocation(result).fold("") {x=>x} must include("/unauthorised")
           }
         }
       }

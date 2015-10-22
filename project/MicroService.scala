@@ -1,7 +1,7 @@
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
-import scoverage.ScoverageSbtPlugin._
+import scoverage.ScoverageSbtPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import wartremover._
 
@@ -41,8 +41,10 @@ trait MicroService {
 
 
   lazy val scoverageSettings = {
+    import scoverage.ScoverageSbtPlugin._
     Seq(
-      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;app.*;prod.*;testOnlyDoNotUseInAppConf.*;.*AuthService.*;models/.data/..*;view.*;config.*;uk.gov.hmrc.*;",
+      // Semicolon-separated list of regexs matching classes to exclude
+      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*;models.*;forms.*;config.*;.*BuildInfo.*;prod.Routes;app.Routes;testOnlyDoNotUseInAppConf.Routes;",
       ScoverageKeys.coverageMinimum := 80,
       ScoverageKeys.coverageFailOnMinimum := false,
       ScoverageKeys.coverageHighlighting := true,
