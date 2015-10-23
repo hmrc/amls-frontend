@@ -2,10 +2,12 @@ package config
 
 import com.typesafe.config.Config
 import play.api.Play
+import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.http.cache.client.{ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.audit.http.config.{LoadAuditingConfig, AuditingConfig}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.{ControllerConfig, AppName, RunMode}
+import uk.gov.hmrc.play.config.{ServicesConfig, ControllerConfig, AppName, RunMode}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HttpGet
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
@@ -49,3 +51,17 @@ object WSHttp extends WSGet with WSPut with WSPost with WSDelete with AppName wi
 object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartial {
   override lazy val httpGet: HttpGet = WSHttp
 }
+
+object AmlsShortLivedHttpCaching extends ShortLivedHttpCaching with AppName with ServicesConfig {
+  override lazy val http = WSHttp
+  override lazy val defaultSource = appName
+  override lazy val baseUri = baseUrl("cachable.short-lived-cache")
+  override lazy val domain = getConfString("cachable.short-lived-cache.domain",
+    throw new Exception(s"Could not find config 'cachable.short-lived-cache.domain'"))
+}
+
+object AmlsShortLivedCache extends ShortLivedCache {
+  override implicit lazy val crypto = ApplicationCrypto.JsonCrypto
+  override lazy val shortLiveCache = AmlsShortLivedHttpCaching
+}
+
