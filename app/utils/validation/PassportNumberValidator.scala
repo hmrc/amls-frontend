@@ -7,9 +7,9 @@ import play.api.data.Forms.text
 import play.api.data.validation.Constraint
 import config.AmlsPropertiesReader.getProperty
 
-object UKPassportNumberValidator extends UKPassportNumberValidator
+object PassportNumberValidator extends PassportNumberValidator
 
-class UKPassportNumberValidator extends FormValidator {
+class PassportNumberValidator extends FormValidator {
 
   def mandatoryPassportNumber(blankValueMessageKey: String, invalidLengthMessageKey: String,
                      invalidValueMessageKey: String) : Mapping[String] = {
