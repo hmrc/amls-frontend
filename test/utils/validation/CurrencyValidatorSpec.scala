@@ -1,12 +1,12 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.CurrencyValidator._
 import play.api.data.FormError
 
-class CurrencyValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplication {
+class CurrencyValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "currency" should {
     "return valid integer based values" in {

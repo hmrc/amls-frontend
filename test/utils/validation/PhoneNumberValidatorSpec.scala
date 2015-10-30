@@ -1,12 +1,12 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.PhoneNumberValidator._
 import play.api.data.FormError
 
-class PhoneNumberValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplication {
+class PhoneNumberValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "mandatoryPhoneNumber" should {
     "respond appropriately for valid phone numbers " in {
