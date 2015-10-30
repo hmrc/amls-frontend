@@ -4,9 +4,9 @@ import play.api.data.Forms
 import play.api.data.format.Formatter
 import play.api.data.FormError
 
-object CurrencyValidator extends CurrencyValidator
+object CurrencyValueValidator extends CurrencyValueValidator
 
-class CurrencyValidator extends FormValidator{
+class CurrencyValueValidator extends FormValidator{
 
   private def cleanMoneyString(moneyString: String) =
     currencyRegex.findFirstIn(moneyString.replace(",","")).getOrElse("")
@@ -33,6 +33,6 @@ class CurrencyValidator extends FormValidator{
     override def unbind(key: String, value: Option[BigDecimal]): Map[String, String] = Map(key -> value.getOrElse("").toString)
   }
 
-  def optionalCurrency(invalidFormatMessageKey: String) =
+  def optionalCurrencyValue(invalidFormatMessageKey: String) =
     Forms.of[Option[BigDecimal]](optionalCurrencyFormatter(invalidFormatMessageKey))
 }
