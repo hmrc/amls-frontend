@@ -3,7 +3,7 @@ package utils.validation
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.data.FormError
-import utils.validation.UKPassportNumberValidator._
+import utils.validation.PassportNumberValidator._
 
 class UKPassportNumberValidatorTest extends PlaySpec with MockitoSugar  with OneServerPerSuite{
 
