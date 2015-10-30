@@ -6,7 +6,7 @@ import play.api.data.FormError
 import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.WebAddressValidator._
 
-class WebAddressValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplication{
+class WebAddressValidatorSpec extends PlaySpec with MockitoSugar  with WithFakeApplication{
 
   "webAddress" should {
     "return the webAddress if the webAddress is correct" in {
