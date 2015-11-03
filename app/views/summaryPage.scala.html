@@ -7,13 +7,15 @@
 sectionTitle = Some(Messages("amls.summary.sectiontitle")),
 title = Messages("amls.summary.title")
 ) {
+<div id="main-pane" class="grid-2-3">
 <p>
     @Messages("amls.summary.description")
 </p>
 
-<table class="summary-table">
+<table id="summary-table" class="summary-table">
     <tr>
         <th class="summary-table"> <h2> <a href="">@Messages("amls.summary.aboutyou") </a> </h2></th>
     </tr>
 </table>
+</div>
 }
