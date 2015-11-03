@@ -32,10 +32,10 @@
 
 @insideHeader = {
     @uiLayouts.header_nav(
-        navTitle = None,
+        navTitle = Some(Messages("amls.title")),
         navTitleLink = None,
         showBetaLink = false,
-        navLinks = None
+        navLinks = Some(Html("<li><a id=\"logOutNavHref\" href=\"\">Sign out</a></li>"))
     )
 }
 
@@ -69,7 +69,7 @@
     @uiLayouts.serviceInfo(
         betaBanner = betaBanner,
         includeGridWrapper = false,
-        serviceInfoContent = Some(Html("<div class=\"login-name\">AMLS registration for Acme Limited</div>"))
+        serviceInfoContent = Some(Html("<span class=\"login-name\">AMLS registration for Acme Limited</span>"))
     )
 }
 

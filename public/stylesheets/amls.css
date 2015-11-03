@@ -41,7 +41,16 @@ table{
     padding: 0.73684em 1.05263em 0.52632em 0;
     text-align: left;
     color: #005ea5;
+    border-top: 1px solid #bfc1c3;
     border-bottom: 1px solid #bfc1c3;
+}
+
+.summary-table a:link, .summary-table a:visited {
+ text-decoration:none;
+}
+
+.summary-table a:hover {
+ text-decoration:underline;
 }
 
 .login-name {
@@ -49,4 +58,11 @@ table{
     font-size: 16px;
     margin: 0;
     float: right;
+    padding: 10px 0 10px 0;
+    margin-top: 10px
+}
+
+.service-info {
+     border-bottom: 1px solid #bfc1c3;
+
 }
