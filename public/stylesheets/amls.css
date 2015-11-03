@@ -14,6 +14,32 @@
  * limitations under the License.
  */
 
+td{
+    border-top: 1px solid #bfc1c3;
+}
+table{
+    border-bottom: 1px solid #a1acb2;
+    margin-bottom: 0px;
+}
+
+
+.section-title{
+    font-size:24px;
+    color:#6f777b;
+}
+
 .touchevents .date-of-birth {
     display:block;
+}
+
+.summary-table {
+    font-family: "nta",Arial,sans-serif;
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 700;
+    text-transform: none;
+    padding: 0.73684em 1.05263em 0.52632em 0;
+    text-align: left;
+    color: #005ea5;
+    border-bottom: 1px solid #bfc1c3;
 }

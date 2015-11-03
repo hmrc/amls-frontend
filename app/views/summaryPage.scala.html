@@ -1,0 +1,19 @@
+@import config.ApplicationConfig
+@import include.amlsMain
+
+@()(implicit request: Request[_])
+
+@amlsMain(
+sectionTitle = Some(Messages("amls.summary.sectiontitle")),
+title = Messages("amls.summary.title")
+) {
+<p>
+    @Messages("amls.summary.description")
+</p>
+
+<table >
+    <tr>
+        <td class="summary-table"> <a href="">@Messages("amls.summary.aboutyou") </a> </td>
+    </tr>
+</table>
+}
