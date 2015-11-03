@@ -11,7 +11,8 @@ trait FormValidator {
   protected lazy val sortCodeRegex = """^\d{2}(-|\s*)?\d{2}\1\d{2}$""".r
   protected lazy val accountNumberRegex = """^(\d){8}$""".r
   protected lazy val ibanRegex = """^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{11,30}$""".r
-  protected lazy val ukPassportNumberRegex = "^[0-9]{9}$".r
+  protected lazy val ukPassportNumberRegex = "^[a-zA-Z0-9]{9}$".r
+  protected lazy val nonUkPassportNumberRegex = "^[a-zA-Z0-9]{6,40}$".r
   protected lazy val webAddressRegex = "(https?:\\/\\/(?:www\\.|(?!www))[^\\s\\.]+\\.[^\\s]{2,}|www\\.[^a\\s]+\\.[^\\s]{2,})".r
 
   protected def stopOnFirstFail[T](constraints: Constraint[T]*) = Constraint { field: T =>
