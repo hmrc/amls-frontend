@@ -10,7 +10,6 @@
     bodyClasses: Option[String] = None,
     sidebar: Html = HtmlFormat.empty,
     contentHeader: Html = HtmlFormat.empty,
-    serviceInfoContent: Html = HtmlFormat.empty,
     scriptElem: Option[Html] = None,
     nameBusiness : Option[String] = None
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
@@ -70,7 +69,7 @@
     @uiLayouts.serviceInfo(
         betaBanner = betaBanner,
         includeGridWrapper = false,
-        serviceInfoContent = Some(logoutLink)
+        serviceInfoContent = Some(Html("<div class=\"login-name\">AMLS registration for Acme Limited</div>"))
     )
 }
 
