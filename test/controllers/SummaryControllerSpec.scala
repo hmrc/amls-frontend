@@ -18,16 +18,16 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
   val mockAmlsService = mock[AmlsService]
   val mockAuthConnector = mock[AuthConnector]
 
-  val summaryController = new SummaryController {
+  val mainSummaryController = new MainSummaryController {
     val authConnector = mockAuthConnector
     val amlsService: AmlsService = mockAmlsService
   }
 
-  "SummaryController" must {
+  "MainSummaryController" must {
         "display a page" in {
           implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
           AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-          val result = summaryController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
+          val result = mainSummaryController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
           status(result) must be(OK)
       }
     }

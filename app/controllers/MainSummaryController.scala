@@ -8,15 +8,15 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait SummaryController extends FrontendController  with Actions {
+trait MainSummaryController extends FrontendController  with Actions {
   def onPageLoad = AuthorisedFor(AmlsRegime).async {
     implicit user =>
       implicit request =>
-      Future.successful(Ok(views.html.summaryPage()))
+      Future.successful(Ok(views.html.mainSummary()))
   }
 }
 
-object SummaryController extends SummaryController {
+object MainSummaryController extends MainSummaryController {
   val amlsService = AmlsService
   val authConnector = AMLSAuthConnector
 }
