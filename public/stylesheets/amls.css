@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-td{
-    border-top: 1px solid #bfc1c3;
-}
-table{
-    border-bottom: 1px solid #a1acb2;
-    margin-bottom: 0px;
-}
-
-
-.section-title{
-    font-size:24px;
-    color:#6f777b;
-}
-
 .touchevents .date-of-birth {
     display:block;
 }
@@ -47,10 +33,12 @@ table{
 
 .summary-table a:link, .summary-table a:visited {
  text-decoration:none;
+ color: #005ea5;
 }
 
 .summary-table a:hover {
  text-decoration:underline;
+ color: #005ea5;
 }
 
 .login-name {
@@ -64,5 +52,4 @@ table{
 
 .service-info {
      border-bottom: 1px solid #bfc1c3;
-
 }
