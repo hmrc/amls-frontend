@@ -1,0 +1,14 @@
+@import forms.FormHelpers._
+
+@(
+    text: String,
+    id: String,
+    presentation: Presentation = Defaults.hint
+)(implicit lang: Lang)
+
+@if(text.nonEmpty) {
+    <span
+        @classes(presentation)
+        id="@id-hint"
+    >@Messages(text)</span>
+}

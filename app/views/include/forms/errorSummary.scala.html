@@ -1,0 +1,16 @@
+@(form: Form[_])(implicit lang: Lang)
+
+@if(form.hasErrors) {
+    <div class="flash error-summary" role="group" aria-labelledby="error-summary-heading" tabindex="-1">
+        <h2 class="heading-medium" id="error-summary-heading">
+            @Messages("errors.summary")
+        </h2>
+        <ul>
+            @form.errors.map { error =>
+                <li>
+                    <a href="#@error.key">@Messages(error.message)</a>
+                </li>
+            }
+        </ul>
+    </div>
+}

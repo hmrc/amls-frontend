@@ -1,5 +1,8 @@
 # microservice specific routes
 
+GET        /assets/*file            controllers.AssetsController.at(path="/public", file)
+
 GET        /hello-world             controllers.HelloWorld.onPageLoad
+POST       /hello-world            controllers.HelloWorld.onSubmit
 GET        /login                   controllers.AmlsController.onPageLoad
 POST       /login                   controllers.AmlsController.onSubmit
