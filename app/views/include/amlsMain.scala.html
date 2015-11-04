@@ -79,14 +79,14 @@
         @contentHeader
     }
     @if(sectionTitle.getOrElse("").length > 0) {
-        <h1 class="heading-medium heading-secondary" >
+        <h1 class="heading-secondary" >
             @sectionTitle.getOrElse("")
         </h1>
         <h2 class="heading-large">
             @title
         </h2>
     } else {
-        <h1 class="heading-large mainTitle" style="padding: 0px; margin-top: 30px;">@title</h1>
+        <h1 class="heading-large" >@title</h1>
     }
 }
 
