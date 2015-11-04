@@ -11,7 +11,8 @@
     sidebar: Html = HtmlFormat.empty,
     contentHeader: Html = HtmlFormat.empty,
     scriptElem: Option[Html] = None,
-    nameBusiness : Option[String] = None
+    nameBusiness : Option[String] = None,
+    serviceInfoContent: Option[Html] = None
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
 
@@ -69,7 +70,7 @@
     @uiLayouts.serviceInfo(
         betaBanner = betaBanner,
         includeGridWrapper = false,
-        serviceInfoContent = Some(Html("<span class=\"login-name\">AMLS registration for Acme Limited</span>"))
+        serviceInfoContent = serviceInfoContent
     )
 }
 
