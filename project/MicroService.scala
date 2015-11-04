@@ -1,8 +1,10 @@
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
-import scoverage.ScoverageSbtPlugin._
+import scoverage.ScoverageSbtPlugin
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import wartremover._
+
 trait MicroService {
 
   import uk.gov.hmrc._
@@ -39,8 +41,10 @@ trait MicroService {
 
 
   lazy val scoverageSettings = {
+    import scoverage.ScoverageSbtPlugin._
     Seq(
-      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*",
+      // Semicolon-separated list of regexs matching classes to exclude
+      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;.*AuthService.*;models/.data/..*;view.*;models.*;forms.*;config.*;.*BuildInfo.*;prod.Routes;app.Routes;testOnlyDoNotUseInAppConf.Routes;",
       ScoverageKeys.coverageMinimum := 80,
       ScoverageKeys.coverageFailOnMinimum := false,
       ScoverageKeys.coverageHighlighting := true,
@@ -53,9 +57,10 @@ trait MicroService {
     .settings(playSettings ++ scoverageSettings: _*)
     .settings(version := appVersion)
     .settings(scalaSettings: _*)
+    .settings(publishingSettings: _*)
     .settings(defaultSettings(): _*)
     .settings(
-      targetJvm := "jvm-1.7",
+      targetJvm := "jvm-1.8",
       shellPrompt := ShellPrompt(appVersion),
       libraryDependencies ++= appDependencies,
       parallelExecution in Test := false,
@@ -115,24 +120,10 @@ private object Repositories {
     credentials += SbtCredentials,
 
     publishArtifact in(Compile, packageDoc) := false,
-    publishArtifact in(Compile, packageSrc) := false,
-    publishArtifact in(Compile, packageBin) := true,
-
-    artifact in publishDist ~= {
-      (art: Artifact) => art.copy(`type` = "zip", extension = "zip")
-    },
-
-    publishDist <<= (target, normalizedName, version) map {
-      (targetDir, id, version) =>
-        val packageName = "%s-%s" format(id, version)
-        targetDir / "universal" / (packageName + ".zip")
-    },
-
-    publishLocal <<= publishLocal dependsOn dist
+    publishArtifact in(Compile, packageSrc) := false
 
   ) ++
     publishAllArtefacts ++
-    nexusPublishingSettings ++
-    addArtifact(artifact in publishDist, publishDist)
+    nexusPublishingSettings
 
 }

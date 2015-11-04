@@ -1,37 +1,57 @@
 package controllers
 
-import services.AmlsService
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import config.AMLSAuthConnector
+import connectors.DataCacheConnector
+import controllers.auth.AmlsRegime
 import forms.AmlsForms._
-
+import models.LoginDetails
 import play.api.mvc._
+import services.AmlsService
+import uk.gov.hmrc.play.frontend.auth.Actions
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-object AmlsController extends AmlsController {
-  val amlsService = AmlsService
-}
-
-trait AmlsController extends FrontendController {
+trait AmlsController extends FrontendController with Actions {
 
   val amlsService: AmlsService
+  val dataCacheConnector: DataCacheConnector
 
-  val onPageLoad = Action { implicit request =>
-    Ok(views.html.AmlsLogin(loginDetailsForm))
-  }
-
-  def onSubmit = Action.async { implicit request =>
-    loginDetailsForm.bindFromRequest.fold(
-      errors => Future.successful(BadRequest(views.html.AmlsLogin(errors))),
-      details => {
-        amlsService.submitLoginDetails(details).map {
-          response => Ok(response.json)
+  def onPageLoad = AuthorisedFor(AmlsRegime).async {
+    implicit user =>
+      implicit request =>
+        dataCacheConnector.fetchDataShortLivedCache[LoginDetails](user.user.oid,"Data") map {
+            case Some(data) => Ok(views.html.AmlsLogin(loginDetailsForm.fill(data)))
+            case _ => Ok(views.html.AmlsLogin(loginDetailsForm))
         } recover {
-          case e: Throwable => {
-            BadRequest("Bad Request: " + e.getStackTrace)
-          }
+          case e:Throwable => throw e
         }
-      }
-    )
   }
+
+  def onSubmit = AuthorisedFor(AmlsRegime).async {
+    implicit user =>
+      implicit request =>
+        loginDetailsForm.bindFromRequest.fold(
+          errors => Future.successful(BadRequest(views.html.AmlsLogin(errors))),
+          details => {
+            dataCacheConnector.saveDataShortLivedCache[LoginDetails](user.user.oid,"Data",details)
+            amlsService.submitLoginDetails(details).map { response =>
+              Ok(response.json)
+            } recover {
+              case e:Throwable => throw e
+            }
+          }
+        )
+  }
+
+  //TODO needs mor information
+  def unauthorised() = Action { implicit request =>
+    Ok(views.html.unauthorised(request))
+  }
+}
+
+object AmlsController extends AmlsController {
+  val amlsService = AmlsService
+  val authConnector = AMLSAuthConnector
+  override val dataCacheConnector = DataCacheConnector
 }

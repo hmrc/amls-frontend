@@ -5,4 +5,5 @@ errors.summary = There are errors in your form submission
 
 ## Login Page
 amls.Login.title= AMLS
+unauthorised.title = Unauthorised
 

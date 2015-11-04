@@ -6,3 +6,7 @@ GET        /hello-world             controllers.HelloWorld.onPageLoad
 POST       /hello-world            controllers.HelloWorld.onSubmit
 GET        /login                   controllers.AmlsController.onPageLoad
 POST       /login                   controllers.AmlsController.onSubmit
+
+GET         /welcome                controllers.WelcomeController.get
+GET         /unauthorised           controllers.AmlsController.unauthorised
+GET         /                       controllers.WelcomeController.get
