@@ -25,7 +25,7 @@ class PassportNumberValidator extends FormValidator {
           trimmedPassportNumber match{
             case p if p.length==0 => Left(Seq(FormError(key, blankValueMessageKey)))
             case num if isUkPassport => {
-              if (num.length != getProperty("validationLengthUkPassportNumber").toInt) {
+              if (num.length != getProperty("validationLengthUkPassportNumber").toInt && num.length != getProperty("validationLengthOldUkPassportNumber").toInt) {
                 Left(Seq(FormError(key, invalidLengthMessageKey)))
               } else {
                 ukPassportNumberRegex.findFirstIn(num) match {
