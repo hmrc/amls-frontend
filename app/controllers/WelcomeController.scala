@@ -1,8 +1,11 @@
 package controllers
 
-/**
- * Created by michael.wolfendale on 04/11/2015.
- */
-class WelcomeController {
+import play.api.mvc._
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
+object WelcomeController extends FrontendController {
+  def get = Action {
+    implicit request =>
+      Ok(views.html.welcomePage())
+  }
 }
