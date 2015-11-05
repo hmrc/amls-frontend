@@ -2,8 +2,18 @@
 generic.other = Other
 generic.please_specify = Please specify
 errors.summary = There are errors in your form submission
+button.save = Save and continue
+button.back = Back
 
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
+
+#About You
+title.yourname = Your name
+lbl.aboutyou = About you
+lbl.yourname = Your name
+lbl.firstname = First name
+lbl.middlename  = Middle name (optional)
+lbl.lastname = Last name
 

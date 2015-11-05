@@ -9,6 +9,6 @@ trait AboutYouController extends FrontendController with Actions {
 
 
 }
-object AboutYouController {
+object AboutYouController extends AboutYouController {
   val authConnector = AMLSAuthConnector
 }
