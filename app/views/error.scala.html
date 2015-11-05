@@ -1,4 +1,4 @@
-@import include.amlsMain
+@import include.main
 
 @(title: String, heading: String, message: String)(implicit request: Request[_])
 
@@ -6,7 +6,7 @@
     <h1>@heading</h1>
 }
 
-@amlsMain(
+@main(
     title = title,
     contentHeader = contentHeader
 ) {
