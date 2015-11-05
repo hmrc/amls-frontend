@@ -6,7 +6,7 @@ import play.api.data.Forms._
 import views.html._
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-object HelloWorld extends FrontendController {
+object ExampleController extends FrontendController {
 
   val form = Form(
     tuple(
