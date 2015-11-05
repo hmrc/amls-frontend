@@ -8,3 +8,5 @@ object LoginDetails{
 
 case class LoginDetails(name: String, password: String)
 
+case class AboutYou(roleWithinBusiness: String)
+

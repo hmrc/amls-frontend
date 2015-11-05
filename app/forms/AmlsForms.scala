@@ -13,5 +13,12 @@ object AmlsForms {
   )(LoginDetails.apply)(LoginDetails.unapply)
 
   val loginDetailsForm = Form(loginDetailsFormMapping)
+
+  val aboutYouMapping = mapping(
+    "roleWithinBusiness" -> text
+  )(AboutYou.apply)(AboutYou.unapply)
+
+  val aboutYouForm = Form(aboutYouMapping)
+
 }
 

@@ -4,7 +4,7 @@ import java.util.UUID
 import _root_.builders.AuthBuilder
 import _root_.builders.SessionBuilder
 import connectors.DataCacheConnector
-import models.LoginDetails
+import models.{AboutYou, LoginDetails}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -14,9 +14,10 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import forms.AmlsForms._
 
 class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
-  implicit val request = FakeRequest()
+
   val userId = s"user-${UUID.randomUUID}"
   val mockAmlsService = mock[AmlsService]
   val mockAuthConnector = mock[AuthConnector]
@@ -45,13 +46,25 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
     "on submit" must {
       "Authorised users" must {
-        "successfully submit entered values" in {
+        "successfully submit valid values" in {
           implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
           AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
           val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
           status(result) must be(OK)
           contentAsString(result) must include("Check your answers")
         }
+
+        "submit without choosing a role and receive validation error in response" in {
+          val aboutYou = AboutYou("")
+          val aboutYouForm1 = aboutYouForm.fill(aboutYou)
+          implicit val request1 = FakeRequest().withFormUrlEncodedBody( aboutYouForm1.data.toSeq : _*)
+          implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+          AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+          val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include("What is your role within the business?")
+        }
+
       }
     }
   }
