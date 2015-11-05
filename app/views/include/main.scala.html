@@ -3,16 +3,17 @@
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
 
 @(
+    sectionTitle: Option[String] = None,
     title: String,
     mainClass: Option[String] = None,
     mainDataAttributes: Option[Html] = None,
     bodyClasses: Option[String] = None,
     sidebar: Html = HtmlFormat.empty,
     contentHeader: Html = HtmlFormat.empty,
-    serviceInfoContent: Html = HtmlFormat.empty,
     scriptElem: Option[Html] = None,
     linkElement : Option[Html] = None,
-    nameBusiness : Option[String] = None
+    nameBusiness : Option[String] = None,
+    serviceInfoContent: Option[Html] = None
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
 @styles = {
@@ -38,10 +39,10 @@
 
 @insideHeader = {
     @uiLayouts.header_nav(
-        navTitle = None,
+        navTitle = Some(Messages("amls.title")),
         navTitleLink = None,
         showBetaLink = false,
-        navLinks = None
+        navLinks = Some(Html("<li><a id=\"logOutNavHref\" href=\"\">Sign out</a></li>"))
     )
 }
 
@@ -75,13 +76,23 @@
     @uiLayouts.serviceInfo(
         betaBanner = betaBanner,
         includeGridWrapper = false,
-        serviceInfoContent = Some(logoutLink)
+        serviceInfoContent = serviceInfoContent
     )
 }
 
+@defaultHeading = {
+    <h1 class="heading-large" >@title</h1>
+}
+
 @mainContentHeader = {
-    @if(contentHeader != HtmlFormat.empty) {
-        @uiLayouts.main_content_header(contentHeader)
+    @contentHeader
+    @sectionTitle.fold(defaultHeading) { sectionTitle =>
+        <h1 class="heading-large">
+            <span class="heading-secondary">
+               @sectionTitle
+            </span>
+        @title
+        </h1>
     }
 }
 
