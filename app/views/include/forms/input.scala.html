@@ -1,0 +1,27 @@
+@import forms.FormHelpers._
+
+@(
+    name: String,
+    labelText: String,
+    hintText: String = "",
+    inputPresentation: Presentation = Defaults.input,
+    fieldPresentation: Presentation = Defaults.field,
+    labelPresentation: Presentation = Defaults.label,
+    hintPresentation: Presentation = Defaults.hint
+)(implicit
+    form: Form[_],
+    lang: Lang
+)
+
+@field(
+    name = name,
+    labelText = labelText,
+    hintText = hintText,
+    fieldPresentation = fieldPresentation,
+    labelPresentation = labelPresentation,
+    hintPresentation = hintPresentation
+) {
+    <input name="@name" type="text" @classes(inputPresentation)
+        @if(hintText.nonEmpty) { aria-describedby="@id(name)-hint" }
+    >
+}

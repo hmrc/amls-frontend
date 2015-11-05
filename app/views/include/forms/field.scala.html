@@ -1,0 +1,31 @@
+@import forms.FormHelpers._
+
+@(
+    name: String,
+    labelText: String,
+    hintText: String = "",
+    fieldPresentation: Presentation = Defaults.field,
+    labelPresentation: Presentation = Defaults.label,
+    hintPresentation: Presentation = Defaults.hint
+)(
+    html: Html
+)(implicit
+    form: Form[_],
+    lang: Lang
+)
+
+@fieldPresentation_ = @{
+    if (form(name).hasErrors) {
+        fieldPresentation.copy(classes = (fieldPresentation.classes :+ "form-field--error"))
+    } else {
+        fieldPresentation
+    }
+}
+
+<div @classes(fieldPresentation_)>
+    @labelContainer(labelText, id(name), labelPresentation) {
+        @hint(hintText, id(name), hintPresentation)
+        @errorField(name)
+    }
+    @html
+</div>
