@@ -11,7 +11,7 @@
 
     <h1>Hello, World!</h1>
 
-    @formHelper(form, routes.HelloWorld.onSubmit) { implicit form: Form[_] =>
+    @formHelper(form, routes.ExampleController.onSubmit) { implicit form: Form[_] =>
 
         @input(
             name = "foo",

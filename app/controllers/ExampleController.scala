@@ -19,14 +19,14 @@ object ExampleController extends FrontendController {
 
   def onPageLoad = Action {
     implicit request =>
-      Ok(hello_world(form))
+      Ok(views.html.hello_world(form))
   }
 
   def onSubmit = Action {
     implicit request =>
       form.bindFromRequest().fold(
         errorForm => BadRequest(hello_world(errorForm)),
-        success => Redirect(routes.HelloWorld.onPageLoad)
+        success => Redirect(routes.ExampleController.onPageLoad)
       )
   }
 }
