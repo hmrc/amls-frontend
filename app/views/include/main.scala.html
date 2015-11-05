@@ -74,19 +74,19 @@
     )
 }
 
+@defaultHeading = {
+    <h1 class="heading-large" >@title</h1>
+}
+
 @mainContentHeader = {
-    @if(contentHeader != HtmlFormat.empty) {
-        @contentHeader
-    }
-    @if(sectionTitle.getOrElse("").length > 0) {
-        <h1 class="heading-secondary" >
-            @sectionTitle.getOrElse("")
+    @contentHeader
+    @sectionTitle.fold(defaultHeading) { sectionTitle =>
+        <h1 class="heading-large">
+            <span class="heading-secondary">
+               @sectionTitle
+            </span>
+        @title
         </h1>
-        <h2 class="heading-large">
-            @title
-        </h2>
-    } else {
-        <h1 class="heading-large" >@title</h1>
     }
 }
 
