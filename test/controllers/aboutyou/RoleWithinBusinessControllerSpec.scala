@@ -32,41 +32,37 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
   }
 
   "RoleWithinBusinessController" must {
-    "on load of page " must {
-      "Authorised users" must {
-        "load the Role Within Business page" in {
-          implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-          AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-          val result = MockRoleWithinBusinessController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
-          status(result) must be(OK)
-          contentAsString(result) must include("What is your role within the business?")
-        }
-      }
+
+    "on load display the Role Within Business page" in {
+      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+      val result = MockRoleWithinBusinessController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
+      status(result) must be(OK)
+      contentAsString(result) must include("What is your role within the business?")
     }
 
-    "on submit" must {
-      "Authorised users" must {
-        "successfully submit valid values" in {
-          implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-          AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-          val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
-          status(result) must be(OK)
-          contentAsString(result) must include("Check your answers")
-        }
-
-        "submit without choosing a role and receive validation error in response" in {
-          val aboutYou = AboutYou("")
-          val aboutYouForm1 = aboutYouForm.fill(aboutYou)
-          implicit val request1 = FakeRequest().withFormUrlEncodedBody( aboutYouForm1.data.toSeq : _*)
-          implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-          AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-          val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
-          status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include("What is your role within the business?")
-        }
-
-      }
+    "on submit of valid role display the next page" in {
+      val aboutYou = AboutYou("Director")
+      val aboutYouForm1 = aboutYouForm.fill(aboutYou)
+      implicit val request1 = FakeRequest().withFormUrlEncodedBody( aboutYouForm1.data.toSeq : _*)
+      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+      val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
+      status(result) must be(OK)
+      contentAsString(result) must include("Check your answers")
     }
+
+    "on submit without choosing a valid role re-display the page with validation error" in {
+      val aboutYou = AboutYou("")
+      val aboutYouForm1 = aboutYouForm.fill(aboutYou)
+      implicit val request1 = FakeRequest().withFormUrlEncodedBody( aboutYouForm1.data.toSeq : _*)
+      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+      val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include("What is your role within the business?")
+    }
+
   }
 }
 
