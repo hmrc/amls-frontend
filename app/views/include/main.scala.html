@@ -15,13 +15,23 @@
     nameBusiness : Option[String] = None
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
+@styles = {
+    <link href="assets/amls.css" rel="stylesheet" type="text/css"/>
+    @linkElement
+}
+
 @head = {
     @uiLayouts.head(
         assetsPrefix = appConfig.assetsPrefix,
-        linkElem = linkElement,
+        linkElem = Some(styles),
         headScripts = None
     )
     <meta name="format-detection" content="telephone=no" />
+}
+
+@scripts = {
+    <script src="assets/amls.js"></script>
+    @scriptElem
 }
 
 @logoutLink = {}
@@ -43,7 +53,7 @@
         analyticsHost = appConfig.analyticsHost,
         assetsPrefix = appConfig.assetsPrefix,
         ssoUrl = None,
-        scriptElem = scriptElem,
+        scriptElem = Some(scripts),
         gaCalls = None
     )
 }
