@@ -1,3 +1,7 @@
+# Generic Messages
+generic.other = Other
+generic.please_specify = Please specify
+errors.summary = There are errors in your form submission
 amls.title=Anti-Money Laundering Supervision
 
 ## Login Page

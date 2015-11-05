@@ -11,22 +11,28 @@
     sidebar: Html = HtmlFormat.empty,
     contentHeader: Html = HtmlFormat.empty,
     scriptElem: Option[Html] = None,
+    linkElement : Option[Html] = None,
     nameBusiness : Option[String] = None,
     serviceInfoContent: Option[Html] = None
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
-
-@linkElement = {
-<link rel="stylesheet" href='@routes.Assets.at("stylesheets/amls.css")' />
+@styles = {
+    <link href="assets/amls.css" rel="stylesheet" type="text/css"/>
+    @linkElement
 }
 
 @head = {
     @uiLayouts.head(
         assetsPrefix = appConfig.assetsPrefix,
-        linkElem = Some(linkElement),
+        linkElem = Some(styles),
         headScripts = None
     )
     <meta name="format-detection" content="telephone=no" />
+}
+
+@scripts = {
+    <script src="assets/amls.js"></script>
+    @scriptElem
 }
 
 @logoutLink = {}
@@ -48,7 +54,7 @@
         analyticsHost = appConfig.analyticsHost,
         assetsPrefix = appConfig.assetsPrefix,
         ssoUrl = None,
-        scriptElem = scriptElem,
+        scriptElem = Some(scripts),
         gaCalls = None
     )
 }
