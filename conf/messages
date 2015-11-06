@@ -7,3 +7,5 @@ errors.summary = There are errors in your form submission
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
+## About You pages
+validation.aboutyou.role.blank=Please choose a valid role

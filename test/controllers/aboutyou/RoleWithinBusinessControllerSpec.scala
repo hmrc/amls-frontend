@@ -10,6 +10,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AmlsService
@@ -61,6 +62,8 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
       val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("What is your role within the business?")
+      contentAsString(result) must include(Messages("validation.aboutyou.role.blank"))
+
     }
 
   }
