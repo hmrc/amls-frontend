@@ -6,7 +6,7 @@ object LoginDetails{
   implicit val formats = Json.format[LoginDetails]
 }
 
-case class LoginDetails(name: String, password: String) 
+case class LoginDetails(name: String, password: String)
 
 object YourName{
   implicit val formats = Json.format[YourName]

@@ -18,7 +18,7 @@ import uk.gov.hmrc.play.http.SessionKeys
 
 import scala.concurrent.Future
 
-class AboutYouYourNameControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
   val userId = s"user-${UUID.randomUUID}"
   implicit val request = FakeRequest()

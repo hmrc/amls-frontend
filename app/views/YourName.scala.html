@@ -11,7 +11,7 @@
 
     <h1>@Messages("lbl.yourname")</h1>
 
-    @formHelper(yourNameForm, routes.AboutYouYourNameController.onSubmit) { implicit form: Form[_] =>
+    @formHelper(yourNameForm, aboutYou.routes.YourNameController.onSubmit) { implicit form: Form[_] =>
 
         @input(
             name = "firtname",

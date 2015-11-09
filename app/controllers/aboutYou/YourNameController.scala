@@ -1,4 +1,4 @@
-package controllers
+package controllers.aboutYou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
@@ -11,7 +11,7 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 import scala.concurrent.Future
 
 
-trait AboutYouYourNameController extends FrontendController with Actions {
+trait YourNameController extends FrontendController with Actions {
 
   val dataCacheConnector: DataCacheConnector
 
@@ -39,7 +39,7 @@ trait AboutYouYourNameController extends FrontendController with Actions {
   }
 }
 
-object AboutYouYourNameController extends AboutYouYourNameController {
+object YourNameController extends YourNameController {
   val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }
