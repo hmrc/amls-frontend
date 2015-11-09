@@ -21,4 +21,6 @@ lbl.firstname = First name
 lbl.middlename  = Middle name (optional)
 lbl.lastname = Last name
 
-validation.aboutyou.role.blank=Please choose a valid role
+title.roleWithinBusiness = What is your role within the business?
+
+validation.aboutyou.roleWithinBusiness.blank=Please choose a valid role

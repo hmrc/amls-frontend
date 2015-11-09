@@ -8,7 +8,8 @@ GET        /login                   controllers.AmlsController.onPageLoad
 POST       /login                   controllers.AmlsController.onSubmit
 GET        /your-name               controllers.aboutYou.YourNameController.onPageLoad
 POST       /your-name               controllers.aboutYou.YourNameController.onSubmit
-
+GET        /role-within-business    controllers.aboutYou.RoleWithinBusinessController.onPageLoad
+POST       /role-within-business    controllers.aboutYou.RoleWithinBusinessController.onSubmit
 
 GET         /welcome                controllers.WelcomeController.get
 GET         /unauthorised           controllers.AmlsController.unauthorised
