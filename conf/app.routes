@@ -14,3 +14,4 @@ POST       /role-within-business    controllers.aboutYou.RoleWithinBusinessContr
 GET         /welcome                controllers.WelcomeController.get
 GET         /unauthorised           controllers.AmlsController.unauthorised
 GET         /                       controllers.WelcomeController.get
+GET         /summary                controllers.MainSummaryController.onPageLoad

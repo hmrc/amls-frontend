@@ -6,7 +6,7 @@
 @(yourNameForm: Form[models.YourName])(implicit request: Request[_])
 
 @main(
-    Messages("title.yourname")
+    title = Messages("title.yourname")
 ) {
 
     <h1>@Messages("lbl.yourname")</h1>

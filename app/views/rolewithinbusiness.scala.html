@@ -7,11 +7,9 @@
 @(roleWithinBusinessForm: Form[models.RoleWithinBusiness])(implicit request: Request[_])
 
 @main(
-    Messages("title.roleWithinBusiness")
+    sectionTitle = Some(Messages("aboutyou.sectiontitle")),
+    title = Messages("title.roleWithinBusiness")
 ) {
-
-    <h1>@Messages("title.roleWithinBusiness")</h1>
-
     @formHelper(roleWithinBusinessForm, aboutYou.routes.RoleWithinBusinessController.onSubmit) { implicit form: Form[_] =>
         @radioGroupWithOther(
             name = "roleWithinBusiness",
