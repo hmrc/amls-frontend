@@ -22,6 +22,8 @@ object FormHelpers {
 
     val legend = Presentation(classes = Seq("heading-small"))
 
+    val legendInvisible = Presentation(classes = Seq("visibly-hidden"))
+
     val hint = Presentation(classes = Seq("form-hint"))
 
     val input = Presentation(classes = Seq("form-control"))

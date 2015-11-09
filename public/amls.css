@@ -70,3 +70,11 @@
 .locked {
     color: #6F777B;
 }
+
+.visibly-hidden {
+    position:absolute;
+    left:-9999px;
+    width:100px;
+    height:auto;
+    overflow:hidden;
+}
