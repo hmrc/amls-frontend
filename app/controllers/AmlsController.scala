@@ -28,6 +28,7 @@ trait AmlsController extends FrontendController with Actions {
         }
   }
 
+
   def onSubmit = AuthorisedFor(AmlsRegime).async {
     implicit user =>
       implicit request =>
