@@ -1,17 +1,17 @@
 @import include.main
 @import forms.FormHelpers._
+@import forms.AmlsForms._
 @import include.forms._
-@import controllers.routes.AmlsController
 
-@(form: Form[_])(implicit request: Request[_])
+@(yourNameForm: Form[models.YourName])(implicit request: Request[_])
 
 @main(
-    @Messages("title.yourname")
+    Messages("title.yourname")
 ) {
 
     <h1>@Messages("lbl.yourname")</h1>
 
-    @formHelper(form, routes.AboutYouController.onYourNameSubmit) { implicit form: Form[_] =>
+    @formHelper(yourNameForm, routes.AboutYouYourNameController.onSubmit) { implicit form: Form[_] =>
 
         @input(
             name = "firtname",

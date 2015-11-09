@@ -1,7 +1,7 @@
 package services
 
-import connectors.{AmlsConnector}
-import models.{LoginDetails}
+import connectors.{DataCacheConnector, AmlsConnector}
+import models. LoginDetails
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HttpResponse
@@ -12,6 +12,7 @@ import scala.concurrent.Future
 trait AmlsService {
 
   val amlsConnector: AmlsConnector
+  val dataCacheConnector: DataCacheConnector
 
   def submitLoginDetails(loginDetails: LoginDetails)(implicit user: AuthContext, headerCarrier: HeaderCarrier) : Future[HttpResponse]= {
     for {
@@ -22,4 +23,5 @@ trait AmlsService {
 
 object AmlsService extends AmlsService {
   val amlsConnector = AmlsConnector
+  val dataCacheConnector = DataCacheConnector
 }
