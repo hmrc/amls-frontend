@@ -1,0 +1,24 @@
+@import helper._
+@import config.ApplicationConfig
+@import include.main
+
+@(areYouEmployedWithinTheBusinessModel: Form[models.AreYouEmployedWithinTheBusinessModel])(implicit request:Request[_])
+@main(
+title = "Anti Money Laundering Registration"
+) {
+<h1 id="page-title" class="heading-48">
+    @Messages("amls.areYouEmployedWithinTheBusiness.title")
+</h1>
+n
+<div>
+    @form(action=controllers.aboutyou.AreYouEmployedWithinTheBusinessController.onSubmit) {
+    @{
+        play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(token)}
+    }
+
+    @inputText(areYouEmployedWithinTheBusinessModel("radio_inline_group_2"))
+        <input type="submit" value="Submit" />
+    </div>
+    }
+</div>
+}

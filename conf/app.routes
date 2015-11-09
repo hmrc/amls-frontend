@@ -15,3 +15,6 @@ GET         /welcome                controllers.WelcomeController.get
 GET         /unauthorised           controllers.AmlsController.unauthorised
 GET         /                       controllers.WelcomeController.get
 GET         /summary                controllers.MainSummaryController.onPageLoad
+
+GET         /about-you-2            controllers.aboutyou.AreYouEmployedWithinTheBusinessController.onPageLoad
+POST        /about-you-2            controllers.aboutyou.AreYouEmployedWithinTheBusinessController.onSubmit
