@@ -4,7 +4,8 @@ import java.util.UUID
 import _root_.builders.AuthBuilder
 import _root_.builders.SessionBuilder
 import connectors.DataCacheConnector
-import models.{AboutYou, LoginDetails}
+import controllers.aboutYou.RoleWithinBusinessController
+import models.{RoleWithinBusiness, LoginDetails}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -15,17 +16,19 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import forms.AmlsForms._
+import forms.AboutYouForms._
 
 class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
   val mockAmlsService = mock[AmlsService]
   val mockAuthConnector = mock[AuthConnector]
+  val mockDataCacheConnector = mock[DataCacheConnector]
 
   object MockRoleWithinBusinessController extends RoleWithinBusinessController {
     val authConnector = mockAuthConnector
     val amlsService: AmlsService = mockAmlsService
+    val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
 
   override def beforeEach(): Unit = {
@@ -43,9 +46,9 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit of valid role display the next page" in {
-      val aboutYou = AboutYou("Director")
-      val aboutYouForm1 = aboutYouForm.fill(aboutYou)
-      implicit val request1 = FakeRequest().withFormUrlEncodedBody( aboutYouForm1.data.toSeq : _*)
+      val aboutYou = RoleWithinBusiness("Director")
+      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
+      implicit val request1 = FakeRequest().withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
       val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
@@ -54,9 +57,9 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
-      val aboutYou = AboutYou("")
-      val aboutYouForm1 = aboutYouForm.fill(aboutYou)
-      implicit val request1 = FakeRequest().withFormUrlEncodedBody( aboutYouForm1.data.toSeq : _*)
+      val aboutYou = RoleWithinBusiness("")
+      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
+      implicit val request1 = FakeRequest().withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
       val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
