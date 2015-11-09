@@ -3,11 +3,10 @@ generic.other = Other
 generic.please_specify = Please specify
 errors.summary = There are errors in your form submission
 button.save = Save and continue
+button.checkYourAnswers = Check your answers
 button.back = Back
 
 ######### save4later #########
-your
-
 
 ## Login Page
 amls.Login.title= AMLS
@@ -22,5 +21,13 @@ lbl.middlename  = Middle name (optional)
 lbl.lastname = Last name
 
 title.roleWithinBusiness = What is your role within the business?
+
+#Roles within business
+lbl.roleWithinBusiness.1=Beneficial shareholder
+lbl.roleWithinBusiness.2=Director
+lbl.roleWithinBusiness.3=Partner
+lbl.roleWithinBusiness.4=Internal accountant
+lbl.roleWithinBusiness.5=Sole proprietor
+lbl.roleWithinBusiness.6=Nominated officer
 
 validation.aboutyou.roleWithinBusiness.blank=Please choose a valid role

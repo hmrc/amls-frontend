@@ -2,6 +2,7 @@
 @import forms.FormHelpers._
 @import forms.AmlsForms._
 @import include.forms._
+@import utils.CommonHelper._
 
 @(roleWithinBusinessForm: Form[models.RoleWithinBusiness])(implicit request: Request[_])
 
@@ -12,16 +13,12 @@
     <h1>@Messages("title.roleWithinBusiness")</h1>
 
     @formHelper(roleWithinBusinessForm, aboutYou.routes.RoleWithinBusinessController.onSubmit) { implicit form: Form[_] =>
-        @radioGroup(
+        @radioGroupWithOther(
             name = "roleWithinBusiness",
-            labelText = "Bla",
-            hintText = "Some hint text",
-            options = Seq(
-                "Yes" -> "yes",
-                "No" -> "no"
-            )
+            labelText = "title.roleWithinBusiness",
+            otherLabelText = "Some other label text",
+            options = getSeqFromMessagesKey("lbl.roleWithinBusiness")
         )
-
-        @submit()
+        @submit(Messages("button.checkYourAnswers"))
     }
 }
