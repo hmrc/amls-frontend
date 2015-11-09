@@ -1,8 +1,10 @@
 package models
 
-/**
- * Created by user on 09/11/15.
- */
-class AboutYou {
+import play.api.libs.json.Json
 
+object YourName{
+  implicit val formats = Json.format[YourName]
 }
+
+case class YourName(firstName: String, middleName: String, lastName: String)
+
