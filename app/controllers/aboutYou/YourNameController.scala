@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.auth.AmlsRegime
 import forms.AboutYouForms._
 import models.YourName
+import play.api.i18n.Messages
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -18,7 +19,7 @@ trait YourNameController extends FrontendController with Actions {
   def onPageLoad = AuthorisedFor(AmlsRegime).async {
     implicit user =>
       implicit request =>
-        dataCacheConnector.fetchDataShortLivedCache[YourName](user.user.oid,"yourName") map {
+        dataCacheConnector.fetchDataShortLivedCache[YourName](user.user.oid, Messages("save4later.your_name")) map {
             case Some(data) => Ok(views.html.YourName(yourNameForm.fill(data)))
             case _ => Ok(views.html.YourName(yourNameForm))
         } recover {
@@ -32,8 +33,8 @@ trait YourNameController extends FrontendController with Actions {
         yourNameForm.bindFromRequest().fold(
         errors => Future.successful(BadRequest(views.html.YourName(errors))),
         details => {
-          dataCacheConnector.saveDataShortLivedCache[YourName](user.user.oid,"yourName", details) map { _ =>
-            Ok(views.html.YourName(yourNameForm.fill(details)))
+          dataCacheConnector.saveDataShortLivedCache[YourName](user.user.oid, Messages("save4later.your_name"), details) map { _ =>
+            Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
           }
         })
   }
