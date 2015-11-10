@@ -30,11 +30,11 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
   object MockAreYouEmployedWithinTheBusinessController extends AreYouEmployedWithinTheBusinessController {
     val authConnector = mockAuthConnector
     val areYouEmployedWithinTheBusinessService = mockAreYouEmployedWithinTheBusinessService
-    val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
+    val dataCacheConnector = mockDataCacheConnector
   }
 
   val fakePostRequest = FakeRequest("POST", "/about-you-2").withFormUrlEncodedBody("radio-inline" -> "Yes")
-  val loginDtls: LoginDetails = LoginDetails("testuser", "password")
+  val loginDtls = LoginDetails("testuser", "password")
 
   "On Page load" must {
 
@@ -56,24 +56,25 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
     }
   }
 
-  override protected def authConnector: AuthConnector = mockAuthConnector
+  override protected def authConnector = mockAuthConnector
 
-  def getWithAuthorisedUser(futureResult: Future[Result] => Any) {
-    getMockAuthorisedUser
-    val result = MockAreYouEmployedWithinTheBusinessController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
-    futureResult(result)
+  def getWithAuthorisedUser(future: Future[Result] => Any) {
 
     def getMockAuthorisedUser() {
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
     }
+
+    getMockAuthorisedUser
+    val result = MockAreYouEmployedWithinTheBusinessController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
+    future(result)
   }
 
 
-  def getWithUnAuthorisedUser(futureResult: Future[Result] => Any) {
+  def getWithUnAuthorisedUser(future: Future[Result] => Any) {
     AuthBuilder.mockUnAuthorisedUser(userId, mockAuthConnector)
     val result = MockAreYouEmployedWithinTheBusinessController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
-    futureResult(result)
+    future(result)
   }
 
 
@@ -96,6 +97,5 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
     val result = MockAreYouEmployedWithinTheBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
     test(result)
   }
-
 
 }

@@ -1,12 +1,13 @@
 package connectors
 
 import config.WSHttp
-import models.{AreYouEmployedWithinTheBusinessModel, LoginDetails}
+import models.AreYouEmployedWithinTheBusinessModel
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HttpGet, HttpPost, HttpResponse}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

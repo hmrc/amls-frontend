@@ -1,10 +1,10 @@
 package controllers
 
-import play.api.mvc._
-import play.api.data._
 import play.api.data.Forms._
-import views.html._
+import play.api.data._
+import play.api.mvc._
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import views.html._
 
 object ExampleController extends FrontendController {
 
