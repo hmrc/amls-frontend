@@ -32,7 +32,7 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
           errors => Future.successful(BadRequest(views.html.rolewithinbusiness(errors))),
           details => {
             dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](user.user.oid,"roleWithinBusiness", details) map { _ =>
-              NotImplemented
+              NotImplemented("Not implemented: summary page")
             }
           })
   }
