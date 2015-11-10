@@ -9,7 +9,6 @@ import play.api.mvc._
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-
 import scala.concurrent.Future
 
 trait AmlsController extends FrontendController with Actions {

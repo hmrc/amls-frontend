@@ -4,8 +4,6 @@ import config.AmlsShortLivedCache
 import play.api.libs.json
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
-
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
