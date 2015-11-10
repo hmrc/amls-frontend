@@ -6,29 +6,25 @@
 @(yourNameForm: Form[models.YourName])(implicit request: Request[_])
 
 @main(
-    Messages("title.your_name")
+    sectionTitle = Some(Messages("sectionTitle.about_you")),
+    title = Messages("title.your_name")
 ) {
 
-    <h1>@Messages("lbl.your_name")</h1>
-
-    @formHelper(yourNameForm, aboutYou.routes.YourNameController.onSubmit) { implicit form: Form[_] =>
+      @formHelper(yourNameForm, aboutYou.routes.YourNameController.onSubmit) { implicit form: Form[_] =>
 
         @input(
             name = "firtname",
-            labelText = Messages("lbl.first_name"),
-            hintText = Messages("some hint text")
+            labelText = Messages("lbl.first_name")
         )
 
         @input(
             name = "middlename",
-            labelText = Messages("lbl.middle_name"),
-            hintText = Messages("some hint text")
+            labelText = Messages("lbl.middle_name")
         )
 
         @input(
             name = "lastname",
-            labelText = Messages("lbl.last_name"),
-            hintText = Messages("some hint text")
+            labelText = Messages("lbl.last_name")
         )
 
         @submit()

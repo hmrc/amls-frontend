@@ -23,7 +23,7 @@ trait YourNameController extends FrontendController with Actions {
             case Some(data) => Ok(views.html.YourName(yourNameForm.fill(data)))
             case _ => Ok(views.html.YourName(yourNameForm))
         } recover {
-          case e:Throwable => throw e
+          case e:Throwable => throw e.fillInStackTrace()
         }
   }
 

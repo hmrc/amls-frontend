@@ -6,5 +6,5 @@ object YourName{
   implicit val formats = Json.format[YourName]
 }
 
-case class YourName(firstName: String, middleName: String, lastName: String)
+case class YourName(firstName: String, middleName:  Option[String], lastName: String)
 
