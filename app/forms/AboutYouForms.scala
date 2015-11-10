@@ -19,7 +19,4 @@ object AboutYouForms {
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply)
 
   val roleWithinBusinessForm = Form(roleWithinBusinessFormMapping)
-
 }
-
-

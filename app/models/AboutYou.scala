@@ -13,4 +13,3 @@ object RoleWithinBusiness{
 }
 
 case class RoleWithinBusiness(roleWithinBusiness: String)
-

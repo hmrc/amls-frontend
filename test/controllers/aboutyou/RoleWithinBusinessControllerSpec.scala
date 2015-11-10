@@ -83,4 +83,3 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
   }
 }
-
