@@ -32,6 +32,11 @@ class CurrencyValueValidatorSpec extends PlaySpec with MockitoSugar  with OneSer
     "report correctly for blank value" in {
       optionalCurrencyValue("error.currency").bind(Map("" -> "")) mustBe Right(None)
     }
+
+    "respond appropriately if unbound" in {
+      optionalCurrencyValue("error.currency").binder.unbind("", Some(BigDecimal(44) )) mustBe Map("" -> "44")
+    }
+
   }
 
 }

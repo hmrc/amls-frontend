@@ -66,6 +66,12 @@ class BankDetailsValidatorSpec extends PlaySpec with MockitoSugar  with OneServe
       mandatoryIban("blank message", "invalid message").bind(Map("" -> ("MT84 MALT 0110 0001 2345 MTLC AST0 01S" + ("S" * 4)))) mustBe
         Left(List(FormError("", "invalid message")))
     }
+
+    "respond appropriately if unbound" in {
+      mandatoryIban("blank message", "invalid message").binder.unbind("", "AL47212110090000000235698741") mustBe
+        Map("" -> "AL47212110090000000235698741")
+    }
+
   }
 
 }

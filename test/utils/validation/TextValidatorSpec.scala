@@ -20,6 +20,7 @@ class TextValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSui
       mandatoryText("blank message", "invalid length", "validationMaxLengthFirstName").bind(Map("" -> "a" * 250)) mustBe
         Left(List(FormError("", "invalid length")))
     }
+
   }
 
 }

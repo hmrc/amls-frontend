@@ -25,6 +25,11 @@ class CurrencyValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPe
     "report correctly for blank value" in {
       optionalCurrency("invalid").bind(Map("" -> "")) mustBe Right(None)
     }
+
+    "respond appropriately if unbound" in {
+      optionalCurrency("invalid").binder.unbind("", Some("GBP")) mustBe Map("" -> "GBP")
+    }
+
   }
 
 }

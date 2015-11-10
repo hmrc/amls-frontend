@@ -75,6 +75,14 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(invalidPostcode)
         .left.getOrElse(Nil).contains(FormError("postcodekey", "invalid-postcode")) mustBe true
     }
+
+    "respond suitably when unbound" in {
+      address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode")
+        .binder.unbind("addr2key", "hello") mustBe
+          Map( "addr2key" -> "hello")
+    }
+
   }
 
 }
