@@ -29,6 +29,10 @@ class PhoneNumberValidatorSpec extends PlaySpec with MockitoSugar  with OneServe
       mandatoryPhoneNumber("blank","length","invalid").bind(Map("" -> "019122244+55 ext 5544"))
         .left.getOrElse(Nil).contains(FormError("", "invalid")) mustBe true
     }
+
+    "respond appropriately if unbound" in {
+      mandatoryPhoneNumber("blank", "length", "invalid").binder.unbind("", "01912224455") mustBe Map("" -> "01912224455")
+    }
   }
 
 }
