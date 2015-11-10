@@ -48,7 +48,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
       contentAsString(result) must include("What is your role within the business?")
     }
 
-    "on submit of valid role display the next page" in {
+    "on submit of valid role display the next page (currently NOT IMPLEMENTED)" in {
       val aboutYou = RoleWithinBusiness("Director")
       val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
       implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
@@ -59,8 +59,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
         .thenReturn(Future.successful(Some(aboutYou)))
 
       val result = MockRoleWithinBusinessController.onSubmit.apply(request1)
-      status(result) must be(OK)
-      contentAsString(result) must include("Check your answers")
+      status(result) must be(NOT_IMPLEMENTED)
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
@@ -72,7 +71,6 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
       when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(aboutYou)))
-
 
       val result = MockRoleWithinBusinessController.onSubmit.apply(request1)
       status(result) must be(BAD_REQUEST)
