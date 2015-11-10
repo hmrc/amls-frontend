@@ -22,7 +22,7 @@ import play.api.data.FormError
 import uk.gov.hmrc.play.mappers.DateFields._
 import utils.validation.DateTupleValidator._
 
-class DateTupleValidatorTest extends WordSpec with Matchers {
+class DateTupleValidatorSpec extends WordSpec with Matchers {
   "dateTuple" should {
     def assertError(dateFields: Map[String, String]) {
       val result = dateTuple.bind(dateFields)

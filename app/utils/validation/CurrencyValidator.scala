@@ -3,36 +3,32 @@ package utils.validation
 import play.api.data.Forms
 import play.api.data.format.Formatter
 import play.api.data.FormError
+import java.util.Currency
+import scala.collection.JavaConverters._
 
 object CurrencyValidator extends CurrencyValidator
 
 class CurrencyValidator extends FormValidator{
 
-  private def cleanMoneyString(moneyString: String) =
-    currencyRegex.findFirstIn(moneyString.replace(",","")).getOrElse("")
+  private def getCurrencies:Set[String] =
+      Currency.getAvailableCurrencies.asScala.map( _.getCurrencyCode ).toSet
 
-  private def optionalCurrencyFormatter(invalidFormatMessageKey: String) = new Formatter[Option[BigDecimal]] {
-    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[BigDecimal]] = {
+  private def optionalCurrencyFormatter(invalidCurrencyMessageKey: String) = new Formatter[Option[String]] {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
       data.get(key) match {
-        case Some(num) => {
-          num.trim match{
+        case Some(currency) => {
+          currency.trim match{
             case "" => Right(None)
-            case numTrimmed => {
-              try {
-                val bigDecimalMoney = BigDecimal(cleanMoneyString(numTrimmed))
-                Right(Some(bigDecimalMoney))
-              } catch {
-                case e: NumberFormatException => Left(Seq(FormError(key, invalidFormatMessageKey)))
-              }
-            }
+            case currencyTrimmed if getCurrencies.contains(currencyTrimmed) => Right(Some(currencyTrimmed))
+            case _ => Left(Seq(FormError(key, invalidCurrencyMessageKey)))
           }
         }
-        case _ => Left(Seq(FormError(key, invalidFormatMessageKey)))
+        case _ => Left(Seq(FormError(key, invalidCurrencyMessageKey)))
       }
     }
-    override def unbind(key: String, value: Option[BigDecimal]): Map[String, String] = Map(key -> value.getOrElse("").toString)
+    override def unbind(key: String, value: Option[String]): Map[String, String] = Map(key -> value.getOrElse(""))
   }
 
   def optionalCurrency(invalidFormatMessageKey: String) =
-    Forms.of[Option[BigDecimal]](optionalCurrencyFormatter(invalidFormatMessageKey))
+    Forms.of[Option[String]](optionalCurrencyFormatter(invalidFormatMessageKey))
 }
