@@ -1,12 +1,12 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.test.{WithFakeApplication}
 import utils.validation.EmailValidator._
 import play.api.data.FormError
 
-class EmailValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplication{
+class EmailValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite{
 
   "mandatoryEmail" should {
     "return the email if the email format is correct" in {
