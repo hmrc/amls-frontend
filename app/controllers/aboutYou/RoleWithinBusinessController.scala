@@ -18,7 +18,9 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
     implicit user =>
       implicit request =>
         dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](user.user.oid,"roleWithinBusiness") map {
-          case Some(data) => Ok(views.html.rolewithinbusiness(roleWithinBusinessForm.fill(data)))
+          case Some(data) => {
+            Ok(views.html.rolewithinbusiness(roleWithinBusinessForm.fill(data)))
+          }
           case _ => Ok(views.html.rolewithinbusiness(roleWithinBusinessForm))
         } recover {
           case e:Throwable => throw e
