@@ -12,12 +12,12 @@ import scala.concurrent.Future
 
 trait RoleWithinBusinessController extends FrontendController with Actions {
 
-  val dataCacheConnector: DataCacheConnector
+  val dataCacheConnector: DataCacheConnector = DataCacheConnector
 
   def onPageLoad = AuthorisedFor(AmlsRegime).async {
     implicit user =>
       implicit request =>
-        dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](user.user.oid,"yourName") map {
+        dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](user.user.oid,"roleWithinBusiness") map {
           case Some(data) => Ok(views.html.rolewithinbusiness(roleWithinBusinessForm.fill(data)))
           case _ => Ok(views.html.rolewithinbusiness(roleWithinBusinessForm))
         } recover {
@@ -31,7 +31,7 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
         roleWithinBusinessForm.bindFromRequest().fold(
           errors => Future.successful(BadRequest(views.html.rolewithinbusiness(errors))),
           details => {
-            dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](user.user.oid,"yourName", details) map { _ =>
+            dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](user.user.oid,"roleWithinBusiness", details) map { _ =>
               Ok(views.html.rolewithinbusiness(roleWithinBusinessForm.fill(details)))
             }
           })

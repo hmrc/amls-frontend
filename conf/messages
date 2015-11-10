@@ -33,8 +33,6 @@ lbl.roleWithinBusiness.4=Internal accountant
 lbl.roleWithinBusiness.5=Sole proprietor
 lbl.roleWithinBusiness.6=Nominated officer
 
-validation.aboutyou.roleWithinBusiness.blank=Please choose a valid role
-
 ## Summary Page
 amls.summary.title=Your AMLS registration
 amls.summary.sectiontitle=Service

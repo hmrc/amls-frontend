@@ -17,6 +17,8 @@ import play.api.test.Helpers._
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import forms.AboutYouForms._
+import org.mockito.Matchers._
+import scala.concurrent.Future
 
 class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
@@ -28,7 +30,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
   object MockRoleWithinBusinessController extends RoleWithinBusinessController {
     val authConnector = mockAuthConnector
     val amlsService: AmlsService = mockAmlsService
-    val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
+    override val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
 
   override def beforeEach(): Unit = {
@@ -36,10 +38,11 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
   }
 
   "RoleWithinBusinessController" must {
-
     "on load display the Role Within Business page" in {
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any(), any())(any(), any()))
+        .thenReturn(Future.successful(None))
       val result = MockRoleWithinBusinessController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
       status(result) must be(OK)
       contentAsString(result) must include("What is your role within the business?")
@@ -48,10 +51,14 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     "on submit of valid role display the next page" in {
       val aboutYou = RoleWithinBusiness("Director")
       val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
-      implicit val request1 = FakeRequest().withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
+      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-      val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
+
+      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(aboutYou)))
+
+      val result = MockRoleWithinBusinessController.onSubmit.apply(request1)
       status(result) must be(OK)
       contentAsString(result) must include("Check your answers")
     }
@@ -59,13 +66,18 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     "on submit without choosing a valid role re-display the page with validation error" in {
       val aboutYou = RoleWithinBusiness("")
       val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
-      implicit val request1 = FakeRequest().withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
+      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-      val result = MockRoleWithinBusinessController.onSubmit.apply(SessionBuilder.buildRequestWithSession(userId))
+
+      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(aboutYou)))
+
+
+      val result = MockRoleWithinBusinessController.onSubmit.apply(request1)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("What is your role within the business?")
-      contentAsString(result) must include(Messages("validation.aboutyou.role.blank"))
+      contentAsString(result) must include(Messages("error.required"))
 
     }
 
