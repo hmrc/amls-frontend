@@ -1,5 +1,6 @@
 package controllers
 
+import java.util
 import java.util.UUID
 
 import builders.{AuthBuilder, SessionBuilder}
@@ -57,22 +58,6 @@ class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
               contentAsString(result) must include(Messages("lbl.first_name")) // TODO need to replace lable with the actual value
           }
         }
-
-     /*   "fail test when there is an exception" in {
-
-         a [Exception] must be thrownBy {
-           implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-           AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-           when(mockDataCacheConnector.fetchDataShortLivedCache[YourName](Matchers.any(),
-        Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.failed(new RuntimeException("test")))
-           val result = MockYourNameController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
-          }
-         /* getMockAuthorisedUserWithException {
-            result =>
-             result  //TODO
-
-          }*/
-        }*/
       }
     }
 
@@ -123,15 +108,6 @@ class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
       getMockAuthorisedUser(test, true)
     }
 
-    def getMockAuthorisedUserWithException(test: Future[Result] => Any) {
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-      when(mockDataCacheConnector.fetchDataShortLivedCache[YourName](Matchers.any(),
-        Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.failed(new RuntimeException("test")))
-      val result = MockYourNameController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
-      test(result)
-    }
-
     def getAuthorisedUserWithPost(test: Future[Result] => Any, fakePostRequest:FakeRequest[AnyContentAsFormUrlEncoded]) {
       implicit val request = fakePostRequest
       val sessionId = s"session-${UUID.randomUUID}"
@@ -140,8 +116,6 @@ class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
         SessionKeys.userId -> userId)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-      when(mockDataCacheConnector.saveDataShortLivedCache[YourName](Matchers.any(),
-      Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(yourName)))
       val result = MockYourNameController.onSubmit.apply(session)
       test(result)
     }
@@ -150,6 +124,8 @@ class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
       val yourNameModel = YourName(firstName, Option(middleName),lastName)
       val form  = yourNameForm.fill(yourNameModel)
       val fakePostRequest = FakeRequest("POST", "/your-name").withFormUrlEncodedBody(form.data.toSeq: _*)
+      when(mockDataCacheConnector.saveDataShortLivedCache[YourName](Matchers.any(),
+      Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(yourName)))
       getAuthorisedUserWithPost(test, fakePostRequest)
     }
 
