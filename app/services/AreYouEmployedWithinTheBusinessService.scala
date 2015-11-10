@@ -1,7 +1,7 @@
 package services
 
-import connectors.AmlsConnector
-import models.LoginDetails
+import connectors.AreYouEmployedWithinTheBusinessConnector
+import models.{AreYouEmployedWithinTheBusinessModel, LoginDetails}
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HttpResponse
@@ -9,18 +9,17 @@ import uk.gov.hmrc.play.http.HttpResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 trait AreYouEmployedWithinTheBusinessService {
 
-  val amlsConnector: AmlsConnector
+  def areYouEmployedWithinTheBusinessConnector: AreYouEmployedWithinTheBusinessConnector
 
-  def submitLoginDetails(loginDetails: LoginDetails)(implicit user: AuthContext, headerCarrier: HeaderCarrier): Future[HttpResponse] = {
+  def submitDetails(areYouEmployedWithinTheBusiness: AreYouEmployedWithinTheBusinessModel)(implicit user: AuthContext, headerCarrier: HeaderCarrier): Future[HttpResponse] = {
     for {
-      response <- amlsConnector.submitLoginDetails(loginDetails)
+      response <- areYouEmployedWithinTheBusinessConnector.submitDetails(areYouEmployedWithinTheBusiness)
     } yield (response)
   }
 }
 
 object AreYouEmployedWithinTheBusinessService extends AreYouEmployedWithinTheBusinessService {
-  val amlsConnector = AmlsConnector
+  override lazy val areYouEmployedWithinTheBusinessConnector = AreYouEmployedWithinTheBusinessConnector
 }
