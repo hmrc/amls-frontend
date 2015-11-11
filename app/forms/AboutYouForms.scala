@@ -19,4 +19,11 @@ object AboutYouForms {
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply)
 
   val roleWithinBusinessForm = Form(roleWithinBusinessFormMapping)
+
+  val roleForBusinessFormMapping = mapping(
+    "roleForBusiness" -> nonEmptyText,
+    "other" -> text
+  )(RoleForBusiness.apply)(RoleForBusiness.unapply)
+
+  val roleForBusinessForm = Form(roleForBusinessFormMapping)
 }
