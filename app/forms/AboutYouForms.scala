@@ -3,6 +3,7 @@ package forms
 import models._
 import play.api.data.Forms._
 import play.api.data._
+import utils.validation.RadioGroupWithOtherValidator.radioGroupWithOther
 
 object AboutYouForms {
 
@@ -15,7 +16,7 @@ object AboutYouForms {
   val yourNameForm = Form(yourNameFormMapping)
 
   val roleWithinBusinessFormMapping = mapping(
-    "roleWithinBusiness" -> nonEmptyText,
+    "roleWithinBusiness" -> radioGroupWithOther("other", "noradiobuttonselected", "blank", "invalidlength", "validationMaxLengthRoleWithinBusinessOther"),
     "other" -> text
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply)
 

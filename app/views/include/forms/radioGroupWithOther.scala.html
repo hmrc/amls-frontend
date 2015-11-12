@@ -1,73 +1,73 @@
 @import forms.FormHelpers._
 
 @(
-    name: String,
-    otherName: String,
-    labelText: String,
-    otherLabelText: String,
-    options: Seq[(String, String)],
-    hintText: String = "",
-    fieldsetPresentation: Presentation = Defaults.radioGroup,
-    containerPresentation: Presentation = Defaults.field,
-    legendPresentation: Presentation = Defaults.legend,
-    hintPresentation: Presentation = Defaults.hint
+name: String,
+otherName: String,
+labelText: String,
+otherLabelText: String,
+options: Seq[(String, String)],
+hintText: String = "",
+fieldsetPresentation: Presentation = Defaults.radioGroup,
+containerPresentation: Presentation = Defaults.field,
+legendPresentation: Presentation = Defaults.legend,
+hintPresentation: Presentation = Defaults.hint
 )(implicit
-    form: Form[_],
-    lang: Lang
+form: Form[_],
+lang: Lang
 )
 
 @fieldsetPresentation_ = @{
-    // Make groups of 2 radio buttons inline
-    if (options.length < 3) {
-        fieldsetPresentation.copy(
-            classes = "inline" +: fieldsetPresentation.classes
-        )
-    } else {
-        fieldsetPresentation
-    }
+// Make groups of 2 radio buttons inline
+if (options.length < 3) {
+fieldsetPresentation.copy(
+classes = "inline" +: fieldsetPresentation.classes
+)
+} else {
+fieldsetPresentation
+}
 }
 
 @containerPresentation_ = @{
-    if (form(name).hasErrors) {
-        containerPresentation.copy(
-            classes = "form-field--error" +: containerPresentation.classes
-        )
-    } else {
-        containerPresentation
-    }
+if (form(name).hasErrors) {
+containerPresentation.copy(
+classes = "form-field--error" +: containerPresentation.classes
+)
+} else {
+containerPresentation
+}
 }
 
 @fieldset(
-    legend = labelText,
-    containerPresentation = containerPresentation_,
-    presentation = fieldsetPresentation_,
-    legendPresentation = legendPresentation
+legend = labelText,
+containerPresentation = containerPresentation_,
+presentation = fieldsetPresentation_,
+legendPresentation = legendPresentation
 ) {
-    @hint(hintText, id(name), hintPresentation)
-    @errorField(name)
-    @options.map { case (key, value) =>
-        @if(key.length>0){
-            <label class="block-label">
-                <input type="radio" name="@name" value="@value"
-                       @form(name).value.filter( _ == value).map{ _ => checked="checked"} >
-                @key
-            </label>
-        }
-    }
+@hint(hintText, id(name), hintPresentation)
+@errorField(name)
+@options.map { case (key, value) =>
+@if(key.length>0){
+<label class="block-label">
+    <input type="radio" name="@name" value="@value"
+           @form(name).value.filter( _ == value).map{ _ => checked="checked"} >
+    @key
+</label>
+}
+}
 
-    <label class="block-label">
-        <input type="radio" name="@name" value='@if(options.last._1==""){@options.last._2}else{other}' data-toggle-other="#@id(name)-other">
-        @Messages("generic.other")
-    </label>
-    <fieldset id="@id(name)-other">
-        <legend class="js-hidden heading-medium">
-            @otherLabelText
-        </legend>
-        <div class="form-group panel-indent">
-            @input(
-            name = otherName,
-            labelText = Messages("generic.please_specify")
-            )
-        </div>
-    </fieldset>
+<label class="block-label">
+    <input type="radio" name="@name" value='@if(options.last._1==""){@options.last._2}else{other}' data-toggle-other="#@id(name)-other">
+    @Messages("generic.other")
+</label>
+<fieldset id="@id(name)-other">
+    <legend class="js-hidden heading-medium">
+        @otherLabelText
+    </legend>
+    <div class="form-group panel-indent">
+        @input(
+        name = otherName,
+        labelText = Messages("generic.please_specify")
+        )
+    </div>
+</fieldset>
 }

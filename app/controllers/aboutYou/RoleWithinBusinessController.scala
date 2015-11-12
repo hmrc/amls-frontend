@@ -13,7 +13,7 @@ import play.api.i18n.Messages
 import scala.concurrent.Future
 
 trait RoleWithinBusinessController extends FrontendController with Actions {
-  val roles = CommonHelper.mapSeqWithMessagesKey(getProperty("roleWithinBusiness").split(","), "lbl.roleWithinBusiness", Messages(_))
+  val roles:Seq[(String,String)] = CommonHelper.mapSeqWithMessagesKey(getProperty("roleWithinBusiness").split(","), "lbl.roleWithinBusiness", Messages(_))
   val dataCacheConnector: DataCacheConnector = DataCacheConnector
 
   def onPageLoad = AuthorisedFor(AmlsRegime).async {
@@ -36,7 +36,6 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
         roleWithinBusinessForm.bindFromRequest().fold(
           errors => Future.successful(BadRequest(views.html.rolewithinbusiness(errors, roles))),
           details => {
-            println( "\n********\n" + details.roleWithinBusiness)
             dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](user.user.oid,"roleWithinBusiness", details) map { _ =>
               NotImplemented("Not implemented: summary page")
             }
