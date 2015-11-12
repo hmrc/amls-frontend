@@ -93,8 +93,8 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
       status(result) must be(NOT_IMPLEMENTED)
     }
 
-    "on submit of valid role of OTHER with NO role entered re-display the page with validation error" in {
-      val aboutYou = RoleForBusiness("Other", "")
+    "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
+      val aboutYou = RoleForBusiness("02", "")
       val roleForBusinessForm1 = roleForBusinessForm.fill(aboutYou)
       implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleForBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")

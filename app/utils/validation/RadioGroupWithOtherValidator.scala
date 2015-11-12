@@ -20,7 +20,7 @@ class RadioGroupWithOtherValidator extends FormValidator {
           n.trim match {
             case p if p.length==0 => Left(Seq(FormError(key, noRadioButtonSelectedMessageKey)))
             case p if p=="Other" =>
-              data.getOrElse(textFieldKey, "") match {
+              data.getOrElse(textFieldKey, "").trim match {
                 case q if q.length == 0 => Left(Seq(FormError(textFieldKey, blankValueMessageKey)))
                 case q if q.length > getProperty(maxLengthKey).toInt => Left(Seq(FormError(textFieldKey, invalidLengthMessageKey)))
                 case _ => Right(n)

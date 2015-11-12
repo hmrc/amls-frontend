@@ -23,8 +23,8 @@ object AboutYouForms {
   val roleWithinBusinessForm = Form(roleWithinBusinessFormMapping)
 
   val roleForBusinessFormMapping = mapping(
-    "roleForBusiness" -> nonEmptyText,
-    "other" -> nonEmptyText
+    "roleForBusiness" -> radioGroupWithOther("other", "error.required", "blank", "invalidlength", "validationMaxLengthRoleForBusinessOther"),
+    "other" -> text
   )(RoleForBusiness.apply)(RoleForBusiness.unapply)
 
   val roleForBusinessForm = Form(roleForBusinessFormMapping)
