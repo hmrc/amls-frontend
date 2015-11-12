@@ -6,10 +6,6 @@ amls.title=Anti-Money Laundering Supervision
 button.save = Save and continue
 button.back = Back
 
-######### save4later ########
-save4later.your_name  = yourName
-
-
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
