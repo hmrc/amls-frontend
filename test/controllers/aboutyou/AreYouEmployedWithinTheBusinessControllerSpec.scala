@@ -24,7 +24,7 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
 
   implicit val request = FakeRequest()
   val userId = s"user-${UUID.randomUUID}"
-  val areYouEmployedWithinTheBusinessModel = AreYouEmployedWithinTheBusinessModel("Yes")
+  val areYouEmployedWithinTheBusinessModel = AreYouEmployedWithinTheBusinessModel(true)
   val mockAuthConnector = mock[AuthConnector]
   val mockDataCacheConnector = mock[DataCacheConnector]
 
@@ -33,7 +33,7 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
     override val dataCacheConnector = mockDataCacheConnector
   }
 
-  val fakePostRequest = FakeRequest("POST", "/about-you-2").withFormUrlEncodedBody("radio-inline" -> "Yes")
+  val fakePostRequest = FakeRequest("POST", "/about-you-2").withFormUrlEncodedBody("radio-inline" -> "true")
   val loginDtls = LoginDetails("testuser", "password")
 
   //For Loading the Page
@@ -43,7 +43,7 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
       "load the Are You Employed Within the Business" in {
         getWithAuthorisedUser {
           futureResult => status(futureResult) must be(OK)
-            contentAsString(futureResult) must include(Messages("areYouEmployedWithinTheBusiness.lbl.areyouemployed"))
+            contentAsString(futureResult) must include(Messages("areYouEmployedWithinTheBusiness.lbl.title"))
         }
       }
 
@@ -51,7 +51,7 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
         getWithAuthorisedUserReturnsModel {
           result =>
             status(result) must be(OK)
-            contentAsString(result) must include(Messages("areYouEmployedWithinTheBusiness.lbl.areyouemployed")) // TODO need to replace lable with the actual value
+            contentAsString(result) must include(Messages("areYouEmployedWithinTheBusiness.lbl.title")) // TODO need to replace lable with the actual value
         }
       }
     }
@@ -76,15 +76,15 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
         }
       }
 
-      "get validation exception if the field is not supplied" in {
-        submitWithAuthorisedUserWithLengthValidation { result =>
-          status(result) must be(BAD_REQUEST)
+      "navigate to the next page if Yes is supplied" in {
+        submitWithAuthorisedUserWithYesOption { result =>
+          status(result) must be(SEE_OTHER)
         }
       }
 
-      "get error message when the user not filled on the mandatory fields" in {
-        submitWithAuthorisedUserWithoutMandatoryFields { result =>
-          status(result) must be(BAD_REQUEST)
+      "navigate to the next page if No is supplied" in {
+        submitWithAuthorisedUserWithNoOption { result =>
+          status(result) must be(SEE_OTHER)
         }
       }
     }
@@ -150,16 +150,16 @@ class AreYouEmployedWithinTheBusinessControllerSpec extends PlaySpec with OneSer
   }
 
 
-  def submitWithAuthorisedUserWithLengthValidation(test: Future[Result] => Any) {
-    createAreYouEmployedWithBusinessFormForSubmission(test, "Yes")
+  def submitWithAuthorisedUserWithYesOption(test: Future[Result] => Any) {
+    createAreYouEmployedWithBusinessFormForSubmission(test, "true")
   }
 
-  def submitWithAuthorisedUserWithoutMandatoryFields(test: Future[Result] => Any) {
-    createAreYouEmployedWithBusinessFormForSubmission(test, "No")
+  def submitWithAuthorisedUserWithNoOption(test: Future[Result] => Any) {
+    createAreYouEmployedWithBusinessFormForSubmission(test, "false")
   }
 
   def createAreYouEmployedWithBusinessFormForSubmission(test: Future[Result] => Any, yesNo: String) {
-    val areYouEmployedWithinTheBusinessModel = AreYouEmployedWithinTheBusinessModel(yesNo)
+    val areYouEmployedWithinTheBusinessModel = AreYouEmployedWithinTheBusinessModel(yesNo.toBoolean)
     val form = areYouEmployedWithinTheBusinessForm.fill(areYouEmployedWithinTheBusinessModel)
     val fakePostRequest = FakeRequest("POST", "/your-name").withFormUrlEncodedBody(form.data.toSeq: _*)
     getAuthorisedUserWithPost(test, fakePostRequest)

@@ -6,4 +6,4 @@ object AreYouEmployedWithinTheBusinessModel {
   implicit val formats = Json.format[AreYouEmployedWithinTheBusinessModel]
 }
 
-case class AreYouEmployedWithinTheBusinessModel(yesNo: String)
+case class AreYouEmployedWithinTheBusinessModel(trueFalse: Boolean)

@@ -31,12 +31,11 @@ trait AreYouEmployedWithinTheBusinessController extends FrontendController with 
       implicit request =>
         areYouEmployedWithinTheBusinessForm.bindFromRequest().fold(
           errors => Future.successful(BadRequest(views.html.AreYouEmployedWithinTheBusiness(errors))),
-          details => {
-            dataCacheConnector.saveDataShortLivedCache[AreYouEmployedWithinTheBusinessModel](user.user.oid, Messages("amls.are_you_employed_within_the_business"), details) map { _ =>
-              Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
+          areYouEmployedWithinTheBusinessModel => {
+            dataCacheConnector.saveDataShortLivedCache[AreYouEmployedWithinTheBusinessModel](user.user.oid, Messages("amls.are_you_employed_within_the_business"), areYouEmployedWithinTheBusinessModel) map { _ =>
+              Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page controller
             }
           })
-
   }
 }
 

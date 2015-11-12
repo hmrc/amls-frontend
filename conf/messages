@@ -5,6 +5,7 @@ errors.summary = There are errors in your form submission
 amls.title=Anti-Money Laundering Supervision
 button.save = Save and continue
 button.back = Back
+amls.button.lbl.saveandcontinue= Save and continue
 
 ## Login Page
 amls.Login.title= AMLS
@@ -22,6 +23,7 @@ lbl.last_name = Last name
 err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
+sectionTitle.about_you = About you
 
 ## Summary Page
 amls.summary.title=Your AMLS registration
@@ -41,10 +43,7 @@ amls.areYouEmployedWithinTheBusiness.title=Anti Money Laundering Registration
 amls.are_you_employed_within_the_business=AreYouEmployedWithinTheBusiness
 
 #Are You Employed Within The Business : Labels
-areYouEmployedWithinTheBusiness.lbl.title = Are you employed?
-areYouEmployedWithinTheBusiness.lbl.areyouemployed = Are you employed within the business?
+areYouEmployedWithinTheBusiness.lbl.title = Are you employed within the business?
 
 #Are You Employed Within The Business : Error Messages
 areYouEmployedWithinTheBusiness.err.YesNo.notsupplied = Select the Option Yes OR No
-areYouEmployedWithinTheBusiness.err.invalidLength = invalid length
-
