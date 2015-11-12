@@ -47,16 +47,16 @@ legendPresentation = legendPresentation
 @errorField(name)
 @options.map { case (key, value) =>
 @if(key.length>0){
-<label class="block-label">
-    <input type="radio" name="@name" value="@value"
-           @form(name).value.filter( _ == value).map{ _ => checked="checked"} >
-    @key
-</label>
+    <label class="block-label">
+        <input type="radio" name="@name" value="@value"
+               @form(name).value.filter( _ == value).map{ _ => checked="checked"} >
+        @key
+    </label>
 }
 }
 
 <label class="block-label">
-    <input type="radio" name="@name" value='@if(options.last._1==""){@options.last._2}else{other}' data-toggle-other="#@id(name)-other">
+    <input type="radio" name="@name"   @form(name).value.filter( _ == "02").map{ _ => checked="checked"}     value='@if(options.last._1==""){@options.last._2}else{other}' data-toggle-other="#@id(name)-other" >
     @Messages("generic.other")
 </label>
 <fieldset id="@id(name)-other">
