@@ -12,4 +12,4 @@ object RoleWithinBusiness{
   implicit val formats = Json.format[RoleWithinBusiness]
 }
 
-case class RoleWithinBusiness(roleWithinBusiness: String)
+case class RoleWithinBusiness(roleWithinBusiness: String, other: String)

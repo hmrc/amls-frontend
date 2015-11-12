@@ -2,6 +2,7 @@
 
 @(
     name: String,
+    otherName: String,
     labelText: String,
     otherLabelText: String,
     options: Seq[(String, String)],
@@ -55,7 +56,7 @@
     }
 
     <label class="block-label">
-        <input type="radio" name="@name" value='@if(options.last._1==""){@options.last._2}else{"value"}' data-toggle-other="#@id(name)-other">
+        <input type="radio" name="@name" value='@if(options.last._1==""){@options.last._2}else{other}' data-toggle-other="#@id(name)-other">
         @Messages("generic.other")
     </label>
     <fieldset id="@id(name)-other">
@@ -64,7 +65,7 @@
         </legend>
         <div class="form-group panel-indent">
             @input(
-            name = s"$name.other",
+            name = otherName,
             labelText = Messages("generic.please_specify")
             )
         </div>

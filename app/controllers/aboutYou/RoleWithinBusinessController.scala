@@ -36,6 +36,7 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
         roleWithinBusinessForm.bindFromRequest().fold(
           errors => Future.successful(BadRequest(views.html.rolewithinbusiness(errors, roles))),
           details => {
+            println( "\n********\n" + details.roleWithinBusiness)
             dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](user.user.oid,"roleWithinBusiness", details) map { _ =>
               NotImplemented("Not implemented: summary page")
             }
