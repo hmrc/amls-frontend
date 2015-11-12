@@ -7,13 +7,13 @@
 
 @(form: Form[_])(implicit request: Request[_])
 
-@main(title = "Anti Money Laundering Registration") {
+@main(title = Messages("areYouEmployedWithinTheBusiness.lbl.title")) {
 
     @formHelper(form, controllers.aboutyou.routes.AreYouEmployedWithinTheBusinessController.onSubmit) { implicit form: Form[_] =>
 
     @radioGroup(
         name = "radio",
-        labelText = "Some label text",
+        labelText = Messages("areYouEmployedWithinTheBusiness.lbl.areyouemployed"),
         hintText = "Some hint text",
         options = Seq(
             "Yes" -> "yes",
@@ -25,4 +25,3 @@
 
     }
 }
-

@@ -41,7 +41,8 @@ amls.areYouEmployedWithinTheBusiness.title=Anti Money Laundering Registration
 amls.are_you_employed_within_the_business=AreYouEmployedWithinTheBusiness
 
 #Are You Employed Within The Business : Labels
-areYouEmployedWithinTheBusiness.lbl.areyouemployed = Some label text
+areYouEmployedWithinTheBusiness.lbl.title = Are you employed?
+areYouEmployedWithinTheBusiness.lbl.areyouemployed = Are you employed within the business?
 
 #Are You Employed Within The Business : Error Messages
 areYouEmployedWithinTheBusiness.err.YesNo.notsupplied = Select the Option Yes OR No
