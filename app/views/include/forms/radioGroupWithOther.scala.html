@@ -45,14 +45,17 @@
     @hint(hintText, id(name), hintPresentation)
     @errorField(name)
     @options.map { case (key, value) =>
-        <label class="block-label">
-            <input type="radio" name="@name" value="@value"
-                   @form(name).value.filter( _ == value).map{ _ => checked="checked"} >
-            @key
-        </label>
+        @if(key.length>0){
+            <label class="block-label">
+                <input type="radio" name="@name" value="@value"
+                       @form(name).value.filter( _ == value).map{ _ => checked="checked"} >
+                @key
+            </label>
+        }
     }
+
     <label class="block-label">
-        <input type="radio" name="@name" value="other" data-toggle-other="#@id(name)-other">
+        <input type="radio" name="@name" value='@if(options.last._1==""){@options.last._2}else{"value"}' data-toggle-other="#@id(name)-other">
         @Messages("generic.other")
     </label>
     <fieldset id="@id(name)-other">

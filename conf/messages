@@ -26,12 +26,12 @@ lbl.lastname = Last name
 title.roleWithinBusiness = What is your role within the business?
 
 #Roles within business
-lbl.roleWithinBusiness.1=Beneficial shareholder
-lbl.roleWithinBusiness.2=Director
-lbl.roleWithinBusiness.3=Partner
-lbl.roleWithinBusiness.4=Internal accountant
-lbl.roleWithinBusiness.5=Sole proprietor
-lbl.roleWithinBusiness.6=Nominated officer
+lbl.roleWithinBusiness.01=Beneficial shareholder
+lbl.roleWithinBusiness.02=Director
+lbl.roleWithinBusiness.03=Partner
+lbl.roleWithinBusiness.04=Internal accountant
+lbl.roleWithinBusiness.05=Sole proprietor
+lbl.roleWithinBusiness.06=Nominated officer
 
 ## Summary Page
 amls.summary.title=Your AMLS registration
