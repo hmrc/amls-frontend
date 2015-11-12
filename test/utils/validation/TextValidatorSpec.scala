@@ -1,12 +1,12 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.TextValidator._
 import play.api.data.FormError
 
-class TextValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplication {
+class TextValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "mandatoryText" should {
     "return valid string if correct" in {
@@ -20,6 +20,7 @@ class TextValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplica
       mandatoryText("blank message", "invalid length", "validationMaxLengthFirstName").bind(Map("" -> "a" * 250)) mustBe
         Left(List(FormError("", "invalid length")))
     }
+
   }
 
 }

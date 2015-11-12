@@ -1,12 +1,12 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.NinoValidator._
 import play.api.data.FormError
 
-class NinoValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplication {
+class NinoValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "mandatoryNino" should {
     "respond appropriately if the nino format is correct" in {
@@ -29,6 +29,12 @@ class NinoValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplica
       mandatoryNino("blank", "length", "invalid").bind(Map("" -> "@&%a"))
         .left.getOrElse(Nil).contains(FormError("", "invalid")) mustBe true
     }
+
+    "respond appropriately if unbound" in {
+      val mapping = mandatoryNino("blank message", "invalid length", "invalid value")
+      mapping.binder.unbind("", "AB123456C") mustBe Map("" -> "AB123456C")
+    }
+
   }
 
 }

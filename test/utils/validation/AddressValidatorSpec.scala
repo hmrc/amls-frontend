@@ -1,12 +1,12 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.data.FormError
 import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.AddressValidator._
 
-class AddressValidatorTest extends PlaySpec with MockitoSugar with WithFakeApplication  {
+class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerSuite  {
 
   "address" should {
     "respond suitably to all mandatory lines being blank" in {
@@ -75,6 +75,14 @@ class AddressValidatorTest extends PlaySpec with MockitoSugar with WithFakeAppli
         "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(invalidPostcode)
         .left.getOrElse(Nil).contains(FormError("postcodekey", "invalid-postcode")) mustBe true
     }
+
+    "respond suitably when unbound" in {
+      address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode")
+        .binder.unbind("addr2key", "hello") mustBe
+          Map( "addr2key" -> "hello")
+    }
+
   }
 
 }

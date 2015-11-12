@@ -1,12 +1,12 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.PhoneNumberValidator._
 import play.api.data.FormError
 
-class PhoneNumberValidatorTest extends PlaySpec with MockitoSugar  with WithFakeApplication {
+class PhoneNumberValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "mandatoryPhoneNumber" should {
     "respond appropriately for valid phone numbers " in {
@@ -28,6 +28,10 @@ class PhoneNumberValidatorTest extends PlaySpec with MockitoSugar  with WithFake
         .left.getOrElse(Nil).contains(FormError("", "invalid")) mustBe true
       mandatoryPhoneNumber("blank","length","invalid").bind(Map("" -> "019122244+55 ext 5544"))
         .left.getOrElse(Nil).contains(FormError("", "invalid")) mustBe true
+    }
+
+    "respond appropriately if unbound" in {
+      mandatoryPhoneNumber("blank", "length", "invalid").binder.unbind("", "01912224455") mustBe Map("" -> "01912224455")
     }
   }
 
