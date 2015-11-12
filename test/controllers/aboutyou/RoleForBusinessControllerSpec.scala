@@ -50,7 +50,7 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
 
 
     "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
-      val aboutYou = RoleForBusiness("External accountant", "")
+      val aboutYou = RoleForBusiness("01", "")
       val roleForBusinessForm1 = roleForBusinessForm.fill(aboutYou)
       implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleForBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")

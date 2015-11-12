@@ -24,6 +24,7 @@ lbl.middlename  = Middle name (optional)
 lbl.lastname = Last name
 
 title.roleWithinBusiness = What is your role within the business?
+title.roleForBusiness = What is your role for the business?
 
 #Roles within business
 lbl.roleWithinBusiness.01=Beneficial shareholder
@@ -32,6 +33,9 @@ lbl.roleWithinBusiness.03=Partner
 lbl.roleWithinBusiness.04=Internal accountant
 lbl.roleWithinBusiness.05=Sole proprietor
 lbl.roleWithinBusiness.06=Nominated officer
+
+#Roles for business
+lbl.roleWithinBusiness.01=External accountant
 
 ## Summary Page
 amls.summary.title=Your AMLS registration
