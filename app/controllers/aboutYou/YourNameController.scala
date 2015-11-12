@@ -2,42 +2,34 @@ package controllers.aboutYou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.auth.AmlsRegime
+import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.YourName
 import play.api.i18n.Messages
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.mvc.{Request, AnyContent}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
 
-trait YourNameController extends FrontendController with Actions {
+trait YourNameController extends AMLSGenericController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def onPageLoad = AuthorisedFor(AmlsRegime).async {
-    implicit user =>
-      implicit request =>
-        dataCacheConnector.fetchDataShortLivedCache[YourName](user.user.oid, Messages("save4later.your_name")) map {
-            case Some(data) => Ok(views.html.YourName(yourNameForm.fill(data)))
-            case _ => Ok(views.html.YourName(yourNameForm))
-        } recover {
-          case e:Throwable => throw e.fillInStackTrace()
-        }
-  }
+  override def get(implicit user: AuthContext, request: Request[AnyContent]) =
+    dataCacheConnector.fetchDataShortLivedCache[YourName](Messages("save4later.your_name")) map {
+      case Some(data) => Ok(views.html.YourName(yourNameForm.fill(data)))
+      case _ => Ok(views.html.YourName(yourNameForm))
+    }
 
-  def onSubmit = AuthorisedFor(AmlsRegime).async {
-    implicit user =>
-      implicit request =>
-        yourNameForm.bindFromRequest().fold(
-        errors => Future.successful(BadRequest(views.html.YourName(errors))),
-        details => {
-          dataCacheConnector.saveDataShortLivedCache[YourName](user.user.oid, Messages("save4later.your_name"), details) map { _ =>
-            Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
-          }
-        })
-  }
+  override def post(implicit user: AuthContext, request: Request[AnyContent]) =
+    yourNameForm.bindFromRequest().fold(
+      errors => Future.successful(BadRequest(views.html.YourName(errors))),
+      details => {
+        dataCacheConnector.saveDataShortLivedCache[YourName](Messages("save4later.your_name"), details) map { _=>
+          Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
+        }
+      })
 }
 
 object YourNameController extends YourNameController {

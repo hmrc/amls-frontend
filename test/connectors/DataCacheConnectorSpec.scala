@@ -40,6 +40,16 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
       }
     }
 
+    "save form data to save4later with cacheId and value" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+      when(mockShortLivedCache.cache(Matchers.any(), Matchers.any(),
+        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(returnedCacheMap))
+      val result = TestDataCacheConnector.saveDataShortLivedCache("formId", loginDtls)
+      whenReady(result) { dtl =>
+        dtl mustBe Some(loginDtls)
+      }
+    }
+
     "fetch saved data from save4later" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
       when(mockShortLivedCache.fetchAndGetEntry[LoginDetails](Matchers.any(),

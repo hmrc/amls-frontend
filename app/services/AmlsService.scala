@@ -2,6 +2,7 @@ package services
 
 import connectors.{DataCacheConnector, AmlsConnector}
 import models. LoginDetails
+import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HttpResponse
