@@ -16,7 +16,7 @@ object AboutYouForms {
   val yourNameForm = Form(yourNameFormMapping)
 
   val roleWithinBusinessFormMapping = mapping(
-    "roleWithinBusiness" -> radioGroupWithOther("other", "noradiobuttonselected", "blank", "invalidlength", "validationMaxLengthRoleWithinBusinessOther"),
+    "roleWithinBusiness" -> radioGroupWithOther("other", "error.required", "blank", "invalidlength", "validationMaxLengthRoleWithinBusinessOther"),
     "other" -> text
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply)
 
