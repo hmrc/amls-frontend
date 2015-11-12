@@ -2,37 +2,45 @@ package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.ExampleController._
+import controllers.auth.AmlsRegime
 import forms.AreYouEmployedWithinTheBusinessForms._
-import play.api.mvc.Action
-import services.AreYouEmployedWithinTheBusinessService
+import models.AreYouEmployedWithinTheBusinessModel
+import play.api.i18n.Messages
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import views.html.hello_world
+
+import scala.concurrent.Future
 
 trait AreYouEmployedWithinTheBusinessController extends FrontendController with Actions {
 
-  def areYouEmployedWithinTheBusinessService: AreYouEmployedWithinTheBusinessService
-
   def dataCacheConnector: DataCacheConnector
 
-  def onPageLoad = Action {
-    implicit request =>
-      Ok(views.html.AreYouEmployedWithinTheBusiness(areYouEmployedWithinTheBusinessForm))
+  def onPageLoad = AuthorisedFor(AmlsRegime).async {
+    implicit user =>
+      implicit request =>
+        dataCacheConnector.fetchDataShortLivedCache[AreYouEmployedWithinTheBusinessModel](user.user.oid, Messages("amls.are_you_employed_within_the_business")) map {
+          case Some(data) => Ok(views.html.AreYouEmployedWithinTheBusiness(areYouEmployedWithinTheBusinessForm.fill(data)))
+          case _ => Ok(views.html.AreYouEmployedWithinTheBusiness(areYouEmployedWithinTheBusinessForm))
+        } recover {
+          case e: Throwable => throw e.fillInStackTrace()
+        }
   }
 
-  def onSubmit = Action {
-    implicit request =>
-      form.bindFromRequest().fold(
-        errorForm => BadRequest(hello_world(errorForm)),
-        success => Redirect(routes.AreYouEmployedWithinTheBusinessController.onPageLoad)
-      )
-  }
+  def onSubmit = AuthorisedFor(AmlsRegime).async {
+    implicit user =>
+      implicit request =>
+        areYouEmployedWithinTheBusinessForm.bindFromRequest().fold(
+          errors => Future.successful(BadRequest(views.html.AreYouEmployedWithinTheBusiness(errors))),
+          details => {
+            dataCacheConnector.saveDataShortLivedCache[AreYouEmployedWithinTheBusinessModel](user.user.oid, Messages("amls.are_you_employed_within_the_business"), details) map { _ =>
+              Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
+            }
+          })
 
+  }
 }
 
 object AreYouEmployedWithinTheBusinessController extends AreYouEmployedWithinTheBusinessController {
   override val authConnector = AMLSAuthConnector
-  override lazy val areYouEmployedWithinTheBusinessService = AreYouEmployedWithinTheBusinessService
   override lazy val dataCacheConnector = DataCacheConnector
 }
