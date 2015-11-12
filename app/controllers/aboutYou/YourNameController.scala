@@ -18,13 +18,13 @@ trait YourNameController extends AMLSGenericController {
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) =
     dataCacheConnector.fetchDataShortLivedCache[YourName](Messages("save4later.your_name")) map {
-      case Some(data) => Ok(views.html.YourName(yourNameForm.fill(data)))
-      case _ => Ok(views.html.YourName(yourNameForm))
+      case Some(data) => Ok(views.html.yourName(yourNameForm.fill(data)))
+      case _ => Ok(views.html.yourName(yourNameForm))
     }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) =
     yourNameForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.YourName(errors))),
+      errors => Future.successful(BadRequest(views.html.yourName(errors))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[YourName](Messages("save4later.your_name"), details) map { _=>
           Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
