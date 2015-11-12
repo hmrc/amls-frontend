@@ -38,6 +38,9 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
   }
 
   "RoleWithinBusinessController" must {
+
+
+
     "on load display the Role Within Business page" in {
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
       AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
@@ -48,8 +51,9 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
       contentAsString(result) must include("What is your role within the business?")
     }
 
-    "on submit of valid role display the next page (currently NOT IMPLEMENTED)" in {
-      val aboutYou = RoleWithinBusiness("Director", "")
+
+    "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
+      val aboutYou = RoleWithinBusiness("01", "")
       val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
       implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
@@ -76,8 +80,40 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("What is your role within the business?")
       contentAsString(result) must include(Messages("error.required"))
-
     }
+
+    "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
+      val aboutYou = RoleWithinBusiness("07", "Cleaner")
+      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
+      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
+      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+
+      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(aboutYou)))
+
+      val result = MockRoleWithinBusinessController.onSubmit.apply(request1)
+      status(result) must be(NOT_IMPLEMENTED)
+    }
+
+    "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
+      val aboutYou = RoleWithinBusiness("07", "")
+      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
+      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
+      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
+
+      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(aboutYou)))
+
+      val result = MockRoleWithinBusinessController.onSubmit.apply(request1)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include("What is your role within the business?")
+      contentAsString(result) must include(Messages("error.required"))
+    }    
+    
+    
+    
 
   }
 }
