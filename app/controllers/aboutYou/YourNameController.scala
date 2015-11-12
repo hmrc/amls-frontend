@@ -33,6 +33,6 @@ trait YourNameController extends AMLSGenericController {
 }
 
 object YourNameController extends YourNameController {
-  val authConnector = AMLSAuthConnector
+  override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }
