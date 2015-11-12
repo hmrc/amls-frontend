@@ -4,7 +4,7 @@
 @import include.forms._
 @import utils.CommonHelper._
 
-@(roleWithinBusinessForm: Form[models.RoleWithinBusiness])(implicit request: Request[_])
+@(roleWithinBusinessForm: Form[models.RoleWithinBusiness], roles:Seq[(String,String)])(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
@@ -16,7 +16,7 @@
             labelText = "title.roleWithinBusiness",
             legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
             otherLabelText = "Some other label text",
-            options = getSeqFromMessagesKey("lbl.roleWithinBusiness", Messages(_))
+            options = roles
         )
         @submit(Messages("button.checkYourAnswers"))
     }

@@ -24,4 +24,12 @@ class CommonHelperTest extends UnitSpec with MockitoSugar  {
       CommonHelper.getSeqFromMessagesKey("aaa", mockedMessages ) shouldBe allKeys
     }
   }
+
+  "mapSeqWithMessagesKey" must {
+    "map a sequence with key values that exist in mocked messages file" in {
+      val allKeys = Seq("one"->"1", "two"->"2", "three"->"3")
+      CommonHelper.mapSeqWithMessagesKey(Seq("1", "2", "3" ), "aaa", mockedMessages ) shouldBe allKeys
+    }
+  }
+
 }
