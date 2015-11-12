@@ -52,3 +52,4 @@ amls.summary.declarationlocked=Declaration (locked)
 amls.summary.declarationlocked.title=You can’t complete this section
 
 error.required=Please enter an item
+error.invalid=Please enter a valid item
