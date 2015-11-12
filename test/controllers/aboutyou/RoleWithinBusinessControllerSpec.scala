@@ -49,7 +49,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit of valid role display the next page (currently NOT IMPLEMENTED)" in {
-      val aboutYou = RoleWithinBusiness("Director")
+      val aboutYou = RoleWithinBusiness("Director", "")
       val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
       implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
@@ -63,7 +63,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
-      val aboutYou = RoleWithinBusiness("")
+      val aboutYou = RoleWithinBusiness("", "")
       val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
       implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
       implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
