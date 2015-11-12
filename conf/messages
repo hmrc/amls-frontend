@@ -35,7 +35,7 @@ lbl.roleWithinBusiness.05=Sole proprietor
 lbl.roleWithinBusiness.06=Nominated officer
 
 #Roles for business
-lbl.roleWithinBusiness.01=External accountant
+lbl.roleForBusiness.01=External accountant
 
 ## Summary Page
 amls.summary.title=Your AMLS registration

@@ -13,6 +13,7 @@
     @formHelper(roleForBusinessForm, aboutYou.routes.RoleForBusinessController.onSubmit) { implicit form: Form[_] =>
         @radioGroupWithOther(
             name = "roleForBusiness",
+            otherName = "other",
             labelText = "title.roleForBusiness",
             legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
             otherLabelText = "Some other label text",

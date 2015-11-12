@@ -13,7 +13,7 @@ import play.api.i18n.Messages
 import scala.concurrent.Future
 
 trait RoleWithinBusinessController extends FrontendController with Actions {
-  val roles = CommonHelper.mapSeqWithMessagesKey(getProperty("roleWithinBusiness").split(","), "lbl.roleWithinBusiness", Messages(_))
+  val roles:Seq[(String,String)] = CommonHelper.mapSeqWithMessagesKey(getProperty("roleWithinBusiness").split(","), "lbl.roleWithinBusiness", Messages(_))
   val dataCacheConnector: DataCacheConnector = DataCacheConnector
 
   def onPageLoad = AuthorisedFor(AmlsRegime).async {
