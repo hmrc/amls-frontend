@@ -67,7 +67,7 @@ $(function () {
 
       $('*[data-toggle-false]').each(function () {
         var $target = $($(this).data('toggle-false'));
-        showHide.call(this, $($(this).data('toggle-false')), false);
+        showHide.call(this, $target, false);
       });
 
       $('*[data-toggle-other]').each(function () {
