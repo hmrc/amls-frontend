@@ -57,6 +57,11 @@ class PassportNumberValidatorSpec extends PlaySpec with MockitoSugar  with OneSe
         .bind(Map("uk passport" -> "false", "" -> "121£21@656"))
         .left.getOrElse(Nil).contains(FormError("", "invalid value")) mustBe true
     }
+
+    "respond appropriately if unbound" in {
+      mandatoryPassportNumber("uk passport", "blank message", "invalid length", "invalid value").
+        binder.unbind("", "A123456") mustBe Map("" -> "A123456")
+    }
   }
 
 }
