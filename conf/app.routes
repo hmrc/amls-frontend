@@ -6,10 +6,14 @@ GET        /example                 controllers.ExampleController.onPageLoad
 POST       /example                 controllers.ExampleController.onSubmit
 GET        /login                   controllers.AmlsController.onPageLoad
 POST       /login                   controllers.AmlsController.onSubmit
-GET        /your-name               controllers.aboutYou.YourNameController.onPageLoad
-POST       /your-name               controllers.aboutYou.YourNameController.onSubmit
-GET        /role-within-business    controllers.aboutYou.RoleWithinBusinessController.onPageLoad
-POST       /role-within-business    controllers.aboutYou.RoleWithinBusinessController.onSubmit
+GET        /your-name               controllers.aboutYou.YourNameController.get()
+
+POST       /your-name               controllers.aboutYou.YourNameController.post()
+
+
+GET        /role-within-business    controllers.aboutYou.RoleWithinBusinessController.get()
+POST       /role-within-business    controllers.aboutYou.RoleWithinBusinessController.post()
+
 
 GET         /welcome                controllers.WelcomeController.get
 GET         /unauthorised           controllers.AmlsController.unauthorised

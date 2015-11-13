@@ -15,13 +15,17 @@ amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
 #About You
-aboutyou.sectiontitle=About you
-title.yourname = Your name
-lbl.aboutyou = About you
-lbl.yourname = Your name
-lbl.firstname = First name
-lbl.middlename  = Middle name (optional)
-lbl.lastname = Last name
+title.your_name = Your name
+sectionTitle.about_you = About you
+lbl.your_name = Your name
+lbl.first_name = First name
+lbl.middle_name  = Middle name (optional)
+lbl.last_name = Last name
+
+##Error messages #####
+err.titleNotEntered.first_name = Enter the first name
+err.titleNotEntered.last_name =  Enter the last name
+err.invalidLength = invalid length
 
 title.roleWithinBusiness = What is your role within the business?
 
@@ -32,7 +36,6 @@ lbl.roleWithinBusiness.03=Partner
 lbl.roleWithinBusiness.04=Internal accountant
 lbl.roleWithinBusiness.05=Sole proprietor
 lbl.roleWithinBusiness.06=Nominated officer
-
 
 ## Summary Page
 amls.summary.title=Your AMLS registration
@@ -47,6 +50,8 @@ amls.summary.aboutyou=About you
 amls.summary.payment=Payment
 amls.summary.declarationlocked=Declaration (locked)
 amls.summary.declarationlocked.title=You can’t complete this section
+
+amls.summary.declarationlocked.title=You can’t complete this section yet
 
 error.required=Please enter an item
 error.invalid=Please enter a valid item
