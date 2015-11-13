@@ -56,7 +56,7 @@ legendPresentation = legendPresentation
 }
 
 <label class="block-label">
-    <input type="radio" name="@name"   @form(name).value.filter( _ == "02").map{ _ => checked="checked"}     value='@if(options.last._1==""){@options.last._2}else{other}' data-toggle-other="#@id(name)-other" >
+    <input type="radio" name="@name"   @form(name).value.filter( _ == options.reverse.head._2).map{ _ => checked="checked"}     value='@if(options.last._1==""){@options.last._2}else{other}' data-toggle-other="#@id(name)-other" >
     @Messages("generic.other")
 </label>
 <fieldset id="@id(name)-other">
