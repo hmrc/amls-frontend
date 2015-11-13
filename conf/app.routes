@@ -6,6 +6,10 @@ GET        /example                 controllers.ExampleController.onPageLoad
 POST       /example                 controllers.ExampleController.onSubmit
 GET        /login                   controllers.AmlsController.onPageLoad
 POST       /login                   controllers.AmlsController.onSubmit
+GET        /your-name               controllers.aboutYou.YourNameController.get()
+
+POST       /your-name               controllers.aboutYou.YourNameController.post()
+
 
 GET         /welcome                controllers.WelcomeController.get
 GET         /unauthorised           controllers.AmlsController.unauthorised

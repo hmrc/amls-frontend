@@ -13,5 +13,7 @@ object AmlsForms {
   )(LoginDetails.apply)(LoginDetails.unapply)
 
   val loginDetailsForm = Form(loginDetailsFormMapping)
+
 }
+
 

@@ -23,10 +23,9 @@ trait AmlsController extends FrontendController with Actions {
         dataCacheConnector.fetchDataShortLivedCache[LoginDetails](user.user.oid,"Data") map {
             case Some(data) => Ok(views.html.AmlsLogin(loginDetailsForm.fill(data)))
             case _ => Ok(views.html.AmlsLogin(loginDetailsForm))
-        } recover {
-          case e:Throwable => throw e
         }
   }
+
 
   def onSubmit = AuthorisedFor(AmlsRegime).async {
     implicit user =>
@@ -37,8 +36,6 @@ trait AmlsController extends FrontendController with Actions {
             dataCacheConnector.saveDataShortLivedCache[LoginDetails](user.user.oid,"Data",details)
             amlsService.submitLoginDetails(details).map { response =>
               Ok(response.json)
-            } recover {
-              case e:Throwable => throw e
             }
           }
         )

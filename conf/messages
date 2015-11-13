@@ -3,11 +3,25 @@ generic.other = Other
 generic.please_specify = Please specify
 errors.summary = There are errors in your form submission
 amls.title=Anti-Money Laundering Supervision
+button.save = Save and continue
+button.back = Back
 
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
+#About You
+title.your_name = Your name
+sectionTitle.about_you = About you
+lbl.your_name = Your name
+lbl.first_name = First name
+lbl.middle_name  = Middle name (optional)
+lbl.last_name = Last name
+
+##Error messages #####
+err.titleNotEntered.first_name = Enter the first name
+err.titleNotEntered.last_name =  Enter the last name
+err.invalidLength = invalid length
 
 ## Summary Page
 amls.summary.title=Your AMLS registration
