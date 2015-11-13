@@ -2,44 +2,38 @@ package controllers.aboutYou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.auth.AmlsRegime
+import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.YourName
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.i18n.Messages
+import play.api.mvc.{Request, AnyContent}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
 
-trait YourNameController extends FrontendController with Actions {
+trait YourNameController extends AMLSGenericController {
 
   val dataCacheConnector: DataCacheConnector
+  val CACHE_KEY_YOURNAME:String  = "yourName"
 
-  def onPageLoad = AuthorisedFor(AmlsRegime).async {
-    implicit user =>
-      implicit request =>
-        dataCacheConnector.fetchDataShortLivedCache[YourName](user.user.oid,"yourName") map {
-            case Some(data) => Ok(views.html.YourName(yourNameForm.fill(data)))
-            case _ => Ok(views.html.YourName(yourNameForm))
-        } recover {
-          case e:Throwable => throw e
+  override def get(implicit user: AuthContext, request: Request[AnyContent]) =
+    dataCacheConnector.fetchDataShortLivedCache[YourName](CACHE_KEY_YOURNAME) map {
+      case Some(data) => Ok(views.html.yourName(yourNameForm.fill(data)))
+      case _ => Ok(views.html.yourName(yourNameForm))
+    }
+
+  override def post(implicit user: AuthContext, request: Request[AnyContent]) =
+    yourNameForm.bindFromRequest().fold(
+      errors => Future.successful(BadRequest(views.html.yourName(errors))),
+      details => {
+        dataCacheConnector.saveDataShortLivedCache[YourName](CACHE_KEY_YOURNAME, details) map { _=>
+          Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
         }
-  }
-
-  def onSubmit = AuthorisedFor(AmlsRegime).async {
-    implicit user =>
-      implicit request =>
-        yourNameForm.bindFromRequest().fold(
-        errors => Future.successful(BadRequest(views.html.YourName(errors))),
-        details => {
-          dataCacheConnector.saveDataShortLivedCache[YourName](user.user.oid,"yourName", details) map { _ =>
-            Ok(views.html.YourName(yourNameForm.fill(details)))
-          }
-        })
-  }
+      })
 }
 
 object YourNameController extends YourNameController {
-  val authConnector = AMLSAuthConnector
+  override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

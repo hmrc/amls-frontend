@@ -1,7 +1,9 @@
 package connectors
 
+import java.util.UUID
+
+import builders.AuthBuilder
 import config.AmlsShortLivedCache
-import models.LoginDetails
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -17,8 +19,15 @@ import scala.concurrent.Future
 class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   val mockShortLivedCache = mock[ShortLivedCache]
-  val loginDtls:LoginDetails = LoginDetails("name","password")
-  val returnedCacheMap: CacheMap = CacheMap("data", Map("formId" -> Json.toJson(loginDtls)))
+  val userId = s"user-${UUID.randomUUID}"
+
+  object TestModel{
+    implicit val formats = Json.format[TestModel]
+  }
+  case class TestModel(name:String)
+
+  val dummyModel:TestModel = TestModel("sample")
+  val returnedCacheMap: CacheMap = CacheMap("data", Map("formId" -> Json.toJson(dummyModel)))
   val sourceId = "AMLS"
 
   object TestDataCacheConnector extends DataCacheConnector {
@@ -34,19 +43,41 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
       implicit val hc: HeaderCarrier = HeaderCarrier()
       when(mockShortLivedCache.cache(Matchers.any(), Matchers.any(),
         Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(returnedCacheMap))
-      val result = TestDataCacheConnector.saveDataShortLivedCache(sourceId, "formId", loginDtls)
+      val result = TestDataCacheConnector.saveDataShortLivedCache(sourceId, "formId", dummyModel)
       whenReady(result) { dtl =>
-        dtl mustBe Some(loginDtls)
+        dtl mustBe Some(dummyModel)
+      }
+    }
+
+    "save form data to save4later with cacheId and value" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+      when(mockShortLivedCache.cache(Matchers.any(), Matchers.any(),
+        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(returnedCacheMap))
+      val result = TestDataCacheConnector.saveDataShortLivedCache("formId", dummyModel)
+      whenReady(result) { dtl =>
+        dtl mustBe Some(dummyModel)
       }
     }
 
     "fetch saved data from save4later" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
-      when(mockShortLivedCache.fetchAndGetEntry[LoginDetails](Matchers.any(),
-        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(loginDtls)))
-      val result = TestDataCacheConnector.fetchDataShortLivedCache[LoginDetails](sourceId,"formId")
+      when(mockShortLivedCache.fetchAndGetEntry[TestModel](Matchers.any(),
+        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(dummyModel)))
+      val result = TestDataCacheConnector.fetchDataShortLivedCache[TestModel](sourceId,"formId")
       whenReady(result) { dtl =>
-        dtl mustBe Some(loginDtls)
+        dtl mustBe Some(dummyModel)
+      }
+    }
+
+    "fetch saved data from save4later with cacheId" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
+      when(mockShortLivedCache.fetchAndGetEntry[TestModel](Matchers.any(),
+        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(dummyModel)))
+      val result = TestDataCacheConnector.fetchDataShortLivedCache[TestModel]("formId")
+      whenReady(result) { dtl =>
+        dtl mustBe Some(dummyModel)
       }
     }
 
@@ -55,8 +86,8 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
       when(mockShortLivedCache.fetch(Matchers.any())(Matchers.any())).thenReturn(Future.successful(Some(returnedCacheMap)))
       val result = TestDataCacheConnector.fetchAll(sourceId)
       whenReady(result) { dtl =>
-        dtl.toString must include("formId")
-      }
+        dtl contains("formId")
+       }
     }
   }
 }

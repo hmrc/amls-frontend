@@ -1,20 +1,21 @@
 package controllers.aboutyou
 
 import java.util.UUID
-import _root_.builders.AuthBuilder
-import _root_.builders.SessionBuilder
 import com.sun.xml.internal.bind.v2.TODO
 import connectors.DataCacheConnector
 import controllers.aboutYou.RoleForBusinessController
-import models.{RoleForBusiness}
+import models.RoleForBusiness
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.mvc.Result
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AmlsService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import forms.AboutYouForms._
 import org.mockito.Matchers._
@@ -23,6 +24,7 @@ import scala.concurrent.Future
 class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
+
   val mockAmlsService = mock[AmlsService]
   val mockAuthConnector = mock[AuthConnector]
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -39,11 +41,10 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
 
   "RoleForBusinessController" must {
     "on load display the Role For Business page" in {
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RoleForBusiness](any(), any())(any(), any()))
+      implicit val request = FakeRequest()
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RoleForBusiness](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
-      val result = MockRoleForBusinessController.onPageLoad.apply(SessionBuilder.buildRequestWithSession(userId))
+      val result = MockRoleForBusinessController.get(mock[AuthContext], request)
       status(result) must be(OK)
       contentAsString(result) must include("What is your role for the business?")
     }
@@ -51,29 +52,13 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
 
     "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
       val aboutYou = RoleForBusiness("01", "")
-      val roleForBusinessForm1 = roleForBusinessForm.fill(aboutYou)
-      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleForBusinessForm1.data.toSeq : _*)
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleForBusiness](any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-
-      val result = MockRoleForBusinessController.onSubmit.apply(request1)
+      val result = submitWithFormValues (aboutYou)
       status(result) must be(NOT_IMPLEMENTED)
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
       val aboutYou = RoleForBusiness("", "")
-      val roleForBusinessForm1 = roleForBusinessForm.fill(aboutYou)
-      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleForBusinessForm1.data.toSeq : _*)
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleForBusiness](any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-
-      val result = MockRoleForBusinessController.onSubmit.apply(request1)
+      val result = submitWithFormValues (aboutYou)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("What is your role for the business?")
       contentAsString(result) must include(Messages("error.required"))
@@ -81,33 +66,25 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
 
     "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
       val aboutYou = RoleForBusiness("Other", "Cleaner")
-      val roleForBusinessForm1 = roleForBusinessForm.fill(aboutYou)
-      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleForBusinessForm1.data.toSeq : _*)
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleForBusiness](any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-
-      val result = MockRoleForBusinessController.onSubmit.apply(request1)
+      val result = submitWithFormValues (aboutYou)
       status(result) must be(NOT_IMPLEMENTED)
     }
 
     "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
       val aboutYou = RoleForBusiness("02", "")
-      val roleForBusinessForm1 = roleForBusinessForm.fill(aboutYou)
-      implicit val request1 = SessionBuilder.buildRequestWithSession(userId).withFormUrlEncodedBody( roleForBusinessForm1.data.toSeq : _*)
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      AuthBuilder.mockAuthorisedUser(userId, mockAuthConnector)
-
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleForBusiness](any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-
-      val result = MockRoleForBusinessController.onSubmit.apply(request1)
+      val result = submitWithFormValues (aboutYou)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("What is your role for the business?")
       contentAsString(result) must include(Messages("error.required"))
     }
 
+    def submitWithFormValues (aboutYou: RoleForBusiness) : Future[Result] = {
+      val roleForBusinessForm1 = roleForBusinessForm.fill(aboutYou)
+      implicit val request1 = FakeRequest("POST", "/role-for-business").withFormUrlEncodedBody( roleForBusinessForm1.data.toSeq : _*)
+      when(mockDataCacheConnector.saveDataShortLivedCache[RoleForBusiness](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(aboutYou)))
+      val result = MockRoleForBusinessController.post(mock[AuthContext],request1)
+      result
+    }
   }
 }
