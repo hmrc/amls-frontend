@@ -29,6 +29,12 @@ class NinoValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSui
       mandatoryNino("blank", "length", "invalid").bind(Map("" -> "@&%a"))
         .left.getOrElse(Nil).contains(FormError("", "invalid")) mustBe true
     }
+
+    "respond appropriately if unbound" in {
+      val mapping = mandatoryNino("blank message", "invalid length", "invalid value")
+      mapping.binder.unbind("", "AB123456C") mustBe Map("" -> "AB123456C")
+    }
+
   }
 
 }

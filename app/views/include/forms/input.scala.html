@@ -21,7 +21,7 @@
     labelPresentation = labelPresentation,
     hintPresentation = hintPresentation
 ) {
-    <input name="@name" type="text" value="@form(name).value" @classes(inputPresentation)
+    <input name="@name" type="text" @classes(inputPresentation) value="@form(name).value" id="@id(name)"
         @if(hintText.nonEmpty) { aria-describedby="@id(name)-hint" }
     >
 }
