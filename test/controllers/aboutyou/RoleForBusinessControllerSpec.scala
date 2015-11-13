@@ -1,8 +1,9 @@
 package controllers.aboutyou
 
 import java.util.UUID
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.aboutYou.RoleForBusinessController
+import controllers.aboutYou.{YourNameController, RoleForBusinessController}
 import models.RoleForBusiness
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -39,6 +40,10 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
   }
 
   "RoleForBusinessController" must {
+    "use correct service" in {
+      RoleForBusinessController.authConnector must be(AMLSAuthConnector)
+    }
+
     "on load display the Role For Business page" in {
       implicit val request = FakeRequest()
       when(mockDataCacheConnector.fetchDataShortLivedCache[RoleForBusiness](any())(any(), any(), any()))
@@ -48,6 +53,15 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
       contentAsString(result) must include("What is your role for the business?")
     }
 
+    "prepopulate the Role For Business page" in {
+      val aboutYou = RoleForBusiness("Other", "Cleaner")
+      implicit val request = FakeRequest()
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RoleForBusiness](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(aboutYou)))
+      val result = MockRoleForBusinessController.get(mock[AuthContext], request)
+      status(result) must be(OK)
+      contentAsString(result) must include("What is your role for the business?")//TODO replace with pre-populated values
+    }
 
     "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
       val aboutYou = RoleForBusiness("01", "")
