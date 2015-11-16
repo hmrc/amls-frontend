@@ -22,14 +22,16 @@ object AboutYouForms {
   val yourNameForm = Form(yourNameFormMapping)
 
   val roleWithinBusinessFormMapping = mapping(
-    "roleWithinBusiness" -> radioGroupWithOther("other", getProperty("roleWithinBusiness").split(",").reverse.head, "error.required", "error.required", "error.invalid", "validationMaxLengthRoleWithinBusinessOther"),
+    "roleWithinBusiness" -> radioGroupWithOther("other", getProperty("roleWithinBusiness").split(",").reverse.head,
+      "error.required", "error.required", "error.invalid", "validationMaxLengthRoleWithinBusinessOther"),
     "other" -> text
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply)
 
   val roleWithinBusinessForm = Form(roleWithinBusinessFormMapping)
 
   val roleForBusinessFormMapping = mapping(
-    "roleForBusiness" -> radioGroupWithOther("other", getProperty("roleForBusiness").split(",").reverse.head, "error.required", "error.required", "error.invalid", "validationMaxLengthRoleForBusinessOther"),
+    "roleForBusiness" -> radioGroupWithOther("other", getProperty("roleForBusiness").split(",").reverse.head,
+      "error.required", "error.required", "error.invalid", "validationMaxLengthRoleForBusinessOther"),
     "other" -> text
   )(RoleForBusiness.apply)(RoleForBusiness.unapply)
 

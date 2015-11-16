@@ -12,7 +12,8 @@ object PassportNumberValidator extends PassportNumberValidator
 
 class PassportNumberValidator extends FormValidator {
 
-  private def mandatoryPassportNumberFormatter(isUkPassportKey: String, blankValueMessageKey: String, invalidLengthMessageKey: String,
+  private def mandatoryPassportNumberFormatter(isUkPassportKey: String, blankValueMessageKey: String,
+                                               invalidLengthMessageKey: String,
                                      invalidValueMessageKey: String) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
       val isUkPassport = data.get(isUkPassportKey) match {
@@ -25,7 +26,8 @@ class PassportNumberValidator extends FormValidator {
           trimmedPassportNumber match{
             case p if p.length==0 => Left(Seq(FormError(key, blankValueMessageKey)))
             case num if isUkPassport => {
-              if (num.length != getProperty("validationLengthUkPassportNumber").toInt && num.length != getProperty("validationLengthOldUkPassportNumber").toInt) {
+              if (num.length != getProperty("validationLengthUkPassportNumber").toInt && num.length !=
+                getProperty("validationLengthOldUkPassportNumber").toInt) {
                 Left(Seq(FormError(key, invalidLengthMessageKey)))
               } else {
                 ukPassportNumberRegex.findFirstIn(num) match {
@@ -35,7 +37,8 @@ class PassportNumberValidator extends FormValidator {
               }
             }
             case num if !isUkPassport => {
-              if (num.length > getProperty("validationMaxLengthNonUkPassportNumber").toInt || num.length < getProperty("validationMinLengthNonUkPassportNumber").toInt) {
+              if (num.length > getProperty("validationMaxLengthNonUkPassportNumber").toInt || num.length <
+                getProperty("validationMinLengthNonUkPassportNumber").toInt) {
                 Left(Seq(FormError(key, invalidLengthMessageKey)))
               } else {
                 nonUkPassportNumberRegex.findFirstIn(num) match {

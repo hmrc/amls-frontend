@@ -47,7 +47,9 @@ trait DateTupleValidator extends FormValidator {
           val mthTrimmed = monthOption.getOrElse("").trim
           val dayTrimmed = dayOption.getOrElse("").trim
           val yearTrimmed = yearOption.getOrElse("").trim
-          if (mthTrimmed != "" && dayTrimmed != "" && yearTrimmed != "" && StringHelper.isAllDigits(mthTrimmed) && StringHelper.isAllDigits(dayTrimmed) && StringHelper.isAllDigits(yearTrimmed)) {
+          if (mthTrimmed != "" && dayTrimmed != "" && yearTrimmed != "" &&
+            StringHelper.isAllDigits(mthTrimmed) && StringHelper.isAllDigits(dayTrimmed) &&
+            StringHelper.isAllDigits(yearTrimmed)) {
             val mth = mthTrimmed.toInt
             val day = dayTrimmed.toInt
             val year = yearTrimmed.toInt

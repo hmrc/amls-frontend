@@ -7,7 +7,7 @@ object CommonHelper {
   def getSeqFromMessagesKey(key:String,
                             messageLookupFunction:String => String,
                             startValue:Int = 1,
-                            items:Seq[ (String, String) ]  = Nil ): Seq[ (String, String) ]  = {
+                            items:Seq[(String, String)]  = Nil ): Seq[(String, String)] = {
     val currentKey = key + "." + startValue.toString
     val currentValue = messageLookupFunction(currentKey)
     if (currentValue != currentKey) {
