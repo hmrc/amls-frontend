@@ -8,6 +8,8 @@ GET        /login                   controllers.AmlsController.onPageLoad
 POST       /login                   controllers.AmlsController.onSubmit
 GET        /your-name               controllers.aboutYou.YourNameController.get()
 POST       /your-name               controllers.aboutYou.YourNameController.post()
+GET        /about-you               controllers.aboutYou.AreYouEmployedWithinTheBusinessController.get()
+POST       /about-you               controllers.aboutYou.AreYouEmployedWithinTheBusinessController.post()
 GET        /role-within-business    controllers.aboutYou.RoleWithinBusinessController.get()
 POST       /role-within-business    controllers.aboutYou.RoleWithinBusinessController.post()
 GET        /role-for-business       controllers.aboutYou.RoleForBusinessController.get()
@@ -20,5 +22,3 @@ GET         /                       controllers.WelcomeController.get
 GET         /summary                controllers.MainSummaryController.onPageLoad
 
 
-GET         /about-you-2            controllers.aboutyou.AreYouEmployedWithinTheBusinessController.get()
-POST        /about-you-2            controllers.aboutyou.AreYouEmployedWithinTheBusinessController.post()

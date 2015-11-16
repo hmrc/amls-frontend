@@ -5,17 +5,17 @@
 @import helper._
 @import config.ApplicationConfig
 
-@(areYouEmployedWithinTheBusinessForm: Form[models.AreYouEmployedWithinTheBusinessModel])(implicit request: Request[_])
+@(employedWithinTheBusinessForm: Form[models.EmployedWithinTheBusinessModel])(implicit request: Request[_])
 
 @main(
 sectionTitle = Some(Messages("sectionTitle.about_you")),
-title = Messages("areYouEmployedWithinTheBusiness.lbl.title")
+title = Messages("amls.employedwithinthebusiness.title")
 ) {
 
-@formHelper(areYouEmployedWithinTheBusinessForm, controllers.aboutyou.routes.AreYouEmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
+@formHelper(employedWithinTheBusinessForm, controllers.aboutYou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
 
     @radioGroup(
-        name = "trueFalse",
+        name = "isEmployed",
         labelText = "",
         options = Seq(
             "Yes" -> "true",
