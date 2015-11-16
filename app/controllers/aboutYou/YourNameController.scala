@@ -28,7 +28,7 @@ trait YourNameController extends AMLSGenericController {
       errors => Future.successful(BadRequest(views.html.yourName(errors))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[YourName](CACHE_KEY_YOURNAME, details) map { _=>
-          Redirect(controllers.aboutYou.routes.AreYouEmployedWithinTheBusinessController.get())
+          Redirect(controllers.aboutYou.routes.EmployedWithinTheBusinessController.get())
         }
       })
 }

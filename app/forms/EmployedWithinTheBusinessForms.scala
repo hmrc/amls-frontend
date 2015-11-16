@@ -1,15 +1,15 @@
 package forms
 
-import models.AreYouEmployedWithinTheBusinessModel
+import models.EmployedWithinTheBusinessModel
 import play.api.data.Form
 import play.api.data.Forms._
 
 object EmployedWithinTheBusinessForms {
 
-  val areYouEmployedWithinTheBusinessFormMapping = mapping(
+  val employedWithinTheBusinessFormMapping = mapping(
     "isEmployed" -> boolean
-  )(AreYouEmployedWithinTheBusinessModel.apply)(AreYouEmployedWithinTheBusinessModel.unapply)
+  )(EmployedWithinTheBusinessModel.apply)(EmployedWithinTheBusinessModel.unapply)
 
-  val areYouEmployedWithinTheBusinessForm = Form(areYouEmployedWithinTheBusinessFormMapping)
+  val employedWithinTheBusinessForm = Form(employedWithinTheBusinessFormMapping)
 
 }

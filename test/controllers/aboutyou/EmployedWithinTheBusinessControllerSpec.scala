@@ -3,8 +3,7 @@ package controllers.aboutyou
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import controllers.aboutYou.EmployedWithinTheBusinessController$$
-import forms.EmployedWithinTheBusinessForms._
+import controllers.aboutYou.EmployedWithinTheBusinessController
 import models.EmployedWithinTheBusinessModel
 import org.mockito.Matchers
 import org.mockito.Mockito._
@@ -23,20 +22,19 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
 
   implicit val request = FakeRequest()
   val userId = s"user-${UUID.randomUUID}"
-  val areYouEmployedWithinTheBusinessModel = EmployedWithinTheBusinessModel(true)
+  val employedWithinTheBusinessModel = EmployedWithinTheBusinessModel(true)
   val mockAuthConnector = mock[AuthConnector]
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   override protected def authConnector = mockAuthConnector
 
-  object MockEmployedWithinTheBusinessController$ extends EmployedWithinTheBusinessController$ {
+  object MockEmployedWithinTheBusinessController extends EmployedWithinTheBusinessController {
     override protected def authConnector: AuthConnector = mockAuthConnector
 
     override def dataCacheConnector = mockDataCacheConnector
   }
 
   val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody("radio-inline" -> "true")
-  //val loginDtls = AreYouEmployedWithinTheBusinessModel("testuser", "password")
 
   //For Loading the Page
   "On Page load" must {
@@ -44,26 +42,26 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     "load the Are You Employed Within the Business" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusinessModel]
         (Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
-        .thenReturn(Future.successful(Some(areYouEmployedWithinTheBusinessModel)))
-      val futureResult = MockEmployedWithinTheBusinessController$.get(mock[AuthContext], request)
+        .thenReturn(Future.successful(Some(employedWithinTheBusinessModel)))
+      val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
-      contentAsString(futureResult) must include(Messages("areYouEmployedWithinTheBusiness.lbl.title"))
+      contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
     }
 
     "load Are you employed with the Business without any Data " in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusinessModel](Matchers.any())
         (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
-      val futureResult = MockEmployedWithinTheBusinessController$.get(mock[AuthContext], request)
+      val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
-      contentAsString(futureResult) must include(Messages("areYouEmployedWithinTheBusiness.lbl.title"))
+      contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
     }
 
     "load Are you employed with the Business with pre populated data" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusinessModel](Matchers.any())
-        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(areYouEmployedWithinTheBusinessModel)))
-      val futureResult = MockEmployedWithinTheBusinessController$.get(mock[AuthContext], request)
+        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(employedWithinTheBusinessModel)))
+      val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
-      contentAsString(futureResult) must include(Messages("areYouEmployedWithinTheBusiness.lbl.title"))
+      contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
     }
 
   }
@@ -96,33 +94,32 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
   }
 
   def submitWithYesOption(futureResult: Future[Result] => Any) {
-    createAreYouEmployedWithBusinessFormForSubmission(futureResult, "true")
+    employedWithBusinessFormForSubmission(futureResult, "true")
   }
 
   def submitWithNoOption(futureResult: Future[Result] => Any) {
-    createAreYouEmployedWithBusinessFormForSubmission(futureResult, "false")
+    employedWithBusinessFormForSubmission(futureResult, "false")
   }
 
   def submitWithoutAnOption(futureResult: Future[Result] => Any) {
-    createAreYouEmployedWithBusinessFormForSubmissionError(futureResult, "")
+    employedWithBusinessFormForSubmissionError(futureResult, "")
   }
 
 
-  def createAreYouEmployedWithBusinessFormForSubmission(futureResult: Future[Result] => Any, isEmployed: String) {
-    val areYouEmployedWithinTheBusinessModel = EmployedWithinTheBusinessModel(isEmployed.toBoolean)
-    val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody(("isEmployed" , isEmployed))
+  def employedWithBusinessFormForSubmission(futureResult: Future[Result] => Any, isEmployed: String) {
+    val employedWithinTheBusinessModel = EmployedWithinTheBusinessModel(isEmployed.toBoolean)
+    val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody(("isEmployed", isEmployed))
+
     when(mockDataCacheConnector.saveDataShortLivedCache[EmployedWithinTheBusinessModel](Matchers.any(),
         Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
-       .thenReturn(Future.successful(Some(areYouEmployedWithinTheBusinessModel)))
+      .thenReturn(Future.successful(Some(employedWithinTheBusinessModel)))
 
-    //dataCacheConnector.saveDataShortLivedCache[AreYouEmployedWithinTheBusinessModel](CACHE_KEY_AREYOUEMPLOYED,
-   //     areYouEmployedWithinTheBusinessModel)
-    MockEmployedWithinTheBusinessController$.post(mock[AuthContext], fakePostRequest)
+    MockEmployedWithinTheBusinessController.post(mock[AuthContext], fakePostRequest)
   }
 
-  def createAreYouEmployedWithBusinessFormForSubmissionError(futureResult: Future[Result] => Any, isEmployed: String) {
-    val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody(("isEmployed" , ""))
-    MockEmployedWithinTheBusinessController$.post(mock[AuthContext], fakePostRequest)
+  def employedWithBusinessFormForSubmissionError(futureResult: Future[Result] => Any, isEmployed: String) {
+    val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody(("isEmployed", ""))
+    MockEmployedWithinTheBusinessController.post(mock[AuthContext], fakePostRequest)
   }
 
 }

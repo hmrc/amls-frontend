@@ -3,8 +3,8 @@ package controllers.aboutYou
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.AMLSGenericController
-import forms.AreYouEmployedWithinTheBusinessForms._
-import models.AreYouEmployedWithinTheBusinessModel
+import forms.EmployedWithinTheBusinessForms._
+import models.EmployedWithinTheBusinessModel
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -17,17 +17,17 @@ trait EmployedWithinTheBusinessController extends AMLSGenericController {
   val CACHE_KEY_AREYOUEMPLOYED = "areYouEmployed"
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) =
-    dataCacheConnector.fetchDataShortLivedCache[AreYouEmployedWithinTheBusinessModel](CACHE_KEY_AREYOUEMPLOYED) map {
-      case Some(data) => Ok(views.html.AreYouEmployedWithinTheBusiness(areYouEmployedWithinTheBusinessForm.fill(data)))
-      case _ => Ok(views.html.AreYouEmployedWithinTheBusiness(areYouEmployedWithinTheBusinessForm))
+    dataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusinessModel](CACHE_KEY_AREYOUEMPLOYED) map {
+      case Some(data) => Ok(views.html.employedwithinthebusiness(employedWithinTheBusinessForm.fill(data)))
+      case _ => Ok(views.html.employedwithinthebusiness(employedWithinTheBusinessForm))
     }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) =
-    areYouEmployedWithinTheBusinessForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.AreYouEmployedWithinTheBusiness(errors))),
-      areYouEmployedWithinTheBusinessModel => {
-        dataCacheConnector.saveDataShortLivedCache[AreYouEmployedWithinTheBusinessModel](CACHE_KEY_AREYOUEMPLOYED,
-        areYouEmployedWithinTheBusinessModel) map {
+    employedWithinTheBusinessForm.bindFromRequest().fold(
+      errors => Future.successful(BadRequest(views.html.employedwithinthebusiness(errors))),
+      employedWithinTheBusinessModel => {
+        dataCacheConnector.saveDataShortLivedCache[EmployedWithinTheBusinessModel](CACHE_KEY_AREYOUEMPLOYED,
+        employedWithinTheBusinessModel) map {
           case Some(y) if y.isEmployed => Redirect(controllers.aboutYou.routes.RoleWithinBusinessController.get())
           case _ => Redirect(controllers.aboutYou.routes.RoleForBusinessController.get())
         }
