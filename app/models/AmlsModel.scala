@@ -9,3 +9,4 @@ object LoginDetails{
 case class LoginDetails(name: String, password: String)
 
 
+

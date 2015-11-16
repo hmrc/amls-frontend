@@ -7,14 +7,18 @@ POST       /example                 controllers.ExampleController.onSubmit
 GET        /login                   controllers.AmlsController.onPageLoad
 POST       /login                   controllers.AmlsController.onSubmit
 GET        /your-name               controllers.aboutYou.YourNameController.get()
-
 POST       /your-name               controllers.aboutYou.YourNameController.post()
+GET        /role-within-business    controllers.aboutYou.RoleWithinBusinessController.get()
+POST       /role-within-business    controllers.aboutYou.RoleWithinBusinessController.post()
+GET        /role-for-business       controllers.aboutYou.RoleForBusinessController.get()
+POST       /role-for-business       controllers.aboutYou.RoleForBusinessController.post()
 
 
 GET         /welcome                controllers.WelcomeController.get
 GET         /unauthorised           controllers.AmlsController.unauthorised
 GET         /                       controllers.WelcomeController.get
 GET         /summary                controllers.MainSummaryController.onPageLoad
+
 
 GET         /about-you-2            controllers.aboutyou.AreYouEmployedWithinTheBusinessController.get()
 POST        /about-you-2            controllers.aboutyou.AreYouEmployedWithinTheBusinessController.post()

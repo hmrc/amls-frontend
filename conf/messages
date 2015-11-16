@@ -4,6 +4,7 @@ generic.please_specify = Please specify
 errors.summary = There are errors in your form submission
 amls.title=Anti-Money Laundering Supervision
 button.save = Save and continue
+button.checkYourAnswers = Check your answers
 button.back = Back
 amls.button.lbl.saveandcontinue= Save and continue
 
@@ -24,6 +25,24 @@ err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
 sectionTitle.about_you = About you
+
+##Error messages #####
+err.titleNotEntered.first_name = Enter the first name
+err.titleNotEntered.last_name =  Enter the last name
+err.invalidLength = invalid length
+title.roleWithinBusiness = What is your role within the business?
+title.roleForBusiness = What is your role for the business?
+
+#Roles within business
+lbl.roleWithinBusiness.01=Beneficial shareholder
+lbl.roleWithinBusiness.02=Director
+lbl.roleWithinBusiness.03=Partner
+lbl.roleWithinBusiness.04=Internal accountant
+lbl.roleWithinBusiness.05=Sole proprietor
+lbl.roleWithinBusiness.06=Nominated officer
+
+#Roles for business
+lbl.roleForBusiness.01=External accountant
 
 ## Summary Page
 amls.summary.title=Your AMLS registration
@@ -47,3 +66,6 @@ areYouEmployedWithinTheBusiness.lbl.title = Are you employed within the business
 
 #Are You Employed Within The Business : Error Messages
 areYouEmployedWithinTheBusiness.err.YesNo.notsupplied = Select the Option Yes OR No
+
+error.required=Please enter an item
+error.invalid=Please enter a valid item

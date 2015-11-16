@@ -12,10 +12,10 @@ $(function () {
     (function () {
      var checkedInputs = 'input[type="checkbox"], input[type="radio"]';
 
-      function showHide(bool) {
-        return function () {
+      function showHide($target, value) {
+
+      console.log($($target));
           var $self = $(this),
-            $target = $($self.data('toggle-' + bool)),
             $inputs = $target.find('input, option, selected, textarea');
 
           function pred() {
@@ -55,14 +55,25 @@ $(function () {
             }
           });
 
-          $('input[name="' + $self.prop('name') + '"][value!="' + bool + '"]').change(function() {
+          $('input[name="' + $self.prop('name') + '"][value!="' + value + '"]').change(function() {
             hide();
           });
-        };
       }
 
-      $('*[data-toggle-true]').each(showHide(true));
-      $('*[data-toggle-false]').each(showHide(false));
-      $('*[data-toggle-other]').each(showHide('other'));
-      })();
+      $('*[data-toggle-true]').each(function () {
+        var $target = $($(this).data('toggle-true'));
+        showHide.call(this, $target, true);
+      });
+
+      $('*[data-toggle-false]').each(function () {
+        var $target = $($(this).data('toggle-false'));
+        showHide.call(this, $target, false);
+      });
+
+      $('*[data-toggle-other]').each(function () {
+        var $target = $($(this).data('toggle-other')),
+            value = $(this).val();
+        showHide.call(this, $target, value);
+      });
+  })();
 });

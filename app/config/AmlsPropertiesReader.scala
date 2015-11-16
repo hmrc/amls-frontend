@@ -6,7 +6,8 @@ import play.api.Play.current
 
 object AmlsPropertiesReader {
 
-  val value  = Play.application.resourceAsStream("amls.properties").getOrElse(throw new RuntimeException("amls.properties file couldn't be retrieved."))
+  val value  = Play.application.resourceAsStream("amls.properties").getOrElse(throw new
+      RuntimeException("amls.properties file couldn't be retrieved."))
   val propertyResource = {
     try {
       new PropertyResourceBundle(value)
