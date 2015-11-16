@@ -12,7 +12,7 @@ sectionTitle = Some(Messages("sectionTitle.about_you")),
 title = Messages("areYouEmployedWithinTheBusiness.lbl.title")
 ) {
 
-@formHelper(areYouEmployedWithinTheBusinessForm, controllers.aboutyou.routes.AreYouEmployedWithinTheBusinessController.onSubmit) { implicit form: Form[_] =>
+@formHelper(areYouEmployedWithinTheBusinessForm, controllers.aboutyou.routes.AreYouEmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
 
     @radioGroup(
         name = "trueFalse",
@@ -23,7 +23,7 @@ title = Messages("areYouEmployedWithinTheBusiness.lbl.title")
         )
     )
 
-@submit(Messages("amls.button.lbl.saveandcontinue"))
+    @submit(Messages("amls.button.lbl.saveandcontinue"))
 
     }
 }
