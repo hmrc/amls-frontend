@@ -15,3 +15,8 @@ object RoleWithinBusiness{
 }
 
 
+object RoleForBusiness{
+  implicit val formats = Json.format[RoleForBusiness]
+}
+
+case class RoleForBusiness(roleForBusiness: String, other: String)
