@@ -12,10 +12,10 @@ sectionTitle = Some(Messages("sectionTitle.about_you")),
 title = Messages("areYouEmployedWithinTheBusiness.lbl.title")
 ) {
 
-@formHelper(areYouEmployedWithinTheBusinessForm, controllers.aboutyou.routes.AreYouEmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
+@formHelper(areYouEmployedWithinTheBusinessForm, controllers.aboutYou.routes.AreYouEmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
 
     @radioGroup(
-        name = "trueFalse",
+        name = "isEmployed",
         labelText = "",
         options = Seq(
             "Yes" -> "true",

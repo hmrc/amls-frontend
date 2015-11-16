@@ -7,7 +7,7 @@ import play.api.data.Forms._
 object AreYouEmployedWithinTheBusinessForms {
 
   val areYouEmployedWithinTheBusinessFormMapping = mapping(
-    "trueFalse" -> boolean
+    "isEmployed" -> boolean
   )(AreYouEmployedWithinTheBusinessModel.apply)(AreYouEmployedWithinTheBusinessModel.unapply)
 
   val areYouEmployedWithinTheBusinessForm = Form(areYouEmployedWithinTheBusinessFormMapping)
