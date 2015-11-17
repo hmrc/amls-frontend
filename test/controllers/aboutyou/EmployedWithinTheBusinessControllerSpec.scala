@@ -1,7 +1,5 @@
 package controllers.aboutyou
 
-import java.util.UUID
-
 import connectors.DataCacheConnector
 import controllers.aboutYou.EmployedWithinTheBusinessController
 import models.EmployedWithinTheBusinessModel
@@ -21,10 +19,10 @@ import scala.concurrent.Future
 class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPerSuite with Actions with MockitoSugar {
 
   implicit val request = FakeRequest()
-  val userId = s"user-${UUID.randomUUID}"
-  val employedWithinTheBusinessModel = EmployedWithinTheBusinessModel(true)
-  val mockAuthConnector = mock[AuthConnector]
-  val mockDataCacheConnector = mock[DataCacheConnector]
+  private val employedWithinTheBusinessModel = EmployedWithinTheBusinessModel(true)
+  private val mockAuthConnector = mock[AuthConnector]
+  private val mockDataCacheConnector = mock[DataCacheConnector]
+  private val endpointURL: String = "/employed-within-business"
 
   override protected def authConnector = mockAuthConnector
 
@@ -34,7 +32,6 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     override def dataCacheConnector = mockDataCacheConnector
   }
 
-  val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody("radio-inline" -> "true")
 
   //For Loading the Page
   "On Page load" must {
@@ -108,7 +105,7 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
 
   def employedWithBusinessFormForSubmission(futureResult: Future[Result] => Any, isEmployed: String) {
     val employedWithinTheBusinessModel = EmployedWithinTheBusinessModel(isEmployed.toBoolean)
-    val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody(("isEmployed", isEmployed))
+    val fakePostRequest = FakeRequest("POST", endpointURL).withFormUrlEncodedBody(("isEmployed", isEmployed))
 
     when(mockDataCacheConnector.saveDataShortLivedCache[EmployedWithinTheBusinessModel](Matchers.any(),
         Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
@@ -118,7 +115,7 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
   }
 
   def employedWithBusinessFormForSubmissionError(futureResult: Future[Result] => Any, isEmployed: String) {
-    val fakePostRequest = FakeRequest("POST", "/about-you").withFormUrlEncodedBody(("isEmployed", ""))
+    val fakePostRequest = FakeRequest("POST", endpointURL).withFormUrlEncodedBody(("isEmployed", ""))
     MockEmployedWithinTheBusinessController.post(mock[AuthContext], fakePostRequest)
   }
 

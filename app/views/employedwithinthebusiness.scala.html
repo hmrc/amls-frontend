@@ -12,14 +12,14 @@ sectionTitle = Some(Messages("sectionTitle.about_you")),
 title = Messages("amls.employedwithinthebusiness.title")
 ) {
 
-@formHelper(employedWithinTheBusinessForm, controllers.aboutYou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
+@formHelper(employedWithinTheBusinessForm, aboutYou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
 
     @radioGroup(
         name = "isEmployed",
         labelText = "",
         options = Seq(
-            "Yes" -> "true",
-            "No" -> "false"
+            Messages("lbl.yes") -> "true",
+            Messages("lbl.no")  -> "false"
         )
     )
 
