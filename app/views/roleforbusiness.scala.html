@@ -1,0 +1,24 @@
+@import include.main
+@import forms.FormHelpers._
+@import forms.AmlsForms._
+@import include.forms._
+@import utils.CommonHelper._
+
+@(roleForBusinessForm: Form[models.RoleForBusiness], roles:Seq[(String,String)])(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("aboutyou.sectiontitle")),
+    title = Messages("title.roleForBusiness")
+) {
+    @formHelper(roleForBusinessForm, aboutYou.routes.RoleForBusinessController.post()) { implicit form: Form[_] =>
+        @radioGroupWithOther(
+            name = "roleForBusiness",
+            otherName = "other",
+            labelText = "title.roleForBusiness",
+            legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
+            otherLabelText = "Some other label text",
+            options = roles
+        )
+        @submit(Messages("button.checkYourAnswers"))
+    }
+}

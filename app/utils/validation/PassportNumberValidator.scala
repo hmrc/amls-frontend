@@ -12,7 +12,8 @@ object PassportNumberValidator extends PassportNumberValidator
 
 class PassportNumberValidator extends FormValidator {
 
-  private def mandatoryPassportNumberFormatter(isUkPassportKey: String, blankValueMessageKey: String, invalidLengthMessageKey: String,
+  private def mandatoryPassportNumberFormatter(isUkPassportKey: String, blankValueMessageKey: String,
+                                               invalidLengthMessageKey: String,
                                      invalidValueMessageKey: String) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
       val isUkPassport = data.get(isUkPassportKey) match {

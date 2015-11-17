@@ -2,13 +2,10 @@
 generic.other = Other
 generic.please_specify = Please specify
 errors.summary = There are errors in your form submission
+amls.title=Anti-Money Laundering Supervision
 button.save = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
-
-amls.title=Anti-Money Laundering Supervision
-
-######### save4later #########
 
 ## Login Page
 amls.Login.title= AMLS
@@ -27,7 +24,12 @@ err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
 
+##Error messages #####
+err.titleNotEntered.first_name = Enter the first name
+err.titleNotEntered.last_name =  Enter the last name
+err.invalidLength = invalid length
 title.roleWithinBusiness = What is your role within the business?
+title.roleForBusiness = What is your role for the business?
 
 #Roles within business
 lbl.roleWithinBusiness.01=Beneficial shareholder
@@ -36,6 +38,9 @@ lbl.roleWithinBusiness.03=Partner
 lbl.roleWithinBusiness.04=Internal accountant
 lbl.roleWithinBusiness.05=Sole proprietor
 lbl.roleWithinBusiness.06=Nominated officer
+
+#Roles for business
+lbl.roleForBusiness.01=External accountant
 
 ## Summary Page
 amls.summary.title=Your AMLS registration
@@ -49,7 +54,7 @@ amls.summary.responsiblepersons=Responsible persons
 amls.summary.aboutyou=About you
 amls.summary.payment=Payment
 amls.summary.declarationlocked=Declaration (locked)
-amls.summary.declarationlocked.title=You can’t complete this section
+amls.summary.declarationlocked.title=You can’t complete this section yetamls.summary.declarationlocked.title=You can’t complete this section
 
 amls.summary.declarationlocked.title=You can’t complete this section yet
 
