@@ -7,6 +7,8 @@ button.save = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
 amls.button.lbl.saveandcontinue= Save and continue
+lbl.yes = Yes
+lbl.no = No
 
 ## Login Page
 amls.Login.title= AMLS
