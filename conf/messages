@@ -59,7 +59,7 @@ amls.summary.declarationlocked=Declaration (locked)
 amls.summary.declarationlocked.title=You can’t complete this section yet
 
 #Are You Employed Within The Business : Labels
-amls.employedwithinthebusiness.title=Anti Money Laundering Registration
+amls.employedwithinthebusiness.title=Are you employed within the business?
 
 #Are You Employed Within The Business : Error Messages
 amls.employedwithinthebusiness.err.option.yesno.notsupplied= Select the Option Yes OR No
