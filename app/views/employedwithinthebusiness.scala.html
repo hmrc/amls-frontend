@@ -1,0 +1,29 @@
+@import include.main
+@import forms.FormHelpers._
+@import include.forms._
+
+@import helper._
+@import config.ApplicationConfig
+
+@(employedWithinTheBusinessForm: Form[models.EmployedWithinTheBusinessModel])(implicit request: Request[_])
+
+@main(
+sectionTitle = Some(Messages("sectionTitle.about_you")),
+title = Messages("amls.employedwithinthebusiness.title")
+) {
+
+@formHelper(employedWithinTheBusinessForm, controllers.aboutYou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
+
+    @radioGroup(
+        name = "isEmployed",
+        labelText = "",
+        options = Seq(
+            "Yes" -> "true",
+            "No" -> "false"
+        )
+    )
+
+    @submit(Messages("amls.button.lbl.saveandcontinue"))
+
+    }
+}
