@@ -7,6 +7,8 @@ button.save = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
 amls.button.lbl.saveandcontinue= Save and continue
+lbl.yes = Yes
+lbl.no = No
 
 ## Login Page
 amls.Login.title= AMLS
@@ -62,7 +64,7 @@ amls.summary.declarationlocked.title=You can’t complete this section yet
 amls.employedwithinthebusiness.title=Are you employed within the business?
 
 #Are You Employed Within The Business : Error Messages
-amls.employedwithinthebusiness.err.option.yesno.notsupplied= Select the Option Yes OR No
+error.boolean.notsupplied= Select the Option Yes OR No
 
 error.required=Please enter an item
 error.invalid=Please enter a valid item

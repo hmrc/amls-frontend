@@ -25,20 +25,4 @@ trait AMLSGenericController extends FrontendController with Actions {
       user => request => post(user, request)
     }
 
-  implicit val booleanFormatter: Formatter[Boolean] = new Formatter[Boolean] {
-
-    override val format = Some(("format.boolean", Nil))
-
-    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Boolean] =
-      data.get(key) match {
-        case Some(value) => value match {
-          case "true" => Right(true)
-          case "false" => Right(false)
-          case _ => Left(Seq(FormError(key, "error.boolean", Nil)))
-        }
-        case _ => Left(Seq(FormError(key, "error.boolean.empty", Nil)))
-      }
-
-    override def unbind(key: String, value: Boolean): Map[String, String] = Map(key -> value.toString)
-  }
 }
