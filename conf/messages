@@ -6,6 +6,7 @@ amls.title=Anti-Money Laundering Supervision
 button.save = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
+amls.button.lbl.saveandcontinue= Save and continue
 
 ## Login Page
 amls.Login.title= AMLS
@@ -23,6 +24,7 @@ lbl.last_name = Last name
 err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
+sectionTitle.about_you = About you
 
 ##Error messages #####
 err.titleNotEntered.first_name = Enter the first name
@@ -54,9 +56,13 @@ amls.summary.responsiblepersons=Responsible persons
 amls.summary.aboutyou=About you
 amls.summary.payment=Payment
 amls.summary.declarationlocked=Declaration (locked)
-amls.summary.declarationlocked.title=You can’t complete this section yetamls.summary.declarationlocked.title=You can’t complete this section
-
 amls.summary.declarationlocked.title=You can’t complete this section yet
+
+#Are You Employed Within The Business : Labels
+amls.employedwithinthebusiness.title=Are you employed within the business?
+
+#Are You Employed Within The Business : Error Messages
+amls.employedwithinthebusiness.err.option.yesno.notsupplied= Select the Option Yes OR No
 
 error.required=Please enter an item
 error.invalid=Please enter a valid item
