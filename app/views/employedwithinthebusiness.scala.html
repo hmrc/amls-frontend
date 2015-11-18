@@ -1,11 +1,11 @@
 @import include.main
 @import forms.FormHelpers._
 @import include.forms._
-
+@import utils.CommonHelper._
 @import helper._
 @import config.ApplicationConfig
 
-@(employedWithinTheBusinessForm: Form[models.EmployedWithinTheBusinessModel])(implicit request: Request[_])
+@(employedWithinTheBusinessForm: Form[models.EmployedWithinTheBusiness])(implicit request: Request[_])
 
 @main(
 sectionTitle = Some(Messages("sectionTitle.about_you")),

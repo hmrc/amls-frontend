@@ -4,8 +4,8 @@ import config.AmlsPropertiesReader._
 import models._
 import play.api.data.Forms._
 import play.api.data._
+import utils.validation.BooleanValidator._
 import utils.validation.RadioGroupWithOtherValidator.radioGroupWithOther
-import play.api.i18n.Messages
 import utils.validation.TextValidator
 
 object AboutYouForms {
@@ -21,6 +21,12 @@ object AboutYouForms {
   )(YourName.apply)(YourName.unapply)
 
   val yourNameForm = Form(yourNameFormMapping)
+
+  val employedWithTheBusinessFormMapping = mapping (
+    "isEmployed" -> mandatoryBoolean("error.boolean.notsupplied")
+  )(EmployedWithinTheBusiness.apply)(EmployedWithinTheBusiness.unapply)
+
+  val employedWithinTheBusinessForm = Form(employedWithTheBusinessFormMapping)
 
   val roleWithinBusinessFormMapping = mapping(
     "roleWithinBusiness" -> radioGroupWithOther("other", getProperty("roleWithinBusiness").split(",").reverse.head,

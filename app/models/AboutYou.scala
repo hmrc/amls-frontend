@@ -8,6 +8,13 @@ object YourName{
 
 case class YourName(firstName: String, middleName:  Option[String], lastName: String)
 
+object EmployedWithinTheBusiness {
+  implicit val formats = Json.format[EmployedWithinTheBusiness]
+}
+
+case class EmployedWithinTheBusiness(isEmployed: Boolean)
+
+
 case class RoleWithinBusiness(roleWithinBusiness: String, other: String)
 
 object RoleWithinBusiness{
