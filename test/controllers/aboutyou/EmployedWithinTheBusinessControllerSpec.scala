@@ -2,7 +2,7 @@ package controllers.aboutyou
 
 import connectors.DataCacheConnector
 import controllers.aboutYou.EmployedWithinTheBusinessController
-import models.EmployedWithinTheBusinessModel
+import models.EmployedWithinTheBusiness
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPerSuite with Actions with MockitoSugar {
 
   implicit val request = FakeRequest()
-  private val employedWithinTheBusinessModel = EmployedWithinTheBusinessModel(true)
+  private val employedWithinTheBusiness = EmployedWithinTheBusiness(true)
   private val mockAuthConnector = mock[AuthConnector]
   private val mockDataCacheConnector = mock[DataCacheConnector]
   private val endpointURL: String = "/employed-within-business"
@@ -37,16 +37,16 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
   "On Page load" must {
 
     "load the Are You Employed Within the Business" in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusinessModel]
+      when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusiness]
         (Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
-        .thenReturn(Future.successful(Some(employedWithinTheBusinessModel)))
+        .thenReturn(Future.successful(Some(employedWithinTheBusiness)))
       val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
       contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
     }
 
     "load Are you employed with the Business without any Data " in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusinessModel](Matchers.any())
+      when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusiness](Matchers.any())
         (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
       val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
@@ -54,8 +54,8 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     }
 
     "load Are you employed with the Business with pre populated data" in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusinessModel](Matchers.any())
-        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(employedWithinTheBusinessModel)))
+      when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusiness](Matchers.any())
+        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(employedWithinTheBusiness)))
       val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
       contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
@@ -104,10 +104,10 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
 
 
   def employedWithBusinessFormForSubmission(futureResult: Future[Result] => Any, isEmployed: String) {
-    val employedWithinTheBusinessModel = EmployedWithinTheBusinessModel(isEmployed.toBoolean)
+    val employedWithinTheBusinessModel = EmployedWithinTheBusiness(isEmployed.toBoolean)
     val fakePostRequest = FakeRequest("POST", endpointURL).withFormUrlEncodedBody(("isEmployed", isEmployed))
 
-    when(mockDataCacheConnector.saveDataShortLivedCache[EmployedWithinTheBusinessModel](Matchers.any(),
+    when(mockDataCacheConnector.saveDataShortLivedCache[EmployedWithinTheBusiness](Matchers.any(),
         Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
       .thenReturn(Future.successful(Some(employedWithinTheBusinessModel)))
 
