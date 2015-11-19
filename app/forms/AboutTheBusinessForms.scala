@@ -1,14 +1,14 @@
 package forms
 
-import models.TelephoningYourBusiness
+import models.TelephoningBusiness
 import play.api.data.Form
 import play.api.data.Forms._
 
 object AboutTheBusinessForms {
 
-  val telephoningYourBusinessForm = Form(mapping(
+  val telephoningBusinessForm = Form(mapping(
     "businessPhoneNumber" -> nonEmptyText(minLength = 10, maxLength = 30),
     "mobileNumber" -> optional(text).verifying("Invalid Phone Number", _.nonEmpty) //TODO Proper Validation
-  )(TelephoningYourBusiness.apply)(TelephoningYourBusiness.unapply))
+  )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 }
 

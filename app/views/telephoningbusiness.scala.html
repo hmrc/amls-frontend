@@ -1,0 +1,27 @@
+@import include.main
+@import forms.FormHelpers._
+@import include.forms._
+
+@(form: Form[_])(implicit request: Request[_])
+
+@main(
+sectionTitle = Some(Messages("telephoningbusiness.title")),
+title = Messages("telephoningbusiness.title")
+) {
+
+    @formHelper(form, aboutthebusiness.routes.TelephoningBusinessController.post) { implicit form: Form[_] =>
+
+        @input(
+            name = "businessPhoneNumber",
+            labelText = Messages("telephoningbusiness.phonenumber")
+        )
+
+        @input(
+            name = "mobileNumber",
+            labelText = Messages("telephoningbusiness.mobilenumber")
+        )
+
+    @submit(Messages("amls.button.lbl.saveandcontinue"))
+
+    }
+}

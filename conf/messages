@@ -68,3 +68,8 @@ error.boolean.notsupplied= Select the Option Yes OR No
 
 error.required=Please enter an item
 error.invalid=Please enter a valid item
+
+telephoningbusiness.cache.key = telephoningbusiness
+telephoningbusiness.title = Telephoning your business
+telephoningbusiness.phonenumber = Business phone number
+telephoningbusiness.mobilenumber = Mobile contact number (optional)
