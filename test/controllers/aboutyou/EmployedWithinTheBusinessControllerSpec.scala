@@ -1,5 +1,6 @@
 package controllers.aboutyou
 
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.aboutYou.EmployedWithinTheBusinessController
 import models.EmployedWithinTheBusiness
