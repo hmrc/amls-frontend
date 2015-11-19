@@ -13,7 +13,7 @@ class RadioGroupWithOtherValidator extends FormValidator {
                                            noRadioButtonSelectedMessageKey: String,
                                            blankValueMessageKey: String,
                                            invalidLengthMessageKey: String,
-                                            maxLengthKey: String) = new Formatter[String] {
+                                            maxLength: Integer) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
       data.get(key) match {
         case Some(n) =>
@@ -22,7 +22,7 @@ class RadioGroupWithOtherValidator extends FormValidator {
             case p if p==otherValue =>
               data.getOrElse(textFieldKey, "") match {
                 case q if q.length == 0 => Left(Seq(FormError(textFieldKey, blankValueMessageKey)))
-                case q if q.length > getProperty(maxLengthKey).toInt => Left(Seq(FormError(textFieldKey, invalidLengthMessageKey)))
+                case q if q.length > maxLength => Left(Seq(FormError(textFieldKey, invalidLengthMessageKey)))
                 case _ => Right(n)
               }
             case _ => Right(n)
@@ -36,7 +36,7 @@ class RadioGroupWithOtherValidator extends FormValidator {
 
   def radioGroupWithOther( textFieldKey:String, otherValue: String, noRadioButtonSelectedMessageKey: String,
                      blankValueMessageKey: String,
-                     invalidLengthMessageKey: String, maxLengthKey: String) =
+                     invalidLengthMessageKey: String, maxLength: Integer) =
     Forms.of[String](radioGroupWithOtherFormatter(textFieldKey, otherValue, noRadioButtonSelectedMessageKey,
-      blankValueMessageKey, invalidLengthMessageKey, maxLengthKey))
+      blankValueMessageKey, invalidLengthMessageKey, maxLength))
 }

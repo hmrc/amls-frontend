@@ -1,28 +1,4 @@
 # Generic Messages
-generic.other = Other
-generic.please_specify = Please specify
-errors.summary = There are errors in your form submission
-amls.title=Anti-Money Laundering Supervision
-button.save = Save and continue
-button.checkYourAnswers = Check your answers
-button.back = Back
-amls.button.lbl.saveandcontinue= Save and continue
-lbl.yes = Yes
-lbl.no = No
-
-## Login Page
-amls.Login.title= AMLS
-unauthorised.title = Unauthorised
-
-#About You
-title.your_name = Your name
-sectionTitle.about_you = About you
-lbl.your_name = Your name
-lbl.first_name = First name
-lbl.middle_name  = Middle name (optional)
-lbl.last_name = Last name
-
-##Error messages #####
 err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
@@ -41,6 +17,35 @@ lbl.roleWithinBusiness.02=Director
 lbl.roleWithinBusiness.03=Partner
 lbl.roleWithinBusiness.04=Internal accountant
 lbl.roleWithinBusiness.05=Sole proprietor
+generic.other = Other
+generic.please_specify = Please specify
+errors.summary = There are errors in your form submission
+amls.title=Anti-Money Laundering Supervision
+button.save = Save and continue
+button.checkYourAnswers = Check your answers
+button.back = Back
+amls.button.lbl.saveandcontinue= Save and continue
+lbl.yes = Yes
+lbl.no = No
+lbl.your_name = Your name
+lbl.first_name = First name
+lbl.middle_name  = Middle name (optional)
+lbl.last_name = Last name
+
+## Login Page
+amls.Login.title= AMLS
+unauthorised.title = Unauthorised
+
+#About You
+title.your_name = Your name
+sectionTitle.about_you = About you
+
+#About the business Section
+sectionTitle.aboutTheBusiness = About the business
+title.businessHasWebsite = Does your business have a website?
+title.addressOfYourWebsite = What is the address of your website?
+
+##Error messages #####
 lbl.roleWithinBusiness.06=Nominated officer
 
 #Roles for business

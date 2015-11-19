@@ -50,7 +50,7 @@ class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
             (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(Some(yourName)))
           val result = MockYourNameController.get(mock[AuthContext], request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("lbl.first_name")) // TODO need to replace lable with the actual value
+          contentAsString(result) must include("firstName")
         }
       }
 

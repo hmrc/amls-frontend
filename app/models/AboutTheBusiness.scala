@@ -6,4 +6,4 @@ object BusinessHasWebsite{
   implicit val formats = Json.format[BusinessHasWebsite]
 }
 
-case class BusinessHasWebsite(hasWebsite: Boolean, website: String)
+case class BusinessHasWebsite(hasWebsite: Boolean, website: Option[String])

@@ -30,7 +30,7 @@ object AboutYouForms {
 
   val roleWithinBusinessFormMapping = mapping(
     "roleWithinBusiness" -> radioGroupWithOther("other", getProperty("roleWithinBusiness").split(",").reverse.head,
-      "error.required", "error.required", "error.invalid", "validationMaxLengthRoleWithinBusinessOther"),
+      "error.required", "error.required", "error.invalid", getIntFromProperty("validationMaxLengthRoleWithinBusinessOther")),
     "other" -> text
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply)
 
@@ -38,7 +38,7 @@ object AboutYouForms {
 
   val roleForBusinessFormMapping = mapping(
     "roleForBusiness" -> radioGroupWithOther("other", getProperty("roleForBusiness").split(",").reverse.head,
-      "error.required", "error.required", "error.invalid", "validationMaxLengthRoleForBusinessOther"),
+      "error.required", "error.required", "error.invalid", getIntFromProperty("validationMaxLengthRoleForBusinessOther")),
     "other" -> text
   )(RoleForBusiness.apply)(RoleForBusiness.unapply)
 

@@ -32,9 +32,10 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     override def dataCacheConnector = mockDataCacheConnector
   }
 
-
-  //For Loading the Page
   "On Page load" must {
+    "use correct service" in {
+      EmployedWithinTheBusinessController.authConnector must be(AMLSAuthConnector)
+    }
 
     "load the Are You Employed Within the Business" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusiness]
@@ -60,17 +61,13 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
       status(futureResult) must be(OK)
       contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
     }
-
   }
 
-  //For Submitting the Page
   "On Page submit" must {
-
     "navigate to the next page if Yes is supplied" in {
       submitWithYesOption { futureResult =>
         status(futureResult) must be(SEE_OTHER)
         contentAsString(futureResult) must include(Messages("title.roleWithinBusiness"))
-        //Redirect(controllers.aboutYou.routes.RoleWithinBusinessController.get())
       }
     }
 
@@ -84,10 +81,8 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     "stay on the page if errors are reported" in {
       submitWithoutAnOption { futureResult =>
         status(futureResult) must be(BAD_REQUEST)
-        //contentAsString(futureResult) must include("") //TODO: Next Page content to be verified
       }
     }
-
   }
 
   def submitWithYesOption(futureResult: Future[Result] => Any) {
@@ -118,5 +113,4 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     val fakePostRequest = FakeRequest("POST", endpointURL).withFormUrlEncodedBody(("isEmployed", ""))
     MockEmployedWithinTheBusinessController.post(mock[AuthContext], fakePostRequest)
   }
-
 }

@@ -3,7 +3,6 @@ package utils.validation
 import play.api.data.Forms
 import play.api.data.format.Formatter
 import play.api.data.FormError
-import config.AmlsPropertiesReader.getProperty
 
 object BooleanWithTextValidator extends FormValidator {
 
@@ -12,7 +11,7 @@ object BooleanWithTextValidator extends FormValidator {
                                            blankValueMessageKey: String,
                                            invalidLengthMessageKey: String,
                                            notBlankValueMessageKey: String,
-                                           maxLengthKey: String) = new Formatter[Boolean] {
+                                           maxLength: Integer) = new Formatter[Boolean] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Boolean] = {
       data.get(key) match {
         case Some(n) =>
@@ -21,7 +20,7 @@ object BooleanWithTextValidator extends FormValidator {
             case p if p==booleanValueThatMandatesTextValue =>
               data.getOrElse(textFieldKey, "") match {
                 case q if q.length == 0 => Left(Seq(FormError(textFieldKey, blankValueMessageKey)))
-                case q if q.length > getProperty(maxLengthKey).toInt => Left(Seq(FormError(textFieldKey, invalidLengthMessageKey)))
+                case q if q.length > maxLength => Left(Seq(FormError(textFieldKey, invalidLengthMessageKey)))
                 case _ => Right(n.toBoolean)
               }
             case p if p!=booleanValueThatMandatesTextValue  =>
@@ -41,7 +40,7 @@ object BooleanWithTextValidator extends FormValidator {
 
   def mandatoryBooleanWithText( textFieldKey:String, booleanValueThatMandatesTextValue: String, noRadioButtonSelectedMessageKey: String,
                      blankValueMessageKey: String,
-                     invalidLengthMessageKey: String, notBlankValueMessageKey: String, maxLengthKey: String) =
+                     invalidLengthMessageKey: String, notBlankValueMessageKey: String, maxLength: Integer) =
     Forms.of[Boolean](mandatoryBooleanWithTextFormatter(textFieldKey, booleanValueThatMandatesTextValue, noRadioButtonSelectedMessageKey,
-      blankValueMessageKey, invalidLengthMessageKey, notBlankValueMessageKey: String, maxLengthKey))
+      blankValueMessageKey, invalidLengthMessageKey, notBlankValueMessageKey: String, maxLength))
 }

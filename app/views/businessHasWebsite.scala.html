@@ -1,0 +1,24 @@
+@import include.main
+@import forms.FormHelpers._
+@import forms.AmlsForms._
+@import include.forms._
+@import utils.CommonHelper._
+
+@(businessHasWebsiteForm: Form[models.BusinessHasWebsite])(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
+    title = Messages("title.businessHasWebsite")
+) {
+    @formHelper(businessHasWebsiteForm, aboutTheBusiness.routes.BusinessHasWebsiteController.post()) { implicit form: Form[_] =>
+        @radioGroupWithOther(
+            name = "hasWebsite",
+            otherName = "website",
+            labelText = "title.addressOfYourWebsite",
+            legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
+            otherLabelText = "Some other label text",
+            options = optionsYesNo
+        )
+        @submit(Messages("button.save"))
+    }
+}
