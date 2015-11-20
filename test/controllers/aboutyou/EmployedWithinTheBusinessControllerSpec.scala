@@ -44,7 +44,7 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
         .thenReturn(Future.successful(Some(employedWithinTheBusiness)))
       val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
-      contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
+      contentAsString(futureResult) must include(Messages("title.employedwithinthebusiness"))
     }
 
     "load Are you employed with the Business without any Data " in {
@@ -52,7 +52,7 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
         (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
       val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
-      contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
+      contentAsString(futureResult) must include(Messages("title.employedwithinthebusiness"))
     }
 
     "load Are you employed with the Business with pre populated data" in {
@@ -60,7 +60,7 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
         (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(employedWithinTheBusiness)))
       val futureResult = MockEmployedWithinTheBusinessController.get(mock[AuthContext], request)
       status(futureResult) must be(OK)
-      contentAsString(futureResult) must include(Messages("amls.employedwithinthebusiness.title"))
+      contentAsString(futureResult) must include(Messages("title.employedwithinthebusiness"))
     }
   }
 

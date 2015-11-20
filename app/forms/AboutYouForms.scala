@@ -23,7 +23,7 @@ object AboutYouForms {
   val yourNameForm = Form(yourNameFormMapping)
 
   val employedWithTheBusinessFormMapping = mapping (
-    "isEmployed" -> mandatoryBoolean("error.boolean.notsupplied")
+    "isEmployed" -> mandatoryBoolean("error.required")
   )(EmployedWithinTheBusiness.apply)(EmployedWithinTheBusiness.unapply)
 
   val employedWithinTheBusinessForm = Form(employedWithTheBusinessFormMapping)
