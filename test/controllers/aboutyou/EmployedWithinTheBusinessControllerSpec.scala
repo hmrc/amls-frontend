@@ -36,7 +36,7 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
   //For Loading the Page
   "On Page load" must {
 
-    "load the Are You Employed Within the Business" in {
+    "load the Are You Employed Within the Business Page" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusiness]
         (Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
         .thenReturn(Future.successful(Some(employedWithinTheBusiness)))

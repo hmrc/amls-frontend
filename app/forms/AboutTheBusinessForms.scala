@@ -7,7 +7,7 @@ import play.api.data.Forms._
 object AboutTheBusinessForms {
 
   val telephoningBusinessForm = Form(mapping(
-    "businessPhoneNumber" -> nonEmptyText(minLength = 10, maxLength = 30),
+    "businessPhoneNumber" -> nonEmptyText(minLength=10, maxLength = 30), //TODO Proper Validation
     "mobileNumber" -> optional(text).verifying("Invalid Phone Number", _.nonEmpty) //TODO Proper Validation
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 }

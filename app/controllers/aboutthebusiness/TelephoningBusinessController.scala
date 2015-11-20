@@ -6,9 +6,8 @@ import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models.TelephoningBusiness
 import play.api.i18n.Messages
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
@@ -24,16 +23,20 @@ trait TelephoningBusinessController extends AMLSGenericController {
       case _ => Ok(views.html.telephoningbusiness(telephoningBusinessForm))
     }
 
-  override protected def post(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = dataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](CACHE_KEY) map {
-    case Some(dataToCache) => Ok(views.html.telephoningbusiness(telephoningBusinessForm))
-    case _ => Ok(views.html.telephoningbusiness(telephoningBusinessForm))
-  }
-
+  override def post(implicit user: AuthContext, request: Request[AnyContent]) =
+    telephoningBusinessForm.bindFromRequest().fold(
+      errors => Future.successful(BadRequest(views.html.telephoningbusiness(errors))),
+      telephoningBusiness => {
+        dataCacheConnector.saveDataShortLivedCache[TelephoningBusiness](CACHE_KEY, telephoningBusiness) map {
+          case Some(tb) if tb.businessPhoneNumber.nonEmpty => Redirect(controllers.aboutYou.routes.RoleWithinBusinessController.get())
+          case _ => Redirect(controllers.aboutYou.routes.RoleForBusinessController.get())
+        }
+      })
 }
 
 
 object TelephoningBusinessController extends TelephoningBusinessController {
-  override val dataCacheConnector = DataCacheConnector
+  override def dataCacheConnector = DataCacheConnector
 
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
+  override def authConnector = AMLSAuthConnector
 }
