@@ -11,12 +11,12 @@
     title = Messages("title.businessHasWebsite")
 ) {
     @formHelper(businessHasWebsiteForm, aboutTheBusiness.routes.BusinessHasWebsiteController.post()) { implicit form: Form[_] =>
-        @radioGroupWithOther(
+        @radioGroupYesNoWithText(
             name = "hasWebsite",
-            otherName = "website",
+            textFieldName = "website",
             labelText = "title.addressOfYourWebsite",
             legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
-            otherLabelText = "Some other label text",
+            textFieldLabelText = Messages("title.addressOfYourWebsite"),
             options = optionsYesNo
         )
         @submit(Messages("button.save"))
