@@ -9,7 +9,6 @@ object BooleanWithTextValidator extends FormValidator {
   private def mandatoryBooleanWithTextFormatter(textFieldKey:String, booleanValueThatMandatesTextValue:String,
                                            noRadioButtonSelectedMessageKey: String,
                                            blankValueMessageKey: String,
-                                           invalidLengthMessageKey: String,
                                            notBlankValueMessageKey: String,
                                            maxLength: Integer) = new Formatter[Boolean] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Boolean] = {
@@ -20,7 +19,6 @@ object BooleanWithTextValidator extends FormValidator {
             case p if p==booleanValueThatMandatesTextValue =>
               data.getOrElse(textFieldKey, "") match {
                 case q if q.length == 0 => Left(Seq(FormError(textFieldKey, blankValueMessageKey)))
-                case q if q.length > maxLength => Left(Seq(FormError(textFieldKey, invalidLengthMessageKey)))
                 case _ => Right(n.toBoolean)
               }
             case p if p!=booleanValueThatMandatesTextValue  =>
@@ -38,9 +36,10 @@ object BooleanWithTextValidator extends FormValidator {
     override def unbind(key: String, value: Boolean): Map[String, String] = Map(key -> value.toString)
   }
 
-  def mandatoryBooleanWithText( textFieldKey:String, booleanValueThatMandatesTextValue: String, noRadioButtonSelectedMessageKey: String,
-                     blankValueMessageKey: String,
-                     invalidLengthMessageKey: String, notBlankValueMessageKey: String, maxLength: Integer) =
-    Forms.of[Boolean](mandatoryBooleanWithTextFormatter(textFieldKey, booleanValueThatMandatesTextValue, noRadioButtonSelectedMessageKey,
-      blankValueMessageKey, invalidLengthMessageKey, notBlankValueMessageKey: String, maxLength))
+  def mandatoryBooleanWithText( textFieldKey:String, booleanValueThatMandatesTextValue: String,
+                                noRadioButtonSelectedMessageKey: String,
+                                blankValueMessageKey: String, notBlankValueMessageKey: String, maxLength: Integer) =
+    Forms.of[Boolean](mandatoryBooleanWithTextFormatter(textFieldKey, booleanValueThatMandatesTextValue,
+      noRadioButtonSelectedMessageKey,
+      blankValueMessageKey, notBlankValueMessageKey: String, maxLength))
 }

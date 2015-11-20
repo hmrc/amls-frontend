@@ -73,3 +73,4 @@ error.boolean.notsupplied= Select the Option Yes OR No
 
 error.required=Please enter an item
 error.invalid=Please enter a valid item
+error.notrequired=No item should be entered
