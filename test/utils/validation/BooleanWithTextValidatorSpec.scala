@@ -18,7 +18,7 @@ class BooleanWithTextValidatorSpec extends PlaySpec with MockitoSugar  with OneS
     "respond appropriately if user has not choosen any" in {
       val mapping = mandatoryBooleanWithText("website","true", "No radio button selected", "blank value", "value not allowed", MAX_LENGTH)
       mapping.bind(Map("website" -> "wwww.google.com"))
-        .left.getOrElse(Nil).contains(FormError("hasWebsite", "No radio button selected")) mustBe true
+        .left.getOrElse(Nil).contains(FormError("", "No radio button selected")) mustBe true
     }
 
     "respond appropriately if Yes is chosen and no value entered into the text field" in {

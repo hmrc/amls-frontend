@@ -29,7 +29,10 @@ object BooleanWithTextValidator extends FormValidator {
               }
             case _ => Right(n.toBoolean)
             }
-        case _ => Left(Seq(FormError(key, noRadioButtonSelectedMessageKey)))
+        case _ => {
+          Left(Seq(FormError(key, noRadioButtonSelectedMessageKey)))
+
+        }
       }
     }
 
