@@ -20,6 +20,7 @@ class CurrencyValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPe
     "report an invalid currency error" in {
       optionalCurrency("invalid").bind(Map("" -> "ZZZ")) mustBe Left(List(FormError("", "invalid")))
       optionalCurrency("invalid").bind(Map("" -> "!£$")) mustBe Left(List(FormError("", "invalid")))
+      optionalCurrency("invalid").bind(Map()) mustBe Left(List(FormError("", "invalid")))
     }
 
     "report correctly for blank value" in {

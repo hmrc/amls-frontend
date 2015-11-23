@@ -22,10 +22,11 @@ class BooleanValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPer
       val mapping = mandatoryBoolean("blank message")
       mapping.binder.unbind("", true) mustBe Map("" -> "true")
     }
-    "respond appropriately if unbound test" in {
+    "respond appropriately if form has no value" in {
       val mapping = mandatoryBoolean("blank message")
-      mapping.bind(Map(""->""))
+      mapping.bind(Map())
         .left.getOrElse(Nil).contains(FormError("", "blank message")) mustBe true
     }
+
   }
 }

@@ -27,6 +27,7 @@ class CurrencyValueValidatorSpec extends PlaySpec with MockitoSugar  with OneSer
       optionalCurrencyValue("error.currency").bind(Map("" -> "1234.01")) mustBe Left(List(FormError("", "error.currency")))
       optionalCurrencyValue("error.currency").bind(Map("" -> "1234.1")) mustBe Left(List(FormError("", "error.currency")))
       optionalCurrencyValue("error.currency").bind(Map("" -> "-1234")) mustBe Left(List(FormError("", "error.currency")))
+      optionalCurrencyValue("error.currency").bind(Map()) mustBe Left(List(FormError("", "error.currency")))
     }
 
     "report correctly for blank value" in {
