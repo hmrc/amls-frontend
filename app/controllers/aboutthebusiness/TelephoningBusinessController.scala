@@ -27,9 +27,8 @@ trait TelephoningBusinessController extends AMLSGenericController {
     telephoningBusinessForm.bindFromRequest().fold(
       errors => Future.successful(BadRequest(views.html.telephoningbusiness(errors))),
       telephoningBusiness => {
-        dataCacheConnector.saveDataShortLivedCache[TelephoningBusiness](CACHE_KEY, telephoningBusiness) map {
-          case Some(tb) if tb.businessPhoneNumber.nonEmpty => Redirect(controllers.aboutYou.routes.RoleWithinBusinessController.get())
-          case _ => Redirect(controllers.aboutYou.routes.RoleForBusinessController.get())
+        dataCacheConnector.saveDataShortLivedCache[TelephoningBusiness](CACHE_KEY, telephoningBusiness) map { _ =>
+          Redirect(controllers.aboutYou.routes.RoleForBusinessController.get())
         }
       })
 }

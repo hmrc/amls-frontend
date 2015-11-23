@@ -2,14 +2,14 @@
 @import forms.FormHelpers._
 @import include.forms._
 
-@(form: Form[_])(implicit request: Request[_])
+@(telephoningBusinessForm: Form[_])(implicit request: Request[_])
 
 @main(
 sectionTitle = Some(Messages("telephoningbusiness.title")),
 title = Messages("telephoningbusiness.title")
 ) {
 
-    @formHelper(form, aboutthebusiness.routes.TelephoningBusinessController.post) { implicit form: Form[_] =>
+    @formHelper(telephoningBusinessForm, aboutthebusiness.routes.TelephoningBusinessController.post) { implicit form: Form[_] =>
 
         @input(
             name = "businessPhoneNumber",
