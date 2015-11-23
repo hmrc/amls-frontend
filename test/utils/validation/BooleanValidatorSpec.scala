@@ -2,6 +2,7 @@ package utils.validation
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import play.api.data.FormError
 import utils.validation.BooleanValidator._
 
 class BooleanValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
@@ -20,6 +21,11 @@ class BooleanValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPer
     "respond appropriately if unbound" in {
       val mapping = mandatoryBoolean("blank message")
       mapping.binder.unbind("", true) mustBe Map("" -> "true")
+    }
+    "respond appropriately if unbound test" in {
+      val mapping = mandatoryBoolean("blank message")
+      mapping.bind(Map(""->""))
+        .left.getOrElse(Nil).contains(FormError("", "blank message")) mustBe true
     }
   }
 }

@@ -5,9 +5,7 @@ import play.api.data.format.Formatter
 import play.api.data.FormError
 import config.AmlsPropertiesReader.getProperty
 
-object RadioGroupWithOtherValidator extends RadioGroupWithOtherValidator
-
-class RadioGroupWithOtherValidator extends FormValidator {
+object RadioGroupWithOtherValidator extends FormValidator {
 
   private def radioGroupWithOtherFormatter(textFieldKey:String, otherValue:String,
                                            noRadioButtonSelectedMessageKey: String,

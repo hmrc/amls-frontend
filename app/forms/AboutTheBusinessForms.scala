@@ -10,9 +10,8 @@ import utils.validation.WebAddressValidator
 object AboutTheBusinessForms {
   val businessHasWebsiteFormMapping = mapping(
     "hasWebsite" -> mandatoryBooleanWithText("website", "true",
-      "error.required", "error.required", "error.notrequired", 
-      getIntFromProperty("validationMaxLengthRoleForBusinessOther")),
-    "website" -> optional(WebAddressValidator.webAddress("error.required","error.invalid"))
+      "error.required", "error.required", "error.notrequired"),
+    "website" -> optional(WebAddressValidator.webAddress("err.invalidLength","error.invalid"))
   )(BusinessHasWebsite.apply)(BusinessHasWebsite.unapply)
 
   val businessHasWebsiteForm = Form(businessHasWebsiteFormMapping)

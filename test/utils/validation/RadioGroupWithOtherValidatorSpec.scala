@@ -20,7 +20,13 @@ class RadioGroupWithOtherValidatorSpec extends PlaySpec with MockitoSugar  with 
          .left.getOrElse(Nil).contains(FormError("otherValue", "blank value")) mustBe true
      }
 
-     "respond appropriately if Yes is chosen and value entered into the text field is too long" in {
+      "respond appropriately if user has not chosen any option and text is empty" in {
+        val mapping = radioGroupWithOther("otherValue","Yes", "No radio button selected", "blank value", "value not allowed", MAX_LENGTH)
+        mapping.bind(Map())
+          .left.getOrElse(Nil).contains(FormError("", "Nothing to validate")) mustBe true
+      }
+
+      "respond appropriately if Yes is chosen and value entered into the text field is too long" in {
        val mapping = radioGroupWithOther("otherValue","Yes", "No radio button selected", "blank value", "Invalid length", MAX_LENGTH)
        mapping.bind(Map("otherValue" -> "aaaaaaaaaa" * 11, "" -> "Yes"))
          .left.getOrElse(Nil).contains(FormError("otherValue", "Invalid length")) mustBe true
