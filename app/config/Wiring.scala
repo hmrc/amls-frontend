@@ -5,6 +5,7 @@ import play.api.Play
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.cache.client.{ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
+import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.{LoadAuditingConfig, AuditingConfig}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.{ServicesConfig, ControllerConfig, AppName, RunMode}
@@ -12,7 +13,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HttpGet
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 import uk.gov.hmrc.play.http.ws.{WSGet, WSPut, WSPost, WSDelete}
-import uk.gov.hmrc.play.partials.CachedStaticHtmlPartial
+import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 
 object AMLSControllerConfig extends ControllerConfig {
   override def controllerConfigs: Config = Play.current.configuration.underlying.getConfig("controllers")
@@ -44,11 +45,12 @@ object AMLSLoggingFilter extends FrontendLoggingFilter {
     AMLSControllerConfig.paramsForController(controllerName).needsLogging
 }
 
-object WSHttp extends WSGet with WSPut with WSPost with WSDelete with AppName with RunMode {
+object WSHttp extends WSGet with WSPut with WSPost with WSDelete with AppName with RunMode  with HttpAuditing {
   override lazy val auditConnector: AuditConnector = AMLSAuditConnector
+  override val hooks = Seq(AuditingHook)
 }
 
-object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartial {
+object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartialRetriever {
   override lazy val httpGet: HttpGet = WSHttp
 }
 

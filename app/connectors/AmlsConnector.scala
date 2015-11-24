@@ -3,13 +3,12 @@ package connectors
 import config.WSHttp
 import models.LoginDetails
 import play.api.libs.json.{JsValue, Json, Reads}
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import uk.gov.hmrc.play.http._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait AmlsConnector extends ServicesConfig {
