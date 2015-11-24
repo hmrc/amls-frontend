@@ -65,4 +65,8 @@ sectionTitle.aboutTheBusiness = About the business
 title.businessHasWebsite = Does your business have a website?
 title.addressOfYourWebsite = What is the address of your website?
 
-
+telephoningbusiness.title = Telephoning your business
+telephoningbusiness.phonenumber = Business phone number
+telephoningbusiness.mobilenumber = Mobile contact number (optional)
+telephoningbusiness.error.invalidphonenumber = Invalid Phone Number
+telephoningbusiness.error.invalidmobilenumber = Invalid Mobile Number
