@@ -32,6 +32,7 @@ class BankDetailsValidatorSpec extends PlaySpec with MockitoSugar  with OneServe
       mandatorySortCode("blank message", "invalid message").bind(Map("" -> "ab-cd-ef")) mustBe Left(List(FormError("", "invalid message")))
       mandatorySortCode("blank message", "invalid message").bind(Map("" -> "sdad3 e32 rb")) mustBe Left(List(FormError("", "invalid message")))
       mandatorySortCode("blank message", "invalid message").bind(Map("" -> "a" * 250)) mustBe Left(List(FormError("", "invalid message")))
+
     }
   }
 
@@ -65,6 +66,7 @@ class BankDetailsValidatorSpec extends PlaySpec with MockitoSugar  with OneServe
       mandatoryIban("blank message", "invalid message").bind(Map("" -> "a" * 250)) mustBe Left(List(FormError("", "invalid message")))
       mandatoryIban("blank message", "invalid message").bind(Map("" -> ("MT84 MALT 0110 0001 2345 MTLC AST0 01S" + ("S" * 4)))) mustBe
         Left(List(FormError("", "invalid message")))
+      mandatoryIban("blank message", "invalid message").bind(Map()) mustBe Left(List(FormError("", "Nothing to validate")))
     }
 
     "respond appropriately if unbound" in {

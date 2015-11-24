@@ -4,9 +4,7 @@ import play.api.data.Forms
 import play.api.data.format.Formatter
 import play.api.data.FormError
 
-object CurrencyValueValidator extends CurrencyValueValidator
-
-class CurrencyValueValidator extends FormValidator{
+object CurrencyValueValidator extends FormValidator{
 
   private def cleanMoneyString(moneyString: String) =
     currencyRegex.findFirstIn(moneyString.replace(",","")).getOrElse("")

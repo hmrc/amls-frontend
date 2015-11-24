@@ -25,9 +25,7 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.play.mappers.DateFields.{day, month, year}
 
 
-object DateTupleValidator extends DateTupleValidator
-
-trait DateTupleValidator extends FormValidator {
+object DateTupleValidator extends FormValidator {
 
 
   val dateTuple: Mapping[Option[LocalDate]] = dateTuple(validate = true)

@@ -3,9 +3,7 @@ package utils.validation
 import play.api.data.format.Formatter
 import play.api.data.{FormError, Forms}
 
-object BooleanValidator extends BooleanValidator
-
-class BooleanValidator extends FormValidator {
+object BooleanValidator extends FormValidator {
 
   private def mandatoryBooleanFormatter(blankValueMessageKey: String) = new Formatter[Boolean] {
 
@@ -26,5 +24,4 @@ class BooleanValidator extends FormValidator {
 
   def mandatoryBoolean(blankValueMessageKey: String) =
     Forms.of[Boolean](mandatoryBooleanFormatter(blankValueMessageKey))
-
 }

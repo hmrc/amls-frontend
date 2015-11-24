@@ -1,41 +1,55 @@
-# Generic Messages
-generic.other = Other
-generic.please_specify = Please specify
-errors.summary = There are errors in your form submission
 amls.title=Anti-Money Laundering Supervision
+
+# Generic Messages
+err.titleNotEntered.first_name = Enter the first name
+err.titleNotEntered.last_name =  Enter the last name
+err.invalidLength = invalid length
+error.required = Please enter an item
+error.invalid = Please enter a valid item
+error.notrequired = No item should be entered
+err.invalidLength = invalid length
+errors.summary = There are errors in your form submission
+
 button.save = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
-amls.button.lbl.saveandcontinue= Save and continue
+generic.other = Other
+generic.please_specify = Please specify
+
 lbl.yes = Yes
 lbl.no = No
-
-## Login Page
-amls.Login.title= AMLS
-unauthorised.title = Unauthorised
-
-#About You
-title.your_name = Your name
-sectionTitle.about_you = About you
 lbl.your_name = Your name
 lbl.first_name = First name
 lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
 
-##Error messages #####
-err.titleNotEntered.first_name = Enter the first name
-err.titleNotEntered.last_name =  Enter the last name
-err.invalidLength = invalid length
-sectionTitle.about_you = About you
+## Login Page
+amls.Login.title= AMLS
+unauthorised.title = Unauthorised
 
-##Error messages #####
-err.titleNotEntered.first_name = Enter the first name
-err.titleNotEntered.last_name =  Enter the last name
-err.invalidLength = invalid length
+
+## Summary Page
+amls.summary.title = Your AMLS registration
+amls.summary.sectiontitle = Service
+amls.summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
+amls.summary.businessactivities = Business activities
+amls.summary.aboutbusiness = About the business
+amls.summary.tradingpremises = Trading premises
+amls.summary.bankdetails = Bank account details
+amls.summary.responsiblepersons = Responsible persons
+amls.summary.aboutyou = About you
+amls.summary.payment = Payment
+amls.summary.declarationlocked = Declaration (locked)
+amls.summary.declarationlocked.title = You can’t complete this section yet
+
+###### About You Section ######
+sectionTitle.about_you = About you
+title.your_name = Your name
+title.employedwithinthebusiness = Are you employed within the business?
 title.roleWithinBusiness = What is your role within the business?
 title.roleForBusiness = What is your role for the business?
 
-#Roles within business
+# Roles within business Radio buttons Options
 lbl.roleWithinBusiness.01=Beneficial shareholder
 lbl.roleWithinBusiness.02=Director
 lbl.roleWithinBusiness.03=Partner
@@ -43,28 +57,12 @@ lbl.roleWithinBusiness.04=Internal accountant
 lbl.roleWithinBusiness.05=Sole proprietor
 lbl.roleWithinBusiness.06=Nominated officer
 
-#Roles for business
+#Roles for business Radio Button Options
 lbl.roleForBusiness.01=External accountant
 
-## Summary Page
-amls.summary.title=Your AMLS registration
-amls.summary.sectiontitle=Service
-amls.summary.description=Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
-amls.summary.businessactivities=Business activities
-amls.summary.aboutbusiness=About the business
-amls.summary.tradingpremises=Trading premises
-amls.summary.bankdetails=Bank account details
-amls.summary.responsiblepersons=Responsible persons
-amls.summary.aboutyou=About you
-amls.summary.payment=Payment
-amls.summary.declarationlocked=Declaration (locked)
-amls.summary.declarationlocked.title=You can’t complete this section yet
+###### About the business Section ######
+sectionTitle.aboutTheBusiness = About the business
+title.businessHasWebsite = Does your business have a website?
+title.addressOfYourWebsite = What is the address of your website?
 
-#Are You Employed Within The Business : Labels
-amls.employedwithinthebusiness.title=Are you employed within the business?
 
-#Are You Employed Within The Business : Error Messages
-error.boolean.notsupplied= Select the Option Yes OR No
-
-error.required=Please enter an item
-error.invalid=Please enter a valid item

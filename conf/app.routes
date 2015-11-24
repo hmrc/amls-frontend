@@ -16,6 +16,10 @@ POST       /role-within-business        controllers.aboutYou.RoleWithinBusinessC
 GET        /role-for-business           controllers.aboutYou.RoleForBusinessController.get()
 POST       /role-for-business           controllers.aboutYou.RoleForBusinessController.post()
 
+GET        /business-has-website        controllers.aboutTheBusiness.BusinessHasWebsiteController.get()
+POST       /business-has-website        controllers.aboutTheBusiness.BusinessHasWebsiteController.post()
+
+
 GET         /welcome                    controllers.WelcomeController.get
 GET         /unauthorised               controllers.AmlsController.unauthorised
 GET         /                           controllers.WelcomeController.get

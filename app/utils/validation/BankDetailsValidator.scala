@@ -8,9 +8,7 @@ import play.api.data.validation.Invalid
 import play.api.data.validation.Valid
 import play.api.data.FormError
 
-object BankDetailsValidator extends BankDetailsValidator
-
-class BankDetailsValidator extends FormValidator {
+object BankDetailsValidator extends FormValidator {
 
   def mandatoryAccountNumber(emptyMessageKey: String, invalidMessageKey: String): Mapping[String] = {
     val constraint = Constraint("Blank and invalid")( {

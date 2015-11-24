@@ -6,9 +6,7 @@ import play.api.data.FormError
 import java.util.Currency
 import scala.collection.JavaConverters._
 
-object CurrencyValidator extends CurrencyValidator
-
-class CurrencyValidator extends FormValidator{
+object CurrencyValidator extends FormValidator{
 
   private def getCurrencies:Set[String] =
       Currency.getAvailableCurrencies.asScala.map( _.getCurrencyCode ).toSet
