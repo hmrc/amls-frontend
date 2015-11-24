@@ -63,10 +63,10 @@ class BusinessHasWebsiteControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
 
-    "on submit of Your Name page" must {
+    "on submit of page" must {
       "successfully navigate to next page " in {
         submitWithFormFilled { result =>
-          status(result) must be(SEE_OTHER)
+          status(result) must be(NOT_IMPLEMENTED)
         }
       }
 
@@ -91,6 +91,7 @@ class BusinessHasWebsiteControllerSpec extends PlaySpec with OneServerPerSuite w
       when(mockDataCacheConnector.saveDataShortLivedCache[BusinessHasWebsite](Matchers.any(), Matchers.any())
         (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(mockBusinessHasWebsite)))
       val result = MockBusinessHasWebsiteController.post(mock[AuthContext], fakePostRequest)
+      test(result)
     }
 
     def submitWithFormFilled(test: Future[Result] => Any) {
