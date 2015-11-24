@@ -13,15 +13,17 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
+import scala.util.Random
 
 class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
   private implicit val authContext = mock[AuthContext]
   private val mockAuthConnector = mock[AuthConnector]
   private val mockDataCacheConnector = mock[DataCacheConnector]
-  private val endpointURL = "/telephoning-business"
-  private val NineDigitNumber = "999999999"
-  private val TenDigitNumber = NineDigitNumber + "0"
+  private val EndpointURL = "/telephoning-business"
+  private val InvalidNumber = "@@@@@@@@"
+  private val TwentySevenDigitNumber = "9" * 27
+  private val TwentyEightDigitNumber = "9" * 28
 
   object MockTelephoningBusinessController extends TelephoningBusinessController {
     override def authConnector = mockAuthConnector
@@ -32,7 +34,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
   "On Page load" must {
 
     implicit val fakeGetRequest = FakeRequest()
-    val telephoningBusiness = TelephoningBusiness(TenDigitNumber, Some(TenDigitNumber))
+    val telephoningBusiness = TelephoningBusiness(TwentySevenDigitNumber, Some(TwentySevenDigitNumber))
 
     "load the blank Telephoning Business page if nothing in cache" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](Matchers.any())
@@ -87,25 +89,37 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
   "On Page submit" must {
 
     "When the user does not provide Phone Number then throw Bad Request" in {
-      val futureResult = telephoneBusinessFormSubmissionHelper("", Some(TenDigitNumber))
+      val futureResult = telephoneBusinessFormSubmissionHelper("", Some(TwentySevenDigitNumber))
       status(futureResult) must be(BAD_REQUEST)
       contentAsString(futureResult) must include(Messages("error.required"))
     }
 
-    "When the user provides the Phone Number then validate it" in {
-      val futureResult = telephoneBusinessFormSubmissionHelper(NineDigitNumber, Some(TenDigitNumber))
+    "When the user provides the Phone Number then validate the length" in {
+      val futureResult = telephoneBusinessFormSubmissionHelper(TwentyEightDigitNumber, Some(TwentySevenDigitNumber))
+      status(futureResult) must be(BAD_REQUEST)
+      contentAsString(futureResult) must include(Messages("err.invalidLength"))
+    }
+
+    "When the user provides the Phone Number then validate the format" in {
+      val futureResult = telephoneBusinessFormSubmissionHelper(InvalidNumber, Some(TwentySevenDigitNumber))
       status(futureResult) must be(BAD_REQUEST)
       contentAsString(futureResult) must include(Messages("telephoningbusiness.error.invalidphonenumber"))
     }
 
-    "When the user provides the Mobile Number then validate it" in {
-      val futureResult = telephoneBusinessFormSubmissionHelper(TenDigitNumber, Some(NineDigitNumber))
+    "When the user provides the Mobile Number then validate the length" in {
+      val futureResult = telephoneBusinessFormSubmissionHelper(TwentySevenDigitNumber, Some(TwentyEightDigitNumber))
       status(futureResult) must be(BAD_REQUEST)
-      contentAsString(futureResult) must include(Messages("telephoningbusiness.error.invalidmobilenumber"))
+      contentAsString(futureResult) must include(Messages("err.invalidLength"))
+    }
+
+    "When the user provides the Mobile Number then validate the format" in {
+      val futureResult = telephoneBusinessFormSubmissionHelper(InvalidNumber, Some(TwentyEightDigitNumber))
+      status(futureResult) must be(BAD_REQUEST)
+      contentAsString(futureResult) must include(Messages("telephoningbusiness.error.invalidphonenumber"))
     }
 
     "Successfully navigate to the next page if the details are valid" in {
-      val futureResult = telephoneBusinessFormSubmissionHelper(TenDigitNumber, Some(TenDigitNumber))
+      val futureResult = telephoneBusinessFormSubmissionHelper(TwentySevenDigitNumber, Some(TwentySevenDigitNumber))
       status(futureResult) must be(SEE_OTHER)
       redirectLocation(futureResult).fold("") { x => x } must include("/role-for-business")
     }
@@ -114,7 +128,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
 
   private def telephoneBusinessFormSubmissionHelper(businessPhoneNumber: String, mobileNumber: Option[String]) = {
     val telephoningBusiness = TelephoningBusiness(businessPhoneNumber, mobileNumber)
-    implicit val fakePostRequest = FakeRequest("POST", endpointURL).withFormUrlEncodedBody(
+    implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
       ("businessPhoneNumber", telephoningBusiness.businessPhoneNumber),
       ("mobileNumber", telephoningBusiness.mobileNumber.fold("") { x => x })
     )
