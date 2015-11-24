@@ -15,7 +15,7 @@ trait TelephoningBusinessController extends AMLSGenericController {
 
   def dataCacheConnector: DataCacheConnector
 
-  private val CACHE_KEY = Messages("telephoningbusiness.cache.key")
+  private val CACHE_KEY = "telephoningbusiness"
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) =
     dataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](CACHE_KEY) map {
@@ -36,6 +36,5 @@ trait TelephoningBusinessController extends AMLSGenericController {
 
 object TelephoningBusinessController extends TelephoningBusinessController {
   override def dataCacheConnector = DataCacheConnector
-
   override def authConnector = AMLSAuthConnector
 }

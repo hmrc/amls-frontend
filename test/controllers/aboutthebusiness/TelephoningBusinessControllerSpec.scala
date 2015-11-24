@@ -26,9 +26,8 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
   private val TwentyEightDigitNumber = "9" * 28
 
   object MockTelephoningBusinessController extends TelephoningBusinessController {
-    override def authConnector = mockAuthConnector
-
-    override def dataCacheConnector = mockDataCacheConnector
+    def authConnector = mockAuthConnector
+    override def dataCacheConnector : DataCacheConnector = mockDataCacheConnector
   }
 
   "On Page load" must {
