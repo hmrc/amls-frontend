@@ -6,9 +6,7 @@ import scala.collection.mutable.ListBuffer
 import uk.gov.hmrc.play.validators.Validators.isPostcodeLengthValid
 import config.AmlsPropertiesReader.getProperty
 
-object AddressValidator extends AddressValidator
-
-class AddressValidator extends FormValidator {
+object AddressValidator extends FormValidator {
 
   private def getAddrDetails(data: Map[String, String], addr1Key: String,
                              addr2Key: String, addr3Key:String,

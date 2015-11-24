@@ -5,9 +5,7 @@ import play.api.data.format.Formatter
 import play.api.data.FormError
 import config.AmlsPropertiesReader.getProperty
 
-object PhoneNumberValidator extends PhoneNumberValidator
-
-class PhoneNumberValidator extends FormValidator {
+object PhoneNumberValidator extends FormValidator {
 
   private def mandatoryPhoneNumberFormatter(blankValueMessageKey: String,
                                             invalidLengthMessageKey: String,

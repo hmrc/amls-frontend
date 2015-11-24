@@ -7,9 +7,7 @@ import play.api.data.Forms.text
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 
-object TextValidator extends TextValidator
-
-class TextValidator extends FormValidator {
+object TextValidator extends FormValidator {
 
   def mandatoryText(blankValueMessageKey:String, invalidLengthMessageKey: String,
                     validationMaxLengthProperty: String): Mapping[String] = {

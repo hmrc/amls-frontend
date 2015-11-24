@@ -5,10 +5,8 @@ import play.api.data.Forms._
 import play.api.data.Mapping
 import play.api.data.validation.{Valid, Invalid, Constraint}
 
-object WebAddressValidator extends WebAddressValidator
 
-
-class WebAddressValidator extends FormValidator {
+object WebAddressValidator extends FormValidator {
   def webAddress(invalidLengthMessageKey: String,
                   invalidValueMessageKey: String) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {

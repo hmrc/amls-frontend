@@ -7,9 +7,7 @@ import play.api.data.Forms.text
 import play.api.data.validation.Constraint
 import config.AmlsPropertiesReader.getProperty
 
-object EmailValidator extends EmailValidator
-
-class EmailValidator extends FormValidator {
+object EmailValidator extends FormValidator {
 
   def mandatoryEmail(blankValueMessageKey: String, invalidLengthMessageKey: String,
                      invalidValueMessageKey: String) : Mapping[String] = {

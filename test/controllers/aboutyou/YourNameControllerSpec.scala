@@ -80,15 +80,16 @@ class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
       val fakePostRequest = FakeRequest("POST", "/your-name").withFormUrlEncodedBody(form.data.toSeq: _*)
       when(mockDataCacheConnector.saveDataShortLivedCache[YourName](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(yourName)))
       val result = MockYourNameController.post(mock[AuthContext], fakePostRequest)
+      test(result)
     }
 
     def submitWithFormFilled(test: Future[Result] => Any) {
-      createYourNameFormForSubmission(test, "firt name","middle name","last name")
+      createYourNameFormForSubmission(test, "first name","middle name","last name")
     }
 
     def submitWithLengthValidation(test: Future[Result] => Any) {
-      createYourNameFormForSubmission(test, "test test test test test test test test test test test test test test test test test test test",
-        "","test test test test test test test test test test test test test test test test test test test")
+      createYourNameFormForSubmission(test, "aaaaaaaaa" * 22,
+        "","aaaaaaaaa" * 11)
     }
 
     def submitWithoutMandatoryFields(test: Future[Result] => Any) {
