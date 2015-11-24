@@ -35,7 +35,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
     implicit val fakeGetRequest = FakeRequest()
     val telephoningBusiness = TelephoningBusiness(TwentySevenDigitNumber, Some(TwentySevenDigitNumber))
 
-    "load the blank Telephoning Business page if nothing in cache" in {
+    "the blank Telephoning Business page if nothing in cache" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](Matchers.any())
       (Matchers.any(),Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
       val futureResult = MockTelephoningBusinessController.get
@@ -43,7 +43,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
       contentAsString(futureResult) must include(Messages("telephoningbusiness.title"))
     }
 
-    "load the Business Telephone Number from the Cache" in {
+    "the Business Telephone Number from the Cache" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](Matchers.any())
       (Matchers.any(),Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(telephoningBusiness)))
       val futureResult = MockTelephoningBusinessController.get
@@ -57,7 +57,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
       */
     }
 
-    "load the Mobile Number from the Cache" in {
+    "the Mobile Number from the Cache" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](Matchers.any())
       (Matchers.any(),Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(telephoningBusiness)))
       val futureResult = MockTelephoningBusinessController.get

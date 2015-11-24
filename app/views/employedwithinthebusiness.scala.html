@@ -6,7 +6,7 @@
 
 @main(
 sectionTitle = Some(Messages("sectionTitle.about_you")),
-title = Messages("amls.employedwithinthebusiness.title")
+title = Messages("title.employedwithinthebusiness")
 ) {
 
 @formHelper(employedWithinTheBusinessForm, aboutYou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
@@ -20,7 +20,7 @@ title = Messages("amls.employedwithinthebusiness.title")
         )
     )
 
-    @submit(Messages("amls.button.lbl.saveandcontinue"))
+    @submit(Messages("button.save"))
 
     }
 }

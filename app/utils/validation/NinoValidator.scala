@@ -5,9 +5,7 @@ import play.api.data.format.Formatter
 import play.api.data.FormError
 import config.AmlsPropertiesReader.getProperty
 
-object NinoValidator extends NinoValidator
-
-class NinoValidator extends FormValidator {
+object NinoValidator extends FormValidator {
 
   private def mandatoryNinoFormatter(blankValueMessageKey: String, invalidLengthMessageKey: String,
                                      invalidValueMessageKey: String) = new Formatter[String] {

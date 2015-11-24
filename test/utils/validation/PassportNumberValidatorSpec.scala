@@ -42,6 +42,10 @@ class PassportNumberValidatorSpec extends PlaySpec with MockitoSugar  with OneSe
       mandatoryPassportNumber("uk passport", "blank message", "invalid length", "invalid value")
         .bind(Map("uk passport" -> "true", "" -> "123A456"))
         .left.getOrElse(Nil).contains(FormError("", "invalid value")) mustBe true
+
+      mandatoryPassportNumber("uk passport", "blank message", "invalid length", "invalid value")
+        .bind(Map())
+        .left.getOrElse(Nil).contains(FormError("", "Nothing to validate")) mustBe true
     }
 
     "return correct form error if a non uk passport number format is incorrect" in {
