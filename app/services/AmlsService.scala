@@ -2,7 +2,7 @@ package services
 
 import connectors.{AmlsConnector}
 import models.{LoginDetails}
-import uk.gov.hmrc.play.audit.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HttpResponse
 
