@@ -13,7 +13,6 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
-import scala.util.Random
 
 class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 

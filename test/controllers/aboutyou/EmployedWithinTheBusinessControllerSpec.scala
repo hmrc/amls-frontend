@@ -2,7 +2,6 @@ package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.aboutYou.EmployedWithinTheBusinessController
 import models.EmployedWithinTheBusiness
 import org.mockito.Matchers
 import org.mockito.Mockito._

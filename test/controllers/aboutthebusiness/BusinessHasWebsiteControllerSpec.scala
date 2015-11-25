@@ -1,13 +1,12 @@
-package controllers
+package controllers.aboutthebusiness
 
 import java.util.UUID
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.aboutTheBusiness.BusinessHasWebsiteController
 import forms.AboutTheBusinessForms._
 import models.BusinessHasWebsite
 import org.mockito.Matchers
-
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -105,9 +104,5 @@ class BusinessHasWebsiteControllerSpec extends PlaySpec with OneServerPerSuite w
     def submitWithoutMandatoryFields(test: Future[Result] => Any) {
       createBusinessHasWebsiteFormForSubmission(test,true,None)
     }
-
-
-
-
   }
 }
