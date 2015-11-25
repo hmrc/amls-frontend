@@ -1,0 +1,40 @@
+package controllers.aboutthebusiness
+
+import config.AMLSAuthConnector
+import connectors.DataCacheConnector
+import controllers.AMLSGenericController
+import forms.AboutTheBusinessForms._
+import models.BusinessWithVAT
+import play.api.mvc.{AnyContent, Request, Result}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
+
+trait BusinessRegForVATController extends AMLSGenericController{
+
+  val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  val CACHE_KEY = "businessWithVAT"
+  override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
+    dataCacheConnector.fetchDataShortLivedCache[BusinessWithVAT](CACHE_KEY) map {
+      case Some(data) => Ok(views.html.businessRegForVAT(businessRegForVATForm.fill(data)))
+      case _ => Ok(views.html.businessRegForVAT(businessRegForVATForm))
+    }
+  }
+
+  override def post(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] =
+    businessRegForVATForm.bindFromRequest().fold(
+      errors => Future.successful(BadRequest(views.html.businessRegForVAT(errors))),
+      details => {
+        dataCacheConnector.saveDataShortLivedCache[BusinessWithVAT](CACHE_KEY, details) map { _=>
+          NotImplemented("Not implemented")
+        }
+      })
+
+}
+
+object BusinessRegForVATController extends BusinessRegForVATController {
+   override val authConnector: AuthConnector = AMLSAuthConnector
+   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+}
+

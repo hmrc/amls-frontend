@@ -70,3 +70,6 @@ telephoningbusiness.phonenumber = Business phone number
 telephoningbusiness.mobilenumber = Mobile contact number (optional)
 telephoningbusiness.error.invalidphonenumber = Invalid Phone Number
 telephoningbusiness.error.invalidmobilenumber = Invalid Mobile Number
+
+title.businessRegForVAT = Is your business registered for VAT?
+title.registeredVATNum = What is your VAT registraton number?
