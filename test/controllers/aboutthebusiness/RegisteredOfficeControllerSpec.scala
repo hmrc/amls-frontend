@@ -13,6 +13,7 @@ import play.api.test.Helpers._
 import services.BusinessCustomerService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -25,11 +26,13 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
   object MockRegisteredOfficeController extends RegisteredOfficeController {
     def authConnector = mockAuthConnector
-    override def dataCacheConnector : DataCacheConnector = mockDataCacheConnector
+
+    override def dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
 
   "On Page load" must {
     implicit val fakeGetRequest = FakeRequest()
+    implicit val headerCarrier = mock[HeaderCarrier]
 
     "the blank Registered Office page if nothing in cache" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
@@ -43,14 +46,14 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     "the Registered Office details from the Cache" in {
       val registeredOffice = RegisteredOffice(true, false)
       val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
-        BCAddress("line_1", "line_2",Some(""),Some(""),Some("CA3 9ST"),"UK"),
+        BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK"),
         "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
 
       when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]).
         thenReturn(Future.successful(businessCustomerDetails))
       when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
-
         (Matchers.any(),Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(registeredOffice)))
+
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
       contentAsString(futureResult) must include(businessCustomerDetails.businessName)
@@ -58,8 +61,5 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.postcode.getOrElse(""))
 
     }
-
-
   }
-
 }

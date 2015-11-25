@@ -14,18 +14,18 @@ import scala.concurrent.Future
 trait RegisteredOfficeController extends AMLSGenericController {
 
   def dataCacheConnector: DataCacheConnector
+
   def businessCustomerService = BusinessCustomerService
 
   private val CACHE_KEY = "registeredOffice"
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) = {
-/*
-    BusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails] map {
-      case bcs => println("++++++++++++++++++++" + bcs)
-      case _ => ""
-    }
-*/
-
+    /*
+        BusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails] map {
+          case bcs => println("++++++++++++++++++++" + bcs)
+          case _ => ""
+        }
+    */
     dataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](CACHE_KEY) map {
       case Some(cachedData) => Ok(views.html.registeredOffice(registeredOfficeForm.fill(cachedData)))
       case _ => Ok(views.html.registeredOffice(registeredOfficeForm))
@@ -44,5 +44,6 @@ trait RegisteredOfficeController extends AMLSGenericController {
 
 object RegisteredOfficeController extends RegisteredOfficeController {
   override def dataCacheConnector = AmlsDataCacheConnector
+
   override def authConnector = AMLSAuthConnector
 }
