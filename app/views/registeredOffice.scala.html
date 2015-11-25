@@ -4,18 +4,23 @@
 @import include.forms._
 @import utils.CommonHelper._
 
-@(registeredOfficeForm: Form[models.RegisteredOffice])(implicit request: Request[_])
+@(registeredOfficeForm: Form[_])(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
     title = Messages("title.registeredOffice")
 ) {
+
     @formHelper(registeredOfficeForm, aboutthebusiness.routes.RegisteredOfficeController.post()) { implicit form: Form[_] =>
+
+form
+
         @radioGroup(
             name = "registeredOfficeForm",
             labelText = "WAAAAAAAA",
             options = optionsIsRegisteredOffice
         )
-        @submit(Messages("button.checkYourAnswers"))
+
+@submit(Messages("button.checkYourAnswers"))
     }
 }

@@ -4,19 +4,22 @@ import org.scalatestplus.play.PlaySpec
 
 class AboutTheBusinessTest extends PlaySpec {
 
+  private val registeredAddress = RegisteredOfficeAddress("Line 1 Mandatory", Option("NE98 1ZZ"))
+
   "AboutTheBusiness " should {
     "successfully apply String to return the Model with correct values" in {
-      val registeredOffice = RegisteredOffice.applyString("true,false")
-      registeredOffice.isRegisteredOffice mustBe true
-      registeredOffice.isCorrespondenceAddressSame mustBe false
+      val registeredOfficeApply = RegisteredOffice.applyString(registeredAddress, "true,false")
+      registeredOfficeApply.registeredOfficeAddress mustBe registeredAddress
+      registeredOfficeApply.isRegisteredOffice mustBe true
+      registeredOfficeApply.isCorrespondenceAddressSame mustBe false
     }
 
     "successfully unapply the Model to return the values as Strings" in {
-      val aa = RegisteredOffice.unapplyString(RegisteredOffice.applyString("true, false")) match {
-        case Some(s) => s
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice.applyString(registeredAddress, "true, false")) match {
+        case Some(registeredOfficeExtracted) => registeredOfficeExtracted
         case _ => ""
       }
-      aa mustBe "true,false"
+      registeredOfficeUnapply mustBe(registeredAddress, "true,false")
     }
   }
 }
