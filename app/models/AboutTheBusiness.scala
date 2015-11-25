@@ -48,8 +48,19 @@ object TelephoningBusiness {
   implicit val formats = Json.format[TelephoningBusiness]
 }
 
-case class RegisteredOffice( isRegisteredOffice: String )
+
+case class RegisteredOffice( isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean )
 
 object RegisteredOffice {
+
   implicit val formats = Json.format[RegisteredOffice]
+
+  def applyString(t: String): RegisteredOffice = {
+    RegisteredOffice(t.split(",")(0).trim.toBoolean, t.split(",")(1).trim.toBoolean)
+  }
+
+  def unapplyString(registeredOffice : RegisteredOffice) = {
+    Some(s"${registeredOffice.isRegisteredOffice},${registeredOffice.isCorrespondenceAddressSame}")
+  }
+
 }

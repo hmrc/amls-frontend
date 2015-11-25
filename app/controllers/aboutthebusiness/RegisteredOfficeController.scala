@@ -1,11 +1,10 @@
-package controllers
+package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.{AmlsDataCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
-import models.{RegisteredOffice, registeredOffice}
-import play.api.i18n.Messages
+import models.RegisteredOffice
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -27,7 +26,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
     registeredOfficeForm.bindFromRequest().fold(
       errors => Future.successful(BadRequest(views.html.registeredOffice(errors))),
       registeredOffice => {
-        dataCacheConnector.saveDataShortLivedCache[registeredOffice](CACHE_KEY, registeredOffice) map { _ =>
+        dataCacheConnector.saveDataShortLivedCache[RegisteredOffice](CACHE_KEY, registeredOffice) map { _ =>
           NotImplemented
         }
       })

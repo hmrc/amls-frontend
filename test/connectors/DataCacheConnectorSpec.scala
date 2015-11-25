@@ -3,14 +3,14 @@ package connectors
 import java.util.UUID
 
 import builders.AuthBuilder
-import config.AmlsShortLivedCache
+import config.{AmlsSessionCache, AmlsShortLivedCache}
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{SessionCache, CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -32,11 +32,12 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
 
   object TestDataCacheConnector extends DataCacheConnector {
     override val shortLivedCache: ShortLivedCache = mockShortLivedCache
+    override val sessionCache: SessionCache = AmlsSessionCache
   }
 
   "DataCacheConnector" must {
     "use the correct session cache for Amls" in {
-      DataCacheConnector.shortLivedCache mustBe AmlsShortLivedCache
+      AmlsDataCacheConnector.shortLivedCache mustBe AmlsShortLivedCache
     }
 
     "save form data to save4later" in {

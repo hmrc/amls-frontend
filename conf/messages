@@ -71,3 +71,7 @@ telephoningbusiness.phonenumber = Business phone number
 telephoningbusiness.mobilenumber = Mobile contact number (optional)
 telephoningbusiness.error.invalidphonenumber = Invalid Phone Number
 telephoningbusiness.error.invalidmobilenumber = Invalid Mobile Number
+
+registeredoffice.lbl.yes.same = Yes, and I would like correspondence to be sent here.
+registeredoffice.lbl.yes.different = Yes, but I would like to provide a different address for correspondence.
+registeredoffice.lbl.no = No

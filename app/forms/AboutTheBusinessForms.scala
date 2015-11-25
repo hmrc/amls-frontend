@@ -24,6 +24,6 @@ object AboutTheBusinessForms {
 
   val registeredOfficeForm = Form(mapping(
     "isRegisteredOffice" -> text
-  )(RegisteredOffice.apply)(RegisteredOffice.unapply))
+  )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
 
 }
