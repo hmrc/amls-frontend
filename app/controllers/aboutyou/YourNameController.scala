@@ -1,4 +1,4 @@
-package controllers.aboutYou
+package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
@@ -28,7 +28,7 @@ trait YourNameController extends AMLSGenericController {
       errors => Future.successful(BadRequest(views.html.yourName(errors))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[YourName](CACHE_KEY_YOURNAME, details) map { _=>
-          Redirect(controllers.aboutYou.routes.EmployedWithinTheBusinessController.get())
+          Redirect(controllers.aboutyou.routes.EmployedWithinTheBusinessController.get())
         }
       })
 }

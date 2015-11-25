@@ -1,4 +1,4 @@
-package controllers.aboutYou
+package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
@@ -28,8 +28,8 @@ trait EmployedWithinTheBusinessController extends AMLSGenericController {
       employedWithinTheBusiness => {
         dataCacheConnector.saveDataShortLivedCache[EmployedWithinTheBusiness](CACHE_KEY_AREYOUEMPLOYED,
         employedWithinTheBusiness) map {
-          case Some(y) if y.isEmployed => Redirect(controllers.aboutYou.routes.RoleWithinBusinessController.get())
-          case _ => Redirect(controllers.aboutYou.routes.RoleForBusinessController.get())
+          case Some(y) if y.isEmployed => Redirect(controllers.aboutyou.routes.RoleWithinBusinessController.get())
+          case _ => Redirect(controllers.aboutyou.routes.RoleForBusinessController.get())
         }
       })
 }

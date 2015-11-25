@@ -1,4 +1,4 @@
-package controllers.aboutYou
+package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import config.AmlsPropertiesReader._

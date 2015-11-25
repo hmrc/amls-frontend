@@ -1,10 +1,10 @@
-package controllers.aboutTheBusiness
+package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.AMLSGenericController
-import models.BusinessHasWebsite
 import forms.AboutTheBusinessForms._
+import models.BusinessHasWebsite
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
