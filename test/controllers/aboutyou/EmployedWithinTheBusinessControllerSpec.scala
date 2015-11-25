@@ -67,14 +67,14 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     "navigate to the next page if Yes is supplied" in {
       submitWithYesOption { futureResult =>
         status(futureResult) must be(SEE_OTHER)
-        contentAsString(futureResult) must include(Messages("title.roleWithinBusiness"))
+        redirectLocation(futureResult).fold("") { x => x } must include("/role-within-business")
       }
     }
 
     "navigate to the next page if No is supplied" in {
       submitWithNoOption { futureResult =>
         status(futureResult) must be(SEE_OTHER)
-        contentAsString(futureResult) must include(Messages("title.roleForBusiness"))
+        redirectLocation(futureResult).fold("") { x => x } must include("/role-for-business")
       }
     }
 
@@ -85,20 +85,20 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     }
   }
 
-  def submitWithYesOption(futureResult: Future[Result] => Any) {
-    employedWithBusinessFormForSubmission(futureResult, "true")
+  def submitWithYesOption(future: Future[Result] => Any) {
+    employedWithBusinessFormForSubmission(future, "true")
   }
 
-  def submitWithNoOption(futureResult: Future[Result] => Any) {
-    employedWithBusinessFormForSubmission(futureResult, "false")
+  def submitWithNoOption(future: Future[Result] => Any) {
+    employedWithBusinessFormForSubmission(future, "false")
   }
 
-  def submitWithoutAnOption(futureResult: Future[Result] => Any) {
-    employedWithBusinessFormForSubmissionError(futureResult, "")
+  def submitWithoutAnOption(future: Future[Result] => Any) {
+    employedWithBusinessFormForSubmissionError(future, "")
   }
 
 
-  def employedWithBusinessFormForSubmission(futureResult: Future[Result] => Any, isEmployed: String) {
+  def employedWithBusinessFormForSubmission(future: Future[Result] => Any, isEmployed: String) {
     val employedWithinTheBusinessModel = EmployedWithinTheBusiness(isEmployed.toBoolean)
     val fakePostRequest = FakeRequest("POST", endpointURL).withFormUrlEncodedBody(("isEmployed", isEmployed))
 
@@ -106,7 +106,8 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
         Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
       .thenReturn(Future.successful(Some(employedWithinTheBusinessModel)))
 
-    MockEmployedWithinTheBusinessController.post(mock[AuthContext], fakePostRequest)
+    val result = MockEmployedWithinTheBusinessController.post(mock[AuthContext], fakePostRequest)
+    future(result)
   }
 
   def employedWithBusinessFormForSubmissionError(futureResult: Future[Result] => Any, isEmployed: String) {
