@@ -1,7 +1,7 @@
 package controllers.aboutTheBusiness
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.{AmlsDataCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import models.BusinessHasWebsite
 import forms.AboutTheBusinessForms._
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 trait BusinessHasWebsiteController extends AMLSGenericController{
 
-  val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
   val CACHE_KEY = "businessHasWebsite"
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
     dataCacheConnector.fetchDataShortLivedCache[BusinessHasWebsite](CACHE_KEY) map {
@@ -35,6 +35,6 @@ trait BusinessHasWebsiteController extends AMLSGenericController{
 
 object BusinessHasWebsiteController extends BusinessHasWebsiteController {
    override val authConnector: AuthConnector = AMLSAuthConnector
-   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+   override val dataCacheConnector: DataCacheConnector = AmlsDataCacheConnector
 }
 

@@ -1,7 +1,7 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.{AmlsDataCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models.TelephoningBusiness
@@ -35,6 +35,6 @@ trait TelephoningBusinessController extends AMLSGenericController {
 
 
 object TelephoningBusinessController extends TelephoningBusinessController {
-  override def dataCacheConnector = DataCacheConnector
+  override def dataCacheConnector = AmlsDataCacheConnector
   override def authConnector = AMLSAuthConnector
 }

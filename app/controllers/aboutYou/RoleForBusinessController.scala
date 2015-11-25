@@ -2,7 +2,7 @@ package controllers.aboutYou
 
 import config.AMLSAuthConnector
 import config.AmlsPropertiesReader._
-import connectors.DataCacheConnector
+import connectors.{AmlsDataCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.RoleForBusiness
@@ -15,7 +15,7 @@ import scala.concurrent.Future
 
 trait RoleForBusinessController extends AMLSGenericController {
   val roles = CommonHelper.mapSeqWithMessagesKey(getProperty("roleForBusiness").split(","), "lbl.roleForBusiness", Messages(_))
-  val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] =
     dataCacheConnector.fetchDataShortLivedCache[RoleForBusiness]("roleForBusiness") map {
@@ -37,5 +37,5 @@ trait RoleForBusinessController extends AMLSGenericController {
 
 object RoleForBusinessController extends RoleForBusinessController {
   val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
+  override val dataCacheConnector = AmlsDataCacheConnector
 }

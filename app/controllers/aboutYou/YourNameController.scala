@@ -1,7 +1,7 @@
 package controllers.aboutYou
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.{AmlsDataCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.YourName
@@ -35,5 +35,5 @@ trait YourNameController extends AMLSGenericController {
 
 object YourNameController extends YourNameController {
   override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
+  override val dataCacheConnector = AmlsDataCacheConnector
 }

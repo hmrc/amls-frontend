@@ -64,6 +64,7 @@ lbl.roleForBusiness.01=External accountant
 sectionTitle.aboutTheBusiness = About the business
 title.businessHasWebsite = Does your business have a website?
 title.addressOfYourWebsite = What is the address of your website?
+title.registeredOffice = Registered office or principal place of business
 
 telephoningbusiness.title = Telephoning your business
 telephoningbusiness.phonenumber = Business phone number

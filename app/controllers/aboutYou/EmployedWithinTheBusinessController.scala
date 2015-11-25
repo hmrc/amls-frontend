@@ -1,7 +1,7 @@
 package controllers.aboutYou
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.{AmlsDataCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.EmployedWithinTheBusiness
@@ -36,5 +36,5 @@ trait EmployedWithinTheBusinessController extends AMLSGenericController {
 
 object EmployedWithinTheBusinessController extends EmployedWithinTheBusinessController {
   override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
+  override val dataCacheConnector = AmlsDataCacheConnector
 }

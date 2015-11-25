@@ -1,6 +1,6 @@
 package forms
 
-import models.{BusinessHasWebsite, TelephoningBusiness}
+import models.{RegisteredOffice, BusinessHasWebsite, TelephoningBusiness}
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
@@ -21,4 +21,9 @@ object AboutTheBusinessForms {
     "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"),
     "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
+
+  val registeredOfficeForm = Form(mapping(
+    "isRegisteredOffice" -> text
+  )(RegisteredOffice.apply)(RegisteredOffice.unapply))
+
 }
