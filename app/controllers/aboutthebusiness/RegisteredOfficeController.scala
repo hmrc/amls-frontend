@@ -27,7 +27,20 @@ trait RegisteredOfficeController extends AMLSGenericController {
       reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture
       cachedData: Option[RegisteredOffice] <- cachedDataFuture
     } yield {
-      val fm = cachedData.fold(registeredOfficeForm){ x=>registeredOfficeForm.fill(x) }
+      val fm = cachedData.fold{
+        println("))))) I AM HERE")
+        val cc = registeredOfficeForm.bind( Map( "registeredOfficeAddress.line_1" -> "Line 1 here",
+          "registeredOfficeAddress.line_2" -> "Line 2 here",
+          "registeredOfficeAddress.line_3" -> "Line 3 here",
+          "registeredOfficeAddress.line_4" -> "Line 4 here",
+          "registeredOfficeAddress.postcode" -> "Postcode here",
+          "registeredOfficeAddress.country" -> "Country here"
+        ) )
+        println("We must get value here" + cc("registeredOfficeAddress.line_2").value.getOrElse("????"))
+        println(cc("registeredOfficeAddress").value.getOrElse("*******"))
+        cc
+      }{ x=>registeredOfficeForm.fill(x) }
+
       Ok(views.html.registeredOffice(fm, reviewBusinessDetails))
     }
   }

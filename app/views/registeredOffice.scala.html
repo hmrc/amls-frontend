@@ -13,23 +13,27 @@
 
     @formHelper(registeredOfficeForm, aboutthebusiness.routes.RegisteredOfficeController.post()) { implicit form: Form[_] =>
 
-<p>@Messages("registeredoffice.address.header")</p>
+        <p>@Messages("registeredoffice.address.header")</p>
 
-<div class="panel-indent">
-<div>@reviewBusinessDetails.businessName</div>
-<div>@reviewBusinessDetails.businessAddress.line_1</div>
-<div>@reviewBusinessDetails.businessAddress.line_2</div>
-<div>@reviewBusinessDetails.businessAddress.line_3.getOrElse("")</div>
-<div>@reviewBusinessDetails.businessAddress.line_4.getOrElse("")</div>
-<div>@reviewBusinessDetails.businessAddress.postcode.getOrElse("")</div>
-</div>
-<div class="form-group">
-        @radioGroup(
-            name = "registeredOfficeForm",
-            labelText = Messages("registeredoffice.is.address.correct"),
-            options = optionsIsRegisteredOffice
-        )
-</div>
-@submit(Messages("button.save"))
+
+
+        <div class="panel-indent">
+
+            <div>@(form("registeredOfficeAddress.line_1").value)</div>
+            <div>@(form("registeredOfficeAddress.line_2").value)</div>
+            <div>@(form("registeredOfficeAddress.line_3").value.getOrElse(""))</div>
+            <div>@(form("registeredOfficeAddress.line_4").value.getOrElse(""))</div>
+            <div>@(form("registeredOfficeAddress.postcode").value.getOrElse(""))</div>
+            <div>@(form("registeredOfficeAddress.country").value)</div>
+
+        </div>
+        <div class="form-group">
+                @radioGroup(
+                    name = "registeredOfficeForm",
+                    labelText = Messages("registeredoffice.is.address.correct"),
+                    options = optionsIsRegisteredOffice
+                )
+        </div>
+        @submit(Messages("button.save"))
     }
 }

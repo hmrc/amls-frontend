@@ -1,6 +1,6 @@
 package forms
 
-import models.{BusinessHasWebsite, RegisteredOffice, RegisteredOfficeAddress, TelephoningBusiness}
+import models._
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
@@ -25,7 +25,11 @@ object AboutTheBusinessForms {
   val registeredOfficeForm = Form(mapping(
     "registeredOfficeAddress" -> mapping(
       "line_1" -> text,
-      "postcode" -> optional(text))(RegisteredOfficeAddress.apply)(RegisteredOfficeAddress.unapply),
+      "line_2" -> text,
+      "line_3" -> optional(text),
+      "line_4" -> optional(text),
+      "postcode" -> optional(text),
+      "country" -> text)(BCAddress.apply)(BCAddress.unapply),
     "isRegisteredOffice" -> text
   )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
 

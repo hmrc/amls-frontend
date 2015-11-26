@@ -48,27 +48,19 @@ object TelephoningBusiness {
   implicit val formats = Json.format[TelephoningBusiness]
 }
 
-
-case class RegisteredOfficeAddress(line_1: String, postCode: Option[String])
-
-object RegisteredOfficeAddress {
-  implicit val formats = Json.format[RegisteredOfficeAddress]
-}
-
-
-case class RegisteredOffice(registeredOfficeAddress: RegisteredOfficeAddress,
+case class RegisteredOffice(registeredOfficeAddress: BCAddress,
                             isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean)
 
 object RegisteredOffice {
 
   implicit val formats = Json.format[RegisteredOffice]
 
-  def applyString(registeredOfficeAddress: RegisteredOfficeAddress, office: String): RegisteredOffice = {
+  def applyString(registeredOfficeAddress: BCAddress, office: String): RegisteredOffice = {
     val regOffice: Seq[Boolean] = office.split(",").map(_.trim.toBoolean).toSeq
     RegisteredOffice(registeredOfficeAddress, regOffice(0), regOffice(1))
   }
 
-  def unapplyString(registeredOffice: RegisteredOffice): Option[(RegisteredOfficeAddress, String)] = {
+  def unapplyString(registeredOffice: RegisteredOffice): Option[(BCAddress, String)] = {
     Some((registeredOffice.registeredOfficeAddress,
       s"${registeredOffice.isRegisteredOffice},${registeredOffice.isCorrespondenceAddressSame}"))
   }
