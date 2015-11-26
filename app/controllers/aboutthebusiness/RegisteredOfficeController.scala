@@ -24,33 +24,36 @@ trait RegisteredOfficeController extends AMLSGenericController {
       reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture
       cachedData: Option[RegisteredOffice] <- cachedDataFuture
     } yield {
-      val fm = cachedData.fold {
-        registeredOfficeForm.bind(Map("registeredOfficeAddress.line_1" -> reviewBusinessDetails.businessAddress.line_1,
-          "registeredOfficeAddress.line_2" -> reviewBusinessDetails.businessAddress.line_2,
-          "registeredOfficeAddress.line_3" -> reviewBusinessDetails.businessAddress.line_3.getOrElse(""),
-          "registeredOfficeAddress.line_4" -> reviewBusinessDetails.businessAddress.line_4.getOrElse(""),
-          "registeredOfficeAddress.postcode" -> reviewBusinessDetails.businessAddress.postcode.getOrElse(""),
-          "registeredOfficeAddress.country" -> reviewBusinessDetails.businessAddress.country
-        ))
-      } { x => registeredOfficeForm.fill(x) }
+      val fm = cachedData.fold { registeredOfficeForm} { registeredOfficeForm.fill }
+      Ok(views.html.registered_office(fm, reviewBusinessDetails))
 
-      Ok(views.html.registeredOffice(fm, reviewBusinessDetails))
+      /*
+              registeredOfficeForm.bind(Map("registeredOfficeAddress.line_1" -> reviewBusinessDetails.businessAddress.line_1,
+                "registeredOfficeAddress.line_2" -> reviewBusinessDetails.businessAddress.line_2,
+                "registeredOfficeAddress.line_3" -> reviewBusinessDetails.businessAddress.line_3.getOrElse(""),
+                "registeredOfficeAddress.line_4" -> reviewBusinessDetails.businessAddress.line_4.getOrElse(""),
+                "registeredOfficeAddress.postcode" -> reviewBusinessDetails.businessAddress.postcode.getOrElse(""),
+                "registeredOfficeAddress.country" -> reviewBusinessDetails.businessAddress.country
+              ))
+      */
+
     }
   }
 
-  override def post(implicit user: AuthContext, request: Request[AnyContent]) =
+  override def post(implicit user: AuthContext, request: Request[AnyContent]) = {
     registeredOfficeForm.bindFromRequest().fold(
       errors => {
         val reviewBusinessDetailsFuture = businessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]
         for (reviewBusinessDetails <- reviewBusinessDetailsFuture) yield {
-          BadRequest(views.html.registeredOffice(errors, reviewBusinessDetails))
+          BadRequest(views.html.registered_office(errors, reviewBusinessDetails))
         }
       },
       registeredOffice => {
         dataCacheConnector.saveDataShortLivedCache[RegisteredOffice](CACHE_KEY, registeredOffice) map { _ =>
-          NotImplemented
+          NotImplemented("Not implemented")
         }
       })
+  }
 }
 
 object RegisteredOfficeController extends RegisteredOfficeController {

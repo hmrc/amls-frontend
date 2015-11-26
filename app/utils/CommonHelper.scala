@@ -20,9 +20,9 @@ object CommonHelper {
   )
 
   def optionsIsRegisteredOffice(implicit lang: Lang) = Seq(
-    Messages("registeredoffice.lbl.yes.same") -> "true, false",
-    Messages("registeredoffice.lbl.yes.different") -> "true, true",
-    Messages("registeredoffice.lbl.no")  -> "false, false"
+    Messages("registeredoffice.lbl.yes.same") -> "true,false",
+    Messages("registeredoffice.lbl.yes.different") -> "true,true",
+    Messages("registeredoffice.lbl.no")  -> "false,false"
   )
 
 }
