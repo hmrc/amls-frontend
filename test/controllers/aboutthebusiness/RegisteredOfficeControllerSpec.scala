@@ -7,7 +7,6 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.BusinessCustomerService
@@ -26,41 +25,59 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   private val EndpointURL = "/registered-office"
   private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
 
-  object MockRegisteredOfficeController extends RegisteredOfficeController {
-    def authConnector = mockAuthConnector
-    override def dataCacheConnector: DataCacheConnector = mockDataCacheConnector
+  private def registeredOfficeFormSubmissionHelper() = {
+    val registeredOffice = RegisteredOffice(registeredAddress, true, false)
+    implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
+      ("isRegisteredOffice", "")
+    )
+    when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](Matchers.any(),
+      Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any()))
+      .thenReturn(Future.successful(Some(registeredOffice)))
+    MockRegisteredOfficeController.post
   }
 
-  "On Page load" must {
+  "The Page load" must {
     implicit val fakeGetRequest = FakeRequest()
     implicit val headerCarrier = mock[HeaderCarrier]
 
-    "the blank Registered Office page if nothing in cache" in {
+    val registeredOffice = RegisteredOffice(registeredAddress, true, false)
+    val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
+      registeredAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
+
+    "throws exception if the Registered Office page does not find the Address" in {
+      a[java.lang.RuntimeException] should be thrownBy {
+        when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]).
+          thenThrow(new RuntimeException)
+        when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
+          (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        MockRegisteredOfficeController.get
+      }
+    }
+
+    "displays the Registered Office page with Address" in {
+      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](Matchers.any(), Matchers.any())).
+        thenReturn(Future.successful(businessCustomerDetails))
       when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
-        (Matchers.any(),Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
-      contentAsString(futureResult) must include(Messages("title.registeredOffice"))
+      contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_1)
+      contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_2)
+      contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_3.getOrElse(""))
+      contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_4.getOrElse(""))
+      contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.postcode.getOrElse(""))
     }
 
 
-    "the Registered Office details from the Cache" in {
-
-      val registeredOffice = RegisteredOffice(registeredAddress, true, false)
-      val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
-        registeredAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
-
-      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]).
+    "load the Registered Office details from the Cache" in {
+      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](Matchers.any(), Matchers.any())).
         thenReturn(Future.successful(businessCustomerDetails))
       when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
-        (Matchers.any(),Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(registeredOffice)))
-
+        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(registeredOffice)))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
-      //contentAsString(futureResult) must include(businessCustomerDetails.businessName)
-      //contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_1)
-      //contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.postcode.getOrElse(""))
-
+      val optionTuple: Option[(BCAddress, String)] = RegisteredOffice.unapplyString(registeredOffice)
+      optionTuple.map(_._2).getOrElse("") must be(s"${registeredOffice.isRegisteredOffice},${registeredOffice.isCorrespondenceAddressSame}")
     }
   }
 
@@ -75,15 +92,12 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
   }
 
-  private def registeredOfficeFormSubmissionHelper() = {
-    val registeredOffice = RegisteredOffice(registeredAddress, true, false)
-    implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
-      ("isRegisteredOffice", "")
-    )
-    when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](Matchers.any(),
-      Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
-      .thenReturn(Future.successful(Some(registeredOffice)))
-    MockRegisteredOfficeController.post
+  object MockRegisteredOfficeController extends RegisteredOfficeController {
+    override def businessCustomerService: BusinessCustomerService = mockBusinessCustomerService
+
+    def authConnector = mockAuthConnector
+
+    override def dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
 
 }
