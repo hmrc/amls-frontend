@@ -75,3 +75,6 @@ telephoningbusiness.error.invalidmobilenumber = Invalid Mobile Number
 registeredoffice.lbl.yes.same = Yes, and I would like correspondence to be sent here.
 registeredoffice.lbl.yes.different = Yes, but I would like to provide a different address for correspondence.
 registeredoffice.lbl.no = No
+registeredoffice.address.header = We have the following address details for you.
+
+registeredoffice.is.address.correct = Is this address your regstered office or principal place of business?
