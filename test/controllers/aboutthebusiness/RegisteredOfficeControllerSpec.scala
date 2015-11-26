@@ -24,10 +24,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   private val mockDataCacheConnector = mock[DataCacheConnector]
   private val mockBusinessCustomerService = mock[BusinessCustomerService]
   private val EndpointURL = "/registered-office"
+  private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
 
   object MockRegisteredOfficeController extends RegisteredOfficeController {
     def authConnector = mockAuthConnector
-
     override def dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
 
@@ -45,11 +45,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
 
     "the Registered Office details from the Cache" in {
-      val registeredOfficeAddress = RegisteredOfficeAddress("HMRC Office", Some("NE98 1ZZ"))
-      val registeredOffice = RegisteredOffice(registeredOfficeAddress, true, false)
+
+      val registeredOffice = RegisteredOffice(registeredAddress, true, false)
       val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
-        BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK"),
-        "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
+        registeredAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
 
       when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]).
         thenReturn(Future.successful(businessCustomerDetails))
@@ -77,11 +76,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   }
 
   private def registeredOfficeFormSubmissionHelper() = {
-    val registeredOffice = RegisteredOffice()
+    val registeredOffice = RegisteredOffice(registeredAddress, true, false)
     implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
       ("isRegisteredOffice", "")
     )
-
     when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](Matchers.any(),
       Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
       .thenReturn(Future.successful(Some(registeredOffice)))

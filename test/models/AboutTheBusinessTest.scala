@@ -4,7 +4,8 @@ import org.scalatestplus.play.PlaySpec
 
 class AboutTheBusinessTest extends PlaySpec {
 
-  private val registeredAddress = RegisteredOfficeAddress("Line 1 Mandatory", Option("NE98 1ZZ"))
+  //private val registeredAddress = RegisteredOfficeAddress("Line 1 Mandatory", Option("NE98 1ZZ"))
+  private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
 
   "AboutTheBusiness " should {
     "successfully apply String to return the Model with correct values" in {
