@@ -1,12 +1,11 @@
 package utils.validation
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.data.FormError
-import uk.gov.hmrc.play.test.WithFakeApplication
 import utils.validation.WebAddressValidator._
 
-class WebAddressValidatorSpec extends PlaySpec with MockitoSugar  with WithFakeApplication{
+class WebAddressValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "webAddress" should {
     "return the webAddress if the webAddress is correct" in {

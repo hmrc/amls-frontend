@@ -4,6 +4,12 @@ GET         /assets/*file                   controllers.AssetsController.at(path
 
 GET         /example                        controllers.ExampleController.onPageLoad
 POST        /example                        controllers.ExampleController.onSubmit
+GET         /                               controllers.WelcomeController.get
+GET         /welcome                        controllers.WelcomeController.get
+
+GET         /unauthorised                   controllers.AmlsController.unauthorised
+GET         /summary                        controllers.MainSummaryController.onPageLoad
+
 GET         /login                          controllers.AmlsController.onPageLoad
 POST        /login                          controllers.AmlsController.onSubmit
 
@@ -22,8 +28,6 @@ POST        /business-has-website           controllers.aboutthebusiness.Busines
 GET         /telephoning-business           controllers.aboutthebusiness.TelephoningBusinessController.get()
 POST        /telephoning-business           controllers.aboutthebusiness.TelephoningBusinessController.post()
 
-GET         /                               controllers.WelcomeController.get
-GET         /welcome                        controllers.WelcomeController.get
+GET         /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.get()
+POST        /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.post()
 
-GET         /unauthorised                   controllers.AmlsController.unauthorised
-GET         /summary                        controllers.MainSummaryController.onPageLoad

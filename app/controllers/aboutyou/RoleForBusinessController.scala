@@ -20,14 +20,14 @@ trait RoleForBusinessController extends AMLSGenericController {
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] =
     dataCacheConnector.fetchDataShortLivedCache[RoleForBusiness]("roleForBusiness") map {
     case Some(data) => {
-      Ok(views.html.roleforbusiness(roleForBusinessForm.fill(data), roles ))
+      Ok(views.html.role_for_business(roleForBusinessForm.fill(data), roles ))
     }
-    case _ => Ok(views.html.roleforbusiness(roleForBusinessForm, roles))
+    case _ => Ok(views.html.role_for_business(roleForBusinessForm, roles))
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] =
     roleForBusinessForm.bindFromRequest().fold(
-    errors => Future.successful(BadRequest(views.html.roleforbusiness(errors, roles))),
+    errors => Future.successful(BadRequest(views.html.role_for_business(errors, roles))),
     details => {
       dataCacheConnector.saveDataShortLivedCache[RoleForBusiness]("roleForBusiness", details) map { _ =>
         NotImplemented("Not implemented: summary page")

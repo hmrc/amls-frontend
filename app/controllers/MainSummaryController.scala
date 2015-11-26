@@ -12,7 +12,7 @@ trait MainSummaryController extends FrontendController  with Actions {
   def onPageLoad = AuthorisedFor(AmlsRegime).async {
     implicit user =>
       implicit request =>
-      Future.successful(Ok(views.html.mainSummary()))
+      Future.successful(Ok(views.html.main_summary()))
   }
 }
 

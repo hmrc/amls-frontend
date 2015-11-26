@@ -1,11 +1,11 @@
 package forms
 
-import models.{BusinessHasWebsite, TelephoningBusiness}
+import models.{BusinessWithVAT, BusinessHasWebsite, TelephoningBusiness}
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.WebAddressValidator
+import utils.validation.{VATNumberValidator, WebAddressValidator}
 
 object AboutTheBusinessForms {
 
@@ -21,4 +21,12 @@ object AboutTheBusinessForms {
     "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"),
     "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
+
+  val businessRegForVATFormMapping = mapping(
+    "hasVAT" -> mandatoryBooleanWithText("VATNum", "true",
+      "error.required", "error.required", "error.notrequired"),
+    "VATNum" -> optional(VATNumberValidator.vatNumber("err.invalidLength", "error.invalid"))
+  )(BusinessWithVAT.apply)(BusinessWithVAT.unapply)
+
+  val businessRegForVATForm = Form(businessRegForVATFormMapping)
 }
