@@ -23,6 +23,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   private val mockAuthConnector = mock[AuthConnector]
   private val mockDataCacheConnector = mock[DataCacheConnector]
   private val mockBusinessCustomerService = mock[BusinessCustomerService]
+  private val EndpointURL = "/registered-office"
 
   object MockRegisteredOfficeController extends RegisteredOfficeController {
     def authConnector = mockAuthConnector
@@ -63,4 +64,28 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     }
   }
+
+  "Page post" must {
+    "when valid values entered forward to NotImplemented page" in {
+
+    }
+
+    "display validation message when no radio button chosen" in {
+
+    }
+
+  }
+
+  private def registeredOfficeFormSubmissionHelper() = {
+    val registeredOffice = RegisteredOffice()
+    implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
+      ("isRegisteredOffice", "")
+    )
+
+    when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](Matchers.any(),
+      Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any()))
+      .thenReturn(Future.successful(Some(registeredOffice)))
+    MockRegisteredOfficeController.post
+  }
+
 }
