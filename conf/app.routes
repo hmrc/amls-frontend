@@ -31,3 +31,5 @@ POST        /telephoning-business           controllers.aboutthebusiness.Telepho
 GET         /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.get()
 POST        /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.post()
 
+GET         /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.get()
+POST        /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.post()

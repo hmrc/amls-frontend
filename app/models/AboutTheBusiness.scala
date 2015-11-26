@@ -20,3 +20,10 @@ case class BusinessWithVAT(hasVAT: Boolean, VATNum: Option[String])
 object BusinessWithVAT {
   implicit val formats = Json.format[BusinessWithVAT]
 }
+
+object BusinessHasEmail {
+  implicit val formats = Json.format[BusinessHasEmail]
+}
+
+case class BusinessHasEmail(email:String)
+
