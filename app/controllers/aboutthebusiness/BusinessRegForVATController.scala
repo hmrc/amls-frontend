@@ -17,14 +17,14 @@ trait BusinessRegForVATController extends AMLSGenericController{
   val CACHE_KEY = "businessWithVAT"
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
     dataCacheConnector.fetchDataShortLivedCache[BusinessWithVAT](CACHE_KEY) map {
-      case Some(data) => Ok(views.html.businessRegForVAT(businessRegForVATForm.fill(data)))
-      case _ => Ok(views.html.businessRegForVAT(businessRegForVATForm))
+      case Some(data) => Ok(views.html.business_reg_for_vat(businessRegForVATForm.fill(data)))
+      case _ => Ok(views.html.business_reg_for_vat(businessRegForVATForm))
     }
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] =
     businessRegForVATForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.businessRegForVAT(errors))),
+      errors => Future.successful(BadRequest(views.html.business_reg_for_vat(errors))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[BusinessWithVAT](CACHE_KEY, details) map { _=>
           NotImplemented("Not implemented")

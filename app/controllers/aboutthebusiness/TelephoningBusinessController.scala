@@ -19,13 +19,13 @@ trait TelephoningBusinessController extends AMLSGenericController {
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) =
     dataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](CACHE_KEY) map {
-      case Some(cachedData) => Ok(views.html.telephoningbusiness(telephoningBusinessForm.fill(cachedData)))
-      case _ => Ok(views.html.telephoningbusiness(telephoningBusinessForm))
+      case Some(cachedData) => Ok(views.html.telephoning_business(telephoningBusinessForm.fill(cachedData)))
+      case _ => Ok(views.html.telephoning_business(telephoningBusinessForm))
     }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) =
     telephoningBusinessForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.telephoningbusiness(errors))),
+      errors => Future.successful(BadRequest(views.html.telephoning_business(errors))),
       telephoningBusiness => {
         dataCacheConnector.saveDataShortLivedCache[TelephoningBusiness](CACHE_KEY, telephoningBusiness) map { _ =>
           Redirect(controllers.aboutyou.routes.RoleForBusinessController.get())
