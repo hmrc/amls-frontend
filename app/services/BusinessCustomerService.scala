@@ -13,7 +13,6 @@ trait BusinessCustomerService {
   val bcSourceId: String = "BC_Business_Details"
 
   def getReviewBusinessDetails[T](implicit hc: HeaderCarrier, formats: json.Format[T]) : Future[T] = {
-    println("Inside HERERERE")
     dataCacheConnector.fetchAndGetData[T](bcSourceId) flatMap {
       case Some(data) => Future.successful(data)
       case None => throw new RuntimeException("No Review Details Found")
