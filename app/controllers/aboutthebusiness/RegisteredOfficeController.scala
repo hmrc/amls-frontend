@@ -33,14 +33,18 @@ trait RegisteredOfficeController extends AMLSGenericController {
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) =
-//    registeredOfficeForm.bindFromRequest().fold(
-//      errors => Future.successful(BadRequest(views.html.registeredOffice(errors))),
-//      registeredOffice => {
-//        dataCacheConnector.saveDataShortLivedCache[RegisteredOffice](CACHE_KEY, registeredOffice) map { _ =>
-//          NotImplemented
-//        }
-//      })
-  Future.successful(NotImplemented)
+    registeredOfficeForm.bindFromRequest().fold(
+      errors => {
+        val reviewBusinessDetailsFuture = BusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]
+        for( reviewBusinessDetails <- reviewBusinessDetailsFuture ) yield {
+          BadRequest(views.html.registeredOffice(errors, reviewBusinessDetails))
+        }
+      },
+      registeredOffice => {
+        dataCacheConnector.saveDataShortLivedCache[RegisteredOffice](CACHE_KEY, registeredOffice) map { _ =>
+          NotImplemented
+        }
+      })
 }
 
 object RegisteredOfficeController extends RegisteredOfficeController {
