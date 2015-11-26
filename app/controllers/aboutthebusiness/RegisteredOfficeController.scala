@@ -30,7 +30,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
           "registeredOfficeAddress.line_3" -> reviewBusinessDetails.businessAddress.line_3.getOrElse(""),
           "registeredOfficeAddress.line_4" -> reviewBusinessDetails.businessAddress.line_4.getOrElse(""),
           "registeredOfficeAddress.postcode" -> reviewBusinessDetails.businessAddress.postcode.getOrElse(""),
-          "registeredOfficeAddress.country" ->  reviewBusinessDetails.businessAddress.country
+          "registeredOfficeAddress.country" -> reviewBusinessDetails.businessAddress.country
         ))
       } { x => registeredOfficeForm.fill(x) }
 

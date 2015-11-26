@@ -2,7 +2,7 @@ package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
 import models._
-import org.mockito.Matchers
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -18,6 +18,9 @@ import scala.concurrent.Future
 
 
 class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+  val registeredOffice = RegisteredOffice(registeredAddress, true, false)
+  val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
+    registeredAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
   private implicit val authContext = mock[AuthContext]
   private val mockAuthConnector = mock[AuthConnector]
   private val mockDataCacheConnector = mock[DataCacheConnector]
@@ -30,8 +33,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
       ("isRegisteredOffice", "")
     )
-    when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](Matchers.any(),
-      Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any()))
+    when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](any(),
+      any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(registeredOffice)))
     MockRegisteredOfficeController.post
   }
@@ -40,25 +43,21 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     implicit val fakeGetRequest = FakeRequest()
     implicit val headerCarrier = mock[HeaderCarrier]
 
-    val registeredOffice = RegisteredOffice(registeredAddress, true, false)
-    val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
-      registeredAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
-
     "throws exception if the Registered Office page does not find the Address" in {
       a[java.lang.RuntimeException] should be thrownBy {
         when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]).
           thenThrow(new RuntimeException)
-        when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
-          (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
         MockRegisteredOfficeController.get
       }
     }
 
     "displays the Registered Office page with Address" in {
-      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](Matchers.any(), Matchers.any())).
+      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
         thenReturn(Future.successful(businessCustomerDetails))
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
-        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
       contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_1)
@@ -70,10 +69,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
 
     "load the Registered Office details from the Cache" in {
-      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](Matchers.any(), Matchers.any())).
+      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
         thenReturn(Future.successful(businessCustomerDetails))
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](Matchers.any())
-        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(registeredOffice)))
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(registeredOffice)))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
       val optionTuple: Option[(BCAddress, String)] = RegisteredOffice.unapplyString(registeredOffice)
@@ -82,12 +81,31 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   }
 
   "Page post" must {
-    "when valid values entered forward to NotImplemented page" in {
+    implicit val headerCarrier = mock[HeaderCarrier]
 
+    "when valid values entered forward to NotImplemented page" in {
+      import forms.AboutTheBusinessForms.registeredOfficeForm
+      val registeredOfficeForm1 = registeredOfficeForm.fill(registeredOffice)
+      implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(registeredOfficeForm1.data.toSeq: _*)
+
+      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
+        thenReturn(Future.successful(businessCustomerDetails))
+      when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(registeredOffice)))
+      val futureResult = MockRegisteredOfficeController.post
+      status(futureResult) must be(NOT_IMPLEMENTED)
     }
 
     "display validation message when no radio button chosen" in {
+      implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(("isRegisteredOffice", ""))
 
+      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
+        thenReturn(Future.successful(businessCustomerDetails))
+      when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(registeredOffice)))
+
+      val futureResult = MockRegisteredOfficeController.post
+      status(futureResult) must be(BAD_REQUEST)
     }
 
   }
