@@ -24,14 +24,7 @@ object AboutTheBusinessForms {
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val registeredOfficeForm = Form(mapping(
-//    "registeredOfficeAddress" -> mapping(
-//      "line_1" -> text,
-//      "line_2" -> text,
-//      "line_3" -> optional(text),
-//      "line_4" -> optional(text),
-//      "postcode" -> optional(text),
-//      "country" -> text)(BCAddress.apply)(BCAddress.unapply),
-    "isRegisteredOffice" -> mandatoryText("waaaa")
+    "isRegisteredOffice" -> mandatoryText("generic.please_specify")
   )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
 
 }

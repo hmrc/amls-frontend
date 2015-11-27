@@ -18,27 +18,16 @@ import scala.concurrent.Future
 
 
 class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
-  private val registeredOffice = RegisteredOffice(true, false)
   private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
   val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
     registeredAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
+  private val registeredOffice = RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=false)
+  private val registeredOfficeSave4Later = RegisteredOfficeSave4Later(registeredAddress, isRegisteredOffice=true, isCorrespondenceAddressSame=false)
   private implicit val authContext = mock[AuthContext]
   private val mockAuthConnector = mock[AuthConnector]
   private val mockDataCacheConnector = mock[DataCacheConnector]
   private val mockBusinessCustomerService = mock[BusinessCustomerService]
   private val EndpointURL = "/registered-office"
-
-
-  private def registeredOfficeFormSubmissionHelper() = {
-    val registeredOffice = RegisteredOffice( true, false)
-    implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
-      ("isRegisteredOffice", "")
-    )
-    when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](any(),
-      any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(registeredOffice)))
-    MockRegisteredOfficeController.post
-  }
 
   "The Page load" must {
     implicit val fakeGetRequest = FakeRequest()
@@ -77,7 +66,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
       val optionTuple: Option[String] = RegisteredOffice.unapplyString(registeredOffice)
-      optionTuple.getOrElse("") must be(s"${registeredOffice.isRegisteredOffice},${registeredOffice.isCorrespondenceAddressSame}")
+      optionTuple.getOrElse("") must be("1")
     }
   }
 
@@ -91,10 +80,11 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
         thenReturn(Future.successful(businessCustomerDetails))
-      when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOffice](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(registeredOffice)))
+      when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredOfficeSave4Later](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(registeredOfficeSave4Later)))
       val futureResult = MockRegisteredOfficeController.post
-      status(futureResult) must be(NOT_IMPLEMENTED)
+      status(futureResult) must be(SEE_OTHER)
+      redirectLocation(futureResult).fold("") { x => x } must include ("/telephoning-business")
     }
 
     "display validation message when no radio button chosen" in {

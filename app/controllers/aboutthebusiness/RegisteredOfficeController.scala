@@ -14,9 +14,9 @@ import scala.concurrent.Future
 
 trait RegisteredOfficeController extends AMLSGenericController {
   def optionsIsRegisteredOffice(implicit lang: Lang) = Seq(
-    Messages("registeredoffice.lbl.yes.same") -> "true,false",
-    Messages("registeredoffice.lbl.yes.different") -> "true,true",
-    Messages("registeredoffice.lbl.no") -> "false,false"
+    Messages("registeredoffice.lbl.yes.same") -> "1",
+    Messages("registeredoffice.lbl.yes.different") -> "2",
+    Messages("registeredoffice.lbl.no") -> "3"
   )
 
   def dataCacheConnector: DataCacheConnector
@@ -32,11 +32,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
       reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture
       cachedData: Option[RegisteredOffice] <- cachedDataFuture
     } yield {
-      val fm = cachedData.fold {
-        registeredOfficeForm
-      } {
-        registeredOfficeForm.fill
-      }
+      val fm = cachedData.fold (registeredOfficeForm) (registeredOfficeForm.fill)
       Ok(views.html.registered_office(fm, reviewBusinessDetails, optionsIsRegisteredOffice))
     }
   }
@@ -52,18 +48,15 @@ trait RegisteredOfficeController extends AMLSGenericController {
       registeredOffice => {
         val futureFutureResult: Future[Future[Result]] =
           for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
-            val registeredOfficeSave4Later = RegisteredOfficeSave4Later(reviewBusinessDetails.businessAddress,
-              registeredOffice.isCorrespondenceAddressSame, registeredOffice.isRegisteredOffice)
+            val regOfficeSave4Later = RegisteredOfficeSave4Later(reviewBusinessDetails.businessAddress,
+               registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame)
 
-            dataCacheConnector.saveDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY,
-              registeredOfficeSave4Later) map { _ =>
-              NotImplemented("Not implemented")
+            dataCacheConnector.saveDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY, regOfficeSave4Later) map {
+              case Some(RegisteredOfficeSave4Later(_, true, false)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
+              case _ => NotImplemented("Not yet implemented")
             }
           }
-
-        val map: Future[Result] = futureFutureResult.flatMap({ (x: Future[Result]) => x map { (y: Result) => y }  })
-        map
-
+        futureFutureResult.flatMap({ (x: Future[Result]) => x map { (y: Result) => y } })
       }
     )
   }

@@ -59,19 +59,29 @@ object RegisteredOfficeSave4Later {
   implicit val formats = Json.format[RegisteredOfficeSave4Later]
 }
 
-case class RegisteredOffice(
-                            isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean)
+case class RegisteredOffice(isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean)
 
 object RegisteredOffice {
 
   implicit val formats = Json.format[RegisteredOffice]
 
   def applyString(isRegisteredOffice: String): RegisteredOffice = {
-    val regOffice: Seq[Boolean] = isRegisteredOffice.split(",").map(_.trim.toBoolean).toSeq
-    RegisteredOffice(regOffice.head, regOffice(1))
+    val booleanTuple: (Boolean, Boolean) = isRegisteredOffice match {
+      case "1" => (true,false)
+      case "2" => (true,true)
+      case "3" =>(false,false)
+      case _ => throw new RuntimeException("Illegal value chosen")
+    }
+    RegisteredOffice(booleanTuple._1, booleanTuple._2)
   }
 
   def unapplyString(registeredOffice: RegisteredOffice): Option[String] = {
-    Some(s"${registeredOffice.isRegisteredOffice},${registeredOffice.isCorrespondenceAddressSame}")
+    val tuple = (registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame)
+    Some( tuple match {
+      case (true,false) => "1"
+      case (true,true) => "2"
+      case (false,false) => "3"
+      case _ => throw new RuntimeException("Illegal value in model")
+    })
   }
 }

@@ -6,18 +6,61 @@ class AboutTheBusinessTest extends PlaySpec {
   private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
 
   "AboutTheBusiness " should {
-    "successfully apply String to return the Model with correct values" in {
-      val registeredOfficeApply = RegisteredOffice.applyString( "true,false")
+    "successfully apply 1 to return the Model with correct values" in {
+      val registeredOfficeApply = RegisteredOffice.applyString("1")
       registeredOfficeApply.isRegisteredOffice mustBe true
       registeredOfficeApply.isCorrespondenceAddressSame mustBe false
     }
 
-    "successfully unapply the Model to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice.applyString( "true, false")) match {
+    "successfully unapply the (true, false) to return the values as Strings" in {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=false)) match {
         case Some(registeredOfficeExtracted) => registeredOfficeExtracted
         case _ => ""
       }
-      registeredOfficeUnapply mustBe "true,false"
+      registeredOfficeUnapply mustBe "1"
     }
+
+
+    "successfully apply 2 to return the Model with correct values" in {
+      val registeredOfficeApply = RegisteredOffice.applyString("2")
+      registeredOfficeApply.isRegisteredOffice mustBe true
+      registeredOfficeApply.isCorrespondenceAddressSame mustBe true
+    }
+
+    "successfully unapply the (true,true) to return the values as Strings" in {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=true)) match {
+        case Some(registeredOfficeExtracted) => registeredOfficeExtracted
+        case _ => ""
+      }
+      registeredOfficeUnapply mustBe "2"
+    }
+
+    "successfully apply 3 to return the Model with correct values" in {
+      val registeredOfficeApply = RegisteredOffice.applyString("3")
+      registeredOfficeApply.isRegisteredOffice mustBe false
+      registeredOfficeApply.isCorrespondenceAddressSame mustBe false
+    }
+
+    "successfully unapply the (false, false) to return the values as Strings" in {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=false, isCorrespondenceAddressSame=false)) match {
+        case Some(registeredOfficeExtracted) => registeredOfficeExtracted
+        case _ => ""
+      }
+      registeredOfficeUnapply mustBe "3"
+    }
+
+
+    "throw an exception if invalid value in apply" in {
+      a[java.lang.RuntimeException] should be thrownBy {
+        RegisteredOffice.unapplyString(RegisteredOffice.applyString("4"))
+      }
+    }
+
+    "throw an exception if invalid value in unapply" in {
+      a[java.lang.RuntimeException] should be thrownBy {
+        RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=false, isCorrespondenceAddressSame=true))
+      }
+    }
+
   }
 }
