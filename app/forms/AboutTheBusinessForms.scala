@@ -19,8 +19,8 @@ object AboutTheBusinessForms {
   val businessHasWebsiteForm = Form(businessHasWebsiteFormMapping)
 
   val telephoningBusinessForm = Form(mapping(
-    "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"),
-    "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"))
+    "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber","validationMaxLengthPhoneNoForBusiness" ),
+    "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber","validationMaxLengthPhoneNoForBusiness"))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val registeredOfficeForm = Form(mapping(

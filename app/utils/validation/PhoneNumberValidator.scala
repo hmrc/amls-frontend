@@ -9,7 +9,8 @@ object PhoneNumberValidator extends FormValidator {
 
   private def mandatoryPhoneNumberFormatter(blankValueMessageKey: String,
                                             invalidLengthMessageKey: String,
-                                            invalidValueMessageKey: String) = new Formatter[String] {
+                                            invalidValueMessageKey: String,
+                                            maxLengthForPhone : String) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
       data.get(key) match {
         case Some(n) =>
@@ -18,7 +19,7 @@ object PhoneNumberValidator extends FormValidator {
           t match{
             case p if p.length==0 => Left(Seq(FormError(key, blankValueMessageKey)))
             case num => {
-              if (num.length > getProperty("validationMaxLengthPhoneNo").toInt) {
+              if (num.trim.length > getProperty(maxLengthForPhone).toInt) {
                 Left(Seq(FormError(key, invalidLengthMessageKey)))
               } else {
                 phoneNoRegex.findFirstIn(num) match {
@@ -37,7 +38,8 @@ object PhoneNumberValidator extends FormValidator {
 
   def mandatoryPhoneNumber( blankValueMessageKey: String,
                             invalidLengthMessageKey: String,
-                            invalidValueMessageKey: String) =
+                            invalidValueMessageKey: String,
+                            maxLengthForPhone : String ) =
     Forms.of[String](mandatoryPhoneNumberFormatter(blankValueMessageKey,
-      invalidLengthMessageKey, invalidValueMessageKey))
+      invalidLengthMessageKey, invalidValueMessageKey, maxLengthForPhone))
 }
