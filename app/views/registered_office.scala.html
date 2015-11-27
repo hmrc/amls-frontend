@@ -4,7 +4,7 @@
 @import include.forms._
 @import utils.CommonHelper._
 
-@(registeredOfficeForm: Form[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
+@(registeredOfficeForm: Form[_], reviewBusinessDetails: BusinessCustomerDetails, optionsIsRegisteredOffice: Seq[(String,String)])(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
@@ -19,9 +19,9 @@
 <div>@reviewBusinessDetails.businessName</div>
 <div>@reviewBusinessDetails.businessAddress.line_1</div>
 <div>@reviewBusinessDetails.businessAddress.line_2</div>
-<div>@reviewBusinessDetails.businessAddress.line_3.getOrElse("Grant")</div>
-<div>@reviewBusinessDetails.businessAddress.line_4.getOrElse("Grant Line 4")</div>
-<div>@reviewBusinessDetails.businessAddress.postcode.getOrElse("Grant PostCode")</div>
+<div>@reviewBusinessDetails.businessAddress.line_3.getOrElse("")</div>
+<div>@reviewBusinessDetails.businessAddress.line_4.getOrElse("")</div>
+<div>@reviewBusinessDetails.businessAddress.postcode.getOrElse("")</div>
 </div>
 <div class="form-group">
         @radioGroup(

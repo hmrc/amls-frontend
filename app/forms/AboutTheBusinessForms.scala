@@ -6,6 +6,7 @@ import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
 import utils.validation.WebAddressValidator
+import utils.validation.TextValidator._
 
 object AboutTheBusinessForms {
 
@@ -30,7 +31,7 @@ object AboutTheBusinessForms {
 //      "line_4" -> optional(text),
 //      "postcode" -> optional(text),
 //      "country" -> text)(BCAddress.apply)(BCAddress.unapply),
-    "isRegisteredOffice" -> text
+    "isRegisteredOffice" -> mandatoryText("waaaa")
   )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
 
 }

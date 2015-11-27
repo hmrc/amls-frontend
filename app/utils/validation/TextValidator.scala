@@ -23,4 +23,15 @@ object TextValidator extends FormValidator {
     text.verifying(constraint)
   }
 
+  def mandatoryText(blankValueMessageKey:String): Mapping[String] = {
+    val constraint = Constraint("Blank and length")( {
+      t:String =>
+        t match {
+          case t if t.length == 0 => Invalid(blankValueMessageKey)
+          case _ => Valid
+        }
+    } )
+    text.verifying(constraint)
+  }
+
 }

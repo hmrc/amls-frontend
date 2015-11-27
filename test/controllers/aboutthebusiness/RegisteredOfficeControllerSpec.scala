@@ -18,7 +18,8 @@ import scala.concurrent.Future
 
 
 class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
-  val registeredOffice = RegisteredOffice(registeredAddress, true, false)
+  private val registeredOffice = RegisteredOffice(true, false)
+  private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
   val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
     registeredAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
   private implicit val authContext = mock[AuthContext]
@@ -26,10 +27,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   private val mockDataCacheConnector = mock[DataCacheConnector]
   private val mockBusinessCustomerService = mock[BusinessCustomerService]
   private val EndpointURL = "/registered-office"
-  private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
+
 
   private def registeredOfficeFormSubmissionHelper() = {
-    val registeredOffice = RegisteredOffice(registeredAddress, true, false)
+    val registeredOffice = RegisteredOffice( true, false)
     implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(
       ("isRegisteredOffice", "")
     )
@@ -54,8 +55,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "displays the Registered Office page with Address" in {
-      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
-        thenReturn(Future.successful(businessCustomerDetails))
+      when(mockBusinessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+        .thenReturn(Future.successful(businessCustomerDetails))
       when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val futureResult = MockRegisteredOfficeController.get
@@ -75,8 +76,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
         (any(), any(), any())).thenReturn(Future.successful(Some(registeredOffice)))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
-      val optionTuple: Option[(BCAddress, String)] = RegisteredOffice.unapplyString(registeredOffice)
-      optionTuple.map(_._2).getOrElse("") must be(s"${registeredOffice.isRegisteredOffice},${registeredOffice.isCorrespondenceAddressSame}")
+      val optionTuple: Option[String] = RegisteredOffice.unapplyString(registeredOffice)
+      optionTuple.getOrElse("") must be(s"${registeredOffice.isRegisteredOffice},${registeredOffice.isCorrespondenceAddressSame}")
     }
   }
 

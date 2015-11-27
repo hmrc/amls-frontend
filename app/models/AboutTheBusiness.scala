@@ -68,7 +68,7 @@ object RegisteredOffice {
 
   def applyString(isRegisteredOffice: String): RegisteredOffice = {
     val regOffice: Seq[Boolean] = isRegisteredOffice.split(",").map(_.trim.toBoolean).toSeq
-    RegisteredOffice(regOffice(0), regOffice(1))
+    RegisteredOffice(regOffice.head, regOffice(1))
   }
 
   def unapplyString(registeredOffice: RegisteredOffice): Option[String] = {

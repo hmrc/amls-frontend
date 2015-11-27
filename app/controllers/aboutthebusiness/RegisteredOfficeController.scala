@@ -5,11 +5,17 @@ import connectors.{AmlsDataCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models.{BusinessCustomerDetails, RegisteredOffice}
+import play.api.i18n.{Messages, Lang}
 import play.api.mvc.{AnyContent, Request}
 import services.BusinessCustomerService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 trait RegisteredOfficeController extends AMLSGenericController {
+  def optionsIsRegisteredOffice(implicit lang: Lang) = Seq(
+    Messages("registeredoffice.lbl.yes.same") -> "true,false",
+    Messages("registeredoffice.lbl.yes.different") -> "true,true",
+    Messages("registeredoffice.lbl.no")  -> "false,false"
+  )
 
   def dataCacheConnector: DataCacheConnector
 
@@ -24,8 +30,12 @@ trait RegisteredOfficeController extends AMLSGenericController {
       reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture
       cachedData: Option[RegisteredOffice] <- cachedDataFuture
     } yield {
+
+      println( "RRRRR->" + reviewBusinessDetails.businessName)
+
+
       val fm = cachedData.fold { registeredOfficeForm} { registeredOfficeForm.fill }
-      Ok(views.html.registered_office(fm, reviewBusinessDetails))
+      Ok(views.html.registered_office(fm, reviewBusinessDetails, optionsIsRegisteredOffice))
 
       /*
               registeredOfficeForm.bind(Map("registeredOfficeAddress.line_1" -> reviewBusinessDetails.businessAddress.line_1,
@@ -45,7 +55,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
       errors => {
         val reviewBusinessDetailsFuture = businessCustomerService.getReviewBusinessDetails[BusinessCustomerDetails]
         for (reviewBusinessDetails <- reviewBusinessDetailsFuture) yield {
-          BadRequest(views.html.registered_office(errors, reviewBusinessDetails))
+          BadRequest(views.html.registered_office(errors, reviewBusinessDetails, optionsIsRegisteredOffice))
         }
       },
       registeredOffice => {
