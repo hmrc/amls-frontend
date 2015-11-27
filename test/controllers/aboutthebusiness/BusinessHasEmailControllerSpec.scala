@@ -65,7 +65,7 @@ class BusinessHasEmailControllerSpec extends PlaySpec with OneServerPerSuite wit
     "on submit of page" must {
       "successfully navigate to next page " in {
         submitWithFormFilled { result =>
-          status(result) must be(NOT_IMPLEMENTED)
+          status(result) must be(SEE_OTHER)
         }
       }
 
