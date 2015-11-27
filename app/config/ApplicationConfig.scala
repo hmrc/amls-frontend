@@ -18,7 +18,6 @@ object ApplicationConfig extends ServicesConfig {
   lazy val analyticsToken = Some(getConfigString(s"analytics.token"))
   lazy val analyticsHost = getConfigString(s"analytics.host")
 
-  // Beta feedback config
   lazy val betaFeedbackUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.authenticated")
   lazy val betaFeedbackUnauthenticatedUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
