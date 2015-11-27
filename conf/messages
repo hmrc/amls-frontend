@@ -73,3 +73,7 @@ telephoningbusiness.error.invalidmobilenumber = Invalid Mobile Number
 
 title.businessRegForVAT = Is your business registered for VAT?
 title.registeredVATNum = What is your VAT registraton number?
+
+title.email = Email
+lbl.businessEmailAddress = What is the business's email address
+
