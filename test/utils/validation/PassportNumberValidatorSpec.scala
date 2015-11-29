@@ -5,7 +5,7 @@ import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.data.FormError
 import utils.validation.PassportNumberValidator._
 
-class PassportNumberValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite{
+class PassportNumberValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "mandatory UK Passport Number" should {
     "return the passport number if uk format is correct" in {

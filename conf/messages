@@ -77,3 +77,6 @@ title.registeredVATNum = What is your VAT registraton number?
 title.email = Email
 lbl.businessEmailAddress = What is the business's email address
 
+lbl.hasMLR.yes.withReg = Yes, I have an existing registration
+lbl.hasMLR.yes.withPastReg = Yes, I was registered in the past but am not presently
+lbl.hasMLR.no = No

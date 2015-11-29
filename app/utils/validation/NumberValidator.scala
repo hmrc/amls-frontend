@@ -1,18 +1,17 @@
 package utils.validation
 
-import config.AmlsPropertiesReader._
 import play.api.data.Forms._
 import play.api.data.Mapping
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
 
-object VATNumberValidator extends FormValidator {
-  def vatNumber(invalidLengthMessageKey: String,
-                  invalidValueMessageKey: String) : Mapping[String] = {
+object NumberValidator extends FormValidator {
+  def validateNumber(invalidLengthMessageKey: String,
+                  invalidValueMessageKey: String, maxLength:Int) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {
       t:String =>
         t match {
-          case t if t.length > getProperty("validationMaxLengthVAT").toInt =>
+          case t if t.length > maxLength =>
             Invalid(invalidLengthMessageKey)
           case _ =>
             Valid

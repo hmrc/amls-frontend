@@ -27,3 +27,8 @@ object BusinessHasEmail {
 
 case class BusinessHasEmail(email:String)
 
+case class RegisteredForMLR(hasMLR: Boolean, mlrNumber: Option[String], prevMlrNumber: Option[String])
+
+object RegisteredForMLR {
+  implicit val formats = Json.format[BusinessHasWebsite]
+}

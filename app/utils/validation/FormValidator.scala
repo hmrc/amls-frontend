@@ -20,7 +20,7 @@ trait FormValidator {
   protected lazy val nonUkPassportNumberRegex = "^[a-zA-Z0-9]{6,40}$".r
   protected lazy val webAddressRegex = ("(https?:\\/\\/(?:www\\.|(?!www))[^\\s\\.]+\\.[^\\s]{2,}" +
     "|www\\.[^a\\s]+\\.[^\\s]{2,})").r
-  val vatRegex = """^\d{9}$""".r
+  val vatRegex = """^\d[0-9]$""".r
 
   protected def stopOnFirstFail[T](constraints: Constraint[T]*) = Constraint { field: T =>
     constraints.toList dropWhile (_(field) == Valid) match {

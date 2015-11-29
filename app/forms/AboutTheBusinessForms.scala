@@ -1,11 +1,12 @@
 package forms
 
-import models.{BusinessHasEmail, BusinessWithVAT, BusinessHasWebsite, TelephoningBusiness}
+import config.AmlsPropertiesReader._
+import models._
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.{VATNumberValidator, WebAddressValidator, EmailValidator}
+import utils.validation.{RadioGroupWithTextValidator, NumberValidator, WebAddressValidator, EmailValidator}
 
 object AboutTheBusinessForms {
 
@@ -23,9 +24,8 @@ object AboutTheBusinessForms {
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val businessRegForVATFormMapping = mapping(
-    "hasVAT" -> mandatoryBooleanWithText("VATNum", "true",
-      "error.required", "error.required", "error.notrequired"),
-    "VATNum" -> optional(VATNumberValidator.vatNumber("err.invalidLength", "error.invalid"))
+    "hasVAT" -> mandatoryBooleanWithText("VATNum", "true", "error.required", "error.required", "error.notrequired"),
+    "VATNum" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid", getIntFromProperty("validationMaxLengthVAT")))
   )(BusinessWithVAT.apply)(BusinessWithVAT.unapply)
 
   val businessRegForVATForm = Form(businessRegForVATFormMapping)
@@ -35,4 +35,12 @@ object AboutTheBusinessForms {
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
 
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)
+
+  val RegisteredForMLRFormMapping = mapping(
+    "hasMLR" -> RadioGroupWithTextValidator.mandatoryBooleanWithText("mlrNumber", "error.required", "error.required", "error.notrequired"),
+    "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid", getIntFromProperty("validationMaxLengthMLR"))),
+    "prevMlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid", getIntFromProperty("validationMaxLengthPrevMLR")))
+  )(RegisteredForMLR.apply)(RegisteredForMLR.unapply)
+
+  val RegisteredForMLRForm = Form(RegisteredForMLRFormMapping)
 }

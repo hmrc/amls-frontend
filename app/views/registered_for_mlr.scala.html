@@ -1,0 +1,24 @@
+@import include.main
+@import forms.FormHelpers._
+@import forms.AboutTheBusinessForms._
+@import include.forms._
+@import utils.CommonHelper._
+
+@(businessRegForVATForm: Form[models.BusinessWithVAT])(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
+    title = Messages("title.businessRegForVAT")
+) {
+    @formHelper(businessRegForVATForm, aboutthebusiness.routes.BusinessRegForVATController.post()) { implicit form: Form[_] =>
+        @radioGroupYesYesNoWithText(
+            name = "hasMLR",
+            textFieldName = "mlrNumber",
+            labelText = "title.registeredVATNum",
+            legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
+            textFieldLabelText = Messages("title.registeredVATNum"),
+            options = optionsYesNo
+        )
+        @submit(Messages("button.save"))
+    }
+}

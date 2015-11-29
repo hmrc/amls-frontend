@@ -3,21 +3,21 @@ package utils.validation
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.data.FormError
-import utils.validation.VATNumberValidator._
+import utils.validation.NumberValidator._
 
-class VATNumberValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
-
+class NumberValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
+  val MAX_LENGTH = 9
   "VATNumberValidator" should {
     "return the VAT number if vat number entered is valid" in {
-      vatNumber("invalid length", "invalid value")
+      validateNumber("invalid length", "invalid value", MAX_LENGTH)
         .bind(Map("" -> "123456789")) mustBe Right("123456789")
     }
 
     "return correct form error if vat number entered is incorrect" in {
-      vatNumber("invalid length", "invalid value").bind(Map("" -> "21"*12))
+      validateNumber("invalid length", "invalid value", MAX_LENGTH).bind(Map("" -> "21"*12))
         .left.getOrElse(Nil).contains(FormError("", "invalid length")) mustBe true
 
-      vatNumber("invalid length", "invalid value").bind(Map("" -> "121331"))
+      validateNumber("invalid length", "invalid value", MAX_LENGTH).bind(Map("" -> "121331"))
         .left.getOrElse(Nil).contains(FormError("", "invalid value")) mustBe true
     }
   }
