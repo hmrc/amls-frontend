@@ -20,7 +20,6 @@ object RadioGroupWithTextValidator extends FormValidator {
                                   noRadioButtonSelectedMessageKey:String, blankValueMessageKey:String,
                                   notBlankValueMessageKey:String ): Either[Seq[FormError], (Boolean, Boolean)]  = {
     n.trim match {
-      case p if p.length == 0 => Left(Seq(FormError(key, noRadioButtonSelectedMessageKey)))
       case "01" =>
           data.getOrElse(textFieldKey, "") match {
             case q if q.length == 0 => Left(Seq(FormError(textFieldKey, blankValueMessageKey)))
@@ -29,7 +28,7 @@ object RadioGroupWithTextValidator extends FormValidator {
       case "02" => Right(Tuple2(false, true))
       case "03" => handleOption03(textFieldKey, textField2Key,data, notBlankValueMessageKey)
 
-      case _ => Left(Seq(FormError("", blankValueMessageKey)))
+      case _ => Left(Seq(FormError("", noRadioButtonSelectedMessageKey)))
     }
   }
 

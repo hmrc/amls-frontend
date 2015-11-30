@@ -13,6 +13,12 @@ class RadioGroupWithTextValidatorSpec extends PlaySpec with MockitoSugar  with O
       mapping.bind(Map("" -> "01", "mlrNumber" -> "12345078")) mustBe Right(Tuple2(true, false))
     }
 
+    "when mandatory fields filled correctly respond with success[true, false] with empty text" in {
+      val mapping = mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "No radio button selected", "blank value", "value not allowed")
+      mapping.bind(Map("" -> "01", "mlrNumber" -> ""))
+        .left.getOrElse(Nil).contains(FormError("mlrNumber", "blank value")) mustBe true
+    }
+
     "when mandatory fields filled correctly respond with success[false, true]" in {
       val mapping = mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "No radio button selected", "blank value", "value not allowed")
       mapping.bind(Map("" -> "02", "mlrNumber" -> "")) mustBe Right(Tuple2(false, true))
@@ -46,7 +52,7 @@ class RadioGroupWithTextValidatorSpec extends PlaySpec with MockitoSugar  with O
     "when mandatory fields not filled correctly respond with failure - invalid option selected" in {
       val mapping = mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "No radio button selected", "blank value", "value not allowed")
       mapping.bind(Map("" -> "04"))
-        .left.getOrElse(Nil).contains(FormError("", "blank value")) mustBe true
+        .left.getOrElse(Nil).contains(FormError("", "No radio button selected")) mustBe true
     }
 
     "respond with failure when form is empty" in {
@@ -54,5 +60,11 @@ class RadioGroupWithTextValidatorSpec extends PlaySpec with MockitoSugar  with O
       mapping.bind(Map())
         .left.getOrElse(Nil).contains(FormError("", "No radio button selected")) mustBe true
     }
+
+      "respond to unbind" in {
+        val mapping = mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "No radio button selected", "blank value", "value not allowed")
+          mapping.unbind( (true, false) ) mustBe Map("" -> "(true,false)")
+      }
+
   }
 }
