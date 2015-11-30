@@ -17,7 +17,8 @@ object RadioGroupWithTextValidator extends FormValidator {
   }
 
   private def handleMandatoryText(key: String, n: String, textFieldKey:String, textField2Key:String, data: Map[String, String],
-                                  noRadioButtonSelectedMessageKey:String, blankValueMessageKey:String, notBlankValueMessageKey:String ): Either[Seq[FormError], (Boolean, Boolean)]  = {
+                                  noRadioButtonSelectedMessageKey:String, blankValueMessageKey:String,
+                                  notBlankValueMessageKey:String ): Either[Seq[FormError], (Boolean, Boolean)]  = {
     n.trim match {
       case p if p.length == 0 => Left(Seq(FormError(key, noRadioButtonSelectedMessageKey)))
       case "01" =>
@@ -26,15 +27,23 @@ object RadioGroupWithTextValidator extends FormValidator {
             case _ => Right(Tuple2(true, false))
           }
       case "02" => Right(Tuple2(false, true))
-      case "03" => handleOption03(textFieldKey, textField2Key, notBlankValueMessageKey)
+      case "03" => handleOption03(textFieldKey, textField2Key,data, notBlankValueMessageKey)
 
       case _ => Left(Seq(FormError(textFieldKey, blankValueMessageKey)))
     }
   }
-  private def handleOption03(textFieldKey:String, textField2Key:String, notBlankValueMessageKey:String): Either[Seq[FormError], (Boolean, Boolean)] = {
-    
-    Right(Tuple2(false, false))
-  }
+
+  private def handleOption03(textFieldKey:String, textField2Key:String, data: Map[String, String],
+                             notBlankValueMessageKey:String): Either[Seq[FormError], (Boolean, Boolean)] = {
+    val test1 =  data.getOrElse(textFieldKey, "")
+    val test2 =  data.getOrElse(textField2Key, "")
+    (test1,test2) match {
+      case ("", x) => Left (Seq (FormError (textFieldKey, notBlankValueMessageKey) ) )
+      case (x, "") => Left (Seq (FormError (textField2Key, notBlankValueMessageKey) ) )
+      case _ => Right(Tuple2(false, false))
+    }
+   }
+
 
   def mandatoryBooleanWithText(textFieldKey:String, textField2Key:String, noRadioButtonSelectedMessageKey: String,
                                 blankValueMessageKey: String, notBlankValueMessageKey: String) = {
