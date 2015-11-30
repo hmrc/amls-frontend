@@ -13,7 +13,8 @@
     scriptElem: Option[Html] = None,
     linkElement : Option[Html] = None,
     nameBusiness : Option[String] = None,
-    serviceInfoContent: Option[Html] = None
+    serviceInfoContent: Option[Html] = None,
+    userLoggedIn : Boolean = true
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
 @styles = {
@@ -65,7 +66,7 @@
 @betaBanner = {
     @uiLayouts.betaBanner(
         // TODO: determine what this should be
-        userLoggedIn = true,
+        userLoggedIn = userLoggedIn,
         betaFeedbackUrl = appConfig.betaFeedbackUrl,
         betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
         showFeedbackLinkInBetaBanner = true
