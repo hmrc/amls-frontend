@@ -7,6 +7,7 @@ import utils.validation.PhoneNumberValidator._
 
 class PhoneNumberValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
 
+  val maxLengthPhoneNo = "maxLengthPhoneNo"
   "mandatoryPhoneNumber" should {
     "respond appropriately for valid phone numbers " in {
       mandatoryPhoneNumber("blank", "length", "invalid").bind(Map("" -> "+44 0191 6678 899")) mustBe Right("0044 0191 6678 899")
@@ -26,7 +27,7 @@ class PhoneNumberValidatorSpec extends PlaySpec with MockitoSugar with OneServer
         .left.getOrElse(Nil).contains(FormError("", "invalid")) mustBe true //mustBe Right("01912224455 EXT 5544")
       mandatoryPhoneNumber("blank", "length", "invalid").bind(Map("" -> ""))
         .left.getOrElse(Nil).contains(FormError("", "blank")) mustBe true
-      mandatoryPhoneNumber("blank", "length", "invalid").bind(Map("" -> "1111111111111111111111111111"))
+      mandatoryPhoneNumber("blank", "length", "invalid").bind(Map("" -> "1" * 31))
         .left.getOrElse(Nil).contains(FormError("", "length")) mustBe true
       mandatoryPhoneNumber("blank", "length", "invalid").bind(Map("" -> "$5gggF"))
         .left.getOrElse(Nil).contains(FormError("", "invalid")) mustBe true
