@@ -70,6 +70,16 @@ $(function () {
         showHide.call(this, $target, false);
       });
 
+      $('*[data-toggle-01]').each(function () {
+        var $target = $($(this).data('toggle-false'));
+        showHide.call(this, $target, false);
+      });
+
+      $('*[data-toggle-02]').each(function () {
+        var $target = $($(this).data('toggle-false'));
+        showHide.call(this, $target, false);
+      });
+
       $('*[data-toggle-other]').each(function () {
         var $target = $($(this).data('toggle-other')),
             value = $(this).val();

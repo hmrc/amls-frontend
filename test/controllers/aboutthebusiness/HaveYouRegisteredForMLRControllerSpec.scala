@@ -51,7 +51,7 @@ class HaveYouRegisteredForMLRControllerSpec extends PlaySpec with OneServerPerSu
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
       val result = MockRegisteredForMLRController.get
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("title.registeredVATNum"))
+      contentAsString(result) must include(Messages("title.registeredForMLR"))
     }
 
     "on load display the businessHasWebsite page with prepopulated data" in {
@@ -59,7 +59,7 @@ class HaveYouRegisteredForMLRControllerSpec extends PlaySpec with OneServerPerSu
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(Some(mockMLRModel)))
       val result = MockRegisteredForMLRController.get
       status(result) must be(OK)
-      contentAsString(result) must include("123456789")
+      contentAsString(result) must include("12345678")
     }
 
 
