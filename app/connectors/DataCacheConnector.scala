@@ -45,7 +45,7 @@ trait DataCacheConnector {
 
 }
 
-object AmlsDataCacheConnector extends DataCacheConnector {
+object DataCacheConnector extends DataCacheConnector {
   override lazy val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
   override val sessionCache: SessionCache = AmlsSessionCache
 }

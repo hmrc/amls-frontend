@@ -1,7 +1,7 @@
-package controllers.aboutYou
+package controllers.aboutyou
 import config.AmlsPropertiesReader._
 import config.AMLSAuthConnector
-import connectors.{AmlsDataCacheConnector, DataCacheConnector}
+import connectors.{DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.RoleWithinBusiness
@@ -20,13 +20,13 @@ trait RoleWithinBusinessController extends AMLSGenericController {
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) =
     dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](CACHE_KEY_ROLE_WITHIN_BUSINESS) map {
-      case Some(data) => Ok(views.html.roleWithinBusiness(roleWithinBusinessForm.fill(data), roles))
-      case _ => Ok(views.html.roleWithinBusiness(roleWithinBusinessForm, roles))
+      case Some(data) => Ok(views.html.role_within_business(roleWithinBusinessForm.fill(data), roles))
+      case _ => Ok(views.html.role_within_business(roleWithinBusinessForm, roles))
     }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) =
     roleWithinBusinessForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.roleWithinBusiness(errors, roles))),
+      errors => Future.successful(BadRequest(views.html.role_within_business(errors, roles))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](CACHE_KEY_ROLE_WITHIN_BUSINESS, details) map { _=>
           Redirect(controllers.routes.AmlsController.onPageLoad()) // TODO replace with actual next page
@@ -36,5 +36,5 @@ trait RoleWithinBusinessController extends AMLSGenericController {
 
 object RoleWithinBusinessController extends RoleWithinBusinessController {
   override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = AmlsDataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
 }

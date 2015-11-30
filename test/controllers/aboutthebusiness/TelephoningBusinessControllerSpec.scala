@@ -13,7 +13,6 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
-import scala.util.Random
 
 class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
@@ -120,7 +119,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
     "Successfully navigate to the next page if the details are valid" in {
       val futureResult = telephoneBusinessFormSubmissionHelper(TwentySevenDigitNumber, Some(TwentySevenDigitNumber))
       status(futureResult) must be(SEE_OTHER)
-      redirectLocation(futureResult).fold("") { x => x } must include("/role-for-business")
+      redirectLocation(futureResult).fold("") { x => x } must include("/business-has-Email")
     }
 
   }

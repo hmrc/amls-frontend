@@ -1,7 +1,7 @@
 package controllers
 
-import config.{AmlsSessionCache, AMLSAuthConnector}
-import connectors.{AmlsDataCacheConnector, DataCacheConnector}
+import config.{ AMLSAuthConnector}
+import connectors.{DataCacheConnector}
 import controllers.auth.AmlsRegime
 import forms.AmlsForms._
 import models.LoginDetails
@@ -49,5 +49,5 @@ trait AmlsController extends FrontendController with Actions {
 object AmlsController extends AmlsController {
   val amlsService = AmlsService
   val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = AmlsDataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
 }

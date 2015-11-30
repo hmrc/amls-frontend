@@ -2,7 +2,6 @@ package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.aboutYou.YourNameController
 import forms.AboutYouForms._
 import models.YourName
 import org.mockito.Matchers
@@ -78,7 +77,8 @@ class YourNameControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
       val yourNameModel = YourName(firstName, Option(middleName),lastName)
       val form  = yourNameForm.fill(yourNameModel)
       val fakePostRequest = FakeRequest("POST", "/your-name").withFormUrlEncodedBody(form.data.toSeq: _*)
-      when(mockDataCacheConnector.saveDataShortLivedCache[YourName](Matchers.any(), Matchers.any()) (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(yourName)))
+      when(mockDataCacheConnector.saveDataShortLivedCache[YourName](Matchers.any(), Matchers.any())
+        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(yourName)))
       val result = MockYourNameController.post(mock[AuthContext], fakePostRequest)
       test(result)
     }

@@ -9,7 +9,7 @@ sectionTitle = Some(Messages("sectionTitle.about_you")),
 title = Messages("title.employedwithinthebusiness")
 ) {
 
-@formHelper(employedWithinTheBusinessForm, aboutYou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
+@formHelper(employedWithinTheBusinessForm, aboutyou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
 
     @radioGroup(
         name = "isEmployed",

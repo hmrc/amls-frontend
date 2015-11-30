@@ -1,0 +1,21 @@
+@import include.main
+@import forms.FormHelpers._
+@import include.forms._
+
+@(businessHasEmailForm: Form[models.BusinessHasEmail])(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("sectionTitle.about_you")),
+    title = Messages("lbl.businessEmailAddress")
+) {
+
+      @formHelper(businessHasEmailForm, aboutthebusiness.routes.BusinessHasEmailController.post()) { implicit form: Form[_] =>
+
+        @input(
+            name = "email",
+            labelText = Messages("title.email")
+        )
+        @submit(Messages("button.save"))
+    }
+}
+

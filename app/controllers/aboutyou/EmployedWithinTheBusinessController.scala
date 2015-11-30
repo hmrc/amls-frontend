@@ -1,7 +1,7 @@
-package controllers.aboutYou
+package controllers.aboutyou
 
 import config.AMLSAuthConnector
-import connectors.{AmlsDataCacheConnector, DataCacheConnector}
+import connectors.{DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.EmployedWithinTheBusiness
@@ -18,23 +18,23 @@ trait EmployedWithinTheBusinessController extends AMLSGenericController {
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) =
     dataCacheConnector.fetchDataShortLivedCache[EmployedWithinTheBusiness](CACHE_KEY_AREYOUEMPLOYED) map {
-      case Some(data) => Ok(views.html.employedwithinthebusiness(employedWithinTheBusinessForm.fill(data)))
-      case _ => Ok(views.html.employedwithinthebusiness(employedWithinTheBusinessForm))
+      case Some(data) => Ok(views.html.employed_within_the_business(employedWithinTheBusinessForm.fill(data)))
+      case _ => Ok(views.html.employed_within_the_business(employedWithinTheBusinessForm))
     }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) =
     employedWithinTheBusinessForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.employedwithinthebusiness(errors))),
+      errors => Future.successful(BadRequest(views.html.employed_within_the_business(errors))),
       employedWithinTheBusiness => {
         dataCacheConnector.saveDataShortLivedCache[EmployedWithinTheBusiness](CACHE_KEY_AREYOUEMPLOYED,
         employedWithinTheBusiness) map {
-          case Some(y) if y.isEmployed => Redirect(controllers.aboutYou.routes.RoleWithinBusinessController.get())
-          case _ => Redirect(controllers.aboutYou.routes.RoleForBusinessController.get())
+          case Some(y) if y.isEmployed => Redirect(controllers.aboutyou.routes.RoleWithinBusinessController.get())
+          case _ => Redirect(controllers.aboutyou.routes.RoleForBusinessController.get())
         }
       })
 }
 
 object EmployedWithinTheBusinessController extends EmployedWithinTheBusinessController {
   override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = AmlsDataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
 }

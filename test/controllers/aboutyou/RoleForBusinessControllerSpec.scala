@@ -1,10 +1,12 @@
 package controllers.aboutyou
 
 import java.util.UUID
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.aboutYou.{YourNameController, RoleForBusinessController}
+import forms.AboutYouForms._
 import models.RoleForBusiness
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -17,8 +19,7 @@ import play.api.test.Helpers._
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import forms.AboutYouForms._
-import org.mockito.Matchers._
+
 import scala.concurrent.Future
 
 class   RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {

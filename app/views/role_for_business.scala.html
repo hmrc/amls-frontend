@@ -10,7 +10,7 @@
     sectionTitle = Some(Messages("sectionTitle.about_you")),
     title = Messages("title.roleForBusiness")
 ) {
-    @formHelper(roleForBusinessForm, aboutYou.routes.RoleForBusinessController.post()) { implicit form: Form[_] =>
+    @formHelper(roleForBusinessForm, aboutyou.routes.RoleForBusinessController.post()) { implicit form: Form[_] =>
         @radioGroupWithOther(
             name = "roleForBusiness",
             otherName = "other",

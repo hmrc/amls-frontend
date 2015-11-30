@@ -10,7 +10,7 @@
     title = Messages("title.your_name")
 ) {
 
-      @formHelper(yourNameForm, aboutYou.routes.YourNameController.post()) { implicit form: Form[_] =>
+      @formHelper(yourNameForm, aboutyou.routes.YourNameController.post()) { implicit form: Form[_] =>
 
         @input(
             name = "firstname",

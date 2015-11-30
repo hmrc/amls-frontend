@@ -37,7 +37,7 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
 
   "DataCacheConnector" must {
     "use the correct session cache for Amls" in {
-      AmlsDataCacheConnector.shortLivedCache mustBe AmlsShortLivedCache
+      DataCacheConnector.shortLivedCache mustBe AmlsShortLivedCache
     }
 
     "save form data to save4later" in {

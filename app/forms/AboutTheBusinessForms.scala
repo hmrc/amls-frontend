@@ -5,7 +5,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.WebAddressValidator
+import utils.validation.{VATNumberValidator, WebAddressValidator, EmailValidator}
 import utils.validation.TextValidator._
 
 object AboutTheBusinessForms {
@@ -27,4 +27,18 @@ object AboutTheBusinessForms {
     "isRegisteredOffice" -> mandatoryText("generic.please_specify")
   )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
 
+
+  val businessRegForVATFormMapping = mapping(
+    "hasVAT" -> mandatoryBooleanWithText("VATNum", "true",
+      "error.required", "error.required", "error.notrequired"),
+    "VATNum" -> optional(VATNumberValidator.vatNumber("err.invalidLength", "error.invalid"))
+  )(BusinessWithVAT.apply)(BusinessWithVAT.unapply)
+
+  val businessRegForVATForm = Form(businessRegForVATFormMapping)
+
+  val BusinessHasEmailFormMapping = mapping(
+    "email" -> EmailValidator.mandatoryEmail("error.required","err.invalidLength", "error.invalid")
+  )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
+
+  val businessHasEmailForm = Form(BusinessHasEmailFormMapping)
 }

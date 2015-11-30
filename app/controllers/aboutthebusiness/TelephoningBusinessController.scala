@@ -1,7 +1,7 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{AmlsDataCacheConnector, DataCacheConnector}
+import connectors.{DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models.TelephoningBusiness
@@ -19,22 +19,22 @@ trait TelephoningBusinessController extends AMLSGenericController {
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) =
     dataCacheConnector.fetchDataShortLivedCache[TelephoningBusiness](CACHE_KEY) map {
-      case Some(cachedData) => Ok(views.html.telephoningbusiness(telephoningBusinessForm.fill(cachedData)))
-      case _ => Ok(views.html.telephoningbusiness(telephoningBusinessForm))
+      case Some(cachedData) => Ok(views.html.telephoning_business(telephoningBusinessForm.fill(cachedData)))
+      case _ => Ok(views.html.telephoning_business(telephoningBusinessForm))
     }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) =
     telephoningBusinessForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.telephoningbusiness(errors))),
+      errors => Future.successful(BadRequest(views.html.telephoning_business(errors))),
       telephoningBusiness => {
         dataCacheConnector.saveDataShortLivedCache[TelephoningBusiness](CACHE_KEY, telephoningBusiness) map { _ =>
-          Redirect(controllers.aboutYou.routes.RoleForBusinessController.get())
+          Redirect(controllers.aboutthebusiness.routes.BusinessHasEmailController.get())
         }
       })
 }
 
 
 object TelephoningBusinessController extends TelephoningBusinessController {
-  override def dataCacheConnector = AmlsDataCacheConnector
+  override def dataCacheConnector = DataCacheConnector
   override def authConnector = AMLSAuthConnector
 }

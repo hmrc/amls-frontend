@@ -2,7 +2,7 @@ package controllers
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.aboutYou.RoleWithinBusinessController
+import controllers.aboutyou.RoleWithinBusinessController
 import models.RoleWithinBusiness
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
