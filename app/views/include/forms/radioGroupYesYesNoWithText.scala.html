@@ -2,9 +2,9 @@
 
 @(
 name: String,
-textFieldName: Seq[String],
-labelText: Seq[String],
-textFieldLabelText: Seq[String],
+textFieldName: (String, String),
+labelText: (String, String),
+textFieldLabelText: (String, String),
 options: Seq[(String, String)],
 hintText: String = "",
 fieldsetPresentation: Presentation = Defaults.radioGroup,
@@ -38,7 +38,7 @@ containerPresentation
 }
 
 @fieldset(
-legend = labelText,
+legend = "OOK",
 containerPresentation = containerPresentation_,
 presentation = fieldsetPresentation_,
 legendPresentation = legendPresentation
@@ -61,15 +61,25 @@ legendPresentation = legendPresentation
     </label>
 }
 }
-
 <fieldset id="@id(name)-01">
     <legend class="js-hidden heading-medium">
-        @textFieldLabelText
+        @textFieldLabelText._1
     </legend>
     <div class="form-group panel-indent">
         @input(
-        name = textFieldName,
-        labelText = textFieldLabelText
+        name = textFieldName._1,
+        labelText = textFieldLabelText._1
+        )
+    </div>
+</fieldset>
+<fieldset id="@id(name)-02">
+    <legend class="js-hidden heading-medium">
+        @textFieldLabelText._2
+    </legend>
+    <div class="form-group panel-indent">
+        @input(
+        name = textFieldName._2,
+        labelText = textFieldLabelText._2
         )
     </div>
 </fieldset>

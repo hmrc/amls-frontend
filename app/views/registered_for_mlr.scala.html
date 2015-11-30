@@ -4,13 +4,13 @@
 @import include.forms._
 @import utils.CommonHelper._
 
-@(businessRegForVATForm: Form[models.BusinessWithVAT])(implicit request: Request[_])
+@(RegisteredForMLRForm: Form[models.RegisteredForMLR])(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
     title = Messages("title.registeredForMLR")
 ) {
-    @formHelper(businessRegForVATForm, aboutthebusiness.routes.HaveYouRegForMLRBeforeController.post()) { implicit form: Form[_] =>
+    @formHelper(RegisteredForMLRForm, aboutthebusiness.routes.HaveYouRegForMLRBeforeController.post()) { implicit form: Form[_] =>
         @radioGroupYesYesNoWithText(
             name = "hasMLR",
             textFieldName = ("mlrNumber","prevMlrNumber"),
