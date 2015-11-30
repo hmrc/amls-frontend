@@ -8,16 +8,16 @@
 
 @main(
     sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
-    title = Messages("title.businessRegForVAT")
+    title = Messages("title.registeredForMLR")
 ) {
-    @formHelper(businessRegForVATForm, aboutthebusiness.routes.BusinessRegForVATController.post()) { implicit form: Form[_] =>
+    @formHelper(businessRegForVATForm, aboutthebusiness.routes.HaveYouRegForMLRBeforeController.post()) { implicit form: Form[_] =>
         @radioGroupYesYesNoWithText(
             name = "hasMLR",
-            textFieldName = "mlrNumber",
-            labelText = "title.registeredVATNum",
+            textFieldName = ("mlrNumber","prevMlrNumber"),
+            labelText = ("lbl.mlrRegistrationNumber","lbl.prevMLRRegistrationNumber"),
             legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
-            textFieldLabelText = Messages("title.registeredVATNum"),
-            options = optionsYesNo
+            textFieldLabelText = ("lbl.mlrRegistrationNumber","lbl.prevMLRRegistrationNumber"),
+            options = optionsRegisteredFoMLR
         )
         @submit(Messages("button.save"))
     }

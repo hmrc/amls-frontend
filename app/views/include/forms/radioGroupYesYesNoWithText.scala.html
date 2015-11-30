@@ -2,9 +2,9 @@
 
 @(
 name: String,
-textFieldName: String,
-labelText: String,
-textFieldLabelText: String,
+textFieldName: Seq[String],
+labelText: Seq[String],
+textFieldLabelText: Seq[String],
 options: Seq[(String, String)],
 hintText: String = "",
 fieldsetPresentation: Presentation = Defaults.radioGroup,
@@ -48,9 +48,9 @@ legendPresentation = legendPresentation
 @options.map { case (key, value) =>
 @if(key.length>0){
     <label class="block-label">
-        @if(key == "Yes") {
+        @if(value == "01" || value == "02") {
         <input type="radio" name="@name" value="@value"
-               @form(name).value.filter( _ == value).map{ _ => checked="checked"} data-toggle-true="#@id(name)-true"  >
+               @form(name).value.filter( _ == value).map{ _ => checked="checked"} data-toggle-true="#@id(name)-@value"  >
 
         } else {
         <input type="radio" name="@name" value="@value"
@@ -61,7 +61,8 @@ legendPresentation = legendPresentation
     </label>
 }
 }
-<fieldset id="@id(name)-true">
+
+<fieldset id="@id(name)-01">
     <legend class="js-hidden heading-medium">
         @textFieldLabelText
     </legend>

@@ -15,6 +15,7 @@ trait HaveYouRegForMLRBeforeController extends AMLSGenericController{
 
   val dataCacheConnector: DataCacheConnector = DataCacheConnector
   val CACHE_KEY = "businessHasWebsite"
+
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
     dataCacheConnector.fetchDataShortLivedCache[BusinessHasWebsite](CACHE_KEY) map {
       case Some(data) => Ok(views.html.business_has_website(businessHasWebsiteForm.fill(data)))
