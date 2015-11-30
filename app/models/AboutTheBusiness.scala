@@ -10,7 +10,7 @@ case class BCAddress(
                       postcode: Option[String] = None,
                       country: String) {
 
-  override def toString = {
+  def render = {
     val line3display = line_3.map(line3 => s"$line3, ").getOrElse("")
     val line4display = line_4.map(line4 => s"$line4, ").getOrElse("")
     val postcodeDisplay = postcode.map(postcode1 => s"$postcode1, ").getOrElse("")

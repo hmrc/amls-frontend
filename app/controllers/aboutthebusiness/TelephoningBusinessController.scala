@@ -1,11 +1,10 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models.TelephoningBusiness
-import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -36,5 +35,6 @@ trait TelephoningBusinessController extends AMLSGenericController {
 
 object TelephoningBusinessController extends TelephoningBusinessController {
   override def dataCacheConnector = DataCacheConnector
+
   override def authConnector = AMLSAuthConnector
 }

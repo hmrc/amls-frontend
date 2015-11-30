@@ -1,7 +1,7 @@
 package controllers.aboutyou
 
 import config.AMLSAuthConnector
-import connectors.{DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.YourName

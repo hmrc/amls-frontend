@@ -26,7 +26,8 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
 
   object MockTelephoningBusinessController extends TelephoningBusinessController {
     def authConnector = mockAuthConnector
-    override def dataCacheConnector : DataCacheConnector = mockDataCacheConnector
+
+    override def dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
 
   "On Page load" must {

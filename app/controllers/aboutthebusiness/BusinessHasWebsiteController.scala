@@ -1,7 +1,7 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models.BusinessHasWebsite

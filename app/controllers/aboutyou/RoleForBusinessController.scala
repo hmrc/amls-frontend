@@ -2,12 +2,12 @@ package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import config.AmlsPropertiesReader._
-import connectors.{DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.RoleForBusiness
 import play.api.i18n.Messages
-import play.api.mvc.{Result, AnyContent, Request}
+import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.CommonHelper
 
