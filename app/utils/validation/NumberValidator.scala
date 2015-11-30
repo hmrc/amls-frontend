@@ -18,10 +18,11 @@ object NumberValidator extends FormValidator {
         }
     } )
     val valueConstraint = Constraint("Value")( {
-      t:String => t match {
-        case t if t.matches(vatRegex.regex) => Valid
-        case _ => Invalid(invalidValueMessageKey)
-      }
+      t:String =>
+        vatRegex.findFirstIn(t) match {
+          case Some(x) => Valid
+          case _ => Invalid(invalidValueMessageKey)
+        }
     } )
     text.verifying(stopOnFirstFail(blankConstraint, valueConstraint))
   }

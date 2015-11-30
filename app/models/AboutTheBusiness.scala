@@ -27,8 +27,15 @@ object BusinessHasEmail {
 
 case class BusinessHasEmail(email:String)
 
-case class RegisteredForMLR(hasMLR: Boolean, mlrNumber: Option[String], prevMlrNumber: Option[String])
+case class RegisteredForMLR(hasDigitalMLR: Boolean, hasNonDigitalMLR:Boolean , mlrNumber: Option[String], prevMlrNumber: Option[String])
 
 object RegisteredForMLR {
-  implicit val formats = Json.format[BusinessHasWebsite]
+  implicit val formats = Json.format[RegisteredForMLR]
+  def applyString(hasMLR: (Boolean, Boolean),  mlrNumber: Option[String], prevMlrNumber: Option[String]): RegisteredForMLR = {
+    RegisteredForMLR(hasMLR._1, hasMLR._2, mlrNumber, prevMlrNumber)
+  }
+  def unapplyString(registeredForMLR: RegisteredForMLR): (Option[( (Boolean, Boolean) , Option[String], Option[String])]) = {
+    val tuple = (registeredForMLR.hasDigitalMLR, registeredForMLR.hasNonDigitalMLR)
+    Some(Tuple3(tuple, registeredForMLR.mlrNumber, registeredForMLR.prevMlrNumber) )
+  }
 }
