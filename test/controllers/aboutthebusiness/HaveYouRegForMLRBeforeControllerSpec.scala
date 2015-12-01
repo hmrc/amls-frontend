@@ -66,7 +66,8 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
     "on submit of page" must {
       "successfully navigate to next page " in {
         submitWithFormFilled { result =>
-          status(result) must be(NOT_IMPLEMENTED)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result).fold("") {x=>x} must include("/business-with-VAT")
         }
       }
 
@@ -83,7 +84,8 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       }
       "get error message when the user not filled on the mandatory fields" in {
         submitWithMandatoryFileldOptionNo { result =>
-          status(result) must be(NOT_IMPLEMENTED)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result).fold("") {x=>x} must include("/business-with-VAT")
         }
       }
 

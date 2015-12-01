@@ -28,7 +28,7 @@ trait HaveYouRegForMLRBeforeController extends AMLSGenericController{
       errors => Future.successful(BadRequest(views.html.registered_for_mlr(errors))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[RegisteredForMLR](CACHE_KEY, details) map { _=>
-          NotImplemented("Not implemented")
+          Redirect(controllers.aboutthebusiness.routes.BusinessRegForVATController.get())
         }
       })
 
