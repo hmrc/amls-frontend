@@ -13,6 +13,6 @@ To stop the Services
 
  sm --stop AMLS_ALL
 
-To start the app locally:
+To start the app locally, kill the service AMLS_FRONTEND and then start using the command below
 
- sbt "run 9220"
+ sbt "run 9222"

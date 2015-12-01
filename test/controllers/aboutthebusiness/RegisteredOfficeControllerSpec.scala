@@ -1,6 +1,6 @@
 package controllers.aboutthebusiness
 
-import connectors.{DataCacheConnector, SessionCacheConnector}
+import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -25,7 +25,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   private implicit val authContext = mock[AuthContext]
   private val mockAuthConnector = mock[AuthConnector]
   private val mockDataCacheConnector = mock[DataCacheConnector]
-  private val mockSessionCacheConnector = mock[SessionCacheConnector]
+  private val mockSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
   private val EndpointURL = "/registered-office"
 
   "The Page load" must {
@@ -101,7 +101,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   }
 
   object MockRegisteredOfficeController extends RegisteredOfficeController {
-    override def sessionCacheConnector: SessionCacheConnector = mockSessionCacheConnector
+    override def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector = mockSessionCacheConnector
 
     def authConnector = mockAuthConnector
 

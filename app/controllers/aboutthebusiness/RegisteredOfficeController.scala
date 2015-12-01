@@ -1,7 +1,7 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{DataCacheConnector, SessionCacheConnector}
+import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models._
@@ -20,12 +20,12 @@ trait RegisteredOfficeController extends AMLSGenericController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def sessionCacheConnector: SessionCacheConnector
+  def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
 
   private val CACHE_KEY = "registeredOffice"
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) = {
-    val reviewBusinessDetailsFuture = sessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
+    val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
     val cachedDataFuture = dataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](CACHE_KEY)
     for {
       reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture
@@ -37,7 +37,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) = {
-    val reviewBusinessDetailsFuture = sessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
+    val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
     registeredOfficeForm.bindFromRequest().fold(
       errors => {
         for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
@@ -68,5 +68,5 @@ object RegisteredOfficeController extends RegisteredOfficeController {
 
   override def authConnector = AMLSAuthConnector
 
-  override def sessionCacheConnector = SessionCacheConnector
+  override def businessCustomerSessionCacheConnector = BusinessCustomerSessionCacheConnector
 }

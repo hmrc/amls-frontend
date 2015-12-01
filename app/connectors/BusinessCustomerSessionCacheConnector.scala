@@ -1,6 +1,6 @@
 package connectors
 
-import config.AmlsSessionCache
+import config.BusinessCustomerSessionCache
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json
 import uk.gov.hmrc.http.cache.client.SessionCache
@@ -8,22 +8,22 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-trait SessionCacheConnector {
+trait BusinessCustomerSessionCacheConnector {
 
-  def sessionCache: SessionCache
+  def businessCustomerSessionCache: SessionCache
 
   def getReviewBusinessDetails[T](implicit hc: HeaderCarrier, formats: json.Format[T]): Future[T]
 
   def fetchAndGetData[T](key: String)(implicit hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
-    sessionCache.fetchAndGetEntry[T](key)
+    businessCustomerSessionCache.fetchAndGetEntry[T](key)
   }
 }
 
-object SessionCacheConnector extends SessionCacheConnector {
+object BusinessCustomerSessionCacheConnector extends BusinessCustomerSessionCacheConnector {
 
   private val BCSourceId = "BC_Business_Details"
 
-  override def sessionCache: SessionCache = AmlsSessionCache
+  override def businessCustomerSessionCache = BusinessCustomerSessionCache
 
   override def getReviewBusinessDetails[T](implicit hc: HeaderCarrier, formats: json.Format[T]): Future[T] = {
     fetchAndGetData[T](BCSourceId) flatMap {
