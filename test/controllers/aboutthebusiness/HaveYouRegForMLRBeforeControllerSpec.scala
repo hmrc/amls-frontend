@@ -134,7 +134,7 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
     }
 
     def submitWithYesAndOptionalText(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (false, true), Some("12345678"), Some("123456789789456"))
+      createRegisteredForMLRForSubmission(test, (false, true), None, Some("123456789789456"))
     }
   }
 }
