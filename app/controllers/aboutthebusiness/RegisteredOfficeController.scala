@@ -48,10 +48,11 @@ trait RegisteredOfficeController extends AMLSGenericController {
         val futureFutureResult: Future[Future[Result]] =
           for {
             reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture
+            result = dataCacheConnector.saveDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY,
+              RegisteredOfficeSave4Later(reviewBusinessDetails.businessAddress,
+              regOffice.isRegisteredOffice, regOffice.isCorrespondenceAddressSame))
           } yield {
-            val regOfficeSave4Later = RegisteredOfficeSave4Later(reviewBusinessDetails.businessAddress,
-              regOffice.isRegisteredOffice, regOffice.isCorrespondenceAddressSame)
-            dataCacheConnector.saveDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY, regOfficeSave4Later) map {
+            result map {
               case Some(RegisteredOfficeSave4Later(_, true, false)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
               case _ => NotImplemented("Not yet implemented")
             }
