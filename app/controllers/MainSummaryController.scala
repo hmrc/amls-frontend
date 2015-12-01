@@ -9,7 +9,7 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 import scala.concurrent.Future
 
 trait MainSummaryController extends FrontendController  with Actions {
-  def onPageLoad = AuthorisedFor(AmlsRegime).async {
+  def onPageLoad = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit user =>
       implicit request =>
       Future.successful(Ok(views.html.main_summary()))
