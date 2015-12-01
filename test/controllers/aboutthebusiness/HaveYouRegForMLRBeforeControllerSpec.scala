@@ -46,7 +46,7 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       HaveYouRegForMLRBeforeController.authConnector must be(AMLSAuthConnector)
     }
 
-    "on load display the businessHasWebsite page" in {
+    "on load display the registered for MLR page" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredForMLR](Matchers.any())
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
       val result = MockRegisteredForMLRController.get
@@ -54,7 +54,7 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       contentAsString(result) must include(Messages("title.registeredForMLR"))
     }
 
-    "on load display the businessHasWebsite page with prepopulated data" in {
+    "on load display the registered for MLR  page with pre-populated data" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredForMLR](Matchers.any())
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(Some(mockMLRModel)))
       val result = MockRegisteredForMLRController.get
@@ -71,6 +71,12 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
         }
       }
 
+      "successfully navigate to next page with Option Yes and optional text" in {
+        submitWithYesAndOptionalText { result =>
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result).fold("") {x=>x} must include("/business-with-VAT")
+        }
+      }
       "get validation exception when the length of the text field is greater than MAX characters" in {
         submitWithLengthValidation { result =>
           status(result) must be(BAD_REQUEST)
@@ -116,14 +122,19 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
     }
 
     def submitWithInvalidDataValidation(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (true, false), Some("sadfhasfd"), None)
+      createRegisteredForMLRForSubmission(test, (true, false), Some("test"), None)
     }
 
     def submitWithMandatoryFileldOptionNo(test: Future[Result] => Any) {
       createRegisteredForMLRForSubmission(test, (false, false), None, None)
     }
+
     def submitWithMandatoryFieldsWithInvalidData(test: Future[Result] => Any) {
       createRegisteredForMLRForSubmission(test, (false, false), Some("12345678"), Some("123456789789456"))
+    }
+
+    def submitWithYesAndOptionalText(test: Future[Result] => Any) {
+      createRegisteredForMLRForSubmission(test, (false, true), Some("12345678"), Some("123456789789456"))
     }
   }
 }
