@@ -53,7 +53,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
               regOffice.isRegisteredOffice, regOffice.isCorrespondenceAddressSame))
           } yield {
             result map {
-              case Some(RegisteredOfficeSave4Later(_, true, false)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
+              case Some(RegisteredOfficeSave4Later(_, true, true)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
               case _ => NotImplemented("Not yet implemented")
             }
           }

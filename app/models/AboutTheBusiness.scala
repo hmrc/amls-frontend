@@ -67,8 +67,8 @@ object RegisteredOffice {
 
   def applyString(isRegisteredOffice: String): RegisteredOffice = {
     val booleanTuple: (Boolean, Boolean) = isRegisteredOffice match {
-      case "1" => (true,false)
-      case "2" => (true,true)
+      case "1" => (true,true)
+      case "2" => (true,false)
       case "3" =>(false,false)
       case _ => throw new RuntimeException("Illegal value chosen")
     }
@@ -78,8 +78,8 @@ object RegisteredOffice {
   def unapplyString(registeredOffice: RegisteredOffice): Option[String] = {
     val tuple = (registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame)
     Some( tuple match {
-      case (true,false) => "1"
-      case (true,true) => "2"
+      case (true,true) => "1"
+      case (true,false) => "2"
       case (false,false) => "3"
       case _ => throw new RuntimeException("Illegal value in model")
     })
