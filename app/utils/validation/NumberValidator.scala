@@ -7,11 +7,11 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 
 object NumberValidator extends FormValidator {
   def validateNumber(invalidLengthMessageKey: String,
-                  invalidValueMessageKey: String, maxLength:Int) : Mapping[String] = {
+                  invalidValueMessageKey: String, minLength:Int, maxLength:Int) : Mapping[String] = {
     val lengthConstraint = Constraint("Length")( {
       t:String =>
         t match {
-          case t if t.length == maxLength =>
+          case t if t.length == maxLength || t.length == minLength  =>
             Valid
           case _ =>
             Invalid(invalidLengthMessageKey)
@@ -19,7 +19,7 @@ object NumberValidator extends FormValidator {
     } )
     val valueConstraint = Constraint("Value")( {
       t:String =>
-        vatRegex.findFirstIn(t) match {
+        numberRegex.findFirstIn(t) match {
           case Some(x) => Valid
           case _ => Invalid(invalidValueMessageKey)
         }

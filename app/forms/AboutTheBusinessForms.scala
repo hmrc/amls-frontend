@@ -32,7 +32,8 @@ object AboutTheBusinessForms {
 
   val businessRegForVATFormMapping = mapping(
     "hasVAT" -> mandatoryBooleanWithText("VATNum", "true", "error.required", "error.required", "error.notrequired"),
-    "VATNum" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid", getIntFromProperty("validationMaxLengthVAT")))
+    "VATNum" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthVAT"), getIntFromProperty("validationMaxLengthVAT")))
   )(BusinessWithVAT.apply)(BusinessWithVAT.unapply)
 
   val businessRegForVATForm = Form(businessRegForVATFormMapping)
@@ -45,9 +46,11 @@ object AboutTheBusinessForms {
 
   val RegisteredForMLRFormMapping = mapping(
     "hasMLR" ->  RadioGroupWithTextValidator.mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
-    "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid", getIntFromProperty("validationMaxLengthMLR"))),
+    "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthMLR"))),
 
-    "prevMlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid", getIntFromProperty("validationMaxLengthPrevMLR")))
+    "prevMlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthPrevMLR")))
   )(applyRegisteredForMLRFormMapping )(unapplyRegisteredForMLRFormMapping)
 
   val RegisteredForMLRForm = Form(RegisteredForMLRFormMapping)
