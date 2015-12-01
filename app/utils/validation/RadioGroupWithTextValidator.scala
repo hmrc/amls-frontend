@@ -28,15 +28,33 @@ object RadioGroupWithTextValidator extends FormValidator {
                                   noRadioButtonSelectedMessageKey:String, blankValueMessageKey:String,
                                   notBlankValueMessageKey:String ): Either[Seq[FormError], (Boolean, Boolean)]  = {
     n.trim match {
-      case "01" =>
-          data.getOrElse(textFieldKey, "") match {
-            case q if q.length == 0 => Left(Seq(FormError(textFieldKey, blankValueMessageKey)))
-            case _ => Right(Tuple2(true, false))
-          }
-      case "02" => Right(Tuple2(false, true))
+      case "01" =>handleYesOption01(textFieldKey, textField2Key, data, blankValueMessageKey, notBlankValueMessageKey)
+      case "02" =>  getFieldError0102(textFieldKey, data, notBlankValueMessageKey) match {
+        case None => Right(Tuple2(false, true))
+        case Some(error) => Left(Seq(error))
+      }
       case "03" => handleOption03(textFieldKey, textField2Key,data, notBlankValueMessageKey)
 
       case _ => Left(Seq(FormError("", noRadioButtonSelectedMessageKey)))
+    }
+  }
+
+  private def handleYesOption01(textFieldKey:String, textField2Key:String, data: Map[String, String], blankValueMessageKey:String,
+                   notBlankValueMessageKey:String ) :  Either[Seq[FormError], (Boolean, Boolean)] = {
+    getFieldError0102(textField2Key, data, notBlankValueMessageKey) match {
+      case None =>
+        data.getOrElse (textFieldKey, "") match {
+          case q if q.length == 0 => Left (Seq (FormError (textFieldKey, blankValueMessageKey) ) )
+          case _ => Right (Tuple2 (true, false) )
+        }
+      case Some(error) => Left(Seq(error))
+    }
+  }
+  private def getFieldError0102(textFieldKey:String, data: Map[String, String], notBlankValueMessageKey:String): Option[FormError] = {
+    val test1 =  data.getOrElse(textFieldKey, "")
+    test1.length>0 match {
+      case true => Some(FormError (textFieldKey, notBlankValueMessageKey) )
+      case _ => None
     }
   }
 
@@ -44,7 +62,6 @@ object RadioGroupWithTextValidator extends FormValidator {
                              notBlankValueMessageKey:String): Either[Seq[FormError], (Boolean, Boolean)] = {
     val test1 =  data.getOrElse(textFieldKey, "")
     val test2 =  data.getOrElse(textField2Key, "")
-
     (test1.length>0,test2.length>0) match {
       case (true, false) => Left (Seq (FormError (textFieldKey, notBlankValueMessageKey) ) )
       case (false, true) => Left (Seq (FormError (textField2Key, notBlankValueMessageKey) ) )
@@ -52,7 +69,6 @@ object RadioGroupWithTextValidator extends FormValidator {
       case _ => Right(Tuple2(false, false))
     }
    }
-
 
   def mandatoryBooleanWithText(textFieldKey:String, textField2Key:String, noRadioButtonSelectedMessageKey: String,
                                 blankValueMessageKey: String, notBlankValueMessageKey: String) = {
