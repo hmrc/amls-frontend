@@ -3,7 +3,7 @@
 @(
 name: String,
 textFieldName: (String, String),
-labelText: (String, String),
+labelText: String,
 textFieldLabelText: (String, String),
 options: Seq[(String, String)],
 hintText: String = "",
@@ -38,7 +38,7 @@ containerPresentation
 }
 
 @fieldset(
-legend = "OOK",
+legend = labelText,
 containerPresentation = containerPresentation_,
 presentation = fieldsetPresentation_,
 legendPresentation = legendPresentation
@@ -62,7 +62,7 @@ legendPresentation = legendPresentation
     @if(value == "01") {
         <fieldset id="@id(name)-01" style="clear:both">
             <legend class="js-hidden heading-medium">
-                @textFieldLabelText._1
+                @Messages(textFieldLabelText._1)
             </legend>
             <div class="form-group panel-indent">
                 @input(
@@ -75,7 +75,7 @@ legendPresentation = legendPresentation
 @if(value == "02"){
         <fieldset id="@id(name)-02" style="clear:both">
             <legend class="js-hidden heading-medium">
-                @textFieldLabelText._2
+                @Messages(textFieldLabelText._2)
             </legend>
             <div class="form-group panel-indent">
                 @input(
