@@ -21,7 +21,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-class HaveYouRegisteredForMLRControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   implicit val request = FakeRequest()
   implicit val authContext = mock[AuthContext]
@@ -82,7 +82,13 @@ class HaveYouRegisteredForMLRControllerSpec extends PlaySpec with OneServerPerSu
         }
       }
       "get error message when the user not filled on the mandatory fields" in {
-        submitWithoutMandatoryFields { result =>
+        submitWithMandatoryFileldOptionNo { result =>
+          status(result) must be(NOT_IMPLEMENTED)
+        }
+      }
+
+      "get error message when the user selected option 03 and filled invalid mandatory fields" in {
+        submitWithMandatoryFieldsWithInvalidData { result =>
           status(result) must be(BAD_REQUEST)
         }
       }
@@ -111,8 +117,11 @@ class HaveYouRegisteredForMLRControllerSpec extends PlaySpec with OneServerPerSu
       createRegisteredForMLRForSubmission(test, (true, false), Some("sadfhasfd"), None)
     }
 
-    def submitWithoutMandatoryFields(test: Future[Result] => Any) {
+    def submitWithMandatoryFileldOptionNo(test: Future[Result] => Any) {
       createRegisteredForMLRForSubmission(test, (false, false), None, None)
+    }
+    def submitWithMandatoryFieldsWithInvalidData(test: Future[Result] => Any) {
+      createRegisteredForMLRForSubmission(test, (false, false), Some("12345678"), Some("123456789789456"))
     }
   }
 }

@@ -71,13 +71,15 @@ $(function () {
       });
 
       $('*[data-toggle-01]').each(function () {
-        var $target = $($(this).data('toggle-false'));
-        showHide.call(this, $target, false);
+        var $target = $($(this).data('toggle-01')),
+            value = $(this).val();
+        showHide.call(this, $target, value);
       });
 
       $('*[data-toggle-02]').each(function () {
-        var $target = $($(this).data('toggle-false'));
-        showHide.call(this, $target, false);
+        var $target = $($(this).data('toggle-02')),
+            value = $(this).val();
+        showHide.call(this, $target, value);
       });
 
       $('*[data-toggle-other]').each(function () {

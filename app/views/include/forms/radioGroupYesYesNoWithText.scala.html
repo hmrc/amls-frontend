@@ -50,7 +50,7 @@ legendPresentation = legendPresentation
     <label class="block-label">
         @if(value == "01" || value == "02") {
         <input type="radio" name="@name" value="@value"
-               @form(name).value.filter( _ == value).map{ _ => checked="checked"} data-toggle-true="#@id(name)-@value"  >
+               @form(name).value.filter( _ == value).map{ _ => checked="checked"} data-toggle-@value="#@id(name)-@value"  >
 
         } else {
         <input type="radio" name="@name" value="@value"
@@ -59,28 +59,33 @@ legendPresentation = legendPresentation
         @key
 
     </label>
+    @if(value == "01") {
+        <fieldset id="@id(name)-01" style="clear:both">
+            <legend class="js-hidden heading-medium">
+                @textFieldLabelText._1
+            </legend>
+            <div class="form-group panel-indent">
+                @input(
+                name = textFieldName._1,
+                labelText = textFieldLabelText._1
+                )
+            </div>
+        </fieldset>
+    }
+@if(value == "02"){
+        <fieldset id="@id(name)-02" style="clear:both">
+            <legend class="js-hidden heading-medium">
+                @textFieldLabelText._2
+            </legend>
+            <div class="form-group panel-indent">
+                @input(
+                name = textFieldName._2,
+                labelText = textFieldLabelText._2
+                )
+            </div>
+        </fieldset>
+    }
 }
 }
-<fieldset id="@id(name)-01">
-    <legend class="js-hidden heading-medium">
-        @textFieldLabelText._1
-    </legend>
-    <div class="form-group panel-indent">
-        @input(
-        name = textFieldName._1,
-        labelText = textFieldLabelText._1
-        )
-    </div>
-</fieldset>
-<fieldset id="@id(name)-02">
-    <legend class="js-hidden heading-medium">
-        @textFieldLabelText._2
-    </legend>
-    <div class="form-group panel-indent">
-        @input(
-        name = textFieldName._2,
-        labelText = textFieldLabelText._2
-        )
-    </div>
-</fieldset>
+
 }
