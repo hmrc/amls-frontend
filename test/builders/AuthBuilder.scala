@@ -20,18 +20,18 @@ object AuthBuilder {
   }
 
   private def createUserAuthority(userId: String): Authority = {
-    Authority(userId, Accounts(org= Some(OrgAccount("org/1234", Org("1234")))), None, None)
+    Authority(userId, Accounts(org= Some(OrgAccount("org/1234", Org("1234")))), None, None, ConfidenceLevel.L50)
   }
 
   def mockUnAuthorisedUser(userId: String, mockAuthConnector: AuthConnector) {
     when(mockAuthConnector.currentAuthority(Matchers.any())) thenReturn {
-      val payeAuthority = Authority(userId, Accounts(paye = Some(PayeAccount(userId, Nino("AA026813B")))), None, None)
+      val payeAuthority = Authority(userId, Accounts(paye = Some(PayeAccount(userId, Nino("AA026813B")))), None, None, ConfidenceLevel.L50)
       Future.successful(Some(payeAuthority))
     }
   }
 
   def createUserAuthContextIndCt(userId: String, userName: String): AuthContext = {
-    val ctAuthority = Authority(userId, Accounts(ct = Some(CtAccount(userId, CtUtr("543212300017")))), None, None)
+    val ctAuthority = Authority(userId, Accounts(ct = Some(CtAccount(userId, CtUtr("543212300017")))), None, None, ConfidenceLevel.L50)
     AuthContext(authority = ctAuthority, nameFromSession = Some(userName))
   }
 

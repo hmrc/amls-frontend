@@ -12,7 +12,7 @@ object TestOnlyController extends TestOnlyController {
 
 trait TestOnlyController extends FrontendController with Actions {
 
-  def dropSave4Later = AuthorisedFor(AmlsRegime).async {
+  def dropSave4Later = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit user =>
       implicit request =>
         AmlsShortLivedCache.remove(user.user.oid).map { x =>

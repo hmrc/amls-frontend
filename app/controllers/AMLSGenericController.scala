@@ -16,12 +16,12 @@ trait AMLSGenericController extends FrontendController with Actions {
   protected def post(implicit user: AuthContext, request: Request[AnyContent]): Future[Result]
 
   def get(): Action[AnyContent] =
-    AuthorisedFor(AmlsRegime).async {
+    AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
       user => request => get(user, request)
     }
 
   def post(): Action[AnyContent] =
-    AuthorisedFor(AmlsRegime).async {
+    AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
       user => request => post(user, request)
     }
 
