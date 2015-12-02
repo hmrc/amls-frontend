@@ -1,6 +1,7 @@
 package models
 
 import play.api.libs.json.Json
+import scala.language.implicitConversions
 
 case class BCAddress(
                       line_1: String,
@@ -56,6 +57,8 @@ case class RegisteredOfficeSave4Later(registeredOfficeAddress: BCAddress,
 
 
 object RegisteredOfficeSave4Later {
+  //def fromRegisteredOffice(registeredOffice: RegisteredOffice): RegisteredOfficeSave4Later = {
+    //RegisteredOfficeSave4Later(BCAddress("","",None,None,None,""), registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame) }
   implicit val formats = Json.format[RegisteredOfficeSave4Later]
 }
 
@@ -83,6 +86,11 @@ object RegisteredOffice {
       case (false,false) => "3"
       case _ => throw new RuntimeException("Illegal value in model")
     })
+  }
+
+  def fromRegisteredOfficeSave4Later(registeredOfficeSave4Later: RegisteredOfficeSave4Later): RegisteredOffice = {
+    //RegisteredOffice(registeredOfficeSave4Later.isRegisteredOffice, registeredOfficeSave4Later.isCorrespondenceAddressSame)
+    RegisteredOffice(true,true)
   }
 }
 
