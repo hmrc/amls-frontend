@@ -1,7 +1,7 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{DataCacheConnector, SessionCacheConnector}
+import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
 import models._
@@ -21,7 +21,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def sessionCacheConnector: SessionCacheConnector
+  def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
 
   private val CACHE_KEY = "registeredOffice"
 
@@ -102,7 +102,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) = {
-    val reviewBusinessDetailsFuture = sessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
+    val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
     registeredOfficeForm.bindFromRequest().fold(
       errors => {
         for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
@@ -118,7 +118,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
                 regOffice.isRegisteredOffice, regOffice.isCorrespondenceAddressSame))
           } yield {
             result map {
-              case Some(RegisteredOfficeSave4Later(_, true, false)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
+              case Some(RegisteredOfficeSave4Later(_, true, true)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
               case _ => NotImplemented("Not yet implemented")
             }
           }
@@ -133,5 +133,5 @@ object RegisteredOfficeController extends RegisteredOfficeController {
 
   override def authConnector = AMLSAuthConnector
 
-  override def sessionCacheConnector = SessionCacheConnector
+  override def businessCustomerSessionCacheConnector = BusinessCustomerSessionCacheConnector
 }

@@ -2,18 +2,17 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 
-class AboutTheBusinessTest extends PlaySpec {
-  private val registeredAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
+class AboutTheBusinessSpec extends PlaySpec {
 
   "AboutTheBusiness " should {
     "successfully apply 1 to return the Model with correct values" in {
       val registeredOfficeApply = RegisteredOffice.applyString("1")
       registeredOfficeApply.isRegisteredOffice mustBe true
-      registeredOfficeApply.isCorrespondenceAddressSame mustBe false
+      registeredOfficeApply.isCorrespondenceAddressSame mustBe true
     }
 
     "successfully unapply the (true, false) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=false)) match {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=true)) match {
         case Some(registeredOfficeExtracted) => registeredOfficeExtracted
         case _ => ""
       }
@@ -24,11 +23,11 @@ class AboutTheBusinessTest extends PlaySpec {
     "successfully apply 2 to return the Model with correct values" in {
       val registeredOfficeApply = RegisteredOffice.applyString("2")
       registeredOfficeApply.isRegisteredOffice mustBe true
-      registeredOfficeApply.isCorrespondenceAddressSame mustBe true
+      registeredOfficeApply.isCorrespondenceAddressSame mustBe false
     }
 
     "successfully unapply the (true,true) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=true)) match {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=false)) match {
         case Some(registeredOfficeExtracted) => registeredOfficeExtracted
         case _ => ""
       }
