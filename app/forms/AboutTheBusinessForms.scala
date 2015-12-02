@@ -1,5 +1,6 @@
 package forms
 
+import config.AmlsPropertiesReader._
 import models.{BusinessHasEmail, BusinessWithVAT, BusinessHasWebsite, TelephoningBusiness}
 import play.api.data.Form
 import play.api.data.Forms._
@@ -18,8 +19,10 @@ object AboutTheBusinessForms {
   val businessHasWebsiteForm = Form(businessHasWebsiteFormMapping)
 
   val telephoningBusinessForm = Form(mapping(
-    "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"),
-    "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"))
+    "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength",
+      "telephoningbusiness.error.invalidphonenumber", getProperty("validationMaxLengthPhoneNo").toInt),
+    "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength",
+      "telephoningbusiness.error.invalidphonenumber", getProperty("validationMaxLengthPhoneNo").toInt))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val businessRegForVATFormMapping = mapping(
@@ -31,7 +34,7 @@ object AboutTheBusinessForms {
   val businessRegForVATForm = Form(businessRegForVATFormMapping)
 
   val BusinessHasEmailFormMapping = mapping(
-    "email" -> EmailValidator.mandatoryEmail("error.required","err.invalidLength", "error.invalid")
+    "email" -> EmailValidator.mandatoryEmail("error.required","err.invalidLength", "error.invalid", getProperty("validationMaxLengthEmail").toInt)
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
 
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)

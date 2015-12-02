@@ -10,13 +10,13 @@ import config.AmlsPropertiesReader.getProperty
 object EmailValidator extends FormValidator {
 
   def mandatoryEmail(blankValueMessageKey: String, invalidLengthMessageKey: String,
-                     invalidValueMessageKey: String) : Mapping[String] = {
+                     invalidValueMessageKey: String, maxLength: Int) : Mapping[String] = {
     val blankConstraint = Constraint("Blank")( {
       t:String =>
         t match {
           case t if t.length == 0 =>
             Invalid(blankValueMessageKey)
-          case t if t.length > getProperty("validationMaxLengthEmail").toInt =>
+          case t if t.length > maxLength =>
             Invalid(invalidLengthMessageKey)
           case _ =>
             Valid

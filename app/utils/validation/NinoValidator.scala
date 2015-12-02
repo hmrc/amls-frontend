@@ -1,14 +1,12 @@
 package utils.validation
 
-import play.api.data.Forms
+import play.api.data.{FormError, Forms}
 import play.api.data.format.Formatter
-import play.api.data.FormError
-import config.AmlsPropertiesReader.getProperty
 
 object NinoValidator extends FormValidator {
 
   private def mandatoryNinoFormatter(blankValueMessageKey: String, invalidLengthMessageKey: String,
-                                     invalidValueMessageKey: String) = new Formatter[String] {
+                                     invalidValueMessageKey: String, maxLength: Int) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
       data.get(key) match {
         case Some(n) =>
@@ -16,7 +14,7 @@ object NinoValidator extends FormValidator {
           s match{
             case p if p.length==0 => Left(Seq(FormError(key, blankValueMessageKey)))
             case num => {
-              if (num.length > getProperty("validationMaxLengthNINO").toInt) {
+              if (num.length > maxLength) {
                 Left(Seq(FormError(key, invalidLengthMessageKey)))
               } else {
                 ninoRegex.findFirstIn(num) match {
@@ -34,7 +32,7 @@ object NinoValidator extends FormValidator {
 
   def mandatoryNino( blankValueMessageKey: String,
                      invalidLengthMessageKey: String,
-                     invalidValueMessageKey: String) =
+                     invalidValueMessageKey: String, maxLength: Int) =
     Forms.of[String](mandatoryNinoFormatter(blankValueMessageKey,
-      invalidLengthMessageKey, invalidValueMessageKey))
+      invalidLengthMessageKey, invalidValueMessageKey, maxLength))
 }
