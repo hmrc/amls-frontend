@@ -57,8 +57,6 @@ case class RegisteredOfficeSave4Later(registeredOfficeAddress: BCAddress,
 
 
 object RegisteredOfficeSave4Later {
-  //def fromRegisteredOffice(registeredOffice: RegisteredOffice): RegisteredOfficeSave4Later = {
-    //RegisteredOfficeSave4Later(BCAddress("","",None,None,None,""), registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame) }
   implicit val formats = Json.format[RegisteredOfficeSave4Later]
 }
 
@@ -89,8 +87,7 @@ object RegisteredOffice {
   }
 
   def fromRegisteredOfficeSave4Later(registeredOfficeSave4Later: RegisteredOfficeSave4Later): RegisteredOffice = {
-    //RegisteredOffice(registeredOfficeSave4Later.isRegisteredOffice, registeredOfficeSave4Later.isCorrespondenceAddressSame)
-    RegisteredOffice(true,true)
+    RegisteredOffice(registeredOfficeSave4Later.isRegisteredOffice, registeredOfficeSave4Later.isCorrespondenceAddressSame)
   }
 }
 

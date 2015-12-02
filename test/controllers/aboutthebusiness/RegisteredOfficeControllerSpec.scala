@@ -60,12 +60,12 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     "load the Registered Office details from the Cache" in {
       when(mockSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
         thenReturn(Future.successful(businessCustomerDetails))
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOffice](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(registeredOffice)))
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredOfficeSave4Later](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(registeredOfficeSave4Later)))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
       val optionTuple: Option[String] = RegisteredOffice.unapplyString(registeredOffice)
-      optionTuple.getOrElse("") must be("2")
+      optionTuple.getOrElse("") must be("1")
     }
   }
 

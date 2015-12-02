@@ -10,7 +10,6 @@ import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
-import scala.util.Success
 
 trait RegisteredOfficeController extends AMLSGenericController {
   def optionsIsRegisteredOffice(implicit lang: Lang) = Seq(
@@ -26,79 +25,15 @@ trait RegisteredOfficeController extends AMLSGenericController {
   private val CACHE_KEY = "registeredOffice"
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) = {
-
-    val reviewBusinessDetailsFuture: Future[BusinessCustomerDetails] = sessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
-    val cachedDataFuture: Future[Option[RegisteredOfficeSave4Later]] = dataCacheConnector.fetchDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY)
-
-    val eventualMaybeReviewBusinessDetails: Future[BusinessCustomerDetails] = for {
+    val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
+    val cachedDataFuture = dataCacheConnector.fetchDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY)
+    for {
       reviewBusinessDetails <- reviewBusinessDetailsFuture
-    } yield {
-        reviewBusinessDetails
-      }
-
-    val eventualMaybeSave4Later: Future[Option[RegisteredOfficeSave4Later]] = for {
       cachedData <- cachedDataFuture
     } yield {
-        cachedData
-      }
-
-    val eventualEventualTuple: Future[RegisteredOffice] = for {
-      re <- eventualMaybeReviewBusinessDetails
-      ch <- eventualMaybeSave4Later
-      regoff <- Future { RegisteredOffice.fromRegisteredOfficeSave4Later(ch.get)}
-      } yield {
-        regoff
-      }
-
-    eventualEventualTuple.
-
-    eventualEventualTuple onSuccess {
-      case t: RegisteredOffice => t
+      val fm = cachedData.fold(registeredOfficeForm)( x => registeredOfficeForm.fill(RegisteredOffice.fromRegisteredOfficeSave4Later(x)) )
+      Ok(views.html.registered_office(fm, reviewBusinessDetails, optionsIsRegisteredOffice))
     }
-
-    Ok(views.html.registered_office(registeredOfficeForm.fill(t),null, optionsIsRegisteredOffice))
-
-
-
-    /*
-        val z: Future[RegisteredOffice] = eventualMaybeSave4Later flatMap {
-          (x: Option[RegisteredOfficeSave4Later]) => Future(x) map {
-            y => RegisteredOffice.fromRegisteredOfficeSave4Later(y.get)
-          }
-        }
-    */
-
-    /*
-        val eventualBusinessDetails =  eventualMaybeReviewBusinessDetails.onComplete {
-          case Success(businessDetails) => {Ok(views.html.registered_office(fm, eventualBusinessDetails, optionsIsRegisteredOffice))}
-          case Failure(t) => throw new RuntimeException("eventual business details")
-        }
-    */
-
-
-    /*
-        val eventualOffice = z onComplete() {
-          case Success(regOff) => Ok(views.html.registered_office(fm, eventualBusinessDetails, optionsIsRegisteredOffice))
-          case Failure(t) => throw new RuntimeException("eventualOffice")
-        }
-    */
-
-
-    /*
-        val future: Future[Option[RegisteredOfficeSave4Later]] = for {
-          reviewBusinessDetails <- reviewBusinessDetailsFuture
-          cachedData <- cachedDataFuture
-          } yield {
-            cachedData
-          }
-    */
-
-    //    val fm = cachedData.fold(registeredOfficeForm)(x => registeredOfficeForm.fill())
-
-    //RegisteredOffice.fromRegisteredOfficeSave4Later(x)
-    //future
-
-
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) = {

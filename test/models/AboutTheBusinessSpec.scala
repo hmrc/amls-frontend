@@ -2,6 +2,8 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 
+import scala.util.Random
+
 class AboutTheBusinessSpec extends PlaySpec {
 
   "AboutTheBusiness " should {
@@ -12,7 +14,7 @@ class AboutTheBusinessSpec extends PlaySpec {
     }
 
     "successfully unapply the (true, false) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=true)) match {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = true)) match {
         case Some(registeredOfficeExtracted) => registeredOfficeExtracted
         case _ => ""
       }
@@ -27,7 +29,7 @@ class AboutTheBusinessSpec extends PlaySpec {
     }
 
     "successfully unapply the (true,true) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=true, isCorrespondenceAddressSame=false)) match {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = false)) match {
         case Some(registeredOfficeExtracted) => registeredOfficeExtracted
         case _ => ""
       }
@@ -41,7 +43,7 @@ class AboutTheBusinessSpec extends PlaySpec {
     }
 
     "successfully unapply the (false, false) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=false, isCorrespondenceAddressSame=false)) match {
+      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = false, isCorrespondenceAddressSame = false)) match {
         case Some(registeredOfficeExtracted) => registeredOfficeExtracted
         case _ => ""
       }
@@ -57,8 +59,14 @@ class AboutTheBusinessSpec extends PlaySpec {
 
     "throw an exception if invalid value in unapply" in {
       a[java.lang.RuntimeException] should be thrownBy {
-        RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice=false, isCorrespondenceAddressSame=true))
+        RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = false, isCorrespondenceAddressSame = true))
       }
+    }
+
+    "successfully convert a RegisteredOfficeSave4Later object to a RegisteredOffice object" in {
+      val registeredOfficeSave4Later = RegisteredOfficeSave4Later(BCAddress("", "", None, None, None, ""), Random.nextBoolean(), Random.nextBoolean())
+      val result = RegisteredOffice.fromRegisteredOfficeSave4Later(registeredOfficeSave4Later)
+      result mustBe RegisteredOffice(registeredOfficeSave4Later.isRegisteredOffice, registeredOfficeSave4Later.isCorrespondenceAddressSame)
     }
 
   }
