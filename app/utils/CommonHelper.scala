@@ -13,5 +13,10 @@ object CommonHelper {
       (if (currentValue == currentKey) "" else currentValue) -> e
     }
   }
+
+  def optionsYesNo(implicit lang: Lang) = Seq(
+    Messages("lbl.yes") -> "true",
+    Messages("lbl.no")  -> "false"
+  )
 }
 

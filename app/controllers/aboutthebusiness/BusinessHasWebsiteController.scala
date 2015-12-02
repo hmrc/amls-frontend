@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 trait BusinessHasWebsiteController extends AMLSGenericController{
 
-  val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
   val CACHE_KEY = "businessHasWebsite"
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
     dataCacheConnector.fetchDataShortLivedCache[BusinessHasWebsite](CACHE_KEY) map {

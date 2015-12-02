@@ -20,5 +20,4 @@ class CommonHelperTest extends UnitSpec with MockitoSugar {
       CommonHelper.mapSeqWithMessagesKey(Seq("1", "2", "3"), "aaa", mockedMessages) shouldBe allKeys
     }
   }
-
 }

@@ -18,7 +18,7 @@ object PhoneNumberValidator extends FormValidator {
           t match{
             case p if p.length==0 => Left(Seq(FormError(key, blankValueMessageKey)))
             case num => {
-              if (num.length > getProperty("validationMaxLengthPhoneNo").toInt) {
+              if (num.trim.length > getProperty("validationMaxLengthPhoneNo").toInt) {
                 Left(Seq(FormError(key, invalidLengthMessageKey)))
               } else {
                 phoneNoRegex.findFirstIn(num) match {

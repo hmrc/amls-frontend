@@ -24,9 +24,11 @@ POST        /role-for-business              controllers.aboutyou.RoleForBusiness
 
 GET         /business-has-website           controllers.aboutthebusiness.BusinessHasWebsiteController.get()
 POST        /business-has-website           controllers.aboutthebusiness.BusinessHasWebsiteController.post()
-
 GET         /telephoning-business           controllers.aboutthebusiness.TelephoningBusinessController.get()
 POST        /telephoning-business           controllers.aboutthebusiness.TelephoningBusinessController.post()
+GET         /registered-office              controllers.aboutthebusiness.RegisteredOfficeController.get()
+POST        /registered-office              controllers.aboutthebusiness.RegisteredOfficeController.post()
+
 
 GET         /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.get()
 POST        /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.post()

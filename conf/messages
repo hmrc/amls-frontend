@@ -65,6 +65,7 @@ sectionTitle.aboutTheBusiness = About the business
 
 title.businessHasWebsite = Does your business have a website?
 title.addressOfYourWebsite = What is the address of your website?
+title.registeredOffice = Registered office or principal place of business
 
 telephoningbusiness.title = Telephoning your business
 telephoningbusiness.phonenumber = Business phone number
@@ -85,3 +86,8 @@ lbl.hasMLR.no = No
 
 lbl.mlrRegistrationNumber = MLR registration number
 lbl.prevMLRRegistrationNumber = MLR registration number (optional)
+
+registeredoffice.lbl.yes.same = Yes, and I would like correspondence to be sent here.
+registeredoffice.lbl.yes.different = Yes, but I would like to provide a different address for correspondence.
+registeredoffice.lbl.no = No
+registeredoffice.address.header = We have the following address details for you.

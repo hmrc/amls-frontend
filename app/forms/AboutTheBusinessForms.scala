@@ -6,7 +6,9 @@ import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.{RadioGroupPrefRegForMLRWithTextValidator, NumberValidator, WebAddressValidator, EmailValidator}
+import utils.validation.TextValidator._
+import utils.validation.{EmailValidator, NumberValidator, RadioGroupPrefRegForMLRWithTextValidator, WebAddressValidator}
+
 
 object AboutTheBusinessForms {
 
@@ -30,6 +32,11 @@ object AboutTheBusinessForms {
     "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
+  val registeredOfficeForm = Form(mapping(
+    "isRegisteredOffice" -> mandatoryText("generic.please_specify")
+  )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
+
+
   val businessRegForVATFormMapping = mapping(
     "hasVAT" -> mandatoryBooleanWithText("VATNum", "true", "error.required", "error.required", "error.notrequired"),
     "VATNum" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
@@ -39,7 +46,7 @@ object AboutTheBusinessForms {
   val businessRegForVATForm = Form(businessRegForVATFormMapping)
 
   val BusinessHasEmailFormMapping = mapping(
-    "email" -> EmailValidator.mandatoryEmail("error.required","err.invalidLength", "error.invalid")
+    "email" -> EmailValidator.mandatoryEmail("error.required", "err.invalidLength", "error.invalid")
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
 
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)
