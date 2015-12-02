@@ -1,47 +1,47 @@
 @import forms.FormHelpers._
 
 @(
-name: String,
-textFieldName: (String, String),
-labelText: String,
-textFieldLabelText: (String, String),
-options: Seq[(String, String)],
-hintText: String = "",
-fieldsetPresentation: Presentation = Defaults.radioGroup,
-containerPresentation: Presentation = Defaults.field,
-legendPresentation: Presentation = Defaults.legend,
-hintPresentation: Presentation = Defaults.hint
+    name: String,
+    textFieldName: (String, String),
+    labelText: String,
+    textFieldLabelText: (String, String),
+    options: Seq[(String, String)],
+    hintText: String = "",
+    fieldsetPresentation: Presentation = Defaults.radioGroup,
+    containerPresentation: Presentation = Defaults.field,
+    legendPresentation: Presentation = Defaults.legend,
+    hintPresentation: Presentation = Defaults.hint
 )(implicit
 form: Form[_],
 lang: Lang
 )
 
 @fieldsetPresentation_ = @{
-// Make groups of 2 radio buttons inline
-if (options.length < 3) {
-fieldsetPresentation.copy(
-classes = "inline" +: fieldsetPresentation.classes
-)
-} else {
-fieldsetPresentation
-}
+    // Make groups of 2 radio buttons inline
+    if (options.length < 3) {
+        fieldsetPresentation.copy(
+            classes = "inline" +: fieldsetPresentation.classes
+        )
+    } else {
+        fieldsetPresentation
+    }
 }
 
 @containerPresentation_ = @{
-if (form(name).hasErrors) {
-containerPresentation.copy(
-classes = "form-field--error" +: containerPresentation.classes
-)
-} else {
-containerPresentation
-}
+    if (form(name).hasErrors) {
+        containerPresentation.copy(
+            classes = "form-field--error" +: containerPresentation.classes
+        )
+    } else {
+        containerPresentation
+    }
 }
 
 @fieldset(
-legend = labelText,
-containerPresentation = containerPresentation_,
-presentation = fieldsetPresentation_,
-legendPresentation = legendPresentation
+    legend = labelText,
+    containerPresentation = containerPresentation_,
+    presentation = fieldsetPresentation_,
+    legendPresentation = legendPresentation
 ) {
 @hint(hintText, id(name), hintPresentation)
 @errorField(name)
@@ -72,7 +72,7 @@ legendPresentation = legendPresentation
             </div>
         </fieldset>
     }
-@if(value == "02"){
+    @if(value == "02"){
         <fieldset id="@id(name)-02" style="clear:both">
             <legend class="js-hidden heading-medium">
                 @Messages(textFieldLabelText._2)

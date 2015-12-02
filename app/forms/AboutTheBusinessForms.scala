@@ -6,7 +6,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.{RadioGroupWithTextValidator, NumberValidator, WebAddressValidator, EmailValidator}
+import utils.validation.{RadioGroupPrefRegForMLRWithTextValidator, NumberValidator, WebAddressValidator, EmailValidator}
 
 object AboutTheBusinessForms {
 
@@ -45,7 +45,7 @@ object AboutTheBusinessForms {
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)
 
   val RegisteredForMLRFormMapping = mapping(
-    "hasMLR" ->  RadioGroupWithTextValidator.mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
+    "hasMLR" ->  RadioGroupPrefRegForMLRWithTextValidator.mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
     "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
       getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthMLR"))),
 

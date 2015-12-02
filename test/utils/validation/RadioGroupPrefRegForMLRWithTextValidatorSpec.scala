@@ -3,9 +3,9 @@ package utils.validation
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.data.FormError
-import utils.validation.RadioGroupWithTextValidator._
+import utils.validation.RadioGroupPrefRegForMLRWithTextValidator._
 
-class RadioGroupWithTextValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
+class RadioGroupPrefRegForMLRWithTextValidatorSpec extends PlaySpec with MockitoSugar  with OneServerPerSuite {
 
   "RadioGroupWithTextValidator" must {
     "when mandatory fields filled correctly respond with success[true, false]" in {

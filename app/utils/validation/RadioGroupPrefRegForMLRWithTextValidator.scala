@@ -3,7 +3,7 @@ package utils.validation
 import play.api.data.{FormError, Forms}
 import play.api.data.format.Formatter
 
-object RadioGroupWithTextValidator extends FormValidator {
+object RadioGroupPrefRegForMLRWithTextValidator extends FormValidator {
   private def mandatoryRadioGroupWithTextFormatter(textFieldKey:String, textField2Key:String ,noRadioButtonSelectedMessageKey:String,
                                                    blankValueMessageKey:String, notBlankValueMessageKey:String) = new Formatter[(Boolean, Boolean)] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], (Boolean, Boolean)] = {
