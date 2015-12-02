@@ -1,14 +1,15 @@
 package controllers.aboutyou
-import config.AmlsPropertiesReader._
 import config.AMLSAuthConnector
+import config.AmlsPropertiesReader._
 import connectors.DataCacheConnector
 import controllers.AMLSGenericController
 import forms.AboutYouForms._
 import models.RoleWithinBusiness
 import play.api.i18n.Messages
-import play.api.mvc.{Request, AnyContent}
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.CommonHelper
+
 import scala.concurrent.Future
 
 

@@ -3,7 +3,7 @@ package config
 import com.typesafe.config.Config
 import play.api.Play
 import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.http.cache.client.{ShortLivedCache, ShortLivedHttpCaching}
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.{LoadAuditingConfig, AuditingConfig}
@@ -17,6 +17,23 @@ import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 
 object AMLSControllerConfig extends ControllerConfig {
   override def controllerConfigs: Config = Play.current.configuration.underlying.getConfig("controllers")
+}
+
+object BusinessCustomerSessionCache extends SessionCache with AppName with ServicesConfig{
+  override lazy val http = WSHttp
+  override lazy val defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
+
+  override lazy val baseUri = baseUrl("cachable.session-cache")
+  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+}
+
+object AmlsSessionCache extends SessionCache with AppName with ServicesConfig{
+  override lazy val http = WSHttp
+  override lazy val defaultSource: String = getConfString("cachable.session-cache.amls-frontend.cache","amls-frontend")
+
+  override lazy val baseUri = baseUrl("cachable.session-cache")
+  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+
 }
 
 object AMLSAuditConnector extends AuditConnector with RunMode {

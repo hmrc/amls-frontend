@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 trait BusinessHasWebsiteController extends AMLSGenericController{
 
-  val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
   val CACHE_KEY = "businessHasWebsite"
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
     dataCacheConnector.fetchDataShortLivedCache[BusinessHasWebsite](CACHE_KEY) map {
@@ -27,7 +27,7 @@ trait BusinessHasWebsiteController extends AMLSGenericController{
       errors => Future.successful(BadRequest(views.html.business_has_website(errors))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[BusinessHasWebsite](CACHE_KEY, details) map { _=>
-          NotImplemented("Not implemented")
+          Redirect(controllers.aboutthebusiness.routes.HaveYouRegForMLRBeforeController.get())
         }
       })
 

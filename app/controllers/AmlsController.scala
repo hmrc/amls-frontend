@@ -9,6 +9,7 @@ import play.api.mvc._
 import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+
 import scala.concurrent.Future
 
 trait AmlsController extends FrontendController with Actions {
@@ -20,8 +21,8 @@ trait AmlsController extends FrontendController with Actions {
     implicit user =>
       implicit request =>
         dataCacheConnector.fetchDataShortLivedCache[LoginDetails](user.user.oid,"Data") map {
-            case Some(data) => Ok(views.html.AmlsLogin(loginDetailsForm.fill(data)))
-            case _ => Ok(views.html.AmlsLogin(loginDetailsForm))
+          case Some(data) => Ok(views.html.AmlsLogin(loginDetailsForm.fill(data)))
+          case _ => Ok(views.html.AmlsLogin(loginDetailsForm))
         }
   }
 

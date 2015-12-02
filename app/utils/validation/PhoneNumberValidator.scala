@@ -34,7 +34,6 @@ object PhoneNumberValidator extends FormValidator {
               }
             }
           }
-
         case _ => Left(Seq(FormError(key, "Nothing to validate")))
       }
     }

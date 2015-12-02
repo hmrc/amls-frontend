@@ -21,12 +21,13 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
   val mockShortLivedCache = mock[ShortLivedCache]
   val userId = s"user-${UUID.randomUUID}"
 
-  object TestModel{
+  object TestModel {
     implicit val formats = Json.format[TestModel]
   }
-  case class TestModel(name:String)
 
-  val dummyModel:TestModel = TestModel("sample")
+  case class TestModel(name: String)
+
+  val dummyModel: TestModel = TestModel("sample")
   val returnedCacheMap: CacheMap = CacheMap("data", Map("formId" -> Json.toJson(dummyModel)))
   val sourceId = "AMLS"
 
@@ -86,8 +87,8 @@ class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with Mockit
       when(mockShortLivedCache.fetch(Matchers.any())(Matchers.any())).thenReturn(Future.successful(Some(returnedCacheMap)))
       val result = TestDataCacheConnector.fetchAll(sourceId)
       whenReady(result) { dtl =>
-        dtl contains("formId")
-       }
+        dtl contains ("formId")
+      }
     }
   }
 }

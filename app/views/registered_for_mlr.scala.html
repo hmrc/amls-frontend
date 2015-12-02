@@ -1,0 +1,24 @@
+@import include.main
+@import forms.FormHelpers._
+@import forms.AboutTheBusinessForms._
+@import include.forms._
+@import utils.DataFields._
+
+@(RegisteredForMLRForm: Form[models.RegisteredForMLR])(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
+    title = Messages("title.registeredForMLR")
+) {
+    @formHelper(RegisteredForMLRForm, aboutthebusiness.routes.HaveYouRegForMLRBeforeController.post()) { implicit form: Form[_] =>
+        @radioGroupPrevRegForMLRWithText(
+            name = "hasMLR",
+            textFieldName = ("mlrNumber","prevMlrNumber"),
+            labelText = "title.registeredForMLR",
+            legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
+            textFieldLabelText = ("lbl.mlrRegistrationNumber","lbl.prevMLRRegistrationNumber"),
+            options = optionsRegisteredFoMLR
+        )
+        @submit(Messages("button.save"))
+    }
+}

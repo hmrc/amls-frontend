@@ -62,8 +62,10 @@ lbl.roleForBusiness.01=External accountant
 
 ###### About the business Section ######
 sectionTitle.aboutTheBusiness = About the business
+
 title.businessHasWebsite = Does your business have a website?
 title.addressOfYourWebsite = What is the address of your website?
+title.registeredOffice = Registered office or principal place of business
 
 telephoningbusiness.title = Telephoning your business
 telephoningbusiness.phonenumber = Business phone number
@@ -77,3 +79,15 @@ title.registeredVATNum = What is your VAT registraton number?
 title.email = Email
 lbl.businessEmailAddress = What is the business's email address
 
+title.registeredForMLR = Have you been registered for MLR before?
+lbl.hasMLR.yes.withReg = Yes, I have an existing registration
+lbl.hasMLR.yes.withPastReg = Yes, I was registered in the past but am not presently
+lbl.hasMLR.no = No
+
+lbl.mlrRegistrationNumber = MLR registration number
+lbl.prevMLRRegistrationNumber = MLR registration number (optional)
+
+registeredoffice.lbl.yes.same = Yes, and I would like correspondence to be sent here.
+registeredoffice.lbl.yes.different = Yes, but I would like to provide a different address for correspondence.
+registeredoffice.lbl.no = No
+registeredoffice.address.header = We have the following address details for you.
