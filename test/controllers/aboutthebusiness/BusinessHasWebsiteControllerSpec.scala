@@ -66,7 +66,7 @@ class BusinessHasWebsiteControllerSpec extends PlaySpec with OneServerPerSuite w
       "successfully navigate to next page " in {
         submitWithFormFilled { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {x=>x} must include("/registered-for-MLR")
+          redirectLocation(result).fold("") {identity} must include("/registered-for-MLR")
         }
       }
 

@@ -67,14 +67,14 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       "successfully navigate to next page " in {
         submitWithFormFilled { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {x=>x} must include("/business-with-VAT")
+          redirectLocation(result).fold("") {identity} must include("/business-with-VAT")
         }
       }
 
       "successfully navigate to next page with Option Yes and optional text" in {
         submitWithYesAndOptionalText { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {x=>x} must include("/business-with-VAT")
+          redirectLocation(result).fold("") {identity} must include("/business-with-VAT")
         }
       }
       "get validation exception when the length of the text field is greater than MAX characters" in {
@@ -91,7 +91,7 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       "get error message when the user not filled on the mandatory fields" in {
         submitWithMandatoryFileldOptionNo { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {x=>x} must include("/business-with-VAT")
+          redirectLocation(result).fold("") {identity} must include("/business-with-VAT")
         }
       }
 
