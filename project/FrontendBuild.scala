@@ -14,10 +14,10 @@ private object AppDependencies {
   import play.PlayImport._
   import play.core.PlayVersion
 
-  private val playHealthVersion = "0.7.0"    
+  private val playHealthVersion = "1.1.0"
 
-  private val govukTemplateVersion = "2.6.0"
-  private val playUiVersion = "1.8.0"
+  private val govukTemplateVersion = "4.0.0"
+  private val playUiVersion = "4.2.0"
   
   val compile = Seq(
     ws,
@@ -28,8 +28,8 @@ private object AppDependencies {
     // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % "3.0.0",
     "uk.gov.hmrc" %% "play-partials" % "4.0.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "3.5.0",
-    "uk.gov.hmrc" %% "play-config" % "2.0.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.0.0",
+    "uk.gov.hmrc" %% "play-config" % "2.0.1",
     "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
     "uk.gov.hmrc" %% "http-caching-client" % "5.2.0",
 
