@@ -43,7 +43,7 @@ class AMLSGenericControllerSpec extends PlaySpec with MockitoSugar with  OneServ
       "respond with a redirect" in {
         getWithUnAuthorisedUser { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") { x => x } must include("/unauthorised")
+          redirectLocation(result).fold("") {identity} must include("/unauthorised")
         }
       }
     }
@@ -52,7 +52,7 @@ class AMLSGenericControllerSpec extends PlaySpec with MockitoSugar with  OneServ
       "respond with a redirect" in {
         getWithUnAuthenticated { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") { x => x } must include("/account/sign-in")
+          redirectLocation(result).fold("") {identity} must include("/account/sign-in")
         }
       }
     }
@@ -71,7 +71,7 @@ class AMLSGenericControllerSpec extends PlaySpec with MockitoSugar with  OneServ
           submitWithUnAuthorisedUser {
             result =>
               status(result) must be(SEE_OTHER)
-              redirectLocation(result).fold("") {x=>x} must include("/unauthorised")
+              redirectLocation(result).fold("") {identity} must include("/unauthorised")
           }
         }
       }
@@ -81,7 +81,7 @@ class AMLSGenericControllerSpec extends PlaySpec with MockitoSugar with  OneServ
           submitWithUnAuthenticated {
             result =>
               status(result) must be(SEE_OTHER)
-              redirectLocation(result).fold("") {x=>x} must include("/account/sign-in")
+              redirectLocation(result).fold("") {identity} must include("/account/sign-in")
           }
         }
       }

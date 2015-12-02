@@ -67,14 +67,14 @@ class EmployedWithinTheBusinessControllerSpec extends PlaySpec with OneServerPer
     "navigate to the next page if Yes is supplied" in {
       submitWithYesOption { futureResult =>
         status(futureResult) must be(SEE_OTHER)
-        redirectLocation(futureResult).fold("") { x => x } must include("/role-within-business")
+        redirectLocation(futureResult).fold("") {identity} must include("/role-within-business")
       }
     }
 
     "navigate to the next page if No is supplied" in {
       submitWithNoOption { futureResult =>
         status(futureResult) must be(SEE_OTHER)
-        redirectLocation(futureResult).fold("") { x => x } must include("/role-for-business")
+        redirectLocation(futureResult).fold("") {identity} must include("/role-for-business")
       }
     }
 

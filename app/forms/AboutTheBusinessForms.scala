@@ -1,13 +1,21 @@
 package forms
 
-import models.{BusinessHasEmail, BusinessWithVAT, BusinessHasWebsite, TelephoningBusiness}
+import config.AmlsPropertiesReader._
+import models._
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.{VATNumberValidator, WebAddressValidator, EmailValidator}
+import utils.validation.{RadioGroupPrefRegForMLRWithTextValidator, NumberValidator, WebAddressValidator, EmailValidator}
 
 object AboutTheBusinessForms {
+
+  def applyRegisteredForMLRFormMapping = (hasMlr:(Boolean, Boolean), mlrNumber: Option[String], prevMlrNumber: Option[String]) =>
+    RegisteredForMLR(hasMlr._1, hasMlr._2, mlrNumber, prevMlrNumber)
+
+  def unapplyRegisteredForMLRFormMapping = (registeredForMLR: RegisteredForMLR) =>
+    Some( ( (registeredForMLR.hasDigitalMLR, registeredForMLR.hasNonDigitalMLR), registeredForMLR.mlrNumber,
+      registeredForMLR.prevMlrNumber ) )
 
   val businessHasWebsiteFormMapping = mapping(
     "hasWebsite" -> mandatoryBooleanWithText("website", "true",
@@ -23,9 +31,9 @@ object AboutTheBusinessForms {
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val businessRegForVATFormMapping = mapping(
-    "hasVAT" -> mandatoryBooleanWithText("VATNum", "true",
-      "error.required", "error.required", "error.notrequired"),
-    "VATNum" -> optional(VATNumberValidator.vatNumber("err.invalidLength", "error.invalid"))
+    "hasVAT" -> mandatoryBooleanWithText("VATNum", "true", "error.required", "error.required", "error.notrequired"),
+    "VATNum" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthVAT"), getIntFromProperty("validationMaxLengthVAT")))
   )(BusinessWithVAT.apply)(BusinessWithVAT.unapply)
 
   val businessRegForVATForm = Form(businessRegForVATFormMapping)
@@ -35,4 +43,15 @@ object AboutTheBusinessForms {
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
 
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)
+
+  val RegisteredForMLRFormMapping = mapping(
+    "hasMLR" ->  RadioGroupPrefRegForMLRWithTextValidator.mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
+    "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthMLR"))),
+
+    "prevMlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthPrevMLR")))
+  )(applyRegisteredForMLRFormMapping )(unapplyRegisteredForMLRFormMapping)
+
+  val RegisteredForMLRForm = Form(RegisteredForMLRFormMapping)
 }
