@@ -35,3 +35,6 @@ POST        /business-with-VAT              controllers.aboutthebusiness.Busines
 
 GET         /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.get()
 POST        /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.post()
+
+GET         /registered-for-MLR             controllers.aboutthebusiness.HaveYouRegForMLRBeforeController.get()
+POST        /registered-for-MLR            controllers.aboutthebusiness.HaveYouRegForMLRBeforeController.post()

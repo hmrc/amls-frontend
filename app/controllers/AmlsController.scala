@@ -17,7 +17,7 @@ trait AmlsController extends FrontendController with Actions {
   val amlsService: AmlsService
   val dataCacheConnector: DataCacheConnector
 
-  def onPageLoad = AuthorisedFor(AmlsRegime).async {
+  def onPageLoad = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit user =>
       implicit request =>
         dataCacheConnector.fetchDataShortLivedCache[LoginDetails](user.user.oid,"Data") map {
@@ -27,7 +27,7 @@ trait AmlsController extends FrontendController with Actions {
   }
 
 
-  def onSubmit = AuthorisedFor(AmlsRegime).async {
+  def onSubmit = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit user =>
       implicit request =>
         loginDetailsForm.bindFromRequest.fold(

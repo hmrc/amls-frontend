@@ -120,7 +120,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
     "Successfully navigate to the next page if the details are valid" in {
       val futureResult = telephoneBusinessFormSubmissionHelper(ThirtyDigitNumber, Some(ThirtyDigitNumber))
       status(futureResult) must be(SEE_OTHER)
-      redirectLocation(futureResult).fold("") { x => x } must include("/business-has-Email")
+      redirectLocation(futureResult).fold("") {identity} must include("/business-has-Email")
     }
 
   }
