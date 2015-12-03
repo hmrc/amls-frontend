@@ -9,10 +9,9 @@ import utils.validation.PhoneNumberValidator._
 import utils.validation.TextValidator._
 import utils.validation.{EmailValidator, NumberValidator, RadioGroupPrefRegForMLRWithTextValidator, WebAddressValidator}
 
-
 object AboutTheBusinessForms {
-
-  def applyRegisteredForMLRFormMapping = (hasMlr:(Boolean, Boolean), mlrNumber: Option[String], prevMlrNumber: Option[String]) =>
+  def applyRegisteredForMLRFormMapping = (hasMlr:(Boolean, Boolean), mlrNumber: Option[String],
+                                          prevMlrNumber: Option[String]) =>
     RegisteredForMLR(hasMlr._1, hasMlr._2, mlrNumber, prevMlrNumber)
 
   def unapplyRegisteredForMLRFormMapping = (registeredForMLR: RegisteredForMLR) =>
@@ -22,14 +21,17 @@ object AboutTheBusinessForms {
   val businessHasWebsiteFormMapping = mapping(
     "hasWebsite" -> mandatoryBooleanWithText("website", "true",
       "error.required", "error.required", "error.notrequired"),
-    "website" -> optional(WebAddressValidator.webAddress("err.invalidLength", "error.invalid"))
+    "website" -> optional(WebAddressValidator.webAddress("err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthWebAddress")))
   )(BusinessHasWebsite.apply)(BusinessHasWebsite.unapply)
 
   val businessHasWebsiteForm = Form(businessHasWebsiteFormMapping)
 
   val telephoningBusinessForm = Form(mapping(
-    "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"),
-    "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength", "telephoningbusiness.error.invalidphonenumber"))
+    "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength",
+      "telephoningbusiness.error.invalidphonenumber", getIntFromProperty("validationMaxLengthPhoneNo")),
+    "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength",
+      "telephoningbusiness.error.invalidphonenumber", getIntFromProperty("validationMaxLengthPhoneNo")))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val registeredOfficeForm = Form(mapping(
@@ -46,13 +48,15 @@ object AboutTheBusinessForms {
   val businessRegForVATForm = Form(businessRegForVATFormMapping)
 
   val BusinessHasEmailFormMapping = mapping(
-    "email" -> EmailValidator.mandatoryEmail("error.required", "err.invalidLength", "error.invalid")
+    "email" -> EmailValidator.mandatoryEmail("error.required", "err.invalidLength", "error.invalid",
+      getIntFromProperty("validationMaxLengthEmail"))
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
 
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)
 
   val RegisteredForMLRFormMapping = mapping(
-    "hasMLR" ->  RadioGroupPrefRegForMLRWithTextValidator.mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
+    "hasMLR" ->  RadioGroupPrefRegForMLRWithTextValidator.mandatoryBooleanWithText("mlrNumber",
+      "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
     "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
       getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthMLR"))),
 

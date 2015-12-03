@@ -4,7 +4,6 @@ import play.api.data.{Forms, FormError}
 import play.api.data.format.Formatter
 import scala.collection.mutable.ListBuffer
 import uk.gov.hmrc.play.validators.Validators.isPostcodeLengthValid
-import config.AmlsPropertiesReader.getProperty
 
 object AddressValidator extends FormValidator {
 
@@ -57,7 +56,11 @@ object AddressValidator extends FormValidator {
                                blankMandatoryAddrLineMessageKey: String,
                                blankAllMandatoryAddrLinesMessageKey: String,
                                invalidAddressLineMessageKey:String,
-                               blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String) = new Formatter[String] {
+                               blankPostcodeMessageKey:String,
+                               invalidPostcodeMessageKey: String,
+                               maxLengthAddressLines:Int,
+                               ukISOCountryCode:String
+                                ) = new Formatter[String] {
     override def bind(key: String, data: Map[String, String]) = {
       val errors = new scala.collection.mutable.ListBuffer[FormError]()
       val addr = getAddrDetails(data, key, addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey)
@@ -68,17 +71,17 @@ object AddressValidator extends FormValidator {
       } else {
 
         validateMandatoryAddressLine(key, addr._1,
-          getProperty("validationMaxLengthAddresslines").trim.toInt, blankMandatoryAddrLineMessageKey,
+          maxLengthAddressLines, blankMandatoryAddrLineMessageKey,
           invalidAddressLineMessageKey, errors)
         validateMandatoryAddressLine(addr2Key, addr._2,
-          getProperty("validationMaxLengthAddresslines").trim.toInt, blankMandatoryAddrLineMessageKey,
+          maxLengthAddressLines, blankMandatoryAddrLineMessageKey,
           invalidAddressLineMessageKey, errors)
         validateOptionalAddressLine(addr3Key, addr._3,
-          getProperty("validationMaxLengthAddresslines").trim.toInt, invalidAddressLineMessageKey, errors)
+          maxLengthAddressLines, invalidAddressLineMessageKey, errors)
         validateOptionalAddressLine(addr4Key, addr._4,
-          getProperty("validationMaxLengthAddresslines").trim.toInt, invalidAddressLineMessageKey, errors)
+          maxLengthAddressLines, invalidAddressLineMessageKey, errors)
       }
-      if (addr._6.length==0 || addr._6 == getProperty("ukIsoCountryCode")) {
+      if (addr._6.length==0 || addr._6 == ukISOCountryCode) {
         validatePostcode(addr._5, postcodeKey, blankPostcodeMessageKey, invalidPostcodeMessageKey, errors)
       }
       if (errors.isEmpty) {
@@ -97,10 +100,12 @@ object AddressValidator extends FormValidator {
                postcodeKey:String, countryCodeKey: String,
                blankMandatoryAddrLineMessageKey: String, blankAllMandatoryAddrLinesMessageKey: String,
                invalidAddressLineMessageKey:String,
-               blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String) =
+               blankPostcodeMessageKey:String, invalidPostcodeMessageKey: String,
+               maxLengthAddressLines:Int,
+               ukISOCountryCode:String) =
     Forms.of(addressFormatter(addr2Key, addr3Key, addr4Key, postcodeKey, countryCodeKey,
       blankMandatoryAddrLineMessageKey, blankAllMandatoryAddrLinesMessageKey, invalidAddressLineMessageKey,
-      blankPostcodeMessageKey, invalidPostcodeMessageKey))
+      blankPostcodeMessageKey, invalidPostcodeMessageKey, maxLengthAddressLines, ukISOCountryCode))
 
 
 

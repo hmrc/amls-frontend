@@ -8,16 +8,20 @@ import utils.validation.AddressValidator._
 
 class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerSuite  {
 
+  private val maxLengthAddressLines = 40
+  private val ukISOCountryCode = "GB"
+
   "address" should {
     "respond suitably to all mandatory lines being blank" in {
       val allMandatoryBlank = Map(
         "addr1key"->"",
         "addr2key"->"",
         "postcodekey"->"CA3 9SD",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(allMandatoryBlank)
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
+        maxLengthAddressLines, ukISOCountryCode).bind(allMandatoryBlank)
         .left.getOrElse(Nil).contains(FormError("", "all-mandatory-blank")) mustBe true
     }
 
@@ -26,10 +30,11 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr1key"->"a",
         "addr2key"->"",
         "postcodekey"->"CA3 9SD",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       val mapping = address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode")
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
+        maxLengthAddressLines, ukISOCountryCode)
         .binder.bind("addr1key", anyMandatoryBlank).left.getOrElse(Nil)
         .contains(FormError("addr2key", "mandatory-blank")) mustBe true
     }
@@ -41,10 +46,11 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr3key"->"addr3",
         "addr4key"->"addr4",
         "postcodekey"->"pcode",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(invalidLine2)
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
+        maxLengthAddressLines, ukISOCountryCode).bind(invalidLine2)
         .left.getOrElse(Nil).contains(FormError("addr2key", "invalid-line")) mustBe true
     }
 
@@ -55,10 +61,11 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr3key"->"addr3",
         "addr4key"->"addr4",
         "postcodekey"->"",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(blankPostcode)
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
+        maxLengthAddressLines, ukISOCountryCode).bind(blankPostcode)
         .left.getOrElse(Nil).contains(FormError("postcodekey", "blank-postcode")) mustBe true
     }
 
@@ -69,16 +76,18 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr3key"->"addr3",
         "addr4key"->"addr4",
         "postcodekey"->"CC!",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode").bind(invalidPostcode)
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
+        maxLengthAddressLines, ukISOCountryCode).bind(invalidPostcode)
         .left.getOrElse(Nil).contains(FormError("postcodekey", "invalid-postcode")) mustBe true
     }
 
     "respond suitably when unbound" in {
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
-        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode")
+        "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
+        maxLengthAddressLines, ukISOCountryCode)
         .binder.unbind("addr2key", "hello") mustBe
           Map( "addr2key" -> "hello")
     }

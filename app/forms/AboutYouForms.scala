@@ -10,19 +10,18 @@ import utils.validation.TextValidator
 
 object AboutYouForms {
 
-  val yourNameFormMapping = mapping (
-  "firstname" -> TextValidator.mandatoryText("err.titleNotEntered.first_name",
-                                              "err.invalidLength","validationMaxLengthYourNameFirstName"),
-  "middlename" -> optional(TextValidator.mandatoryText("",
-                                                        "err.invalidLength","validationMaxLengthYourNameFirstName")),
-  "lastname" -> TextValidator.mandatoryText("err.titleNotEntered.last_name",
-                                              "err.invalidLength","validationMaxLengthYourNameFirstName")
-
-  )(YourName.apply)(YourName.unapply)
+  val yourNameFormMapping = mapping(
+    "firstname" -> TextValidator.mandatoryText("err.titleNotEntered.first_name",
+      "err.invalidLength", getIntFromProperty("validationMaxLengthFirstName")),
+    "middlename" -> optional(TextValidator.mandatoryText("", "err.invalidLength",
+      getIntFromProperty("validationMaxLengthFirstName"))),
+    "lastname" -> TextValidator.mandatoryText("err.titleNotEntered.last_name", "err.invalidLength",
+      getIntFromProperty("validationMaxLengthFirstName"))
+  ) (YourName.apply)(YourName.unapply)
 
   val yourNameForm = Form(yourNameFormMapping)
 
-  val employedWithTheBusinessFormMapping = mapping (
+  val employedWithTheBusinessFormMapping = mapping(
     "isEmployed" -> mandatoryBoolean("error.required")
   )(EmployedWithinTheBusiness.apply)(EmployedWithinTheBusiness.unapply)
 

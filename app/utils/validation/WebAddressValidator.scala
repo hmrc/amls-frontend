@@ -1,29 +1,27 @@
 package utils.validation
 
-import config.AmlsPropertiesReader._
 import play.api.data.Forms._
 import play.api.data.Mapping
-import play.api.data.validation.{Valid, Invalid, Constraint}
+import play.api.data.validation.{Constraint, Invalid, Valid}
 
 
 object WebAddressValidator extends FormValidator {
   def webAddress(invalidLengthMessageKey: String,
-                  invalidValueMessageKey: String) : Mapping[String] = {
-    val blankConstraint = Constraint("Blank")( {
-      t:String =>
+                 invalidValueMessageKey: String,
+                 maxLengthWebAddress: Int): Mapping[String] = {
+    val blankConstraint = Constraint("Blank")({
+      t: String =>
         t match {
-          case t if t.length > getProperty("validationMaxLengthWebAddress").toInt =>
-            Invalid(invalidLengthMessageKey)
-          case _ =>
-            Valid
+          case t if t.length > maxLengthWebAddress => Invalid(invalidLengthMessageKey)
+          case _ => Valid
         }
-    } )
-    val valueConstraint = Constraint("Value")( {
-      t:String => t match {
+    })
+    val valueConstraint = Constraint("Value")({
+      t: String => t match {
         case t if t.matches(webAddressRegex.regex) => Valid
         case _ => Invalid(invalidValueMessageKey)
       }
-    } )
+    })
     text.verifying(stopOnFirstFail(blankConstraint, valueConstraint))
   }
 
