@@ -17,7 +17,7 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr1key"->"",
         "addr2key"->"",
         "postcodekey"->"CA3 9SD",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
         "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
@@ -30,7 +30,7 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr1key"->"a",
         "addr2key"->"",
         "postcodekey"->"CA3 9SD",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       val mapping = address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
         "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
@@ -46,7 +46,7 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr3key"->"addr3",
         "addr4key"->"addr4",
         "postcodekey"->"pcode",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
         "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
@@ -61,7 +61,7 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr3key"->"addr3",
         "addr4key"->"addr4",
         "postcodekey"->"",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
         "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",
@@ -76,7 +76,7 @@ class AddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerS
         "addr3key"->"addr3",
         "addr4key"->"addr4",
         "postcodekey"->"CC!",
-        "countrycodekey"->"GB"
+        "countrycodekey"->ukISOCountryCode
       )
       address("addr2key","addr3key","addr4key","postcodekey", "countrycodekey",
         "mandatory-blank", "all-mandatory-blank", "invalid-line","blank-postcode","invalid-postcode",

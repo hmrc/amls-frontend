@@ -12,11 +12,11 @@ object AboutYouForms {
 
   val yourNameFormMapping = mapping(
     "firstname" -> TextValidator.mandatoryText("err.titleNotEntered.first_name",
-      "err.invalidLength", getProperty("validationMaxLengthFirstName").toInt),
+      "err.invalidLength", getIntFromProperty("validationMaxLengthFirstName")),
     "middlename" -> optional(TextValidator.mandatoryText("", "err.invalidLength",
-      getProperty("validationMaxLengthFirstName").toInt)),
+      getIntFromProperty("validationMaxLengthFirstName"))),
     "lastname" -> TextValidator.mandatoryText("err.titleNotEntered.last_name", "err.invalidLength",
-      getProperty("validationMaxLengthFirstName").toInt)
+      getIntFromProperty("validationMaxLengthFirstName"))
   ) (YourName.apply)(YourName.unapply)
 
   val yourNameForm = Form(yourNameFormMapping)

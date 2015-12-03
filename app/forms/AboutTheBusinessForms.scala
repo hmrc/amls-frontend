@@ -9,9 +9,7 @@ import utils.validation.PhoneNumberValidator._
 import utils.validation.TextValidator._
 import utils.validation.{EmailValidator, NumberValidator, RadioGroupPrefRegForMLRWithTextValidator, WebAddressValidator}
 
-
 object AboutTheBusinessForms {
-
   def applyRegisteredForMLRFormMapping = (hasMlr:(Boolean, Boolean), mlrNumber: Option[String],
                                           prevMlrNumber: Option[String]) =>
     RegisteredForMLR(hasMlr._1, hasMlr._2, mlrNumber, prevMlrNumber)
@@ -24,16 +22,16 @@ object AboutTheBusinessForms {
     "hasWebsite" -> mandatoryBooleanWithText("website", "true",
       "error.required", "error.required", "error.notrequired"),
     "website" -> optional(WebAddressValidator.webAddress("err.invalidLength", "error.invalid",
-      getProperty("validationMaxLengthWebAddress").toInt))
+      getIntFromProperty("validationMaxLengthWebAddress")))
   )(BusinessHasWebsite.apply)(BusinessHasWebsite.unapply)
 
   val businessHasWebsiteForm = Form(businessHasWebsiteFormMapping)
 
   val telephoningBusinessForm = Form(mapping(
     "businessPhoneNumber" -> mandatoryPhoneNumber("error.required", "err.invalidLength",
-      "telephoningbusiness.error.invalidphonenumber", getProperty("validationMaxLengthPhoneNo").toInt),
+      "telephoningbusiness.error.invalidphonenumber", getIntFromProperty("validationMaxLengthPhoneNo")),
     "mobileNumber" -> optional(mandatoryPhoneNumber("error.required", "err.invalidLength",
-      "telephoningbusiness.error.invalidphonenumber", getProperty("validationMaxLengthPhoneNo").toInt))
+      "telephoningbusiness.error.invalidphonenumber", getIntFromProperty("validationMaxLengthPhoneNo")))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val registeredOfficeForm = Form(mapping(
@@ -51,7 +49,7 @@ object AboutTheBusinessForms {
 
   val BusinessHasEmailFormMapping = mapping(
     "email" -> EmailValidator.mandatoryEmail("error.required", "err.invalidLength", "error.invalid",
-      getProperty("validationMaxLengthEmail").toInt)
+      getIntFromProperty("validationMaxLengthEmail"))
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
 
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)

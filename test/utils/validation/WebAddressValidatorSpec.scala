@@ -7,9 +7,10 @@ import utils.validation.WebAddressValidator._
 
 class WebAddressValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
 
+  private val maxLengthWebAddress = 100
   "webAddress" should {
     "return the webAddress if the webAddress is correct" in {
-      webAddress("invalid length", "invalid value", 100)
+      webAddress("invalid length", "invalid value", maxLengthWebAddress)
         .bind(Map("" -> "http://www.foufos.gr")) mustBe Right("http://www.foufos.gr")
     }
 
