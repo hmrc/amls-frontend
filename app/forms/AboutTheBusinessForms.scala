@@ -12,7 +12,8 @@ import utils.validation.{EmailValidator, NumberValidator, RadioGroupPrefRegForML
 
 object AboutTheBusinessForms {
 
-  def applyRegisteredForMLRFormMapping = (hasMlr:(Boolean, Boolean), mlrNumber: Option[String], prevMlrNumber: Option[String]) =>
+  def applyRegisteredForMLRFormMapping = (hasMlr:(Boolean, Boolean), mlrNumber: Option[String],
+                                          prevMlrNumber: Option[String]) =>
     RegisteredForMLR(hasMlr._1, hasMlr._2, mlrNumber, prevMlrNumber)
 
   def unapplyRegisteredForMLRFormMapping = (registeredForMLR: RegisteredForMLR) =>
@@ -22,7 +23,8 @@ object AboutTheBusinessForms {
   val businessHasWebsiteFormMapping = mapping(
     "hasWebsite" -> mandatoryBooleanWithText("website", "true",
       "error.required", "error.required", "error.notrequired"),
-    "website" -> optional(WebAddressValidator.webAddress("err.invalidLength", "error.invalid", getProperty("validationMaxLengthWebAddress").toInt))
+    "website" -> optional(WebAddressValidator.webAddress("err.invalidLength", "error.invalid",
+      getProperty("validationMaxLengthWebAddress").toInt))
   )(BusinessHasWebsite.apply)(BusinessHasWebsite.unapply)
 
   val businessHasWebsiteForm = Form(businessHasWebsiteFormMapping)
@@ -48,13 +50,15 @@ object AboutTheBusinessForms {
   val businessRegForVATForm = Form(businessRegForVATFormMapping)
 
   val BusinessHasEmailFormMapping = mapping(
-    "email" -> EmailValidator.mandatoryEmail("error.required", "err.invalidLength", "error.invalid", getProperty("validationMaxLengthEmail").toInt)
+    "email" -> EmailValidator.mandatoryEmail("error.required", "err.invalidLength", "error.invalid",
+      getProperty("validationMaxLengthEmail").toInt)
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply)
 
   val businessHasEmailForm = Form(BusinessHasEmailFormMapping)
 
   val RegisteredForMLRFormMapping = mapping(
-    "hasMLR" ->  RadioGroupPrefRegForMLRWithTextValidator.mandatoryBooleanWithText("mlrNumber", "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
+    "hasMLR" ->  RadioGroupPrefRegForMLRWithTextValidator.mandatoryBooleanWithText("mlrNumber",
+      "prevMlrNumber", "error.required", "error.required", "error.notrequired"),
     "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "error.invalid",
       getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthMLR"))),
 
