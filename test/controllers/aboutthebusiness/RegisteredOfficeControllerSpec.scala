@@ -1,6 +1,7 @@
 package controllers.aboutthebusiness
 
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
+import forms.AboutTheBusinessForms
 import forms.AboutTheBusinessForms.registeredOfficeForm
 import models._
 import org.mockito.Matchers._
@@ -64,8 +65,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
         (any(), any(), any())).thenReturn(Future.successful(Some(registeredOfficeSave4Later)))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
-      val optionTuple: Option[String] = RegisteredOffice.unapplyString(registeredOffice)
-      optionTuple.getOrElse("") must be("1")
+      val booleanMapping = AboutTheBusinessForms.unapplyFromModel(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = true)) //RegisteredOffice.unapplyString(registeredOffice)
+      //val seq = AboutTheBusinessForms.StringToBooleanMapping map { x => if (x._2 == booleanMapping.get) x._1 }
+      val isMappingValid = AboutTheBusinessForms.StringToBooleanMapping contains ("1", booleanMapping.get)
+      isMappingValid must be (true)
     }
   }
 

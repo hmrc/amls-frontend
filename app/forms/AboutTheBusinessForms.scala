@@ -41,12 +41,12 @@ object AboutTheBusinessForms {
     Some(Tuple2( registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame ))
   }
 
-  private val ValidValuesForRadioButton = Seq("1", "2", "3")
-  private val TupleMapping = Seq((true, true), (true, false), (false, false))
-  private val mappedValuesForBinding: Seq[(String, (Boolean, Boolean))] = ValidValuesForRadioButton.zip(TupleMapping)
+  val ValidValuesForRadioButton = Seq("1", "2", "3")
+  val TupleMapping = Seq((true, true), (true, false), (false, false))
+  val StringToBooleanMapping: Seq[(String, (Boolean, Boolean))] = ValidValuesForRadioButton.zip(TupleMapping)
 
   val registeredOfficeForm = Form(mapping(
-  "isRegisteredOffice" -> mandatoryBooleanTuple( mappedValuesForBinding)
+  "isRegisteredOffice" -> mandatoryBooleanTuple(StringToBooleanMapping)
   )(applyToModel)(unapplyFromModel))
 
 
