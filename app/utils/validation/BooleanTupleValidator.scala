@@ -1,12 +1,12 @@
 package utils.validation
 
 import play.api.data.format.Formatter
-import play.api.data.{FormError, Forms}
+import play.api.data.{FieldMapping, FormError, Forms}
 
 object BooleanTupleValidator extends FormValidator {
   private var validationTuples: Seq[(String, (Boolean, Boolean))] = Nil
 
-  def mandatoryBooleanTuple(tuples: Seq[(String, (Boolean, Boolean))]) = {
+  def mandatoryBooleanTuple(tuples: Seq[(String, (Boolean, Boolean))]): FieldMapping[(Boolean, Boolean)] = {
     validationTuples = tuples
     Forms.of(mandatoryBooleanTupleFormatter)
   }
@@ -20,10 +20,10 @@ object BooleanTupleValidator extends FormValidator {
       }
     }
 
-    override def unbind(key: String, value: (Boolean, Boolean)) = {
+    override def unbind(key: String, value: (Boolean, Boolean)): Map[String, String] = {
       validationTuples find (_._2 == value) match {
-        case Some(x) => Map(("", key), ("", x._1))
-        case None => Map(("",""), ("", ""))
+        case Some(x) => Map(key -> x._1)
+        case None => Map(key -> "")
       }
     }
 

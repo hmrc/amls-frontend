@@ -6,7 +6,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.TextValidator._
+import utils.validation.BooleanTupleValidator._
 import utils.validation.{EmailValidator, NumberValidator, RadioGroupPrefRegForMLRWithTextValidator, WebAddressValidator}
 
 object AboutTheBusinessForms {
@@ -34,9 +34,20 @@ object AboutTheBusinessForms {
       "telephoningbusiness.error.invalidphonenumber", getIntFromProperty("validationMaxLengthPhoneNo")))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
+  def applyToModel(tuple: (Boolean, Boolean)): RegisteredOffice = {
+    RegisteredOffice(tuple._1, tuple._2)
+  }
+  def unapplyFromModel(registeredOffice: RegisteredOffice): Some[(Boolean, Boolean)] = {
+    Some(Tuple2( registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame ))
+  }
+
+  private val ValidValuesForRadioButton = Seq("1", "2", "3")
+  private val TupleMapping = Seq((true, true), (true, false), (false, false))
+  private val mappedValuesForBinding: Seq[(String, (Boolean, Boolean))] = ValidValuesForRadioButton.zip(TupleMapping)
+
   val registeredOfficeForm = Form(mapping(
-    "isRegisteredOffice" -> mandatoryText("generic.please_specify")
-  )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
+  "isRegisteredOffice" -> mandatoryBooleanTuple( mappedValuesForBinding)
+  )(applyToModel)(unapplyFromModel))
 
 
   val businessRegForVATFormMapping = mapping(

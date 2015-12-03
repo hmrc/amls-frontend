@@ -7,11 +7,11 @@ import utils.validation.BooleanTupleValidator._
 
 class BooleanTupleValidatorSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
 
+  private val InvalidValuesForRadioButton = Seq("Invalid", "****")
   private val ValidValuesForRadioButton = Seq("First", "Second", "Third")
   private val TupleMapping = Seq((true, true), (true, false), (false, true))
-  private val InvalidValuesForRadioButton = Seq("Invalid", "****")
   private val mappedValuesForBinding: Seq[(String, (Boolean, Boolean))] = ValidValuesForRadioButton.zip(TupleMapping)
-  
+
   "BooleanTupleValidator bind" should {
 
     "accept valid selections" in {
