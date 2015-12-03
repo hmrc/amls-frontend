@@ -4,7 +4,6 @@ import play.api.data.{Forms, FormError}
 import play.api.data.format.Formatter
 import scala.collection.mutable.ListBuffer
 import uk.gov.hmrc.play.validators.Validators.isPostcodeLengthValid
-import config.AmlsPropertiesReader.getProperty
 
 object AddressValidator extends FormValidator {
 
