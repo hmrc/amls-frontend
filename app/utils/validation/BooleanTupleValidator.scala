@@ -2,6 +2,7 @@ package utils.validation
 
 import play.api.data.format.Formatter
 import play.api.data.{FieldMapping, FormError, Forms}
+import scala.util.{Try, Success, Failure}
 
 object BooleanTupleValidator extends FormValidator {
 
@@ -12,9 +13,13 @@ object BooleanTupleValidator extends FormValidator {
 
     def mandatoryBooleanTupleFormatter = new Formatter[(Boolean, Boolean)] {
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], (Boolean, Boolean)] = {
-        stringToBooleanTupleMappings find (_._1 == data(key)) match {
-          case Some(x) => Right(x._2)
-          case None => Left(Seq(FormError(key, "error.something")))
+        Try(data.apply(key)) match {
+          case Failure(e) => Left(Seq(FormError(key, "error.something")))
+          case Success(fieldValue) =>
+            stringToBooleanTupleMappings find (_._1 == fieldValue) match {
+              case Some(x) => Right(x._2)
+              case None => Left(Seq(FormError(key, "error.something")))
+          }
         }
       }
 
