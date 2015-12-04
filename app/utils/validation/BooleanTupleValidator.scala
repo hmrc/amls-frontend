@@ -5,9 +5,12 @@ import play.api.data.{FieldMapping, FormError, Forms}
 
 object BooleanTupleValidator extends FormValidator {
 
-  def mandatoryBooleanTuple(tuples: Seq[(String, (Boolean, Boolean))]): FieldMapping[(Boolean, Boolean)] = {
+  val StringToBooleanTupleMappings123ToTTTFFF: Seq[(String, (Boolean, Boolean))] = Seq("1", "2", "3")
+    .zip(Seq((true, true), (true, false), (false, false)))
 
-    val validationTuples = tuples
+  def mandatoryBooleanTuple(stringToBooleanTupleMappings: Seq[(String, (Boolean, Boolean))]): FieldMapping[(Boolean, Boolean)] = {
+
+    val validationTuples = stringToBooleanTupleMappings
 
     def mandatoryBooleanTupleFormatter = new Formatter[(Boolean, Boolean)] {
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], (Boolean, Boolean)] = {

@@ -14,6 +14,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.validation.BooleanTupleValidator
 
 import scala.concurrent.Future
 
@@ -57,7 +58,6 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.postcode.getOrElse(""))
     }
 
-
     "load the Registered Office details from the Cache" in {
       when(mockSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
         thenReturn(Future.successful(businessCustomerDetails))
@@ -65,9 +65,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
         (any(), any(), any())).thenReturn(Future.successful(Some(registeredOfficeSave4Later)))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
-      val booleanMapping = AboutTheBusinessForms.unapplyFromModel(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = true)) //RegisteredOffice.unapplyString(registeredOffice)
-      //val seq = AboutTheBusinessForms.StringToBooleanMapping map { x => if (x._2 == booleanMapping.get) x._1 }
-      val isMappingValid = AboutTheBusinessForms.StringToBooleanMapping contains ("1", booleanMapping.get)
+      val booleanMapping = RegisteredOffice.unapply(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = true)) //RegisteredOffice.unapplyString(registeredOffice)
+      val isMappingValid = BooleanTupleValidator.StringToBooleanTupleMappings123ToTTTFFF contains ("1", booleanMapping.get)
       isMappingValid must be (true)
     }
   }

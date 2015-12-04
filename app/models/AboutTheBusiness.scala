@@ -70,6 +70,15 @@ object RegisteredOffice {
   def fromRegisteredOfficeSave4Later(registeredOfficeSave4Later: RegisteredOfficeSave4Later): RegisteredOffice = {
     RegisteredOffice(registeredOfficeSave4Later.isRegisteredOffice, registeredOfficeSave4Later.isCorrespondenceAddressSame)
   }
+
+  def fromBooleanTuple(tuple: (Boolean, Boolean)): RegisteredOffice = {
+    RegisteredOffice(tuple._1, tuple._2)
+  }
+
+  def toBooleanTuple(registeredOffice: RegisteredOffice): Some[(Boolean, Boolean)] = {
+    Some(Tuple2( registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame ))
+  }
+
 }
 
 case class BusinessWithVAT(hasVAT: Boolean, VATNum: Option[String])

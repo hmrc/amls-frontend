@@ -34,21 +34,9 @@ object AboutTheBusinessForms {
       "telephoningbusiness.error.invalidphonenumber", getIntFromProperty("validationMaxLengthPhoneNo")))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
-  def applyToModel(tuple: (Boolean, Boolean)): RegisteredOffice = {
-    RegisteredOffice(tuple._1, tuple._2)
-  }
-  def unapplyFromModel(registeredOffice: RegisteredOffice): Some[(Boolean, Boolean)] = {
-    Some(Tuple2( registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame ))
-  }
-
-  val ValidValuesForRadioButton = Seq("1", "2", "3")
-  val TupleMapping = Seq((true, true), (true, false), (false, false))
-  val StringToBooleanMapping: Seq[(String, (Boolean, Boolean))] = ValidValuesForRadioButton.zip(TupleMapping)
-
   val registeredOfficeForm = Form(mapping(
-  "isRegisteredOffice" -> mandatoryBooleanTuple(StringToBooleanMapping)
-  )(applyToModel)(unapplyFromModel))
-
+    "isRegisteredOffice" -> mandatoryBooleanTuple(StringToBooleanTupleMappings123ToTTTFFF)
+  )(RegisteredOffice.fromBooleanTuple)(RegisteredOffice.toBooleanTuple))
 
   val businessRegForVATFormMapping = mapping(
     "hasVAT" -> mandatoryBooleanWithText("VATNum", "true", "error.required", "error.required", "error.notrequired"),
