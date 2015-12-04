@@ -10,6 +10,7 @@ class BooleanTupleValidatorSpec extends PlaySpec with MockitoSugar with OneServe
   private val InvalidValuesForRadioButton = Seq("Invalid", "****")
   private val ValidValuesForRadioButton = Seq("First", "Second", "Third")
   private val TupleMapping = Seq((true, true), (true, false), (false, true))
+  private val InvalidTupleMapping = (false,false)
   private val mappedValuesForBinding: Seq[(String, (Boolean, Boolean))] = ValidValuesForRadioButton.zip(TupleMapping)
 
   "BooleanTupleValidator bind" should {
@@ -32,10 +33,14 @@ class BooleanTupleValidatorSpec extends PlaySpec with MockitoSugar with OneServe
   "BooleanTupleValidator unbind" should {
     "accept valid values" in {
       val mapping = mandatoryBooleanTuple(mappedValuesForBinding)
-      InvalidValuesForRadioButton.foreach { x =>
-        mapping.binder.unbind("", (true, true)) mustBe Map("" -> "First")
+      mappedValuesForBinding.foreach { x =>
+        mapping.binder.unbind("", x._2) mustBe Map("" -> x._1)
       }
     }
-  }
 
+    "accept invalid value" in {
+      val mapping = mandatoryBooleanTuple(mappedValuesForBinding)
+        mapping.binder.unbind("", InvalidTupleMapping) mustBe Map("" -> "")
+      }
+    }
 }
