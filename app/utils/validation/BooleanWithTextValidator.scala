@@ -24,7 +24,7 @@ object BooleanWithTextValidator extends FormValidator {
     override def unbind(key: String, value: Boolean): Map[String, String] = Map(key -> value.toString)
   }
 
-  private def checkTextField(shouldTextBePresent: String => Boolean, data: String, n: String, textFieldKey: String, messageKey: String) = {
+  private def checkTextField(shouldTextBePresent: String => Boolean, data: String, n: String, textFieldKey: String, messageKey: String): Either[Seq[FormError], Boolean] = {
     data match {
       case textValue if shouldTextBePresent(textValue) => Left(Seq(FormError(textFieldKey, messageKey)))
       case _ => Right(n.toBoolean)
