@@ -66,8 +66,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
       val booleanMapping = RegisteredOffice.unapply(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = true)) //RegisteredOffice.unapplyString(registeredOffice)
-      val isMappingValid = BooleanTupleValidator.StringToBooleanTupleMappings123ToTTTFFF contains ("1", booleanMapping.get)
-      isMappingValid must be (true)
+      booleanMapping mustBe Some(Tuple2(true, true))
     }
   }
 

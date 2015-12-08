@@ -25,9 +25,17 @@ class BooleanTupleValidatorSpec extends PlaySpec with MockitoSugar with OneServe
     "reject invalid selection" in {
       val mapping = mandatoryBooleanTuple(mappedValuesForBinding)
       InvalidValuesForRadioButton.foreach { x =>
-        mapping.bind(Map("" -> x)).left.getOrElse(Nil) must contain(FormError("", "error.something"))
+        mapping.bind(Map("" -> x)).left.getOrElse(Nil) must contain(FormError("", "generic.please_specify"))
       }
     }
+
+    "report error invalid selection" in {
+      val mapping = mandatoryBooleanTuple(mappedValuesForBinding)
+      InvalidValuesForRadioButton.foreach { x =>
+        mapping.bind(Map()).left.getOrElse(Nil) must contain(FormError("", "generic.please_specify"))
+      }
+    }
+
   }
 
   "BooleanTupleValidator unbind" should {
