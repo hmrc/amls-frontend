@@ -1,6 +1,7 @@
 package controllers.aboutthebusiness
 
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
+import forms.AboutTheBusinessForms
 import forms.AboutTheBusinessForms.registeredOfficeForm
 import models._
 import org.mockito.Matchers._
@@ -13,6 +14,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.validation.BooleanTupleValidator
 
 import scala.concurrent.Future
 
@@ -56,7 +58,6 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.postcode.getOrElse(""))
     }
 
-
     "load the Registered Office details from the Cache" in {
       when(mockSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
         thenReturn(Future.successful(businessCustomerDetails))
@@ -64,8 +65,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
         (any(), any(), any())).thenReturn(Future.successful(Some(registeredOfficeSave4Later)))
       val futureResult = MockRegisteredOfficeController.get
       status(futureResult) must be(OK)
-      val optionTuple: Option[String] = RegisteredOffice.unapplyString(registeredOffice)
-      optionTuple.getOrElse("") must be("1")
+      val booleanMapping = RegisteredOffice.unapply(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = true)) //RegisteredOffice.unapplyString(registeredOffice)
+      booleanMapping mustBe Some(Tuple2(true, true))
     }
   }
 

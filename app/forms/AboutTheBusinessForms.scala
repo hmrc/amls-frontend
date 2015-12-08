@@ -6,7 +6,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
 import utils.validation.PhoneNumberValidator._
-import utils.validation.TextValidator._
+import utils.validation.BooleanTupleValidator._
 import utils.validation.{EmailValidator, NumberValidator, RadioGroupPrefRegForMLRWithTextValidator, WebAddressValidator}
 
 object AboutTheBusinessForms {
@@ -35,9 +35,8 @@ object AboutTheBusinessForms {
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val registeredOfficeForm = Form(mapping(
-    "isRegisteredOffice" -> mandatoryText("generic.please_specify")
-  )(RegisteredOffice.applyString)(RegisteredOffice.unapplyString))
-
+    "isRegisteredOffice" -> mandatoryBooleanTuple(StringToBooleanTupleMappings123ToTTTFFF)
+  )(RegisteredOffice.fromBooleanTuple)(RegisteredOffice.toBooleanTuple))
 
   val businessRegForVATFormMapping = mapping(
     "hasVAT" -> mandatoryBooleanWithText("VATNum", "true", "error.required", "error.required", "error.notrequired"),
