@@ -7,13 +7,13 @@
 @(registeredOfficeForm: Form[_], reviewBusinessDetails: BusinessCustomerDetails, optionsIsRegisteredOffice: Seq[(String,String)])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
-    title = Messages("title.registeredOffice")
+    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
+    title = Messages("aboutthebusiness.registeredoffice.title")
 ) {
 
     @formHelper(registeredOfficeForm, aboutthebusiness.routes.RegisteredOfficeController.post()) { implicit form: Form[_] =>
 
-<p>@Messages("registeredoffice.address.header")</p>
+<p>@Messages("aboutthebusiness.registeredoffice.addressheader")</p>
 
 <div class="panel-indent">
     <ul>
@@ -28,7 +28,7 @@
 <div class="form-group">
         @radioGroup(
             name = "isRegisteredOffice",
-            labelText = Messages("registeredoffice.is.address.correct"),
+            labelText = Messages("aboutthebusiness.registeredoffice.isaddresscorrect"),
             options = optionsIsRegisteredOffice
         )
 </div>

@@ -5,15 +5,15 @@
 @(businessHasEmailForm: Form[models.BusinessHasEmail])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("sectiontitle.aboutyou")),
-    title = Messages("lbl.businessEmailAddress")
+    sectionTitle = Some(Messages("aboutyou.sectiontitle")),
+    title = Messages("aboutthebusiness.whatisbusinessemail.title")
 ) {
 
       @formHelper(businessHasEmailForm, aboutthebusiness.routes.BusinessHasEmailController.post()) { implicit form: Form[_] =>
 
         @input(
             name = "email",
-            labelText = Messages("title.email")
+            labelText = Messages("aboutthebusiness.whatisbusinessemail.email")
         )
         @submit(Messages("button.saveandcontinue"))
     }

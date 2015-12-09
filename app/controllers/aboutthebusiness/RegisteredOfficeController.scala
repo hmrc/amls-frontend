@@ -13,9 +13,9 @@ import scala.concurrent.Future
 
 trait RegisteredOfficeController extends AMLSGenericController {
   def optionsIsRegisteredOffice(implicit lang: Lang) = Seq(
-    Messages("registeredoffice.lbl.yes.same") -> "1",
-    Messages("registeredoffice.lbl.yes.different") -> "2",
-    Messages("registeredoffice.lbl.no") -> "3"
+    Messages("aboutthebusiness.registeredoffice.isregoffice.yessame") -> "1",
+    Messages("aboutthebusiness.registeredoffice.isregoffice.yesdifferent") -> "2",
+    Messages("aboutthebusiness.registeredoffice.isregoffice.no") -> "3"
   )
 
   def dataCacheConnector: DataCacheConnector

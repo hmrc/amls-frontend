@@ -4,26 +4,26 @@
 @()(implicit request: Request[_])
 
 @main(
-sectionTitle = Some(Messages("amls.summary.sectiontitle")),
-title = Messages("amls.summary.title"),
+sectionTitle = Some(Messages("summary.sectiontitle")),
+title = Messages("summary.title"),
 serviceInfoContent = Some(Html("<span class=\"login-name\">AMLS registration for Acme Limited</span>"))
 ) {
 <div id="main-pane" class="column-three-quarters">
 <p>
-    @Messages("amls.summary.description")
+    @Messages("summary.description")
 </p>
 
 <table id="summary-table" class="summary-table">
     <tr>
-        <thead><tr><th class="section-name"> <span> <a href="">@Messages("amls.summary.businessactivities") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@aboutthebusiness.routes.RegisteredOfficeController.get()">@Messages("amls.summary.aboutbusiness") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="">@Messages("amls.summary.tradingpremises") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="">@Messages("amls.summary.bankdetails") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="">@Messages("amls.summary.responsiblepersons") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@aboutyou.routes.YourNameController.get()">@Messages("amls.summary.aboutyou") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="">@Messages("amls.summary.payment") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.businessactivities") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="@aboutthebusiness.routes.RegisteredOfficeController.get()">@Messages("summary.aboutbusiness") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.tradingpremises") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.bankdetails") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.responsiblepersons") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="@aboutyou.routes.YourNameController.get()">@Messages("summary.aboutyou") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.payment") </a> </span> </th></tr></thead>
         <thead><tr><th class="section-name">
-            <span class="locked" title='@Messages("amls.summary.declarationlocked.title")'>@Messages("amls.summary.declarationlocked")</span>
+            <span class="locked" title='@Messages("summary.declarationlocked.title")'>@Messages("summary.declarationlocked")</span>
         </th></tr></thead>
     </tr>
 </table>
