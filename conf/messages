@@ -4,24 +4,26 @@ amls.title=Anti-Money Laundering Supervision
 err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
-error.required = Please enter an item
-error.invalid = Please enter a valid item
-error.notrequired = No item should be entered
+err.required = Please enter an item
+err.invalid = Please enter a valid item
+err.notrequired = No item should be entered
 err.invalidLength = invalid length
-errors.summary = There are errors in your form submission
+err.summary = There are errors in your form submission
+err.pleasespecify = Please specify
 
-button.save = Save and continue
+
+button.saveandcontinue = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
-generic.other = Other
-generic.please_specify = Please specify
 
+lbl.other = Other
 lbl.yes = Yes
 lbl.no = No
 lbl.your_name = Your name
 lbl.first_name = First name
 lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
+lbl.pleasespecify = Please specify
 
 ## Login Page
 amls.Login.title= AMLS
@@ -43,8 +45,8 @@ amls.summary.declarationlocked = Declaration (locked)
 amls.summary.declarationlocked.title = You can’t complete this section yet
 
 ###### About You Section ######
-sectionTitle.about_you = About you
-title.your_name = Your name
+sectiontitle.aboutyou = About you
+title.yourname = Your name
 title.employedwithinthebusiness = Are you employed within the business?
 title.roleWithinBusiness = What is your role within the business?
 title.roleForBusiness = What is your role for the business?
@@ -70,8 +72,8 @@ title.registeredOffice = Registered office or principal place of business
 telephoningbusiness.title = Telephoning your business
 telephoningbusiness.phonenumber = Business phone number
 telephoningbusiness.mobilenumber = Mobile contact number (optional)
-telephoningbusiness.error.invalidphonenumber = Invalid Phone Number
-telephoningbusiness.error.invalidmobilenumber = Invalid Mobile Number
+telephoningbusiness.err.invalidphonenumber = Invalid Phone Number
+telephoningbusiness.err.invalidmobilenumber = Invalid Mobile Number
 
 title.businessRegForVAT = Is your business registered for VAT?
 title.registeredVATNum = What is your VAT registraton number?

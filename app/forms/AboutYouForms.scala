@@ -20,19 +20,19 @@ object AboutYouForms {
   )(YourName.apply)(YourName.unapply))
 
   val employedWithinTheBusinessForm = Form(mapping(
-    "isEmployed" -> mandatoryBoolean("error.required")
+    "isEmployed" -> mandatoryBoolean("err.required")
   )(EmployedWithinTheBusiness.apply)(EmployedWithinTheBusiness.unapply))
 
   val roleWithinBusinessForm = Form(mapping(
     "roleWithinBusiness" -> radioGroupWithOther("other", getProperty("roleWithinBusiness").split(",").reverse.head,
-      "error.required", "error.required", "error.invalid", getIntFromProperty("validationMaxLengthRoleWithinBusinessOther")),
+      "err.required", "err.required", "err.invalid", getIntFromProperty("validationMaxLengthRoleWithinBusinessOther")),
     "other" -> text
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply))
 
 
   val roleForBusinessForm = Form(mapping(
     "roleForBusiness" -> radioGroupWithOther("other", getProperty("roleForBusiness").split(",").reverse.head,
-      "error.required", "error.required", "error.invalid", getIntFromProperty("validationMaxLengthRoleForBusinessOther")),
+      "err.required", "err.required", "err.invalid", getIntFromProperty("validationMaxLengthRoleForBusinessOther")),
     "other" -> text
   )(RoleForBusiness.apply)(RoleForBusiness.unapply))
 

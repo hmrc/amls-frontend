@@ -6,8 +6,8 @@
 @(yourNameForm: Form[models.YourName])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("sectionTitle.about_you")),
-    title = Messages("title.your_name")
+    sectionTitle = Some(Messages("sectiontitle.aboutyou")),
+    title = Messages("title.yourname")
 ) {
 
       @formHelper(yourNameForm, aboutyou.routes.YourNameController.post()) { implicit form: Form[_] =>
@@ -27,6 +27,6 @@
             labelText = Messages("lbl.last_name")
         )
 
-        @submit(Messages("button.save"))
+        @submit(Messages("button.saveandcontinue"))
     }
 }

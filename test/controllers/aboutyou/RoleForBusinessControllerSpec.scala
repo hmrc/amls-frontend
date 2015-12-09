@@ -75,7 +75,7 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
       val result = submitWithFormValues (aboutYou)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("What is your role for the business?")
-      contentAsString(result) must include(Messages("error.required"))
+      contentAsString(result) must include(Messages("err.required"))
     }
 
     "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
@@ -89,7 +89,7 @@ class RoleForBusinessControllerSpec extends PlaySpec with OneServerPerSuite with
       val result = submitWithFormValues (aboutYou)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("What is your role for the business?")
-      contentAsString(result) must include(Messages("error.required"))
+      contentAsString(result) must include(Messages("err.required"))
     }
 
     def submitWithFormValues (aboutYou: RoleForBusiness) : Future[Result] = {

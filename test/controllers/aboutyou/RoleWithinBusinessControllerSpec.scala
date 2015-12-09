@@ -62,7 +62,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
-      postFormAndTestResult(RoleWithinBusiness("", ""), roleWithinBusinessForm, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("error.required")))
+      postFormAndTestResult(RoleWithinBusiness("", ""), roleWithinBusinessForm, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
     }
 
     "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
@@ -70,7 +70,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
-      postFormAndTestResult(RoleWithinBusiness("07", ""), roleWithinBusinessForm, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("error.required")))
+      postFormAndTestResult(RoleWithinBusiness("07", ""), roleWithinBusinessForm, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
     }
 
   }

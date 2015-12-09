@@ -7,7 +7,7 @@
 @(roleWithinBusinessForm: Form[models.RoleWithinBusiness], roles:Seq[(String,String)])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("sectionTitle.about_you")),
+    sectionTitle = Some(Messages("sectiontitle.aboutyou")),
     title = Messages("title.roleWithinBusiness")
 ) {
     @formHelper(roleWithinBusinessForm, aboutyou.routes.RoleWithinBusinessController.post) { implicit form: Form[_] =>

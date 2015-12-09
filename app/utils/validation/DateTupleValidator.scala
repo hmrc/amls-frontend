@@ -110,9 +110,9 @@ object DateTupleValidator extends FormValidator {
       }
     )
 
-  def mandatoryDateTuple(blankValueMessageKey: String = "error.invalid.date.format",
-                         invalidValueMessageKey: String = "error.invalid.date.format",
-                         invalidNumberTooHighMessageKey: String = "error.invalid.date.format"): Mapping[LocalDate]
+  def mandatoryDateTuple(blankValueMessageKey: String = "err.invalid.date.format",
+                         invalidValueMessageKey: String = "err.invalid.date.format",
+                         invalidNumberTooHighMessageKey: String = "err.invalid.date.format"): Mapping[LocalDate]
   = dateTuple(true,blankValueMessageKey, invalidValueMessageKey, invalidNumberTooHighMessageKey)
     .verifying(blankValueMessageKey,
       data => data.isDefined).transform(o =>
@@ -120,9 +120,9 @@ object DateTupleValidator extends FormValidator {
         v => Option(v))
 
   def dateTuple(validate: Boolean = true,
-                invalidEmptyMessageKey: String = "error.invalid.date.format",
-                invalidValueMessageKey: String = "error.invalid.date.format",
-                invalidNumberTooHighMessageKey: String = "error.invalid.date.format") = tuple(
+                invalidEmptyMessageKey: String = "err.invalid.date.format",
+                invalidValueMessageKey: String = "err.invalid.date.format",
+                invalidNumberTooHighMessageKey: String = "err.invalid.date.format") = tuple(
     year -> optional(text),
     month -> optional(text),
     day -> optional(text)

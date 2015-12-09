@@ -5,7 +5,7 @@
 @(employedWithinTheBusinessForm: Form[models.EmployedWithinTheBusiness])(implicit request: Request[_])
 
 @main(
-sectionTitle = Some(Messages("sectionTitle.about_you")),
+sectionTitle = Some(Messages("sectiontitle.aboutyou")),
 title = Messages("title.employedwithinthebusiness")
 ) {
 
@@ -20,7 +20,7 @@ title = Messages("title.employedwithinthebusiness")
         )
     )
 
-    @submit(Messages("button.save"))
+    @submit(Messages("button.saveandcontinue"))
 
     }
 }
