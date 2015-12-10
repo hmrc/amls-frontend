@@ -14,7 +14,7 @@ import utils.CommonHelper
 import scala.concurrent.Future
 
 trait RoleForBusinessController extends AMLSGenericController {
-  val roles = CommonHelper.mapSeqWithMessagesKey(getProperty("roleForBusiness").split(","), "lbl.roleForBusiness", Messages(_))
+  val roles = CommonHelper.mapSeqWithMessagesKey(getProperty("roleForBusiness").split(","), "aboutyou.roleforbusiness.lbl", Messages(_))
   val dataCacheConnector: DataCacheConnector
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] =

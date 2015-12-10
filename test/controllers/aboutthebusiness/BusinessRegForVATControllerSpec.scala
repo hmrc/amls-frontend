@@ -51,7 +51,7 @@ class BusinessRegForVATControllerSpec extends PlaySpec with OneServerPerSuite wi
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
       val result = MockBusinessRegForVATController.get
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("title.registeredVATNum"))
+      contentAsString(result) must include(Messages("aboutthebusiness.vatnumber.title"))
     }
 
     "on load display the businessHasWebsite page with prepopulated data" in {

@@ -10,37 +10,30 @@ import utils.validation.TextValidator
 
 object AboutYouForms {
 
-  val yourNameFormMapping = mapping(
+  val yourNameForm = Form(mapping(
     "firstname" -> TextValidator.mandatoryText("err.titleNotEntered.first_name",
       "err.invalidLength", getIntFromProperty("validationMaxLengthFirstName")),
     "middlename" -> optional(TextValidator.mandatoryText("", "err.invalidLength",
       getIntFromProperty("validationMaxLengthFirstName"))),
     "lastname" -> TextValidator.mandatoryText("err.titleNotEntered.last_name", "err.invalidLength",
       getIntFromProperty("validationMaxLengthFirstName"))
-  ) (YourName.apply)(YourName.unapply)
+  )(YourName.apply)(YourName.unapply))
 
-  val yourNameForm = Form(yourNameFormMapping)
+  val employedWithinTheBusinessForm = Form(mapping(
+    "isEmployed" -> mandatoryBoolean("err.required")
+  )(EmployedWithinTheBusiness.apply)(EmployedWithinTheBusiness.unapply))
 
-  val employedWithTheBusinessFormMapping = mapping(
-    "isEmployed" -> mandatoryBoolean("error.required")
-  )(EmployedWithinTheBusiness.apply)(EmployedWithinTheBusiness.unapply)
-
-  val employedWithinTheBusinessForm = Form(employedWithTheBusinessFormMapping)
-
-  val roleWithinBusinessFormMapping = mapping(
+  val roleWithinBusinessForm = Form(mapping(
     "roleWithinBusiness" -> radioGroupWithOther("other", getProperty("roleWithinBusiness").split(",").reverse.head,
-      "error.required", "error.required", "error.invalid", getIntFromProperty("validationMaxLengthRoleWithinBusinessOther")),
+      "err.required", "err.required", "err.invalid", getIntFromProperty("validationMaxLengthRoleWithinBusinessOther")),
     "other" -> text
-  )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply)
+  )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply))
 
-  val roleWithinBusinessForm = Form(roleWithinBusinessFormMapping)
 
-  val roleForBusinessFormMapping = mapping(
+  val roleForBusinessForm = Form(mapping(
     "roleForBusiness" -> radioGroupWithOther("other", getProperty("roleForBusiness").split(",").reverse.head,
-      "error.required", "error.required", "error.invalid", getIntFromProperty("validationMaxLengthRoleForBusinessOther")),
+      "err.required", "err.required", "err.invalid", getIntFromProperty("validationMaxLengthRoleForBusinessOther")),
     "other" -> text
-  )(RoleForBusiness.apply)(RoleForBusiness.unapply)
-
-  val roleForBusinessForm = Form(roleForBusinessFormMapping)
+  )(RoleForBusiness.apply)(RoleForBusiness.unapply))
 
 }

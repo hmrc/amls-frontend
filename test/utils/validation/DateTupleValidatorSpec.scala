@@ -27,7 +27,7 @@ class DateTupleValidatorSpec extends WordSpec with Matchers {
     def assertError(dateFields: Map[String, String]) {
       val result = dateTuple.bind(dateFields)
       result.isLeft shouldBe true
-      result.left.getOrElse(Nil) shouldBe Seq(FormError("", "error.invalid.date.format"))
+      result.left.getOrElse(Nil) shouldBe Seq(FormError("", "err.invalid.date.format"))
     }
 
     "create a mapping for a valid date" in {

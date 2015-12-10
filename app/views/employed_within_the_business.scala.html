@@ -5,8 +5,8 @@
 @(employedWithinTheBusinessForm: Form[models.EmployedWithinTheBusiness])(implicit request: Request[_])
 
 @main(
-sectionTitle = Some(Messages("sectionTitle.about_you")),
-title = Messages("title.employedwithinthebusiness")
+sectionTitle = Some(Messages("aboutyou.sectiontitle")),
+title = Messages("aboutyou.employedwithinbusiness.title")
 ) {
 
 @formHelper(employedWithinTheBusinessForm, aboutyou.routes.EmployedWithinTheBusinessController.post) { implicit form: Form[_] =>
@@ -20,7 +20,7 @@ title = Messages("title.employedwithinthebusiness")
         )
     )
 
-    @submit(Messages("button.save"))
+    @submit(Messages("button.saveandcontinue"))
 
     }
 }

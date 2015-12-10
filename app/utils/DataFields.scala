@@ -10,8 +10,8 @@ object DataFields {
   )
 
   def optionsRegisteredFoMLR(implicit lang: Lang) = Seq(
-    Messages("lbl.hasMLR.yes.withReg") -> "01",
-    Messages("lbl.hasMLR.yes.withPastReg") -> "02",
-    Messages("lbl.hasMLR.no")  -> "03"
+    Messages("aboutthebusiness.registeredformlr.lbl.yes.withreg") -> "01",
+    Messages("aboutthebusiness.registeredformlr.lbl.yes.withpastreg") -> "02",
+    Messages("aboutthebusiness.registeredformlr.lbl.no")  -> "03"
   )
 }

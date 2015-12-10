@@ -51,7 +51,7 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
       val result = MockRegisteredForMLRController.get
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("title.registeredForMLR"))
+      contentAsString(result) must include(Messages("aboutthebusiness.registeredformlr.title"))
     }
 
     "on load display the registered for MLR  page with pre-populated data" in {

@@ -1,93 +1,102 @@
+
+#
+# Conventions:-
+# title.
+# lbl.
+# err.
+# button.
+#
+
 amls.title=Anti-Money Laundering Supervision
 
 # Generic Messages
 err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
-error.required = Please enter an item
-error.invalid = Please enter a valid item
-error.notrequired = No item should be entered
+err.required = Please enter an item
+err.invalid = Please enter a valid item
+err.notrequired = No item should be entered
 err.invalidLength = invalid length
-errors.summary = There are errors in your form submission
+err.summary = There are errors in your form submission
+err.pleasespecify = Please specify
 
-button.save = Save and continue
+button.saveandcontinue = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
-generic.other = Other
-generic.please_specify = Please specify
 
+lbl.other = Other
 lbl.yes = Yes
 lbl.no = No
 lbl.your_name = Your name
 lbl.first_name = First name
 lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
+lbl.pleasespecify = Please specify
 
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
+# Sections
 
-## Summary Page
-amls.summary.title = Your AMLS registration
-amls.summary.sectiontitle = Service
-amls.summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
-amls.summary.businessactivities = Business activities
-amls.summary.aboutbusiness = About the business
-amls.summary.tradingpremises = Trading premises
-amls.summary.bankdetails = Bank account details
-amls.summary.responsiblepersons = Responsible persons
-amls.summary.aboutyou = About you
-amls.summary.payment = Payment
-amls.summary.declarationlocked = Declaration (locked)
-amls.summary.declarationlocked.title = You can’t complete this section yet
+aboutyou.sectiontitle = About you
+aboutthebusiness.sectiontitle = About the business
 
-###### About You Section ######
-sectionTitle.about_you = About you
-title.your_name = Your name
-title.employedwithinthebusiness = Are you employed within the business?
-title.roleWithinBusiness = What is your role within the business?
-title.roleForBusiness = What is your role for the business?
+# Individual pages
 
-# Roles within business Radio buttons Options
-lbl.roleWithinBusiness.01=Beneficial shareholder
-lbl.roleWithinBusiness.02=Director
-lbl.roleWithinBusiness.03=Partner
-lbl.roleWithinBusiness.04=Internal accountant
-lbl.roleWithinBusiness.05=Sole proprietor
-lbl.roleWithinBusiness.06=Nominated officer
+summary.title = Your AMLS registration
+summary.sectiontitle = Service
+summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
+summary.businessactivities = Business activities
+summary.aboutbusiness = About the business
+summary.tradingpremises = Trading premises
+summary.bankdetails = Bank account details
+summary.responsiblepersons = Responsible persons
+summary.aboutyou = About you
+summary.payment = Payment
+summary.declarationlocked = Declaration (locked)
+summary.declarationlocked.title = You can’t complete this section yet
 
-#Roles for business Radio Button Options
-lbl.roleForBusiness.01=External accountant
+aboutyou.yourname.title = Your name
 
-###### About the business Section ######
-sectionTitle.aboutTheBusiness = About the business
+aboutyou.employedwithinbusiness.title = Are you employed within the business?
 
-title.businessHasWebsite = Does your business have a website?
-title.addressOfYourWebsite = What is the address of your website?
-title.registeredOffice = Registered office or principal place of business
+aboutyou.rolewithinbusiness.title = What is your role within the business?
+aboutyou.rolewithinbusiness.lbl.01=Beneficial shareholder
+aboutyou.rolewithinbusiness.lbl.02=Director
+aboutyou.rolewithinbusiness.lbl.03=Partner
+aboutyou.rolewithinbusiness.lbl.04=Internal accountant
+aboutyou.rolewithinbusiness.lbl.05=Sole proprietor
+aboutyou.rolewithinbusiness.lbl.06=Nominated officer
 
-telephoningbusiness.title = Telephoning your business
-telephoningbusiness.phonenumber = Business phone number
-telephoningbusiness.mobilenumber = Mobile contact number (optional)
-telephoningbusiness.error.invalidphonenumber = Invalid Phone Number
-telephoningbusiness.error.invalidmobilenumber = Invalid Mobile Number
+aboutyou.roleforbusiness.title = What is your role for the business?
+aboutyou.roleforbusiness.lbl.01=External accountant
 
-title.businessRegForVAT = Is your business registered for VAT?
-title.registeredVATNum = What is your VAT registraton number?
+aboutthebusiness.businesshaswebsite.title = Does your business have a website?
+aboutthebusiness.addressofyourwebsite.title = What is the address of your website?
 
-title.email = Email
-lbl.businessEmailAddress = What is the business's email address
+aboutthebusiness.telephoning.title = Telephoning your business
+aboutthebusiness.telephoning.phone = Business phone number
+aboutthebusiness.telephoning.mobile = Mobile contact number (optional)
+aboutthebusiness.telephoning.invalidphone = Invalid Phone Number
+aboutthebusiness.telephoning.invalidmobile = Invalid Mobile Number
 
-title.registeredForMLR = Have you been registered for MLR before?
-lbl.hasMLR.yes.withReg = Yes, I have an existing registration
-lbl.hasMLR.yes.withPastReg = Yes, I was registered in the past but am not presently
-lbl.hasMLR.no = No
+aboutthebusiness.registeredforvat.title = Is your business registered for VAT?
+aboutthebusiness.vatnumber.title = What is your VAT registration number?
 
-lbl.mlrRegistrationNumber = MLR registration number
-lbl.prevMLRRegistrationNumber = MLR registration number (optional)
+aboutthebusiness.whatisbusinessemail.title = What is the business's email address
+aboutthebusiness.whatisbusinessemail.email = Email
 
-registeredoffice.lbl.yes.same = Yes, and I would like correspondence to be sent here.
-registeredoffice.lbl.yes.different = Yes, but I would like to provide a different address for correspondence.
-registeredoffice.lbl.no = No
-registeredoffice.address.header = We have the following address details for you.
+aboutthebusiness.registeredformlr.title = Have you been registered for MLR before?
+aboutthebusiness.registeredformlr.lbl.yes.withreg = Yes, I have an existing registration
+aboutthebusiness.registeredformlr.lbl.yes.withpastreg = Yes, I was registered in the past but am not presently
+aboutthebusiness.registeredformlr.lbl.no = No
+aboutthebusiness.registeredformlr.mlrregno = MLR registration number
+aboutthebusiness.registeredformlr.prevmlrregno = MLR registration number (optional)
+
+aboutthebusiness.registeredoffice.title = Registered office or principal place of business
+aboutthebusiness.registeredoffice.isregoffice.yessame = Yes, and I would like correspondence to be sent here.
+aboutthebusiness.registeredoffice.isregoffice.yesdifferent = Yes, but I would like to provide a different address for correspondence.
+aboutthebusiness.registeredoffice.isregoffice.no = No
+aboutthebusiness.registeredoffice.addressheader = We have the following address details for you.
+aboutthebusiness.registeredoffice.isaddresscorrect = Is this address your registered office or principal place of business?

@@ -3,7 +3,9 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.aboutyou.RoleWithinBusinessController
+import forms.AboutYouForms._
 import models.RoleWithinBusiness
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -14,8 +16,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import forms.AboutYouForms._
-import org.mockito.Matchers._
+import helpers.CommonTestHelper._
 import scala.concurrent.Future
 
 class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
@@ -46,61 +47,32 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
       contentAsString(result) must include("What is your role within the business?")
     }
     "on load display the Role Within Business page with pre populated data" in {
-      val aboutYou = RoleWithinBusiness("07", "Cleaner")
+      val roleWithinBusiness = RoleWithinBusiness("07", "Cleaner")
       when(mockDataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any())
-        (any(), any(),  any())).thenReturn(Future.successful(Some(aboutYou)))
+        (any(), any(),  any())).thenReturn(Future.successful(Some(roleWithinBusiness)))
       val result = MockRoleWithinBusinessController.get(mock[AuthContext], request)
       status(result) must be(OK)
       contentAsString(result) must include("What is your role within the business?")
     }
 
     "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
-      val aboutYou = RoleWithinBusiness("01", "")
-      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
-      implicit val request1 = FakeRequest("POST", "/role-within-business").withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any()) (any(), any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-      val result = MockRoleWithinBusinessController.post(mock[AuthContext], request1)
-      status(result) must be(SEE_OTHER)
+      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
+        RoleWithinBusiness("01", ""), roleWithinBusinessForm, mockDataCacheConnector, performVerify(SEE_OTHER, None))
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
-      val aboutYou = RoleWithinBusiness("", "")
-      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
-      implicit val request1 =  FakeRequest("POST", "/role-within-business").withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any()) (any(), any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-
-      val result = MockRoleWithinBusinessController.post(mock[AuthContext], request1)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("What is your role within the business?")
-      contentAsString(result) must include(Messages("error.required"))
+      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
+        RoleWithinBusiness("", ""), roleWithinBusinessForm, mockDataCacheConnector, performVerify(BAD_REQUEST, None, "What is your role within the business?", Messages("err.required")))
     }
 
     "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
-      val aboutYou = RoleWithinBusiness("07", "Cleaner")
-      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
-      implicit val request1 =  FakeRequest("POST", "/role-within-business").withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
-
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any()) (any(), any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-
-      val result = MockRoleWithinBusinessController.post(mock[AuthContext], request1)
-      status(result) must be(SEE_OTHER)
+      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
+        RoleWithinBusiness("07", "Cleaner"), roleWithinBusinessForm, mockDataCacheConnector, performVerify(SEE_OTHER, None))
     }
 
     "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
-      val aboutYou = RoleWithinBusiness("07", "")
-      val roleWithinBusinessForm1 = roleWithinBusinessForm.fill(aboutYou)
-      implicit val request1 =  FakeRequest("POST", "/role-within-business").withFormUrlEncodedBody( roleWithinBusinessForm1.data.toSeq : _*)
-
-      when(mockDataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any()) (any(), any(), any()))
-        .thenReturn(Future.successful(Some(aboutYou)))
-
-      val result = MockRoleWithinBusinessController.post(mock[AuthContext], request1)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("What is your role within the business?")
-      contentAsString(result) must include(Messages("error.required"))
-    }    
+      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
+        RoleWithinBusiness("07", ""), roleWithinBusinessForm, mockDataCacheConnector, performVerify(BAD_REQUEST, None, "What is your role within the business?", Messages("err.required")))
+    }
   }
 }

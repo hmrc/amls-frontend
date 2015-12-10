@@ -7,18 +7,18 @@
 @(businessHasWebsiteForm: Form[models.BusinessHasWebsite])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
-    title = Messages("title.businessHasWebsite")
+    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
+    title = Messages("aboutthebusiness.businesshaswebsite.title")
 ) {
     @formHelper(businessHasWebsiteForm, aboutthebusiness.routes.BusinessHasWebsiteController.post()) { implicit form: Form[_] =>
         @radioGroupYesNoWithText(
             name = "hasWebsite",
             textFieldName = "website",
-            labelText = "title.addressOfYourWebsite",
+            labelText = "aboutthebusiness.addressofyourwebsite.title",
             legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
-            textFieldLabelText = Messages("title.addressOfYourWebsite"),
+            textFieldLabelText = Messages("aboutthebusiness.addressofyourwebsite.title"),
             options = optionsYesNo
         )
-        @submit(Messages("button.save"))
+        @submit(Messages("button.saveandcontinue"))
     }
 }

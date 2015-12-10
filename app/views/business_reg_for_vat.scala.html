@@ -7,18 +7,18 @@
 @(businessRegForVATForm: Form[models.BusinessWithVAT])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("sectionTitle.aboutTheBusiness")),
-    title = Messages("title.businessRegForVAT")
+    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
+    title = Messages("aboutthebusiness.registeredforvat.title")
 ) {
     @formHelper(businessRegForVATForm, aboutthebusiness.routes.BusinessRegForVATController.post()) { implicit form: Form[_] =>
         @radioGroupYesNoWithText(
             name = "hasVAT",
             textFieldName = "VATNum",
-            labelText = "title.registeredVATNum",
+            labelText = "aboutthebusiness.vatnumber.title",
             legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
-            textFieldLabelText = Messages("title.registeredVATNum"),
+            textFieldLabelText = Messages("aboutthebusiness.vatnumber.title"),
             options = optionsYesNo
         )
-        @submit(Messages("button.save"))
+        @submit(Messages("button.saveandcontinue"))
     }
 }
