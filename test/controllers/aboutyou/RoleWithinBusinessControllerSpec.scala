@@ -11,14 +11,12 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
+import helpers.CommonTestHelper._
 import scala.concurrent.Future
 
 class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
@@ -58,38 +56,23 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
-      postFormAndTestResult[RoleWithinBusiness](RoleWithinBusiness("01", ""), roleWithinBusinessForm, verifyResult(SEE_OTHER))
+      postAndTestResult[RoleWithinBusiness]((x,y)=>MockRoleWithinBusinessController.post(x,y),
+        RoleWithinBusiness("01", ""), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(SEE_OTHER))
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
-      postFormAndTestResult(RoleWithinBusiness("", ""), roleWithinBusinessForm, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
+      postAndTestResult( (x,y)=>MockRoleWithinBusinessController.post(x,y),
+        RoleWithinBusiness("", ""), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
     }
 
     "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
-      postFormAndTestResult(RoleWithinBusiness("07", "Cleaner"), roleWithinBusinessForm, verifyResult(SEE_OTHER))
+      postAndTestResult( (x,y)=>MockRoleWithinBusinessController.post(x,y),
+        RoleWithinBusiness("07", "Cleaner"), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(SEE_OTHER))
     }
 
     "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
-      postFormAndTestResult(RoleWithinBusiness("07", ""), roleWithinBusinessForm, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
-    }
-
-  }
-
-  private def postFormAndTestResult[T](roleWithinBusiness: T, fm: Form[T], result: Future[Result] => Any) = {
-    val tempForm = fm.fill(roleWithinBusiness)
-    val request = FakeRequest("POST", "/role-within-business").withFormUrlEncodedBody(tempForm.data.toSeq: _*)
-    val authContext = mock[AuthContext]
-    when(mockDataCacheConnector.saveDataShortLivedCache[T](any(), any()) (any(), any(), any()))
-      .thenReturn(Future.successful[Option[T]](Some(roleWithinBusiness)))
-    result(MockRoleWithinBusinessController.post(authContext, request))
-  }
-
-  private def verifyResult(expectedStatus: Int, expectedContent: String*): Future[Result] => Any = result => {
-    status(result) must be(expectedStatus)
-    expectedContent.foreach {
-      contentAsString(result) must include(_)
+      postAndTestResult( (x,y)=>MockRoleWithinBusinessController.post(x,y),
+        RoleWithinBusiness("07", ""), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
     }
   }
-
-
 }
