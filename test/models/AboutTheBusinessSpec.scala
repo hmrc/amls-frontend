@@ -7,60 +7,16 @@ import scala.util.Random
 class AboutTheBusinessSpec extends PlaySpec {
 
   "AboutTheBusiness " should {
-    "successfully apply 1 to return the Model with correct values" in {
-      val registeredOfficeApply = RegisteredOffice.applyString("1")
-      registeredOfficeApply.isRegisteredOffice mustBe true
-      registeredOfficeApply.isCorrespondenceAddressSame mustBe true
-    }
 
-    "successfully unapply the (true, false) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = true)) match {
-        case Some(registeredOfficeExtracted) => registeredOfficeExtracted
-        case _ => ""
-      }
-      registeredOfficeUnapply mustBe "1"
-    }
+    "Successfully apply all combinations for boolean tuple to model and then unapply" in {
 
+    Seq( (true,true), (true, false), (false,false), (false, true)).foreach( tuple => {
+        val registeredOfficeApply = RegisteredOffice.fromBooleanTuple((tuple._1,tuple._2))
+        registeredOfficeApply.isRegisteredOffice mustBe tuple._1
+        registeredOfficeApply.isCorrespondenceAddressSame mustBe tuple._2
 
-    "successfully apply 2 to return the Model with correct values" in {
-      val registeredOfficeApply = RegisteredOffice.applyString("2")
-      registeredOfficeApply.isRegisteredOffice mustBe true
-      registeredOfficeApply.isCorrespondenceAddressSame mustBe false
-    }
-
-    "successfully unapply the (true,true) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = true, isCorrespondenceAddressSame = false)) match {
-        case Some(registeredOfficeExtracted) => registeredOfficeExtracted
-        case _ => ""
-      }
-      registeredOfficeUnapply mustBe "2"
-    }
-
-    "successfully apply 3 to return the Model with correct values" in {
-      val registeredOfficeApply = RegisteredOffice.applyString("3")
-      registeredOfficeApply.isRegisteredOffice mustBe false
-      registeredOfficeApply.isCorrespondenceAddressSame mustBe false
-    }
-
-    "successfully unapply the (false, false) to return the values as Strings" in {
-      val registeredOfficeUnapply = RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = false, isCorrespondenceAddressSame = false)) match {
-        case Some(registeredOfficeExtracted) => registeredOfficeExtracted
-        case _ => ""
-      }
-      registeredOfficeUnapply mustBe "3"
-    }
-
-
-    "throw an exception if invalid value in apply" in {
-      a[java.lang.RuntimeException] should be thrownBy {
-        RegisteredOffice.unapplyString(RegisteredOffice.applyString("4"))
-      }
-    }
-
-    "throw an exception if invalid value in unapply" in {
-      a[java.lang.RuntimeException] should be thrownBy {
-        RegisteredOffice.unapplyString(RegisteredOffice(isRegisteredOffice = false, isCorrespondenceAddressSame = true))
-      }
+        RegisteredOffice.toBooleanTuple(RegisteredOffice(isRegisteredOffice = tuple._1, isCorrespondenceAddressSame = tuple._2)) mustBe Some((tuple._1, tuple._2))
+      })
     }
 
     "successfully convert a RegisteredOfficeSave4Later object to a RegisteredOffice object" in {

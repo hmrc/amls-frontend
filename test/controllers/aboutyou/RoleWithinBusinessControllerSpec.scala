@@ -56,22 +56,22 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
     }
 
     "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
-      postAndTestResult[RoleWithinBusiness]((x,y)=>MockRoleWithinBusinessController.post(x,y),
+      postAndTestResult( MockRoleWithinBusinessController.post(_,_),
         RoleWithinBusiness("01", ""), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(SEE_OTHER))
     }
 
     "on submit without choosing a valid role re-display the page with validation error" in {
-      postAndTestResult( (x,y)=>MockRoleWithinBusinessController.post(x,y),
+      postAndTestResult( MockRoleWithinBusinessController.post(_,_),
         RoleWithinBusiness("", ""), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
     }
 
     "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
-      postAndTestResult( (x,y)=>MockRoleWithinBusinessController.post(x,y),
+      postAndTestResult( MockRoleWithinBusinessController.post(_,_),
         RoleWithinBusiness("07", "Cleaner"), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(SEE_OTHER))
     }
 
     "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
-      postAndTestResult( (x,y)=>MockRoleWithinBusinessController.post(x,y),
+      postAndTestResult( MockRoleWithinBusinessController.post(_,_),
         RoleWithinBusiness("07", ""), roleWithinBusinessForm, mockDataCacheConnector, verifyResult(BAD_REQUEST, "What is your role within the business?", Messages("err.required")))
     }
   }
