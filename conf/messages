@@ -78,8 +78,8 @@ aboutthebusiness.addressofyourwebsite.title = What is the address of your websit
 aboutthebusiness.telephoning.title = Telephoning your business
 aboutthebusiness.telephoning.phone = Business phone number
 aboutthebusiness.telephoning.mobile = Mobile contact number (optional)
-aboutthebusiness.telephoning.invalidphone = Invalid Phone Number
-aboutthebusiness.telephoning.invalidmobile = Invalid Mobile Number
+aboutthebusiness.telephoning.invalid.phone = Invalid Phone Number
+aboutthebusiness.telephoning.invalid.mobile = Invalid Mobile Number
 
 aboutthebusiness.registeredforvat.title = Is your business registered for VAT?
 aboutthebusiness.vatnumber.title = What is your VAT registration number?
@@ -92,7 +92,7 @@ aboutthebusiness.registeredformlr.lbl.yes.withreg = Yes, I have an existing regi
 aboutthebusiness.registeredformlr.lbl.yes.withpastreg = Yes, I was registered in the past but am not presently
 aboutthebusiness.registeredformlr.lbl.no = No
 aboutthebusiness.registeredformlr.mlrregno = MLR registration number
-aboutthebusiness.registeredformlr.prevmlrregno = MLR registration number (optional)
+aboutthebusiness.registeredformlr.previous.mlrregno = MLR registration number (optional)
 
 aboutthebusiness.registeredoffice.title = Registered office or principal place of business
 aboutthebusiness.registeredoffice.isregoffice.yessame = Yes, and I would like correspondence to be sent here.

@@ -102,7 +102,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
     "When the user provides the Phone Number then validate the format" in {
       val futureResult = telephoneBusinessFormSubmissionHelper(InvalidNumber, Some(ThirtyDigitNumber))
       status(futureResult) must be(BAD_REQUEST)
-      contentAsString(futureResult) must include(Messages("aboutthebusiness.telephoning.invalidphone"))
+      contentAsString(futureResult) must include(Messages("aboutthebusiness.telephoning.invalid.phone"))
     }
 
     "When the user provides the Mobile Number then validate the length" in {
@@ -114,7 +114,7 @@ class TelephoningBusinessControllerSpec extends PlaySpec with OneServerPerSuite 
     "When the user provides the Mobile Number then validate the format" in {
       val futureResult = telephoneBusinessFormSubmissionHelper(InvalidNumber, Some(ThirtyOneDigitNumber))
       status(futureResult) must be(BAD_REQUEST)
-      contentAsString(futureResult) must include(Messages("aboutthebusiness.telephoning.invalidphone"))
+      contentAsString(futureResult) must include(Messages("aboutthebusiness.telephoning.invalid.phone"))
     }
 
     "Successfully navigate to the next page if the details are valid" in {

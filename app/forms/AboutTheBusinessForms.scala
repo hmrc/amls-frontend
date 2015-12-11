@@ -19,9 +19,9 @@ object AboutTheBusinessForms {
 
   val telephoningBusinessForm = Form(mapping(
     "businessPhoneNumber" -> mandatoryPhoneNumber("err.required", "err.invalidLength",
-      "aboutthebusiness.telephoning.invalidphone", getIntFromProperty("validationMaxLengthPhoneNo")),
+      "aboutthebusiness.telephoning.invalid.phone", getIntFromProperty("validationMaxLengthPhoneNo")),
     "mobileNumber" -> optional(mandatoryPhoneNumber("err.required", "err.invalidLength",
-      "aboutthebusiness.telephoning.invalidphone", getIntFromProperty("validationMaxLengthPhoneNo")))
+      "aboutthebusiness.telephoning.invalid.phone", getIntFromProperty("validationMaxLengthPhoneNo")))
   )(TelephoningBusiness.apply)(TelephoningBusiness.unapply))
 
   val registeredOfficeForm = Form(mapping(
