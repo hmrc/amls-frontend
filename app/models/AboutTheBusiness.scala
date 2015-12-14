@@ -76,7 +76,7 @@ object RegisteredOffice {
   }
 
   def toBooleanTuple(registeredOffice: RegisteredOffice): Some[(Boolean, Boolean)] = {
-    Some(Tuple2( registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame ))
+    Some(Tuple2(registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame))
   }
 
 }
@@ -87,11 +87,12 @@ object BusinessWithVAT {
   implicit val formats = Json.format[BusinessWithVAT]
 }
 
+case class BusinessHasEmail(email: String)
+
 object BusinessHasEmail {
   implicit val formats = Json.format[BusinessHasEmail]
 }
 
-case class BusinessHasEmail(email: String)
 
 case class RegisteredForMLR(hasDigitalMLR: Boolean, hasNonDigitalMLR: Boolean, mlrNumber: Option[String], prevMlrNumber: Option[String])
 
