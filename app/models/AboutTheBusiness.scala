@@ -56,10 +56,10 @@ object TelephoningBusiness {
 case class RegisteredOfficeSave4Later(registeredOfficeAddress: BCAddress,
                                       isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean)
 
-
 object RegisteredOfficeSave4Later {
   implicit val formats = Json.format[RegisteredOfficeSave4Later]
 }
+
 
 case class RegisteredOffice(isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean)
 
