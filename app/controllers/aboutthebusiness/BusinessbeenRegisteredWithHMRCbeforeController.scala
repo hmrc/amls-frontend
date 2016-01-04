@@ -11,7 +11,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait HaveYouRegForMLRBeforeController extends AMLSGenericController{
+trait BusinessRegisteredWithHMRCBeforeController extends AMLSGenericController{
 
   val dataCacheConnector: DataCacheConnector = DataCacheConnector
   val CACHE_KEY = "registeredForMLR"
@@ -34,7 +34,7 @@ trait HaveYouRegForMLRBeforeController extends AMLSGenericController{
 
 }
 
-object HaveYouRegForMLRBeforeController extends HaveYouRegForMLRBeforeController {
+object BusinessRegisteredWithHMRCBeforeController extends BusinessRegisteredWithHMRCBeforeController {
    override val authConnector: AuthConnector = AMLSAuthConnector
    override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

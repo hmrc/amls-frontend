@@ -21,7 +21,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   implicit val request = FakeRequest()
   implicit val authContext = mock[AuthContext]
@@ -29,10 +29,10 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
   val userId = s"user-${UUID.randomUUID}"
   val mockAuthConnector = mock[AuthConnector]
   val mockDataCacheConnector = mock[DataCacheConnector]
+  val VAT_URL = "/business-details/vat"
+  val mockMLRModel = RegisteredForMLR(true, Some("12345678"))
 
-  val mockMLRModel = RegisteredForMLR.applyString((true, false), Some("12345678"), None)
-
-  object MockRegisteredForMLRController extends  HaveYouRegForMLRBeforeController {
+  object MockRegisteredForMLRController extends BusinessRegisteredWithHMRCBeforeController {
     val authConnector = mockAuthConnector
     override val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
   }
@@ -43,7 +43,7 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
 
   "HaveYouRegForMLRBeforeController" must {
     "use correct service" in {
-      HaveYouRegForMLRBeforeController.authConnector must be(AMLSAuthConnector)
+      BusinessRegisteredWithHMRCBeforeController.authConnector must be(AMLSAuthConnector)
     }
 
     "on load display the registered for MLR page" in {
@@ -67,14 +67,21 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       "successfully navigate to next page " in {
         submitWithFormFilled { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {identity} must include("/business-with-VAT")
+          redirectLocation(result).fold("") {identity} must include(VAT_URL)
+        }
+      }
+
+      "successfully navigate to next page when form filled with 15 digit mlr number" in {
+        submitWithFormFilledWithValidMaxLength { result =>
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result).fold("") {identity} must include(VAT_URL)
         }
       }
 
       "successfully navigate to next page with Option Yes and optional text" in {
         submitWithYesAndOptionalText { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {identity} must include("/business-with-VAT")
+          redirectLocation(result).fold("") {identity} must include(VAT_URL)
         }
       }
       "get validation exception when the length of the text field is greater than MAX characters" in {
@@ -91,7 +98,7 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       "get error message when the user not filled on the mandatory fields" in {
         submitWithMandatoryFileldOptionNo { result =>
           status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {identity} must include("/business-with-VAT")
+          redirectLocation(result).fold("") {identity} must include(VAT_URL)
         }
       }
 
@@ -102,9 +109,9 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
       }
     }
 
-    def createRegisteredForMLRForSubmission(test: Future[Result] => Any, hasMLR: (Boolean, Boolean),
-                                                  mlrNumber: Option[String], prevMlrNumber: Option[String]) {
-      val mockRegisteredForMLR = RegisteredForMLR.applyString(hasMLR, mlrNumber, prevMlrNumber)
+    def createRegisteredForMLRForSubmission(test: Future[Result] => Any, hasMLR: Boolean,
+                                                  mlrNumber: Option[String]) {
+      val mockRegisteredForMLR = RegisteredForMLR(hasMLR, mlrNumber)
       val form  = RegisteredForMLRForm.fill(mockRegisteredForMLR)
       val fakePostRequest = FakeRequest("POST", "/business-with-VAT").withFormUrlEncodedBody(form.data.toSeq: _*)
       when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredForMLR](Matchers.any(), Matchers.any())
@@ -114,27 +121,31 @@ class HaveYouRegForMLRBeforeControllerSpec extends PlaySpec with OneServerPerSui
     }
 
     def submitWithFormFilled(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (true, false), Some("12345678"), None)
+      createRegisteredForMLRForSubmission(test, true, Some("12345678"))
+    }
+
+    def submitWithFormFilledWithValidMaxLength(test: Future[Result] => Any) {
+      createRegisteredForMLRForSubmission(test, true, Some("123456781234567"))
     }
 
     def submitWithLengthValidation(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (true, false), Some("12"*10), None)
+      createRegisteredForMLRForSubmission(test, true, Some("12"*10))
     }
 
     def submitWithInvalidDataValidation(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (true, false), Some("test"), None)
+      createRegisteredForMLRForSubmission(test, true, Some("test"))
     }
 
     def submitWithMandatoryFileldOptionNo(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (false, false), None, None)
+      createRegisteredForMLRForSubmission(test, false, None)
     }
 
     def submitWithMandatoryFieldsWithInvalidData(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (false, false), Some("12345678"), Some("123456789789456"))
+      createRegisteredForMLRForSubmission(test, false, Some("123456789789456"))
     }
 
     def submitWithYesAndOptionalText(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, (false, true), None, Some("123456789789456"))
+      createRegisteredForMLRForSubmission(test, false, None)
     }
   }
 }

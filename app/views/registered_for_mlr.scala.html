@@ -10,14 +10,13 @@
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.registeredformlr.title")
 ) {
-    @formHelper(RegisteredForMLRForm, aboutthebusiness.routes.HaveYouRegForMLRBeforeController.post()) { implicit form: Form[_] =>
-        @radioGroupPrevRegForMLRWithText(
+    @formHelper(RegisteredForMLRForm, aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>
+        @radioGroupYesNoWithText(
             name = "hasMLR",
-            textFieldName = ("mlrNumber","prevMlrNumber"),
-            labelText = "aboutthebusiness.registeredformlr.title",
-            legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
-            textFieldLabelText = ("aboutthebusiness.registeredformlr.mlrregno","aboutthebusiness.registeredformlr.previous.mlrregno"),
-            options = optionsRegisteredFoMLR
+            textFieldName = "mlrNumber",
+            labelText = "aboutthebusiness.registeredformlr.lbl",
+            textFieldLabelText = Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"),
+            options = optionsYesNo
         )
         @submit(Messages("button.saveandcontinue"))
     }
