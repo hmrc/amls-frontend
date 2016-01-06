@@ -4,15 +4,15 @@
 @import include.forms._
 @import utils.DataFields._
 
-@(RegisteredForMLRForm: Form[models.RegisteredForMLR])(implicit request: Request[_])
+@(registeredWithHMRCBeforeForm: Form[models.RegisteredWithHMRCBefore])(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.registeredformlr.title")
 ) {
-    @formHelper(RegisteredForMLRForm, aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>
+    @formHelper(registeredWithHMRCBeforeForm, aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>
         @radioGroupYesNoWithText(
-            name = "hasMLR",
+            name = "registeredWithHMRC",
             textFieldName = "mlrNumber",
             labelText = "aboutthebusiness.registeredformlr.lbl",
             textFieldLabelText = Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"),

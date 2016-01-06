@@ -5,7 +5,7 @@ import java.util.UUID
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import forms.AboutTheBusinessForms._
-import models.RegisteredForMLR
+import models.RegisteredWithHMRCBefore
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -30,7 +30,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
   val mockAuthConnector = mock[AuthConnector]
   val mockDataCacheConnector = mock[DataCacheConnector]
   val VAT_URL = "/business-details/vat"
-  val mockMLRModel = RegisteredForMLR(true, Some("12345678"))
+  val mockMLRModel = RegisteredWithHMRCBefore(true, Some("12345678"))
 
   object MockRegisteredForMLRController extends BusinessRegisteredWithHMRCBeforeController {
     val authConnector = mockAuthConnector
@@ -47,7 +47,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
     }
 
     "on load display the registered for MLR page" in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredForMLR](Matchers.any())
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredWithHMRCBefore](Matchers.any())
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
       val result = MockRegisteredForMLRController.get
       status(result) must be(OK)
@@ -55,7 +55,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
     }
 
     "on load display the registered for MLR  page with pre-populated data" in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredForMLR](Matchers.any())
+      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredWithHMRCBefore](Matchers.any())
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(Some(mockMLRModel)))
       val result = MockRegisteredForMLRController.get
       status(result) must be(OK)
@@ -109,12 +109,12 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
       }
     }
 
-    def createRegisteredForMLRForSubmission(test: Future[Result] => Any, hasMLR: Boolean,
+    def createRegisteredForMLRForSubmission(test: Future[Result] => Any, registeredWithHMRC: Boolean,
                                                   mlrNumber: Option[String]) {
-      val mockRegisteredForMLR = RegisteredForMLR(hasMLR, mlrNumber)
-      val form  = RegisteredForMLRForm.fill(mockRegisteredForMLR)
-      val fakePostRequest = FakeRequest("POST", "/business-with-VAT").withFormUrlEncodedBody(form.data.toSeq: _*)
-      when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredForMLR](Matchers.any(), Matchers.any())
+      val mockRegisteredForMLR = RegisteredWithHMRCBefore(registeredWithHMRC, mlrNumber)
+      val form  = registeredWithHMRCBeforeForm.fill(mockRegisteredForMLR)
+      val fakePostRequest = FakeRequest("POST", VAT_URL).withFormUrlEncodedBody(form.data.toSeq: _*)
+      when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredWithHMRCBefore](Matchers.any(), Matchers.any())
         (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(mockRegisteredForMLR)))
       val result = MockRegisteredForMLRController.post(mock[AuthContext], fakePostRequest)
       test(result)

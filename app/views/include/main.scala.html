@@ -18,7 +18,7 @@
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
 @styles = {
-    <link  href="@routes.AssetsController.at("amls.css")" rel="stylesheet" type="text/css"/>
+    <link  href='@controllers.routes.Assets.at("amls.css")' rel="stylesheet" type="text/css"/>
     @linkElement
 }
 
@@ -32,7 +32,7 @@
 }
 
 @scripts = {
-    <script src="@routes.AssetsController.at("amls.js")"></script>
+    <script src='@controllers.routes.Assets.at("amls.js")'></script>
     @scriptElem
 }
 
