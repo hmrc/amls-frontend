@@ -1,10 +1,9 @@
 package controllers.aboutyou
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import forms.AboutYouForms._
-import models.{YourDetails}
-import org.mockito.Matchers
+import models.YourDetails
+import org.jsoup.Jsoup
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
@@ -21,80 +20,71 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
   implicit val request = FakeRequest()
 
-  val yourName: YourDetails = YourDetails("firstName", Option("middleName"), "lastName")
-  val mockAuthConnector = mock[AuthConnector]
-  val mockDataCacheConnector = mock[DataCacheConnector]
-
-  object MockYourNameController extends YourDetailsController {
-    override protected def authConnector: AuthConnector = mockAuthConnector
-    val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
+  object Controller extends YourDetailsController {
+    override val authConnector = mock[AuthConnector]
+    override val dataCacheConnector = mock[DataCacheConnector]
   }
 
   "AboutYouController" must {
-    "use correct service" in {
-      YourDetailsController.authConnector must be(AMLSAuthConnector)
-    }
 
-    "on load of page AboutYou" must {
-        "load Your Name page" in {
-            when(mockDataCacheConnector.fetchDataShortLivedCache[YourDetails](Matchers.any())
-            (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
-            val result = MockYourNameController.get(mock[AuthContext], request)
-            status(result) must be(OK)
-            contentAsString(result) must include(Messages("lbl.first_name"))
-          }
+    "Get" must {
 
-        "load Your Name page with pre populated data" in {
-          when(mockDataCacheConnector.fetchDataShortLivedCache[YourDetails](Matchers.any())
-            (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(Some(yourName)))
-          val result = MockYourNameController.get(mock[AuthContext], request)
-          status(result) must be(OK)
-          contentAsString(result) must include("firstName")
-        }
+      "load Your Name page" in {
+
+        when(Controller.dataCacheConnector.fetchDataShortLivedCache[YourDetails](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        val result = Controller.get(mock[AuthContext], request)
+
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("lbl.first_name"))
       }
 
-    "on submit of Your Name page" must {
-      "successfully navigate to next page " in {
-        submitWithFormFilled { result =>
-          status(result) must be(SEE_OTHER)
-        }
-      }
+      "load Your Name page with pre populated data" in {
 
-      "get validation exception when the length of the text field is greater than MAX characters" in {
-        submitWithLengthValidation { result =>
-          status(result) must be(BAD_REQUEST)
-        }
-      }
+        val yourDetails = YourDetails("foo", None, "bar")
 
-      "get error message when the user not filled on the mandatory fields" in {
-        submitWithoutMandatoryFields { result =>
-          status(result) must be(BAD_REQUEST)
-        }
+        when(Controller.dataCacheConnector.fetchDataShortLivedCache[YourDetails](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(yourDetails)))
+
+        val result = Controller.get(mock[AuthContext], request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[name=firstname]").`val` must be("foo")
+        document.select("input[name=lastname]").`val` must be("bar")
       }
     }
 
-    def createYourNameFormForSubmission(test: Future[Result] => Any, firstName: String, middleName:String, lastName:String) {
-      val yourNameModel = YourDetails(firstName, Option(middleName),lastName)
-      val form  = yourDetailsForm.fill(yourNameModel)
-      val fakePostRequest = FakeRequest("POST", "/your-name").withFormUrlEncodedBody(form.data.toSeq: _*)
-      when(mockDataCacheConnector.saveDataShortLivedCache[YourDetails](Matchers.any(), Matchers.any())
-        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(yourName)))
-      val result = MockYourNameController.post(mock[AuthContext], fakePostRequest)
-      test(result)
-    }
+    "Post" must {
 
-    def submitWithFormFilled(test: Future[Result] => Any) {
-      createYourNameFormForSubmission(test, "first name","middle name","last name")
-    }
+      "on post valid data" in {
 
-    def submitWithLengthValidation(test: Future[Result] => Any) {
-      createYourNameFormForSubmission(test, "aaaaaaaaa" * 22,
-        "","aaaaaaaaa" * 11)
-    }
+        val request = FakeRequest().withFormUrlEncodedBody(
+          "firstname" -> "foo",
+          "lastname" -> "bar"
+        )
 
-    def submitWithoutMandatoryFields(test: Future[Result] => Any) {
-      createYourNameFormForSubmission(test,"","","")
-    }
+        when(Controller.dataCacheConnector.saveDataShortLivedCache[YourDetails](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
 
+        val result = Controller.post(mock[AuthContext], request)
+        status(result) must be(SEE_OTHER)
+//        redirectLocation(result) must be(Some(controllers.aboutyou.routes.YourDetailsController.get().url))
+      }
+
+      "on post invalid data" in {
+
+        val request = FakeRequest().withFormUrlEncodedBody(
+          "firstname" -> "foo"
+        )
+
+        val result = Controller.post(mock[AuthContext], request)
+        status(result) must be(BAD_REQUEST)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[name=firstname]").`val`() must be("foo")
+      }
+    }
   }
 }

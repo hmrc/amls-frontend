@@ -57,20 +57,17 @@ summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
 
-aboutyou.yourname.title = Your details
-
-aboutyou.employedwithinbusiness.title = Are you employed within the business?
+aboutyou.yourdetails.title = Your details
 
 aboutyou.rolewithinbusiness.title = What is your role within the business?
 aboutyou.rolewithinbusiness.lbl.01=Beneficial shareholder
 aboutyou.rolewithinbusiness.lbl.02=Director
-aboutyou.rolewithinbusiness.lbl.03=Partner
+aboutyou.rolewithinbusiness.lbl.03=External accountant
 aboutyou.rolewithinbusiness.lbl.04=Internal accountant
-aboutyou.rolewithinbusiness.lbl.05=Sole proprietor
-aboutyou.rolewithinbusiness.lbl.06=Nominated officer
-
-aboutyou.roleforbusiness.title = What is your role for the business?
-aboutyou.roleforbusiness.lbl.01=External accountant
+aboutyou.rolewithinbusiness.lbl.05=Nominated officer
+aboutyou.rolewithinbusiness.lbl.06=Partner
+aboutyou.rolewithinbusiness.lbl.07=Sole proprietor
+aboutyou.rolewithinbusiness.lbl.08=Other
 
 aboutthebusiness.businesshaswebsite.title = Does your business have a website?
 aboutthebusiness.addressofyourwebsite.title = What is the address of your website?

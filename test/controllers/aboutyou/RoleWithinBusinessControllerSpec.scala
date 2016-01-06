@@ -1,78 +1,83 @@
 package controllers
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.aboutyou.RoleWithinBusinessController
-import forms.AboutYouForms._
 import models.RoleWithinBusiness
+import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import helpers.CommonTestHelper._
+
 import scala.concurrent.Future
 
 class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
-  implicit val request = FakeRequest()
-  val mockAuthConnector = mock[AuthConnector]
-  val mockDataCacheConnector = mock[DataCacheConnector]
+  val request = FakeRequest()
 
-  object MockRoleWithinBusinessController extends RoleWithinBusinessController {
-    val authConnector = mockAuthConnector
-    override val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
-  }
-
-  override def beforeEach(): Unit = {
-    reset(mockAuthConnector)
+  object Controller extends RoleWithinBusinessController {
+    override val authConnector = mock[AuthConnector]
+    override val dataCacheConnector = mock[DataCacheConnector]
   }
 
   "RoleWithinBusinessController" must {
-    "use correct service" in {
-      RoleWithinBusinessController.authConnector must be(AMLSAuthConnector)
-    }
 
-    "on load display the Role Within Business page" in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any())
+    "on get display the Role Within Business page" in {
+
+      when(Controller.dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any())
         (any(), any(),  any())).thenReturn(Future.successful(None))
-      val result = MockRoleWithinBusinessController.get(mock[AuthContext], request)
+
+      val result = Controller.get(mock[AuthContext], request)
       status(result) must be(OK)
       contentAsString(result) must include("What is your role within the business?")
     }
-    "on load display the Role Within Business page with pre populated data" in {
-      val roleWithinBusiness = RoleWithinBusiness("07", "Cleaner")
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any())
+
+    "on get display the Role Within Business page with pre populated data" in {
+
+      val roleWithinBusiness = RoleWithinBusiness("01", "")
+
+      when(Controller.dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any())
         (any(), any(),  any())).thenReturn(Future.successful(Some(roleWithinBusiness)))
-      val result = MockRoleWithinBusinessController.get(mock[AuthContext], request)
+
+      val result = Controller.get(mock[AuthContext], request)
       status(result) must be(OK)
-      contentAsString(result) must include("What is your role within the business?")
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
-    "on submit of valid role other than OTHER display the next page (currently NOT IMPLEMENTED)" in {
-      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
-        RoleWithinBusiness("01", ""), roleWithinBusinessForm, mockDataCacheConnector, performVerify(SEE_OTHER, None))
+    "on post with valid data" in {
+
+      val request = FakeRequest().withFormUrlEncodedBody(
+        "roleWithinBusiness" -> "01",
+        "other" -> ""
+      )
+
+      when(Controller.dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = Controller.post(mock[AuthContext], request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.aboutyou.routes.YourDetailsController.get().url))
     }
 
-    "on submit without choosing a valid role re-display the page with validation error" in {
-      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
-        RoleWithinBusiness("", ""), roleWithinBusinessForm, mockDataCacheConnector, performVerify(BAD_REQUEST, None, "What is your role within the business?", Messages("err.required")))
-    }
+    "on post with invalid data" in {
 
-    "on submit of valid role of OTHER with role entered in text field display the next page (currently NOT IMPLEMENTED)" in {
-      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
-        RoleWithinBusiness("07", "Cleaner"), roleWithinBusinessForm, mockDataCacheConnector, performVerify(SEE_OTHER, None))
-    }
+      val request = FakeRequest().withFormUrlEncodedBody(
+        "other" -> "foo"
+      )
 
-    "on submit of valid role of OTHER with NO role entered in text field re-display the page with validation error" in {
-      postAndVerifyResult( MockRoleWithinBusinessController.post(_,_),
-        RoleWithinBusiness("07", ""), roleWithinBusinessForm, mockDataCacheConnector, performVerify(BAD_REQUEST, None, "What is your role within the business?", Messages("err.required")))
+      val result = Controller.post(mock[AuthContext], request)
+      status(result) must be(BAD_REQUEST)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("input[name=other]").`val`() must be("foo")
     }
   }
 }

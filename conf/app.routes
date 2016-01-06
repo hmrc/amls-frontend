@@ -13,14 +13,10 @@ GET         /summary                        controllers.MainSummaryController.on
 GET         /login                          controllers.AmlsController.onPageLoad
 POST        /login                          controllers.AmlsController.onSubmit
 
-GET         /your-name                      controllers.aboutyou.YourNameController.get()
-POST        /your-name                      controllers.aboutyou.YourNameController.post()
-GET         /employed-within-business       controllers.aboutyou.EmployedWithinTheBusinessController.get()
-POST        /employed-within-business       controllers.aboutyou.EmployedWithinTheBusinessController.post()
+GET         /your-details                   controllers.aboutyou.YourDetailsController.get()
+POST        /your-details                   controllers.aboutyou.YourDetailsController.post()
 GET         /role-within-business           controllers.aboutyou.RoleWithinBusinessController.get()
 POST        /role-within-business           controllers.aboutyou.RoleWithinBusinessController.post()
-GET         /role-for-business              controllers.aboutyou.RoleForBusinessController.get()
-POST        /role-for-business              controllers.aboutyou.RoleForBusinessController.post()
 
 GET         /business-has-website           controllers.aboutthebusiness.BusinessHasWebsiteController.get()
 POST        /business-has-website           controllers.aboutthebusiness.BusinessHasWebsiteController.post()
