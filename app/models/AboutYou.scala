@@ -2,10 +2,10 @@ package models
 
 import play.api.libs.json.Json
 
-case class YourName(firstName: String, middleName: Option[String], lastName: String)
+case class YourDetails(firstName: String, middleName: Option[String], lastName: String)
 
-object YourName {
-  implicit val formats = Json.format[YourName]
+object YourDetails {
+  implicit val formats = Json.format[YourDetails]
 }
 
 case class EmployedWithinTheBusiness(isEmployed: Boolean)

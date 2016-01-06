@@ -3,7 +3,7 @@
 @import forms.AmlsForms._
 @import include.forms._
 
-@(yourNameForm: Form[models.YourName])(implicit request: Request[_])
+@(yourNameForm: Form[_])(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
