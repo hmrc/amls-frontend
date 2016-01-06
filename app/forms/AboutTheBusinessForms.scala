@@ -39,9 +39,9 @@ object AboutTheBusinessForms {
       getIntFromProperty("validationMaxLengthEmail"))
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply))
 
-  val RegisteredForMLRForm = Form(mapping(
+  val registeredWithHMRCBeforeForm = Form(mapping(
     "hasMLR" -> mandatoryBooleanWithText("mlrNumber", "true", "err.required", "err.required", "err.notrequired"),
     "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "err.invalid",
       getIntFromProperty("validationMinLengthMLR"), getIntFromProperty("validationMaxLengthMLR")))
-  )(RegisteredForMLR.apply)(RegisteredForMLR.unapply))
+  )(RegisteredWithHMRCBefore.apply)(RegisteredWithHMRCBefore.unapply))
 }

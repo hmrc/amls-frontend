@@ -93,8 +93,8 @@ object BusinessHasEmail {
   implicit val formats = Json.format[BusinessHasEmail]
 }
 
-case class RegisteredForMLR(hasMLR: Boolean, mlrNumber: Option[String])
+case class RegisteredWithHMRCBefore(registeredWithHMR: Boolean, mlrNumber: Option[String])
 
-object RegisteredForMLR {
-  implicit val formats = Json.format[RegisteredForMLR]
+object RegisteredWithHMRCBefore {
+  implicit val formats = Json.format[RegisteredWithHMRCBefore]
 }
