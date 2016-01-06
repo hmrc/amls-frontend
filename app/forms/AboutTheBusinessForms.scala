@@ -40,7 +40,7 @@ object AboutTheBusinessForms {
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply))
 
   val registeredWithHMRCBeforeForm = Form(mapping(
-    "hasMLR" -> mandatoryBooleanWithText("mlrNumber", "true", "err.required", "err.required", "err.notrequired"),
+    "registeredWithHMR" -> mandatoryBooleanWithText("mlrNumber", "true", "err.required", "err.required", "err.notrequired"),
     "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "err.invalid",
       getIntFromProperty("validationMinLengthMLR"), getIntFromProperty("validationMaxLengthMLR")))
   )(RegisteredWithHMRCBefore.apply)(RegisteredWithHMRCBefore.unapply))
