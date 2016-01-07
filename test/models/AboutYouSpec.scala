@@ -60,4 +60,63 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
         be(partialModel)
     }
   }
+
+  "None" when {
+    "Merged with your details" must {
+      "return AboutYou with correct details set" in {
+        val result = AboutYou.merge(None, yourDetails)
+        result must be (AboutYou(Some(yourDetails), None))
+      }
+    }
+
+    "Merged with yourRoleIntheBusinsess" must {
+      "return AboutYou with correct role in the business set" in {
+        val result = AboutYou.merge(None, role)
+        result must be (AboutYou(None, Some(role)))
+      }
+    }
+  }
+
+  "AboutYou" when {
+    "yourDetails already set" when {
+      val initial = AboutYou(Some(yourDetails), None)
+
+      "Merged with your details" must {
+        "return AboutYou with correct details set" in {
+          val newDetails = YourDetails("TestName2", Some("TestName3"), "TestName4")
+          val result = AboutYou.merge(Some(initial), newDetails)
+          result must be (AboutYou(Some(newDetails), None))
+        }
+      }
+
+      "Merged with yourRoleIntheBusinsess" must {
+        "return AboutYou with correct role in the business set" in {
+          val newRole = RoleWithinBusiness("TestRoleWithinTheBusiness2", "")
+          val result = AboutYou.merge(Some(initial), newRole)
+          result must be (AboutYou(Some(yourDetails), Some(newRole)))
+        }
+      }
+    }
+  }
+
+  "AboutYou" when {
+    "yourRoleInTheBusiness already set" when {
+      val initial = AboutYou(None, Some(role))
+      "Merged with your details" must {
+        "return AboutYou with correct details set" in {
+          val newDetails = YourDetails("TestName2", Some("TestName3"), "TestName4")
+          val result = AboutYou.merge(Some(initial), newDetails)
+          result must be (AboutYou(Some(newDetails), Some(role)))
+        }
+      }
+
+      "Merged with yourRoleIntheBusinsess" must {
+        "return AboutYou with correct role in the business set" in {
+          val newRole = RoleWithinBusiness("TestRoleWithinTheBusiness2", "")
+          val result = AboutYou.merge(Some(initial), newRole)
+          result must be (AboutYou(None, Some(newRole)))
+        }
+      }
+    }
+  }
 }
