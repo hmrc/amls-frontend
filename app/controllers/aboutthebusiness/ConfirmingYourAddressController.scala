@@ -11,13 +11,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-trait RegisteredOfficeController extends AMLSGenericController {
-  def optionsIsRegisteredOffice(implicit lang: Lang) = Seq(
-    Messages("aboutthebusiness.registeredoffice.isregoffice.yessame") -> "1",
-    Messages("aboutthebusiness.registeredoffice.isregoffice.yesdifferent") -> "2",
-    Messages("aboutthebusiness.registeredoffice.isregoffice.no") -> "3"
-  )
-
+trait ConfirmingYourAddressController extends AMLSGenericController {
   def dataCacheConnector: DataCacheConnector
 
   def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
@@ -26,34 +20,33 @@ trait RegisteredOfficeController extends AMLSGenericController {
 
   override def get(implicit user: AuthContext, request: Request[AnyContent]) = {
     val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
-    val cachedDataFuture = dataCacheConnector.fetchDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY)
+    val cachedDataFuture = dataCacheConnector.fetchDataShortLivedCache[ConfirmingYourAddressSave4Later](CACHE_KEY)
     for {
       reviewBusinessDetails <- reviewBusinessDetailsFuture
       cachedData <- cachedDataFuture
     } yield {
-      val fm = cachedData.fold(registeredOfficeForm)( x => registeredOfficeForm.fill(RegisteredOffice.fromRegisteredOfficeSave4Later(x)) )
-      Ok(views.html.registered_office(fm, reviewBusinessDetails, optionsIsRegisteredOffice))
+      val fm = cachedData.fold(confirmingYourAddressForm)( x => confirmingYourAddressForm.fill(ConfirmingYourAddress.fromRegisteredOfficeSave4Later(x)) )
+      Ok(views.html.registered_office(fm, reviewBusinessDetails))
     }
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]) = {
     val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
-    registeredOfficeForm.bindFromRequest().fold(
+    confirmingYourAddressForm.bindFromRequest().fold(
       errors => {
         for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
-          BadRequest(views.html.registered_office(errors, reviewBusinessDetails, optionsIsRegisteredOffice))
+          BadRequest(views.html.registered_office(errors, reviewBusinessDetails))
         }
       },
       regOffice => {
         val futureFutureResult: Future[Future[Result]] =
           for {
             reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture
-            result = dataCacheConnector.saveDataShortLivedCache[RegisteredOfficeSave4Later](CACHE_KEY,
-              RegisteredOfficeSave4Later(reviewBusinessDetails.businessAddress,
-                regOffice.isRegisteredOffice, regOffice.isCorrespondenceAddressSame))
+            result = dataCacheConnector.saveDataShortLivedCache[ConfirmingYourAddressSave4Later](CACHE_KEY,
+              ConfirmingYourAddressSave4Later(reviewBusinessDetails.businessAddress, regOffice.isRegOfficeOrMainPlaceOfBusiness))
           } yield {
             result map {
-              case Some(RegisteredOfficeSave4Later(_, true, true)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
+              case Some(ConfirmingYourAddressSave4Later(_, true)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
               case _ => NotImplemented("Not yet implemented")
             }
           }
@@ -63,7 +56,7 @@ trait RegisteredOfficeController extends AMLSGenericController {
   }
 }
 
-object RegisteredOfficeController extends RegisteredOfficeController {
+object ConfirmingYourAddressController extends ConfirmingYourAddressController {
   override def dataCacheConnector = DataCacheConnector
 
   override def authConnector = AMLSAuthConnector

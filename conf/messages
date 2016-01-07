@@ -72,26 +72,24 @@ aboutyou.rolewithinbusiness.lbl.06=Nominated officer
 aboutyou.roleforbusiness.title = What is your role for the business?
 aboutyou.roleforbusiness.lbl.01=External accountant
 
-aboutthebusiness.businesshaswebsite.title = Does your business have a website?
-aboutthebusiness.addressofyourwebsite.title = What is the address of your website?
-
-aboutthebusiness.telephoning.title = Telephoning your business
-aboutthebusiness.telephoning.phone = Business phone number
-aboutthebusiness.telephoning.mobile = Mobile contact number (optional)
-aboutthebusiness.telephoning.invalid.phone = Invalid Phone Number
-aboutthebusiness.telephoning.invalid.mobile = Invalid Mobile Number
-
 aboutthebusiness.registeredforvat.title = Is this business registered for VAT?
 aboutthebusiness.vatnumber.lbl = VAT registration number
 
-aboutthebusiness.whatisbusinessemail.title = What is the business's email address
-aboutthebusiness.whatisbusinessemail.email = Email
+aboutthebusiness.contactingyou.title = Contacting you
+aboutthebusiness.contactingyou.lbl = We may need to get in touch to discuss your registration.
+aboutthebusiness.contactingyou.email.lbl = Email address
+aboutthebusiness.contactingyou.phone.lbl = Phone number
+aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
+aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
+aboutthebusiness.contactingyou.website.lbl = Website address (optional)
+aboutthebusiness.contactingyou.businessaddress = Business address:
 
 aboutthebusiness.registeredformlr.title = Has this business been registered with HMRC before?
 aboutthebusiness.registeredformlr.lbl = This only refers to registration for anti-money laundering supervision with HMRC.
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulation registration number
 
-aboutthebusiness.registeredoffice.title = Registered office or principal place of business
+aboutthebusiness.confirmingyouraddress.title = Confirming your address
+aboutthebusiness.confirmingyouraddress.registeredormainplace.lbl = Is this your registered office or main place of business?
 aboutthebusiness.registeredoffice.isregoffice.yessame = Yes, and I would like correspondence to be sent here.
 aboutthebusiness.registeredoffice.isregoffice.yesdifferent = Yes, but I would like to provide a different address for correspondence.
 aboutthebusiness.registeredoffice.isregoffice.no = No
