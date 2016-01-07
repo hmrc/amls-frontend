@@ -23,13 +23,13 @@
         <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.postcode.getOrElse("")</li>
     </ul>
 </div>
-<div class="form-group">
+
         @radioGroup(
             name = "isRegOfficeOrMainPlaceOfBusiness",
             labelText = Messages("aboutthebusiness.confirmingyouraddress.registeredormainplace.lbl"),
             options = optionsYesNo
         )
-</div>
+
 @submit(Messages("button.saveandcontinue"))
     }
 }
