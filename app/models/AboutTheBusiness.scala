@@ -67,7 +67,7 @@ object ConfirmingYourAddress {
 
   implicit val formats = Json.format[ConfirmingYourAddress]
 
-  def fromRegisteredOfficeSave4Later(confirmingYourAddressSave4Later: ConfirmingYourAddressSave4Later): ConfirmingYourAddress = {
+  def fromConfirmingYourAddressSave4Later(confirmingYourAddressSave4Later: ConfirmingYourAddressSave4Later): ConfirmingYourAddress = {
     ConfirmingYourAddress(confirmingYourAddressSave4Later.isRegOfficeOrMainPlaceOfBusiness)
   }
 

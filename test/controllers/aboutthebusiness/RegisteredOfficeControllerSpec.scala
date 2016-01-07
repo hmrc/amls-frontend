@@ -21,13 +21,13 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   private val bCAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
   private val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
     bCAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
-  private val regOffTrueTrue = ConfirmingYourAddress(isRegOfficeOrMainPlaceOfBusiness = true)
-  private val regOffSave4LaterTrue = ConfirmingYourAddressSave4Later(bCAddress, isRegOfficeOrMainPlaceOfBusiness = true)
+  private val confirmingAddress = ConfirmingYourAddress(isRegOfficeOrMainPlaceOfBusiness = true)
+  private val confirmingAddressSave4Later = ConfirmingYourAddressSave4Later(bCAddress, isRegOfficeOrMainPlaceOfBusiness = true)
   private implicit val authContext = mock[AuthContext]
   private val mockAuthConnector = mock[AuthConnector]
   private val mockDataCacheConnector = mock[DataCacheConnector]
   private val mockSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
-  private val EndpointURL = "/registered-office"
+  private val EndpointURL = "/business-details/confirming-address"
 
   "The Page load" must {
     implicit val fakeGetRequest = FakeRequest()
@@ -39,7 +39,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
           thenThrow(new RuntimeException)
         when(mockDataCacheConnector.fetchDataShortLivedCache[ConfirmingYourAddress](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
-        MockRegisteredOfficeController.get
+        MockConfirmingYourAddressController.get
       }
     }
 
@@ -48,7 +48,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
         .thenReturn(Future.successful(businessCustomerDetails))
       when(mockDataCacheConnector.fetchDataShortLivedCache[ConfirmingYourAddress](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
-      val futureResult = MockRegisteredOfficeController.get
+      val futureResult = MockConfirmingYourAddressController.get
       status(futureResult) must be(OK)
       contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_1)
       contentAsString(futureResult) must include(businessCustomerDetails.businessAddress.line_2)
@@ -61,8 +61,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       when(mockSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
         thenReturn(Future.successful(businessCustomerDetails))
       when(mockDataCacheConnector.fetchDataShortLivedCache[ConfirmingYourAddressSave4Later](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(regOffSave4LaterTrue)))
-      val futureResult = MockRegisteredOfficeController.get
+        (any(), any(), any())).thenReturn(Future.successful(Some(confirmingAddressSave4Later)))
+      val futureResult = MockConfirmingYourAddressController.get
       status(futureResult) must be(OK)
     }
   }
@@ -71,11 +71,11 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     implicit val headerCarrier = mock[HeaderCarrier]
 
     "when valid values entered including choice of first option then forward to Telephoning Business page" in {
-      val registeredOfficeForm1 = confirmingYourAddressForm.fill(regOffTrueTrue)
+      val registeredOfficeForm1 = confirmingYourAddressForm.fill(confirmingAddress)
       implicit val fakePostRequest = FakeRequest("POST", EndpointURL)
         .withFormUrlEncodedBody(registeredOfficeForm1.data.toSeq: _*)
 
-      postFormAndTestResult(regOffSave4LaterTrue, result => {
+      postFormAndTestResult(confirmingAddressSave4Later, result => {
         status(result) must be(SEE_OTHER)
         redirectLocation(result).fold("") { x => x } must include("/telephoning-business")
       })
@@ -94,7 +94,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "display validation message when no radio button chosen" in {
       implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(("isRegOfficeOrMainPlaceOfBusiness", ""))
-      postFormAndTestResult(regOffSave4LaterTrue, result => status(result) must be(BAD_REQUEST)
+      postFormAndTestResult(confirmingAddressSave4Later, result => status(result) must be(BAD_REQUEST)
       )
     }
 
@@ -107,11 +107,11 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       thenReturn(Future.successful(businessCustomerDetails))
     when(mockDataCacheConnector.saveDataShortLivedCache[ConfirmingYourAddressSave4Later](any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(registeredOfficeSave4Later)))
-    val result = MockRegisteredOfficeController.post
+    val result = MockConfirmingYourAddressController.post
     test(result)
   }
 
-  object MockRegisteredOfficeController extends ConfirmingYourAddressController {
+  object MockConfirmingYourAddressController extends ConfirmingYourAddressController {
     override def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector = mockSessionCacheConnector
 
     def authConnector = mockAuthConnector

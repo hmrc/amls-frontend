@@ -81,6 +81,10 @@ aboutthebusiness.contactingyou.email.lbl = Email address
 aboutthebusiness.contactingyou.phone.lbl = Phone number
 aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
 aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
+
+aboutthebusiness.businesshaswebsite.title = Does your business have a website?
+aboutthebusiness.addressofyourwebsite.title = What is the address of your website?
+
 aboutthebusiness.contactingyou.website.lbl = Website address (optional)
 aboutthebusiness.contactingyou.businessaddress = Business address:
 

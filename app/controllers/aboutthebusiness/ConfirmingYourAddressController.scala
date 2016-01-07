@@ -25,7 +25,7 @@ trait ConfirmingYourAddressController extends AMLSGenericController {
       reviewBusinessDetails <- reviewBusinessDetailsFuture
       cachedData <- cachedDataFuture
     } yield {
-      val fm = cachedData.fold(confirmingYourAddressForm)( x => confirmingYourAddressForm.fill(ConfirmingYourAddress.fromRegisteredOfficeSave4Later(x)) )
+      val fm = cachedData.fold(confirmingYourAddressForm)( x => confirmingYourAddressForm.fill(ConfirmingYourAddress.fromConfirmingYourAddressSave4Later(x)) )
       Ok(views.html.registered_office(fm, reviewBusinessDetails))
     }
   }
