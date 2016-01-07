@@ -8,12 +8,10 @@
 
 @main(
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
-    title = Messages("aboutthebusiness.registeredoffice.title")
+    title = Messages("aboutthebusiness.confirmingyouraddress.title")
 ) {
 
     @formHelper(confirmingYourAddressForm, aboutthebusiness.routes.ConfirmingYourAddressController.post()) { implicit form: Form[_] =>
-
-<p>@Messages("aboutthebusiness.registeredoffice.addressheader")</p>
 
 <div class="panel-indent">
     <ul>

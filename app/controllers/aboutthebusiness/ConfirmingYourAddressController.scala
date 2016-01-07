@@ -26,7 +26,7 @@ trait ConfirmingYourAddressController extends AMLSGenericController {
       cachedData <- cachedDataFuture
     } yield {
       val fm = cachedData.fold(confirmingYourAddressForm)( x => confirmingYourAddressForm.fill(ConfirmingYourAddress.fromConfirmingYourAddressSave4Later(x)) )
-      Ok(views.html.registered_office(fm, reviewBusinessDetails))
+      Ok(views.html.confirming_your_address(fm, reviewBusinessDetails))
     }
   }
 
@@ -35,7 +35,7 @@ trait ConfirmingYourAddressController extends AMLSGenericController {
     confirmingYourAddressForm.bindFromRequest().fold(
       errors => {
         for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
-          BadRequest(views.html.registered_office(errors, reviewBusinessDetails))
+          BadRequest(views.html.confirming_your_address(errors, reviewBusinessDetails))
         }
       },
       regOffice => {
@@ -58,8 +58,6 @@ trait ConfirmingYourAddressController extends AMLSGenericController {
 
 object ConfirmingYourAddressController extends ConfirmingYourAddressController {
   override def dataCacheConnector = DataCacheConnector
-
   override def authConnector = AMLSAuthConnector
-
   override def businessCustomerSessionCacheConnector = BusinessCustomerSessionCacheConnector
 }

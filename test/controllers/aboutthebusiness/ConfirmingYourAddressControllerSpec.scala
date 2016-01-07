@@ -1,5 +1,6 @@
 package controllers.aboutthebusiness
 
+import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import forms.AboutTheBusinessForms.confirmingYourAddressForm
 import models._
@@ -17,7 +18,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class ConfirmingYourAddressControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
   private val bCAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
   private val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
     bCAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
@@ -32,6 +33,12 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
   "The Page load" must {
     implicit val fakeGetRequest = FakeRequest()
     implicit val headerCarrier = mock[HeaderCarrier]
+
+    "use correct service" in {
+      ConfirmingYourAddressController.authConnector must be(AMLSAuthConnector)
+      ConfirmingYourAddressController.businessCustomerSessionCacheConnector must be(BusinessCustomerSessionCacheConnector)
+      ConfirmingYourAddressController.dataCacheConnector must be(DataCacheConnector)
+    }
 
     "throws exception if the Registered Office page does not find the Address" in {
       a[java.lang.RuntimeException] should be thrownBy {
@@ -82,14 +89,12 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "when valid values entered including choice of second option then forward to NotImplemented page" in {
-      val registeredOfficeForm1 = confirmingYourAddressForm.fill(ConfirmingYourAddress(isRegOfficeOrMainPlaceOfBusiness = true))
+      val registeredOfficeForm1 = confirmingYourAddressForm.fill(ConfirmingYourAddress(isRegOfficeOrMainPlaceOfBusiness = false))
       implicit val fakePostRequest = FakeRequest("POST", EndpointURL)
         .withFormUrlEncodedBody(registeredOfficeForm1.data.toSeq: _*)
 
-      val registeredOfficeSave4Later = ConfirmingYourAddressSave4Later(bCAddress, isRegOfficeOrMainPlaceOfBusiness = true)
-
-      postFormAndTestResult(registeredOfficeSave4Later, result => status(result) must be(NOT_IMPLEMENTED)
-      )
+      val registeredOfficeSave4Later = ConfirmingYourAddressSave4Later(bCAddress, isRegOfficeOrMainPlaceOfBusiness = false)
+      postFormAndTestResult(registeredOfficeSave4Later, result => status(result) must be(NOT_IMPLEMENTED))
     }
 
     "display validation message when no radio button chosen" in {
@@ -100,13 +105,13 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
   }
 
-  private def postFormAndTestResult(registeredOfficeSave4Later: ConfirmingYourAddressSave4Later,
+  private def postFormAndTestResult(confirmingYourAddressSave4Later: ConfirmingYourAddressSave4Later,
                                     test: Future[Result] => Any)(
     implicit request: FakeRequest[AnyContentAsFormUrlEncoded]) = {
     when(mockSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any())).
       thenReturn(Future.successful(businessCustomerDetails))
     when(mockDataCacheConnector.saveDataShortLivedCache[ConfirmingYourAddressSave4Later](any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(registeredOfficeSave4Later)))
+      .thenReturn(Future.successful(Some(confirmingYourAddressSave4Later)))
     val result = MockConfirmingYourAddressController.post
     test(result)
   }
