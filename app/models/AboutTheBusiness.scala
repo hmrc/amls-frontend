@@ -53,30 +53,22 @@ object TelephoningBusiness {
 /**
  * This created because the address is not entered at front end so isn't in form.
  */
-case class RegisteredOfficeSave4Later(registeredOfficeAddress: BCAddress,
-                                      isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean)
+case class ConfirmingYourAddressSave4Later(registeredOfficeAddress: BCAddress,
+                                      isRegOfficeOrMainPlaceOfBusiness: Boolean)
 
-object RegisteredOfficeSave4Later {
-  implicit val formats = Json.format[RegisteredOfficeSave4Later]
+object ConfirmingYourAddressSave4Later {
+  implicit val formats = Json.format[ConfirmingYourAddressSave4Later]
 }
 
 
-case class RegisteredOffice(isRegisteredOffice: Boolean, isCorrespondenceAddressSame: Boolean)
+case class ConfirmingYourAddress(isRegOfficeOrMainPlaceOfBusiness: Boolean)
 
-object RegisteredOffice {
+object ConfirmingYourAddress {
 
-  implicit val formats = Json.format[RegisteredOffice]
+  implicit val formats = Json.format[ConfirmingYourAddress]
 
-  def fromRegisteredOfficeSave4Later(registeredOfficeSave4Later: RegisteredOfficeSave4Later): RegisteredOffice = {
-    RegisteredOffice(registeredOfficeSave4Later.isRegisteredOffice, registeredOfficeSave4Later.isCorrespondenceAddressSame)
-  }
-
-  def fromBooleanTuple(tuple: (Boolean, Boolean)): RegisteredOffice = {
-    RegisteredOffice(tuple._1, tuple._2)
-  }
-
-  def toBooleanTuple(registeredOffice: RegisteredOffice): Some[(Boolean, Boolean)] = {
-    Some(Tuple2(registeredOffice.isRegisteredOffice, registeredOffice.isCorrespondenceAddressSame))
+  def fromConfirmingYourAddressSave4Later(confirmingYourAddressSave4Later: ConfirmingYourAddressSave4Later): ConfirmingYourAddress = {
+    ConfirmingYourAddress(confirmingYourAddressSave4Later.isRegOfficeOrMainPlaceOfBusiness)
   }
 
 }
