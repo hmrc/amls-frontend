@@ -93,7 +93,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "display validation message when no radio button chosen" in {
-      implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(("isRegisteredOffice", ""))
+      implicit val fakePostRequest = FakeRequest("POST", EndpointURL).withFormUrlEncodedBody(("isRegOfficeOrMainPlaceOfBusiness", ""))
       postFormAndTestResult(regOffSave4LaterTrue, result => status(result) must be(BAD_REQUEST)
       )
     }
