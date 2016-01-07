@@ -24,6 +24,7 @@ trait AmlsController extends FrontendController with Actions {
           case Some(data) => Ok(views.html.AmlsLogin(loginDetailsForm.fill(data)))
           case _ => Ok(views.html.AmlsLogin(loginDetailsForm))
         }
+
   }
 
 

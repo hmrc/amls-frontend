@@ -39,20 +39,9 @@ object AboutTheBusinessForms {
       getIntFromProperty("validationMaxLengthEmail"))
   )(BusinessHasEmail.apply)(BusinessHasEmail.unapply))
 
-  val RegisteredForMLRForm = Form(mapping(
-    "hasMLR" -> RadioGroupPrefRegForMLRWithTextValidator.mandatoryBooleanWithText("mlrNumber",
-      "prevMlrNumber", "err.required", "err.required", "err.notrequired"),
+  val registeredWithHMRCBeforeForm = Form(mapping(
+    "registeredWithHMRC" -> mandatoryBooleanWithText("mlrNumber", "true", "err.required", "err.required", "err.notrequired"),
     "mlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "err.invalid",
-      getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthMLR"))),
-    "prevMlrNumber" -> optional(NumberValidator.validateNumber("err.invalidLength", "err.invalid",
-      getIntFromProperty("validationMaxLengthMLR"), getIntFromProperty("validationMaxLengthPrevMLR")))
-  )(applyRegisteredForMLRFormMapping)(unapplyRegisteredForMLRFormMapping))
-
-  def applyRegisteredForMLRFormMapping = (hasMlr: (Boolean, Boolean), mlrNumber: Option[String],
-                                          prevMlrNumber: Option[String]) =>
-    RegisteredForMLR(hasMlr._1, hasMlr._2, mlrNumber, prevMlrNumber)
-
-  def unapplyRegisteredForMLRFormMapping = (registeredForMLR: RegisteredForMLR) =>
-    Some(((registeredForMLR.hasDigitalMLR, registeredForMLR.hasNonDigitalMLR), registeredForMLR.mlrNumber,
-      registeredForMLR.prevMlrNumber))
+      getIntFromProperty("validationMinLengthMLR"), getIntFromProperty("validationMaxLengthMLR")))
+  )(RegisteredWithHMRCBefore.apply)(RegisteredWithHMRCBefore.unapply))
 }

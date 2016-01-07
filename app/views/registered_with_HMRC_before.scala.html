@@ -1,0 +1,23 @@
+@import include.main
+@import forms.FormHelpers._
+@import forms.AboutTheBusinessForms._
+@import include.forms._
+@import utils.DataFields._
+
+@(registeredWithHMRCBeforeForm: Form[models.RegisteredWithHMRCBefore])(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
+    title = Messages("aboutthebusiness.registeredformlr.title")
+) {
+    @formHelper(registeredWithHMRCBeforeForm, aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>
+        @radioGroupYesNoWithText(
+            name = "registeredWithHMRC",
+            textFieldName = "mlrNumber",
+            labelText = "aboutthebusiness.registeredformlr.lbl",
+            textFieldLabelText = Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"),
+            options = optionsYesNo
+        )
+        @submit(Messages("button.saveandcontinue"))
+    }
+}

@@ -81,18 +81,15 @@ aboutthebusiness.telephoning.mobile = Mobile contact number (optional)
 aboutthebusiness.telephoning.invalid.phone = Invalid Phone Number
 aboutthebusiness.telephoning.invalid.mobile = Invalid Mobile Number
 
-aboutthebusiness.registeredforvat.title = Is your business registered for VAT?
-aboutthebusiness.vatnumber.title = What is your VAT registration number?
+aboutthebusiness.registeredforvat.title = Is this business registered for VAT?
+aboutthebusiness.vatnumber.lbl = VAT registration number
 
 aboutthebusiness.whatisbusinessemail.title = What is the business's email address
 aboutthebusiness.whatisbusinessemail.email = Email
 
-aboutthebusiness.registeredformlr.title = Have you been registered for MLR before?
-aboutthebusiness.registeredformlr.lbl.yes.withreg = Yes, I have an existing registration
-aboutthebusiness.registeredformlr.lbl.yes.withpastreg = Yes, I was registered in the past but am not presently
-aboutthebusiness.registeredformlr.lbl.no = No
-aboutthebusiness.registeredformlr.mlrregno = MLR registration number
-aboutthebusiness.registeredformlr.previous.mlrregno = MLR registration number (optional)
+aboutthebusiness.registeredformlr.title = Has this business been registered with HMRC before?
+aboutthebusiness.registeredformlr.lbl = This only refers to registration for anti-money laundering supervision with HMRC.
+aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulation registration number
 
 aboutthebusiness.registeredoffice.title = Registered office or principal place of business
 aboutthebusiness.registeredoffice.isregoffice.yessame = Yes, and I would like correspondence to be sent here.

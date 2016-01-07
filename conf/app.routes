@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET         /assets/*file                   controllers.AssetsController.at(path="/public", file)
+GET         /assets/*file                   controllers.Assets.at(path="/public", file)
 
 GET         /example                        controllers.ExampleController.onPageLoad
 POST        /example                        controllers.ExampleController.onSubmit
@@ -22,19 +22,15 @@ POST        /role-within-business           controllers.aboutyou.RoleWithinBusin
 GET         /role-for-business              controllers.aboutyou.RoleForBusinessController.get()
 POST        /role-for-business              controllers.aboutyou.RoleForBusinessController.post()
 
-GET         /business-has-website           controllers.aboutthebusiness.BusinessHasWebsiteController.get()
-POST        /business-has-website           controllers.aboutthebusiness.BusinessHasWebsiteController.post()
-GET         /telephoning-business           controllers.aboutthebusiness.TelephoningBusinessController.get()
-POST        /telephoning-business           controllers.aboutthebusiness.TelephoningBusinessController.post()
-GET         /registered-office              controllers.aboutthebusiness.RegisteredOfficeController.get()
-POST        /registered-office              controllers.aboutthebusiness.RegisteredOfficeController.post()
-
-
-GET         /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.get()
-POST        /business-with-VAT              controllers.aboutthebusiness.BusinessRegForVATController.post()
-
-GET         /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.get()
-POST        /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.post()
-
-GET         /registered-for-MLR             controllers.aboutthebusiness.HaveYouRegForMLRBeforeController.get()
-POST        /registered-for-MLR            controllers.aboutthebusiness.HaveYouRegForMLRBeforeController.post()
+GET         /business-has-website                 controllers.aboutthebusiness.BusinessHasWebsiteController.get()
+POST        /business-has-website                 controllers.aboutthebusiness.BusinessHasWebsiteController.post()
+GET         /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.get()
+POST        /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.post()
+GET         /business-details/confirming-address  controllers.aboutthebusiness.RegisteredOfficeController.get()
+POST        /business-details/confirming-address  controllers.aboutthebusiness.RegisteredOfficeController.post()
+GET         /business-details/vat                 controllers.aboutthebusiness.BusinessRegForVATController.get()
+POST        /business-details/vat                 controllers.aboutthebusiness.BusinessRegForVATController.post()
+GET         /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.get()
+POST        /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.post()
+GET         /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
+POST        /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()
