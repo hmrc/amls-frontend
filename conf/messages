@@ -21,6 +21,7 @@ err.summary = There are errors in your form submission
 err.pleasespecify = Please specify
 
 button.saveandcontinue = Save and continue
+button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
 button.back = Back
 

@@ -1,0 +1,47 @@
+@import include.main
+@import models.AboutYou
+
+@(data: AboutYou)(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("summary.about")),
+    title = Messages("aboutyou.summary.title")
+) {
+
+    @data.roleWithinBusiness.map { role =>
+        <table>
+            <tr>
+                <th>Your role in the business</th>
+                <td><a href="">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">@role.roleWithinBusiness</td>
+            </tr>
+            @if(role.other.isEmpty) {
+                <tr>
+                    <td colspan="2">@role.other</td>
+                </tr>
+            }
+        </table>
+    }
+
+    @data.yourDetails.map { yourDetails =>
+        <table>
+            <tr>
+                <th>Your details</th>
+                <td><a href="">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @Seq(
+                        Some(yourDetails.firstName),
+                        yourDetails.middleName,
+                        Some(yourDetails.lastName)
+                    ).flatten.mkString(" ")
+                </td>
+            </tr>
+        </table>
+    }
+
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Save and complete section</a>
+}

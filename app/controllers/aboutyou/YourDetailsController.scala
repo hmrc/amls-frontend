@@ -3,21 +3,21 @@ package controllers.aboutyou
 import config.AMLSAuthConnector
 import config.AmlsPropertiesReader._
 import connectors.DataCacheConnector
-import controllers.AMLSGenericController
-import models.YourDetails
+import controllers.auth.AmlsRegime
+import models.{AboutYou, YourDetails}
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.Actions
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 import utils.validation.TextValidator
 
 import scala.concurrent.Future
 
 
-trait YourDetailsController extends AMLSGenericController {
+trait YourDetailsController extends FrontendController with Actions {
 
-  protected val dataCacheConnector: DataCacheConnector
-  protected val cacheKey = "your-details"
+  val dataCacheConnector: DataCacheConnector
+  val cacheKey = "your-details"
 
   val yourDetailsForm = Form(mapping(
     "firstname" -> TextValidator.mandatoryText("err.titleNotEntered.first_name",
@@ -28,20 +28,28 @@ trait YourDetailsController extends AMLSGenericController {
       getIntFromProperty("validationMaxLengthFirstName"))
   )(YourDetails.apply)(YourDetails.unapply))
 
-  override def get(implicit user: AuthContext, request: Request[AnyContent]) =
-    dataCacheConnector.fetchDataShortLivedCache[YourDetails](cacheKey) map {
-      case Some(data) => Ok(views.html.your_details(yourDetailsForm.fill(data)))
-      case _ => Ok(views.html.your_details(yourDetailsForm))
-    }
+  def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+    implicit user => implicit request =>
+      dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key, user.user.oid) map {
+        case Some(AboutYou(Some(data), _)) => Ok(views.html.your_details(yourDetailsForm.fill(data), edit))
+        case _ => Ok(views.html.your_details(yourDetailsForm, edit))
+      }
+  }
 
-  override def post(implicit user: AuthContext, request: Request[AnyContent]) =
-    yourDetailsForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.your_details(errors))),
-      details => {
-        dataCacheConnector.saveDataShortLivedCache[YourDetails](cacheKey, details) map { _=>
-          Redirect(controllers.aboutyou.routes.RoleWithinBusinessController.get())
+  def post(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+    implicit authContext => implicit request =>
+      yourDetailsForm.bindFromRequest().fold(
+        errors => Future.successful(BadRequest(views.html.your_details(errors, edit))),
+        details => {
+          for {
+            aboutYou <- dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key, authContext.user.oid)
+            _ <- dataCacheConnector.saveDataShortLivedCache[AboutYou](AboutYou.key, authContext.user.oid,
+              AboutYou.merge(aboutYou, details)
+            )
+          } yield Redirect(routes.SummaryController.get())
         }
-      })
+      )
+  }
 }
 
 object YourDetailsController extends YourDetailsController {

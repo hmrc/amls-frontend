@@ -3,14 +3,14 @@
 @import forms.AmlsForms._
 @import include.forms._
 
-@(form: Form[_])(implicit request: Request[_])
+@(form: Form[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.yourdetails.title")
 ) {
 
-      @formHelper(form, aboutyou.routes.YourDetailsController.post()) { implicit form: Form[_] =>
+      @formHelper(form, aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form[_] =>
 
         @input(
             name = "firstname",
@@ -27,6 +27,6 @@
             labelText = Messages("lbl.last_name")
         )
 
-        @submit(Messages("button.saveandcontinue"))
+        @submit(Messages(if (edit) "button.saveandreturn" else "button.saveandcontinue"))
     }
 }
