@@ -1,9 +1,9 @@
 package models
 
-import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.Writes._
-import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 case class YourDetails(firstName: String, middleName: Option[String], lastName: String)
 
@@ -17,7 +17,19 @@ object RoleWithinBusiness {
   implicit val formats = Json.format[RoleWithinBusiness]
 }
 
-case class AboutYou(yourDetails: Option[YourDetails], roleWithinBusiness: Option[RoleWithinBusiness])
+case class AboutYou(
+                     yourDetails: Option[YourDetails] = None,
+                     roleWithinBusiness: Option[RoleWithinBusiness] = None
+                   ) {
+
+  def yourDetails(v: YourDetails): AboutYou = {
+    this.copy(yourDetails = Some(v))
+  }
+
+  def roleWithinBusiness(v: RoleWithinBusiness): AboutYou = {
+    this.copy(roleWithinBusiness = Some(v))
+  }
+}
 
 object AboutYou {
 
@@ -33,22 +45,11 @@ object AboutYou {
       Seq(
         Json.toJson(model.yourDetails).asOpt[JsObject],
         Json.toJson(model.roleWithinBusiness).asOpt[JsObject]
-      ).flatten.fold(Json.obj()) { _ ++ _ }
+      ).flatten.fold(Json.obj()) {
+        _ ++ _
+      }
   }
 
-  def merge(aboutYou : Option[AboutYou], yourDetails : YourDetails) = {
-    aboutYou.fold {
-      AboutYou(Some(yourDetails), None)
-    } {
-      _.copy(yourDetails = Some(yourDetails))
-    }
-  }
-
-  def merge(aboutYou : Option[AboutYou], yourRole : RoleWithinBusiness) =  {
-    aboutYou.fold {
-      AboutYou(None, Some(yourRole))
-    } {
-      _.copy(roleWithinBusiness = Some(yourRole))
-    }
-  }
+  implicit def default(aboutYou: Option[AboutYou]): AboutYou =
+    aboutYou.getOrElse(AboutYou())
 }

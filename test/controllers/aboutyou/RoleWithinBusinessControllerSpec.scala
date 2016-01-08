@@ -2,7 +2,7 @@ package controllers
 
 import connectors.DataCacheConnector
 import controllers.aboutyou.RoleWithinBusinessController
-import models.RoleWithinBusiness
+import models.{AboutYou, RoleWithinBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -21,8 +21,7 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
     val controller = new RoleWithinBusinessController {
       override val dataCacheConnector = mock[DataCacheConnector]
-
-      override protected def authConnector = self.authConnector
+      override val authConnector = self.authConnector
     }
   }
 
@@ -42,8 +41,8 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
       val roleWithinBusiness = RoleWithinBusiness("01", "")
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(roleWithinBusiness)))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(AboutYou(None, Some(roleWithinBusiness)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -59,7 +58,10 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
         "other" -> ""
       )
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.saveDataShortLivedCache[AboutYou](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
@@ -74,13 +76,12 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
         "other" -> ""
       )
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[RoleWithinBusiness](any(), any())
+      when(controller.dataCacheConnector.saveDataShortLivedCache[AboutYou](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      /* TODO Make sure this goes to summary page */
-      redirectLocation(result) must be(Some(controllers.aboutyou.routes.YourDetailsController))
+      redirectLocation(result) must be(Some(controllers.aboutyou.routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {

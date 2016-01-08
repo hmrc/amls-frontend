@@ -12,8 +12,8 @@ trait SummaryController extends FrontendController with Actions {
   def dataCache: DataCacheConnector
 
   def get = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
-    implicit user => implicit request =>
-      dataCache.fetchDataShortLivedCache[AboutYou](AboutYou.key, user.user.oid) map {
+    implicit authContext => implicit request =>
+      dataCache.fetchDataShortLivedCache[AboutYou](AboutYou.key) map {
         case Some(data) => Ok(views.html.about_you_summary(data))
         case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }

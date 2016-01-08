@@ -13,7 +13,6 @@ import utils.validation.TextValidator
 
 import scala.concurrent.Future
 
-
 trait YourDetailsController extends FrontendController with Actions {
 
   val dataCacheConnector: DataCacheConnector
@@ -29,9 +28,9 @@ trait YourDetailsController extends FrontendController with Actions {
   )(YourDetails.apply)(YourDetails.unapply))
 
   def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
-    implicit user => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key, user.user.oid) map {
-        case Some(AboutYou(Some(data), _)) => Ok(views.html.your_details(yourDetailsForm.fill(data), edit))
+    implicit authContext => implicit request =>
+      dataCacheConnector.fetchDataShortLivedCache[YourDetails](AboutYou.key) map {
+        case Some(data) => Ok(views.html.your_details(yourDetailsForm.fill(data), edit))
         case _ => Ok(views.html.your_details(yourDetailsForm, edit))
       }
   }
@@ -42,9 +41,9 @@ trait YourDetailsController extends FrontendController with Actions {
         errors => Future.successful(BadRequest(views.html.your_details(errors, edit))),
         details => {
           for {
-            aboutYou <- dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key, authContext.user.oid)
-            _ <- dataCacheConnector.saveDataShortLivedCache[AboutYou](AboutYou.key, authContext.user.oid,
-              AboutYou.merge(aboutYou, details)
+            aboutYou <- dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key)
+            _ <- dataCacheConnector.saveDataShortLivedCache[AboutYou](AboutYou.key,
+              aboutYou.yourDetails(details)
             )
           } yield Redirect(routes.SummaryController.get())
         }

@@ -1,7 +1,7 @@
 package controllers.aboutyou
 
 import connectors.DataCacheConnector
-import models.YourDetails
+import models.{AboutYou, YourDetails}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -63,12 +63,15 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
           "lastname" -> "bar"
         )
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[YourDetails](any(), any())
+        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.saveDataShortLivedCache[AboutYou](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-//        redirectLocation(result) must be(Some(controllers.aboutyou.routes.YourDetailsController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutyou.routes.SummaryController.get().url))
       }
 
       "on post invalid data" in new Fixture {
