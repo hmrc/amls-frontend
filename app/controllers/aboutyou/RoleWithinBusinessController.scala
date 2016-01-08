@@ -33,12 +33,11 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
   )(RoleWithinBusiness.apply)(RoleWithinBusiness.unapply))
 
   val dataCacheConnector: DataCacheConnector
-  val cacheKey = "role-within-business"
 
   def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[AboutYou](cacheKey) map {
-        case Some(AboutYou(_, Some(data))) => Ok(views.html.role_within_business(roleWithinBusinessForm.fill(data), roles, edit))
+      dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](AboutYou.key) map {
+        case Some(data) => Ok(views.html.role_within_business(roleWithinBusinessForm.fill(data), roles, edit))
         case _ => Ok(views.html.role_within_business(roleWithinBusinessForm, roles, edit))
       }
   }
@@ -49,9 +48,9 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
         errors => Future.successful(BadRequest(views.html.role_within_business(errors, roles, edit))),
         role => {
           for {
-            aboutYou <- dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key, authContext.user.oid)
-            _ <- dataCacheConnector.saveDataShortLivedCache[AboutYou](AboutYou.key, authContext.user.oid,
-              AboutYou.merge(aboutYou, role)
+            aboutYou <- dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key)
+            _ <- dataCacheConnector.saveDataShortLivedCache[AboutYou](AboutYou.key,
+              aboutYou.roleWithinBusiness(role)
             )
           } yield Redirect(routes.SummaryController.get())
         })
