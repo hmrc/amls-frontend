@@ -16,7 +16,6 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
   )
 
   "AboutYou" must {
-
     val completeJson = Json.obj(
       "firstName" -> "firstname",
       "lastName" -> "lastname",
@@ -62,16 +61,18 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
   }
 
   "None" when {
+    val initial : Option[AboutYou] = None
+
     "Merged with your details" must {
       "return AboutYou with correct details set" in {
-        val result = AboutYou.merge(None, yourDetails)
+        val result = initial.yourDetails(yourDetails)
         result must be (AboutYou(Some(yourDetails), None))
       }
     }
 
     "Merged with yourRoleIntheBusinsess" must {
       "return AboutYou with correct role in the business set" in {
-        val result = AboutYou.merge(None, role)
+        val result = initial.roleWithinBusiness(role)
         result must be (AboutYou(None, Some(role)))
       }
     }
@@ -84,7 +85,7 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
       "Merged with your details" must {
         "return AboutYou with correct details set" in {
           val newDetails = YourDetails("TestName2", Some("TestName3"), "TestName4")
-          val result = AboutYou.merge(Some(initial), newDetails)
+          val result = initial.yourDetails(newDetails)
           result must be (AboutYou(Some(newDetails), None))
         }
       }
@@ -92,7 +93,7 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
       "Merged with yourRoleIntheBusinsess" must {
         "return AboutYou with correct role in the business set" in {
           val newRole = RoleWithinBusiness("TestRoleWithinTheBusiness2", "")
-          val result = AboutYou.merge(Some(initial), newRole)
+          val result = initial.roleWithinBusiness(newRole)
           result must be (AboutYou(Some(yourDetails), Some(newRole)))
         }
       }
@@ -105,7 +106,7 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
       "Merged with your details" must {
         "return AboutYou with correct details set" in {
           val newDetails = YourDetails("TestName2", Some("TestName3"), "TestName4")
-          val result = AboutYou.merge(Some(initial), newDetails)
+          val result = initial.yourDetails(newDetails)
           result must be (AboutYou(Some(newDetails), Some(role)))
         }
       }
@@ -113,7 +114,7 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
       "Merged with yourRoleIntheBusinsess" must {
         "return AboutYou with correct role in the business set" in {
           val newRole = RoleWithinBusiness("TestRoleWithinTheBusiness2", "")
-          val result = AboutYou.merge(Some(initial), newRole)
+          val result = initial.roleWithinBusiness(newRole)
           result must be (AboutYou(None, Some(newRole)))
         }
       }
