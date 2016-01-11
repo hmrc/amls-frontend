@@ -1,23 +1,23 @@
 # microservice specific routes
 
-GET         /assets/*file                   controllers.Assets.at(path="/public", file)
+GET         /assets/*file                           controllers.Assets.at(path="/public", file)
 
-GET         /example                        controllers.ExampleController.onPageLoad
-POST        /example                        controllers.ExampleController.onSubmit
-GET         /                               controllers.WelcomeController.get
-GET         /welcome                        controllers.WelcomeController.get
+GET         /example                                controllers.ExampleController.onPageLoad
+POST        /example                                controllers.ExampleController.onSubmit
+GET         /                                       controllers.WelcomeController.get
+GET         /welcome                                controllers.WelcomeController.get
 
-GET         /unauthorised                   controllers.AmlsController.unauthorised
-GET         /summary                        controllers.MainSummaryController.onPageLoad
+GET         /unauthorised                           controllers.AmlsController.unauthorised
+GET         /summary                                controllers.MainSummaryController.onPageLoad
 
-GET         /login                          controllers.AmlsController.onPageLoad
-POST        /login                          controllers.AmlsController.onSubmit
+GET         /login                                  controllers.AmlsController.onPageLoad
+POST        /login                                  controllers.AmlsController.onSubmit
 
-GET         /about-you/your-details                   controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
-POST        /about-you/your-details                   controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)
-GET         /about-you/role-within-business           controllers.aboutyou.RoleWithinBusinessController.get(edit: Boolean ?= false)
-POST        /about-you/role-within-business           controllers.aboutyou.RoleWithinBusinessController.post(edit: Boolean ?= false)
-GET         /about-you/summary                        controllers.aboutyou.SummaryController.get()
+GET         /about-you/your-details                 controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
+POST        /about-you/your-details                 controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)
+GET         /about-you/role-within-business         controllers.aboutyou.RoleWithinBusinessController.get(edit: Boolean ?= false)
+POST        /about-you/role-within-business         controllers.aboutyou.RoleWithinBusinessController.post(edit: Boolean ?= false)
+GET         /about-you/summary                      controllers.aboutyou.SummaryController.get()
 
 GET         /business-details/confirming-address    controllers.aboutthebusiness.RegOfficeOrMainPlaceOfBusinessController.get()
 POST        /business-details/confirming-address    controllers.aboutthebusiness.RegOfficeOrMainPlaceOfBusinessController.post()

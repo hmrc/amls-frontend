@@ -22,7 +22,7 @@ object AboutTheBusinessForms {
       getIntFromProperty("validationMaxLengthVAT"), getIntFromProperty("validationMaxLengthVAT")))
   )(BusinessWithVAT.apply)(BusinessWithVAT.unapply))
 
-  val contactingYouForm = Form(mapping(
+/*  val contactingYouForm = Form(mapping(
     "phoneNumber" -> mandatoryPhoneNumber("err.required", "err.invalidLength",
       "aboutthebusiness.telephoning.invalid.phone", getIntFromProperty("validationMaxLengthPhoneNo")),
     "email" -> EmailValidator.mandatoryEmail("err.required", "err.invalidLength", "err.invalid",
@@ -30,7 +30,7 @@ object AboutTheBusinessForms {
     "website" -> optional(WebAddressValidator.webAddress("err.invalidLength", "err.invalid",
       getIntFromProperty("validationMaxLengthWebAddress"))),
     "letterToThisAddress" -> mandatoryBoolean("err.required")
-  )(ContactingYou.apply)(ContactingYou.unapply))
+  )(ContactingYou.apply)(ContactingYou.unapply))*/
 
   val registeredWithHMRCBeforeForm = Form(mapping(
     "registeredWithHMRC" -> mandatoryBooleanWithText("mlrNumber", "true", "err.required", "err.required", "err.notrequired"),
