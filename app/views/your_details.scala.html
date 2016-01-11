@@ -1,16 +1,17 @@
 @import include.main
 @import forms.FormHelpers._
 @import forms.AmlsForms._
-@import include.forms._
+@import include.form._
+@import forms.FormHelpers._
+@import forms.Form2
 
-@(form: Form[_], edit: Boolean)(implicit request: Request[_])
+@(form: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.yourdetails.title")
 ) {
-
-      @formHelper(form, aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form[_] =>
+      @formHelper(form, aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form2[_] =>
 
         @input(
             name = "firstname",

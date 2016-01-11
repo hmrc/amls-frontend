@@ -7,7 +7,7 @@
     sectionTitle = Some(Messages("summary.about")),
     title = Messages("aboutyou.summary.title")
 ) {
-
+@*
     @data.roleWithinBusiness.map { role =>
         <table>
             <tr>
@@ -42,6 +42,6 @@
             </tr>
         </table>
     }
-
+*@
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Save and complete section</a>
 }

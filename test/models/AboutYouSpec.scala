@@ -10,10 +10,10 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
     "firstname", None, "lastname"
   )
 
-  val role = RoleWithinBusiness(
-    "01",
-    ""
-  )
+//  val role = RoleWithinBusiness(
+//    "01",
+//    ""
+//  )
 
   "AboutYou" must {
 
@@ -24,7 +24,7 @@ class AboutYouSpec extends PlaySpec with MockitoSugar {
       "other" -> ""
     )
 
-    val completeModel = AboutYou(Some(yourDetails), Some(role))
+    val completeModel = AboutYou(Some(yourDetails), None)
 
     "Serialise as expected" in {
 

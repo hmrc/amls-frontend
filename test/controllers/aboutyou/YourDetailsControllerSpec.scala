@@ -8,6 +8,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
@@ -60,6 +61,7 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
         val newRequest = request.withFormUrlEncodedBody(
           "firstname" -> "foo",
+          "middlename" -> "asdf",
           "lastname" -> "bar"
         )
 
@@ -85,6 +87,24 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[name=firstname]").`val` must be("foo")
+      }
+
+      "a" in {
+
+        val model = YourDetails("foo", None, "bar")
+
+        Json.toJson(model) must
+          be(None)
+      }
+
+      "b" in {
+
+        val json = Json.obj(
+          "lastName" -> "bar"
+        )
+
+        json.as[YourDetails] must
+          be(None)
       }
     }
   }
