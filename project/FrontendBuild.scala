@@ -34,7 +34,12 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "http-caching-client" % "5.2.0",
 
     "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.9",
-    "com.codahale.metrics" % "metrics-graphite" % "3.0.2"
+    "com.codahale.metrics" % "metrics-graphite" % "3.0.2",
+    "io.github.jto" %% "validation-core" % "1.1",
+    "io.github.jto" %% "validation-json" % "1.1",
+    "io.github.jto" %% "validation-form" % "1.1"
+
+
   )
 
   trait TestDependencies {

@@ -1,0 +1,50 @@
+@import include.main
+@import forms.FormHelpers._
+@import include.forms._
+@import utils.DataFields._
+
+@(businessHasEmailForm: Form[models.ContactingYou], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
+
+@main(
+    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
+    title = Messages("aboutthebusiness.contactingyou.title")
+) {
+
+      @formHelper(businessHasEmailForm, aboutthebusiness.routes.ContactingYouController.post()) { implicit form: Form[_] =>
+        <span>@Messages("aboutthebusiness.contactingyou.lbl")</span>
+        @input(
+            name = "phoneNumber",
+            labelText = Messages("aboutthebusiness.contactingyou.phone.lbl")
+        )
+
+        @input(
+            name = "email",
+            labelText = Messages("aboutthebusiness.contactingyou.email.lbl")
+        )
+        @input(
+            name = "website",
+            labelText = Messages("aboutthebusiness.contactingyou.website.lbl")
+        )
+        <div>
+            <span>@Messages("aboutthebusiness.contactingyou.businessaddress")</span>
+        </div>
+        <div class="panel-indent">
+
+            <ul>
+                <li class="no-padding no-margin">@reviewBusinessDetails.businessName</li>
+                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_1</li>
+                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_2</li>
+                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_3.getOrElse("")</li>
+                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_4.getOrElse("")</li>
+                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.postcode.getOrElse("")</li>
+            </ul>
+        </div>
+        @radioGroup(
+            name = "letterToThisAddress",
+            labelText = Messages("aboutthebusiness.contactingyou.sendletter.lbl"),
+            options = optionsYesNo
+        )
+    @submit(Messages("button.saveandcontinue"))
+    }
+}
+

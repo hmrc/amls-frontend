@@ -22,18 +22,14 @@ POST        /role-within-business           controllers.aboutyou.RoleWithinBusin
 GET         /role-for-business              controllers.aboutyou.RoleForBusinessController.get()
 POST        /role-for-business              controllers.aboutyou.RoleForBusinessController.post()
 
-GET         /business-has-website                 controllers.aboutthebusiness.BusinessHasWebsiteController.get()
-POST        /business-has-website                 controllers.aboutthebusiness.BusinessHasWebsiteController.post()
-GET         /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.get()
-POST        /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.post()
-GET         /business-details/confirming-address  controllers.aboutthebusiness.ConfirmingYourAddressController.get()
-POST        /business-details/confirming-address  controllers.aboutthebusiness.ConfirmingYourAddressController.post()
+GET         /business-details/confirming-address    controllers.aboutthebusiness.ConfirmingYourAddressController.get()
+POST        /business-details/confirming-address    controllers.aboutthebusiness.ConfirmingYourAddressController.post()
 
-GET         /business-details/vat                 controllers.aboutthebusiness.BusinessRegForVATController.get()
-POST        /business-details/vat                 controllers.aboutthebusiness.BusinessRegForVATController.post()
+GET         /business-details/vat                   controllers.aboutthebusiness.BusinessRegForVATController.get()
+POST        /business-details/vat                   controllers.aboutthebusiness.BusinessRegForVATController.post()
 
-GET         /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.get()
-POST        /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.post()
+GET         /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.get()
+POST        /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.post()
 
-GET         /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
-POST        /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()
+GET         /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
+POST        /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()

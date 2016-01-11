@@ -79,17 +79,12 @@ aboutthebusiness.contactingyou.title = Contacting you
 aboutthebusiness.contactingyou.lbl = We may need to get in touch to discuss your registration.
 aboutthebusiness.contactingyou.email.lbl = Email address
 aboutthebusiness.contactingyou.phone.lbl = Phone number
-aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
-aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
-
-aboutthebusiness.businesshaswebsite.title = Does your business have a website?
-aboutthebusiness.addressofyourwebsite.title = What is the address of your website?
-aboutthebusiness.telephoning.title = Telephoning your business
-aboutthebusiness.telephoning.phone = Business phone number
-aboutthebusiness.telephoning.mobile = Mobile contact number (optional)
-
+aboutthebusiness.contactingyou.sendletter.lbl = Do you want us to send letters to this address?
 aboutthebusiness.contactingyou.website.lbl = Website address (optional)
 aboutthebusiness.contactingyou.businessaddress = Business address:
+
+aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
+aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
 
 aboutthebusiness.registeredformlr.title = Has this business been registered with HMRC before?
 aboutthebusiness.registeredformlr.lbl = This only refers to registration for anti-money laundering supervision with HMRC.

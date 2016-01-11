@@ -2,23 +2,24 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import controllers.AMLSGenericController
+import controllers.auth.AmlsRegime
 import forms.AboutTheBusinessForms._
 import models._
-import play.api.i18n.{Lang, Messages}
-import play.api.mvc.{AnyContent, Request, Result}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import play.api.mvc.Result
+import uk.gov.hmrc.play.frontend.auth.Actions
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait ConfirmingYourAddressController extends AMLSGenericController {
+trait ConfirmingYourAddressController extends FrontendController with Actions {
   def dataCacheConnector: DataCacheConnector
 
   def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
 
   private val CACHE_KEY = "registeredOffice"
 
-  override def get(implicit user: AuthContext, request: Request[AnyContent]) = {
+  def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+    implicit authContext => implicit request =>
     val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
     val cachedDataFuture = dataCacheConnector.fetchDataShortLivedCache[ConfirmingYourAddressSave4Later](CACHE_KEY)
     for {
@@ -30,7 +31,8 @@ trait ConfirmingYourAddressController extends AMLSGenericController {
     }
   }
 
-  override def post(implicit user: AuthContext, request: Request[AnyContent]) = {
+  def post(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+    implicit authContext => implicit request =>
     val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
     confirmingYourAddressForm.bindFromRequest().fold(
       errors => {
@@ -46,7 +48,7 @@ trait ConfirmingYourAddressController extends AMLSGenericController {
               ConfirmingYourAddressSave4Later(reviewBusinessDetails.businessAddress, regOffice.isRegOfficeOrMainPlaceOfBusiness))
           } yield {
             result map {
-              case Some(ConfirmingYourAddressSave4Later(_, true)) => Redirect(controllers.aboutthebusiness.routes.TelephoningBusinessController.get())
+              case Some(ConfirmingYourAddressSave4Later(_, true)) => Redirect(controllers.aboutthebusiness.routes.ContactingYouController.get())
               case _ => NotImplemented("Not yet implemented")
             }
           }

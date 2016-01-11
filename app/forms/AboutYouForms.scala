@@ -2,8 +2,8 @@ package forms
 
 import config.AmlsPropertiesReader._
 import models._
+import play.api.data.Form
 import play.api.data.Forms._
-import play.api.data._
 import utils.validation.BooleanValidator._
 import utils.validation.RadioGroupWithOtherValidator.radioGroupWithOther
 import utils.validation.TextValidator
