@@ -1,0 +1,23 @@
+@import forms.FormHelpers._
+@import forms.Form2
+
+@(
+    name: String,
+    labelText: String,
+    hintText: String = ""
+)(implicit
+    form: Form2[_],
+    lang: Lang
+)
+
+<div class="form-group">
+    <label>
+        <span class="form-label">@labelText</span>
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@id(name)-hint">@hintText</span>
+        }
+        <input name="@name" class="form-control" type="text" value="@form(name)" id="@id(name)"
+               @if(hintText.nonEmpty) { aria-describedby="@id(name)-hint" }
+        >
+    </label>
+</div>

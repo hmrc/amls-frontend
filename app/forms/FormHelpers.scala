@@ -1,8 +1,11 @@
 package forms
 
+import play.api.data.mapping.Path
 import play.twirl.api.{HtmlFormat, Html}
 
 object FormHelpers {
+
+  implicit def strToPath(str: String): Path = Path \ str
 
   def id(name: String): String =
     name.replace('.', '-')

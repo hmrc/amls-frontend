@@ -11,6 +11,7 @@ object FrontendBuild extends Build with MicroService {
 }
 
 private object AppDependencies {
+
   import play.PlayImport._
   import play.core.PlayVersion
 
@@ -18,7 +19,9 @@ private object AppDependencies {
 
   private val govukTemplateVersion = "4.0.0"
   private val playUiVersion = "4.2.0"
-  
+
+  private val playJars = ExclusionRule(organization = "com.typesafe.play")
+
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
@@ -35,16 +38,15 @@ private object AppDependencies {
 
     "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.9",
     "com.codahale.metrics" % "metrics-graphite" % "3.0.2",
-    "io.github.jto" %% "validation-core" % "1.1",
-    "io.github.jto" %% "validation-json" % "1.1",
-    "io.github.jto" %% "validation-form" % "1.1"
 
-
+    "io.github.jto" %% "validation-core" % "1.1" excludeAll playJars,
+    "io.github.jto" %% "validation-json" % "1.1" excludeAll playJars,
+    "io.github.jto" %% "validation-form" % "1.1" excludeAll playJars
   )
 
   trait TestDependencies {
     lazy val scope: String = "test"
-    lazy val test : Seq[ModuleID] = ???
+    lazy val test: Seq[ModuleID] = ???
   }
 
   object Test {
