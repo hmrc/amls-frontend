@@ -1,13 +1,10 @@
 package utils
 
-import _root_.forms.{InvalidForm, CompletedForm, Form2}
-import models.YourDetails
+import _root_.forms.{InvalidForm, ValidForm, Form2}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
-
-import scala.concurrent.Future
 
 class Form2Spec extends PlaySpec with MockitoSugar {
 
@@ -42,16 +39,16 @@ class Form2Spec extends PlaySpec with MockitoSugar {
 
   "Form2" must {
 
-    "return a CompletedForm when a valid model is passed" in new Fixture {
+    "return a ValidForm when a valid model is passed" in new Fixture {
 
       Form2[Foobar](model) must
-        be(CompletedForm(data, model))
+        be(ValidForm(data, model))
     }
 
-    "return a CompletedForm when valid UrlFormEncoded data is passed" in new Fixture {
+    "return a Valid when valid UrlFormEncoded data is passed" in new Fixture {
 
       Form2[Foobar](data) must
-        be(CompletedForm(data, model))
+        be(ValidForm(data, model))
     }
 
     "return an InvalidForm when invalid UrlFormEncoded data is passed" in new Fixture {

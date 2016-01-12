@@ -1,7 +1,7 @@
 package controllers.aboutyou
 
 import connectors.DataCacheConnector
-import models.{AboutYou, YourDetails}
+import models.aboutyou.{AboutYou, YourDetails}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -87,24 +87,6 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[name=firstname]").`val` must be("foo")
-      }
-
-      "a" in {
-
-        val model = YourDetails("foo", None, "bar")
-
-        Json.toJson(model) must
-          be(None)
-      }
-
-      "b" in {
-
-        val json = Json.obj(
-          "lastName" -> "bar"
-        )
-
-        json.as[YourDetails] must
-          be(None)
       }
     }
   }

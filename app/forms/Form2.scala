@@ -19,12 +19,14 @@ sealed trait Form2[+A] {
   def errors(path: Path): Seq[ValidationError]
 }
 
-case class CompletedForm[A](data: UrlFormEncoded, model: A) extends Form2[A] {
+sealed trait CompletedForm[+A] extends Form2[A]
+
+case class ValidForm[A](data: UrlFormEncoded, model: A) extends CompletedForm[A] {
   override def errors: Seq[(Path, Seq[ValidationError])] = Seq.empty
   override def errors(path: Path): Seq[mapping.ValidationError] = Seq.empty
 }
 
-case class InvalidForm(data: UrlFormEncoded, errors: Seq[(Path, Seq[ValidationError])]) extends Form2[Nothing] {
+case class InvalidForm(data: UrlFormEncoded, errors: Seq[(Path, Seq[ValidationError])]) extends CompletedForm[Nothing] {
   override def errors(path: Path): Seq[ValidationError] =
     errors.collectFirst {
       case (p, e) if (p == path) => e
@@ -43,16 +45,16 @@ object Form2 {
   (a: A)
   (implicit
     write: Write[A, UrlFormEncoded]
-  ): CompletedForm[A] =
-    CompletedForm(write.writes(a), a)
+  ): ValidForm[A] =
+    ValidForm(write.writes(a), a)
 
   def apply[A]
   (data: UrlFormEncoded)
   (implicit
     rule: Rule[UrlFormEncoded, A]
-  ): Form2[A] =
+  ): CompletedForm[A] =
     rule.validate(data) match {
-      case Success(a) => CompletedForm(data, a)
+      case Success(a) => ValidForm(data, a)
       case Failure(errors) => InvalidForm(data, errors)
     }
 

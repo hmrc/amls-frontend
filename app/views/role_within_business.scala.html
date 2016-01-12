@@ -1,11 +1,10 @@
 @import include.main
 @import forms.FormHelpers._
-@import forms.AmlsForms._
 @import include.forms._
-@import utils.CommonHelper._
 @import forms.Form2
+@import models.aboutyou._
 
-@(roleWithinBusinessForm: Form2[models.RoleWithinBusiness], roles:Seq[(String,String)], edit: Boolean)(implicit request: Request[_])
+@(form: Form2[RoleWithinBusiness], edit: Boolean)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),

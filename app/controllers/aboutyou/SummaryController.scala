@@ -3,7 +3,7 @@ package controllers.aboutyou
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.auth.AmlsRegime
-import models.AboutYou
+import models.aboutyou.AboutYou
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 

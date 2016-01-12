@@ -2,7 +2,6 @@ package controllers
 
 import connectors.DataCacheConnector
 import controllers.aboutyou.RoleWithinBusinessController
-import models.{AboutYou, RoleWithinBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
