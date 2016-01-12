@@ -4,6 +4,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.auth.AmlsRegime
+import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegistered}
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 

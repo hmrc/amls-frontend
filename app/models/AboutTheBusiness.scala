@@ -1,5 +1,4 @@
 package models
-
 import play.api.libs.json.Json
 
 import scala.language.implicitConversions
@@ -54,7 +53,7 @@ object TelephoningBusiness {
  * This created because the address is not entered at front end so isn't in form.
  */
 case class ConfirmingYourAddressSave4Later(registeredOfficeAddress: BCAddress,
-                                      isRegOfficeOrMainPlaceOfBusiness: Boolean)
+                                           isRegOfficeOrMainPlaceOfBusiness: Boolean)
 
 object ConfirmingYourAddressSave4Later {
   implicit val formats = Json.format[ConfirmingYourAddressSave4Later]
@@ -90,3 +89,4 @@ case class RegisteredWithHMRCBefore(registeredWithHMRC: Boolean, mlrNumber: Opti
 object RegisteredWithHMRCBefore {
   implicit val formats = Json.format[RegisteredWithHMRCBefore]
 }
+
