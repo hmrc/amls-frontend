@@ -14,17 +14,17 @@
       @formHelper(form, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form2[_] =>
 
         @input(
-            name = "firstname",
+            name = "firstName",
             labelText = Messages("lbl.first_name")
         )
 
         @input(
-            name = "middlename",
+            name = "middleName",
             labelText = Messages("lbl.middle_name")
         )
 
         @input(
-            name = "lastname",
+            name = "lastName",
             labelText = Messages("lbl.last_name")
         )
 

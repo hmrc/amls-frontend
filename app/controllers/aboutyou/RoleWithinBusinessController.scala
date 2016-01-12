@@ -1,20 +1,18 @@
 package controllers.aboutyou
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.auth.AmlsRegime
+import controllers.BaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutyou.{AboutYou, RoleWithinBusiness}
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait RoleWithinBusinessController extends FrontendController with Actions {
+trait RoleWithinBusinessController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](AboutYou.key) map {
         case Some(data) => Ok(views.html.role_within_business(Form2[RoleWithinBusiness](data), edit))
@@ -22,7 +20,7 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
       }
   }
 
-  def post(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[RoleWithinBusiness](request.body) match {
         case f: InvalidForm => Future.successful(BadRequest(views.html.role_within_business(f, edit)))
@@ -32,7 +30,10 @@ trait RoleWithinBusinessController extends FrontendController with Actions {
             _ <- dataCacheConnector.saveDataShortLivedCache[AboutYou](AboutYou.key,
               aboutYou.roleWithinBusiness(data)
             )
-          } yield Redirect(routes.SummaryController.get())
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.YourDetailsController.get())
+          }
       }
     }
   }

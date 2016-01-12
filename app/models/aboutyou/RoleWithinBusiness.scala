@@ -18,55 +18,59 @@ case class Other(value: String) extends RoleWithinBusiness
 
 object RoleWithinBusiness {
 
+  import utils.MappingImplicits._
+
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusiness] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     (__ \ "roleWithinBusiness").read[String] flatMap {
-      case "01" => Rule.fromMapping { _ => Success(BeneficialShareholder) }
-      case "02" => Rule.fromMapping { _ => Success(Director) }
-      case "03" => Rule.fromMapping { _ => Success(ExternalAccountant) }
-      case "04" => Rule.fromMapping { _ => Success(InternalAccountant) }
-      case "05" => Rule.fromMapping { _ => Success(NominatedOfficer) }
-      case "06" => Rule.fromMapping { _ => Success(Partner) }
-      case "07" => Rule.fromMapping { _ => Success(SoleProprietor) }
+      case "01" => BeneficialShareholder
+      case "02" => Director
+      case "03" => ExternalAccountant
+      case "04" => InternalAccountant
+      case "05" => NominatedOfficer
+      case "06" => Partner
+      case "07" => SoleProprietor
       case "08" =>
-        (__ \ "other").read(minLength(1)) flatMap {
-          value =>
-            Rule.fromMapping { _ => Success(Other(value)) }
-        }
-      case _ => Rule { _ =>
-        Failure(Seq((Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))))
-      }
+        (__ \ "other").read(notEmpty |+| maxLength(30)) fmap Other.apply
+      case _ =>
+        (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
     }
   }
 
   implicit val formWrites: Write[RoleWithinBusiness, UrlFormEncoded] = Write {
-    case BeneficialShareholder => Map("roleWithinBusiness" -> Seq("01"))
-    case Director => Map("roleWithinBusiness" -> Seq("02"))
-    case ExternalAccountant => Map("roleWithinBusiness" -> Seq("03"))
-    case InternalAccountant => Map("roleWithinBusiness" -> Seq("04"))
-    case NominatedOfficer => Map("roleWithinBusiness" -> Seq("05"))
-    case Partner => Map("roleWithinBusiness" -> Seq("06"))
-    case SoleProprietor => Map("roleWithinBusiness" -> Seq("07"))
+    case BeneficialShareholder => "roleWithinBusiness" -> "01"
+    case Director => "roleWithinBusiness" -> "02"
+    case ExternalAccountant => "roleWithinBusiness" -> "03"
+    case InternalAccountant => "roleWithinBusiness" -> "04"
+    case NominatedOfficer => "roleWithinBusiness" -> "05"
+    case Partner => "roleWithinBusiness" -> "06"
+    case SoleProprietor => "roleWithinBusiness" -> "07"
     case Other(value) =>
       Map(
-        "roleWithinBusiness" -> Seq("08"),
-        "other" -> Seq(value)
+        "roleWithinBusiness" -> "08",
+        "other" -> value
       )
   }
 
-  implicit val jsonReads =
-    (__ \ "roleWithinBusiness").read[String] flatMap[RoleWithinBusiness] {
-      case "01" => Reads(_ => JsSuccess(BeneficialShareholder))
-      case "02" => Reads(_ => JsSuccess(Director))
-      case "03" => Reads(_ => JsSuccess(ExternalAccountant))
-      case "04" => Reads(_ => JsSuccess(InternalAccountant))
-      case "05" => Reads(_ => JsSuccess(NominatedOfficer))
-      case "06" => Reads(_ => JsSuccess(Partner))
-      case "07" => Reads(_ => JsSuccess(SoleProprietor))
-      case "08" => (__ \ "roleWithinBusinessOther").read[String] map {
-        Other(_)
+  implicit val jsonReads = {
+    import play.api.libs.json.Reads.{StringReads, minLength}
+    (__ \ "roleWithinBusiness").read[String].flatMap[RoleWithinBusiness] {
+      case "01" => BeneficialShareholder
+      case "02" => Director
+      case "03" => ExternalAccountant
+      case "04" => InternalAccountant
+      case "05" => NominatedOfficer
+      case "06" => Partner
+      case "07" => SoleProprietor
+      case "08" =>
+        (JsPath \ "roleWithinBusinessOther").read(minLength(1)) map {
+          Other(_)
+        }
+      case _ => Reads { _ =>
+        JsError(ValidationError("error.invalid"))
       }
     }
+  }
 
   implicit val jsonWrites = Writes[RoleWithinBusiness] {
     case BeneficialShareholder => Json.obj("roleWithinBusiness" -> "01")

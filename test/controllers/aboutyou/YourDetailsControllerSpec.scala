@@ -8,7 +8,6 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
-import play.api.libs.json.Json
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
@@ -60,9 +59,9 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       "on post valid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "firstname" -> "foo",
-          "middlename" -> "asdf",
-          "lastname" -> "bar"
+          "firstName" -> "foo",
+          "middleName" -> "asdf",
+          "lastName" -> "bar"
         )
 
         when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
@@ -79,7 +78,7 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       "on post invalid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "firstname" -> "foo"
+          "firstName" -> "foo"
         )
 
         val result = controller.post()(newRequest)
