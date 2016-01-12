@@ -1,16 +1,18 @@
 @import include.main
 @import forms.FormHelpers._
-@import forms.AmlsForms._
 @import include.forms._
-@import utils.CommonHelper._
+@import forms.Form2
+@import models.aboutyou._
 
-@(roleWithinBusinessForm: Form[models.RoleWithinBusiness], roles:Seq[(String,String)])(implicit request: Request[_])
+@(form: Form2[RoleWithinBusiness], edit: Boolean)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.rolewithinbusiness.title")
 ) {
-    @formHelper(roleWithinBusinessForm, aboutyou.routes.RoleWithinBusinessController.post) { implicit form: Form[_] =>
+@*
+        @formHelper(roleWithinBusinessForm, aboutyou.routes.RoleWithinBusinessController.post(edit)) { implicit form: Form[_] =>
+
         @radioGroupWithOther(
             name = "roleWithinBusiness",
             otherName = "other",
@@ -19,6 +21,8 @@
             otherLabelText = "Some other label text",
             options = roles
         )
-        @submit(Messages("button.checkYourAnswers"))
+
+        @submit(Messages(if (edit) "button.saveandreturn" else "button.saveandcontinue"))
     }
+*@
 }

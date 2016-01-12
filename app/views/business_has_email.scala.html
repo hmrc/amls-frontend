@@ -9,7 +9,7 @@
     title = Messages("aboutthebusiness.contactingyou.title")
 ) {
 
-      @formHelper(businessHasEmailForm, aboutthebusiness.routes.BusinessHasEmailController.post()) { implicit form: Form[_] =>
+      @formHelper(businessHasEmailForm, routes.BusinessHasEmailController.post()) { implicit form: Form[_] =>
         <span>@Messages("aboutthebusiness.contactingyou.lbl")</span>
         @input(
             name = "businessPhoneNumber",

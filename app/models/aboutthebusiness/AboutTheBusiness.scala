@@ -11,11 +11,12 @@ case class AboutTheBusiness(
 object AboutTheBusiness {
 
   import play.api.libs.json._
+  import play.api.libs.functional.syntax._
 
   val key = "about-the-business"
 
   implicit val reads: Reads[AboutTheBusiness] = (
-      __.read[Option[PreviouslyRegistered]]
+      JsPath.read[Option[PreviouslyRegistered]]
     ) (AboutTheBusiness.apply _)
 
   implicit val writes: Writes[AboutTheBusiness] = Writes[AboutTheBusiness] {

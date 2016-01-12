@@ -7,25 +7,23 @@ POST        /example                        controllers.ExampleController.onSubm
 GET         /                               controllers.WelcomeController.get
 GET         /welcome                        controllers.WelcomeController.get
 
-GET         /unauthorised                   controllers.AmlsController.unauthorised
-GET         /summary                        controllers.MainSummaryController.onPageLoad
-
 GET         /login                          controllers.AmlsController.onPageLoad
 POST        /login                          controllers.AmlsController.onSubmit
 
-GET         /your-name                      controllers.aboutyou.YourNameController.get()
-POST        /your-name                      controllers.aboutyou.YourNameController.post()
-GET         /employed-within-business       controllers.aboutyou.EmployedWithinTheBusinessController.get()
-POST        /employed-within-business       controllers.aboutyou.EmployedWithinTheBusinessController.post()
-GET         /role-within-business           controllers.aboutyou.RoleWithinBusinessController.get()
-POST        /role-within-business           controllers.aboutyou.RoleWithinBusinessController.post()
-GET         /role-for-business              controllers.aboutyou.RoleForBusinessController.get()
-POST        /role-for-business              controllers.aboutyou.RoleForBusinessController.post()
+GET         /about-you/your-details                   controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
+POST        /about-you/your-details                   controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)
+GET         /about-you/role-within-business           controllers.aboutyou.RoleWithinBusinessController.get(edit: Boolean ?= false)
+POST        /about-you/role-within-business           controllers.aboutyou.RoleWithinBusinessController.post(edit: Boolean ?= false)
+GET         /about-you/summary                        controllers.aboutyou.SummaryController.get()
 
 GET         /business-has-website                 controllers.aboutthebusiness.BusinessHasWebsiteController.get()
 POST        /business-has-website                 controllers.aboutthebusiness.BusinessHasWebsiteController.post()
 GET         /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.get()
 POST        /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.post()
+
+GET         /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
+POST        /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()
+
 GET         /business-details/confirming-address  controllers.aboutthebusiness.ConfirmingYourAddressController.get()
 POST        /business-details/confirming-address  controllers.aboutthebusiness.ConfirmingYourAddressController.post()
 
@@ -35,5 +33,11 @@ POST        /business-details/vat                 controllers.aboutthebusiness.B
 GET         /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.get()
 POST        /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.post()
 
-GET         /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
-POST        /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()
+
+
+GET         /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.get()
+POST        /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.post()
+
+GET         /summary                        controllers.MainSummaryController.onPageLoad
+GET         /unauthorised                   controllers.AmlsController.unauthorised
+

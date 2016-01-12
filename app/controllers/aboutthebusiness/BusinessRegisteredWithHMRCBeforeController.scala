@@ -1,4 +1,4 @@
-package controllers.aboutyou
+package controllers.aboutthebusiness
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
@@ -28,11 +28,11 @@ trait BusinessRegisteredWithHMRCBeforeController extends FrontendController with
         case f: InvalidForm => Future.successful(BadRequest(views.html.registered_with_HMRC_before(f, edit)))
         case ValidForm(_, data) =>
           for {
-            AboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
+            aboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
-              AboutTheBusiness.roleWithinBusiness(data)
+              aboutTheBusiness.previouslyRegistered(data)
             )
-          } yield Redirect(routes.SummaryController.get())
+          } yield Redirect(routes.BusinessRegForVATController.get())
       }
     }
   }

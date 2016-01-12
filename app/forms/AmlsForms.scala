@@ -1,8 +1,8 @@
 package forms
 
 import models._
+import play.api.data.Form
 import play.api.data.Forms._
-import play.api.data._
 
 object AmlsForms {
   val loginDetailsFormMapping = mapping(

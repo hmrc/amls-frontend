@@ -2,6 +2,7 @@ import sbt._
 import scala.language.reflectiveCalls
 
 object FrontendBuild extends Build with MicroService {
+
   import scala.util.Properties.envOrElse
 
   val appName = "amls-frontend"
@@ -11,6 +12,7 @@ object FrontendBuild extends Build with MicroService {
 }
 
 private object AppDependencies {
+
   import play.PlayImport._
   import play.core.PlayVersion
 
@@ -45,7 +47,7 @@ private object AppDependencies {
 
   trait TestDependencies {
     lazy val scope: String = "test"
-    lazy val test : Seq[ModuleID] = ???
+    lazy val test: Seq[ModuleID] = ???
   }
 
   object Test {

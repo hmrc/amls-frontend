@@ -21,6 +21,7 @@ err.summary = There are errors in your form submission
 err.pleasespecify = Please specify
 
 button.saveandcontinue = Save and continue
+button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
 button.back = Back
 
@@ -57,20 +58,17 @@ summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
 
-aboutyou.yourname.title = Your name
-
-aboutyou.employedwithinbusiness.title = Are you employed within the business?
+aboutyou.yourdetails.title = Your details
 
 aboutyou.rolewithinbusiness.title = What is your role within the business?
 aboutyou.rolewithinbusiness.lbl.01=Beneficial shareholder
 aboutyou.rolewithinbusiness.lbl.02=Director
-aboutyou.rolewithinbusiness.lbl.03=Partner
+aboutyou.rolewithinbusiness.lbl.03=External accountant
 aboutyou.rolewithinbusiness.lbl.04=Internal accountant
-aboutyou.rolewithinbusiness.lbl.05=Sole proprietor
-aboutyou.rolewithinbusiness.lbl.06=Nominated officer
-
-aboutyou.roleforbusiness.title = What is your role for the business?
-aboutyou.roleforbusiness.lbl.01=External accountant
+aboutyou.rolewithinbusiness.lbl.05=Nominated officer
+aboutyou.rolewithinbusiness.lbl.06=Partner
+aboutyou.rolewithinbusiness.lbl.07=Sole proprietor
+aboutyou.rolewithinbusiness.lbl.08=Other
 
 aboutthebusiness.registeredforvat.title = Is this business registered for VAT?
 aboutthebusiness.vatnumber.lbl = VAT registration number
