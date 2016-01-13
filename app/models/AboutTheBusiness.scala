@@ -5,6 +5,27 @@ import play.api.data.mapping._
 import play.api.libs.json._
 
 import scala.language.implicitConversions
+/*
+case class BCAddress(
+                      line_1: String,
+                      line_2: String,
+                      line_3: Option[String] = None,
+                      line_4: Option[String] = None,
+                      postcode: Option[String] = None,
+                      country: String) {
+
+  def render = {
+    val line3display = line_3.map(line3 => s"$line3, ").getOrElse("")
+    val line4display = line_4.map(line4 => s"$line4, ").getOrElse("")
+    val postcodeDisplay = postcode.map(postcode1 => s"$postcode1, ").getOrElse("")
+    s"$line_1, $line_2, $line3display$line4display$postcodeDisplay$country"
+  }
+}
+
+object BCAddress {
+  implicit val formats = Json.format[BCAddress]
+}
+*/
 
 case class BusinessWithVAT(hasVAT: Boolean, VATNum: Option[String])
 
