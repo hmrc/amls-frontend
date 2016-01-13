@@ -18,10 +18,11 @@ case class Other(value: String) extends RoleWithinBusiness
 
 object RoleWithinBusiness {
 
-  import utils.MappingImplicits._
+  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusiness] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
+    import models.FormTypes._
     (__ \ "roleWithinBusiness").read[String] flatMap {
       case "01" => BeneficialShareholder
       case "02" => Director
@@ -31,7 +32,7 @@ object RoleWithinBusiness {
       case "06" => Partner
       case "07" => SoleProprietor
       case "08" =>
-        (__ \ "other").read(notEmpty |+| maxLength(30)) fmap Other.apply
+        (__ \ "other").read(descriptionType) fmap Other.apply
       case _ =>
         (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
     }
@@ -53,7 +54,7 @@ object RoleWithinBusiness {
   }
 
   implicit val jsonReads = {
-    import play.api.libs.json.Reads.{StringReads, minLength}
+    import play.api.libs.json.Reads.StringReads
     (__ \ "roleWithinBusiness").read[String].flatMap[RoleWithinBusiness] {
       case "01" => BeneficialShareholder
       case "02" => Director
@@ -63,12 +64,11 @@ object RoleWithinBusiness {
       case "06" => Partner
       case "07" => SoleProprietor
       case "08" =>
-        (JsPath \ "roleWithinBusinessOther").read(minLength(1)) map {
+        (JsPath \ "roleWithinBusinessOther").read[String] map {
           Other(_)
         }
-      case _ => Reads { _ =>
-        JsError(ValidationError("error.invalid"))
-      }
+      case _ =>
+        ValidationError("error.invalid")
     }
   }
 

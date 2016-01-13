@@ -2,16 +2,14 @@ package controllers.aboutyou
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.auth.AmlsRegime
+import controllers.BaseController
 import models.aboutyou.AboutYou
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-trait SummaryController extends FrontendController with Actions {
+trait SummaryController extends BaseController {
 
   def dataCache: DataCacheConnector
 
-  def get = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+  def get = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetchDataShortLivedCache[AboutYou](AboutYou.key) map {
         case Some(data) => Ok(views.html.about_you_summary(data))

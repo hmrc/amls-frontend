@@ -1,5 +1,6 @@
 package models.aboutyou
 
+
 import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, To, Write}
 import play.api.libs.json.Json
@@ -16,10 +17,11 @@ object YourDetails {
 
   implicit val formRule: Rule[UrlFormEncoded, YourDetails] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
+    import models.FormTypes._
     (
-      (__ \ "firstName").read(minLength(1)) and
+      (__ \ "firstName").read(indivNameType) and
         (__ \ "middleName").read[Option[String]] and
-        (__ \ "lastName").read(minLength(1))
+        (__ \ "lastName").read(indivNameType)
       )(YourDetails.apply _)
   }
 
