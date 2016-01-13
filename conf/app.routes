@@ -7,6 +7,9 @@ POST        /example                        controllers.ExampleController.onSubm
 GET         /                               controllers.WelcomeController.get
 GET         /welcome                        controllers.WelcomeController.get
 
+GET         /unauthorised                   controllers.AmlsController.unauthorised
+GET         /summary                        controllers.MainSummaryController.onPageLoad
+
 GET         /login                          controllers.AmlsController.onPageLoad
 POST        /login                          controllers.AmlsController.onSubmit
 
@@ -32,11 +35,6 @@ POST        /business-details/vat                 controllers.aboutthebusiness.B
 
 GET         /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.get()
 POST        /business-has-Email                   controllers.aboutthebusiness.BusinessHasEmailController.post()
-
-
-
-GET         /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.get()
-POST        /business-has-Email             controllers.aboutthebusiness.BusinessHasEmailController.post()
 
 GET         /summary                        controllers.MainSummaryController.onPageLoad
 GET         /unauthorised                   controllers.AmlsController.unauthorised

@@ -15,6 +15,9 @@ sealed trait Form2[+A] {
   def apply(path: Path): Option[String] =
     data.get(path.toString.substring(1)) map { _.mkString("") }
 
+  def apply(path: String): Option[String] =
+    data.get(path) map { _.mkString("") }
+
   def errors: Seq[(Path, Seq[ValidationError])]
   def errors(path: Path): Seq[ValidationError]
 }
@@ -61,6 +64,6 @@ object Form2 {
   def apply[A]
   (data: AnyContent)
   (implicit rule: Rule[UrlFormEncoded, A]
-    ): Form2[A] =
+    ): CompletedForm[A] =
     Form2[A](data.asFormUrlEncoded.getOrElse(Map.empty[String, Seq[String]]): UrlFormEncoded)
 }
