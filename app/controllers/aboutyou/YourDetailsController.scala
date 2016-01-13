@@ -14,8 +14,8 @@ trait YourDetailsController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[YourDetails](AboutYou.key) map {
-        case Some(data) => Ok(views.html.your_details(Form2[YourDetails](data), edit))
+      dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key) map {
+        case Some(AboutYou(Some(data), _)) => Ok(views.html.your_details(Form2[YourDetails](data), edit))
         case _ => Ok(views.html.your_details(EmptyForm, edit))
       }
   }

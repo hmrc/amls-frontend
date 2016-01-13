@@ -14,8 +14,8 @@ trait RoleWithinBusinessController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](AboutYou.key) map {
-        case Some(data) => Ok(views.html.role_within_business(Form2[RoleWithinBusiness](data), edit))
+      dataCacheConnector.fetchDataShortLivedCache[AboutYou](AboutYou.key) map {
+        case Some(AboutYou(_, Some(data))) => Ok(views.html.role_within_business(Form2[RoleWithinBusiness](data), edit))
         case _ => Ok(views.html.role_within_business(EmptyForm, edit))
       }
   }
