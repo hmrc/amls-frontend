@@ -27,7 +27,7 @@ trait BusinessRegForVATController extends AMLSGenericController{
       errors => Future.successful(BadRequest(views.html.business_reg_for_vat(errors))),
       details => {
         dataCacheConnector.saveDataShortLivedCache[BusinessWithVAT](CACHE_KEY, details) map { _=>
-          NotImplemented("Not implemented")
+          Redirect(controllers.aboutthebusiness.routes.ConfirmingYourAddressController.get())
         }
       })
 

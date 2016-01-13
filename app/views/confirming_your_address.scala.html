@@ -4,16 +4,14 @@
 @import include.forms._
 @import utils.CommonHelper._
 
-@(registeredOfficeForm: Form[_], reviewBusinessDetails: BusinessCustomerDetails, optionsIsRegisteredOffice: Seq[(String,String)])(implicit request: Request[_])
+@(confirmingYourAddressForm: Form[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
-    title = Messages("aboutthebusiness.registeredoffice.title")
+    title = Messages("aboutthebusiness.confirmingyouraddress.title")
 ) {
 
-    @formHelper(registeredOfficeForm, aboutthebusiness.routes.RegisteredOfficeController.post()) { implicit form: Form[_] =>
-
-<p>@Messages("aboutthebusiness.registeredoffice.addressheader")</p>
+    @formHelper(confirmingYourAddressForm, aboutthebusiness.routes.ConfirmingYourAddressController.post()) { implicit form: Form[_] =>
 
 <div class="panel-indent">
     <ul>
@@ -25,13 +23,13 @@
         <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.postcode.getOrElse("")</li>
     </ul>
 </div>
-<div class="form-group">
+
         @radioGroup(
-            name = "isRegisteredOffice",
-            labelText = Messages("aboutthebusiness.registeredoffice.isaddresscorrect"),
-            options = optionsIsRegisteredOffice
+            name = "isRegOfficeOrMainPlaceOfBusiness",
+            labelText = Messages("aboutthebusiness.confirmingyouraddress.registeredormainplace.lbl"),
+            options = optionsYesNo
         )
-</div>
+
 @submit(Messages("button.saveandcontinue"))
     }
 }

@@ -46,15 +46,15 @@ class BusinessRegForVATControllerSpec extends PlaySpec with OneServerPerSuite wi
       BusinessRegForVATController.authConnector must be(AMLSAuthConnector)
     }
 
-    "on load display the businessHasWebsite page" in {
+    "on load display the businessHasVAT page" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[BusinessWithVAT](Matchers.any())
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
       val result = MockBusinessRegForVATController.get
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("aboutthebusiness.vatnumber.title"))
+      contentAsString(result) must include(Messages("aboutthebusiness.vatnumber.lbl"))
     }
 
-    "on load display the businessHasWebsite page with prepopulated data" in {
+    "on load display the businessHasVAT page with prepopulated data" in {
       when(mockDataCacheConnector.fetchDataShortLivedCache[BusinessWithVAT](Matchers.any())
         (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(Some(mockBusinessWithVAT)))
       val result = MockBusinessRegForVATController.get
@@ -66,7 +66,8 @@ class BusinessRegForVATControllerSpec extends PlaySpec with OneServerPerSuite wi
     "on submit of page" must {
       "successfully navigate to next page " in {
         submitWithFormFilled { result =>
-          status(result) must be(NOT_IMPLEMENTED)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result).fold("") {identity} must include("/business-details/confirming-address")
         }
       }
 
@@ -92,7 +93,7 @@ class BusinessRegForVATControllerSpec extends PlaySpec with OneServerPerSuite wi
                                                   website: Option[String]) {
       val mockBusinessHasWebsite = BusinessWithVAT(hasWebsite, website)
       val form  = businessRegForVATForm.fill(mockBusinessHasWebsite)
-      val fakePostRequest = FakeRequest("POST", "/business-with-VAT").withFormUrlEncodedBody(form.data.toSeq: _*)
+      val fakePostRequest = FakeRequest("POST", "/vat").withFormUrlEncodedBody(form.data.toSeq: _*)
       when(mockDataCacheConnector.saveDataShortLivedCache[BusinessWithVAT](Matchers.any(), Matchers.any())
         (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(mockBusinessHasWebsite)))
       val result = MockBusinessRegForVATController.post(mock[AuthContext], fakePostRequest)

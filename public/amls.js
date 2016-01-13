@@ -13,8 +13,7 @@ $(function () {
      var checkedInputs = 'input[type="checkbox"], input[type="radio"]';
 
       function showHide($target, value) {
-
-      console.log($($target));
+      console.log(""+$($target))
           var $self = $(this),
             $inputs = $target.find('input, option, selected, textarea');
 
