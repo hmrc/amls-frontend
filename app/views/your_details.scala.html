@@ -1,33 +1,30 @@
 @import include.main
-@import forms.FormHelpers._
-@import forms.AmlsForms._
-@import include.form._
-@import forms.FormHelpers._
+@import include.form
 @import forms.Form2
 
-@(form: Form2[_], edit: Boolean)(implicit request: Request[_])
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.yourdetails.title")
 ) {
-      @formHelper(form, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form2[_] =>
+      @form.formHelper(f, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit f: Form2[_] =>
 
-        @input(
+        @form.input(
             name = "firstName",
             labelText = Messages("lbl.first_name")
         )
 
-        @input(
+        @form.input(
             name = "middleName",
             labelText = Messages("lbl.middle_name")
         )
 
-        @input(
+        @form.input(
             name = "lastName",
             labelText = Messages("lbl.last_name")
         )
 
-        @submit(Messages(if (edit) "button.saveandreturn" else "button.saveandcontinue"))
+        @form.submit(Messages(if (edit) "button.saveandreturn" else "button.saveandcontinue"))
     }
 }
