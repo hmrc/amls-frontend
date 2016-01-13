@@ -7,6 +7,9 @@ POST        /example                        controllers.ExampleController.onSubm
 GET         /                               controllers.WelcomeController.get
 GET         /welcome                        controllers.WelcomeController.get
 
+GET         /unauthorised                   controllers.AmlsController.unauthorised
+GET         /summary                        controllers.MainSummaryController.onPageLoad
+
 GET         /login                          controllers.AmlsController.onPageLoad
 POST        /login                          controllers.AmlsController.onSubmit
 
@@ -27,6 +30,3 @@ POST        /business-details/contacting-you        controllers.aboutthebusiness
 
 GET         /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
 POST        /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()
-
-GET         /summary                        controllers.MainSummaryController.onPageLoad
-GET         /unauthorised                   controllers.AmlsController.unauthorised

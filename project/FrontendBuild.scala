@@ -2,6 +2,7 @@ import sbt._
 import scala.language.reflectiveCalls
 
 object FrontendBuild extends Build with MicroService {
+
   import scala.util.Properties.envOrElse
 
   val appName = "amls-frontend"
