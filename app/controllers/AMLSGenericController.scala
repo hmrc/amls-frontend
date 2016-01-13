@@ -9,6 +9,7 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
+@deprecated
 trait AMLSGenericController extends FrontendController with Actions {
 
   protected def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result]
