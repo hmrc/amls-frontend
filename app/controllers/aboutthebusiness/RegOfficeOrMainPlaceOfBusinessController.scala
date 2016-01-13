@@ -2,53 +2,49 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import controllers.auth.AmlsRegime
+import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.aboutthebusiness.{AboutTheBusiness, RegOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
-import models.aboutyou.AboutYou
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import models.aboutthebusiness.{RegOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
 
-trait RegOfficeOrMainPlaceOfBusinessController extends FrontendController with Actions {
+import scala.concurrent.Future
+
+trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
+
   def dataCacheConnector: DataCacheConnector
-
   def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
 
-  def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       for {
         reviewBusinessDetails <- businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
-        cachedData <- dataCacheConnector.fetchDataShortLivedCache[RegOfficeOrMainPlaceOfBusiness](AboutYou.key)
       } yield {
-        cachedData match {
-          case Some(data) => Ok(views.html.registered_office_or_main_place(Form2[RegOfficeOrMainPlaceOfBusiness](data), reviewBusinessDetails))
-          case _ => Ok(views.html.registered_office_or_main_place(EmptyForm, reviewBusinessDetails))
+        reviewBusinessDetails match {
+          case Some(data) => Ok(views.html.registered_office_or_main_place(EmptyForm, data))
+          case _ => Redirect(routes.BusinessRegisteredWithHMRCBeforeController.get())  //TODo replace with actual registered address page
         }
       }
   }
 
-  def post(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-
-      val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
 
       Form2[RegOfficeOrMainPlaceOfBusiness](request.body) match {
         case f: InvalidForm => {
-          for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
-            BadRequest(views.html.registered_office_or_main_place(f, reviewBusinessDetails))
+          for {
+            reviewBusinessDetails <- businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
+          } yield {
+              reviewBusinessDetails match {
+                case Some(data) => BadRequest(views.html.registered_office_or_main_place(f, data))
+                case _ =>  Redirect(routes.RegOfficeOrMainPlaceOfBusinessController.get())
+              }
+            }
+        }
+        case ValidForm(_, data) => {
+          data.isRegOfficeOrMainPlaceOfBusiness match {
+            case true => Future.successful(Redirect(routes.BusinessRegForVATController.get())) //TODO replace with correct path
+            case false => Future.successful(Redirect(routes.BusinessRegisteredWithHMRCBeforeController.get())) //TODO replace with correct path
           }
         }
-        case ValidForm(_, data) =>
-          for {
-             aboutthebusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
-              aboutthebusiness.regOfficeOrMainPlaceOfBusiness(data))
-          } yield {
-            data.isRegOfficeOrMainPlaceOfBusiness match {
-              case true => Redirect(routes.BusinessRegForVATController.get())   //TODO replace with correct path
-              case false => Redirect(routes.BusinessRegisteredWithHMRCBeforeController.get()) //TODO replace with correct path
-            }
-          }
       }
   }
 }

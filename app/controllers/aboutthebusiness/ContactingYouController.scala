@@ -26,18 +26,20 @@ trait ContactingYouController extends AMLSGenericController{
       cachedData <- testData
     } yield {
       val form = cachedData.fold(contactingYouForm)(x => contactingYouForm.fill(x))
-      Ok(views.html.contacting_you(form, result))
+     // Ok(views.html.contacting_you(form, result))
+      Ok
     }
   }
 
   override def post(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
     val reviewBusinessDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
-    contactingYouForm.bindFromRequest().fold(
-      errors =>{
-        for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
+  /*  contactingYouForm.bindFromRequest().fold(
+      errors =>
+
+        /*for (reviewBusinessDetails: BusinessCustomerDetails <- reviewBusinessDetailsFuture) yield {
           BadRequest(views.html.contacting_you(errors, reviewBusinessDetails))
-        }
-      },
+        }*/
+      ,
       details => {
         dataCacheConnector.saveDataShortLivedCache[ContactingYou](CACHE_KEY, details) map { _ =>
           details.letterToThisAddress match {
@@ -45,7 +47,8 @@ trait ContactingYouController extends AMLSGenericController{
             case false => NotImplemented("Not yet implemented:should go to Address for letters relating to anti-money laundering supervision page")
           }
         }
-      })
+      })*/
+    Future.successful(Ok)
   }
 }
 

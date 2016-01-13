@@ -3,11 +3,11 @@ package models.aboutthebusiness
 import scala.language.implicitConversions
 
 case class AboutTheBusiness(
-                             regOfficeOrMainPlaceOfBusiness: Option[RegOfficeOrMainPlaceOfBusiness] = None,
+                             dummyModel: Option[BusinessWithVAT] = None,
                              businessWithVAT :Option[BusinessWithVAT] = None
                             ) {
-  def regOfficeOrMainPlaceOfBusiness(obj:RegOfficeOrMainPlaceOfBusiness) : AboutTheBusiness= {
-    this.copy(regOfficeOrMainPlaceOfBusiness = Some(obj))
+  def dummyModel(obj:BusinessWithVAT) : AboutTheBusiness= {
+    this.copy(dummyModel = Some(obj))
   }
 
   def businessWithVAT(obj:BusinessWithVAT) : AboutTheBusiness= {
@@ -23,14 +23,14 @@ object AboutTheBusiness {
   val key = "about-the-business"
 
   implicit val reads: Reads[AboutTheBusiness] = (
-    __.read[Option[RegOfficeOrMainPlaceOfBusiness]] and
+    __.read[Option[BusinessWithVAT]] and
     __.read[Option[BusinessWithVAT]]
     ) (AboutTheBusiness.apply _)
 
   implicit val writes: Writes[AboutTheBusiness] = Writes[AboutTheBusiness] {
     model =>
       Seq(
-        Json.toJson(model.regOfficeOrMainPlaceOfBusiness).asOpt[JsObject]
+        Json.toJson(model.dummyModel).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }

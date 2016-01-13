@@ -39,8 +39,8 @@ class RoleWithinBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
     "on get display the Role Within Business page with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[RoleWithinBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BeneficialShareholder)))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(AboutYou(None, Some(BeneficialShareholder)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)

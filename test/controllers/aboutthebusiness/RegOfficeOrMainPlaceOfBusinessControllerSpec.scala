@@ -1,5 +1,6 @@
 package controllers.aboutthebusiness
 
+import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import models.aboutthebusiness.{AboutTheBusiness, BCAddress, RegOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
 import org.jsoup.Jsoup
@@ -33,15 +34,18 @@ class RegOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServ
 
   "RegOfficeOrMainPlaceOfBusinessController" must {
 
+    "use correct services" in new Fixture {
+      RegOfficeOrMainPlaceOfBusinessController.authConnector must be(AMLSAuthConnector)
+      RegOfficeOrMainPlaceOfBusinessController.dataCacheConnector must be(DataCacheConnector)
+      RegOfficeOrMainPlaceOfBusinessController.businessCustomerSessionCacheConnector must be(BusinessCustomerSessionCacheConnector)
+    }
+
     "Get Option:" must {
 
       "load register Office" in new Fixture {
 
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(businessCustomerDetails))
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[RegOfficeOrMainPlaceOfBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
+          .thenReturn(Future.successful(Some(businessCustomerDetails)))
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))
@@ -50,17 +54,14 @@ class RegOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServ
       "load Your Name page with pre populated data" in new Fixture {
 
         val registeredAddress = RegOfficeOrMainPlaceOfBusiness(isRegOfficeOrMainPlaceOfBusiness = true)
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(businessCustomerDetails))
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[RegOfficeOrMainPlaceOfBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(registeredAddress)))
+        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.get().url))
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=isRegOfficeOrMainPlaceOfBusiness]").`val` must be("true")
       }
     }
 
@@ -72,13 +73,7 @@ class RegOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServ
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(businessCustomerDetails))
-
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(businessCustomerDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -91,13 +86,7 @@ class RegOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServ
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(businessCustomerDetails))
-
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(businessCustomerDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -110,13 +99,26 @@ class RegOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServ
           "isRegOfficeOrMainPlaceOfBusiness" -> "898989"
         )
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(businessCustomerDetails))
+          .thenReturn(Future.successful(Some(businessCustomerDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[name=isRegOfficeOrMainPlaceOfBusiness]").`val` must be("true")
+      }
+
+      "on post reload the same page when businessCustomerDetails is None" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isRegOfficeOrMainPlaceOfBusiness" -> "898989"
+        )
+        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.get().url))
       }
     }
   }

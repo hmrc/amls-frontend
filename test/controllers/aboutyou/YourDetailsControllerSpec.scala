@@ -42,8 +42,8 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
         val yourDetails = YourDetails("foo", None, "bar")
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[YourDetails](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(yourDetails)))
+        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(AboutYou(Some(yourDetails), None))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
