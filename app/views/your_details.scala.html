@@ -5,7 +5,6 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.yourdetails.title")
 ) {
       @form.formHelper(f, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit f: Form2[_] =>

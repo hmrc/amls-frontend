@@ -7,7 +7,6 @@
 @(businessHasWebsiteForm: Form[models.BusinessHasWebsite])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.businesshaswebsite.title")
 ) {
     @formHelper(businessHasWebsiteForm, aboutthebusiness.routes.BusinessHasWebsiteController.post()) { implicit form: Form[_] =>
