@@ -2,15 +2,16 @@
 @import forms.FormHelpers._
 @import include.forms._
 @import utils.DataFields._
+@import models.aboutthebusiness._
 
-@(businessHasEmailForm: Form[models.ContactingYou], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
+@(businessHasEmailForm: Form[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.contactingyou.title")
 ) {
 
-      @formHelper(businessHasEmailForm, aboutthebusiness.routes.ContactingYouController.post()) { implicit form: Form[_] =>
+      @formHelper(businessHasEmailForm, controllers.aboutthebusiness.routes.ContactingYouController.post()) { implicit form: Form[_] =>
         <span>@Messages("aboutthebusiness.contactingyou.lbl")</span>
         @input(
             name = "phoneNumber",

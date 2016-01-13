@@ -1,11 +1,9 @@
 package models
 
-import play.api.libs.json.{JsObject, Writes, Reads}
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 import scala.language.implicitConversions
-
+/*
 case class BCAddress(
                       line_1: String,
                       line_2: String,
@@ -25,40 +23,7 @@ case class BCAddress(
 object BCAddress {
   implicit val formats = Json.format[BCAddress]
 }
-
-case class BusinessCustomerDetails(businessName: String,
-                                   businessType: Option[String],
-                                   businessAddress: BCAddress,
-                                   sapNumber: String,
-                                   safeId: String,
-                                   agentReferenceNumber: Option[String],
-                                   firstName: Option[String] = None,
-                                   lastName: Option[String] = None)
-
-object BusinessCustomerDetails {
-  implicit val formats = Json.format[BusinessCustomerDetails]
-}
-
-/**
- * This created because the address is not entered at front end so isn't in form.
- */
-case class ConfirmingYourAddressSave4Later(registeredOfficeAddress: BCAddress,
-                                      isRegOfficeOrMainPlaceOfBusiness: Boolean)
-
-object ConfirmingYourAddressSave4Later {
-  implicit val formats = Json.format[ConfirmingYourAddressSave4Later]
-}
-
-case class ConfirmingYourAddress(isRegOfficeOrMainPlaceOfBusiness: Boolean)
-
-object ConfirmingYourAddress {
-
-  implicit val formats = Json.format[ConfirmingYourAddress]
-
-  def fromConfirmingYourAddressSave4Later(confirmingYourAddressSave4Later: ConfirmingYourAddressSave4Later): ConfirmingYourAddress = {
-    ConfirmingYourAddress(confirmingYourAddressSave4Later.isRegOfficeOrMainPlaceOfBusiness)
-  }
-}
+*/
 
 case class BusinessWithVAT(hasVAT: Boolean, VATNum: Option[String])
 
@@ -81,7 +46,6 @@ object RegisteredWithHMRCBefore {
 case class AboutTheBusiness(
                              registeredWithHMRCBefore: Option[RegisteredWithHMRCBefore] = None,
                              businessWithVAT: Option[BusinessWithVAT] = None,
-                             confirmingYourAddress: Option[ConfirmingYourAddress] =None,
                              contactingYou: Option[ContactingYou] = None
                            ) {
   def registeredWithHMRCBefore(obj:RegisteredWithHMRCBefore): AboutTheBusiness = {
@@ -91,11 +55,6 @@ case class AboutTheBusiness(
   def businessWithVAT(obj: BusinessWithVAT) : AboutTheBusiness= {
     this.copy(businessWithVAT = Some(obj))
   }
-
-  def confirmingYourAddress(obj:ConfirmingYourAddress) : AboutTheBusiness= {
-    this.copy(confirmingYourAddress = Some(obj))
-  }
-
   def contactingYou(obj:ContactingYou):AboutTheBusiness = {
     this.copy(contactingYou= Some(obj))
   }

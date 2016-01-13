@@ -16,8 +16,8 @@ GET         /about-you/role-within-business           controllers.aboutyou.RoleW
 POST        /about-you/role-within-business           controllers.aboutyou.RoleWithinBusinessController.post(edit: Boolean ?= false)
 GET         /about-you/summary                        controllers.aboutyou.SummaryController.get()
 
-GET         /business-details/confirming-address    controllers.aboutthebusiness.ConfirmingYourAddressController.get()
-POST        /business-details/confirming-address    controllers.aboutthebusiness.ConfirmingYourAddressController.post()
+GET         /business-details/confirming-address    controllers.aboutthebusiness.RegOfficeOrMainPlaceOfBusinessController.get(edit: Boolean ?= false)
+POST        /business-details/confirming-address    controllers.aboutthebusiness.RegOfficeOrMainPlaceOfBusinessController.post(edit: Boolean ?= false)
 
 GET         /business-details/vat                   controllers.aboutthebusiness.BusinessRegForVATController.get()
 POST        /business-details/vat                   controllers.aboutthebusiness.BusinessRegForVATController.post()

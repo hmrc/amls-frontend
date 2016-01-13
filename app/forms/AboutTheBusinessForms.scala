@@ -2,6 +2,7 @@ package forms
 
 import config.AmlsPropertiesReader._
 import models._
+import models.aboutthebusiness.RegOfficeOrMainPlaceOfBusiness
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.validation.BooleanWithTextValidator._
@@ -13,7 +14,7 @@ object AboutTheBusinessForms {
 
   val confirmingYourAddressForm = Form(mapping(
     "isRegOfficeOrMainPlaceOfBusiness" -> mandatoryBoolean("err.required")
-  )(ConfirmingYourAddress.apply)(ConfirmingYourAddress.unapply))
+  )(RegOfficeOrMainPlaceOfBusiness.apply)(RegOfficeOrMainPlaceOfBusiness.unapply))
 
   val businessRegForVATForm = Form(mapping(
     "hasVAT" -> mandatoryBooleanWithText("VATNum", "true", "err.required", "err.required", "err.notrequired"),

@@ -4,7 +4,8 @@ import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import controllers.AMLSGenericController
 import forms.AboutTheBusinessForms._
-import models.{BusinessCustomerDetails, ContactingYou}
+import models.aboutthebusiness.BusinessCustomerDetails
+import models.ContactingYou
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

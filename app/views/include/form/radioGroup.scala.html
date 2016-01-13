@@ -1,0 +1,41 @@
+@import forms.FormHelpers._
+@import forms.Form2
+
+@(
+    name: String,
+    labelText: String,
+    options: Seq[(String, String)],
+    hintText: String = "",
+    fieldsetPresentation: Presentation = Defaults.radioGroup
+
+)(implicit
+    form: Form2[_],
+    lang: Lang
+)
+
+@fieldsetPresentation_ = @{
+    // Make groups of 2 radio buttons inline
+    if (options.length < 3) {
+        fieldsetPresentation.copy(
+            classes = "inline" +: fieldsetPresentation.classes
+        )
+    } else {
+        fieldsetPresentation
+    }
+}
+
+
+
+@fieldset(
+    legend = labelText,
+   presentation = fieldsetPresentation_
+
+) {
+      @options.map { case (key, value) =>
+        <label class="block-label">
+            <input type="radio" name="@name" value="@value"
+                   @form(name).filter( _ == value).map{ _ => checked="checked"} >
+            @key
+        </label>
+    }
+}

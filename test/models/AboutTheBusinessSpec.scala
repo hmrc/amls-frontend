@@ -6,7 +6,7 @@ import scala.util.Random
 
 class AboutTheBusinessSpec extends PlaySpec {
 
-  "AboutTheBusiness " should {
+  /*"AboutTheBusiness " should {
 
     "successfully convert a RegisteredOfficeSave4Later object to a RegisteredOffice object" in {
       val registeredOfficeSave4Later = ConfirmingYourAddressSave4Later(BCAddress("", "", None, None, None, ""), Random.nextBoolean())
@@ -14,5 +14,5 @@ class AboutTheBusinessSpec extends PlaySpec {
       result mustBe ConfirmingYourAddress(registeredOfficeSave4Later.isRegOfficeOrMainPlaceOfBusiness)
     }
 
-  }
+  }*/
 }

@@ -22,7 +22,7 @@ import scala.concurrent.Future
 
 class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
-  implicit val request = FakeRequest()
+ /* implicit val request = FakeRequest()
   implicit val authContext = mock[AuthContext]
 
   val userId = s"user-${UUID.randomUUID}"
@@ -70,5 +70,5 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
     def submitWithFormFilled(test: Future[Result] => Any) {
       createBusinessHasEmailFormForSubmission(test, "test@google.com")
     }
-  }
+  }*/
 }
