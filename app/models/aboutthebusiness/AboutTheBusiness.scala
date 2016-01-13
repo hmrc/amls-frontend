@@ -1,7 +1,8 @@
 package models.aboutthebusiness
 
 case class AboutTheBusiness(
-                     previouslyRegistered: Option[PreviouslyRegistered] = None
+                             previouslyRegistered: Option[PreviouslyRegistered] = None,
+                             previouslyRegistered1: Option[PreviouslyRegistered] = None
                      ) {
 
   def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness =
@@ -14,9 +15,9 @@ object AboutTheBusiness {
   import play.api.libs.functional.syntax._
 
   val key = "about-the-business"
-
   implicit val reads: Reads[AboutTheBusiness] = (
-      JsPath.read[Option[PreviouslyRegistered]]
+      __.read[Option[PreviouslyRegistered]] and
+        __.read[Option[PreviouslyRegistered]]
     ) (AboutTheBusiness.apply _)
 
   implicit val writes: Writes[AboutTheBusiness] = Writes[AboutTheBusiness] {

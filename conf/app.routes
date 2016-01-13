@@ -24,8 +24,8 @@ POST        /business-has-website                 controllers.aboutthebusiness.B
 GET         /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.get()
 POST        /telephoning-business                 controllers.aboutthebusiness.TelephoningBusinessController.post()
 
-GET         /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
-POST        /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()
+GET         /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get(edit: Boolean ?= false)
+POST        /business-details/index               controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post(edit: Boolean ?= false)
 
 GET         /business-details/confirming-address  controllers.aboutthebusiness.ConfirmingYourAddressController.get()
 POST        /business-details/confirming-address  controllers.aboutthebusiness.ConfirmingYourAddressController.post()

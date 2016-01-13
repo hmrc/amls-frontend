@@ -10,45 +10,43 @@ sealed trait PreviouslyRegistered
 case class PreviouslyRegisteredYes(value : String) extends PreviouslyRegistered
 case object PreviouslyRegisteredNo extends PreviouslyRegistered
 
+
 object PreviouslyRegistered {
 
   implicit val formRule: Rule[UrlFormEncoded, PreviouslyRegistered] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "previouslyRegistered").read[String] flatMap {
+    (__ \ "previouslyRegistered").read[Boolean] flatMap {
 
-      case "01" =>
+      case true =>
         (__ \ "previouslyRegisteredYes").read(minLength(1)) flatMap {
           value =>
             Rule.fromMapping { _ => Success(PreviouslyRegisteredYes(value)) }
         }
-      case "02" => Rule.fromMapping { _ => Success(PreviouslyRegisteredNo) }
-      case _ => Rule { _ =>
-        Failure(Seq((Path \ "previouslyRegistered") -> Seq(ValidationError("error.invalid"))))
-      }
+      case false => Rule.fromMapping { _ => Success(PreviouslyRegisteredNo) }
     }
   }
 
   implicit val formWrites: Write[PreviouslyRegistered, UrlFormEncoded] = Write {
     case PreviouslyRegisteredYes(value) =>
-      Map("previouslyRegistered" -> Seq("01"),
+      Map("previouslyRegistered" -> Seq("true"),
         "previouslyRegisteredYes" -> Seq(value)
       )
-    case PreviouslyRegisteredNo => Map("previouslyRegistered" -> Seq("02"))
+    case PreviouslyRegisteredNo => Map("previouslyRegistered" -> Seq("false"))
   }
 
   implicit val jsonReads =
-    (__ \ "previouslyRegistered").read[String] flatMap[PreviouslyRegistered] {
-    case "01" => (__ \ "previouslyRegisteredYes").read[String] map {
+    (__ \ "previouslyRegistered").read[Boolean] flatMap[PreviouslyRegistered] {
+    case true => (__ \ "previouslyRegisteredYes").read[String] map {
       PreviouslyRegisteredYes(_)
     }
-    case "02" => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
+    case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
   }
 
   implicit val jsonWrites = Writes[PreviouslyRegistered] {
     case PreviouslyRegisteredYes(value) => Json.obj(
-      "previouslyRegistered" -> "01",
+      "previouslyRegistered" -> true,
       "previouslyRegisteredYes" -> value
     )
-    case PreviouslyRegisteredNo => Json.obj("previouslyRegistered" -> "02")
+    case PreviouslyRegisteredNo => Json.obj("previouslyRegistered" -> false)
   }
 }

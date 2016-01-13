@@ -16,8 +16,8 @@ trait BusinessRegisteredWithHMRCBeforeController extends FrontendController with
 
   def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[PreviouslyRegistered](AboutTheBusiness.key) map {
-        case Some(data) => Ok(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
+      dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
+        case Some(AboutTheBusiness(Some(data), _)) => Ok(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
         case _ => Ok(views.html.registered_with_HMRC_before(EmptyForm, edit))
       }
   }
