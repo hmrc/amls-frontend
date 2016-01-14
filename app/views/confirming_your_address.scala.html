@@ -11,7 +11,7 @@
     title = Messages("aboutthebusiness.confirmingyouraddress.title")
 ) {
 
-    @formHelper(confirmingYourAddressForm, aboutthebusiness.routes.ConfirmingYourAddressController.post()) { implicit form: Form[_] =>
+    @formHelper(confirmingYourAddressForm, controllers.aboutthebusiness.routes.ConfirmingYourAddressController.post()) { implicit form: Form[_] =>
 
 <div class="panel-indent">
     <ul>

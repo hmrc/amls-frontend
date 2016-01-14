@@ -10,7 +10,7 @@
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.businesshaswebsite.title")
 ) {
-    @formHelper(businessHasWebsiteForm, aboutthebusiness.routes.BusinessHasWebsiteController.post()) { implicit form: Form[_] =>
+    @formHelper(businessHasWebsiteForm, controllers.aboutthebusiness.routes.BusinessHasWebsiteController.post()) { implicit form: Form[_] =>
         @radioGroupYesNoWithText(
             name = "hasWebsite",
             textFieldName = "website",

@@ -11,7 +11,7 @@
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.yourdetails.title")
 ) {
-      @formHelper(form, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form2[_] =>
+      @FormHelper(form, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form2[_] =>
 
         @input(
             name = "firstName",

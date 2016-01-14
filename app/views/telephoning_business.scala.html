@@ -9,7 +9,7 @@ sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
 title = Messages("aboutthebusiness.telephoning.title")
 ) {
 
-    @formHelper(telephoningBusinessForm, aboutthebusiness.routes.TelephoningBusinessController.post) { implicit form: Form[_] =>
+    @formHelper(telephoningBusinessForm, controllers.aboutthebusiness.routes.TelephoningBusinessController.post) { implicit form: Form[_] =>
 
         @input(
             name = "businessPhoneNumber",
