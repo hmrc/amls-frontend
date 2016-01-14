@@ -1,6 +1,5 @@
 package models.aboutthebusiness
 
-import models.aboutthebusiness
 import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, Write}
 import play.api.libs.json.Json
