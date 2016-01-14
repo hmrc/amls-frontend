@@ -28,4 +28,6 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     }
   }
 
+  // this test will fail until we add more section to about the business in model
+
 }
