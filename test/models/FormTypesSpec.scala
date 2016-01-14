@@ -58,4 +58,32 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
   }
+
+  "prevMLRRegNoType" must {
+
+    "successfully validate" in {
+
+      prevMLRRegNoType.validate("12345678") must
+        be(Success("12345678"))
+
+      prevMLRRegNoType.validate("123456789012345") must
+        be(Success("123456789012345"))
+    }
+
+    "fail to validate an empty string" in {
+
+      prevMLRRegNoType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 15" in {
+
+      prevMLRRegNoType.validate("1" * 16) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 15))
+        )))
+    }
+  }
 }
