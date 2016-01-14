@@ -61,15 +61,15 @@ object Form2 {
   def apply[A]
   (a: A)
   (implicit
-    write: Write[A, UrlFormEncoded]
-  ): ValidForm[A] =
+   write: Write[A, UrlFormEncoded]
+    ): ValidForm[A] =
     ValidForm(write.writes(a), a)
 
   def apply[A]
   (data: UrlFormEncoded)
   (implicit
-    rule: Rule[UrlFormEncoded, A]
-  ): CompletedForm[A] =
+   rule: Rule[UrlFormEncoded, A]
+    ): CompletedForm[A] =
     rule.validate(data) match {
       case Success(a) => ValidForm(data, a)
       case Failure(errors) => InvalidForm(data, errors)
@@ -78,6 +78,6 @@ object Form2 {
   def apply[A]
   (data: AnyContent)
   (implicit rule: Rule[UrlFormEncoded, A]
-  ): CompletedForm[A] =
+    ): CompletedForm[A] =
     Form2[A](data.asFormUrlEncoded.getOrElse(Map.empty[String, Seq[String]]): UrlFormEncoded)
 }

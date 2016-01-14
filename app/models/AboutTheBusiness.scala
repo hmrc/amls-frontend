@@ -1,9 +1,10 @@
 package models
 
+import play.api.libs.json._
 import play.api.libs.json.Json
 
 import scala.language.implicitConversions
-
+/*
 case class BCAddress(
                       line_1: String,
                       line_2: String,
@@ -23,55 +24,7 @@ case class BCAddress(
 object BCAddress {
   implicit val formats = Json.format[BCAddress]
 }
-
-case class BusinessCustomerDetails(businessName: String,
-                                   businessType: Option[String],
-                                   businessAddress: BCAddress,
-                                   sapNumber: String,
-                                   safeId: String,
-                                   agentReferenceNumber: Option[String],
-                                   firstName: Option[String] = None,
-                                   lastName: Option[String] = None)
-
-object BusinessCustomerDetails {
-  implicit val formats = Json.format[BusinessCustomerDetails]
-}
-
-case class BusinessHasWebsite(hasWebsite: Boolean, website: Option[String])
-
-object BusinessHasWebsite {
-  implicit val formats = Json.format[BusinessHasWebsite]
-}
-
-case class TelephoningBusiness(businessPhoneNumber: String,
-                               mobileNumber: Option[String])
-
-object TelephoningBusiness {
-  implicit val formats = Json.format[TelephoningBusiness]
-}
-
-/**
- * This created because the address is not entered at front end so isn't in form.
- */
-case class ConfirmingYourAddressSave4Later(registeredOfficeAddress: BCAddress,
-                                      isRegOfficeOrMainPlaceOfBusiness: Boolean)
-
-object ConfirmingYourAddressSave4Later {
-  implicit val formats = Json.format[ConfirmingYourAddressSave4Later]
-}
-
-
-case class ConfirmingYourAddress(isRegOfficeOrMainPlaceOfBusiness: Boolean)
-
-object ConfirmingYourAddress {
-
-  implicit val formats = Json.format[ConfirmingYourAddress]
-
-  def fromConfirmingYourAddressSave4Later(confirmingYourAddressSave4Later: ConfirmingYourAddressSave4Later): ConfirmingYourAddress = {
-    ConfirmingYourAddress(confirmingYourAddressSave4Later.isRegOfficeOrMainPlaceOfBusiness)
-  }
-
-}
+*/
 
 case class BusinessWithVAT(hasVAT: Boolean, VATNum: Option[String])
 
@@ -79,14 +32,57 @@ object BusinessWithVAT {
   implicit val formats = Json.format[BusinessWithVAT]
 }
 
-case class BusinessHasEmail(email: String)
+case class ContactingYou(phoneNumber: String, email: String, website: Option[String], letterToThisAddress: Boolean)
 
-object BusinessHasEmail {
-  implicit val formats = Json.format[BusinessHasEmail]
+object ContactingYou {
+  implicit val formats = Json.format[ContactingYou]
 }
 
 case class RegisteredWithHMRCBefore(registeredWithHMRC: Boolean, mlrNumber: Option[String])
 
 object RegisteredWithHMRCBefore {
   implicit val formats = Json.format[RegisteredWithHMRCBefore]
+}
+
+case class AboutTheBusiness(
+                             registeredWithHMRCBefore: Option[RegisteredWithHMRCBefore] = None,
+                             businessWithVAT: Option[BusinessWithVAT] = None,
+                             contactingYou: Option[ContactingYou] = None
+                           ) {
+  def registeredWithHMRCBefore(obj:RegisteredWithHMRCBefore): AboutTheBusiness = {
+    this.copy(registeredWithHMRCBefore = Some(obj))
+  }
+
+  def businessWithVAT(obj: BusinessWithVAT) : AboutTheBusiness= {
+    this.copy(businessWithVAT = Some(obj))
+  }
+  def contactingYou(obj:ContactingYou):AboutTheBusiness = {
+    this.copy(contactingYou= Some(obj))
+  }
+}
+
+object AboutTheBusiness {
+  val key = "about-the-business"
+
+/*  implicit val reads: Reads[AboutTheBusiness] = (
+      __.read[Option[RegisteredWithHMRCBefore]] and
+      __.read[Option[BusinessWithVAT]] and
+      __.read[Option[ConfirmingYourAddress]] and
+      __.read[Option[ContactingYou]]
+    ) (AboutTheBusiness.apply _)
+
+  implicit val writes: Writes[AboutTheBusiness] = Writes[AboutTheBusiness] {
+    model =>
+      Seq(
+        Json.toJson(model.registeredWithHMRCBefore).asOpt[JsObject],
+        Json.toJson(model.businessWithVAT).asOpt[JsObject],
+        Json.toJson(model.confirmingYourAddress).asOpt[JsObject],
+        Json.toJson(model.contactingYou).asOpt[JsObject]
+      ).flatten.fold(Json.obj()) {
+        _ ++ _
+      }
+  }*/
+  implicit def default(aboutTheBusiness: Option[AboutTheBusiness]): AboutTheBusiness =
+      aboutTheBusiness.getOrElse(AboutTheBusiness())
+
 }

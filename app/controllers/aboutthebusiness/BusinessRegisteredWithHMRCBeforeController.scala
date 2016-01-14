@@ -1,41 +1,49 @@
 package controllers.aboutthebusiness
 
+import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.AMLSGenericController
-import forms.AboutTheBusinessForms._
-import models.RegisteredWithHMRCBefore
-import play.api.mvc.{AnyContent, Request, Result}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import controllers.BaseController
+import controllers.auth.AmlsRegime
+import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegistered}
+import uk.gov.hmrc.play.frontend.auth.Actions
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait BusinessRegisteredWithHMRCBeforeController extends AMLSGenericController{
+trait BusinessRegisteredWithHMRCBeforeController extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  val CACHE_KEY = "registeredForMLR"
+  val dataCacheConnector: DataCacheConnector
 
-  override def get(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] = {
-    dataCacheConnector.fetchDataShortLivedCache[RegisteredWithHMRCBefore](CACHE_KEY) map {
-      case Some(data) => Ok(views.html.registered_with_HMRC_before(registeredWithHMRCBeforeForm.fill(data)))
-      case _ => Ok(views.html.registered_with_HMRC_before(registeredWithHMRCBeforeForm))
-    }
+  def get(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
+        case Some(AboutTheBusiness(Some(data), _)) => Ok(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
+        case _ => Ok(views.html.registered_with_HMRC_before(EmptyForm, edit))
+      }
   }
 
-  override def post(implicit user: AuthContext, request: Request[AnyContent]): Future[Result] =
-    registeredWithHMRCBeforeForm.bindFromRequest().fold(
-      errors => Future.successful(BadRequest(views.html.registered_with_HMRC_before(errors))),
-      details => {
-        dataCacheConnector.saveDataShortLivedCache[RegisteredWithHMRCBefore](CACHE_KEY, details) map { _=>
-          Redirect(controllers.aboutthebusiness.routes.BusinessRegForVATController.get())
-        }
-      })
-
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request => {
+      Form2[PreviouslyRegistered](request.body) match {
+        case f: InvalidForm => Future.successful(BadRequest(views.html.registered_with_HMRC_before(f, edit)))
+        case ValidForm(_, data) =>
+          for {
+            aboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
+            _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
+              aboutTheBusiness.previouslyRegistered(data)
+            )
+          } yield edit match {
+              // TODO summary doesn't exits for now
+              // case true => Redirect(routes.AboutTheBusinessSummaryController.get())
+               case false => Redirect(routes.BusinessRegForVATController.get())
+      }
+      }
+    }
+  }
 }
 
 object BusinessRegisteredWithHMRCBeforeController extends BusinessRegisteredWithHMRCBeforeController {
-   override val authConnector: AuthConnector = AMLSAuthConnector
-   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
+  override val dataCacheConnector = DataCacheConnector
 }
-

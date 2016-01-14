@@ -1,151 +1,103 @@
 package controllers.aboutthebusiness
 
-import java.util.UUID
-
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import forms.AboutTheBusinessForms._
-import models.RegisteredWithHMRCBefore
-import org.mockito.Matchers
+import models.aboutthebusiness._
+import org.jsoup.Jsoup
+import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.i18n.Messages
-import play.api.mvc.Result
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
-  implicit val request = FakeRequest()
-  implicit val authContext = mock[AuthContext]
+class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+  trait Fixture extends AuthorisedFixture {
+    self =>
 
-  val userId = s"user-${UUID.randomUUID}"
-  val mockAuthConnector = mock[AuthConnector]
-  val mockDataCacheConnector = mock[DataCacheConnector]
-  val VAT_URL = "/business-details/vat"
-  val mockMLRModel = RegisteredWithHMRCBefore(true, Some("12345678"))
-
-  object MockRegisteredForMLRController extends BusinessRegisteredWithHMRCBeforeController {
-    val authConnector = mockAuthConnector
-    override val dataCacheConnector: DataCacheConnector = mockDataCacheConnector
-  }
-
-  override def beforeEach(): Unit = {
-    reset(mockAuthConnector)
-  }
-
-  "HaveYouRegForMLRBeforeController" must {
-    "use correct service" in {
-      BusinessRegisteredWithHMRCBeforeController.authConnector must be(AMLSAuthConnector)
+    val controller = new BusinessRegisteredWithHMRCBeforeController {
+      override val dataCacheConnector = mock[DataCacheConnector]
+      override val authConnector = self.authConnector
     }
+  }
 
-    "on load display the registered for MLR page" in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredWithHMRCBefore](Matchers.any())
-        (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(None))
-      val result = MockRegisteredForMLRController.get
+  "BusinessRegisteredWithHMRCBeforeController" must {
+
+    "on get display the previously registered with HMRC page" in new Fixture {
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+      val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("aboutthebusiness.registeredformlr.title"))
-    }
-
-    "on load display the registered for MLR  page with pre-populated data" in {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[RegisteredWithHMRCBefore](Matchers.any())
-        (Matchers.any(), Matchers.any(),  Matchers.any())).thenReturn(Future.successful(Some(mockMLRModel)))
-      val result = MockRegisteredForMLRController.get
-      status(result) must be(OK)
-      contentAsString(result) must include("12345678")
-    }
-
-
-    "on submit of page" must {
-      "successfully navigate to next page " in {
-        submitWithFormFilled { result =>
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {identity} must include(VAT_URL)
-        }
-      }
-
-      "successfully navigate to next page when form filled with 15 digit mlr number" in {
-        submitWithFormFilledWithValidMaxLength { result =>
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {identity} must include(VAT_URL)
-        }
-      }
-
-      "successfully navigate to next page with Option Yes and optional text" in {
-        submitWithYesAndOptionalText { result =>
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {identity} must include(VAT_URL)
-        }
-      }
-      "get validation exception when the length of the text field is greater than MAX characters" in {
-        submitWithLengthValidation { result =>
-          status(result) must be(BAD_REQUEST)
-        }
-      }
-
-      "get validation exception when user enters invalid Data" in {
-        submitWithInvalidDataValidation { result =>
-          status(result) must be(BAD_REQUEST)
-        }
-      }
-      "get error message when the user not filled on the mandatory fields" in {
-        submitWithMandatoryFileldOptionNo { result =>
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result).fold("") {identity} must include(VAT_URL)
-        }
-      }
-
-      "get error message when the user selected option 03 and filled invalid mandatory fields" in {
-        submitWithMandatoryFieldsWithInvalidData { result =>
-          status(result) must be(BAD_REQUEST)
-        }
-      }
-    }
-
-    def createRegisteredForMLRForSubmission(test: Future[Result] => Any, registeredWithHMRC: Boolean,
-                                                  mlrNumber: Option[String]) {
-      val mockRegisteredForMLR = RegisteredWithHMRCBefore(registeredWithHMRC, mlrNumber)
-      val form  = registeredWithHMRCBeforeForm.fill(mockRegisteredForMLR)
-      val fakePostRequest = FakeRequest("POST", VAT_URL).withFormUrlEncodedBody(form.data.toSeq: _*)
-      when(mockDataCacheConnector.saveDataShortLivedCache[RegisteredWithHMRCBefore](Matchers.any(), Matchers.any())
-        (Matchers.any(), Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(mockRegisteredForMLR)))
-      val result = MockRegisteredForMLRController.post(mock[AuthContext], fakePostRequest)
-      test(result)
-    }
-
-    def submitWithFormFilled(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, true, Some("12345678"))
-    }
-
-    def submitWithFormFilledWithValidMaxLength(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, true, Some("123456781234567"))
-    }
-
-    def submitWithLengthValidation(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, true, Some("12"*10))
-    }
-
-    def submitWithInvalidDataValidation(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, true, Some("test"))
-    }
-
-    def submitWithMandatoryFileldOptionNo(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, false, None)
-    }
-
-    def submitWithMandatoryFieldsWithInvalidData(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, false, Some("123456789789456"))
-    }
-
-    def submitWithYesAndOptionalText(test: Future[Result] => Any) {
-      createRegisteredForMLRForSubmission(test, false, None)
+      contentAsString(result) must include("Has this business been registered with HMRC before?")
     }
   }
+
+  "on get display the previously registered with HMRC with pre populated data" in new Fixture {
+
+    when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+      (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678"))))))
+
+    val result = controller.get()(request)
+    status(result) must be(OK)
+
+    val document = Jsoup.parse(contentAsString(result))
+    // TODO
+    //      document.select("input[value=01]").hasAttr("checked") must be(true)
+  }
+
+  "on post with valid data" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody(
+      "previouslyRegistered" -> "true",
+      "previouslyRegisteredYes" -> "12345678"
+    )
+
+    when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+      (any(), any(), any())).thenReturn(Future.successful(None))
+
+    when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(None))
+
+    val result = controller.post()(newRequest)
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegForVATController.get().url))
+  }
+
+  "on post with invalid data" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody(
+      "previouslyRegisteredYes" -> "12345678"
+    )
+
+    val result = controller.post()(newRequest)
+    status(result) must be(BAD_REQUEST)
+
+    val document = Jsoup.parse(contentAsString(result))
+    // TODO
+    //      document.select("input[name=other]").`val` must be("foo")
+  }
+
+  // to be valid after summary edit page is ready
+ /* "on post with valid data in edit mode" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody(
+      "previouslyRegisteredYes" -> "01"
+    )
+
+    when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+      (any(), any(), any())).thenReturn(Future.successful(None))
+
+    when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(None))
+
+    val result = controller.post(true)(newRequest)
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result) must be(Some(controllers.aboutyou.routes.SummaryController.get().url))
+  }*/
+
+
+
 }

@@ -1,0 +1,10 @@
+@import views.html.helper.CSRF
+@import forms.Form2
+
+@(form: Form2[_], call: Call)(fn: (Form2[_]) => Html)(implicit request: Request[_], lang: Lang)
+
+@*@errorSummary(form)*@
+<form method="@call.method" action="@call.url" autocomplete="off">
+    @play.filters.csrf.CSRF.getToken(request).map { token => @CSRF.formField(token) }
+    @fn(form)
+</form>
