@@ -4,9 +4,7 @@
 @()(implicit request: Request[_])
 
 @main(
-sectionTitle = Some(Messages("summary.sectiontitle")),
-title = Messages("summary.title"),
-serviceInfoContent = Some(Html("<span class=\"login-name\">AMLS registration for Acme Limited</span>"))
+    title = Messages("summary.title")
 ) {
 <div id="main-pane" class="column-three-quarters">
 <p>
@@ -16,7 +14,7 @@ serviceInfoContent = Some(Html("<span class=\"login-name\">AMLS registration for
 <table id="summary-table" class="summary-table">
     <tr>
         <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.businessactivities") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.get()">@Messages("summary.aboutbusiness") </a> </span> </th></tr></thead>
+        <thead><tr><th class="section-name"> <span> <a href="@controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.get()">@Messages("summary.aboutbusiness") </a> </span> </th></tr></thead>
         <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.tradingpremises") </a> </span> </th></tr></thead>
         <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.bankdetails") </a> </span> </th></tr></thead>
         <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.responsiblepersons") </a> </span> </th></tr></thead>

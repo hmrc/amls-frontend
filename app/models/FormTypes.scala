@@ -4,22 +4,26 @@ object FormTypes {
 
   import play.api.data.mapping.forms.Rules._
 
-  val maxLengthName = 35
-  val maxDescriptionType = 255
+  val maxNameTypeLength = 35
+  val maxDescriptionTypeLength = 255
   val maxAddressLength = 35
   val maxPostCodeLength = 10
   val maxCountryTypeLength = 2
+  val maxPrevMLRRegNoLength = 15
 
   def indivNameType =
-    notEmpty |+| maxLength(maxLengthName)
+    notEmpty |+| maxLength(maxNameTypeLength)
 
   def descriptionType =
-    notEmpty |+| maxLength(maxDescriptionType)
+    notEmpty |+| maxLength(maxDescriptionTypeLength)
 
-  def validateAddressType =
+  val prevMLRRegNoType =  notEmpty |+| maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
+
+
+  def validAddressType =
     notEmpty |+| maxLength(maxAddressLength)
 
-  def validPostCode =
+  def validPostCodeType =
     notEmpty |+| maxLength((maxPostCodeLength))
 
   def validCountryType =

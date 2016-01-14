@@ -3,14 +3,15 @@
 @import forms.AboutTheBusinessForms._
 @import include.forms._
 @import utils.DataFields._
+@import forms.Form2
 
-@(registeredWithHMRCBeforeForm: Form[_])(implicit request: Request[_])
+@(form: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.registeredformlr.title")
 ) {
-    @formHelper(registeredWithHMRCBeforeForm, controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>
+@*
+    @formHelper(form, controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>
         @radioGroupYesNoWithText(
             name = "registeredWithHMRC",
             textFieldName = "mlrNumber",
@@ -20,4 +21,5 @@
         )
         @submit(Messages("button.saveandcontinue"))
     }
+*@
 }

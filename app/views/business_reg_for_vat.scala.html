@@ -7,7 +7,6 @@
 @(businessRegForVATForm: Form[_])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.registeredforvat.title")
 ) {
     @formHelper(businessRegForVATForm, controllers.aboutthebusiness.routes.BusinessRegForVATController.post()) { implicit form: Form[_] =>

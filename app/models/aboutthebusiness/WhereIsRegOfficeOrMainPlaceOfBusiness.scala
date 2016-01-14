@@ -32,16 +32,16 @@ object WhereIsRegOfficeOrMainPlaceOfBusiness {
     (__ \ "isUKOrOverseas").read[Boolean] flatMap[WhereIsRegOfficeOrMainPlaceOfBusiness] {
       case true =>
         (
-          (__ \ "addressLine1").read(validateAddressType) and
-          (__ \ "addressLine2").read(validateAddressType) and
+          (__ \ "addressLine1").read(validAddressType) and
+          (__ \ "addressLine2").read(validAddressType) and
           (__ \ "addressLine3").read[Option[String]] and
           (__ \ "addressLine4").read[Option[String]] and
-          (__ \ "postCode").read(validPostCode)
+          (__ \ "postCode").read(validPostCodeType)
         )(RegOfficeOrMainPlaceOfBusinessUK.apply _)
       case false =>
         (
-          (__ \ "addressLine1").read(validateAddressType) and
-          (__ \ "addressLine2").read(validateAddressType) and
+          (__ \ "addressLine1").read(validAddressType) and
+          (__ \ "addressLine2").read(validAddressType) and
           (__ \ "addressLine3").read[Option[String]] and
           (__ \ "addressLine4").read[Option[String]] and
           (__ \ "country").read(validCountryType)
