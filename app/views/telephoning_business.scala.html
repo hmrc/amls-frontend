@@ -5,8 +5,7 @@
 @(telephoningBusinessForm: Form[_])(implicit request: Request[_])
 
 @main(
-sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
-title = Messages("aboutthebusiness.telephoning.title")
+    title = Messages("aboutthebusiness.telephoning.title")
 ) {
 
     @formHelper(telephoningBusinessForm, aboutthebusiness.routes.TelephoningBusinessController.post) { implicit form: Form[_] =>

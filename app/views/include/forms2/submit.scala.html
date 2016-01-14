@@ -1,0 +1,8 @@
+@(edit: Boolean = false)(implicit lang: Lang)
+
+<input
+        type="submit"
+        name="submit"
+        class="button"
+        value="@Messages(if (edit) "button.saveandreturn" else "button.saveandcontinue")"
+>

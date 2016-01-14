@@ -1,28 +1,35 @@
-@import include.main
-@import forms.FormHelpers._
-@import include.forms._
-@import forms.Form2
-@import models.aboutyou._
+@import include.{forms => deprecated, _}
+@import forms2._
 
-@(form: Form2[RoleWithinBusiness], edit: Boolean)(implicit request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@target = @{
+    s"""${f("other").id}-fieldset"""
+}
 
 @main(
-    sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.rolewithinbusiness.title")
 ) {
-@*
-        @formHelper(roleWithinBusinessForm, aboutyou.routes.RoleWithinBusinessController.post(edit)) { implicit form: Form[_] =>
 
-        @radioGroupWithOther(
-            name = "roleWithinBusiness",
-            otherName = "other",
-            labelText = "aboutyou.rolewithinbusiness.title",
-            legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
-            otherLabelText = "Some other label text",
-            options = roles
-        )
+    @heading("aboutyou.rolewithinbusiness.title", "summary.aboutyou")
 
-        @submit(Messages(if (edit) "button.saveandreturn" else "button.saveandcontinue"))
+    @form(f, controllers.aboutyou.routes.RoleWithinBusinessController.post(edit)) {
+
+        @radioGroup(f("roleWithinBusiness")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.01", "01")
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.02", "02")
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.03", "03")
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.04", "04")
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.05", "05")
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.06", "06")
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.07", "07")
+            @radio(f("roleWithinBusiness"), "aboutyou.rolewithinbusiness.lbl.08", "08", target = s"#$target")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("other"), "lbl.pleasespecify", bold = false)
+            }
+        }
+
+        @submit(edit)
     }
-*@
 }

@@ -1,0 +1,18 @@
+@(
+    f: forms.Field,
+    labelText: String,
+    value: String,
+    target: String = ""
+)(implicit lang: Lang)
+
+<label class="block-label">
+    <input
+            id="@{f.id}-@value"
+            type="radio"
+            name="@f.name"
+            value="@value"
+            @if(f.value == Some(value)) {checked="checked"}
+            @if(target.nonEmpty) {data-toggle="@target"}
+    >
+    @Messages(labelText)
+</label>

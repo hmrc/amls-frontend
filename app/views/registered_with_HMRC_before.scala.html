@@ -7,7 +7,6 @@
 @(registeredWithHMRCBeforeForm: Form[models.RegisteredWithHMRCBefore])(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.registeredformlr.title")
 ) {
     @formHelper(registeredWithHMRCBeforeForm, aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>

@@ -1,0 +1,10 @@
+@(
+    legend: String,
+    jsHidden: Boolean = false,
+    id: String = ""
+)(content: Html)(implicit lang: Lang)
+
+<fieldset class="panel-indent @if(jsHidden) {amls-js-hidden}" @if(id.nonEmpty) {id="@id"}>
+    @include.forms2.legend(legend, jsHidden)
+    @content
+</fieldset>
