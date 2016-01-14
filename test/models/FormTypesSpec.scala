@@ -86,4 +86,29 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
   }
+
+  "VATRegNoType" must {
+
+    "successfully validate" in {
+
+      VATRegNoType.validate("123456789") must
+        be(Success("123456789"))
+    }
+
+    "fail to validate an empty string" in {
+
+      VATRegNoType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 9" in {
+
+      VATRegNoType.validate("1" * 10) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 9))
+        )))
+    }
+  }
 }

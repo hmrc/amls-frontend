@@ -11,4 +11,6 @@ object FormTypes {
     notEmpty |+| maxLength(255)
 
   val prevMLRRegNoType =  notEmpty |+| maxLength(15) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
+
+  val VATRegNoType =  notEmpty |+| maxLength(9) compose pattern("^[0-9]{9}$".r)
 }

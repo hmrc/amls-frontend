@@ -3,14 +3,16 @@
 @import forms.AboutTheBusinessForms._
 @import include.forms._
 @import utils.DataFields._
+@import forms.Form2
 
-@(businessRegForVATForm: Form[models.BusinessWithVAT])(implicit request: Request[_])
+@(form: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.registeredforvat.title")
 ) {
-    @formHelper(businessRegForVATForm, controllers.aboutthebusiness.routes.BusinessRegForVATController.post()) { implicit form: Form[_] =>
+@*
+    @formHelper(registeredForVATForm, controllers.aboutthebusiness.routes.BusinessRegisteredForVATController.post()) { implicit form: Form[_] =>
         @radioGroupYesNoWithText(
             name = "hasVAT",
             textFieldName = "VATNum",
@@ -21,4 +23,5 @@
         )
         @submit(Messages("button.saveandcontinue"))
     }
+*@
 }
