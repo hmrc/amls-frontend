@@ -4,9 +4,7 @@
 @()(implicit request: Request[_])
 
 @main(
-sectionTitle = Some(Messages("summary.sectiontitle")),
-title = Messages("summary.title"),
-serviceInfoContent = Some(Html("<span class=\"login-name\">AMLS registration for Acme Limited</span>"))
+    title = Messages("summary.title")
 ) {
 <div id="main-pane" class="column-three-quarters">
 <p>

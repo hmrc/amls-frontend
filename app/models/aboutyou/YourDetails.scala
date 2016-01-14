@@ -20,7 +20,7 @@ object YourDetails {
     import models.FormTypes._
     (
       (__ \ "firstName").read(indivNameType) and
-        (__ \ "middleName").read[Option[String]] and
+        (__ \ "middleName").read(optionR(indivNameType)) and
         (__ \ "lastName").read(indivNameType)
       )(YourDetails.apply _)
   }
