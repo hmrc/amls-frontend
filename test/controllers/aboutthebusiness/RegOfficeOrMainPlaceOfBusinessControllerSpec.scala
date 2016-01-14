@@ -2,7 +2,7 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import models.aboutthebusiness.{AboutTheBusiness, BCAddress, RegOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
+import models.aboutthebusiness.{BCAddress, RegOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
