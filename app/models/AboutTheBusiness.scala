@@ -95,6 +95,7 @@ object ContactingYou {
 /*sealed trait CorrespondenceAddress
 
 object CorrespondenceAddress {
+<<<<<<< 1532a2694342c9a72004499e938c045d36abe5b9
 
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
@@ -118,6 +119,31 @@ object CorrespondenceAddress {
     }
   }
 
+=======
+
+  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    (__ \ "radioButton").read[Boolean].flatMap[CorrespondenceAddress] {
+      case true =>
+        (
+          (__ \ "address_line1").read(minLength(1)) and
+          (__ \ "address_line2").read(minLength(1)) and
+          (__ \ "address_line3").read[Option[String]] and
+          (__ \ "address_line4").read[Option[String]] and
+          (__ \ "postcode").read[String]
+        )(UKCorrespondenceAddress.apply _)
+      case false =>
+        (
+          (__ \ "address_line1").read(minLength(1)) and
+          (__ \ "address_line2").read(minLength(1)) and
+          (__ \ "address_line3").read[Option[String]] and
+          (__ \ "address_line4").read[Option[String]] and
+          (__ \ "country").read[String]
+        )(NonUKCorrespondenceAddress.apply _)
+    }
+  }
+
+>>>>>>> AMLS-239: Changes for the Controller
 
   implicit val jsonReads: Reads[CorrespondenceAddress] =
     (
