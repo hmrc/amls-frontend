@@ -5,13 +5,13 @@
 @import forms.FormHelpers._
 @import forms.Form2
 
-@(form: Form2[_], edit: Boolean)(implicit request: Request[_])
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutyou.sectiontitle")),
     title = Messages("aboutyou.yourdetails.title")
 ) {
-      @FormHelper(form, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit form: Form2[_] =>
+      @formHelper(f, controllers.aboutyou.routes.YourDetailsController.post(edit)) { implicit f: Form2[_] =>
 
         @input(
             name = "firstName",
