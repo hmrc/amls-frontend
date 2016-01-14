@@ -10,18 +10,15 @@ sealed trait PreviouslyRegistered
 case class PreviouslyRegisteredYes(value : String) extends PreviouslyRegistered
 case object PreviouslyRegisteredNo extends PreviouslyRegistered
 
-
 object PreviouslyRegistered {
+
+  import models.FormTypes._
 
   implicit val formRule: Rule[UrlFormEncoded, PreviouslyRegistered] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     (__ \ "previouslyRegistered").read[Boolean] flatMap {
-
       case true =>
-        (__ \ "previouslyRegisteredYes").read(minLength(1)) flatMap {
-          value =>
-            Rule.fromMapping { _ => Success(PreviouslyRegisteredYes(value)) }
-        }
+        (__ \ "previouslyRegisteredYes").read(prevMLRRegNoType) fmap (PreviouslyRegisteredYes.apply _)
       case false => Rule.fromMapping { _ => Success(PreviouslyRegisteredNo) }
     }
   }
@@ -36,9 +33,7 @@ object PreviouslyRegistered {
 
   implicit val jsonReads =
     (__ \ "previouslyRegistered").read[Boolean] flatMap[PreviouslyRegistered] {
-    case true => (__ \ "previouslyRegisteredYes").read[String] map {
-      PreviouslyRegisteredYes(_)
-    }
+    case true => (__ \ "previouslyRegisteredYes").read[String] map (PreviouslyRegisteredYes.apply _)
     case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
   }
 
