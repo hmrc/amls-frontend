@@ -9,4 +9,6 @@ object FormTypes {
 
   def descriptionType =
     notEmpty |+| maxLength(255)
+
+  val prevMLRRegNoType =  notEmpty |+| maxLength(15) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 }
