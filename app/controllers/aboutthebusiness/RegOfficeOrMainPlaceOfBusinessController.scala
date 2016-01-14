@@ -13,7 +13,7 @@ trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
   def dataCacheConnector: DataCacheConnector
   def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get() = Authorised.async {
     implicit authContext => implicit request =>
       for {
         reviewBusinessDetails <- businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
@@ -25,7 +25,7 @@ trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post() = Authorised.async {
     implicit authContext => implicit request =>
 
       Form2[RegOfficeOrMainPlaceOfBusiness](request.body) match {
