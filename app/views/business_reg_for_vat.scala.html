@@ -4,7 +4,7 @@
 @import include.forms._
 @import utils.DataFields._
 
-@(businessRegForVATForm: Form[models.BusinessWithVAT])(implicit request: Request[_])
+@(businessRegForVATForm: Form[_])(implicit request: Request[_])
 
 @main(
     sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
