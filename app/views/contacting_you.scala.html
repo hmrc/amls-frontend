@@ -3,12 +3,10 @@
 @import forms.AmlsForms._
 @import include.form._
 @import forms.Form2
-@import models.BCAddress
 
 @(form: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
-    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.contactingyou.title")
 ) {@*
     @formHelper(form, controllers.aboutthebusiness.routes.ContactingYouController.post(edit)) { implicit form: Form2[_] =>

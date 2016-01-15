@@ -32,10 +32,5 @@
 
 ) {
       @options.map { case (key, value) =>
-        <label class="block-label">
-            <input type="radio" name="@name" value="@value"
-                   @form(name).filter( _ == value).map{ _ => checked="checked"} >
-            @key
-        </label>
     }
 }

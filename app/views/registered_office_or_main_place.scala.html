@@ -7,30 +7,3 @@
 
 
 @(form: Form2[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
-
-@main(
-    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
-    title = Messages("aboutthebusiness.confirmingyouraddress.title")
-) {
-
-    @formHelper(form, controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.post()) { implicit form: Form2[_] =>
-
-        <div class="panel-indent">
-            <ul>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessName</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_1</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_2</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_3.getOrElse("")</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_4.getOrElse("")</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.postcode.getOrElse("")</li>
-            </ul>
-        </div>
-
-        @radioGroup(
-            name = "isRegOfficeOrMainPlaceOfBusiness",
-            labelText = "",
-            options = optionsYesNo
-        )
-    @submit(Messages("button.saveandcontinue"))
-    }
-}
