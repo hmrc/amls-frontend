@@ -1,34 +1,42 @@
-@import include.main
-@import models.aboutyou.AboutYou
+@import include._
+@import models.aboutyou._
 
-@(data: AboutYou)(implicit request: Request[_])
+@(model: AboutYou)(implicit request: Request[_])
 
 @main(
-    title = Messages("aboutyou.summary.title")
+    title = Messages("summary.checkyouranswers.title")
 ) {
-@*
-    @data.roleWithinBusiness.map { role =>
+
+    @heading("summary.checkyouranswers.title", "summary.aboutyou")
+
+    @model.roleWithinBusiness.map { role =>
         <table>
             <tr>
-                <th>Your role in the business</th>
-                <td><a href="">Edit</a></td>
+                <th class="summary-title">@Messages("aboutyou.rolewithinbusiness.title")</th>
+                <td><a href="@controllers.aboutyou.routes.RoleWithinBusinessController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
-                <td colspan="2">@role.roleWithinBusiness</td>
+                <td colspan="2">
+                    @role match {
+                        case BeneficialShareholder => { @Messages("aboutyou.rolewithinbusiness.lbl.01") }
+                        case Director => { @Messages("aboutyou.rolewithinbusiness.lbl.02") }
+                        case ExternalAccountant => { @Messages("aboutyou.rolewithinbusiness.lbl.03") }
+                        case InternalAccountant => { @Messages("aboutyou.rolewithinbusiness.lbl.04") }
+                        case NominatedOfficer => { @Messages("aboutyou.rolewithinbusiness.lbl.05") }
+                        case Partner => { @Messages("aboutyou.rolewithinbusiness.lbl.06") }
+                        case SoleProprietor => { @Messages("aboutyou.rolewithinbusiness.lbl.07") }
+                        case Other(value) => { @value }
+                    }
+                </td>
             </tr>
-            @if(role.other.isEmpty) {
-                <tr>
-                    <td colspan="2">@role.other</td>
-                </tr>
-            }
         </table>
     }
 
-    @data.yourDetails.map { yourDetails =>
+    @model.yourDetails.map { yourDetails =>
         <table>
             <tr>
-                <th>Your details</th>
-                <td><a href="">Edit</a></td>
+                <th class="summary-title">@Messages("aboutyou.yourdetails.title")</th>
+                <td><a href="@controllers.aboutyou.routes.YourDetailsController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -41,6 +49,6 @@
             </tr>
         </table>
     }
-*@
-    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Save and complete section</a>
+
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Accept and complete section</a>
 }

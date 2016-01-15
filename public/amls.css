@@ -70,12 +70,14 @@ form .block-label + fieldset {
 }
 
 
-.touchevents .date-of-birth {
-    display:block;
+/* summary styles */
+.summary-title {
+    width : 90%;
 }
 
-.column-three-quarters {
-    width: 75%;
+
+.touchevents .date-of-birth {
+    display:block;
 }
 
 .summary-table a:link, .summary-table a:visited {
