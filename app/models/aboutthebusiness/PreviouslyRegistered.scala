@@ -18,7 +18,7 @@ object PreviouslyRegistered {
     import play.api.data.mapping.forms.Rules._
     (__ \ "previouslyRegistered").read[Boolean] flatMap {
       case true =>
-        (__ \ "previouslyRegisteredYes").read(prevMLRRegNoType) fmap (PreviouslyRegisteredYes.apply _)
+        (__ \ "prevMLRRegNo").read(prevMLRRegNoType) fmap (PreviouslyRegisteredYes.apply _)
       case false => Rule.fromMapping { _ => Success(PreviouslyRegisteredNo) }
     }
   }
@@ -26,21 +26,21 @@ object PreviouslyRegistered {
   implicit val formWrites: Write[PreviouslyRegistered, UrlFormEncoded] = Write {
     case PreviouslyRegisteredYes(value) =>
       Map("previouslyRegistered" -> Seq("true"),
-        "previouslyRegisteredYes" -> Seq(value)
+        "prevMLRRegNo" -> Seq(value)
       )
     case PreviouslyRegisteredNo => Map("previouslyRegistered" -> Seq("false"))
   }
 
   implicit val jsonReads =
     (__ \ "previouslyRegistered").read[Boolean] flatMap[PreviouslyRegistered] {
-    case true => (__ \ "previouslyRegisteredYes").read[String] map (PreviouslyRegisteredYes.apply _)
+    case true => (__ \ "prevMLRRegNo").read[String] map (PreviouslyRegisteredYes.apply _)
     case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
   }
 
   implicit val jsonWrites = Writes[PreviouslyRegistered] {
     case PreviouslyRegisteredYes(value) => Json.obj(
       "previouslyRegistered" -> true,
-      "previouslyRegisteredYes" -> value
+      "prevMLRRegNo" -> value
     )
     case PreviouslyRegisteredNo => Json.obj("previouslyRegistered" -> false)
   }

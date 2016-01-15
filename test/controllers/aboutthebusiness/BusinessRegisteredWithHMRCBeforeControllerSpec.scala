@@ -52,7 +52,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
 
     val newRequest = request.withFormUrlEncodedBody(
       "previouslyRegistered" -> "true",
-      "previouslyRegisteredYes" -> "12345678"
+      "prevMLRRegNo" -> "12345678"
     )
 
     when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
@@ -69,7 +69,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
   "on post with invalid data" in new Fixture {
 
     val newRequest = request.withFormUrlEncodedBody(
-      "previouslyRegisteredYes" -> "12345678"
+      "prevMLRRegNo" -> "12345678"
     )
 
     val result = controller.post()(newRequest)
