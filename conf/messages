@@ -24,6 +24,7 @@ button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
 button.back = Back
+button.edit = Edit
 
 lbl.other = Other
 lbl.yes = Yes
@@ -58,7 +59,9 @@ summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
 
-aboutyou.yourdetails.title = Your details
+summary.checkyouranswers.title = Check your answers
+
+aboutyou.yourdetails.title = What is your name?
 
 aboutyou.rolewithinbusiness.title = What is your role within the business?
 aboutyou.rolewithinbusiness.lbl.01=Beneficial shareholder
