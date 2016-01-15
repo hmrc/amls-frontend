@@ -12,21 +12,21 @@ object FormTypes {
   val maxPrevMLRRegNoLength = 15
 
   def indivNameType =
-    notEmpty |+| maxLength(maxNameTypeLength)
+    notEmpty compose maxLength(maxNameTypeLength)
 
   def descriptionType =
-    notEmpty |+| maxLength(maxDescriptionTypeLength)
+    notEmpty compose maxLength(maxDescriptionTypeLength)
 
-  val prevMLRRegNoType =  notEmpty |+| maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
+  val prevMLRRegNoType =  notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 
 
-  def validAddressType =
-    notEmpty |+| maxLength(maxAddressLength)
+  def addressType =
+    notEmpty compose maxLength(maxAddressLength)
 
-  def validPostCodeType =
-    notEmpty |+| maxLength((maxPostCodeLength))
+  def postcodeType =
+    notEmpty compose maxLength(maxPostCodeLength)
 
-  def validCountryType =
-    notEmpty |+| maxLength(maxCountryTypeLength)
+  def countryType =
+    notEmpty compose maxLength(maxCountryTypeLength)
 
 }
