@@ -1,21 +1,18 @@
-@import include.main
-@import forms.AmlsForms._
 @import forms.Form2
-@import include.form._
-@import models.aboutthebusiness._
+@import include.{main, heading}
+@import include.forms2._
 @import utils.CommonHelper._
+@import models.aboutthebusiness._
 
-
-@(form: Form2[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
+@(f: Form2[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_], lang: Lang)
 
 @main(
-    sectionTitle = Some(Messages("aboutthebusiness.sectiontitle")),
     title = Messages("aboutthebusiness.confirmingyouraddress.title")
 ) {
+    @heading("What is your name?", "aboutthebusiness.sectiontitle")
 
-    @formHelper(form, controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.post()) { implicit form: Form2[_] =>
-
-        <div class="panel-indent">
+    @form(f, controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.post()) {
+          <div class="panel-indent">
             <ul>
                 <li class="no-padding no-margin">@reviewBusinessDetails.businessName</li>
                 <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_1</li>
@@ -26,11 +23,11 @@
             </ul>
         </div>
 
-        @radioGroup(
-            name = "isRegOfficeOrMainPlaceOfBusiness",
+        @radio(
+            f = f("isRegOfficeOrMainPlaceOfBusiness"),
             labelText = "",
-            options = optionsYesNo
+            value = optionsYesNo
         )
-    @submit(Messages("button.saveandcontinue"))
+        @submit("")
     }
 }
