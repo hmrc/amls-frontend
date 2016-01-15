@@ -23,7 +23,7 @@ case class RegisteredOfficeOrMainPlaceOfBusinessNonUK(
                                                 country : String
                                               ) extends RegisteredOfficeOrMainPlaceOfBusiness
 
-object WhereIsRegOfficeOrMainPlaceOfBusiness {
+object RegisteredOfficeOrMainPlaceOfBusiness {
 
   import utils.MappingUtils.Implicits._
 
