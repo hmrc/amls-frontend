@@ -10,17 +10,5 @@
 @main(
     title = Messages("aboutthebusiness.registeredforvat.title")
 ) {
-@*
-    @formHelper(registeredForVATForm, controllers.aboutthebusiness.routes.BusinessRegisteredForVATController.post()) { implicit form: Form[_] =>
-        @radioGroupYesNoWithText(
-            name = "hasVAT",
-            textFieldName = "VATNum",
-            labelText = "aboutthebusiness.vatnumber.lbl",
-            legendPresentation = forms.FormHelpers.Defaults.legendInvisible,
-            textFieldLabelText = Messages("aboutthebusiness.vatnumber.lbl"),
-            options = optionsYesNo
-        )
-        @submit(Messages("button.saveandcontinue"))
-    }
-*@
+
 }

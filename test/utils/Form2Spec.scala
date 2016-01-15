@@ -1,6 +1,6 @@
 package utils
 
-import _root_.forms.{InvalidForm, ValidForm, Form2}
+import _root_.forms.{ValidField, InvalidForm, ValidForm, Form2}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping._
@@ -65,7 +65,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
     "return data for a field when given a path" in new Fixture {
 
       Form2[Foobar](model).apply(Path \ "s") must
-        be(Some("foo"))
+        be(ValidField(Path \ "s", Some("foo")))
     }
   }
 
