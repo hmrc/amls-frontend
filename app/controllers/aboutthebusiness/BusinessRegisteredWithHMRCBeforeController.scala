@@ -18,15 +18,15 @@ trait BusinessRegisteredWithHMRCBeforeController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(Some(data), _)) => Ok //(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
-        case _ => Ok //(views.html.registered_with_HMRC_before(EmptyForm, edit))
+        case Some(AboutTheBusiness(Some(data), _)) => Ok(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
+        case _ => Ok(views.html.registered_with_HMRC_before(EmptyForm, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[PreviouslyRegistered](request.body) match {
-        case f: InvalidForm => Future.successful(Ok)//(BadRequest(views.html.registered_with_HMRC_before(f, edit)))
+        case f: InvalidForm => Future.successful(BadRequest(views.html.registered_with_HMRC_before(f, edit)))
         case ValidForm(_, data) =>
           for {
             aboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
