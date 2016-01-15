@@ -5,7 +5,7 @@ import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import controllers.BaseController
 import controllers.auth.AmlsRegime
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.{ContactingYouDetails, AboutTheBusiness, ContactingYou}
+import models.aboutthebusiness.{ContactingYouDetails, AboutTheBusiness, ContactingYou}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -23,7 +23,7 @@ trait ContactingYouController extends BaseController {
         //businessCustomerDetails <- businessCustomerDetailsFuture
         aboutTheBusiness <- aboutTheBusinessFuture
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(Some(data))) => Ok(views.html.contacting_you(Form2[ContactingYou](data), edit))
+        case Some(AboutTheBusiness(_,Some(data))) => Ok(views.html.contacting_you(Form2[ContactingYou](data), edit))
         case _ => Ok(views.html.contacting_you(EmptyForm, edit))
       }
 

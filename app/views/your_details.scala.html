@@ -4,3 +4,29 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
+@main(
+    title = Messages("aboutyou.yourdetails.title")
+) {
+
+    @heading("aboutyou.yourdetails.title", "summary.aboutyou")
+
+    @form(f, controllers.aboutyou.routes.YourDetailsController.post(edit)) {
+
+        @input(
+            field = f("firstName"),
+            labelText = Messages("lbl.first_name")
+        )
+
+        @input(
+            field = f("middleName"),
+            labelText = Messages("lbl.middle_name")
+        )
+
+        @input(
+            field = f("lastName"),
+            labelText = Messages("lbl.last_name")
+        )
+
+        @submit(edit)
+    }
+}
