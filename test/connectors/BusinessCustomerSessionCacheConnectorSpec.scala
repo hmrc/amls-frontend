@@ -38,18 +38,8 @@ class BusinessCustomerSessionCacheConnectorSpec extends PlaySpec with OneServerP
       when(mockBusinessCustomerSessionCache.fetchAndGetEntry[ModelForString] (any()) (any(), any())).thenReturn(Future.successful(Some(dummyModelForString)))
       val result = TestBusinessCustomerSessionCacheConnector.getReviewBusinessDetails[ModelForString]
       whenReady(result) { dtl =>
-        dtl mustBe dummyModelForString
+        dtl mustBe Some(dummyModelForString)
       }
     }
-
-    "throw exception" in {
-      when(mockBusinessCustomerSessionCache.fetchAndGetEntry[ModelForString] (any()) (any(), any())).thenReturn(Future.successful(None))
-      a [RuntimeException] shouldBe thrownBy( {
-        val result = TestBusinessCustomerSessionCacheConnector.getReviewBusinessDetails[ModelForString]
-        whenReady(result){_ => ""}
-      })
-    }
-
   }
-  
 }

@@ -14,12 +14,70 @@
  * limitations under the License.
  */
 
-.touchevents .date-of-birth {
-    display:block;
+
+/* required as js-hidden in assets frontend ia !important */
+.amls-js-hidden {
+    display : none;
 }
 
-.column-three-quarters {
-    width: 75%;
+.amls-service-info {
+    border-top : 10px solid #005ea5;
+    /*margin-bottom : 15px;*/
+}
+
+div.grid-layout {
+    margin : 0;
+}
+
+
+/* form errors */
+.amls-error-summary {
+    background-color: white;
+    border: 5px solid #b10e1e;
+}
+.amls-error-summary li {
+    font-weight: bold;
+}
+.amls-error-summary li > a {
+    color : #b10e1e;
+}
+.form-field--error {
+    border-left-width: 5px;
+    border-color : #b10e1e;
+}
+.form-field--error span.error-notification {
+    font-weight : bold;
+}
+
+
+/* forms */
+.form-group {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+form input[type=text].form-control {
+    border : 2px solid #6f777b;
+    width : 50%;
+}
+form .form-label-bold {
+    font-size: 19px;
+    line-height: 1.31579;
+    margin-bottom : 0.5em;
+}
+form .block-label + fieldset {
+    float: left;
+    margin-top : 10px;
+}
+
+
+/* summary styles */
+.summary-title {
+    width : 90%;
+}
+
+
+.touchevents .date-of-birth {
+    display:block;
 }
 
 .summary-table a:link, .summary-table a:visited {
@@ -51,9 +109,7 @@
     margin-top: 10px
 }
 
-.service-info {
-     border-bottom: 1px solid #bfc1c3;
-}
+
 
 .heading-secondary {
     display: block;

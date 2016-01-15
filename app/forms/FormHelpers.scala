@@ -5,8 +5,6 @@ import play.twirl.api.{HtmlFormat, Html}
 
 object FormHelpers {
 
-  implicit def strToPath(str: String): Path = Path \ str
-
   def id(name: String): String =
     name.replace('.', '-')
 
@@ -17,8 +15,10 @@ object FormHelpers {
     }
   }
 
+  @deprecated
   case class Presentation(classes: Seq[String])
 
+  @deprecated
   object Defaults {
 
     val label = Presentation(classes = Seq("form-label"))

@@ -18,11 +18,8 @@ trait BusinessCustomerSessionCacheConnector {
     businessCustomerSessionCache.fetchAndGetEntry[T](key)
   }
 
-  def getReviewBusinessDetails[T](implicit hc: HeaderCarrier, formats: json.Format[T]): Future[T] = {
-    fetchAndGetData[T](BCSourceId) flatMap {
-      case Some(data) => Future.successful(data)
-      case None => throw new RuntimeException("No Review Details Found")
-    }
+  def getReviewBusinessDetails[T](implicit hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
+    fetchAndGetData[T](BCSourceId)
   }
 }
 

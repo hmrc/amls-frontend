@@ -1,0 +1,5 @@
+@(f: forms.Field)(content: Html)(implicit lang: Lang)
+
+<fieldset class="form-group @if(f.hasErrors){form-field--error}" id="@f.id">
+    @content
+</fieldset>
