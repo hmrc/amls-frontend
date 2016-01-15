@@ -1,19 +1,18 @@
-@import include.main
-@import forms.AmlsForms._
 @import forms.Form2
-@import models.aboutthebusiness._
+@import include.{main, heading}
+@import include.forms2._
 @import utils.CommonHelper._
+@import models.aboutthebusiness._
 
-
-@(form: Form2[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_])
+@(f: Form2[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_], lang: Lang)
 
 @main(
     title = Messages("aboutthebusiness.confirmingyouraddress.title")
 ) {
-@*
-    @formHelper(form, controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.post()) { implicit form: Form2[_] =>
+    @heading("aboutthebusiness.confirmingyouraddress.title", "aboutthebusiness.sectiontitle")
 
-        <div class="panel-indent">
+    @form(f, controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.post()) {
+          <div class="panel-indent">
             <ul>
                 <li class="no-padding no-margin">@reviewBusinessDetails.businessName</li>
                 <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_1</li>
@@ -24,12 +23,12 @@
             </ul>
         </div>
 
-        @radioGroup(
-            name = "isRegOfficeOrMainPlaceOfBusiness",
-            labelText = "",
-            options = optionsYesNo
-        )
-    @submit(Messages("button.saveandcontinue"))
+        @inlineRadioGroup(f("isRegOfficeOrMainPlaceOfBusiness")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.yes", "true")
+            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.no", "false")
+        }
+
+        @submit()
     }
-*@
 }

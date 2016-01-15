@@ -29,7 +29,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       indivNameType.validate("a" * 36) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 35))
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxNameTypeLength))
         )))
     }
   }
@@ -54,7 +54,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       descriptionType.validate("a" * 256) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 255))
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxDescriptionTypeLength))
         )))
     }
   }
@@ -82,7 +82,82 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       prevMLRRegNoType.validate("1" * 16) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 15))
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxPrevMLRRegNoLength))
+        )))
+    }
+  }
+
+  "validateAddressType" must {
+
+    "successfully validate" in {
+
+      validAddressType.validate("177A") must
+        be(Success("177A"))
+    }
+
+    "fail to validate an empty string" in {
+
+      validAddressType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 35" in {
+
+      validAddressType.validate("a" * 36) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength))
+        )))
+    }
+  }
+
+  "validPostCodeType" must {
+
+    "successfully validate" in {
+
+      validPostCodeType.validate("177A") must
+        be(Success("177A"))
+    }
+
+    "fail to validate an empty string" in {
+
+      validPostCodeType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 255" in {
+
+      validPostCodeType.validate("a" * 11) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxPostCodeLength))
+        )))
+    }
+  }
+
+  "validCountryType" must {
+
+    "successfully validate" in {
+
+      validCountryType.validate("IN") must
+        be(Success("IN"))
+    }
+
+    "fail to validate an empty string" in {
+
+      validCountryType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 255" in {
+
+      validCountryType.validate("a" * 3) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxCountryTypeLength))
         )))
     }
   }
