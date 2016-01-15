@@ -1,25 +1,31 @@
-@import include.main
-@import forms.FormHelpers._
-@import forms.AboutTheBusinessForms._
-@import include.forms._
-@import utils.DataFields._
-@import forms.Form2
+@import include.{forms => deprecated, _}
+@import forms2._
 
-@(form: Form2[_], edit: Boolean)(implicit request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+    s"""${f("prevMLRRegNo").id}-fieldset"""
+}
 
 @main(
     title = Messages("aboutthebusiness.registeredformlr.title")
 ) {
-@*
-    @formHelper(form, controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post()) { implicit form: Form[_] =>
-        @radioGroupYesNoWithText(
-            name = "registeredWithHMRC",
-            textFieldName = "mlrNumber",
-            labelText = "aboutthebusiness.registeredformlr.lbl",
-            textFieldLabelText = Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"),
-            options = optionsYesNo
-        )
-        @submit(Messages("button.saveandcontinue"))
+
+    @heading("aboutthebusiness.registeredformlr.title", "summary.aboutbusiness")
+
+    <p>@Messages("aboutthebusiness.registeredformlr.lbl")</p>
+
+    @form(f, controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post(edit)) {
+
+        @inlineRadioGroup(f("previouslyRegistered")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("previouslyRegistered"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("previouslyRegistered"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("prevMLRRegNo"), "aboutthebusiness.registeredformlr.mlrregno.lbl", bold = false)
+            }
+        }
+
+        @submit(edit)
     }
-*@
 }

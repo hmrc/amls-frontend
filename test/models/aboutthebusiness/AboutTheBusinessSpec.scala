@@ -15,7 +15,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
   "AboutTheBusiness" must {
     val completeJson = Json.obj(
       "previouslyRegistered" -> true,
-      "previouslyRegisteredYes" -> "12345678"
+      "prevMLRRegNo" -> "12345678"
     )
 
     val completeModel = AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678")))
@@ -37,7 +37,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
     val partialJson = Json.obj(
       "previouslyRegistered" -> true,
-      "previouslyRegisteredYes" -> "12345678"
+      "prevMLRRegNo" -> "12345678"
     )
 
     val partialModel = AboutTheBusiness(Some(previouslyRegistered), None)
