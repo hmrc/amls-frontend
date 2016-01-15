@@ -5,7 +5,7 @@ object FormTypes {
   import play.api.data.mapping.forms.Rules._
 
   val maxNameTypeLength = 35
-  val maxDescriptionTypeLength = 255
+  val maxDescriptionTypeLength = 150
   val maxAddressLength = 35
   val maxPostCodeTypeLength = 10
   val maxCountryTypeLength = 2
