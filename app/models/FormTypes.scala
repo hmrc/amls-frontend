@@ -10,23 +10,24 @@ object FormTypes {
   val maxPostCodeTypeLength = 10
   val maxCountryTypeLength = 2
   val maxPrevMLRRegNoLength = 15
+  val maxVRNTypeLength = 9
 
-  def indivNameType =
+  val indivNameType =
     notEmpty compose maxLength(maxNameTypeLength)
 
-  def descriptionType =
+  val descriptionType =
     notEmpty compose maxLength(maxDescriptionTypeLength)
 
   val prevMLRRegNoType =  notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 
+  val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
 
-  def addressType =
+  val addressType =
     notEmpty compose maxLength(maxAddressLength)
 
-  def postCodeType =
+  val postCodeType =
     notEmpty compose maxLength(maxPostCodeTypeLength)
 
-  def countryType =
+  val countryType =
     notEmpty compose maxLength(maxCountryTypeLength)
-
 }

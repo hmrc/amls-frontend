@@ -22,7 +22,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
       )
 
       WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
-        be(Success(RegOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "NE7 7DX")))
+        be(Success(RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "NE7 7DX")))
     }
 
     "validate the given non UK address" in {
@@ -36,7 +36,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
       )
 
       WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
-        be(Success(RegOfficeOrMainPlaceOfBusinessNonUK("38B", "Longbenton", None, None, "UK")))
+        be(Success(RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "UK")))
     }
 
     "fail to validation for not filling mandatory field" in {
@@ -57,7 +57,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
     "fail to validation for not filling mandatory isUKOrOverseas field" in {
       val data = Map(
-        "isUKOrOverseas" -> Seq(""),
+        "l" -> Seq(""),
         "addressLine2" -> Seq(""),
         "addressLine3" -> Seq(""),
         "addressLine4" -> Seq(""),
@@ -90,7 +90,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
     "write correct data to the model " in {
 
-      val data = RegOfficeOrMainPlaceOfBusinessNonUK("38B", "Longbenton", None, None, "NE7 7DX")
+      val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "NE7 7DX")
 
       WhereIsRegOfficeOrMainPlaceOfBusiness.formWrites.writes(data) must be
       Map("addressLine1" -> "38B",
@@ -102,15 +102,15 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
     "json read the given non UK address" in {
 
-      val data = RegOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
+      val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
       val jsonObj = Json.obj("postCode" -> "NE7 7DX")
 
-      Json.fromJson[WhereIsRegOfficeOrMainPlaceOfBusiness](jsonObj) must be
+      Json.fromJson[RegisteredOfficeOrMainPlaceOfBusiness](jsonObj) must be
       JsSuccess(data, JsPath \ "postCode")
     }
 
     "write correct value to json" in {
-      val data = RegOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
+      val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
 
       Json.toJson(data) must
         be( Json.obj("addressLine1" -> "38B",

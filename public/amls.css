@@ -68,6 +68,10 @@ form .block-label + fieldset {
     float: left;
     margin-top : 10px;
 }
+form .inline .block-label + fieldset {
+    float: none;
+    margin-top : 0;
+}
 
 
 /* summary styles */
