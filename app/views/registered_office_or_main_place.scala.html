@@ -23,7 +23,7 @@
             </ul>
         </div>
 
-        @radioGroup(f("isRegOfficeOrMainPlaceOfBusiness")) {
+        @inlineRadioGroup(f("isRegOfficeOrMainPlaceOfBusiness")) {
             @legend("TODO", jsHidden = true)
             @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.yes", "true")
             @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.no", "false")
