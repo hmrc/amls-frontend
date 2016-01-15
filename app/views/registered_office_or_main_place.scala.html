@@ -23,11 +23,12 @@
             </ul>
         </div>
 
-        @radio(
-            f = f("isRegOfficeOrMainPlaceOfBusiness"),
-            labelText = "",
-            value = optionsYesNo
-        )
-        @submit("")
+        @radioGroup(f("isRegOfficeOrMainPlaceOfBusiness")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.yes", "true")
+            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.no", "false")
+        }
+
+        @submit()
     }
 }
