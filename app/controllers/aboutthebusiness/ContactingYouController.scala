@@ -5,7 +5,7 @@ import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import controllers.BaseController
 import controllers.auth.AmlsRegime
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{ContactingYouDetails, AboutTheBusiness, ContactingYou}
+import models.aboutthebusiness.{ContactingYouDetails, AboutTheBusiness, ContactingYou, BusinessCustomerDetails}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -17,14 +17,14 @@ trait ContactingYouController extends BaseController {
 
   def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit authContext => implicit request =>
-      //val businessCustomerDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
+      val businessCustomerDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
       val aboutTheBusinessFuture = dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
       for {
-        //businessCustomerDetails <- businessCustomerDetailsFuture
+        businessCustomerDetails <- businessCustomerDetailsFuture
         aboutTheBusiness <- aboutTheBusinessFuture
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_, _, Some(data))) => Ok(views.html.contacting_you(Form2[ContactingYou](data), edit))
-        case _ => Ok(views.html.contacting_you(EmptyForm, edit))
+        case Some(AboutTheBusiness(_, _, Some(data))) => Ok(views.html.contacting_you(Form2[ContactingYou](data),businessCustomerDetails,edit))
+        case _ => Ok(views.html.contacting_you(EmptyForm,businessCustomerDetails,edit))
       }
 
   }
@@ -66,7 +66,7 @@ trait ContactingYouController extends BaseController {
 
     implicit authContext => implicit request => {
       Form2[ContactingYouDetails](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.contacting_you(f, edit))) //We will create Address here
+        case f: InvalidForm => Future.successful(BadRequest(views.html.contacting_you(f, None, edit))) //We will create Address here
         case ValidForm(_, data: ContactingYouDetails) =>
           for {
             aboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
