@@ -15,12 +15,12 @@ import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
-class RegOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new RegOfficeOrMainPlaceOfBusinessController {
+    val controller = new ConfirmRegisteredOfficeOrMainPlaceOfBusinessController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val businessCustomerSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
@@ -32,12 +32,12 @@ class RegOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServ
     bCAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
 
 
-  "RegOfficeOrMainPlaceOfBusinessController" must {
+  "ConfirmRegisteredOfficeOrMainPlaceOfBusinessController" must {
 
     "use correct services" in new Fixture {
-      RegOfficeOrMainPlaceOfBusinessController.authConnector must be(AMLSAuthConnector)
-      RegOfficeOrMainPlaceOfBusinessController.dataCacheConnector must be(DataCacheConnector)
-      RegOfficeOrMainPlaceOfBusinessController.businessCustomerSessionCacheConnector must be(BusinessCustomerSessionCacheConnector)
+      ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.authConnector must be(AMLSAuthConnector)
+      ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.dataCacheConnector must be(DataCacheConnector)
+      ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.businessCustomerSessionCacheConnector must be(BusinessCustomerSessionCacheConnector)
     }
 
     "Get Option:" must {

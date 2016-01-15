@@ -2,7 +2,7 @@ package models.aboutthebusiness
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNull, Json}
 
 class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
@@ -15,10 +15,19 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
   "AboutTheBusiness" must {
     val completeJson = Json.obj(
       "previouslyRegistered" -> true,
-      "prevMLRRegNo" -> "12345678"
+      "prevMLRRegNo" -> "12345678",
+      "registeredForVAT" -> true,
+      "vrnNumber" -> "123456789",
+      "isUKOrOverseas" -> true,
+      "addressLine1" -> "38B",
+      "addressLine2" -> "Longbenton",
+      "addressLine3" -> JsNull,
+      "addressLine4" -> JsNull,
+      "postCode" -> "NE7 7DX"
+
     )
 
-    val completeModel = AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678")))
+    val completeModel = AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678")), Some(regForVAT), Some(regOfficeOrMainPlaceUK))
 
     "Serialise as expected" in {
 

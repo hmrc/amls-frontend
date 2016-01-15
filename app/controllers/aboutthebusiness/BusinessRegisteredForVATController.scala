@@ -36,7 +36,7 @@ trait BusinessRegisteredForVATController extends BaseController {
           } yield edit match {
               // TODO
 //            case true => Redirect(routes.BusinessRegisteredForVATController.get())
-            case false => Redirect(routes.RegOfficeOrMainPlaceOfBusinessController.get())
+            case false => Redirect(routes.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.get())
           }
       }
     }

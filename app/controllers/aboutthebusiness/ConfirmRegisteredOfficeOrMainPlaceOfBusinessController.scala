@@ -4,11 +4,11 @@ import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.aboutthebusiness.{RegOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
+import models.aboutthebusiness.{ConfirmRegisteredOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
 
 import scala.concurrent.Future
 
-trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
+trait ConfirmRegisteredOfficeOrMainPlaceOfBusinessController extends BaseController  {
 
   def dataCacheConnector: DataCacheConnector
   def businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
@@ -19,7 +19,7 @@ trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
         reviewBusinessDetails <- businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
       } yield {
         reviewBusinessDetails match {
-          case Some(data) => Ok(views.html.registered_office_or_main_place(EmptyForm, data))
+          case Some(data) => Ok(views.html.confirm_registered_office_or_main_place(EmptyForm, data))
           case _ => Redirect(routes.BusinessRegisteredWithHMRCBeforeController.get())  //TODo replace with actual registered address page
         }
       }
@@ -28,14 +28,14 @@ trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
   def post() = Authorised.async {
     implicit authContext => implicit request =>
 
-      Form2[RegOfficeOrMainPlaceOfBusiness](request.body) match {
+      Form2[ConfirmRegisteredOfficeOrMainPlaceOfBusiness](request.body) match {
         case f: InvalidForm => {
           for {
             reviewBusinessDetails <- businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
           } yield {
               reviewBusinessDetails match {
-                case Some(data) => BadRequest(views.html.registered_office_or_main_place(f, data))
-                case _ =>  Redirect(routes.RegOfficeOrMainPlaceOfBusinessController.get())
+                case Some(data) => BadRequest(views.html.confirm_registered_office_or_main_place(f, data))
+                case _ =>  Redirect(routes.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.get())
               }
             }
         }
@@ -49,7 +49,7 @@ trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
   }
 }
 
-object RegOfficeOrMainPlaceOfBusinessController extends RegOfficeOrMainPlaceOfBusinessController {
+object ConfirmRegisteredOfficeOrMainPlaceOfBusinessController extends ConfirmRegisteredOfficeOrMainPlaceOfBusinessController {
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
   override val businessCustomerSessionCacheConnector = BusinessCustomerSessionCacheConnector

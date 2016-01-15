@@ -7,7 +7,7 @@ import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, JsNull, Json}
 
-class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
+class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
 
   "WhereIsRegOfficeOrMainPlaceOfBusiness" must {
 
@@ -21,7 +21,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "postCode" -> Seq("NE7 7DX")
       )
 
-      WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
+      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
         be(Success(RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "NE7 7DX")))
     }
 
@@ -35,7 +35,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "country" -> Seq("UK")
       )
 
-      WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
+      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
         be(Success(RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "UK")))
     }
 
@@ -48,7 +48,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "country" -> Seq("UK")
       )
 
-      WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "addressLine1") -> Seq(ValidationError("error.required")),
           (Path \ "postCode") -> Seq(ValidationError("error.required"))
@@ -64,7 +64,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "country" -> Seq("")
       )
 
-      WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "isUKOrOverseas") -> Seq(ValidationError("error.invalid"))
 
@@ -81,7 +81,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "postCode" -> Seq("UK"*12)
       )
 
-      WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "addressLine2") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
           (Path \ "postCode") -> Seq(ValidationError("error.maxLength", FormTypes.maxPostCodeTypeLength))
@@ -92,7 +92,7 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
       val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "NE7 7DX")
 
-      WhereIsRegOfficeOrMainPlaceOfBusiness.formWrites.writes(data) must be
+      RegisteredOfficeOrMainPlaceOfBusiness.formWrites.writes(data) must be
       Map("addressLine1" -> "38B",
         "addressLine2" -> "Longbenton",
         "addressLine3" -> "",
