@@ -33,7 +33,11 @@ trait BusinessRegisteredForVATController extends BaseController {
             _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
               aboutTheBusiness.registeredForVAT(data)
             )
-          } yield Redirect(routes.BusinessRegisteredForVATController.get())
+          } yield edit match {
+              // TODO
+//            case true => Redirect(routes.BusinessRegisteredForVATController.get())
+            case false => Redirect(routes.RegOfficeOrMainPlaceOfBusinessController.get())
+          }
       }
     }
   }

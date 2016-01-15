@@ -52,7 +52,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
 
     val newRequest = request.withFormUrlEncodedBody(
       "registeredForVAT" -> "true",
-      "registeredForVATYes" -> "123456789"
+      "vrnNumber" -> "123456789"
     )
 
     when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
@@ -63,7 +63,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegisteredForVATController.get().url))
+    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.get().url))
   }
 
   "on post with invalid data" in new Fixture {

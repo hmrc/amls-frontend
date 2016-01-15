@@ -21,11 +21,11 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
 
       val data = Map(
         "registeredForVAT" -> Seq("true"),
-        "registeredForVATYes" -> Seq("12345678")
+        "vrnNumber" -> Seq("123456789")
       )
 
       RegisteredForVAT.formRule.validate(data) must
-        be(Success(RegisteredForVATYes("12345678")))
+        be(Success(RegisteredForVATYes("123456789")))
     }
 
     "fail to validate given an `Yes` with no value" in {
@@ -36,7 +36,7 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
 
       RegisteredForVAT.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "registeredForVATYes") -> Seq(ValidationError("error.required"))
+          (Path \ "vrnNumber") -> Seq(ValidationError("error.required"))
         )))
     }
 
@@ -50,7 +50,7 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
     "write correct data from `Yes` value" in {
 
       RegisteredForVAT.formWrites.writes(RegisteredForVATYes("12345678")) must
-        be(Map("registeredForVAT" -> Seq("true"), "registeredForVATYes" -> Seq("12345678")))
+        be(Map("registeredForVAT" -> Seq("true"), "vrnNumber" -> Seq("12345678")))
     }
   }
 
@@ -64,10 +64,10 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an `Yes` value" in {
 
-      val json = Json.obj("registeredForVAT" -> true, "registeredForVATYes" ->"12345678")
+      val json = Json.obj("registeredForVAT" -> true, "vrnNumber" ->"12345678")
 
       Json.fromJson[RegisteredForVAT](json) must
-        be(JsSuccess(RegisteredForVATYes("12345678"), JsPath \ "registeredForVAT" \ "registeredForVATYes"))
+        be(JsSuccess(RegisteredForVATYes("12345678"), JsPath \ "registeredForVAT" \ "vrnNumber"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -75,7 +75,7 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForVAT" -> true)
 
       Json.fromJson[RegisteredForVAT](json) must
-        be(JsError((JsPath \ "registeredForVAT" \ "registeredForVATYes") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "registeredForVAT" \ "vrnNumber") -> ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {
@@ -86,7 +86,7 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
       Json.toJson(RegisteredForVATYes("12345678")) must
         be(Json.obj(
           "registeredForVAT" -> true,
-          "registeredForVATYes" -> "12345678"
+          "vrnNumber" -> "12345678"
         ))
     }
   }
