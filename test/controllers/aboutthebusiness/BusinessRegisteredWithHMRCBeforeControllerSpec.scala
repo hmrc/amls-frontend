@@ -63,7 +63,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegForVATController.get().url))
+    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegisteredForVATController.get().url))
   }
 
   "on post with invalid data" in new Fixture {
@@ -84,7 +84,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
  /* "on post with valid data in edit mode" in new Fixture {
 
     val newRequest = request.withFormUrlEncodedBody(
-      "previouslyRegisteredYes" -> "01"
+      "previouslyRegisteredYes" -> "true"
     )
 
     when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
@@ -95,7 +95,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.aboutyou.routes.SummaryController.get().url))
+    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
   }*/
 
 

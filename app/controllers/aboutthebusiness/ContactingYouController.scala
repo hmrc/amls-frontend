@@ -23,7 +23,7 @@ trait ContactingYouController extends BaseController {
         //businessCustomerDetails <- businessCustomerDetailsFuture
         aboutTheBusiness <- aboutTheBusinessFuture
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,Some(data))) => Ok(views.html.contacting_you(Form2[ContactingYou](data), edit))
+        case Some(AboutTheBusiness(_, _, Some(data))) => Ok(views.html.contacting_you(Form2[ContactingYou](data), edit))
         case _ => Ok(views.html.contacting_you(EmptyForm, edit))
       }
 

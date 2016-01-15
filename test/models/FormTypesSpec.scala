@@ -161,4 +161,29 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
   }
+
+  "vrnType" must {
+
+    "successfully validate" in {
+
+      vrnType.validate("123456789") must
+        be(Success("123456789"))
+    }
+
+    "fail to validate an empty string" in {
+
+      vrnType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 9" in {
+
+      vrnType.validate("1" * 10) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 9))
+        )))
+    }
+  }
 }

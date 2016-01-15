@@ -20,7 +20,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou("1234567890", "test@test.com", "http://mywebsite.co.uk"))
-  val aboutTheBusinessWithData = AboutTheBusiness(None,contactingYou)
+  val aboutTheBusinessWithData = AboutTheBusiness(None,None,contactingYou)
 
   trait Fixture extends AuthorisedFixture {
     self =>

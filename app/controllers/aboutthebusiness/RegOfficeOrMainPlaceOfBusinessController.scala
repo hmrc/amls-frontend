@@ -41,7 +41,7 @@ trait RegOfficeOrMainPlaceOfBusinessController extends BaseController  {
         }
         case ValidForm(_, data) => {
           data.isRegOfficeOrMainPlaceOfBusiness match {
-            case true => Future.successful(Redirect(routes.BusinessRegForVATController.get())) //TODO replace with correct path
+            case true => Future.successful(Redirect(routes.BusinessRegisteredForVATController.get())) //TODO replace with correct path
             case false => Future.successful(Redirect(routes.BusinessRegisteredWithHMRCBeforeController.get())) //TODO replace with correct path
           }
         }
