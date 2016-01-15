@@ -2,11 +2,16 @@ package models.aboutthebusiness
 
 case class AboutTheBusiness(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
-                             previouslyRegistered1: Option[PreviouslyRegistered] = None
+                             whereIsRegOfficeOrMainPlaceOfBusiness: Option[WhereIsRegOfficeOrMainPlaceOfBusiness] = None
                      ) {
 
   def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness =
     this.copy(previouslyRegistered = Some(v))
+
+  def whereIsRegOfficeOrMainPlaceOfBusiness(v: WhereIsRegOfficeOrMainPlaceOfBusiness): AboutTheBusiness =
+    this.copy(whereIsRegOfficeOrMainPlaceOfBusiness = Some(v))
+
+
 }
 
 object AboutTheBusiness {
@@ -17,13 +22,14 @@ object AboutTheBusiness {
   val key = "about-the-business"
   implicit val reads: Reads[AboutTheBusiness] = (
       __.read[Option[PreviouslyRegistered]] and
-        __.read[Option[PreviouslyRegistered]]
+        __.read[Option[WhereIsRegOfficeOrMainPlaceOfBusiness]]
     ) (AboutTheBusiness.apply _)
 
   implicit val writes: Writes[AboutTheBusiness] = Writes[AboutTheBusiness] {
     model =>
       Seq(
-        Json.toJson(model.previouslyRegistered).asOpt[JsObject]
+        Json.toJson(model.previouslyRegistered).asOpt[JsObject],
+        Json.toJson(model.whereIsRegOfficeOrMainPlaceOfBusiness).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }

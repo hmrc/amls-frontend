@@ -52,6 +52,7 @@ object WhereIsRegOfficeOrMainPlaceOfBusiness {
   implicit val formWrites: Write[WhereIsRegOfficeOrMainPlaceOfBusiness, UrlFormEncoded] = Write {
     case f: RegOfficeOrMainPlaceOfBusinessUK =>
       Map(
+        "isUKOrOverseas" -> Seq("true"),
         "addressLine1" -> f.addressLine1,
         "addressLine2" -> f.addressLine1,
         "addressLine3" -> f.addressLine1,
@@ -60,6 +61,7 @@ object WhereIsRegOfficeOrMainPlaceOfBusiness {
       )
     case f: RegOfficeOrMainPlaceOfBusinessNonUK =>
       Map(
+        "isUKOrOverseas" -> Seq("false"),
         "addressLine1" -> f.addressLine1,
         "addressLine2" -> f.addressLine1,
         "addressLine3" -> f.addressLine1,
@@ -93,13 +95,15 @@ object WhereIsRegOfficeOrMainPlaceOfBusiness {
 
   implicit val jsonWrites = Writes[WhereIsRegOfficeOrMainPlaceOfBusiness] {
     case m: RegOfficeOrMainPlaceOfBusinessUK =>
-      Json.obj( "addressLine1" -> m.addressLine1,
+      Json.obj("isUKOrOverseas" -> true,
+        "addressLine1" -> m.addressLine1,
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
         "postCode" -> m.postCode)
     case m: RegOfficeOrMainPlaceOfBusinessNonUK =>
-      Json.obj( "addressLine1" -> m.addressLine1,
+      Json.obj( "isUKOrOverseas" -> false,
+        "addressLine1" -> m.addressLine1,
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,

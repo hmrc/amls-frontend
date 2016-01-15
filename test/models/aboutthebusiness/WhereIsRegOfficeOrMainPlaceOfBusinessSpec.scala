@@ -55,6 +55,22 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         )))
     }
 
+    "fail to validation for not filling mandatory isUKOrOverseas field" in {
+      val data = Map(
+        "isUKOrOverseas" -> Seq(""),
+        "addressLine2" -> Seq(""),
+        "addressLine3" -> Seq(""),
+        "addressLine4" -> Seq(""),
+        "country" -> Seq("")
+      )
+
+      WhereIsRegOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "isUKOrOverseas") -> Seq(ValidationError("error.invalid"))
+
+        )))
+    }
+
     "fail to validation for invalid model" in {
       val data = Map(
         "isUKOrOverseas" -> Seq("true"),
@@ -107,3 +123,4 @@ class WhereIsRegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
     }
   }
 }
+
