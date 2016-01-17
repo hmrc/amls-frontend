@@ -51,7 +51,7 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
         contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))
       }
 
-      "load Your Name page with pre populated data" in new Fixture {
+      "load Registered office or main place of business when Business Address from save4later returns None" in new Fixture {
 
         val registeredAddress = ConfirmRegisteredOfficeOrMainPlaceOfBusiness(isRegOfficeOrMainPlaceOfBusiness = true)
 
@@ -60,7 +60,7 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeOrMainPlaceOfBusinessController.get().url))
 
       }
     }
@@ -90,23 +90,20 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeOrMainPlaceOfBusinessController.get().url))
       }
 
       "on post invalid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "isRegOfficeOrMainPlaceOfBusiness" -> "898989"
         )
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
           .thenReturn(Future.successful(Some(businessCustomerDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(Messages("This field is required"))
 
-        val document = Jsoup.parse(contentAsString(result))
-//        TODO
-//        document.select("input[name=isRegOfficeOrMainPlaceOfBusiness]").`val` must be("true")
       }
 
       "on post reload the same page when businessCustomerDetails is None" in new Fixture {

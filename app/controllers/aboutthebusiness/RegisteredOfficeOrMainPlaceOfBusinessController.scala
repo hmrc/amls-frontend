@@ -12,7 +12,7 @@ trait RegisteredOfficeOrMainPlaceOfBusinessController extends BaseController  {
 
   val dataCacheConnector: DataCacheConnector
 
-  val model = RegisteredOfficeOrMainPlaceOfBusinessUK("38Bxxxx", "Longbenton", None, None, "NE7 7DX")
+  val model = RegisteredOfficeOrMainPlaceOfBusinessUK("", "", None, None, "")
 
   def get(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>

@@ -55,8 +55,8 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
         "isUKOrOverseas" -> Seq("true"),
         "addressLine1" -> f.addressLine1,
         "addressLine2" -> f.addressLine2,
-        "addressLine3" -> f.addressLine1,
-        "addressLine4" -> f.addressLine1,
+        "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
+        "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
         "postCode" -> f.postCode
       )
     case f: RegisteredOfficeOrMainPlaceOfBusinessNonUK =>
@@ -64,8 +64,8 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
         "isUKOrOverseas" -> Seq("false"),
         "addressLine1" -> f.addressLine1,
         "addressLine2" -> f.addressLine2,
-        "addressLine3" -> f.addressLine1,
-        "addressLine4" -> f.addressLine1,
+        "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
+        "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
         "country" -> f.country
       )
   }
