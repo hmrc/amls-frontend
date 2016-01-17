@@ -40,10 +40,10 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
           )(RegisteredOfficeOrMainPlaceOfBusinessUK.apply _)
       case false =>
         (
-          (__ \ "addressLine1").read(addressType) and
-            (__ \ "addressLine2").read(addressType) and
-            (__ \ "addressLine3").read[Option[String]] and
-            (__ \ "addressLine4").read[Option[String]] and
+          (__ \ "addressLineNonUK1").read(addressType) and
+            (__ \ "addressLineNonUK2").read(addressType) and
+            (__ \ "addressLineNonUK3").read[Option[String]] and
+            (__ \ "addressLineNonUK4").read[Option[String]] and
             (__ \ "country").read(countryType)
           )(RegisteredOfficeOrMainPlaceOfBusinessNonUK.apply _)
     }
@@ -62,10 +62,10 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
     case f: RegisteredOfficeOrMainPlaceOfBusinessNonUK =>
       Map(
         "isUKOrOverseas" -> Seq("false"),
-        "addressLine1" -> f.addressLine1,
-        "addressLine2" -> f.addressLine2,
-        "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
-        "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
+        "addressLineNonUK1" -> f.addressLine1,
+        "addressLineNonUK2" -> f.addressLine2,
+        "addressLineNonUK3" -> Seq(f.addressLine3.getOrElse("")),
+        "addressLineNonUK4" -> Seq(f.addressLine4.getOrElse("")),
         "country" -> f.country
       )
   }
@@ -85,10 +85,10 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
           )(RegisteredOfficeOrMainPlaceOfBusinessUK.apply _) map identity[RegisteredOfficeOrMainPlaceOfBusiness]
       ) orElse
       (
-        (__ \ "addressLine1").read[String] and
-          (__ \ "addressLine2").read[String] and
-          (__ \ "addressLine3").read[Option[String]] and
-          (__ \ "addressLine4").read[Option[String]] and
+        (__ \ "addressLineNonUK1").read[String] and
+          (__ \ "addressLineNonUK2").read[String] and
+          (__ \ "addressLineNonUK3").read[Option[String]] and
+          (__ \ "addressLineNonUK4").read[Option[String]] and
           (__ \ "country").read[String]
         )(RegisteredOfficeOrMainPlaceOfBusinessNonUK.apply _)
   }
@@ -103,10 +103,10 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
         "postCode" -> m.postCode)
     case m: RegisteredOfficeOrMainPlaceOfBusinessNonUK =>
       Json.obj( "isUKOrOverseas" -> false,
-        "addressLine1" -> m.addressLine1,
-        "addressLine2" -> m.addressLine2,
-        "addressLine3" -> m.addressLine3,
-        "addressLine4" -> m.addressLine4,
+        "addressLineNonUK1" -> m.addressLine1,
+        "addressLineNonUK2" -> m.addressLine2,
+        "addressLineNonUK3" -> m.addressLine3,
+        "addressLineNonUK4" -> m.addressLine4,
         "country" -> m.country)
   }
 }

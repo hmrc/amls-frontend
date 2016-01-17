@@ -23,33 +23,54 @@
             @legend("TODO", jsHidden = true)
             @radio(f("isUKOrOverseas"), "lbl.uk", "true", target = s"#$target")
             @radio(f("isUKOrOverseas"), "lbl.overseas", "false", target = s"#$target1")
-            @input(
-                field = f("addressLine1"),
-                labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
-            )
-
-            @input(
-                field = f("addressLine2"),
-                labelText = ""
-            )
-
-            @input(
-                field = f("addressLine3"),
-                labelText = ""
-            )
-
-            @input(
-                field = f("addressLine4"),
-                labelText = ""
-            )
 
             @fieldset("TODO", jsHidden = true, id = target) {
+                @input(
+                    field = f("addressLine1"),
+                    labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
+                )
+
+                @input(
+                    field = f("addressLine2"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLine3"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLine4"),
+                    labelText = ""
+                )
+
                 @input(
                     field = f("postCode"),
                     labelText = Messages("aboutthebusiness.registeredoffice.postcode.lbl")
                 )
             }
             @fieldset("TODO", jsHidden = true, id = target1) {
+                @input(
+                    field = f("addressLineNonUK1"),
+                    labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
+                )
+
+                @input(
+                    field = f("addressLineNonUK2"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLineNonUK3"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLineNonUK4"),
+                    labelText = ""
+                )
+
                  @input(
                     field = f("country"),
                     labelText = Messages("aboutthebusiness.registeredoffice.country.lbl")

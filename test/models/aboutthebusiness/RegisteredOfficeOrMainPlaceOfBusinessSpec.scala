@@ -28,10 +28,10 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
     "validate the given non UK address" in {
       val model = Map(
         "isUKOrOverseas" -> Seq("false"),
-        "addressLine1" -> Seq("38B"),
-        "addressLine2" -> Seq("Longbenton"),
-        "addressLine3" -> Seq(""),
-        "addressLine4" -> Seq(""),
+        "addressLineNonUK1" -> Seq("38B"),
+        "addressLineNonUK2" -> Seq("Longbenton"),
+        "addressLineNonUK3" -> Seq(""),
+        "addressLineNonUK4" -> Seq(""),
         "country" -> Seq("UK")
       )
 
@@ -41,25 +41,25 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
     "fail to validation for not filling mandatory field" in {
       val data = Map(
-        "isUKOrOverseas" -> Seq("true"),
-        "addressLine2" -> Seq("Longbenton"),
-        "addressLine3" -> Seq(""),
-        "addressLine4" -> Seq(""),
-        "country" -> Seq("UK")
+        "isUKOrOverseas" -> Seq("false"),
+        "addressLineNonUK2" -> Seq("Longbenton"),
+        "addressLineNonUK3" -> Seq(""),
+        "addressLineNonUK4" -> Seq(""),
+        "postCode" -> Seq("UK")
       )
 
       RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "addressLine1") -> Seq(ValidationError("error.required")),
-          (Path \ "postCode") -> Seq(ValidationError("error.required"))
+          (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required")),
+          (Path \ "country") -> Seq(ValidationError("error.required"))
         )))
     }
 
     "fail to validation for not filling mandatory isUKOrOverseas field" in {
       val data = Map(
-        "addressLine2" -> Seq(""),
-        "addressLine3" -> Seq(""),
-        "addressLine4" -> Seq(""),
+        "addressLineNonUK2" -> Seq(""),
+        "addressLineNonUK3" -> Seq(""),
+        "addressLineNonUK4" -> Seq(""),
         "country" -> Seq("")
       )
 
