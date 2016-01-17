@@ -9,7 +9,7 @@ import play.api.libs.json.{JsPath, JsSuccess, JsNull, Json}
 
 class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
 
-  "WhereIsRegOfficeOrMainPlaceOfBusiness" must {
+  "RegisteredOfficeOrMainPlaceOfBusiness" must {
 
     "validate the given UK address" in {
       val model = Map(
@@ -36,7 +36,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
       )
 
       RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
-        be(Success(RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "UK")))
+        be(Success(RegisteredOfficeOrMainPlaceOfBusinessNonUK("38B", "Longbenton", None, None, "UK")))
     }
 
     "fail to validation for not filling mandatory field" in {
@@ -57,7 +57,6 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
     "fail to validation for not filling mandatory isUKOrOverseas field" in {
       val data = Map(
-        "l" -> Seq(""),
         "addressLine2" -> Seq(""),
         "addressLine3" -> Seq(""),
         "addressLine4" -> Seq(""),
@@ -66,7 +65,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
       RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "isUKOrOverseas") -> Seq(ValidationError("error.invalid"))
+          (Path \ "isUKOrOverseas") -> Seq(ValidationError("error.required"))
 
         )))
     }
@@ -113,7 +112,8 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
       val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
 
       Json.toJson(data) must
-        be( Json.obj("addressLine1" -> "38B",
+        be( Json.obj("isUKOrOverseas" -> true,
+          "addressLine1" -> "38B",
           "addressLine2" -> "Longbenton",
           "addressLine3" -> "line 1",
           "addressLine4" -> JsNull,

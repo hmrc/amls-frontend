@@ -10,16 +10,16 @@ sealed trait RegisteredOfficeOrMainPlaceOfBusiness
 case class RegisteredOfficeOrMainPlaceOfBusinessUK(
                                              addressLine1: String,
                                              addressLine2: String,
-                                             addressLine3: Option[String],
-                                             addressLine4: Option[String],
+                                             addressLine3: Option[String] = None,
+                                             addressLine4: Option[String] = None,
                                              postCode : String
                                            ) extends RegisteredOfficeOrMainPlaceOfBusiness
 
 case class RegisteredOfficeOrMainPlaceOfBusinessNonUK(
                                                 addressLine1: String,
                                                 addressLine2: String,
-                                                addressLine3: Option[String],
-                                                addressLine4: Option[String],
+                                                addressLine3: Option[String] = None,
+                                                addressLine4: Option[String] = None,
                                                 country : String
                                               ) extends RegisteredOfficeOrMainPlaceOfBusiness
 
@@ -54,7 +54,7 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
       Map(
         "isUKOrOverseas" -> Seq("true"),
         "addressLine1" -> f.addressLine1,
-        "addressLine2" -> f.addressLine1,
+        "addressLine2" -> f.addressLine2,
         "addressLine3" -> f.addressLine1,
         "addressLine4" -> f.addressLine1,
         "postCode" -> f.postCode
@@ -63,7 +63,7 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
       Map(
         "isUKOrOverseas" -> Seq("false"),
         "addressLine1" -> f.addressLine1,
-        "addressLine2" -> f.addressLine1,
+        "addressLine2" -> f.addressLine2,
         "addressLine3" -> f.addressLine1,
         "addressLine4" -> f.addressLine1,
         "country" -> f.country

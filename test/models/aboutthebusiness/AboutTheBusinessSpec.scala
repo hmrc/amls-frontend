@@ -131,7 +131,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "return AboutTheBusiness with correct previously registered status" in {
             val newPreviouslyRegistered = PreviouslyRegisteredYes("22222222")
             val result = initial.previouslyRegistered(newPreviouslyRegistered)
-            result must be(AboutTheBusiness(Some(newPreviouslyRegistered), Some(regForVAT)))
+            result must be(AboutTheBusiness(Some(newPreviouslyRegistered), Some(regForVAT), Some(regOfficeOrMainPlaceUK)))
           }
         }
 
@@ -139,7 +139,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "Merged with previously registered with MLR" in {
             val newregForVAT = RegisteredForVATYes("012345678")
             val result = initial.registeredForVAT(newregForVAT)
-            result must be(AboutTheBusiness(None, Some(newregForVAT)))
+            result must be(AboutTheBusiness(None, Some(newregForVAT), Some(regOfficeOrMainPlaceUK)))
           }
         }
 
@@ -147,7 +147,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "return AboutTheBusiness with correct registered office detailes" in {
             val newregOffice = RegisteredOfficeOrMainPlaceOfBusinessNonUK("38B", "Longbenton", None, None, "UK")
             val result = initial.registeredOfficeOrMainPlaceOfBusiness(newregOffice)
-            result must be(AboutTheBusiness(None, None, Some(newregOffice)))
+            result must be(AboutTheBusiness(None, Some(regForVAT), Some(newregOffice)))
           }
         }
       }

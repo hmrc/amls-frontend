@@ -5,7 +5,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
 
-class RegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
+class ConfirmRegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
   "RegOfficeOrMainPlaceOfBusiness " must {
 
     "validate the given model " in {
@@ -13,8 +13,8 @@ class RegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
         "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
       )
 
-      RegOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
-        be(Success(RegOfficeOrMainPlaceOfBusiness(true)))
+      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+        be(Success(ConfirmRegisteredOfficeOrMainPlaceOfBusiness(true)))
     }
 
     "successfully validate given a data model" in {
@@ -23,13 +23,13 @@ class RegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
         "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
       )
 
-      RegOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
-        be(Success(RegOfficeOrMainPlaceOfBusiness(true)))
+      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+        be(Success(ConfirmRegisteredOfficeOrMainPlaceOfBusiness(true)))
     }
 
     "fail to validate when given invalid data" in {
 
-      RegOfficeOrMainPlaceOfBusiness.formRule.validate(Map.empty) must
+      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(Map.empty) must
         be(Failure(Seq(
           (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required"))
         )))
@@ -37,9 +37,9 @@ class RegOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
 
     "write correct data" in {
 
-      val model = RegOfficeOrMainPlaceOfBusiness(true)
+      val model = ConfirmRegisteredOfficeOrMainPlaceOfBusiness(true)
 
-      RegOfficeOrMainPlaceOfBusiness.formWrites.writes(model) must
+      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formWrites.writes(model) must
         be(Map(
           "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
         ))

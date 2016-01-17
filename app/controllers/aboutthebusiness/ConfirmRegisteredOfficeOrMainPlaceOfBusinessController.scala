@@ -20,7 +20,7 @@ trait ConfirmRegisteredOfficeOrMainPlaceOfBusinessController extends BaseControl
       } yield {
         reviewBusinessDetails match {
           case Some(data) => Ok(views.html.confirm_registered_office_or_main_place(EmptyForm, data))
-          case _ => Redirect(routes.BusinessRegisteredWithHMRCBeforeController.get())  //TODo replace with actual registered address page
+          case _ => Redirect(routes.RegisteredOfficeOrMainPlaceOfBusinessController.get())
         }
       }
   }
@@ -42,7 +42,7 @@ trait ConfirmRegisteredOfficeOrMainPlaceOfBusinessController extends BaseControl
         case ValidForm(_, data) => {
           data.isRegOfficeOrMainPlaceOfBusiness match {
             case true => Future.successful(Redirect(routes.BusinessRegisteredForVATController.get())) //TODO replace with correct path
-            case false => Future.successful(Redirect(routes.BusinessRegisteredWithHMRCBeforeController.get())) //TODO replace with correct path
+            case false => Future.successful(Redirect(routes.RegisteredOfficeOrMainPlaceOfBusinessController.get()))
           }
         }
       }

@@ -2,7 +2,7 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import models.aboutthebusiness.{BCAddress, RegOfficeOrMainPlaceOfBusiness, BusinessCustomerDetails}
+import models.aboutthebusiness.{ConfirmRegisteredOfficeOrMainPlaceOfBusiness, BCAddress, BusinessCustomerDetails}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -53,7 +53,7 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
 
       "load Your Name page with pre populated data" in new Fixture {
 
-        val registeredAddress = RegOfficeOrMainPlaceOfBusiness(isRegOfficeOrMainPlaceOfBusiness = true)
+        val registeredAddress = ConfirmRegisteredOfficeOrMainPlaceOfBusiness(isRegOfficeOrMainPlaceOfBusiness = true)
 
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
           .thenReturn(Future.successful(None))
@@ -119,7 +119,7 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.get().url))
       }
     }
   }

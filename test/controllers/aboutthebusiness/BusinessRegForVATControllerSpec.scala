@@ -63,7 +63,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.get().url))
+    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.get().url))
   }
 
   "on post with invalid data" in new Fixture {
