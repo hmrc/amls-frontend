@@ -30,3 +30,6 @@ POST        /business-details/vat                   controllers.aboutthebusiness
 
 GET         /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get(edit: Boolean ?= false)
 POST        /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post(edit: Boolean ?= false)
+
+GET         /business-details/address-for-letters   controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
+POST        /business-details/address-for-letters   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)

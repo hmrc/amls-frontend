@@ -2,21 +2,24 @@
 
 @(
     field: Field,
-    labelText: String,
+    labelText: String = "",
     hintText: String = "",
-    bold: Boolean = false
+    bold: Boolean = true,
+    classes: Seq[String] = Seq.empty
 )(implicit lang: Lang)
 
 <div class="form-group @if(field.hasErrors) {form-field--error}">
     <label>
-        <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+        @if(labelText.nonEmpty) {
+            <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+        }
         @if(hintText.nonEmpty) {
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
         }
         @if(field.hasErrors) {
             <span class="error-notification">@field.error</span>
         }
-        <input name="@field.name" class="form-control" type="text" value="@field.value" id="@field.id"
+        <input name="@field.name" class="form-control @classes.mkString(" ")" type="text" value="@field.value" id="@field.id"
                @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
         >
     </label>
