@@ -18,7 +18,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new BusinessRegisteredForVATController {
+    val controller = new VATRegisteredController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -38,7 +38,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
   "on get display the registered for VAT page with pre populated data" in new Fixture {
 
     when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("")), Some(RegisteredForVATYes("123456789"))))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("")), Some(VATRegisteredYes("123456789"))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -63,7 +63,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.get().url))
+    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.get().url))
   }
 
   "on post with invalid data" in new Fixture {

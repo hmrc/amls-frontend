@@ -2,15 +2,19 @@ package models.aboutthebusiness
 
 case class AboutTheBusiness(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
-                             registeredForVAT: Option[RegisteredForVAT] = None,
-                             contactingYou: Option[ContactingYou] = None
-                             ) {
+                             vatRegistered: Option[VATRegistered] = None,
+                             contactingYou: Option[ContactingYou] = None,
+                             registeredOffice: Option[RegisteredOffice] = None
+                     ) {
 
   def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness =
     this.copy(previouslyRegistered = Some(v))
 
-  def registeredForVAT(r: RegisteredForVAT): AboutTheBusiness =
-    this.copy(registeredForVAT = Some(r))
+  def vatRegistered(r: VATRegistered): AboutTheBusiness =
+    this.copy(vatRegistered = Some(r))
+
+  def registeredOffice(v: RegisteredOffice): AboutTheBusiness =
+    this.copy(registeredOffice = Some(v))
 
   def contactingYou(obj: ContactingYou):
   AboutTheBusiness = {
@@ -26,16 +30,18 @@ object AboutTheBusiness {
   val key = "about-the-business"
   implicit val reads: Reads[AboutTheBusiness] = (
       __.read[Option[PreviouslyRegistered]] and
-        __.read[Option[RegisteredForVAT]] and
-        __.read[Option[ContactingYou]]
+        __.read[Option[VATRegistered]] and
+        __.read[Option[ContactingYou]] and
+        __.read[Option[RegisteredOffice]]
     ) (AboutTheBusiness.apply _)
 
   implicit val writes: Writes[AboutTheBusiness] = Writes[AboutTheBusiness] {
     model =>
       Seq(
         Json.toJson(model.previouslyRegistered).asOpt[JsObject],
-        Json.toJson(model.registeredForVAT).asOpt[JsObject],
-        Json.toJson(model.contactingYou).asOpt[JsObject]
+        Json.toJson(model.vatRegistered).asOpt[JsObject],
+        Json.toJson(model.contactingYou).asOpt[JsObject],
+        Json.toJson(model.registeredOffice).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }

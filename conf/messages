@@ -35,6 +35,9 @@ lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
 lbl.pleasespecify = Please specify
 
+lbl.uk = UK
+lbl.overseas = Overseas
+
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
@@ -92,3 +95,9 @@ aboutthebusiness.registeredformlr.lbl = This only refers to registration for ant
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulation registration number
 
 aboutthebusiness.confirmingyouraddress.title = Is this your registered office or main place of business?
+
+aboutthebusiness.registeredoffice.title = Where is your registered office or main place of business?
+aboutthebusiness.registeredoffice.address.lbl = Address
+aboutthebusiness.registeredoffice.postcode.lbl = Postcode
+aboutthebusiness.registeredoffice.country.lbl = Country
+

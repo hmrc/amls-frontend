@@ -28,7 +28,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
     self =>
 
     val controller = new ContactingYouController {
-      override val dataCacheConnector = mock[DataCacheConnector]
+      override val dataCache = mock[DataCacheConnector]
       override val businessCustomerSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -43,7 +43,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
           .thenReturn(Future.successful(Some(businessCustomerData)))
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -57,7 +57,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
           .thenReturn(Future.successful(Some(businessCustomerData)))
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
@@ -79,10 +79,10 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
           .thenReturn(Future.successful(Some(businessCustomerData)))
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
+        when(controller.dataCache.saveDataShortLivedCache[AboutTheBusiness](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.post()(newRequest)
@@ -100,10 +100,10 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
           .thenReturn(Future.successful(Some(businessCustomerData)))
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
+        when(controller.dataCache.saveDataShortLivedCache[AboutTheBusiness](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.post()(newRequest)

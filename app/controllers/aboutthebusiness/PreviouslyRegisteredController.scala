@@ -5,45 +5,45 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.auth.AmlsRegime
-import models.aboutthebusiness._
+import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegistered}
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait BusinessRegisteredForVATController extends BaseController {
+trait PreviouslyRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_,Some(data),_)) => Ok(views.html.business_reg_for_vat(Form2[RegisteredForVAT](data), edit))
-        case _ => Ok(views.html.business_reg_for_vat(EmptyForm, edit))
+        case Some(AboutTheBusiness(Some(data), _, _, _)) => Ok(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
+        case _ => Ok(views.html.registered_with_HMRC_before(EmptyForm, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[RegisteredForVAT](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.business_reg_for_vat(f, edit)))
+      Form2[PreviouslyRegistered](request.body) match {
+        case f: InvalidForm => Future.successful(BadRequest(views.html.registered_with_HMRC_before(f, edit)))
         case ValidForm(_, data) =>
           for {
             aboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.registeredForVAT(data)
+              aboutTheBusiness.previouslyRegistered(data)
             )
           } yield edit match {
-              // TODO
-//            case true => Redirect(routes.BusinessRegisteredForVATController.get())
-            case false => Redirect(routes.RegOfficeOrMainPlaceOfBusinessController.get())
+            // TODO summary doesn't exits for now
+            // case true => Redirect(routes.AboutTheBusinessSummaryController.get())
+            case false => Redirect(routes.VATRegisteredController.get())
           }
       }
     }
   }
 }
 
-object BusinessRegisteredForVATController extends BusinessRegisteredForVATController {
+object PreviouslyRegisteredController extends PreviouslyRegisteredController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

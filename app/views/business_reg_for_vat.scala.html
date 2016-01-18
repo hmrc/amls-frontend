@@ -13,7 +13,7 @@
 
     @heading("aboutthebusiness.registeredforvat.title", "summary.aboutbusiness")
 
-    @form(f, controllers.aboutthebusiness.routes.BusinessRegisteredForVATController.post(edit)) {
+    @form(f, controllers.aboutthebusiness.routes.VATRegisteredController.post(edit)) {
 
         @inlineRadioGroup(f("registeredForVAT")) {
             @legend("TODO", jsHidden = true)
