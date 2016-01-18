@@ -25,8 +25,8 @@ POST        /business-details/confirming-address    controllers.aboutthebusiness
 GET         /business-details/vat                   controllers.aboutthebusiness.BusinessRegisteredForVATController.get(edit: Boolean ?= false)
 POST        /business-details/vat                   controllers.aboutthebusiness.BusinessRegisteredForVATController.post(edit: Boolean ?= false)
 
-#GET         /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.get()
-#POST        /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.post()
+GET         /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
+POST        /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
 GET         /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get(edit: Boolean ?= false)
 POST        /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post(edit: Boolean ?= false)
