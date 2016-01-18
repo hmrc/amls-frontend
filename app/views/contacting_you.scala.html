@@ -36,12 +36,20 @@
         </div>
         <div class="panel-indent">
             <ul>
-                <li class="no-padding no-margin">@businessCustomerDetails.get.businessName</li>
-                <li class="no-padding no-margin">@businessCustomerDetails.get.businessAddress.line_1</li>
-                <li class="no-padding no-margin">@businessCustomerDetails.get.businessAddress.line_2</li>
-                <li class="no-padding no-margin">@businessCustomerDetails.get.businessAddress.line_3.getOrElse("")</li>
-                <li class="no-padding no-margin">@businessCustomerDetails.get.businessAddress.line_4.getOrElse("")</li>
-                <li class="no-padding no-margin">@businessCustomerDetails.get.businessAddress.postcode.getOrElse("")</li>
+                @businessCustomerDetails.map { details =>
+                    <li class="no-padding no-margin">@details.businessName</li>
+                    <li class="no-padding no-margin">@details.businessAddress.line_1</li>
+                    <li class="no-padding no-margin">@details.businessAddress.line_2</li>
+                    @details.businessAddress.line_3.map { line =>
+                    <li class="no-padding no-margin">@line</li>
+                    }
+                    @details.businessAddress.line_4.map { line =>
+                    <li class="no-padding no-margin">@line</li>
+                    }
+                    @details.businessAddress.postcode.map { postcode =>
+                    <li class="no-padding no-margin">@postcode</li>
+                    }
+                }
             </ul>
         </div>
 
@@ -53,7 +61,6 @@
                  @radio(f("letterToThisAddress"), "lbl.no", "false")
                 }
         </div>
-    @submit(Messages(if (edit) "button.saveandreturn" else "button.saveandcontinue"))
+    @submit(edit)
     }
 }
-
