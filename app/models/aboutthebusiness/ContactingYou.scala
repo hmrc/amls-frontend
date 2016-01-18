@@ -40,7 +40,7 @@ object ContactingYouDetails {
       (__ \ "phoneNumber").read(minLength(1)) and
         (__ \ "email").read(minLength(1)) and
         (__ \ "website").read[String] and
-        (__ \ "sendLettersToThisAddress").read[Boolean]
+        (__ \ "letterToThisAddress").read[Boolean]
       )(ContactingYouDetails.apply _)
   }
 
@@ -51,7 +51,7 @@ object ContactingYouDetails {
       (__ \ "phoneNumber").write[String] and
         (__ \ "email").write[String] and
         (__ \ "website").write[String] and
-        (__ \ "sendLettersToThisAddress").write[Boolean]
+        (__ \ "letterToThisAddress").write[Boolean]
       )(unlift(ContactingYouDetails.unapply _))
   }
 }
