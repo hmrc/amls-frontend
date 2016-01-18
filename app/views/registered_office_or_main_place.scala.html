@@ -4,10 +4,10 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
-@target = @{
+@targetYes = @{
     s"""${f("postCode").id}-fieldset"""
 }
-@target1 = @{
+@targetNo = @{
     s"""${f("country").id}-fieldset"""
 }
 
@@ -21,10 +21,10 @@
 
         @inlineRadioGroup(f("isUKOrOverseas")) {
             @legend("TODO", jsHidden = true)
-            @radio(f("isUKOrOverseas"), "lbl.uk", "true", target = s"#$target")
-            @radio(f("isUKOrOverseas"), "lbl.overseas", "false", target = s"#$target1")
+            @radio(f("isUKOrOverseas"), "lbl.uk", "true", target = s"#$targetYes")
+            @radio(f("isUKOrOverseas"), "lbl.overseas", "false", target = s"#$targetNo")
 
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("TODO", jsHidden = true, id = targetYes) {
                 @input(
                     field = f("addressLine1"),
                     labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
@@ -50,7 +50,7 @@
                     labelText = Messages("aboutthebusiness.registeredoffice.postcode.lbl")
                 )
             }
-            @fieldset("TODO", jsHidden = true, id = target1) {
+            @fieldset("TODO", jsHidden = true, id = targetNo) {
                 @input(
                     field = f("addressLineNonUK1"),
                     labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
