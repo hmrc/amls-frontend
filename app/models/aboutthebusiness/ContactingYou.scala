@@ -4,19 +4,10 @@ import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, To, Write}
 import play.api.libs.json.Json
 
-case class ContactingYou(phoneNumber: String, email: String, website: String)
+case class ContactingYou(phoneNumber: String, email: String, website: Option[String])
 
 object ContactingYou {
   implicit val formats = Json.format[ContactingYou]
-
-  implicit val formRule: Rule[UrlFormEncoded, ContactingYou] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    (
-      (__ \ "phoneNumber").read(minLength(1)) and
-        (__ \ "email").read(minLength(1)) and
-        (__ \ "website").read[String]
-      )(ContactingYou.apply _)
-  }
 
   implicit val formWrites: Write[ContactingYou, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Writes._
@@ -24,34 +15,35 @@ object ContactingYou {
     (
       (__ \ "phoneNumber").write[String] and
         (__ \ "email").write[String] and
-        (__ \ "website").write[String]
+        (__ \ "website").write[Option[String]]
       )(unlift(ContactingYou.unapply _))
   }
 }
 
-case class ContactingYouDetails(phoneNumber: String, email: String, website: String, sendLettersToThisAddress: Boolean)
+case class ContactingYouForm(phoneNumber: String, email: String, website: Option[String], letterToThisAddress: Boolean)
 
-object ContactingYouDetails {
+object ContactingYouForm {
 
-  implicit val formats = Json.format[ContactingYouDetails]
-  implicit val formRule: Rule[UrlFormEncoded, ContactingYouDetails] = From[UrlFormEncoded] { __ =>
+  implicit val formats = Json.format[ContactingYouForm]
+  implicit val formRule: Rule[UrlFormEncoded, ContactingYouForm] = From[UrlFormEncoded] { __ =>
+    import models.FormTypes._
     import play.api.data.mapping.forms.Rules._
     (
-      (__ \ "phoneNumber").read(minLength(1)) and
-        (__ \ "email").read(minLength(1)) and
-        (__ \ "website").read[String] and
+      (__ \ "phoneNumber").read(phoneNumberType) and
+        (__ \ "email").read(emailType) and
+        (__ \ "website").read(optionR(emailType)) and
         (__ \ "letterToThisAddress").read[Boolean]
-      )(ContactingYouDetails.apply _)
+      )(ContactingYouForm.apply _)
   }
 
-  implicit val formWrites: Write[ContactingYouDetails, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWrites: Write[ContactingYouForm, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
       (__ \ "phoneNumber").write[String] and
         (__ \ "email").write[String] and
-        (__ \ "website").write[String] and
+        (__ \ "website").write[Option[String]] and
         (__ \ "letterToThisAddress").write[Boolean]
-      )(unlift(ContactingYouDetails.unapply _))
+      )(unlift(ContactingYouForm.unapply _))
   }
 }

@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
-  val contactingYou = Some(ContactingYou("1234567890", "test@test.com", "http://mywebsite.co.uk"))
+  val contactingYou = Some(ContactingYou("1234567890", "test@test.com", Some("http://mywebsite.co.uk")))
   val aboutTheBusinessWithData = AboutTheBusiness(None, None, contactingYou)
   val businessAddress = BCAddress("line_1", "2", Some("3"), Some("4"), Some("5"), "UK")
   val businessCustomerData = BusinessCustomerDetails("name", Some("business_type"), businessAddress, "12345", "2345678", Some("12345678"), Some("John"), Some("San"))
@@ -72,8 +72,8 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         val newRequest = request.withFormUrlEncodedBody(
           "phoneNumber" -> "1234567890",
           "email" -> "test@test.com",
-          "website" -> "http://mywebsite.co.uk",
-          "sendLettersToThisAddress" -> "true"
+          "website" -> "website",
+          "letterToThisAddress" -> "true"
         )
 
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
