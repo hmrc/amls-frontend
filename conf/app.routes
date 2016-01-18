@@ -28,5 +28,5 @@ POST        /business-details/vat                   controllers.aboutthebusiness
 GET         /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /business-details/contacting-you        controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
-GET         /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get()
-POST        /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post()
+GET         /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get(edit: Boolean ?= false)
+POST        /business-details/index                 controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post(edit: Boolean ?= false)
