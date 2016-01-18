@@ -15,6 +15,7 @@ trait ContactingYouController extends BaseController {
   val dataCacheConnector: DataCacheConnector = DataCacheConnector
   val businessCustomerSessionCacheConnector: BusinessCustomerSessionCacheConnector
 
+
   def get(edit: Boolean = false) = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence).async {
     implicit authContext => implicit request =>
       val businessCustomerDetailsFuture = businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
@@ -66,15 +67,24 @@ trait ContactingYouController extends BaseController {
 
     implicit authContext => implicit request => {
       Form2[ContactingYouDetails](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.contacting_you(f, None, edit))) //We will create Address here
+        case f: InvalidForm => {
+          for {
+            reviewBusinessDetails <- businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails]
+          } yield {
+            reviewBusinessDetails match {
+              case Some(data) => BadRequest(views.html.contacting_you(f, Some(data), edit))
+              case _ => Redirect(routes.ContactingYouController.get())
+            }
+          }
+        }
         case ValidForm(_, data: ContactingYouDetails) =>
           for {
             aboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.contactingYou(ContactingYou(data.email, data.phoneNumber, data.website))
             )
           } yield data.sendLettersToThisAddress match {
-            case true =>  Redirect(routes.ContactingYouController.get())
-            case false => Redirect(routes.ContactingYouController.get())
+            case true =>  Redirect(routes.ContactingYouController.get(edit))
+            case false => Redirect(routes.ContactingYouController.get(edit))
           } //TODO Not Yet Implemented
       }
     }

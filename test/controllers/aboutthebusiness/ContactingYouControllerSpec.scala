@@ -3,7 +3,7 @@ package controllers.aboutthebusiness
 import java.util.UUID
 
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import models.aboutthebusiness.{AboutTheBusiness, ContactingYou}
+import models.aboutthebusiness.{BCAddress, BusinessCustomerDetails, AboutTheBusiness, ContactingYou}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -21,9 +21,11 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou("1234567890", "test@test.com", "http://mywebsite.co.uk"))
   val aboutTheBusinessWithData = AboutTheBusiness(None,None,contactingYou)
-
+  val businessAddress = BCAddress("line_1","2",Some("3"),Some("4"),Some("5"),"UK")
+  val businessCustomerData = BusinessCustomerDetails("name",Some("business_type"),businessAddress,"12345","2345678",Some("12345678"),Some("John"),Some("San"))
   trait Fixture extends AuthorisedFixture {
     self =>
+
     val controller = new ContactingYouController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val businessCustomerSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
@@ -37,6 +39,9 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       "load the page" in new Fixture {
 
+        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+          .thenReturn(Future.successful(Some(businessCustomerData)))
+
         when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -47,6 +52,9 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
       }
 
       "load the page with the pre populated data" in new Fixture {
+
+        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+          .thenReturn(Future.successful(Some(businessCustomerData)))
 
         when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
@@ -77,6 +85,9 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
           "sendLettersToThisAddress" -> "true"
         )
 
+        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+          .thenReturn(Future.successful(Some(businessCustomerData)))
+
         when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
@@ -94,6 +105,9 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         val newRequest = request.withFormUrlEncodedBody(
           "phoneNumber" -> "1234567890"
         )
+
+        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+          .thenReturn(Future.successful(Some(businessCustomerData)))
 
         when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
