@@ -11,14 +11,14 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait BusinessRegisteredWithHMRCBeforeController extends BaseController {
+trait PreviouslyRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(Some(data), _, _)) => Ok(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
+        case Some(AboutTheBusiness(Some(data), _, _, _)) => Ok(views.html.registered_with_HMRC_before(Form2[PreviouslyRegistered](data), edit))
         case _ => Ok(views.html.registered_with_HMRC_before(EmptyForm, edit))
       }
   }
@@ -34,16 +34,16 @@ trait BusinessRegisteredWithHMRCBeforeController extends BaseController {
               aboutTheBusiness.previouslyRegistered(data)
             )
           } yield edit match {
-              // TODO summary doesn't exits for now
-              // case true => Redirect(routes.AboutTheBusinessSummaryController.get())
-               case false => Redirect(routes.BusinessRegisteredForVATController.get())
-      }
+            // TODO summary doesn't exits for now
+            // case true => Redirect(routes.AboutTheBusinessSummaryController.get())
+            case false => Redirect(routes.VATRegisteredController.get())
+          }
       }
     }
   }
 }
 
-object BusinessRegisteredWithHMRCBeforeController extends BusinessRegisteredWithHMRCBeforeController {
+object PreviouslyRegisteredController extends PreviouslyRegisteredController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

@@ -11,39 +11,42 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait BusinessRegisteredForVATController extends BaseController {
+trait VATRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_, Some(data), _)) => Ok(views.html.business_reg_for_vat(Form2[RegisteredForVAT](data), edit))
-        case _ => Ok(views.html.business_reg_for_vat(EmptyForm, edit))
+        case Some(AboutTheBusiness(_, Some(data), _, _)) =>
+          Ok(views.html.business_reg_for_vat(Form2[VATRegistered](data), edit))
+        case _ =>
+          Ok(views.html.business_reg_for_vat(EmptyForm, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[RegisteredForVAT](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.business_reg_for_vat(f, edit)))
+      Form2[VATRegistered](request.body) match {
+        case f: InvalidForm =>
+          Future.successful(BadRequest(views.html.business_reg_for_vat(f, edit)))
         case ValidForm(_, data) =>
           for {
             aboutTheBusiness <- dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.registeredForVAT(data)
+              aboutTheBusiness.vatRegistered(data)
             )
           } yield edit match {
               // TODO
 //            case true => Redirect(routes.BusinessRegisteredForVATController.get())
-            case false => Redirect(routes.RegOfficeOrMainPlaceOfBusinessController.get())
+            case false => Redirect(routes.ConfirmRegisteredOfficeController.get())
           }
       }
     }
   }
 }
 
-object BusinessRegisteredForVATController extends BusinessRegisteredForVATController {
+object VATRegisteredController extends VATRegisteredController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

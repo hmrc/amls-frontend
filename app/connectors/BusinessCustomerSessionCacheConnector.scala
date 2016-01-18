@@ -20,6 +20,12 @@ trait BusinessCustomerSessionCacheConnector {
   def getReviewBusinessDetails[T](implicit hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
     fetchAndGetData[T](BCSourceId)
   }
+
+/*  def getBusinessAddress (implicit hc: HeaderCarrier) : Future[Option[RegisteredOfficeOrMainPlaceOfBusiness]]= {
+    for {
+      reviewBusinessDetails <- getReviewBusinessDetails[RegisteredOfficeOrMainPlaceOfBusiness]
+    } yield (reviewBusinessDetails)
+  }*/
 }
 
 object BusinessCustomerSessionCacheConnector extends BusinessCustomerSessionCacheConnector {

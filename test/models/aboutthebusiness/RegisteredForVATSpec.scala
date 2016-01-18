@@ -13,8 +13,8 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
 
-      RegisteredForVAT.formRule.validate(Map("registeredForVAT" -> Seq("false"))) must
-        be(Success(RegisteredForVATNo))
+      VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("false"))) must
+        be(Success(VATRegisteredNo))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -24,8 +24,8 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
         "vrnNumber" -> Seq("123456789")
       )
 
-      RegisteredForVAT.formRule.validate(data) must
-        be(Success(RegisteredForVATYes("123456789")))
+      VATRegistered.formRule.validate(data) must
+        be(Success(VATRegisteredYes("123456789")))
     }
 
     "fail to validate given an `Yes` with no value" in {
@@ -34,7 +34,7 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
         "registeredForVAT" -> Seq("true")
       )
 
-      RegisteredForVAT.formRule.validate(data) must
+      VATRegistered.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "vrnNumber") -> Seq(ValidationError("error.required"))
         )))
@@ -42,14 +42,14 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
 
     "write correct data from enum value" in {
 
-      RegisteredForVAT.formWrites.writes(RegisteredForVATNo) must
+      VATRegistered.formWrites.writes(VATRegisteredNo) must
         be(Map("registeredForVAT" -> Seq("false")))
 
     }
 
     "write correct data from `Yes` value" in {
 
-      RegisteredForVAT.formWrites.writes(RegisteredForVATYes("12345678")) must
+      VATRegistered.formWrites.writes(VATRegisteredYes("12345678")) must
         be(Map("registeredForVAT" -> Seq("true"), "vrnNumber" -> Seq("12345678")))
     }
   }
@@ -58,32 +58,32 @@ class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
 
-      Json.fromJson[RegisteredForVAT](Json.obj("registeredForVAT" -> false)) must
-        be(JsSuccess(RegisteredForVATNo, JsPath \ "registeredForVAT"))
+      Json.fromJson[VATRegistered](Json.obj("registeredForVAT" -> false)) must
+        be(JsSuccess(VATRegisteredNo, JsPath \ "registeredForVAT"))
     }
 
     "successfully validate given an `Yes` value" in {
 
       val json = Json.obj("registeredForVAT" -> true, "vrnNumber" ->"12345678")
 
-      Json.fromJson[RegisteredForVAT](json) must
-        be(JsSuccess(RegisteredForVATYes("12345678"), JsPath \ "registeredForVAT" \ "vrnNumber"))
+      Json.fromJson[VATRegistered](json) must
+        be(JsSuccess(VATRegisteredYes("12345678"), JsPath \ "registeredForVAT" \ "vrnNumber"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
 
       val json = Json.obj("registeredForVAT" -> true)
 
-      Json.fromJson[RegisteredForVAT](json) must
+      Json.fromJson[VATRegistered](json) must
         be(JsError((JsPath \ "registeredForVAT" \ "vrnNumber") -> ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {
 
-      Json.toJson(RegisteredForVATNo) must
+      Json.toJson(VATRegisteredNo) must
         be(Json.obj("registeredForVAT" -> false))
 
-      Json.toJson(RegisteredForVATYes("12345678")) must
+      Json.toJson(VATRegisteredYes("12345678")) must
         be(Json.obj(
           "registeredForVAT" -> true,
           "vrnNumber" -> "12345678"

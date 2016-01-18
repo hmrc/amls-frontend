@@ -1,34 +1,82 @@
 @import forms.Form2
-@import include.{main, heading}
+@import include._
 @import include.forms2._
-@import utils.CommonHelper._
-@import models.aboutthebusiness._
 
-@(f: Form2[_], reviewBusinessDetails: BusinessCustomerDetails)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@targetYes = @{
+    s"""${f("postCode").id}-fieldset"""
+}
+@targetNo = @{
+    s"""${f("country").id}-fieldset"""
+}
 
 @main(
-    title = Messages("aboutthebusiness.confirmingyouraddress.title")
+    title = Messages("aboutthebusiness.registeredoffice.title")
 ) {
-    @heading("aboutthebusiness.confirmingyouraddress.title", "aboutthebusiness.sectiontitle")
 
-    @form(f, controllers.aboutthebusiness.routes.RegOfficeOrMainPlaceOfBusinessController.post()) {
-          <div class="panel-indent">
-            <ul>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessName</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_1</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_2</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_3.getOrElse("")</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.line_4.getOrElse("")</li>
-                <li class="no-padding no-margin">@reviewBusinessDetails.businessAddress.postcode.getOrElse("")</li>
-            </ul>
-        </div>
+    @heading("aboutthebusiness.registeredoffice.title", "summary.aboutbusiness")
 
-        @inlineRadioGroup(f("isRegOfficeOrMainPlaceOfBusiness")) {
+    @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.post(edit)) {
+
+        @inlineRadioGroup(f("isUKOrOverseas")) {
             @legend("TODO", jsHidden = true)
-            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.yes", "true")
-            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.no", "false")
-        }
+            @radio(f("isUKOrOverseas"), "lbl.uk", "true", target = s"#$targetYes")
+            @radio(f("isUKOrOverseas"), "lbl.overseas", "false", target = s"#$targetNo")
 
-        @submit()
+            @fieldset("TODO", jsHidden = true, id = targetYes) {
+                @input(
+                    field = f("addressLine1"),
+                    labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
+                )
+
+                @input(
+                    field = f("addressLine2"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLine3"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLine4"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("postCode"),
+                    labelText = Messages("aboutthebusiness.registeredoffice.postcode.lbl")
+                )
+            }
+            @fieldset("TODO", jsHidden = true, id = targetNo) {
+                @input(
+                    field = f("addressLineNonUK1"),
+                    labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
+                )
+
+                @input(
+                    field = f("addressLineNonUK2"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLineNonUK3"),
+                    labelText = ""
+                )
+
+                @input(
+                    field = f("addressLineNonUK4"),
+                    labelText = ""
+                )
+
+                 @input(
+                    field = f("country"),
+                    labelText = Messages("aboutthebusiness.registeredoffice.country.lbl")
+                )
+            }
+        }
+        @submit(edit)
     }
 }

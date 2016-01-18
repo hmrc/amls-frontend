@@ -15,7 +15,7 @@
 
     <p>@Messages("aboutthebusiness.registeredformlr.lbl")</p>
 
-    @form(f, controllers.aboutthebusiness.routes.BusinessRegisteredWithHMRCBeforeController.post(edit)) {
+    @form(f, controllers.aboutthebusiness.routes.PreviouslyRegisteredController.post(edit)) {
 
         @inlineRadioGroup(f("previouslyRegistered")) {
             @legend("TODO", jsHidden = true)
