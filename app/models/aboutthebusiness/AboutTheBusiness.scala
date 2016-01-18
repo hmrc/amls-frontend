@@ -1,12 +1,10 @@
 package models.aboutthebusiness
 
-import play.api.libs.json.Json
-
 case class AboutTheBusiness(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
                              registeredForVAT: Option[RegisteredForVAT] = None,
                              contactingYou: Option[ContactingYou] = None
-                     ) {
+                             ) {
 
   def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness =
     this.copy(previouslyRegistered = Some(v))
@@ -22,8 +20,8 @@ case class AboutTheBusiness(
 
 object AboutTheBusiness {
 
-  import play.api.libs.json._
   import play.api.libs.functional.syntax._
+  import play.api.libs.json._
 
   val key = "about-the-business"
   implicit val reads: Reads[AboutTheBusiness] = (

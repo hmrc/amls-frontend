@@ -1,12 +1,9 @@
 package models.aboutthebusiness
 
-import play.api.data.mapping.{To, Write, From, Rule}
 import play.api.data.mapping.forms._
+import play.api.data.mapping.{From, Rule, To, Write}
 import play.api.libs.json.Json
 
-/**
-  * Created by user on 15/01/16.
-  */
 case class ContactingYou(phoneNumber: String, email: String, website: String)
 
 object ContactingYou {
@@ -32,7 +29,7 @@ object ContactingYou {
   }
 }
 
-case class ContactingYouDetails(phoneNumber: String, email: String, website: String, sendLettersToThisAddress:Boolean)
+case class ContactingYouDetails(phoneNumber: String, email: String, website: String, sendLettersToThisAddress: Boolean)
 
 object ContactingYouDetails {
 
@@ -43,7 +40,7 @@ object ContactingYouDetails {
       (__ \ "phoneNumber").read(minLength(1)) and
         (__ \ "email").read(minLength(1)) and
         (__ \ "website").read[String] and
-        (__ \ "sendLettersToThisAddress").read[Boolean]
+        (__ \ "letterToThisAddress").read[Boolean]
       )(ContactingYouDetails.apply _)
   }
 
@@ -54,7 +51,7 @@ object ContactingYouDetails {
       (__ \ "phoneNumber").write[String] and
         (__ \ "email").write[String] and
         (__ \ "website").write[String] and
-        (__ \ "sendLettersToThisAddress").write[Boolean]
+        (__ \ "letterToThisAddress").write[Boolean]
       )(unlift(ContactingYouDetails.unapply _))
   }
 }
