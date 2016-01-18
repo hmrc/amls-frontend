@@ -1,9 +1,12 @@
 package connectors
 
 import config.BusinessCustomerSessionCache
+import models.aboutthebusiness.{BusinessCustomerDetails, RegisteredOfficeOrMainPlaceOfBusiness}
 import play.api.libs.json
 import uk.gov.hmrc.http.cache.client.SessionCache
 import uk.gov.hmrc.play.http.HeaderCarrier
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -20,6 +23,12 @@ trait BusinessCustomerSessionCacheConnector {
   def getReviewBusinessDetails[T](implicit hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
     fetchAndGetData[T](BCSourceId)
   }
+
+/*  def getBusinessAddress (implicit hc: HeaderCarrier) : Future[Option[RegisteredOfficeOrMainPlaceOfBusiness]]= {
+    for {
+      reviewBusinessDetails <- getReviewBusinessDetails[RegisteredOfficeOrMainPlaceOfBusiness]
+    } yield (reviewBusinessDetails)
+  }*/
 }
 
 object BusinessCustomerSessionCacheConnector extends BusinessCustomerSessionCacheConnector {
