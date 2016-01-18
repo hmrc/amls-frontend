@@ -19,18 +19,18 @@ GET         /about-you/role-within-business            controllers.aboutyou.Role
 POST        /about-you/role-within-business            controllers.aboutyou.RoleWithinBusinessController.post(edit: Boolean ?= false)
 GET         /about-you/summary                         controllers.aboutyou.SummaryController.get()
 
-#GET         /business-details/contacting-you          controllers.aboutthebusiness.ContactingYouController.get()
-#POST        /business-details/contacting-you          controllers.aboutthebusiness.ContactingYouController.post()
+GET         /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
+POST        /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
-GET         /business-details/index                    controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.get(edit: Boolean ?= false)
-POST        /business-details/index                    controllers.aboutthebusiness.BusinessRegisteredWithHMRCBeforeController.post(edit: Boolean ?= false)
+GET         /business-details/index                    controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/index                    controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-details/vat                      controllers.aboutthebusiness.BusinessRegisteredForVATController.get(edit: Boolean ?= false)
-POST        /business-details/vat                      controllers.aboutthebusiness.BusinessRegisteredForVATController.post(edit: Boolean ?= false)
+GET         /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.get()
-POST        /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.post()
+GET         /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
-GET         /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeOrMainPlaceOfBusinessController.get(edit: Boolean ?= false)
-POST        /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeOrMainPlaceOfBusinessController.post(edit: Boolean ?= false)
+GET         /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
 

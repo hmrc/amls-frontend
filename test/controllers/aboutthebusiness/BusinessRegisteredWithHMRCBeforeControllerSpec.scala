@@ -18,7 +18,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new BusinessRegisteredWithHMRCBeforeController {
+    val controller = new PreviouslyRegisteredController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }

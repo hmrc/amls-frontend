@@ -17,7 +17,7 @@
 
     @heading("aboutthebusiness.registeredoffice.title", "summary.aboutbusiness")
 
-    @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeOrMainPlaceOfBusinessController.post(edit)) {
+    @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.post(edit)) {
 
         @inlineRadioGroup(f("isUKOrOverseas")) {
             @legend("TODO", jsHidden = true)

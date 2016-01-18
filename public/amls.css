@@ -29,6 +29,10 @@ div.grid-layout {
     margin : 0;
 }
 
+.address-list li {
+    margin : 0;
+}
+
 
 /* form errors */
 .amls-error-summary {

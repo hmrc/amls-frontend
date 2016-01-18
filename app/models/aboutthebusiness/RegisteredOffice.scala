@@ -5,52 +5,52 @@ import play.api.data.mapping.forms._
 import play.api.data.mapping._
 import play.api.libs.json.{Writes, Reads, Json}
 
-sealed trait RegisteredOfficeOrMainPlaceOfBusiness
+sealed trait RegisteredOffice
 
-case class RegisteredOfficeOrMainPlaceOfBusinessUK(
-                                             addressLine1: String,
-                                             addressLine2: String,
-                                             addressLine3: Option[String] = None,
-                                             addressLine4: Option[String] = None,
-                                             postCode : String
-                                           ) extends RegisteredOfficeOrMainPlaceOfBusiness
+case class RegisteredOfficeUK(
+                               addressLine1: String,
+                               addressLine2: String,
+                               addressLine3: Option[String] = None,
+                               addressLine4: Option[String] = None,
+                               postCode: String
+                             ) extends RegisteredOffice
 
-case class RegisteredOfficeOrMainPlaceOfBusinessNonUK(
-                                                addressLine1: String,
-                                                addressLine2: String,
-                                                addressLine3: Option[String] = None,
-                                                addressLine4: Option[String] = None,
-                                                country : String
-                                              ) extends RegisteredOfficeOrMainPlaceOfBusiness
+case class RegisteredOfficeNonUK(
+                                  addressLine1: String,
+                                  addressLine2: String,
+                                  addressLine3: Option[String] = None,
+                                  addressLine4: Option[String] = None,
+                                  country: String
+                                ) extends RegisteredOffice
 
-object RegisteredOfficeOrMainPlaceOfBusiness {
+object RegisteredOffice {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val formRule: Rule[UrlFormEncoded, RegisteredOfficeOrMainPlaceOfBusiness] = From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "isUKOrOverseas").read[Boolean] flatMap[RegisteredOfficeOrMainPlaceOfBusiness] {
+    (__ \ "isUKOrOverseas").read[Boolean] flatMap[RegisteredOffice] {
       case true =>
         (
           (__ \ "addressLine1").read(addressType) and
             (__ \ "addressLine2").read(addressType) and
-            (__ \ "addressLine3").read[Option[String]] and
-            (__ \ "addressLine4").read[Option[String]] and
+            (__ \ "addressLine3").read(optionR(addressType)) and
+            (__ \ "addressLine4").read(optionR(addressType)) and
             (__ \ "postCode").read(postCodeType)
-          )(RegisteredOfficeOrMainPlaceOfBusinessUK.apply _)
+          ) (RegisteredOfficeUK.apply _)
       case false =>
         (
           (__ \ "addressLineNonUK1").read(addressType) and
             (__ \ "addressLineNonUK2").read(addressType) and
-            (__ \ "addressLineNonUK3").read[Option[String]] and
-            (__ \ "addressLineNonUK4").read[Option[String]] and
+            (__ \ "addressLineNonUK3").read(optionR(addressType)) and
+            (__ \ "addressLineNonUK4").read(optionR(addressType)) and
             (__ \ "country").read(countryType)
-          )(RegisteredOfficeOrMainPlaceOfBusinessNonUK.apply _)
+          ) (RegisteredOfficeNonUK.apply _)
     }
   }
 
-  implicit val formWrites: Write[RegisteredOfficeOrMainPlaceOfBusiness, UrlFormEncoded] = Write {
-    case f: RegisteredOfficeOrMainPlaceOfBusinessUK =>
+  implicit val formWrites: Write[RegisteredOffice, UrlFormEncoded] = Write {
+    case f: RegisteredOfficeUK =>
       Map(
         "isUKOrOverseas" -> Seq("true"),
         "addressLine1" -> f.addressLine1,
@@ -59,7 +59,7 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
         "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
         "postCode" -> f.postCode
       )
-    case f: RegisteredOfficeOrMainPlaceOfBusinessNonUK =>
+    case f: RegisteredOfficeNonUK =>
       Map(
         "isUKOrOverseas" -> Seq("false"),
         "addressLineNonUK1" -> f.addressLine1,
@@ -70,7 +70,7 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
       )
   }
 
-  implicit val jsonReads: Reads[RegisteredOfficeOrMainPlaceOfBusiness] = {
+  implicit val jsonReads: Reads[RegisteredOffice] = {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
@@ -82,7 +82,7 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
             (__ \ "addressLine3").read[Option[String]] and
             (__ \ "addressLine4").read[Option[String]] and
             (__ \ "postCode").read[String]
-          )(RegisteredOfficeOrMainPlaceOfBusinessUK.apply _) map identity[RegisteredOfficeOrMainPlaceOfBusiness]
+          ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
         (__ \ "addressLineNonUK1").read[String] and
@@ -90,19 +90,19 @@ object RegisteredOfficeOrMainPlaceOfBusiness {
           (__ \ "addressLineNonUK3").read[Option[String]] and
           (__ \ "addressLineNonUK4").read[Option[String]] and
           (__ \ "country").read[String]
-        )(RegisteredOfficeOrMainPlaceOfBusinessNonUK.apply _)
+        ) (RegisteredOfficeNonUK.apply _)
   }
 
-  implicit val jsonWrites = Writes[RegisteredOfficeOrMainPlaceOfBusiness] {
-    case m: RegisteredOfficeOrMainPlaceOfBusinessUK =>
+  implicit val jsonWrites = Writes[RegisteredOffice] {
+    case m: RegisteredOfficeUK =>
       Json.obj("isUKOrOverseas" -> true,
         "addressLine1" -> m.addressLine1,
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
         "postCode" -> m.postCode)
-    case m: RegisteredOfficeOrMainPlaceOfBusinessNonUK =>
-      Json.obj( "isUKOrOverseas" -> false,
+    case m: RegisteredOfficeNonUK =>
+      Json.obj("isUKOrOverseas" -> false,
         "addressLineNonUK1" -> m.addressLine1,
         "addressLineNonUK2" -> m.addressLine2,
         "addressLineNonUK3" -> m.addressLine3,

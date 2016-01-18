@@ -2,7 +2,7 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import models.aboutthebusiness.{ConfirmRegisteredOfficeOrMainPlaceOfBusiness, BCAddress, BusinessCustomerDetails}
+import models.aboutthebusiness.{ConfirmingRegisteredOffice$, BCAddress, BusinessCustomerDetails}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -20,8 +20,8 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new ConfirmRegisteredOfficeOrMainPlaceOfBusinessController {
-      override val dataCacheConnector = mock[DataCacheConnector]
+    val controller = new ConfirmRegisteredOfficeController {
+      override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val businessCustomerSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
     }
@@ -35,9 +35,9 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
   "ConfirmRegisteredOfficeOrMainPlaceOfBusinessController" must {
 
     "use correct services" in new Fixture {
-      ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.authConnector must be(AMLSAuthConnector)
-      ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.dataCacheConnector must be(DataCacheConnector)
-      ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.businessCustomerSessionCacheConnector must be(BusinessCustomerSessionCacheConnector)
+      ConfirmRegisteredOfficeController.authConnector must be(AMLSAuthConnector)
+      ConfirmRegisteredOfficeController.dataCache must be(DataCacheConnector)
+      ConfirmRegisteredOfficeController.businessCustomerSessionCacheConnector must be(BusinessCustomerSessionCacheConnector)
     }
 
     "Get Option:" must {
@@ -53,7 +53,7 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
 
       "load Registered office or main place of business when Business Address from save4later returns None" in new Fixture {
 
-        val registeredAddress = ConfirmRegisteredOfficeOrMainPlaceOfBusiness(isRegOfficeOrMainPlaceOfBusiness = true)
+        val registeredAddress = ConfirmingRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
 
         when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
           .thenReturn(Future.successful(None))

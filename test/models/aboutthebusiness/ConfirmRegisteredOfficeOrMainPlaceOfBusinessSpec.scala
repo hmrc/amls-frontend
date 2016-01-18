@@ -13,8 +13,8 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with Moc
         "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
       )
 
-      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
-        be(Success(ConfirmRegisteredOfficeOrMainPlaceOfBusiness(true)))
+      ConfirmRegisteredOffice.formRule.validate(data) must
+        be(Success(ConfirmRegisteredOffice(true)))
     }
 
     "successfully validate given a data model" in {
@@ -23,13 +23,13 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with Moc
         "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
       )
 
-      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
-        be(Success(ConfirmRegisteredOfficeOrMainPlaceOfBusiness(true)))
+      ConfirmRegisteredOffice.formRule.validate(data) must
+        be(Success(ConfirmRegisteredOffice(true)))
     }
 
     "fail to validate when given invalid data" in {
 
-      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(Map.empty) must
+      ConfirmRegisteredOffice.formRule.validate(Map.empty) must
         be(Failure(Seq(
           (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required"))
         )))
@@ -37,9 +37,9 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with Moc
 
     "write correct data" in {
 
-      val model = ConfirmRegisteredOfficeOrMainPlaceOfBusiness(true)
+      val model = ConfirmRegisteredOffice(true)
 
-      ConfirmRegisteredOfficeOrMainPlaceOfBusiness.formWrites.writes(model) must
+      ConfirmRegisteredOffice.formWrites.writes(model) must
         be(Map(
           "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
         ))

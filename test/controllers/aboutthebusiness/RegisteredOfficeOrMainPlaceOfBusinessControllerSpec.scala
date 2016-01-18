@@ -2,7 +2,7 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{RegisteredOfficeOrMainPlaceOfBusinessUK, AboutTheBusiness}
+import models.aboutthebusiness.{RegisteredOfficeUK, AboutTheBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -20,7 +20,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new RegisteredOfficeOrMainPlaceOfBusinessController () {
+    val controller = new RegisteredOfficeController$ () {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -29,11 +29,11 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
   "RegisteredOfficeOrMainPlaceOfBusinessController" must {
 
     "use correct services" in new Fixture {
-      RegisteredOfficeOrMainPlaceOfBusinessController.authConnector must be(AMLSAuthConnector)
-      RegisteredOfficeOrMainPlaceOfBusinessController.dataCacheConnector must be(DataCacheConnector)
+      RegisteredOfficeController$.authConnector must be(AMLSAuthConnector)
+      RegisteredOfficeController$.dataCacheConnector must be(DataCacheConnector)
     }
 
-    val ukAddress = RegisteredOfficeOrMainPlaceOfBusinessUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+    val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
 
     "load the where is your registered office or main place of business place page" in new Fixture {
 

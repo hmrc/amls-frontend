@@ -21,8 +21,8 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "postCode" -> Seq("NE7 7DX")
       )
 
-      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
-        be(Success(RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "NE7 7DX")))
+      RegisteredOffice.formRule.validate(model) must
+        be(Success(RegisteredOfficeUK("38B", "Longbenton", None, None, "NE7 7DX")))
     }
 
     "validate the given non UK address" in {
@@ -35,8 +35,8 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "country" -> Seq("UK")
       )
 
-      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(model) must
-        be(Success(RegisteredOfficeOrMainPlaceOfBusinessNonUK("38B", "Longbenton", None, None, "UK")))
+      RegisteredOffice.formRule.validate(model) must
+        be(Success(RegisteredOfficeNonUK("38B", "Longbenton", None, None, "UK")))
     }
 
     "fail to validation for not filling mandatory field" in {
@@ -48,7 +48,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "postCode" -> Seq("UK")
       )
 
-      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+      RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required")),
           (Path \ "country") -> Seq(ValidationError("error.required"))
@@ -63,7 +63,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "country" -> Seq("")
       )
 
-      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+      RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "isUKOrOverseas") -> Seq(ValidationError("error.required"))
 
@@ -80,7 +80,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
         "postCode" -> Seq("UK"*12)
       )
 
-      RegisteredOfficeOrMainPlaceOfBusiness.formRule.validate(data) must
+      RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "addressLine2") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
           (Path \ "postCode") -> Seq(ValidationError("error.maxLength", FormTypes.maxPostCodeTypeLength))
@@ -89,9 +89,9 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
     "write correct data to the model " in {
 
-      val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", None, None, "NE7 7DX")
+      val data = RegisteredOfficeUK("38B", "Longbenton", None, None, "NE7 7DX")
 
-      RegisteredOfficeOrMainPlaceOfBusiness.formWrites.writes(data) must be
+      RegisteredOffice.formWrites.writes(data) must be
       Map("addressLine1" -> "38B",
         "addressLine2" -> "Longbenton",
         "addressLine3" -> "",
@@ -101,15 +101,15 @@ class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSug
 
     "json read the given non UK address" in {
 
-      val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
+      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
       val jsonObj = Json.obj("postCode" -> "NE7 7DX")
 
-      Json.fromJson[RegisteredOfficeOrMainPlaceOfBusiness](jsonObj) must be
+      Json.fromJson[RegisteredOffice](jsonObj) must be
       JsSuccess(data, JsPath \ "postCode")
     }
 
     "write correct value to json" in {
-      val data = RegisteredOfficeOrMainPlaceOfBusinessUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
+      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
 
       Json.toJson(data) must
         be( Json.obj("isUKOrOverseas" -> true,
