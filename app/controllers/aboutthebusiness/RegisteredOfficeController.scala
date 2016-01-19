@@ -10,8 +10,9 @@ import scala.concurrent.Future
 
 trait RegisteredOfficeController extends BaseController  {
 
-  val dataCacheConnector: DataCacheConnector
-  val preSelectUK = RegisteredOfficeUK("","",Some(""), Some(""), "")
+  protected val dataCacheConnector: DataCacheConnector
+
+  private val preSelectUK = RegisteredOfficeUK("","", None, None, "")
 
   def get(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
