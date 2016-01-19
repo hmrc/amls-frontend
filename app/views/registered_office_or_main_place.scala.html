@@ -19,64 +19,47 @@
 
     @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.post(edit)) {
 
-        @inlineRadioGroup(f("isUKOrOverseas")) {
+        @inlineRadioGroup(f("isUK")) {
             @legend("TODO", jsHidden = true)
-            @radio(f("isUKOrOverseas"), "lbl.uk", "true", target = s"#$targetYes")
-            @radio(f("isUKOrOverseas"), "lbl.overseas", "false", target = s"#$targetNo")
-
-            @fieldset("TODO", jsHidden = true, id = targetYes) {
-                @input(
-                    field = f("addressLine1"),
-                    labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
-                )
-
-                @input(
-                    field = f("addressLine2"),
-                    labelText = ""
-                )
-
-                @input(
-                    field = f("addressLine3"),
-                    labelText = ""
-                )
-
-                @input(
-                    field = f("addressLine4"),
-                    labelText = ""
-                )
-
-                @input(
-                    field = f("postCode"),
-                    labelText = Messages("aboutthebusiness.registeredoffice.postcode.lbl")
-                )
-            }
-            @fieldset("TODO", jsHidden = true, id = targetNo) {
-                @input(
-                    field = f("addressLineNonUK1"),
-                    labelText = Messages("aboutthebusiness.registeredoffice.address.lbl")
-                )
-
-                @input(
-                    field = f("addressLineNonUK2"),
-                    labelText = ""
-                )
-
-                @input(
-                    field = f("addressLineNonUK3"),
-                    labelText = ""
-                )
-
-                @input(
-                    field = f("addressLineNonUK4"),
-                    labelText = ""
-                )
-
-                 @input(
-                    field = f("country"),
-                    labelText = Messages("aboutthebusiness.registeredoffice.country.lbl")
-                )
-            }
+            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
+            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
         }
+
+        <fieldset class="">
+            <legend class="form-label-bold">
+                @Messages("aboutthebusiness.correspondenceaddress.address")
+            </legend>
+            @input(f("addressLine1"))
+            @input(f("addressLine2"))
+            @input(f("addressLine3"))
+            @input(f("addressLine4"))
+        </fieldset>
+
+        @fieldset(
+            legend = "TODO",
+            jsHidden = true,
+            panel = false,
+            id = s"""${f("postCode").id}-fieldset"""
+        ) {
+            @input(
+                field = f("postCode"),
+                labelText = "aboutthebusiness.correspondenceaddress.postCode",
+                classes = Seq("form-control-1-8")
+            )
+        }
+
+        @fieldset(
+            legend = "TODO",
+            jsHidden = true,
+            panel = false,
+            id = s"""${f("country").id}-fieldset"""
+        ) {
+            @input(
+                field = f("country"),
+                labelText = "aboutthebusiness.correspondenceaddress.country"
+            )
+        }
+
         @submit(edit)
     }
 }

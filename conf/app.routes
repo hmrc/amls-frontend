@@ -34,3 +34,5 @@ POST        /business-details/confirming-address       controllers.aboutthebusin
 GET         /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
 
+GET         /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
+POST        /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
