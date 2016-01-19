@@ -45,7 +45,6 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        //val jsonObject = JsObject(Seq("name" -> JsString("name Value")))
         contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.title"))
       }
 
@@ -56,6 +55,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
 
         val result = controller.get()(request)
         status(result) must be(OK)
+        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.title"))
       }
     }
 

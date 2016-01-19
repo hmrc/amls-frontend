@@ -50,5 +50,15 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
      completeJson.as[ContactingYouForm] must be(completeModel)
     }
 
+    "write correct data" in {
+      val model = ContactingYou("1234567890", "test@test.com", Some("http://www.test.com"))
+      ContactingYou.formWrites.writes(model) must
+        be(Map(
+          "phoneNumber" -> Seq("1234567890"),
+          "email" -> Seq("test@test.com"),
+          "website" -> Seq("http://www.test.com")
+        ))
+    }
+
   }
 }
