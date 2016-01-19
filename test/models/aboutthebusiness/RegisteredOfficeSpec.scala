@@ -7,7 +7,7 @@ import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, JsNull, Json}
 
-class RegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
+class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
   "RegisteredOfficeOrMainPlaceOfBusiness" must {
 
