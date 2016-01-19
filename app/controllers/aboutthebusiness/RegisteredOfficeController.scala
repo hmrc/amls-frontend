@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 trait RegisteredOfficeController extends BaseController  {
 
-  protected val dataCacheConnector: DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
   private val preSelectUK = RegisteredOfficeUK("","", None, None, "")
 
