@@ -27,8 +27,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
     )
 
-    
-    val completeModel = AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678")), Some(regForVAT), None, Some(regOfficeOrMainPlaceUK), None)
+
+    val completeModel = AboutTheBusiness(previouslyRegistered=Some(PreviouslyRegisteredYes("12345678")), vatRegistered = Some(regForVAT), registeredOffice = Some(regOfficeOrMainPlaceUK))
 
     "Serialise as expected" in {
 

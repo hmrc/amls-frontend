@@ -2,8 +2,8 @@ package controllers.aboutthebusiness
 
 import java.util.UUID
 
-import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import models.aboutthebusiness.{AboutTheBusiness, BCAddress, BusinessCustomerDetails, ContactingYou}
+import connectors.DataCacheConnector
+import models.aboutthebusiness.{RegisteredOfficeUK, AboutTheBusiness, ContactingYou}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -18,18 +18,16 @@ import scala.concurrent.Future
 
 class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
- /* val userId = s"user-${UUID.randomUUID}"
+  val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou("1234567890", "test@test.com", Some("http://mywebsite.co.uk")))
-  val aboutTheBusinessWithData = AboutTheBusiness(None, None, contactingYou)
-  val businessAddress = BCAddress("line_1", "2", Some("3"), Some("4"), Some("5"), "UK")
-  val businessCustomerData = BusinessCustomerDetails("name", Some("business_type"), businessAddress, "12345", "2345678", Some("12345678"), Some("John"), Some("San"))
+  val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+  val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou, registeredOffice = Some(ukAddress))
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
     val controller = new ContactingYouController {
       override val dataCache = mock[DataCacheConnector]
-      override val businessCustomerSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
       override val authConnector = self.authConnector
     }
   }
@@ -40,11 +38,10 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       "load the page" in new Fixture {
 
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerData)))
+        val aboutTheBusinessWithAddress = AboutTheBusiness(registeredOffice = Some(ukAddress))
 
         when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithAddress)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -53,9 +50,6 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
       }
 
       "load the page with the pre populated data" in new Fixture {
-
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerData)))
 
         when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
@@ -76,9 +70,6 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
           "letterToThisAddress" -> "true"
         )
 
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerData)))
-
         when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
@@ -97,9 +88,6 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
           "phoneNumber" -> "1234567890"
         )
 
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerData)))
-
         when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
@@ -110,6 +98,6 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         status(result) must be(BAD_REQUEST)
       }
     }
-  }*/
+  }
 
 }
