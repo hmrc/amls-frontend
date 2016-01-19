@@ -16,7 +16,7 @@ trait CorrespondenceAddressController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_, _, Some(data))) =>
+        case Some(AboutTheBusiness(_, _, _, _, Some(data))) =>
           Ok(views.html.business_correspondence_address(Form2[CorrespondenceAddress](data), edit))
         case _ =>
           Ok(views.html.business_correspondence_address(EmptyForm, edit))
@@ -26,7 +26,8 @@ trait CorrespondenceAddressController extends BaseController {
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddress](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.business_correspondence_address(f, edit)))
+        case f: InvalidForm =>
+          Future.successful(BadRequest(views.html.business_correspondence_address(f, edit)))
         case ValidForm(_, data) =>
           for {
             aboutTheBusiness <- dataConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)

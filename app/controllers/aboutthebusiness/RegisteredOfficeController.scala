@@ -16,7 +16,7 @@ trait RegisteredOfficeController extends BaseController  {
   def get(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_ , _, _, Some(data))) =>
+        case Some(AboutTheBusiness(_ , _, _, Some(data), _)) =>
           Ok(views.html.registered_office_or_main_place(Form2[RegisteredOffice](data), edit))
         case _ =>
           Ok(views.html.registered_office_or_main_place(Form2[RegisteredOffice](preSelectUK), edit))

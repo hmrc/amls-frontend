@@ -29,7 +29,7 @@ object RegisteredOffice {
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "isUKOrOverseas").read[Boolean] flatMap[RegisteredOffice] {
+    (__ \ "isUK").read[Boolean] flatMap[RegisteredOffice] {
       case true =>
         (
           (__ \ "addressLine1").read(addressType) and
@@ -40,19 +40,19 @@ object RegisteredOffice {
           ) (RegisteredOfficeUK.apply _)
       case false =>
         (
-          (__ \ "addressLineNonUK1").read(addressType) and
-            (__ \ "addressLineNonUK2").read(addressType) and
-            (__ \ "addressLineNonUK3").read(optionR(addressType)) and
-            (__ \ "addressLineNonUK4").read(optionR(addressType)) and
+          (__ \ "addressLine1").read(addressType) and
+            (__ \ "addressLine2").read(addressType) and
+            (__ \ "addressLine3").read(optionR(addressType)) and
+            (__ \ "addressLine4").read(optionR(addressType)) and
             (__ \ "country").read(countryType)
-          ) (RegisteredOfficeNonUK.apply _)
+          )(RegisteredOfficeNonUK.apply _)
     }
   }
 
   implicit val formWrites: Write[RegisteredOffice, UrlFormEncoded] = Write {
     case f: RegisteredOfficeUK =>
       Map(
-        "isUKOrOverseas" -> Seq("true"),
+        "isUK" -> Seq("true"),
         "addressLine1" -> f.addressLine1,
         "addressLine2" -> f.addressLine2,
         "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
@@ -61,11 +61,11 @@ object RegisteredOffice {
       )
     case f: RegisteredOfficeNonUK =>
       Map(
-        "isUKOrOverseas" -> Seq("false"),
-        "addressLineNonUK1" -> f.addressLine1,
-        "addressLineNonUK2" -> f.addressLine2,
-        "addressLineNonUK3" -> Seq(f.addressLine3.getOrElse("")),
-        "addressLineNonUK4" -> Seq(f.addressLine4.getOrElse("")),
+        "isUK" -> Seq("false"),
+        "addressLine1" -> f.addressLine1,
+        "addressLine2" -> f.addressLine2,
+        "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
+        "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
         "country" -> f.country
       )
   }
@@ -85,28 +85,28 @@ object RegisteredOffice {
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
-        (__ \ "addressLineNonUK1").read[String] and
-          (__ \ "addressLineNonUK2").read[String] and
-          (__ \ "addressLineNonUK3").read[Option[String]] and
-          (__ \ "addressLineNonUK4").read[Option[String]] and
+        (__ \ "addressLine1").read[String] and
+          (__ \ "addressLine2").read[String] and
+          (__ \ "addressLine3").read[Option[String]] and
+          (__ \ "addressLine4").read[Option[String]] and
           (__ \ "country").read[String]
         ) (RegisteredOfficeNonUK.apply _)
   }
 
   implicit val jsonWrites = Writes[RegisteredOffice] {
     case m: RegisteredOfficeUK =>
-      Json.obj("isUKOrOverseas" -> true,
+      Json.obj("isUK" -> true,
         "addressLine1" -> m.addressLine1,
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
         "postCode" -> m.postCode)
     case m: RegisteredOfficeNonUK =>
-      Json.obj("isUKOrOverseas" -> false,
-        "addressLineNonUK1" -> m.addressLine1,
-        "addressLineNonUK2" -> m.addressLine2,
-        "addressLineNonUK3" -> m.addressLine3,
-        "addressLineNonUK4" -> m.addressLine4,
+      Json.obj("isUK" -> false,
+        "addressLine1" -> m.addressLine1,
+        "addressLine2" -> m.addressLine2,
+        "addressLine3" -> m.addressLine3,
+        "addressLine4" -> m.addressLine4,
         "country" -> m.country)
   }
 }
