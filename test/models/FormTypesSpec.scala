@@ -186,4 +186,52 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
   }
+
+  "phoneNumberType" must {
+    "successfully validate" in {
+
+      phoneNumberType.validate("1234567890") must
+        be(Success("1234567890"))
+    }
+
+    "fail to validate an empty string" in {
+
+      phoneNumberType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 30" in {
+
+      phoneNumberType.validate("1" * 31) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 30))
+        )))
+    }
+  }
+
+  "emailType" must {
+    "successfully validate" in {
+
+      emailType.validate("test@test.com") must
+        be(Success("test@test.com"))
+    }
+
+    "fail to validate an empty string" in {
+
+      emailType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 100" in {
+
+      emailType.validate("1" * 101) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 100))
+        )))
+    }
+  }
 }
