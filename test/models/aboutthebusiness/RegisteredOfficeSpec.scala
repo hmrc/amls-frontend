@@ -13,7 +13,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "validate the given UK address" in {
       val model = Map(
-        "isUKOrOverseas" -> Seq("true"),
+        "isUK" -> Seq("true"),
         "addressLine1" -> Seq("38B"),
         "addressLine2" -> Seq("Longbenton"),
         "addressLine3" -> Seq(""),
@@ -27,7 +27,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "validate the given non UK address" in {
       val model = Map(
-        "isUKOrOverseas" -> Seq("false"),
+        "isUK" -> Seq("false"),
         "addressLineNonUK1" -> Seq("38B"),
         "addressLineNonUK2" -> Seq("Longbenton"),
         "addressLineNonUK3" -> Seq(""),
@@ -41,7 +41,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "fail to validation for not filling mandatory field" in {
       val data = Map(
-        "isUKOrOverseas" -> Seq("false"),
+        "isUK" -> Seq("false"),
         "addressLineNonUK2" -> Seq("Longbenton"),
         "addressLineNonUK3" -> Seq(""),
         "addressLineNonUK4" -> Seq(""),
@@ -65,14 +65,14 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
       RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "isUKOrOverseas") -> Seq(ValidationError("error.required"))
+          (Path \ "isUK") -> Seq(ValidationError("error.required"))
 
         )))
     }
 
     "fail to validation for invalid model" in {
       val data = Map(
-        "isUKOrOverseas" -> Seq("true"),
+        "isUK" -> Seq("true"),
         "addressLine1" -> Seq("38B"),
         "addressLine2" -> Seq("a"*36),
         "addressLine3" -> Seq(""),
@@ -112,7 +112,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
 
       Json.toJson(data) must
-        be( Json.obj("isUKOrOverseas" -> true,
+        be( Json.obj("isUK" -> true,
           "addressLine1" -> "38B",
           "addressLine2" -> "Longbenton",
           "addressLine3" -> "line 1",
