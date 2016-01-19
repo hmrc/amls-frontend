@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice}
+import models.aboutthebusiness.{RegisteredOfficeUK, AboutTheBusiness, RegisteredOffice}
 
 import scala.concurrent.Future
 
@@ -12,13 +12,15 @@ trait RegisteredOfficeController extends BaseController  {
 
   val dataCacheConnector: DataCacheConnector
 
+  private val preSelectUK = RegisteredOfficeUK("","", None, None, "")
+
   def get(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
         case Some(AboutTheBusiness(_ , _, _, Some(data), _)) =>
           Ok(views.html.registered_office_or_main_place(Form2[RegisteredOffice](data), edit))
         case _ =>
-          Ok(views.html.registered_office_or_main_place(EmptyForm, edit))
+          Ok(views.html.registered_office_or_main_place(Form2[RegisteredOffice](preSelectUK), edit))
       }
   }
 

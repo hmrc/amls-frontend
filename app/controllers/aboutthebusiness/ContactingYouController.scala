@@ -1,11 +1,10 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 trait ContactingYouController extends BaseController {
 
