@@ -29,7 +29,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "CA3 9ST")
   private val aboutTheBusiness = AboutTheBusiness(None, None, None, Some(ukAddress), None)
 
-  "ConfirmRegisteredOfficeOrMainPlaceOfBusinessController" must {
+  "ConfirmRegisteredOfficeController" must {
 
     "use correct services" in new Fixture {
       ConfirmRegisteredOfficeController.authConnector must be(AMLSAuthConnector)
@@ -102,17 +102,17 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
       }
 
-      "on post reload the same page when businessCustomerDetails is None" in new Fixture {
-
+      "on post with invalid data show error" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
-          "isRegOfficeOrMainPlaceOfBusiness" -> "898989"
+          "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
         when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include ("There are errors in your form submission")
+
       }
     }
   }

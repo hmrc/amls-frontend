@@ -26,7 +26,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
   }
 
-  "RegisteredOfficeOrMainPlaceOfBusinessController" must {
+  "RegisteredOfficeController" must {
 
     "use correct services" in new Fixture {
       RegisteredOfficeController.authConnector must be(AMLSAuthConnector)
@@ -66,7 +66,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       when (controller.dataCacheConnector.saveDataShortLivedCache(any(), any())(any(), any(), any())).thenReturn(Future.successful(None))
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isUKOrOverseas"-> "true",
+        "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
         "addressLine3"->"",
@@ -83,7 +83,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       when (controller.dataCacheConnector.saveDataShortLivedCache(any(), any())(any(), any(), any())).thenReturn(Future.successful(None))
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isUKOrOverseas"-> "true",
+        "isUK"-> "true",
         "addressLine2"->"line2",
         "addressLine3"->"",
         "addressLine4"->"",

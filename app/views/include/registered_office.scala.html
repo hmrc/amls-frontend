@@ -17,12 +17,12 @@
                 <li>@a.postCode</li>
             }
             case a: RegisteredOfficeNonUK => {
-                <li>@a.addressLine1</li>
-                <li>@a.addressLine2</li>
-                @a.addressLine3.map { line =>
+                <li>@a.addressLineNonUK1</li>
+                <li>@a.addressLineNonUK2</li>
+                @a.addressLineNonUK3.map { line =>
                     <li>@line</li>
                 }
-                @a.addressLine4.map { line =>
+                @a.addressLineNonUK4.map { line =>
                     <li>@line</li>
                 }
                 <li>@a.country</li>
