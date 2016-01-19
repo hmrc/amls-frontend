@@ -62,10 +62,10 @@ object RegisteredOffice {
     case f: RegisteredOfficeNonUK =>
       Map(
         "isUK" -> Seq("false"),
-        "addressLine1" -> f.addressLineNonUK1,
-        "addressLine2" -> f.addressLineNonUK2,
-        "addressLine3" -> Seq(f.addressLineNonUK3.getOrElse("")),
-        "addressLine4" -> Seq(f.addressLineNonUK4.getOrElse("")),
+        "addressLineNonUK1" -> f.addressLineNonUK1,
+        "addressLineNonUK2" -> f.addressLineNonUK2,
+        "addressLineNonUK3" -> Seq(f.addressLineNonUK3.getOrElse("")),
+        "addressLineNonUK4" -> Seq(f.addressLineNonUK4.getOrElse("")),
         "country" -> f.country
       )
   }
