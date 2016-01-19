@@ -2,7 +2,7 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
-import models.aboutthebusiness.{ConfirmingRegisteredOffice$, BCAddress, BusinessCustomerDetails}
+import models.aboutthebusiness._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -15,7 +15,7 @@ import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
-class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -23,29 +23,25 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
     val controller = new ConfirmRegisteredOfficeController {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
-      override val businessCustomerSessionCacheConnector = mock[BusinessCustomerSessionCacheConnector]
     }
   }
 
-  private val bCAddress = BCAddress("line_1", "line_2", Some(""), Some(""), Some("CA3 9ST"), "UK")
-  private val businessCustomerDetails = BusinessCustomerDetails("businessName", Some("businessType"),
-    bCAddress, "sapNumber", "safeId", Some("agentReferenceNumber"), Some("firstName"), Some("lastName"))
-
+  private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "CA3 9ST")
+  private val aboutTheBusiness = AboutTheBusiness(None, None, None, Some(ukAddress), None)
 
   "ConfirmRegisteredOfficeOrMainPlaceOfBusinessController" must {
 
     "use correct services" in new Fixture {
       ConfirmRegisteredOfficeController.authConnector must be(AMLSAuthConnector)
       ConfirmRegisteredOfficeController.dataCache must be(DataCacheConnector)
-      ConfirmRegisteredOfficeController.businessCustomerSessionCacheConnector must be(BusinessCustomerSessionCacheConnector)
     }
 
     "Get Option:" must {
 
       "load register Office" in new Fixture {
 
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerDetails)))
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))
@@ -53,14 +49,14 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
 
       "load Registered office or main place of business when Business Address from save4later returns None" in new Fixture {
 
-        val registeredAddress = ConfirmingRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
+        val registeredAddress = ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
 
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeOrMainPlaceOfBusinessController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
 
       }
     }
@@ -72,12 +68,12 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerDetails)))
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.BusinessRegisteredForVATController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ContactingYouController.get().url))
       }
 
       "successfully redirect to the page on selection of 'No' this is not registered address" in new Fixture {
@@ -85,20 +81,20 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerDetails)))
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeOrMainPlaceOfBusinessController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
       }
 
       "on post invalid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
         )
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
-          .thenReturn(Future.successful(Some(businessCustomerDetails)))
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -111,12 +107,12 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpe
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "898989"
         )
-        when(controller.businessCustomerSessionCacheConnector.getReviewBusinessDetails[BusinessCustomerDetails](any(), any()))
+        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeOrMainPlaceOfBusinessController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
       }
     }
   }

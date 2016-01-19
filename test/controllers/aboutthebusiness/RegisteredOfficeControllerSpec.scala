@@ -45,7 +45,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
       contentAsString(result) must include (Messages("aboutthebusiness.registeredoffice.title"))
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=isUKOrOverseas]").`val` must be("true")
+      document.select("input[name=isUK]").`val` must be("true")
       document.select("input[name=addressLine2]").`val` must be("")
 
     }
@@ -53,7 +53,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, Some(ukAddress)))))
+        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, Some(ukAddress), None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -74,7 +74,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
         "postCode"->"NE7 7DS")
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BusinessRegisteredForVATController.get().url))
+      redirectLocation(result) must be(Some(routes.ContactingYouController.get().url))
     }
 
     "fail form submission on validation error" in new Fixture {
