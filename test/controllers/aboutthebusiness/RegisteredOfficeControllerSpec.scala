@@ -15,12 +15,12 @@ import play.api.test.Helpers._
 import scala.concurrent.Future
 
 
-class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with  MockitoSugar{
+class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with  MockitoSugar{
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new RegisteredOfficeController$ () {
+    val controller = new RegisteredOfficeController () {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -29,8 +29,8 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
   "RegisteredOfficeOrMainPlaceOfBusinessController" must {
 
     "use correct services" in new Fixture {
-      RegisteredOfficeController$.authConnector must be(AMLSAuthConnector)
-      RegisteredOfficeController$.dataCacheConnector must be(DataCacheConnector)
+      RegisteredOfficeController.authConnector must be(AMLSAuthConnector)
+      RegisteredOfficeController.dataCacheConnector must be(DataCacheConnector)
     }
 
     val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
