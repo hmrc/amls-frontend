@@ -111,3 +111,19 @@ aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
 
+
+
+tradingpremises.whatyouneed.title=What you need
+tradingpremises.whatyouneed.paragraph1.text=We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
+tradingpremises.whatyouneed.requiredinfo.heading=For each of your trading premises, you'll need:
+tradingpremises.whatyouneed.requiredinfo.text.1=your trading name
+tradingpremises.whatyouneed.requiredinfo.text.2=whose premises they are
+tradingpremises.whatyouneed.requiredinfo.text.3=date you will start trading from these premises
+tradingpremises.whatyouneed.requiredinfo.text.4=whether or not it's a residential address
+tradingpremises.whatyouneed.agentinfo.heading=If your business uses agents, you'll need the following information for each one:
+tradingpremises.whatyouneed.agentinfo.text.1=your agent's registered business name
+tradingpremises.whatyouneed.agentinfo.text.1=your agent's Unique Tax Reference number
+tradingpremises.whatyouneed.agentinfo.text.1=the type of tax your agent pays
+tradingpremises.whatyouneed.agentinfo.text.1="our agent's business structure
+
+amls.timeout.continue_button.text=Continue
