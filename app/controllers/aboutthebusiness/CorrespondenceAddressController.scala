@@ -34,8 +34,7 @@ trait CorrespondenceAddressController extends BaseController {
             _ <- dataConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
               aboutTheBusiness.correspondenceAddress(data)
             )
-            //TODO Redirect to summary
-          } yield Ok("")
+          } yield Redirect(routes.SummaryController.get())
       }
     }
   }

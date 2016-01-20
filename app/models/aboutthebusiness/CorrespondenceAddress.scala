@@ -4,7 +4,31 @@ import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{From, Rule, Write}
 import play.api.libs.json.{Reads, Writes}
 
-sealed trait CorrespondenceAddress
+sealed trait CorrespondenceAddress {
+
+  def toLines: Seq[String] = this match {
+    case a: UKCorrespondenceAddress =>
+      Seq(
+        Some(a.yourName),
+        Some(a.businessName),
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.postCode)
+      ).flatten
+    case a: NonUKCorrespondenceAddress =>
+      Seq(
+        Some(a.yourName),
+        Some(a.businessName),
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.country)
+      ).flatten
+  }
+}
 
 case class UKCorrespondenceAddress(
                                   yourName: String,

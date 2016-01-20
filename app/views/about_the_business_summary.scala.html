@@ -1,0 +1,66 @@
+@import include._
+@import models.aboutthebusiness._
+
+@(model: AboutTheBusiness)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.aboutyou")
+
+    @model.registeredOffice.map { a =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("aboutthebusiness.registeredoffice.title")</th>
+                <td><a href="@controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @a.toLines.map { line =>
+                        @line<br/>
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.contactingYou.map { c =>
+        <table>
+
+            <tr>
+                <th class="summary-title">@Messages("aboutthebusiness.contactingyou.title")</th>
+                <td colspan="2"><a href="@controllers.aboutthebusiness.routes.ContactingYouController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+
+            <tr>
+                <td colspan="2">@c.phoneNumber</td>
+            </tr>
+
+            <tr>
+                <td colspan="2">@c.email</td>
+            </tr>
+
+            @c.website.map { a =>
+                <tr>
+                    <td colspan="2">@a</td>
+                </tr>
+            }
+
+            @{model.correspondenceAddress == None}
+
+            @model.correspondenceAddress.map { ca =>
+                <tr>
+                    <td colspan="2">
+                        ca.toLines.map { line =>
+                            foo<br/>
+                        }
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Accept and complete section</a>
+}

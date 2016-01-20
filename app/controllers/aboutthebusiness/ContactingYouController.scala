@@ -47,7 +47,7 @@ trait ContactingYouController extends BaseController {
               aboutTheBusiness.contactingYou(data)
             )
           } yield data.letterToThisAddress match {
-            case true => Redirect(routes.ContactingYouController.get(edit)) //TODO Go to the Summary Page
+            case true => Redirect(routes.SummaryController.get()) //TODO Go to the Summary Page
             case false => Redirect(routes.CorrespondenceAddressController.get(edit))
           }
       }
