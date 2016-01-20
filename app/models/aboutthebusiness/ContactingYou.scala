@@ -55,15 +55,4 @@ object ContactingYouForm {
         )(ContactingYouForm.apply _)
     }
 
-  implicit val formWrites: Write[ContactingYouForm, UrlFormEncoded] =
-    To[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Writes._
-      import play.api.libs.functional.syntax.unlift
-      (
-        (__ \ "phoneNumber").write[String] and
-          (__ \ "email").write[String] and
-          (__ \ "website").write[Option[String]] and
-          (__ \ "letterToThisAddress").write[Boolean]
-        ) (unlift(ContactingYouForm.unapply _))
-    }
 }
