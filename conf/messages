@@ -47,6 +47,7 @@ unauthorised.title = Unauthorised
 
 aboutyou.sectiontitle = About you
 aboutthebusiness.sectiontitle = About the business
+estateagentbusiness.sectiontitle = Estate agent business
 
 # Individual pages
 
@@ -55,6 +56,7 @@ summary.sectiontitle = Service
 summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
 summary.businessactivities = Business activities
 summary.aboutbusiness = About the business
+summary.estateagentbusiness = Estate agent business
 summary.tradingpremises = Trading premises
 summary.bankdetails = Bank account details
 summary.responsiblepersons = Responsible persons
@@ -111,4 +113,13 @@ aboutthebusiness.registeredoffice.title = Where is your registered office or mai
 aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
+
+estateagentbusiness.whatyouneed.title = What you need
+estateagentbusiness.whatyouneed.subtitle = You need the following information to complete this section
+estateagentbusiness.whatyouneed.line_1 = anticipated turnover for the next 12 months
+estateagentbusiness.whatyouneed.line_2 = franchisor''s name, if relevant
+estateagentbusiness.whatyouneed.line_3 = number of employees
+estateagentbusiness.whatyouneed.line_4 = list of countries where your most high-value customers live
+estateagentbusiness.whatyouneed.line_5 = how you record transactions, if relevant
+
 
