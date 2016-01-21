@@ -15,22 +15,22 @@ import play.api.test.Helpers._
 import scala.concurrent.Future
 
 
-class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with  MockitoSugar{
+class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with  MockitoSugar{
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new RegisteredOfficeController$ () {
+    val controller = new RegisteredOfficeController () {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
   }
 
-  "RegisteredOfficeOrMainPlaceOfBusinessController" must {
+  "RegisteredOfficeController" must {
 
     "use correct services" in new Fixture {
-      RegisteredOfficeController$.authConnector must be(AMLSAuthConnector)
-      RegisteredOfficeController$.dataCacheConnector must be(DataCacheConnector)
+      RegisteredOfficeController.authConnector must be(AMLSAuthConnector)
+      RegisteredOfficeController.dataCacheConnector must be(DataCacheConnector)
     }
 
     val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
@@ -45,7 +45,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
       contentAsString(result) must include (Messages("aboutthebusiness.registeredoffice.title"))
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=isUKOrOverseas]").`val` must be("true")
+      document.select("input[name=isUK]").`val` must be("true")
       document.select("input[name=addressLine2]").`val` must be("")
 
     }
@@ -53,7 +53,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, Some(ukAddress)))))
+        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, Some(ukAddress), None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -66,7 +66,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
       when (controller.dataCacheConnector.saveDataShortLivedCache(any(), any())(any(), any(), any())).thenReturn(Future.successful(None))
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isUKOrOverseas"-> "true",
+        "isUK"-> "true",
         "addressLine1"->"line1",
         "addressLine2"->"line2",
         "addressLine3"->"",
@@ -74,7 +74,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
         "postCode"->"NE7 7DS")
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BusinessRegisteredForVATController.get().url))
+      redirectLocation(result) must be(Some(routes.ContactingYouController.get().url))
     }
 
     "fail form submission on validation error" in new Fixture {
@@ -83,7 +83,7 @@ class RegisteredOfficeOrMainPlaceOfBusinessControllerSpec extends PlaySpec with 
       when (controller.dataCacheConnector.saveDataShortLivedCache(any(), any())(any(), any(), any())).thenReturn(Future.successful(None))
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isUKOrOverseas"-> "true",
+        "isUK"-> "true",
         "addressLine2"->"line2",
         "addressLine3"->"",
         "addressLine4"->"",

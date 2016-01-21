@@ -18,7 +18,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "prevMLRRegNo" -> "12345678",
       "registeredForVAT" -> true,
       "vrnNumber" -> "123456789",
-      "isUKOrOverseas" -> true,
+      "isUK" -> true,
       "addressLine1" -> "38B",
       "addressLine2" -> "Longbenton",
       "addressLine3" -> JsNull,
@@ -27,7 +27,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
     )
 
-    val completeModel = AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678")), Some(regForVAT), Some(regOfficeOrMainPlaceUK))
+
+    val completeModel = AboutTheBusiness(previouslyRegistered=Some(PreviouslyRegisteredYes("12345678")), vatRegistered = Some(regForVAT), registeredOffice = Some(regOfficeOrMainPlaceUK))
 
     "Serialise as expected" in {
 
@@ -77,14 +78,14 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "Merged with RegisteredForVAT" must {
       "return AboutTheBusiness with correct VAT Registered option" in {
         val result = initial.vatRegistered(regForVAT)
-        result must be (AboutTheBusiness(None, Some(regForVAT)))
+        result must be (AboutTheBusiness(None, Some(regForVAT), None, None, None))
       }
     }
 
     "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
       "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
         val result = initial.registeredOffice(regOfficeOrMainPlaceUK)
-        result must be (AboutTheBusiness(None, None, Some(regOfficeOrMainPlaceUK)))
+        result must be (AboutTheBusiness(None, None, None, Some(regOfficeOrMainPlaceUK)))
       }
     }
   }
@@ -116,7 +117,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
         "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
           val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, "UK")
           val result = initial.registeredOffice(newregOffice)
-          result must be (AboutTheBusiness(Some(previouslyRegistered), None, Some(newregOffice)))
+          result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, Some(newregOffice)))
         }
       }
     }
@@ -125,13 +126,13 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
       "previouslyRegistered already set" when {
 
-        val initial = AboutTheBusiness(None, Some(regForVAT), Some(regOfficeOrMainPlaceUK))
+        val initial = AboutTheBusiness(None, Some(regForVAT), None, Some(regOfficeOrMainPlaceUK))
 
         "return AboutTheBusiness with correct VAT registration number" must {
           "return AboutTheBusiness with correct previously registered status" in {
             val newPreviouslyRegistered = PreviouslyRegisteredYes("22222222")
             val result = initial.previouslyRegistered(newPreviouslyRegistered)
-            result must be(AboutTheBusiness(Some(newPreviouslyRegistered), Some(regForVAT), Some(regOfficeOrMainPlaceUK)))
+            result must be(AboutTheBusiness(Some(newPreviouslyRegistered), Some(regForVAT), None,  Some(regOfficeOrMainPlaceUK)))
           }
         }
 
@@ -139,7 +140,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "Merged with previously registered with MLR" in {
             val newregForVAT = VATRegisteredYes("012345678")
             val result = initial.vatRegistered(newregForVAT)
-            result must be(AboutTheBusiness(None, Some(newregForVAT), Some(regOfficeOrMainPlaceUK)))
+            result must be(AboutTheBusiness(None, Some(newregForVAT), None, Some(regOfficeOrMainPlaceUK)))
           }
         }
 
@@ -147,7 +148,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "return AboutTheBusiness with correct registered office detailes" in {
             val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, "UK")
             val result = initial.registeredOffice(newregOffice)
-            result must be(AboutTheBusiness(None, Some(regForVAT), Some(newregOffice)))
+            result must be(AboutTheBusiness(None, Some(regForVAT), None, Some(newregOffice)))
           }
         }
       }

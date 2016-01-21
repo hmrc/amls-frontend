@@ -36,10 +36,10 @@ case class RegisteredOfficeUK(
                              ) extends RegisteredOffice
 
 case class RegisteredOfficeNonUK(
-                                  addressLine1: String,
-                                  addressLine2: String,
-                                  addressLine3: Option[String] = None,
-                                  addressLine4: Option[String] = None,
+                                  addressLineNonUK1: String,
+                                  addressLineNonUK2: String,
+                                  addressLineNonUK3: Option[String] = None,
+                                  addressLineNonUK4: Option[String] = None,
                                   country: String
                                 ) extends RegisteredOffice
 
@@ -60,10 +60,10 @@ object RegisteredOffice {
           ) (RegisteredOfficeUK.apply _)
       case false =>
         (
-          (__ \ "addressLine1").read(addressType) and
-            (__ \ "addressLine2").read(addressType) and
-            (__ \ "addressLine3").read(optionR(addressType)) and
-            (__ \ "addressLine4").read(optionR(addressType)) and
+          (__ \ "addressLineNonUK1").read(addressType) and
+            (__ \ "addressLineNonUK2").read(addressType) and
+            (__ \ "addressLineNonUK3").read(optionR(addressType)) and
+            (__ \ "addressLineNonUK4").read(optionR(addressType)) and
             (__ \ "country").read(countryType)
           )(RegisteredOfficeNonUK.apply _)
     }
@@ -82,10 +82,10 @@ object RegisteredOffice {
     case f: RegisteredOfficeNonUK =>
       Map(
         "isUK" -> Seq("false"),
-        "addressLine1" -> f.addressLine1,
-        "addressLine2" -> f.addressLine2,
-        "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
-        "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
+        "addressLineNonUK1" -> f.addressLineNonUK1,
+        "addressLineNonUK2" -> f.addressLineNonUK2,
+        "addressLineNonUK3" -> Seq(f.addressLineNonUK3.getOrElse("")),
+        "addressLineNonUK4" -> Seq(f.addressLineNonUK4.getOrElse("")),
         "country" -> f.country
       )
   }
@@ -105,10 +105,10 @@ object RegisteredOffice {
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
-        (__ \ "addressLine1").read[String] and
-          (__ \ "addressLine2").read[String] and
-          (__ \ "addressLine3").read[Option[String]] and
-          (__ \ "addressLine4").read[Option[String]] and
+        (__ \ "addressLineNonUK1").read[String] and
+          (__ \ "addressLineNonUK2").read[String] and
+          (__ \ "addressLineNonUK3").read[Option[String]] and
+          (__ \ "addressLineNonUK4").read[Option[String]] and
           (__ \ "country").read[String]
         ) (RegisteredOfficeNonUK.apply _)
   }
@@ -123,10 +123,10 @@ object RegisteredOffice {
         "postCode" -> m.postCode)
     case m: RegisteredOfficeNonUK =>
       Json.obj("isUK" -> false,
-        "addressLine1" -> m.addressLine1,
-        "addressLine2" -> m.addressLine2,
-        "addressLine3" -> m.addressLine3,
-        "addressLine4" -> m.addressLine4,
+        "addressLineNonUK1" -> m.addressLineNonUK1,
+        "addressLineNonUK2" -> m.addressLineNonUK2,
+        "addressLineNonUK3" -> m.addressLineNonUK3,
+        "addressLineNonUK4" -> m.addressLineNonUK4,
         "country" -> m.country)
   }
 }
