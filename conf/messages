@@ -25,6 +25,7 @@ button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Edit
+button.continue=Continue
 
 lbl.other = Other
 lbl.yes = Yes
@@ -34,6 +35,7 @@ lbl.first_name = First name
 lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
 lbl.pleasespecify = Please specify
+lbl.na = Not applicable
 
 lbl.uk = UK
 lbl.overseas = Overseas
@@ -46,6 +48,7 @@ unauthorised.title = Unauthorised
 
 aboutyou.sectiontitle = About you
 aboutthebusiness.sectiontitle = About the business
+estateagentbusiness.sectiontitle = Estate agent business
 
 # Individual pages
 
@@ -54,6 +57,7 @@ summary.sectiontitle = Service
 summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
 summary.businessactivities = Business activities
 summary.aboutbusiness = About the business
+summary.estateagentbusiness = Estate agent business
 summary.tradingpremises = Trading premises
 summary.bankdetails = Bank account details
 summary.responsiblepersons = Responsible persons
@@ -111,8 +115,6 @@ aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
 
-
-
 tradingpremises.whatyouneed.title=What you need
 tradingpremises.whatyouneed.paragraph1.text=We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading=For each of your trading premises, you'll need:
@@ -126,4 +128,12 @@ tradingpremises.whatyouneed.agentinfo.text.1=your agent`s registered business na
 tradingpremises.whatyouneed.agentinfo.text.2=the type of tax your agent pays
 tradingpremises.whatyouneed.agentinfo.text.3=your agent`s business structure
 
-amls.continue_button.text=Continue
+
+estateagentbusiness.whatyouneed.title = What you need
+estateagentbusiness.whatyouneed.subtitle = You need the following information to complete this section
+estateagentbusiness.whatyouneed.line_1 = anticipated turnover for the next 12 months
+estateagentbusiness.whatyouneed.line_2 = franchisor''s name, if relevant
+estateagentbusiness.whatyouneed.line_3 = number of employees
+estateagentbusiness.whatyouneed.line_4 = list of countries where your most high-value customers live
+estateagentbusiness.whatyouneed.line_5 = how you record transactions, if relevant
+

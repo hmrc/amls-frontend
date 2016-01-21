@@ -4,29 +4,8 @@
 
 <div class="form-field">
     <ul class="panel-indent address-list">
-        @model match {
-            case a: RegisteredOfficeUK => {
-                <li>@a.addressLine1</li>
-                <li>@a.addressLine2</li>
-                @a.addressLine3.map { line =>
-                    <li>@line</li>
-                }
-                @a.addressLine4.map { line =>
-                    <li>@line</li>
-                }
-                <li>@a.postCode</li>
-            }
-            case a: RegisteredOfficeNonUK => {
-                <li>@a.addressLineNonUK1</li>
-                <li>@a.addressLineNonUK2</li>
-                @a.addressLineNonUK3.map { line =>
-                    <li>@line</li>
-                }
-                @a.addressLineNonUK4.map { line =>
-                    <li>@line</li>
-                }
-                <li>@a.country</li>
-            }
+        @model.toLines.map { line =>
+            <li>@line</li>
         }
     </ul>
 </div>

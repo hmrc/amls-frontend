@@ -22,6 +22,9 @@ case class AboutTheBusiness(
 
   def correspondenceAddress(v: CorrespondenceAddress): AboutTheBusiness =
     this.copy(correspondenceAddress = Some(v))
+
+  def correspondenceAddress(v: Option[CorrespondenceAddress]): AboutTheBusiness =
+    this.copy(correspondenceAddress = v)
 }
 
 object AboutTheBusiness {
