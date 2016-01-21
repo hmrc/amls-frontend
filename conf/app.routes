@@ -38,4 +38,4 @@ GET         /business-details/correspondence-address   controllers.aboutthebusin
 POST        /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
 
 GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
-
+#GET         /trading-premises/premises                 controllers.tradingpremises.YourTradingPremisesController.get()
