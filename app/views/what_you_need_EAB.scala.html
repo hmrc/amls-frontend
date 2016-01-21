@@ -1,0 +1,24 @@
+@import include._
+@()(implicit request: Request[_])
+@main(
+    title = Messages("estateagentbusiness.whatyouneed.title")
+) {
+
+    @heading("estateagentbusiness.whatyouneed.title", "estateagentbusiness.sectiontitle")
+
+    <div class="form-field">
+        <span class="panel-indent">@Messages("estateagentbusiness.whatyouneed.subtitle")</span>
+    </div>
+
+
+        <ul class="list-bullet form-group">
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.whatyouneed.line_1")</li>
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.whatyouneed.line_2")</li>
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.whatyouneed.line_3")</li>
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.whatyouneed.line_4")</li>
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.whatyouneed.line_5")</li>
+        </ul>
+
+        <div class="form-field"><a class="button" href="">Continue</a></div>
+
+    }
