@@ -115,6 +115,7 @@ aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
 
+summary.tradingpremises=Trading premises
 tradingpremises.whatyouneed.title=What you need
 tradingpremises.whatyouneed.paragraph1.text=We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading=For each of your trading premises, you'll need:
