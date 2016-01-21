@@ -114,8 +114,9 @@ aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
 
-estateagentbusiness.whatyouneed.title = What you need
-estateagentbusiness.whatyouneed.subtitle = You need the following information to complete this section
+estateagentbusiness.whatyouneed.title = Estate agent business - What you need
+estateagentbusiness.whatyouneed.heading = What you need
+estateagentbusiness.whatyouneed.subheading = You need the following information to complete this section
 estateagentbusiness.whatyouneed.line_1 = anticipated turnover for the next 12 months
 estateagentbusiness.whatyouneed.line_2 = franchisor''s name, if relevant
 estateagentbusiness.whatyouneed.line_3 = number of employees
