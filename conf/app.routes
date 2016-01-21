@@ -38,4 +38,6 @@ GET         /business-details/correspondence-address   controllers.aboutthebusin
 POST        /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
 
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
+GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
