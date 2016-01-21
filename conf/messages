@@ -34,6 +34,7 @@ lbl.first_name = First name
 lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
 lbl.pleasespecify = Please specify
+lbl.na = Not applicable
 
 lbl.uk = UK
 lbl.overseas = Overseas

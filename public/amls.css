@@ -34,6 +34,13 @@ div.grid-layout {
 }
 
 
+/* postcode */
+/* TODO, determine if there's a class in Assets Frontend for this */
+form input[type=text].form-control.postcode {
+    width : 20%;
+}
+
+
 /* form errors */
 .amls-error-summary {
     background-color: white;

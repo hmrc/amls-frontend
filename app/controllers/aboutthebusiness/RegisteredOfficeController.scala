@@ -33,11 +33,13 @@ trait RegisteredOfficeController extends BaseController  {
           for {
             aboutTheBusiness <-
               dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
-            _ <-
-              dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
+            _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
               aboutTheBusiness.registeredOffice(data)
             )
-          } yield Redirect(routes.ContactingYouController.get(edit))
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.ContactingYouController.get(edit))
+          }
         }
       }
   }
