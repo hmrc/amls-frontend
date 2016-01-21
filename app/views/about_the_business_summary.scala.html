@@ -47,13 +47,11 @@
                 </tr>
             }
 
-            @{model.correspondenceAddress == None}
-
             @model.correspondenceAddress.map { ca =>
                 <tr>
                     <td colspan="2">
-                        ca.toLines.map { line =>
-                            foo<br/>
+                        @ca.toLines.map { line =>
+                            @line<br/>
                         }
                     </td>
                 </tr>
@@ -61,6 +59,36 @@
 
         </table>
     }
+
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("aboutthebusiness.registeredforvat.title")</th>
+            <td colspan="2"><a href="@controllers.aboutthebusiness.routes.VATRegisteredController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.vatRegistered.map {
+                    case VATRegisteredNo => { @Messages("lbl.na") }
+                    case VATRegisteredYes(v) => { @v }
+                }
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("aboutthebusiness.registeredformlr.title")</th>
+            <td colspan="2"><a href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.previouslyRegistered.map {
+                    case PreviouslyRegisteredNo => { @Messages("lbl.na") }
+                    case PreviouslyRegisteredYes(v) => { @v }
+                }
+            </td>
+        </tr>
+    </table>
 
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Accept and complete section</a>
 }

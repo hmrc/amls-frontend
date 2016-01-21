@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness.AboutTheBusiness
+import play.api.libs.json.JsValue
 
 trait SummaryController extends BaseController {
 
@@ -19,6 +20,6 @@ trait SummaryController extends BaseController {
 }
 
 object SummaryController extends SummaryController {
-  override protected val dataCache = DataCacheConnector
-  override protected val authConnector = AMLSAuthConnector
+  override val dataCache = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
 }

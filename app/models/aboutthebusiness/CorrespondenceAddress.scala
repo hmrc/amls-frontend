@@ -116,8 +116,8 @@ object CorrespondenceAddress {
           (__ \ "businessName").read[String] and
           (__ \ "correspondenceAddressLine1").read[String] and
           (__ \ "correspondenceAddressLine2").read[String] and
-          (__ \ "correspondenceAddressLine3").read[Option[String]] and
-          (__ \ "correspondenceAddressLine4").read[Option[String]] and
+          (__ \ "correspondenceAddressLine3").readNullable[String] and
+          (__ \ "correspondenceAddressLine4").readNullable[String] and
           (__ \ "correspondencePostCode").read[String]
         )(UKCorrespondenceAddress.apply _)
       case false => (
@@ -125,8 +125,8 @@ object CorrespondenceAddress {
           (__ \ "businessName").read[String] and
           (__ \ "correspondenceAddressLine1").read[String] and
           (__ \ "correspondenceAddressLine2").read[String] and
-          (__ \ "correspondenceAddressLine3").read[Option[String]] and
-          (__ \ "correspondenceAddressLine4").read[Option[String]] and
+          (__ \ "correspondenceAddressLine3").readNullable[String] and
+          (__ \ "correspondenceAddressLine4").readNullable[String] and
           (__ \ "correspondenceCountry").read[String]
         )(NonUKCorrespondenceAddress.apply _)
     }

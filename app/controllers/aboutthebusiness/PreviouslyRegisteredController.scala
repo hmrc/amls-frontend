@@ -37,9 +37,8 @@ trait PreviouslyRegisteredController extends BaseController {
               aboutTheBusiness.previouslyRegistered(data)
             )
           } yield edit match {
-            // TODO summary doesn't exits for now
-            // case true => Redirect(routes.AboutTheBusinessSummaryController.get())
-            case false => Redirect(routes.VATRegisteredController.get())
+             case true => Redirect(routes.SummaryController.get())
+             case false => Redirect(routes.VATRegisteredController.get(edit))
           }
       }
     }
