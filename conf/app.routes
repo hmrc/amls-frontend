@@ -41,3 +41,5 @@ GET         /business-details/summary                  controllers.aboutthebusin
 
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 
+GET         /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
+POST        /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)

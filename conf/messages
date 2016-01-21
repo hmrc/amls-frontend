@@ -123,4 +123,7 @@ estateagentbusiness.whatyouneed.line_3 = number of employees
 estateagentbusiness.whatyouneed.line_4 = list of countries where your most high-value customers live
 estateagentbusiness.whatyouneed.line_5 = how you record transactions, if relevant
 
-
+estateagentbusiness.penalisedunderestateagentact.title = Has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
+estateagentbusiness.penalisedunderestateagentact.subtitle = Examples of a penalty include:
+estateagentbusiness.penalisedunderestateagentact.warning = receiving a formal warning
+estateagentbusiness.penalisedunderestateagentact.banned = being banned from taking part in estate agency activities

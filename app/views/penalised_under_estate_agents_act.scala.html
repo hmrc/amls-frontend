@@ -1,0 +1,34 @@
+@import forms.Form2
+@import include.{main, heading, registered_office}
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean = false)(implicit request: Request[_], lang: Lang)
+
+@main(
+title = Messages("estateagentbusiness.penalisedunderestateagentact.title")
+) {
+
+    @heading("estateagentbusiness.penalisedunderestateagentact.title", "estateagentbusiness.penalisedunderestateagentact.sectiontitle")
+
+    <div class="form-field">
+        @Messages("estateagentbusiness.penalisedunderestateagentact.subtitle")
+    </div>
+
+    @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
+
+        <ul class="list-bullet form-group">
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.penalisedunderestateagentact.warning")</li>
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.penalisedunderestateagentact.banned")</li>
+        </ul>
+
+        <div class="form-field">
+            @inlineRadioGroup(f("isPenalisedUnderEstateAgentsAct")) {
+                @legend("TODO", jsHidden = true)
+                @radio(f("isPenalisedUnderEstateAgentsAct"), "lbl.yes", "true")
+                @radio(f("isPenalisedUnderEstateAgentsAct"), "lbl.no", "false")
+            }
+        </div>
+
+        @submit(edit)
+    }
+}
