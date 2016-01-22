@@ -29,7 +29,7 @@ object RegisteredOffice {
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "isUK").read[Boolean] flatMap[RegisteredOffice] {
+    (__ \ "isUK").read[Boolean] flatMap {
       case true =>
         (
           (__ \ "addressLine1").read(addressType) and
