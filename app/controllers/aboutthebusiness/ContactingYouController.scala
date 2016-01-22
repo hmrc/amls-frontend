@@ -43,10 +43,10 @@ trait ContactingYouController extends BaseController {
           for {
             aboutTheBusiness <- dataCache.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCache.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.contactingYou(data)
+              aboutTheBusiness.contactingYou(data).correspondenceAddress(None)
             )
           } yield data.letterToThisAddress match {
-            case true => Redirect(routes.ContactingYouController.get(edit)) //TODO Go to the Summary Page
+            case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.CorrespondenceAddressController.get(edit))
           }
       }

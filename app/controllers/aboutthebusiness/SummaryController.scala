@@ -1,9 +1,10 @@
-package controllers.aboutyou
+package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.aboutyou.AboutYou
+import models.aboutthebusiness.AboutTheBusiness
+import play.api.libs.json.JsValue
 
 trait SummaryController extends BaseController {
 
@@ -11,14 +12,14 @@ trait SummaryController extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchDataShortLivedCache[AboutYou](AboutYou.key) map {
-        case Some(data) => Ok(views.html.about_you_summary(data))
+      dataCache.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
+        case Some(data) => Ok(views.html.about_the_business_summary(data))
         case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }
   }
 }
 
 object SummaryController extends SummaryController {
-  override protected val dataCache = DataCacheConnector
-  override protected val authConnector = AMLSAuthConnector
+  override val dataCache = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
 }

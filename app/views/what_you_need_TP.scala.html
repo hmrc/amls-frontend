@@ -1,0 +1,33 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@()(implicit request: Request[_])
+
+@main(
+    title = Messages("tradingpremises.whatyouneed.title")
+) {
+
+@heading("tradingpremises.whatyouneed.heading", "summary.tradingpremises")
+
+<div class="form-field">
+    <span class="panel-indent form-field">@Messages("tradingpremises.whatyouneed.paragraph1.text")</span>
+</div>
+
+<p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
+<ul class="list-bullet form-group">
+<li class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.1")</li>
+<li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.2")</li>
+<li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.3")</li>
+<li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
+<li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.5")</li>
+
+</ul>
+<p>@Messages("tradingpremises.whatyouneed.agentinfo.heading")</p>
+<ul class="list-bullet form-group">
+<li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.agentinfo.text.1")</li>
+<li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.agentinfo.text.2")</li>
+<li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.agentinfo.text.3")</li>
+</ul>
+<div class="form-field"><a id="what-you-need-continue" class="button" href="">@Messages("button.continue")</a></div>
+}
