@@ -37,5 +37,10 @@ POST        /business-details/new-registered-office    controllers.aboutthebusin
 GET         /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
 POST        /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
 
+GET         /business-details/summary                  controllers.aboutthebusiness.SummaryController.get()
+
+GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
+#GET         /trading-premises/premises                 controllers.tradingpremises.YourTradingPremisesController.get()
+
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 

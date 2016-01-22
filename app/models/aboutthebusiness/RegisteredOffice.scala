@@ -5,7 +5,27 @@ import play.api.data.mapping.forms._
 import play.api.data.mapping._
 import play.api.libs.json.{Writes, Reads, Json}
 
-sealed trait RegisteredOffice
+sealed trait RegisteredOffice {
+
+  def toLines: Seq[String] = this match {
+    case a: RegisteredOfficeUK =>
+      Seq(
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.postCode)
+      ).flatten
+    case a: RegisteredOfficeNonUK =>
+      Seq(
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.country)
+      ).flatten
+  }
+}
 
 case class RegisteredOfficeUK(
                                addressLine1: String,
@@ -16,10 +36,10 @@ case class RegisteredOfficeUK(
                              ) extends RegisteredOffice
 
 case class RegisteredOfficeNonUK(
-                                  addressLineNonUK1: String,
-                                  addressLineNonUK2: String,
-                                  addressLineNonUK3: Option[String] = None,
-                                  addressLineNonUK4: Option[String] = None,
+                                  addressLine1: String,
+                                  addressLine2: String,
+                                  addressLine3: Option[String] = None,
+                                  addressLine4: Option[String] = None,
                                   country: String
                                 ) extends RegisteredOffice
 
@@ -62,10 +82,10 @@ object RegisteredOffice {
     case f: RegisteredOfficeNonUK =>
       Map(
         "isUK" -> Seq("false"),
-        "addressLineNonUK1" -> f.addressLineNonUK1,
-        "addressLineNonUK2" -> f.addressLineNonUK2,
-        "addressLineNonUK3" -> Seq(f.addressLineNonUK3.getOrElse("")),
-        "addressLineNonUK4" -> Seq(f.addressLineNonUK4.getOrElse("")),
+        "addressLineNonUK1" -> f.addressLine1,
+        "addressLineNonUK2" -> f.addressLine2,
+        "addressLineNonUK3" -> Seq(f.addressLine3.getOrElse("")),
+        "addressLineNonUK4" -> Seq(f.addressLine4.getOrElse("")),
         "country" -> f.country
       )
   }
@@ -79,16 +99,16 @@ object RegisteredOffice {
         (
           (__ \ "addressLine1").read[String] and
             (__ \ "addressLine2").read[String] and
-            (__ \ "addressLine3").read[Option[String]] and
-            (__ \ "addressLine4").read[Option[String]] and
+            (__ \ "addressLine3").readNullable[String] and
+            (__ \ "addressLine4").readNullable[String] and
             (__ \ "postCode").read[String]
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
         (__ \ "addressLineNonUK1").read[String] and
           (__ \ "addressLineNonUK2").read[String] and
-          (__ \ "addressLineNonUK3").read[Option[String]] and
-          (__ \ "addressLineNonUK4").read[Option[String]] and
+          (__ \ "addressLineNonUK3").readNullable[String] and
+          (__ \ "addressLineNonUK4").readNullable[String] and
           (__ \ "country").read[String]
         ) (RegisteredOfficeNonUK.apply _)
   }
@@ -103,10 +123,10 @@ object RegisteredOffice {
         "postCode" -> m.postCode)
     case m: RegisteredOfficeNonUK =>
       Json.obj("isUK" -> false,
-        "addressLineNonUK1" -> m.addressLineNonUK1,
-        "addressLineNonUK2" -> m.addressLineNonUK2,
-        "addressLineNonUK3" -> m.addressLineNonUK3,
-        "addressLineNonUK4" -> m.addressLineNonUK4,
+        "addressLineNonUK1" -> m.addressLine1,
+        "addressLineNonUK2" -> m.addressLine2,
+        "addressLineNonUK3" -> m.addressLine3,
+        "addressLineNonUK4" -> m.addressLine4,
         "country" -> m.country)
   }
 }
