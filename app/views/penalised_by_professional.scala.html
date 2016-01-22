@@ -3,6 +3,11 @@
 @import include.forms2._
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@target = @{
+s"""${f("professionalBody").id}-fieldset"""
+}
+
 @main(
     title = Messages("estateagentbusiness.penalisedbyprofessional.title")
 ) {
@@ -23,10 +28,13 @@
         </ul>
 
         <div class="form-field">
-            @inlineRadioGroup(f("letterToThisAddress")) {
+            @inlineRadioGroup(f("penalised")) {
             @legend("TODO", jsHidden = true)
-            @radio(f("letterToThisAddress"), "lbl.yes", "true")
-            @radio(f("letterToThisAddress"), "lbl.no", "false")
+            @radio(f("penalised"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("penalised"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+            @input(f("professionalBody"), "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl", bold = false)
+            }
             }
         </div>
         @submit(edit)
