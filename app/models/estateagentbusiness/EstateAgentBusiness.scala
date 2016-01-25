@@ -1,5 +1,7 @@
 package models.estateagentbusiness
 
+import models.aboutthebusiness.VATRegistered
+
 case class EstateAgentBusiness(
                                 // services: Option[Set[Service]] = None,
                                 estateAgentAct: Option[String] = None,

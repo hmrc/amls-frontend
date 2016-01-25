@@ -145,3 +145,11 @@ estateagentbusiness.penalisedunderestateagentsact.subtitle = Examples of a penal
 estateagentbusiness.penalisedunderestateagentsact.warning = receiving a formal warning
 estateagentbusiness.penalisedunderestateagentsact.banned = being banned from taking part in estate agency activities
 estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl = Please provide details
+
+estateagentbusiness.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
+estateagentbusiness.penalisedbyprofessional.subtitle = The penalty should relate to estate agent business activities. Examples of a penalty include:
+estateagentbusiness.penalisedbyprofessional.line_1 = a fine
+estateagentbusiness.penalisedbyprofessional.line_2 = a warning
+estateagentbusiness.penalisedbyprofessional.line_3 = suspension
+estateagentbusiness.penalisedbyprofessional.line_4 = expulsion
+estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Please provide details
