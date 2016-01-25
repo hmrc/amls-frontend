@@ -19,13 +19,9 @@ case object TaxTypeCorporationTax extends TaxType
 sealed trait BusinessStructure
 
 case object SoleProprietor extends BusinessStructure
-
 case object LimitedLiabilityPartnership extends BusinessStructure
-
 case object Partnership extends BusinessStructure
-
 case object IncorporatedBody extends BusinessStructure
-
 case object UnincorporatedBody extends BusinessStructure
 
 
@@ -78,24 +74,96 @@ object YourAgent {
   }
 
 
-
-  implicit val formWrites: Write[YourAgent, UrlFormEncoded] = Write {
-    case a: YourAgent =>
-      Map("agentRegisteredName" -> Seq("xyz"))
-    case _ => Map("previouslyRegistered" -> Seq("false"))
+  implicit val formWrites: Write[YourAgent, UrlFormEncoded] = To[UrlFormEncoded] {__ =>
+    import play.api.data.mapping.forms.Writes._
+    import play.api.libs.functional.syntax.unlift
+    import models.FormTypes._
+    (__.write[AgentsRegisteredName] ~
+      __.write[TaxType] ~
+      __.write[BusinessStructure])(unlift(YourAgent.unapply _))
   }
 
-  implicit val jsonReads = {
+  implicit val formWritesRegisteredName: Write[AgentsRegisteredName, UrlFormEncoded] = Write {
+    case agentsRegisteredName =>
+      Map("agentsRegisteredName" -> Seq(agentsRegisteredName.value))
+  }
+
+  implicit val formWritesTaxType : Write[TaxType, UrlFormEncoded] = Write {
+    case TaxTypeSelfAssesment =>
+      Map("taxType" -> Seq("01"))
+    case TaxTypeCorporationTax =>
+      Map("taxType" -> Seq("02"))
+    case _ => Map("" ->Seq(""))
+  }
+
+  implicit val formWritesBusinessStructure: Write[BusinessStructure, UrlFormEncoded] = Write {
+    case SoleProprietor =>
+      Map("businessStructure" -> Seq("01"))
+    case LimitedLiabilityPartnership =>
+      Map("businessStructure" -> Seq("02"))
+    case Partnership =>
+      Map("businessStructure" -> Seq("03"))
+    case IncorporatedBody =>
+      Map("businessStructure" -> Seq("04"))
+    case UnincorporatedBody =>
+      Map("businessStructure" -> Seq("05"))
+  }
+
+
+  implicit val jsonReads: Reads[YourAgent] = {
+      import play.api.libs.json._
+      import play.api.libs.functional.syntax._
+      (__.read[AgentsRegisteredName] and
+        __.read[TaxType] and
+        __.read[BusinessStructure])(YourAgent.apply _)
+  }
+
+  implicit val jsonReadsRegisteredName =  {
+    import play.api.libs.json.Reads.StringReads
+      (JsPath \ "agentsRegisteredName").read[String] map (AgentsRegisteredName.apply _)
+  }
+
+  implicit val jsonReadsTaxType =  {
     (__ \ "taxType").read[String].flatMap[TaxType] {
-        case "01" => TaxTypeSelfAssesment
-        case "02" => TaxTypeCorporationTax
-        case _ => ValidationError("error.invalid")
-      }
+      case "01" => TaxTypeSelfAssesment
+      case "02" => TaxTypeCorporationTax
+      case _ => ValidationError("error.invalid")
+    }
   }
 
-  implicit val jsonWrites = Writes[YourAgent] {
-    Json.obj(
-      "agentRegisteredName" -> "xyz"
-    )
+  implicit val jsonReadsBusinessStructure =  {
+    (__ \ "businessStructure").read[String].flatMap[BusinessStructure] {
+      case "01" => SoleProprietor
+      case "02" => LimitedLiabilityPartnership
+      case "03" => Partnership
+      case "04" => IncorporatedBody
+      case "05" => UnincorporatedBody
+      case _ =>
+        ValidationError("error.invalid")
+    }
+  }
+
+//  implicit val formats = Json.format[YourAgent]
+  implicit val jsonWrite :Writes[YourAgent] = {
+    import play.api.libs.json._
+    import play.api.libs.functional.syntax._
+    (__.write[AgentsRegisteredName] and
+      __.write[TaxType] and
+      __.write[BusinessStructure])(unlift(YourAgent.unapply))
+  }
+
+  implicit val jsonWritesRegisteredName = Writes[AgentsRegisteredName] {
+    case agentsRegisteredName => Json.obj("agentsRegisteredName" -> agentsRegisteredName.value)
+  }
+  implicit val jsonWritesTaxType = Writes[TaxType] {
+    case TaxTypeSelfAssesment => Json.obj("taxTypeSelfAssesment" -> "01")
+    case TaxTypeCorporationTax => Json.obj("TaxTypeCorporationTax" -> "02")
+  }
+  implicit val jsonWritesBusinessStructure = Writes[BusinessStructure] {
+    case SoleProprietor => Json.obj("soleProprietor" -> "01")
+    case LimitedLiabilityPartnership => Json.obj("limitedLiabilityPartnership" -> "02")
+    case Partnership => Json.obj("partnership" -> "03")
+    case IncorporatedBody => Json.obj("IncorporatedBody" -> "04")
+    case UnincorporatedBody => Json.obj("unincorporatedBody" -> "05")
   }
 }
