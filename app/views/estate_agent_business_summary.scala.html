@@ -1,0 +1,34 @@
+@import include._
+@import models.estateagentbusiness._
+
+@(model: EstateAgentBusiness)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.estateagentbusiness")
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("estateagentbusiness.penalisedbyprofessional.title")</th>
+            <td colspan="2"><a href="@controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.professionalBody.map {
+                case ProfessionalBodyNo => { @Messages("lbl.no") }
+                case ProfessionalBodyYes(v) => { @Messages("lbl.yes") }
+                }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.professionalBody.map {
+                case ProfessionalBodyNo => { @Messages("lbl.na") }
+                case ProfessionalBodyYes(v) => { @v }
+                }
+            </td>
+        </tr>
+    </table>
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
+}

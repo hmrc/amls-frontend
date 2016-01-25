@@ -11,6 +11,7 @@ trait WhatYouNeedController extends BaseController {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.what_you_need_EAB()))
   }
+
 }
 
 object WhatYouNeedController extends WhatYouNeedController {
