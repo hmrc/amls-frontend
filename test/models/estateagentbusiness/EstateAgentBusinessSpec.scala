@@ -13,8 +13,12 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
   "Default" must {
     "convert an `Option[EAB]` to `EAB`" in {
 
-      val model = EstateAgentBusiness(None, Some("foo"), Some("bar"))
-      val zero = EstateAgentBusiness(None, None, None)
+      val model = EstateAgentBusiness(//None,
+                                      Some("foo"),
+                                      Some(ProfessionalBodyYes("details")))
+      val zero = EstateAgentBusiness(//None,
+                                     None,
+                                     None)
 
       (Some(model): EstateAgentBusiness) must be(model)
       (None: EstateAgentBusiness) must be(zero)
