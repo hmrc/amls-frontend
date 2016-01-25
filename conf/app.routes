@@ -39,6 +39,9 @@ POST        /business-details/correspondence-address   controllers.aboutthebusin
 
 GET         /business-details/summary                  controllers.aboutthebusiness.SummaryController.get()
 
+GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
+#GET         /trading-premises/premises                 controllers.tradingpremises.YourTradingPremisesController.get()
+
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 
 GET         /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
