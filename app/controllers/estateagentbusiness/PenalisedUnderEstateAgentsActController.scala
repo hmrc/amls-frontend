@@ -28,8 +28,8 @@ trait PenalisedUnderEstateAgentsActController extends BaseController {
                  EstateAgentBusiness.key,
                  estateAgentBusiness.penalisedUnderEstateAgentsAct(data))
           } yield edit match {
-            //case true => Redirect(routes.SummaryController.get()) //TODO
-            case false => Redirect(routes.PenalisedUnderEstateAgentsActController.get()) //TODO
+            case true => NotImplemented
+            case false => Redirect(routes.PenalisedByProfessionalController.get()) //TODO
           }
       }
 
