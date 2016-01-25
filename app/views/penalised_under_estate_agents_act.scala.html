@@ -4,28 +4,36 @@
 
 @(f: Form2[_], edit: Boolean = false)(implicit request: Request[_], lang: Lang)
 
+@target = @{
+s"""${f("penalisedunderestateagentsactdetails").id}-fieldset"""
+}
+
 @main(
-title = Messages("estateagentbusiness.penalisedunderestateagentact.title")
+title = Messages("estateagentbusiness.penalisedunderestateagentsact.title")
 ) {
 
-    @heading("estateagentbusiness.penalisedunderestateagentact.title", "estateagentbusiness.penalisedunderestateagentact.sectiontitle")
+    @heading("estateagentbusiness.penalisedunderestateagentsact.title", "estateagentbusiness.penalisedunderestateagentsact.sectiontitle")
 
     <div class="form-field">
-        @Messages("estateagentbusiness.penalisedunderestateagentact.subtitle")
+        @Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")
     </div>
 
     @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
 
         <ul class="list-bullet form-group">
-            <li class="no-padding no-margin" >@Messages("estateagentbusiness.penalisedunderestateagentact.warning")</li>
-            <li class="no-padding no-margin" >@Messages("estateagentbusiness.penalisedunderestateagentact.banned")</li>
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
+            <li class="no-padding no-margin" >@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
         </ul>
 
         <div class="form-field">
-            @inlineRadioGroup(f("isPenalisedUnderEstateAgentsAct")) {
+            @inlineRadioGroup(f("penalisedunderestateagentsact")) {
                 @legend("TODO", jsHidden = true)
-                @radio(f("isPenalisedUnderEstateAgentsAct"), "lbl.yes", "true")
-                @radio(f("isPenalisedUnderEstateAgentsAct"), "lbl.no", "false")
+                @radio(f("penalisedunderestateagentsact"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("penalisedunderestateagentsact"), "lbl.no", "false")
+
+                @fieldset("TODO", jsHidden = true, id = target) {
+                    @input(f("penalisedunderestateagentsactdetails"), "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl", bold = false)
+                }
             }
         </div>
 
