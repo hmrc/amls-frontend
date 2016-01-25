@@ -26,21 +26,21 @@ object PenalisedUnderEstateAgentsAct {
       Map("penalisedunderestateagentsact" -> Seq("true"),
         "penalisedunderestateagentsactdetails" -> Seq(value)
       )
-    case PenalisedUnderEstateAgentsActNo => Map("penalised" -> Seq("false"))
+    case PenalisedUnderEstateAgentsActNo => Map("penalisedunderestateagentsact" -> Seq("false"))
   }
 
   implicit val jsonReads =
     (__ \ "penalisedunderestateagentsact").read[Boolean] flatMap[PenalisedUnderEstateAgentsAct] {
-      case true => (__ \ "professionalBody").read[String] map (PenalisedUnderEstateAgentsActYes.apply _)
+      case true => (__ \ "penalisedunderestateagentsactdetails").read[String] map (PenalisedUnderEstateAgentsActYes.apply _)
       case false => Reads(_ => JsSuccess(PenalisedUnderEstateAgentsActNo))
     }
 
   implicit val jsonWrites = Writes[PenalisedUnderEstateAgentsAct] {
     case PenalisedUnderEstateAgentsActYes(value) => Json.obj(
       "penalisedunderestateagentsact" -> true,
-      "professionalBody" -> value
+      "penalisedunderestateagentsactdetails" -> value
     )
-    case PenalisedUnderEstateAgentsActNo => Json.obj("penalised" -> false)
+    case PenalisedUnderEstateAgentsActNo => Json.obj("penalisedunderestateagentsact" -> false)
   }
 
 }

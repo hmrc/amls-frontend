@@ -3,35 +3,41 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
-import models.estateagentbusiness.EstateAgentBusiness
+import forms._
+import models.estateagentbusiness.{EstateAgentBusiness, PenalisedUnderEstateAgentsAct}
 
 import scala.concurrent.Future
 
 trait PenalisedUnderEstateAgentsActController extends BaseController {
 
-  val dataCache: DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-/*      for {
-        estateAgentBusiness <- dataCache.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key)
-      } yield estateAgentBusiness match {
-        //case Some(EstateAgentBusiness(_,Some(data),_)) => BadRequest(views.html.penalised_under_estate_agents_act(f))
-        case _ => Ok(views.html.penalised_under_estate_agents_act(EmptyForm, edit))
-      }*/
       Future.successful(Ok(views.html.penalised_under_estate_agents_act(EmptyForm, edit)))
     }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.penalised_under_estate_agents_act(EmptyForm, edit)))
+      Form2[PenalisedUnderEstateAgentsAct](request.body) match {
+        case f: InvalidForm => Future.successful(BadRequest(views.html.penalised_under_estate_agents_act(f, edit)))
+        case ValidForm(_, data) =>
+          for {estateAgentBusiness <- dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key)
+               _ <- dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](
+                 EstateAgentBusiness.key,
+                 estateAgentBusiness.penalisedUnderEstateAgentsAct(data))
+          } yield edit match {
+            //case true => Redirect(routes.SummaryController.get()) //TODO
+            case false => Redirect(routes.PenalisedUnderEstateAgentsActController.get()) //TODO
+          }
+      }
+
   }
 
 }
 
 object PenalisedUnderEstateAgentsActController extends PenalisedUnderEstateAgentsActController {
-  override val dataCache = DataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }
