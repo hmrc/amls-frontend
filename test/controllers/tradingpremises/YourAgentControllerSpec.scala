@@ -36,28 +36,28 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
     val tradingPremises2 = TradingPremises(None, Some(yourAgent2))
 
 
-    "on get display who is your agent page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include("   ")
-    }
-
-    "on get() display the who is your agent page with pre populated data" in new Fixture {
-
-
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises1)))
-
-      val result = controller.get()(request)
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-      // TODO
-      //      document.select("input[value=01]").hasAttr("checked") must be(true)
-    }
+//    "on get display who is your agent page" in new Fixture {
+//      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+//        (any(), any(), any())).thenReturn(Future.successful(None))
+//
+//      val result = controller.get()(request)
+//      status(result) must be(OK)
+//      contentAsString(result) must include("   ")
+//    }
+//
+//    "on get() display the who is your agent page with pre populated data" in new Fixture {
+//
+//
+//      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+//        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises1)))
+//
+//      val result = controller.get()(request)
+//      status(result) must be(OK)
+//
+//      val document = Jsoup.parse(contentAsString(result))
+//      // TODO
+//      //      document.select("input[value=01]").hasAttr("checked") must be(true)
+//    }
 
     "on post with valid data" in new Fixture {
 
@@ -76,23 +76,23 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 //      redirectLocation(result) must be(Some(controllers.routes.MainSummaryController.onPageLoad().url))
     }
 
-    "on post with invalid data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "agentsRegisteredName" -> "XYZ",
-        "taxType" -> "09",
-        "businessStructure" -> "07"
-      )
-      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document = Jsoup.parse(contentAsString(result))
-      // TODO
-      //      document.select("input[name=other]").`val` must be("foo")
-    }
+//    "on post with invalid data" in new Fixture {
+//
+//      val newRequest = request.withFormUrlEncodedBody(
+//        "agentsRegisteredName" -> "XYZ",
+//        "taxType" -> "09",
+//        "businessStructure" -> "07"
+//      )
+//      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
+//        (any(), any(), any())).thenReturn(Future.successful(None))
+//
+//      val result = controller.post()(newRequest)
+//      status(result) must be(BAD_REQUEST)
+//
+//      val document = Jsoup.parse(contentAsString(result))
+//      // TODO
+//      //      document.select("input[name=other]").`val` must be("foo")
+//    }
 
     // to be valid after summary edit page is ready
     /* "on post with valid data in edit mode" in new Fixture {

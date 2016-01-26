@@ -29,7 +29,6 @@ object TradingPremises {
       Seq(
         Json.toJson(model.yourTradingPremises).asOpt[JsObject],
         Json.toJson(model.yourAgent).asOpt[JsObject]
-
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }
@@ -38,5 +37,3 @@ object TradingPremises {
   implicit def default(aboutYou: Option[TradingPremises]): TradingPremises =
     aboutYou.getOrElse(TradingPremises())
 }
-
-

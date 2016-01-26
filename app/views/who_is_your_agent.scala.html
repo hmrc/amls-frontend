@@ -6,8 +6,15 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @main(
-    title = Messages("tradingpremises.whatyouneed.title")
+    title = Messages("tradingpremises.youragent.title")
 ) {
+
+
+@heading("tradingpremises.youragent.heading", "summary.tradingpremises")
+
+<div class="form-field">
+    <span class="form-field">@Messages("tradingpremises.youragent.paragraph1.text")</span>
+</div>
 
 @form(f, controllers.tradingpremises.routes.YourAgentController.post(edit)) {
 
@@ -17,17 +24,23 @@ labelText = "tradingpremises.youragent.registeredname",
 classes = Seq("registeredname")
 )
 
+<p>@Messages("tradingpremises.youragent.taxtype")</p>
+
 @inlineRadioGroup(f("taxType")) {
 @legend("TODO", jsHidden = true)
-@radio(f("taxType"), "lbl.yes", "01")
-@radio(f("taxType"), "lbl.no", "02")
+@radio(f("taxType"), "tradingpremises.youragent.taxtype.lbl.01", "01")
+@radio(f("taxType"), "tradingpremises.youragent.taxtype.lbl.02", "02")
 }
 
+<p>@Messages("tradingpremises.youragent.businessstructure")</p>
 
 @radioGroup(f("agentsBusinessStructure")) {
 @legend("TODO", jsHidden = true)
-@radio(f("agentsBusinessStructure"), "tradingpremises.businessstructure.lbl.01", "01")
-@radio(f("agentsBusinessStructure"), "tradingpremises.businessstructure.lbl.02", "02")
+@radio(f("agentsBusinessStructure"), "tradingpremises.youragent.businessstructure.lbl.01", "01")
+@radio(f("agentsBusinessStructure"), "tradingpremises.youragent.businessstructure.lbl.02", "02")
+@radio(f("agentsBusinessStructure"), "tradingpremises.youragent.businessstructure.lbl.03", "03")
+@radio(f("agentsBusinessStructure"), "tradingpremises.youragent.businessstructure.lbl.04", "04")
+@radio(f("agentsBusinessStructure"), "tradingpremises.youragent.businessstructure.lbl.05", "05")
 }
 
 @submit(edit)

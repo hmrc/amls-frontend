@@ -30,31 +30,30 @@ object YourAgent {
   val key = "your-agent"
   import utils.MappingUtils.Implicits._
 
+
   implicit val formRule: Rule[UrlFormEncoded, YourAgent] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
 
-    (__.read[AgentsRegisteredName] and
-      __.read[TaxType] and
+    (__.read[AgentsRegisteredName] ~
+      __.read[TaxType] ~
       __.read[BusinessStructure]).apply(YourAgent.apply _)
   }
 
   implicit val agentsRegisteredNameRule : Rule[UrlFormEncoded, AgentsRegisteredName] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-
     (__ \ "agentRegisteredName").read[String] fmap (AgentsRegisteredName.apply)
   }
 
   implicit val taxTypeRule : Rule[UrlFormEncoded, TaxType] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-
     (__ \ "taxType").read[String] flatMap {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
       case _ =>
-        (Path \ "yourAgent") -> Seq(ValidationError("error.invalid"))
+        (Path \ "taxType") -> Seq(ValidationError("error.invalid"))
     }
   }
 
@@ -68,11 +67,9 @@ object YourAgent {
       case "03" => Partnership
       case "04" => IncorporatedBody
       case "05" => UnincorporatedBody
-      case _ =>
-        (Path \ "yourAgent") -> Seq(ValidationError("error.invalid"))
+      case _ => (Path \ "agentsBusinessStructure") -> Seq(ValidationError("error.invalid"))
     }
   }
-
 
   implicit val formWrites: Write[YourAgent, UrlFormEncoded] = To[UrlFormEncoded] {__ =>
     import play.api.data.mapping.forms.Writes._
@@ -156,14 +153,14 @@ object YourAgent {
     case agentsRegisteredName => Json.obj("agentsRegisteredName" -> agentsRegisteredName.value)
   }
   implicit val jsonWritesTaxType = Writes[TaxType] {
-    case TaxTypeSelfAssesment => Json.obj("taxTypeSelfAssesment" -> "01")
-    case TaxTypeCorporationTax => Json.obj("TaxTypeCorporationTax" -> "02")
+    case TaxTypeSelfAssesment => Json.obj("taxType" -> "01")
+    case TaxTypeCorporationTax => Json.obj("taxType" -> "02")
   }
   implicit val jsonWritesBusinessStructure = Writes[BusinessStructure] {
-    case SoleProprietor => Json.obj("soleProprietor" -> "01")
-    case LimitedLiabilityPartnership => Json.obj("limitedLiabilityPartnership" -> "02")
-    case Partnership => Json.obj("partnership" -> "03")
-    case IncorporatedBody => Json.obj("IncorporatedBody" -> "04")
-    case UnincorporatedBody => Json.obj("unincorporatedBody" -> "05")
+    case SoleProprietor => Json.obj("agentsBusinessStructure" -> "01")
+    case LimitedLiabilityPartnership => Json.obj("agentsBusinessStructure" -> "02")
+    case Partnership => Json.obj("agentsBusinessStructure" -> "03")
+    case IncorporatedBody => Json.obj("agentsBusinessStructure" -> "04")
+    case UnincorporatedBody => Json.obj("agentsBusinessStructure" -> "05")
   }
 }
