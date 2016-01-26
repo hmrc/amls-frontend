@@ -1,34 +1,50 @@
 package models.tradingpremises
 
-import models.FormTypes._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
-import play.api.libs.json._
+import org.joda.time.LocalDate
 
-sealed trait YourTradingPremises
+case class YourTradingPremises(tradingName : String,
+                              tradingAddress: TradingPremisesAddress,
+                              startOfTradingDate: LocalDate,
+                              isResidential : IsResidential)
 
-case object DummyObject  extends YourTradingPremises
+sealed trait TradingPremisesAddress {
 
-object YourTradingPremises {
-
-  implicit val formRule: Rule[UrlFormEncoded, YourTradingPremises] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    (__ \ "dummyObject").read[Boolean] flatMap {
-      case false => Rule.fromMapping { _ => Success(DummyObject) }
-    }
-  }
-
-  implicit val formWrites: Write[YourTradingPremises, UrlFormEncoded] = Write {
-    case DummyObject => Map("" -> Seq(""))
-  }
-
-  implicit val jsonReads =
-    (__ \ "dummyObject").read[Boolean] flatMap[YourTradingPremises] {
-      case x => Reads(_ => JsSuccess(""))
-  }
-
-  implicit val jsonWrites = Writes[YourTradingPremises] {
-    case DummyObject => Json.obj("dummyObject" -> false)
+  def toLines: Seq[String] = this match {
+    case a: TradingPremisesAddressUK =>
+      Seq(
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.postCode)
+      ).flatten
+    case a: TradingPremisesAddressNonUK =>
+      Seq(
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.country)
+      ).flatten
   }
 }
+
+case class TradingPremisesAddressUK(
+                               addressLine1: String,
+                               addressLine2: String,
+                               addressLine3: Option[String] = None,
+                               addressLine4: Option[String] = None,
+                               postCode: String
+                             ) extends TradingPremisesAddress
+
+case class TradingPremisesAddressNonUK(
+                                  addressLine1: String,
+                                  addressLine2: String,
+                                  addressLine3: Option[String] = None,
+                                  addressLine4: Option[String] = None,
+                                  country: String
+                                ) extends TradingPremisesAddress
+
+sealed trait IsResidential
+case object ResidentialYes extends IsResidential
+case object ResidentialNo extends IsResidential
