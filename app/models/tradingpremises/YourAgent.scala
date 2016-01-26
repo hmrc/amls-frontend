@@ -98,15 +98,15 @@ object YourAgent {
 
   implicit val formWritesBusinessStructure: Write[BusinessStructure, UrlFormEncoded] = Write {
     case SoleProprietor =>
-      Map("businessStructure" -> Seq("01"))
+      Map("agentsBusinessStructure" -> Seq("01"))
     case LimitedLiabilityPartnership =>
-      Map("businessStructure" -> Seq("02"))
+      Map("agentsBusinessStructure" -> Seq("02"))
     case Partnership =>
-      Map("businessStructure" -> Seq("03"))
+      Map("agentsBusinessStructure" -> Seq("03"))
     case IncorporatedBody =>
-      Map("businessStructure" -> Seq("04"))
+      Map("agentsBusinessStructure" -> Seq("04"))
     case UnincorporatedBody =>
-      Map("businessStructure" -> Seq("05"))
+      Map("agentsBusinessStructure" -> Seq("05"))
   }
 
 
@@ -132,7 +132,7 @@ object YourAgent {
   }
 
   implicit val jsonReadsBusinessStructure =  {
-    (__ \ "businessStructure").read[String].flatMap[BusinessStructure] {
+    (__ \ "agentsBsinessStructure").read[String].flatMap[BusinessStructure] {
       case "01" => SoleProprietor
       case "02" => LimitedLiabilityPartnership
       case "03" => Partnership

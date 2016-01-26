@@ -1,0 +1,38 @@
+@import include.{forms => deprecated, _}
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("tradingpremises.whatyouneed.title")
+) {
+
+@form(f, controllers.tradingpremises.routes.YourAgentController.post(edit)) {
+
+@input(
+field = f("agentRegisteredName"),
+labelText = "tradingpremises.youragent.registeredname",
+classes = Seq("registeredname")
+)
+
+@inlineRadioGroup(f("taxType")) {
+@legend("TODO", jsHidden = true)
+@radio(f("taxType"), "lbl.yes", "01")
+@radio(f("taxType"), "lbl.no", "02")
+}
+
+
+@radioGroup(f("agentsBusinessStructure")) {
+@legend("TODO", jsHidden = true)
+@radio(f("agentsBusinessStructure"), "tradingpremises.businessstructure.lbl.01", "01")
+@radio(f("agentsBusinessStructure"), "tradingpremises.businessstructure.lbl.02", "02")
+@radio(f("agentsBusinessStructure"), "aboutyou.rolewithinbusiness.lbl.03", "03")
+}
+
+@submit(edit)
+
+}
+
+}
