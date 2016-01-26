@@ -31,8 +31,8 @@ object ProfessionalBody {
     case ProfessionalBodyNo => Map("penalised" -> Seq("false"))
   }
 
-  implicit val jsonReads =
-    (__ \ "penalised").read[Boolean] flatMap[ProfessionalBody] {
+  implicit val jsonReads: Reads[ProfessionalBody] =
+    (__ \ "penalised").read[Boolean] flatMap {
     case true => (__ \ "professionalBody").read[String] map (ProfessionalBodyYes.apply _)
     case false => Reads(_ => JsSuccess(ProfessionalBodyNo))
   }
