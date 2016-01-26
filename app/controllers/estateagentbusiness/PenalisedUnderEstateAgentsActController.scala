@@ -14,7 +14,10 @@ trait PenalisedUnderEstateAgentsActController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Future.successful(Ok(views.html.penalised_under_estate_agents_act(EmptyForm, edit)))
+      dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
+        case Some(EstateAgentBusiness(_, _, Some(data))) => Ok(views.html.penalised_under_estate_agents_act(Form2[PenalisedUnderEstateAgentsAct](data), edit))
+        case _ => Ok(views.html.penalised_under_estate_agents_act(EmptyForm, edit))
+      }
     }
   }
 
@@ -32,7 +35,6 @@ trait PenalisedUnderEstateAgentsActController extends BaseController {
             case false => Redirect(routes.PenalisedByProfessionalController.get()) //TODO
           }
       }
-
   }
 
 }

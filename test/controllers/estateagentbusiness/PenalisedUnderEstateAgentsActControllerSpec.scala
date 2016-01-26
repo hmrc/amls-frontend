@@ -46,10 +46,11 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[name=penalisedunderestateagentsact]").`val` must be("true")
+      document.select("input[name=penalisedunderestateagentsactdetails]").`val` must be("penalisedunderestateagentsactdetails data")
     }
 
 
-    "on post must capture the details provided by the user for penalised before" in new Fixture {
+    "on post capture the details provided by the user for penalised before" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "penalisedunderestateagentsact" -> "true",
@@ -64,11 +65,11 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get().url))
+      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get().url))
     }
 
 
-    "on post with missing data must remain on the same page and also retain the data supplied" in new Fixture {
+    "on post with missing data remain on the same page and also retain the data supplied" in new Fixture {
 
       val requestWithIncompleteData = request.withFormUrlEncodedBody(
         "penalisedunderestateagentsactdetails" -> "Do not remember why penalised before"
