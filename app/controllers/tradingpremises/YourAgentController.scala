@@ -29,9 +29,7 @@ trait YourAgentController extends BaseController {
         case ValidForm(_, data) =>
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key,
-              tradingPremises.yourAgent(data)
-            )
+            _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourAgent(data))
           } yield  Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }
     }
