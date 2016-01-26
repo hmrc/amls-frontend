@@ -7,6 +7,7 @@ import play.api.libs.json._
 sealed trait PenalisedUnderEstateAgentsAct
 
 case class PenalisedUnderEstateAgentsActYes(value: String) extends PenalisedUnderEstateAgentsAct
+
 case object PenalisedUnderEstateAgentsActNo extends PenalisedUnderEstateAgentsAct
 
 object PenalisedUnderEstateAgentsAct {
@@ -29,8 +30,8 @@ object PenalisedUnderEstateAgentsAct {
     case PenalisedUnderEstateAgentsActNo => Map("penalisedunderestateagentsact" -> Seq("false"))
   }
 
-  implicit val jsonReads =
-    (__ \ "penalisedunderestateagentsact").read[Boolean] flatMap[PenalisedUnderEstateAgentsAct] {
+  implicit val jsonReads: Reads[PenalisedUnderEstateAgentsAct] =
+    (__ \ "penalisedunderestateagentsact").read[Boolean] flatMap {
       case true => (__ \ "penalisedunderestateagentsactdetails").read[String] map (PenalisedUnderEstateAgentsActYes.apply _)
       case false => Reads(_ => JsSuccess(PenalisedUnderEstateAgentsActNo))
     }
@@ -44,4 +45,3 @@ object PenalisedUnderEstateAgentsAct {
   }
 
 }
-
