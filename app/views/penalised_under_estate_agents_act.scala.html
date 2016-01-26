@@ -5,7 +5,7 @@
 @(f: Form2[_], edit: Boolean = false)(implicit request: Request[_], lang: Lang)
 
 @target = @{
-s"""${f("penalisedunderestateagentsactdetails").id}-fieldset"""
+s"""${f("penalisedUnderEstateAgentsActDetails").id}-fieldset"""
 }
 
 @main(
@@ -26,13 +26,13 @@ title = Messages("estateagentbusiness.penalisedunderestateagentsact.title")
         </ul>
 
         <div class="form-field">
-            @inlineRadioGroup(f("penalisedunderestateagentsact")) {
+            @inlineRadioGroup(f("penalisedUnderEstateAgentsAct")) {
                 @legend("TODO", jsHidden = true)
-                @radio(f("penalisedunderestateagentsact"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("penalisedunderestateagentsact"), "lbl.no", "false")
+                @radio(f("penalisedUnderEstateAgentsAct"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("penalisedUnderEstateAgentsAct"), "lbl.no", "false")
 
                 @fieldset("TODO", jsHidden = true, id = target) {
-                    @input(f("penalisedunderestateagentsactdetails"), "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl", bold = false)
+                    @input(f("penalisedUnderEstateAgentsActDetails"), "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl", bold = false)
                 }
             }
         </div>

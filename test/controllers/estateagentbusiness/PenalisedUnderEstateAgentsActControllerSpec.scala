@@ -39,22 +39,22 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
     "load the page with data when the user revisits at a later time" in new Fixture {
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None,
-        Some(PenalisedUnderEstateAgentsActYes("penalisedunderestateagentsactdetails data"))))))
+        Some(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before"))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=penalisedunderestateagentsact]").`val` must be("true")
-      document.select("input[name=penalisedunderestateagentsactdetails]").`val` must be("penalisedunderestateagentsactdetails data")
+      document.select("input[name=penalisedUnderEstateAgentsAct]").`val` must be("true")
+      document.select("input[name=penalisedUnderEstateAgentsActDetails]").`val` must be("Do not remember why penalised before")
     }
 
 
     "on post capture the details provided by the user for penalised before" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "penalisedunderestateagentsact" -> "true",
-        "penalisedunderestateagentsactdetails" -> "Do not remember why penalised before"
+        "penalisedUnderEstateAgentsAct" -> "true",
+        "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
@@ -72,13 +72,13 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
     "on post with missing data remain on the same page and also retain the data supplied" in new Fixture {
 
       val requestWithIncompleteData = request.withFormUrlEncodedBody(
-        "penalisedunderestateagentsactdetails" -> "Do not remember why penalised before"
+        "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before"
       )
 
       val result = controller.post()(requestWithIncompleteData)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=penalisedunderestateagentsactdetails]").`val` must be("Do not remember why penalised before")
+      document.select("input[name=penalisedUnderEstateAgentsActDetails]").`val` must be("Do not remember why penalised before")
     }
   }
 

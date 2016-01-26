@@ -1,9 +1,6 @@
 package models.estateagentbusiness
 
-import models.aboutthebusiness.VATRegistered
-
 case class EstateAgentBusiness(
-                                // services: Option[Set[Service]] = None,
                                 estateAgentAct: Option[String] = None,
                                 professionalBody: Option[ProfessionalBody] = None,
                                 penalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = None
@@ -24,7 +21,6 @@ object EstateAgentBusiness {
   val key = "estate-agent-business"
 
   implicit val reads: Reads[EstateAgentBusiness] = (
-    // __.read[Option[Set[Service]]] and
     __.read[Option[String]] and
       __.read[Option[ProfessionalBody]] and
       __.read[Option[PenalisedUnderEstateAgentsAct]]
@@ -34,7 +30,6 @@ object EstateAgentBusiness {
     Writes[EstateAgentBusiness] {
       model =>
         Seq(
-          //  Json.toJson(model.services).asOpt[JsObject],
           Json.toJson(model.estateAgentAct).asOpt[JsObject],
           Json.toJson(model.professionalBody).asOpt[JsObject],
           Json.toJson(model.penalisedUnderEstateAgentsAct).asOpt[JsObject]

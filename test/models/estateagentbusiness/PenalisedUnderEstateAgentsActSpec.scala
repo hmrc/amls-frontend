@@ -12,67 +12,68 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
   "Form Validation" must {
 
     "successfully validate given an enum value" in {
-      PenalisedUnderEstateAgentsAct.formRule.validate(Map("penalisedunderestateagentsact" -> Seq("false"))) must
+      PenalisedUnderEstateAgentsAct.formRule.validate(Map("penalisedUnderEstateAgentsAct" -> Seq("false"))) must
         be(Success(PenalisedUnderEstateAgentsActNo))
     }
 
     "successfully validate given an `Yes` value" in {
       val data = Map(
-        "penalisedunderestateagentsact" -> Seq("true"),
-        "penalisedunderestateagentsactdetails" -> Seq("penalisedunderestateagentsactdetails data")
+        "penalisedUnderEstateAgentsAct" -> Seq("true"),
+        "penalisedUnderEstateAgentsActDetails" -> Seq("Do not remember why penalised before")
       )
 
       PenalisedUnderEstateAgentsAct.formRule.validate(data) must
-        be(Success(PenalisedUnderEstateAgentsActYes("penalisedunderestateagentsactdetails data")))
+        be(Success(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before")))
     }
 
     "fail to validate given a `Yes` but no details provided" in {
       val data = Map(
-        "penalisedunderestateagentsact" -> Seq("true")
+        "penalisedUnderEstateAgentsAct" -> Seq("true")
       )
 
       PenalisedUnderEstateAgentsAct.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "penalisedunderestateagentsactdetails") -> Seq(ValidationError("error.required"))
+          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.required"))
         )))
     }
 
     "write correct data from enum value" in {
       PenalisedUnderEstateAgentsAct.formWrites.writes(PenalisedUnderEstateAgentsActNo) must
-        be(Map("penalisedunderestateagentsact" -> Seq("false")))
+        be(Map("penalisedUnderEstateAgentsAct" -> Seq("false")))
     }
 
     "write correct data from `Yes` value" in {
-      PenalisedUnderEstateAgentsAct.formWrites.writes(PenalisedUnderEstateAgentsActYes("penalisedunderestateagentsactdetails data")) must
-        be(Map("penalisedunderestateagentsact" -> Seq("true"), "penalisedunderestateagentsactdetails" -> Seq("penalisedunderestateagentsactdetails data")))
+      PenalisedUnderEstateAgentsAct.formWrites.writes(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before")) must
+        be(Map("penalisedUnderEstateAgentsAct" -> Seq("true"), "penalisedUnderEstateAgentsActDetails" -> Seq("Do not remember why penalised before")))
     }
   }
 
   "JSON validation" must {
 
     "successfully validate given an enum value" in {
-      Json.fromJson[PenalisedUnderEstateAgentsAct](Json.obj("penalisedunderestateagentsact" -> false)) must
-        be(JsSuccess(PenalisedUnderEstateAgentsActNo, JsPath \ "penalisedunderestateagentsact"))
+      Json.fromJson[PenalisedUnderEstateAgentsAct](Json.obj("penalisedUnderEstateAgentsAct" -> false)) must
+        be(JsSuccess(PenalisedUnderEstateAgentsActNo, JsPath \ "penalisedUnderEstateAgentsAct"))
     }
 
     "successfully validate given an `Yes` value" in {
-      val json = Json.obj("penalisedunderestateagentsact" -> true, "penalisedunderestateagentsactdetails" -> "penalisedunderestateagentsactdetails data")
+      val json = Json.obj("penalisedUnderEstateAgentsAct" -> true, "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before")
       Json.fromJson[PenalisedUnderEstateAgentsAct](json) must
-        be(JsSuccess(PenalisedUnderEstateAgentsActYes("penalisedunderestateagentsactdetails data"), JsPath \ "penalisedunderestateagentsact" \ "penalisedunderestateagentsactdetails"))
+        be(JsSuccess(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before"),
+          JsPath \ "penalisedUnderEstateAgentsAct" \ "penalisedUnderEstateAgentsActDetails"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
-      val json = Json.obj("penalisedunderestateagentsact" -> true)
+      val json = Json.obj("penalisedUnderEstateAgentsAct" -> true)
       Json.fromJson[PenalisedUnderEstateAgentsAct](json) must
-        be(JsError((JsPath \ "penalisedunderestateagentsact" \ "penalisedunderestateagentsactdetails") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "penalisedUnderEstateAgentsAct" \ "penalisedUnderEstateAgentsActDetails") -> ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {
-      Json.toJson(PenalisedUnderEstateAgentsActNo) must be(Json.obj("penalisedunderestateagentsact" -> false))
-      Json.toJson(PenalisedUnderEstateAgentsActYes("penalisedunderestateagentsactdetails data")) must
+      Json.toJson(PenalisedUnderEstateAgentsActNo) must be(Json.obj("penalisedUnderEstateAgentsAct" -> false))
+      Json.toJson(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before")) must
         be(Json.obj(
-          "penalisedunderestateagentsact" -> true,
-          "penalisedunderestateagentsactdetails" -> "penalisedunderestateagentsactdetails data"
+          "penalisedUnderEstateAgentsAct" -> true,
+          "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before"
         ))
     }
   }
