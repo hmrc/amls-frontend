@@ -61,19 +61,24 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on post with valid data" in new Fixture {
 
+      val tradingPremisesWithData = TradingPremises(yourTradingPremises = None, yourAgent=Some(yourAgent1))
+
+
       val newRequest = request.withFormUrlEncodedBody(
         "agentsRegisteredName" -> "XYZ",
         "taxType" -> "01",
-        "businessStructure" -> "01"
+        "agentsBusinessStructure" -> "01"
       )
+
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithData)))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
-      println("============================ " + result)
       status(result) must be(SEE_OTHER)
-//      redirectLocation(result) must be(Some(controllers.routes.MainSummaryController.onPageLoad().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
     }
 
 //    "on post with invalid data" in new Fixture {

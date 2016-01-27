@@ -9,22 +9,23 @@
     title = Messages("tradingpremises.youragent.title")
 ) {
 
-
 @heading("tradingpremises.youragent.heading", "summary.tradingpremises")
+
+
+@form(f, controllers.tradingpremises.routes.YourAgentController.post(edit)) {
+
 
 <div class="form-field">
     <span class="form-field">@Messages("tradingpremises.youragent.paragraph1.text")</span>
 </div>
 
-@form(f, controllers.tradingpremises.routes.YourAgentController.post(edit)) {
-
 @input(
-field = f("agentRegisteredName"),
+field = f("agentsRegisteredName"),
 labelText = "tradingpremises.youragent.registeredname",
 classes = Seq("registeredname")
 )
 
-<p>@Messages("tradingpremises.youragent.taxtype")</p>
+<p class="form-label-bold">@Messages("tradingpremises.youragent.taxtype")</p>
 
 @inlineRadioGroup(f("taxType")) {
 @legend("TODO", jsHidden = true)
@@ -32,7 +33,7 @@ classes = Seq("registeredname")
 @radio(f("taxType"), "tradingpremises.youragent.taxtype.lbl.02", "02")
 }
 
-<p>@Messages("tradingpremises.youragent.businessstructure")</p>
+<p class="form-label-bold">@Messages("tradingpremises.youragent.businessstructure")</p>
 
 @radioGroup(f("agentsBusinessStructure")) {
 @legend("TODO", jsHidden = true)

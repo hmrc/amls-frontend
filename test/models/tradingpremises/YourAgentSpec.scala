@@ -4,7 +4,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 
 class YourAgentSpec extends PlaySpec with MockitoSugar {
 
@@ -26,35 +26,58 @@ class YourAgentSpec extends PlaySpec with MockitoSugar {
     "agentsBusinessStructure"-> Seq("05"))
 
 
-  "Form Validation" must {
-
-    "successfully validate given an enum value" in {
-      YourAgent.formRule.validate(inputData1) must be(Success(yourAgent1))
-    }
-
+//  "Form Validation" must {
+//
+//    import play.api.libs.json._, play.api.data.mapping._
+//    import play.api.libs.json._
+//    import play.api.data.mapping._
+//
+//    "successfully validate given an enum value" in {
+//
+//      //val js = Json.obj("agentsRegisteredName" -> "STUDENT", "taxType" -> "01", "agentsBusinessStructure"-> "01")
+//      //val fromYourAgent = From[JsValue, YourAgent](js)
+//
+//
+//      YourAgent.formRule.validate(inputData1) must be(Success(yourAgent1))
+//    }
+//
+//
 //    "write correct data from enum value" in {
 //      YourAgent.formWrites.writes(yourAgent1) must be(inputData1)
 //      YourAgent.formWrites.writes(yourAgent2) must be(inputData2)
 //    }
+//  }
+
+  "JSON validation" must {
+
+    "successfully validate json to object conversion" in {
+
+      val agentJObj = Json.obj("agentsRegisteredName" -> "STUDENT", "taxType" -> "01", "agentsBusinessStructure"-> "01")
+      val jVal =  Json.fromJson[YourAgent](agentJObj)
+      jVal must be(JsSuccess(yourAgent1, JsPath))
+    }
+
+    "successfully validate given an json value" in {
+
+      val rn = Json.obj("agentsRegisteredName" -> "STUDENT")
+      val tt = Json.obj("taxType" -> "01")
+      val bs = Json.obj("agentsBusinessStructure"-> "01")
+
+      val jVal1 =  Json.fromJson[AgentsRegisteredName](rn)
+      jVal1 must be(JsSuccess(AgentsRegisteredName("STUDENT"), JsPath \ "agentsRegisteredName"))
+
+      val jVal2 =  Json.fromJson[TaxType](tt)
+      jVal2 must be(JsSuccess(TaxTypeSelfAssesment, JsPath \ "taxType"))
+
+      val jVal3 =  Json.fromJson[BusinessStructure](bs)
+      jVal3 must be(JsSuccess(SoleProprietor, JsPath \ "agentsBusinessStructure"))
+
+    }
   }
 
-//  "JSON validation" must {
-//
-//    "successfully validate given an enum value" in {
-//
-//      val agentJObj = Json.obj("agentsRegisteredName" -> "STUDENT", "taxType" -> "01", "agentsBusinessStructure"-> "01")
-//
-//
-//      println("=====------======----- " +agentJObj)
-//
-//      val jVal =  Json.fromJson[YourAgent](agentJObj)
-//
-//      println("------------------- " +jVal)
-//
-//      Json.fromJson[YourAgent](agentJObj) must
-//        be(JsSuccess(YourAgent, JsPath \ "taxType"))
-//
-//    }
-//  }
+  "successfully convert object to json " in {
+    val agentJObj = Json.obj("agentsRegisteredName" -> "STUDENT", "taxType" -> "01", "agentsBusinessStructure"-> "01")
+    Json.toJson[YourAgent](yourAgent1) must be(agentJObj)
+  }
 
   }

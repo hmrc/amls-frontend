@@ -24,16 +24,76 @@ case object Partnership extends BusinessStructure
 case object IncorporatedBody extends BusinessStructure
 case object UnincorporatedBody extends BusinessStructure
 
+object AgentsRegisteredName {
+
+  //  implicit val format = Json.format[AgentsRegisteredName]
+
+  implicit val jsonWritesRegisteredName = Writes[AgentsRegisteredName] {
+    case agentsRegisteredName => Json.obj("agentsRegisteredName" -> agentsRegisteredName.value)
+  }
+
+    implicit val jsonReadsRegisteredName : Reads[AgentsRegisteredName] =  {
+      import play.api.libs.json.Reads.StringReads
+        (__ \ "agentsRegisteredName").read[String] map (AgentsRegisteredName.apply _)
+    }
+
+}
+
+object TaxType {
+
+  import utils.MappingUtils.Implicits._
+
+  implicit val jsonReadsTaxType = {
+    (__ \ "taxType").read[String].flatMap[TaxType] {
+      case "01" => TaxTypeSelfAssesment
+      case "02" => TaxTypeCorporationTax
+      case _ => ValidationError("error.invalid")
+    }
+  }
+
+  implicit val jsonWritesTaxType = Writes[TaxType] {
+    case TaxTypeSelfAssesment => Json.obj("taxType" -> "01")
+    case TaxTypeCorporationTax => Json.obj("taxType" -> "02")
+  }
+}
+
+
+object BusinessStructure {
+
+  import utils.MappingUtils.Implicits._
+
+  implicit val jsonReadsBusinessStructure = {
+    (__ \ "agentsBusinessStructure").read[String].flatMap[BusinessStructure] {
+      case "01" => SoleProprietor
+      case "02" => LimitedLiabilityPartnership
+      case "03" => Partnership
+      case "04" => IncorporatedBody
+      case "05" => UnincorporatedBody
+      case _ =>
+        ValidationError("error.invalid")
+    }
+  }
+
+  implicit val jsonWritesBusinessStructure = Writes[BusinessStructure] {
+    case SoleProprietor => Json.obj("agentsBusinessStructure" -> "01")
+    case LimitedLiabilityPartnership => Json.obj("agentsBusinessStructure" -> "02")
+    case Partnership => Json.obj("agentsBusinessStructure" -> "03")
+    case IncorporatedBody => Json.obj("agentsBusinessStructure" -> "04")
+    case UnincorporatedBody => Json.obj("agentsBusinessStructure" -> "05")
+  }
+
+}
+
 
 object YourAgent {
 
   val key = "your-agent"
   import utils.MappingUtils.Implicits._
+  import models.FormTypes._
 
 
   implicit val formRule: Rule[UrlFormEncoded, YourAgent] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    import models.FormTypes._
 
     (__.read[AgentsRegisteredName] ~
       __.read[TaxType] ~
@@ -42,8 +102,7 @@ object YourAgent {
 
   implicit val agentsRegisteredNameRule : Rule[UrlFormEncoded, AgentsRegisteredName] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    import models.FormTypes._
-    (__ \ "agentRegisteredName").read[String] fmap (AgentsRegisteredName.apply)
+    (__ \ "agentsRegisteredName").read(agentNameType) fmap (AgentsRegisteredName.apply)
   }
 
   implicit val taxTypeRule : Rule[UrlFormEncoded, TaxType] = From[UrlFormEncoded] { __ =>
@@ -108,39 +167,16 @@ object YourAgent {
 
 
   implicit val jsonReads: Reads[YourAgent] = {
-      import play.api.libs.json._
-      import play.api.libs.functional.syntax._
-      (__.read[AgentsRegisteredName] and
-        __.read[TaxType] and
-        __.read[BusinessStructure])(YourAgent.apply _)
+    import play.api.libs.json._
+    import play.api.libs.functional.syntax._
+    import AgentsRegisteredName._
+
+    (__.read[AgentsRegisteredName] and
+      __.read[TaxType] and
+      __.read[BusinessStructure])(YourAgent.apply _)
   }
 
-  implicit val jsonReadsRegisteredName =  {
-    import play.api.libs.json.Reads.StringReads
-      (JsPath \ "agentsRegisteredName").read[String] map (AgentsRegisteredName.apply _)
-  }
 
-  implicit val jsonReadsTaxType =  {
-    (__ \ "taxType").read[String].flatMap[TaxType] {
-      case "01" => TaxTypeSelfAssesment
-      case "02" => TaxTypeCorporationTax
-      case _ => ValidationError("error.invalid")
-    }
-  }
-
-  implicit val jsonReadsBusinessStructure =  {
-    (__ \ "agentsBsinessStructure").read[String].flatMap[BusinessStructure] {
-      case "01" => SoleProprietor
-      case "02" => LimitedLiabilityPartnership
-      case "03" => Partnership
-      case "04" => IncorporatedBody
-      case "05" => UnincorporatedBody
-      case _ =>
-        ValidationError("error.invalid")
-    }
-  }
-
-//  implicit val formats = Json.format[YourAgent]
   implicit val jsonWrite :Writes[YourAgent] = {
     import play.api.libs.json._
     import play.api.libs.functional.syntax._
@@ -149,18 +185,5 @@ object YourAgent {
       __.write[BusinessStructure])(unlift(YourAgent.unapply))
   }
 
-  implicit val jsonWritesRegisteredName = Writes[AgentsRegisteredName] {
-    case agentsRegisteredName => Json.obj("agentsRegisteredName" -> agentsRegisteredName.value)
-  }
-  implicit val jsonWritesTaxType = Writes[TaxType] {
-    case TaxTypeSelfAssesment => Json.obj("taxType" -> "01")
-    case TaxTypeCorporationTax => Json.obj("taxType" -> "02")
-  }
-  implicit val jsonWritesBusinessStructure = Writes[BusinessStructure] {
-    case SoleProprietor => Json.obj("agentsBusinessStructure" -> "01")
-    case LimitedLiabilityPartnership => Json.obj("agentsBusinessStructure" -> "02")
-    case Partnership => Json.obj("agentsBusinessStructure" -> "03")
-    case IncorporatedBody => Json.obj("agentsBusinessStructure" -> "04")
-    case UnincorporatedBody => Json.obj("agentsBusinessStructure" -> "05")
-  }
+
 }

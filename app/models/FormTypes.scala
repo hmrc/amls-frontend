@@ -13,6 +13,7 @@ object FormTypes {
   val maxVRNTypeLength = 9
   val maxPhoneNumberLength = 30
   val maxEMailLength = 100
+  val maxAgentNameLength = 140
 
   val indivNameType =
     notEmpty compose maxLength(maxNameTypeLength)
@@ -36,5 +37,7 @@ object FormTypes {
   val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
 
   val emailType = notEmpty compose maxLength(maxEMailLength)
+
+  val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
 
 }
