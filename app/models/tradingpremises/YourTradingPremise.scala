@@ -1,44 +1,28 @@
 package models.tradingpremises
 
-
-import models.FormTypes._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
-import play.api.libs.json._
-
-case class YourTradingPremises(name:String, city:String)
-
-object YourTradingPremises {
-
-  implicit val formRule: Rule[UrlFormEncoded, YourTradingPremises] =
-    From[UrlFormEncoded] { __ =>
-      import models.FormTypes._
-      import play.api.data.mapping.forms.Rules._
-      (
-        (__ \ "name").read[String] and
-          (__ \ "city").read[String]
-        )(YourTradingPremises.apply _)
-    }
-
-  implicit val formWrites: Write[YourTradingPremises, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "name").write[String] and
-        (__ \ "city").write[String]
-      ) (unlift(YourTradingPremises.unapply _))
-  }
-
-  implicit val formats = Json.format[YourTradingPremises]
-}
-/*
 import org.joda.time.LocalDate
+import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.mapping.{Success, Path, Rule}
+import play.api.libs.functional.FunctionalBuilder
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+import models.FormTypes._
+import play.api.data.mapping.forms.Rules._
 
 case class YourTradingPremises(tradingName : String,
                               tradingAddress: TradingPremisesAddress,
                               startOfTradingDate: LocalDate,
                               isResidential : IsResidential)
+
+object YourTradingPremises{
+  implicit val jsonReadsYourTradingPremises = {
+    ((JsPath \ "tradingName").read[String] and
+      JsPath.read[TradingPremisesAddress] and
+      (JsPath).read[LocalDate] and
+      (JsPath).read[IsResidential])(YourTradingPremises.apply _)
+  }
+}
+
 
 sealed trait TradingPremisesAddress {
 
@@ -78,7 +62,38 @@ case class TradingPremisesAddressNonUK(
                                   country: String
                                 ) extends TradingPremisesAddress
 
+object TradingPremisesAddress{
+
+  val jsonReadsFourAddressLines = {
+    (JsPath \ "tradingPremisesAddressLine1").read[String] and
+      (JsPath \ "tradingPremisesAddressLine2").read[String] and
+      (JsPath \ "tradingPremisesAddressLine3").readNullable[String] and
+      (JsPath \ "tradingPremisesAddressLine4").readNullable[String]
+  }
+
+  implicit val jsonReadsTradingPremisesAddress : Reads[TradingPremisesAddress]= {
+    (JsPath \ "isUk").read[Boolean].flatMap {
+      case true => (jsonReadsFourAddressLines and
+                    (JsPath \ "postcode").read[String]
+                   ).apply(TradingPremisesAddressUK.apply _)
+
+      case false => (jsonReadsFourAddressLines and
+                      (JsPath \ "country").read[String]
+                    ).apply(TradingPremisesAddressNonUK.apply _)
+
+    }
+  }
+}
+
 sealed trait IsResidential
 case object ResidentialYes extends IsResidential
 case object ResidentialNo extends IsResidential
-*/
+
+object IsResidential {
+  implicit val jsonReadsIsResidential : Reads[IsResidential] = {
+    (JsPath \ "isResidential").read[Boolean] fmap {
+      case true => ResidentialYes
+      case false => ResidentialNo
+    }
+  }
+}
