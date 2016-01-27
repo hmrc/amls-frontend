@@ -1,9 +1,8 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import models.aboutthebusiness._
-import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
@@ -63,7 +62,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
     "Post" must {
 
-      "successfully redirect to the page on selection of 'Yes' this is registered address" in new Fixture {
+      "successfully redirect to the page on selection of 'Yes' [this is registered address]" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
@@ -76,7 +75,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
         redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ContactingYouController.get().url))
       }
 
-      "successfully redirect to the page on selection of 'No' this is not registered address" in new Fixture {
+      "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"

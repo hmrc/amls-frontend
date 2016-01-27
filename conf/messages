@@ -67,6 +67,8 @@ summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
 
 summary.checkyouranswers.title = Check your answers
+button.summary.acceptandcomplete = Accept and complete section
+
 
 aboutyou.yourdetails.title = What is your name?
 

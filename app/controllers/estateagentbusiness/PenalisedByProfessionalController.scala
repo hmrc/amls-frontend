@@ -14,7 +14,12 @@ trait PenalisedByProfessionalController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.penalised_by_professional(EmptyForm, edit)))
+      dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
+        case Some(EstateAgentBusiness(_, Some(data), _)) =>
+          Ok(views.html.penalised_by_professional(Form2[ProfessionalBody](data), edit))
+        case _ =>
+          Ok(views.html.penalised_by_professional(EmptyForm, edit))
+      }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -27,10 +32,7 @@ trait PenalisedByProfessionalController extends BaseController {
             estateAgentBusiness <- dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key,
               estateAgentBusiness.professionalBody(data))
-          } yield edit match {
-            //case true => Redirect(routes.SummaryController.get()) //TODO
-            case false => Redirect(routes.PenalisedByProfessionalController.get()) //TODO
-          }
+          } yield Redirect(routes.SummaryController.get())
       }
   }
 }

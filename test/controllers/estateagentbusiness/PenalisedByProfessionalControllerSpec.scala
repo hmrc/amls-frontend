@@ -1,5 +1,6 @@
 package controllers.estateagentbusiness
 
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness._
 import org.jsoup.Jsoup
@@ -27,6 +28,11 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
 
   "PenalisedByProfessionalController" must {
 
+    "use correct services" in new Fixture {
+      PenalisedByProfessionalController.authConnector must be(AMLSAuthConnector)
+      PenalisedByProfessionalController.dataCacheConnector must be(DataCacheConnector)
+    }
+
     "on get display the Penalised By Professional Body page" in new Fixture {
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
@@ -43,9 +49,8 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
 
     val result = controller.get()(request)
     status(result) must be(OK)
+    contentAsString(result) must include (Messages("estateagentbusiness.penalisedbyprofessional.title"))
 
-    val document = Jsoup.parse(contentAsString(result))
-    // TODO
   }
 
   "on post with valid data" in new Fixture {
@@ -63,7 +68,7 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get().url))
+    redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
   }
 
   "on post with invalid data" in new Fixture {
@@ -79,7 +84,7 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
     // TODO
   }
 
-  /* "on post with valid data in edit mode" in new Fixture {
+   "on post with valid data in edit mode" in new Fixture {
 
      val newRequest = request.withFormUrlEncodedBody(
        "penalised" -> "true",
@@ -95,10 +100,7 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)
      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
-   }*/
-
-
-
+   }
 }
 
 

@@ -30,26 +30,25 @@
             labelText = "aboutthebusiness.correspondenceaddress.businessName"
         )
 
-        <fieldset class="">
-            <legend class="form-label-bold">
-                @Messages("aboutthebusiness.correspondenceaddress.address")
-            </legend>
-            @input(f("addressLine1"))
-            @input(f("addressLine2"))
-            @input(f("addressLine3"))
-            @input(f("addressLine4"))
-        </fieldset>
-
         @fieldset(
             legend = "TODO",
             jsHidden = true,
             panel = false,
             id = s"""${f("postCode").id}-fieldset"""
         ) {
+            <fieldset class="">
+                <legend class="form-label-bold">
+                    @Messages("aboutthebusiness.correspondenceaddress.address")
+                </legend>
+                @input(f("addressLine1"))
+                @input(f("addressLine2"))
+                @input(f("addressLine3"))
+                @input(f("addressLine4"))
+            </fieldset>
             @input(
                 field = f("postCode"),
                 labelText = "aboutthebusiness.correspondenceaddress.postCode",
-                classes = Seq("form-control-1-8")
+                classes = Seq("postcode")
             )
         }
 
@@ -59,6 +58,15 @@
             panel = false,
             id = s"""${f("country").id}-fieldset"""
         ) {
+            <fieldset class="">
+                <legend class="form-label-bold">
+                    @Messages("aboutthebusiness.correspondenceaddress.address")
+                </legend>
+                @input(f("addressLineNonUK1"))
+                @input(f("addressLineNonUK2"))
+                @input(f("addressLineNonUK3"))
+                @input(f("addressLineNonUK4"))
+            </fieldset>
             @input(
                 field = f("country"),
                 labelText = "aboutthebusiness.correspondenceaddress.country"

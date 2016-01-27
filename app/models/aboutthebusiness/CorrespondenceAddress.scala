@@ -21,10 +21,10 @@ sealed trait CorrespondenceAddress {
       Seq(
         Some(a.yourName),
         Some(a.businessName),
-        Some(a.addressLine1),
-        Some(a.addressLine2),
-        a.addressLine3,
-        a.addressLine4,
+        Some(a.addressLineNonUK1),
+        Some(a.addressLineNonUK2),
+        a.addressLineNonUK3,
+        a.addressLineNonUK4,
         Some(a.country)
       ).flatten
   }
@@ -43,10 +43,10 @@ case class UKCorrespondenceAddress(
 case class NonUKCorrespondenceAddress(
                                      yourName: String,
                                      businessName: String,
-                                     addressLine1: String,
-                                     addressLine2: String,
-                                     addressLine3: Option[String],
-                                     addressLine4: Option[String],
+                                     addressLineNonUK1: String,
+                                     addressLineNonUK2: String,
+                                     addressLineNonUK3: Option[String],
+                                     addressLineNonUK4: Option[String],
                                      country: String
                                      ) extends CorrespondenceAddress
 
@@ -98,10 +98,10 @@ object CorrespondenceAddress {
         "isUK" -> Seq("false"),
         "yourName" -> Seq(a.yourName),
         "businessName" -> Seq(a.businessName),
-        "addressLine1" -> Seq(a.addressLine1),
-        "addressLine2" -> Seq(a.addressLine2),
-        "addressLine3" -> a.addressLine3.toSeq,
-        "addressLine4" -> a.addressLine4.toSeq,
+        "addressLine1" -> Seq(a.addressLineNonUK1),
+        "addressLine2" -> Seq(a.addressLineNonUK2),
+        "addressLine3" -> a.addressLineNonUK3.toSeq,
+        "addressLine4" -> a.addressLineNonUK4.toSeq,
         "country" -> Seq(a.country)
       )
   }
