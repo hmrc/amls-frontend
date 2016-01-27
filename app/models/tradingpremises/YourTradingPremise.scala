@@ -21,8 +21,12 @@ object YourTradingPremises{
       (JsPath).read[LocalDate] and
       (JsPath).read[IsResidential])(YourTradingPremises.apply _)
   }
-}
 
+  //TODO - Joe: Implement Writes
+  implicit val jsonWritesYourTradingPremises : Writes[YourTradingPremises] = OWrites({
+    x:YourTradingPremises => {x match {case _ => Json.obj("fdsfsd" -> "fdsfsf")}}
+  })
+}
 
 sealed trait TradingPremisesAddress {
 
@@ -80,7 +84,6 @@ object TradingPremisesAddress{
       case false => (jsonReadsFourAddressLines and
                       (JsPath \ "country").read[String]
                     ).apply(TradingPremisesAddressNonUK.apply _)
-
     }
   }
 }
