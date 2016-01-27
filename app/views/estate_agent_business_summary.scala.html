@@ -30,5 +30,27 @@
             </td>
         </tr>
     </table>
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("estateagentbusiness.penalisedunderestateagentsact.title")</th>
+            <td colspan="2"><a href="@controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.penalisedUnderEstateAgentsAct.map {
+                case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.no") }
+                case PenalisedUnderEstateAgentsActYes(v) => { @Messages("lbl.yes") }
+                }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.penalisedUnderEstateAgentsAct.map {
+                case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.na") }
+                case PenalisedUnderEstateAgentsActYes(v) => { @v }
+                }
+            </td>
+        </tr>
+    </table>
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
 }

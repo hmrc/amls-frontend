@@ -46,6 +46,8 @@ GET         /estate-agents/index                       controllers.estateagentbu
 GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
+GET         /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
+POST        /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
 GET         /estate-agents/summary                     controllers.estateagentbusiness.SummaryController.get()
 
 

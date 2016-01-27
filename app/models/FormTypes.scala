@@ -40,5 +40,4 @@ object FormTypes {
 
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
-
 }

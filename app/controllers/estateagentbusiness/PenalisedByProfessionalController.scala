@@ -15,7 +15,7 @@ trait PenalisedByProfessionalController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
-        case Some(EstateAgentBusiness(_, Some(data))) =>
+        case Some(EstateAgentBusiness(_, Some(data), _)) =>
           Ok(views.html.penalised_by_professional(Form2[ProfessionalBody](data), edit))
         case _ =>
           Ok(views.html.penalised_by_professional(EmptyForm, edit))
