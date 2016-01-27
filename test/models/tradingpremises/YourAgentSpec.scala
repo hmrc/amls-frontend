@@ -26,27 +26,21 @@ class YourAgentSpec extends PlaySpec with MockitoSugar {
     "agentsBusinessStructure"-> Seq("05"))
 
 
-//  "Form Validation" must {
-//
-//    import play.api.libs.json._, play.api.data.mapping._
-//    import play.api.libs.json._
-//    import play.api.data.mapping._
-//
-//    "successfully validate given an enum value" in {
-//
-//      //val js = Json.obj("agentsRegisteredName" -> "STUDENT", "taxType" -> "01", "agentsBusinessStructure"-> "01")
-//      //val fromYourAgent = From[JsValue, YourAgent](js)
-//
-//
-//      YourAgent.formRule.validate(inputData1) must be(Success(yourAgent1))
-//    }
-//
-//
-//    "write correct data from enum value" in {
-//      YourAgent.formWrites.writes(yourAgent1) must be(inputData1)
-//      YourAgent.formWrites.writes(yourAgent2) must be(inputData2)
-//    }
-//  }
+  "Form Validation" must {
+
+    import play.api.libs.json._, play.api.data.mapping._
+    import play.api.libs.json._
+    import play.api.data.mapping._
+
+    "successfully validate given an input data" in {
+      YourAgent.formRule.validate(inputData1) must be(Success(yourAgent1))
+    }
+
+    "write correct data from object to Form(UrlFormEncoded) object" in {
+      YourAgent.formWrites.writes(yourAgent1) must be(inputData1)
+      YourAgent.formWrites.writes(yourAgent2) must be(inputData2)
+    }
+  }
 
   "JSON validation" must {
 

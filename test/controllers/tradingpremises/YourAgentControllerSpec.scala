@@ -14,7 +14,6 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-
 class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
@@ -27,7 +26,6 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
   }
 
   "YourAgentController" must {
-
     val yourAgent1 = YourAgent(AgentsRegisteredName("ABC Corporation"), TaxTypeCorporationTax, SoleProprietor)
     val yourAgent2 = YourAgent(AgentsRegisteredName("PQR Corporation"), TaxTypeCorporationTax, SoleProprietor)
     val yourAgent3 = YourAgent(AgentsRegisteredName("XYZ Corporation"), TaxTypeCorporationTax, SoleProprietor)
@@ -36,33 +34,32 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
     val tradingPremises2 = TradingPremises(None, Some(yourAgent2))
 
 
-//    "on get display who is your agent page" in new Fixture {
-//      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
-//        (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//      val result = controller.get()(request)
-//      status(result) must be(OK)
-//      contentAsString(result) must include("   ")
-//    }
-//
-//    "on get() display the who is your agent page with pre populated data" in new Fixture {
-//
-//
-//      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
-//        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises1)))
-//
-//      val result = controller.get()(request)
-//      status(result) must be(OK)
-//
-//      val document = Jsoup.parse(contentAsString(result))
-//      // TODO
-//      //      document.select("input[value=01]").hasAttr("checked") must be(true)
-//    }
+    "on get display who is your agent page" in new Fixture {
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+      contentAsString(result) must include("   ")
+    }
+
+    "on get() display the who is your agent page with pre populated data" in new Fixture {
+
+
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises1)))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      // TODO : Check the elements on the page are populated right
+      //      document.select("input[value=01]").hasAttr("checked") must be(true)
+    }
 
     "on post with valid data" in new Fixture {
 
-      val tradingPremisesWithData = TradingPremises(yourTradingPremises = None, yourAgent=Some(yourAgent1))
-
+      val tradingPremisesWithData = TradingPremises(yourTradingPremises = None, yourAgent = Some(yourAgent1))
 
       val newRequest = request.withFormUrlEncodedBody(
         "agentsRegisteredName" -> "XYZ",
@@ -81,42 +78,45 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
     }
 
-//    "on post with invalid data" in new Fixture {
-//
-//      val newRequest = request.withFormUrlEncodedBody(
-//        "agentsRegisteredName" -> "XYZ",
-//        "taxType" -> "09",
-//        "businessStructure" -> "07"
-//      )
-//      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
-//        (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//      val result = controller.post()(newRequest)
-//      status(result) must be(BAD_REQUEST)
-//
-//      val document = Jsoup.parse(contentAsString(result))
-//      // TODO
-//      //      document.select("input[name=other]").`val` must be("foo")
-//    }
+    "on post with invalid data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "agentsRegisteredName" -> "XYZ",
+        "taxType" -> "09",
+        "businessStructure" -> "07"
+      )
+      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document = Jsoup.parse(contentAsString(result))
+      // TODO : Check the page fields are set to the right values
+      //      document.select("input[name=other]").`val` must be("foo")
+      document.select("input[name=agentsRegisteredName").`val` must be("XYZ")
+    }
 
     // to be valid after summary edit page is ready
-    /* "on post with valid data in edit mode" in new Fixture {
+    "on post with valid data in edit mode" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody(
-      "previouslyRegisteredYes" -> "true"
-    )
+      val tradingPremisesWithData = TradingPremises(yourTradingPremises = None, yourAgent = Some(yourAgent2))
 
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+      val newRequest = request.withFormUrlEncodedBody(
+        "agentsRegisteredName" -> "XYZ",
+        "taxType" -> "01",
+        "agentsBusinessStructure" -> "01"
+      )
 
-    when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithData)))
 
-    val result = controller.post(true)(newRequest)
-    status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
-  }*/
+      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
-
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+    }
   }
 }
