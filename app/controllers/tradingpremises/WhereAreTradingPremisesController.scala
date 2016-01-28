@@ -8,6 +8,10 @@ trait WhereAreTradingPremisesController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
+  def get(edit : Boolean = false) = Authorised.async {???}
+
+  def post(edit : Boolean = false) = Authorised.async {???}
+
 }
 
 object WhereAreTradingPremisesController extends WhereAreTradingPremisesController {
