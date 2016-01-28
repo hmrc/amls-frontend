@@ -18,7 +18,7 @@ object YourTradingPremises{
   implicit val jsonReadsYourTradingPremises = {
     ((JsPath \ "tradingName").read[String] and
       JsPath.read[TradingPremisesAddress] and
-      (JsPath).read[LocalDate] and
+      (JsPath \ "startOfTrading").read[LocalDate] and
       (JsPath).read[IsResidential])(YourTradingPremises.apply _)
   }
 
@@ -76,7 +76,7 @@ object TradingPremisesAddress{
   }
 
   implicit val jsonReadsTradingPremisesAddress : Reads[TradingPremisesAddress]= {
-    (JsPath \ "isUk").read[Boolean].flatMap {
+    (JsPath \ "isUK").read[Boolean].flatMap {
       case true => (jsonReadsFourAddressLines and
                     (JsPath \ "postcode").read[String]
                    ).apply(TradingPremisesAddressUK.apply _)
