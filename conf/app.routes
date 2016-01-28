@@ -42,9 +42,11 @@ GET         /business-details/summary                  controllers.aboutthebusin
 GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
 #GET         /trading-premises/premises                 controllers.tradingpremises.YourTradingPremisesController.get()
 
+GET         /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.get(edit: Boolean ?= false)
+POST        /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.post(edit: Boolean ?= false)
+
 GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(edit: Boolean ?= false)
 POST        /trading-premises/agent                    controllers.tradingpremises.YourAgentController.post(edit: Boolean ?= false)
-
 
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
