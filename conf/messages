@@ -127,10 +127,30 @@ tradingpremises.whatyouneed.requiredinfo.text.2=your trading address
 tradingpremises.whatyouneed.requiredinfo.text.3=whose premises they are
 tradingpremises.whatyouneed.requiredinfo.text.4=date you will start trading from these premises
 tradingpremises.whatyouneed.requiredinfo.text.5=whether or not it's a residential address
-tradingpremises.whatyouneed.agentinfo.heading=If your business uses agents, you`ll need the following information for each one:
-tradingpremises.whatyouneed.agentinfo.text.1=your agent`s registered business name
+tradingpremises.whatyouneed.agentinfo.heading=If your business uses agents, you''ll need the following information for each one:
+tradingpremises.whatyouneed.agentinfo.text.1=your agent''s registered business name
 tradingpremises.whatyouneed.agentinfo.text.2=the type of tax your agent pays
-tradingpremises.whatyouneed.agentinfo.text.3=your agent`s business structure
+tradingpremises.whatyouneed.agentinfo.text.3=your agent''s business structure
+
+tradingpremises.youragent.title=Trading premises - Who is your agent?
+tradingpremises.youragent.heading=Who is your agent?
+tradingpremises.youragent.paragraph1.text=An agent is an individual or business that works on behalf of your business to offer your services.
+tradingpremises.youragent.requiredinfo.heading=For each of your trading premises, you''ll need:
+
+tradingpremises.youragent.registeredname = What is your agent''s registered business name?
+tradingpremises.youragent.registeredname.subtitle = It must be identical to the name on the incorporation certificate.
+tradingpremises.youragent.taxtype = What type of tax does your agent pay?
+tradingpremises.youragent.taxtype.lbl.01=Self-assesment
+tradingpremises.youragent.taxtype.lbl.02=Corporation tax
+
+tradingpremises.youragent.businessstructure=What is your agent''s business structure?
+tradingpremises.youragent.businessstructure.lbl.01=Sole proprietor
+tradingpremises.youragent.businessstructure.lbl.02=Limited liability partnership
+tradingpremises.youragent.businessstructure.lbl.03=Partnership
+tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
+tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
+
+
 
 estateagentbusiness.whatyouneed.title = Estate agent business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
