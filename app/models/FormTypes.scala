@@ -13,6 +13,7 @@ object FormTypes {
   val maxVRNTypeLength = 9
   val maxPhoneNumberLength = 30
   val maxEMailLength = 100
+  val maxPenalisedTypeLength = 255
   val maxAgentNameLength = 140
 
   val indivNameType =
@@ -38,6 +39,8 @@ object FormTypes {
 
   val emailType = notEmpty compose maxLength(maxEMailLength)
 
-  val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
+  val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
+  val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
 }
+

@@ -31,8 +31,8 @@ object VATRegistered {
     case VATRegisteredNo => Map("registeredForVAT" -> Seq("false"))
   }
 
-  implicit val jsonReads =
-    (__ \ "registeredForVAT").read[Boolean] flatMap[VATRegistered] {
+  implicit val jsonReads: Reads[VATRegistered] =
+    (__ \ "registeredForVAT").read[Boolean] flatMap {
     case true => (__ \ "vrnNumber").read[String] map (VATRegisteredYes.apply _)
     case false => Reads(_ => JsSuccess(VATRegisteredNo))
   }
