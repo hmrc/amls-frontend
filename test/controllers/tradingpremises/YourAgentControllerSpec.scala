@@ -4,6 +4,8 @@ import connectors.DataCacheConnector
 import models.aboutthebusiness._
 import models.tradingpremises._
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -53,16 +55,15 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      // TODO : Check the elements on the page are populated right
-      //      document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
     "on post with valid data" in new Fixture {
 
       val tradingPremisesWithData = TradingPremises(yourTradingPremises = None, yourAgent = Some(yourAgent1))
 
+      val agentName = "XYZ"
       val newRequest = request.withFormUrlEncodedBody(
-        "agentsRegisteredName" -> "XYZ",
+        "agentsRegisteredName" -> agentName,
         "taxType" -> "01",
         "agentsBusinessStructure" -> "01"
       )
@@ -80,8 +81,9 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on post with invalid data" in new Fixture {
 
+      val agentName = "XYZ"
       val newRequest = request.withFormUrlEncodedBody(
-        "agentsRegisteredName" -> "XYZ",
+        "agentsRegisteredName" -> agentName,
         "taxType" -> "09",
         "businessStructure" -> "07"
       )
@@ -91,10 +93,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      val document = Jsoup.parse(contentAsString(result))
-      // TODO : Check the page fields are set to the right values
-      //      document.select("input[name=other]").`val` must be("foo")
-      document.select("input[name=agentsRegisteredName").`val` must be("XYZ")
+
     }
 
     // to be valid after summary edit page is ready
