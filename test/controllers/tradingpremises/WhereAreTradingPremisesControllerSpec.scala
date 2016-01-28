@@ -1,6 +1,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import models.aboutthebusiness.AboutTheBusiness
 import models.tradingpremises.YourTradingPremises
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -32,6 +33,17 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include (Messages("tradingpremises.yourtradingpremises.title"))
+
+    }
+
+
+    "on post of the page with invalid data must reload the page" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody()
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any())).thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
 
     }
 

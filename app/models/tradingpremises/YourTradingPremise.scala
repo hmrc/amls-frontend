@@ -2,7 +2,7 @@ package models.tradingpremises
 
 import org.joda.time.LocalDate
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{Success, Path, Rule}
+import play.api.data.mapping.{From, Success, Path, Rule}
 import play.api.libs.functional.FunctionalBuilder
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -26,6 +26,21 @@ object YourTradingPremises{
   implicit val jsonWritesYourTradingPremises : Writes[YourTradingPremises] = OWrites({
     x:YourTradingPremises => {x match {case _ => Json.obj("fdsfsd" -> "fdsfsf")}}
   })
+
+  implicit val formRules : Rule[UrlFormEncoded, YourTradingPremises] = From[UrlFormEncoded] {
+
+    import models.FormTypes._
+    import play.api.data.mapping.forms.Rules._
+    import models.FormTypes._
+    import play.api.data.mapping.forms.Rules._
+    (
+      (__ \ "phoneNumber").read(phoneNumberType) and
+        (__ \ "email").read(emailType) and
+        (__ \ "website").read(optionR(emailType)) and
+        (__ \ "letterToThisAddress").read[Boolean]
+      )(TradingPremisesAddress.apply _)
+  }
+
 }
 
 sealed trait TradingPremisesAddress {
