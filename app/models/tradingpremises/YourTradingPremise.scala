@@ -2,17 +2,15 @@ package models.tradingpremises
 
 import org.joda.time.LocalDate
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Success, Path, Rule}
-import play.api.libs.functional.FunctionalBuilder
-import play.api.libs.json._
+import play.api.data.mapping.{From, Rule}
 import play.api.libs.functional.syntax._
-import play.api.data.mapping.forms.Rules._
 import play.api.libs.json.Writes._
+import play.api.libs.json._
 
-case class YourTradingPremises(tradingName : String,
-                              tradingAddress: TradingPremisesAddress,
-                              startOfTradingDate: LocalDate,
-                              isResidential : IsResidential)
+case class YourTradingPremises(tradingName: String,
+                               tradingAddress: TradingPremisesAddress,
+                               startOfTradingDate: LocalDate,
+                               isResidential: IsResidential)
 
 object YourTradingPremises {
   implicit val jsonReadsYourTradingPremises = {
@@ -28,20 +26,6 @@ object YourTradingPremises {
       (__ \ "startOfTrading").write[LocalDate] and
       (__).write[IsResidential]
     ) (unlift(YourTradingPremises.unapply))
-
-  implicit val formRules : Rule[UrlFormEncoded, YourTradingPremises] = From[UrlFormEncoded] {
-
-    import models.FormTypes._
-    import play.api.data.mapping.forms.Rules._
-    import models.FormTypes._
-    import play.api.data.mapping.forms.Rules._
-    (
-      (__ \ "phoneNumber").read(phoneNumberType) and
-        (__ \ "email").read(emailType) and
-        (__ \ "website").read(optionR(emailType)) and
-        (__ \ "letterToThisAddress").read[Boolean]
-      )(TradingPremisesAddress.apply _)
-  }
 
 }
 
@@ -73,75 +57,104 @@ case class TradingPremisesAddressUK(
                                      addressLine3: Option[String] = None,
                                      addressLine4: Option[String] = None,
                                      postcode: String
-                             ) extends TradingPremisesAddress
+                                   ) extends TradingPremisesAddress
 
 case class TradingPremisesAddressNonUK(
-                                  addressLine1: String,
-                                  addressLine2: String,
-                                  addressLine3: Option[String] = None,
-                                  addressLine4: Option[String] = None,
-                                  country: String
-                                ) extends TradingPremisesAddress
+                                        addressLine1: String,
+                                        addressLine2: String,
+                                        addressLine3: Option[String] = None,
+                                        addressLine4: Option[String] = None,
+                                        country: String
+                                      ) extends TradingPremisesAddress
 
-object TradingPremisesAddress{
+object TradingPremisesAddress {
 
   val jsonReadsFourAddressLines = {
-    (JsPath \ "tradingPremisesAddressLine1").read[String] and
-      (JsPath \ "tradingPremisesAddressLine2").read[String] and
-      (JsPath \ "tradingPremisesAddressLine3").readNullable[String] and
-      (JsPath \ "tradingPremisesAddressLine4").readNullable[String]
+    (JsPath \ "addressLine1").read[String] and
+      (JsPath \ "addressLine2").read[String] and
+      (JsPath \ "addressLine3").readNullable[String] and
+      (JsPath \ "addressLine4").readNullable[String]
   }
 
   val jsonWritesFourAddressLines = {
-    (JsPath \ "tradingPremisesAddressLine1").write[String] and
-      (JsPath \ "tradingPremisesAddressLine2").write[String] and
-      (JsPath \ "tradingPremisesAddressLine3").writeNullable[String] and
-      (JsPath \ "tradingPremisesAddressLine4").writeNullable[String]
+    (JsPath \ "addressLine1").write[String] and
+      (JsPath \ "addressLine2").write[String] and
+      (JsPath \ "addressLine3").writeNullable[String] and
+      (JsPath \ "addressLine4").writeNullable[String]
   }
 
-  implicit val jsonReadsTradingPremisesAddress : Reads[TradingPremisesAddress]= {
+  implicit val jsonReadsTradingPremisesAddress: Reads[TradingPremisesAddress] = {
     (JsPath \ "isUK").read[Boolean].flatMap {
       case true => (jsonReadsFourAddressLines and
-                    (JsPath \ "postcode").read[String]
-                   ).apply(TradingPremisesAddressUK.apply _)
+        (JsPath \ "postcode").read[String]
+        ).apply(TradingPremisesAddressUK.apply _)
 
       case false => (jsonReadsFourAddressLines and
-                      (JsPath \ "country").read[String]
-                    ).apply(TradingPremisesAddressNonUK.apply _)
+        (JsPath \ "country").read[String]
+        ).apply(TradingPremisesAddressNonUK.apply _)
     }
   }
 
-  implicit val jsonWritesTradingPremisesAddress : Writes[TradingPremisesAddress] = Writes[TradingPremisesAddress] {
-      case tpa: TradingPremisesAddressUK => Json.obj(
-        "isUK" -> true,
-        "tradingPremisesAddressLine1" -> tpa.addressLine1,
-        "tradingPremisesAddressLine2" -> tpa.addressLine2,
-        "tradingPremisesAddressLine3" -> tpa.addressLine3,
-        "tradingPremisesAddressLine4" -> tpa.addressLine4,
-        "postcode" -> tpa.postcode)
-      case tpa: TradingPremisesAddressNonUK => Json.obj(
-        "isUK" -> false,
-        "tradingPremisesAddressLine1" -> tpa.addressLine1,
-        "tradingPremisesAddressLine2" -> tpa.addressLine2,
-        "tradingPremisesAddressLine3" -> tpa.addressLine3,
-        "tradingPremisesAddressLine4" -> tpa.addressLine4,
-        "country" -> tpa.country)
+  implicit val jsonWritesTradingPremisesAddress: Writes[TradingPremisesAddress] = Writes[TradingPremisesAddress] {
+    case tpa: TradingPremisesAddressUK => Json.obj(
+      "isUK" -> true,
+      "addressLine1" -> tpa.addressLine1,
+      "addressLine2" -> tpa.addressLine2,
+      "addressLine3" -> tpa.addressLine3,
+      "addressLine4" -> tpa.addressLine4,
+      "postcode" -> tpa.postcode)
+    case tpa: TradingPremisesAddressNonUK => Json.obj(
+      "isUK" -> false,
+      "addressLine1" -> tpa.addressLine1,
+      "addressLine2" -> tpa.addressLine2,
+      "addressLine3" -> tpa.addressLine3,
+      "addressLine4" -> tpa.addressLine4,
+      "country" -> tpa.country)
+  }
+
+  implicit val formRule: Rule[UrlFormEncoded, TradingPremisesAddress] =
+    From[UrlFormEncoded] { __ =>
+      import models.FormTypes._
+      import play.api.data.mapping.forms.Rules._
+
+      val nameType = notEmpty compose maxLength(140)
+
+      (__ \ "isUK").read[Boolean] flatMap {
+        case true => (
+            (__ \ "addressLine1").read(addressType) ~
+            (__ \ "addressLine2").read(addressType) ~
+            (__ \ "addressLine3").read(optionR(addressType)) ~
+            (__ \ "addressLine4").read(optionR(addressType)) ~
+            (__ \ "postCode").read(postCodeType)
+          ) (TradingPremisesAddressUK.apply _)
+        case false => (
+            (__ \ "addressLine1").read(addressType) ~
+            (__ \ "addressLine2").read(addressType) ~
+            (__ \ "addressLine3").read(optionR(addressType)) ~
+            (__ \ "addressLine4").read(optionR(addressType)) ~
+            (__ \ "country").read(countryType)
+          ) (TradingPremisesAddressNonUK.apply _)
+      }
     }
+
+
 }
 
 sealed trait IsResidential
+
 case object ResidentialYes extends IsResidential
+
 case object ResidentialNo extends IsResidential
 
 object IsResidential {
-  implicit val jsonReadsIsResidential : Reads[IsResidential] = {
+  implicit val jsonReadsIsResidential: Reads[IsResidential] = {
     (JsPath \ "isResidential").read[Boolean] fmap {
       case true => ResidentialYes
       case false => ResidentialNo
     }
   }
 
-  implicit val jsonWritesIsResidential : Writes[IsResidential] = Writes[IsResidential] {
+  implicit val jsonWritesIsResidential: Writes[IsResidential] = Writes[IsResidential] {
     case ResidentialYes => (JsPath \ "isResidential").write[Boolean].writes(true)
     case ResidentialNo => (JsPath \ "isResidential").write[Boolean].writes(false)
   }

@@ -3,9 +3,8 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{InvalidForm, Form2, EmptyForm}
-import models.aboutthebusiness.ConfirmRegisteredOffice
-import models.tradingpremises.{TradingPremises, TradingPremisesAddressUK}
+import forms.{EmptyForm, Form2}
+import models.tradingpremises.{TradingPremisesAddress, TradingPremises, TradingPremisesAddressUK}
 
 import scala.concurrent.Future
 
@@ -21,7 +20,7 @@ trait WhereAreTradingPremisesController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[TradingPremises](request.body) match {
+      Form2[TradingPremisesAddress](request.body) match {
         case _ => Future.successful(BadRequest(views.html.where_are_trading_premises(EmptyForm, edit)))
       }
 

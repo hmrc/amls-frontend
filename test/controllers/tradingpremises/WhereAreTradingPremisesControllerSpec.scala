@@ -41,7 +41,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
       val newRequest = request.withFormUrlEncodedBody()
       when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any())).thenReturn(Future.successful(None))
-
+      
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
