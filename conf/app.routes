@@ -48,6 +48,10 @@ POST        /estate-agents/penalised                   controllers.estateagentbu
 
 GET         /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
+
+GET         /estate-agents/services                   controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
+POST        /estate-agents/services                   controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
+
 GET         /estate-agents/summary                     controllers.estateagentbusiness.SummaryController.get()
 
 

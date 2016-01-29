@@ -155,3 +155,16 @@ estateagentbusiness.penalisedbyprofessional.line_2 = a warning
 estateagentbusiness.penalisedbyprofessional.line_3 = suspension
 estateagentbusiness.penalisedbyprofessional.line_4 = expulsion
 estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Please provide details
+
+estateagentbusiness.servicess.title = Which services does your business provide?
+estateagentbusiness.service.lbl.01 = Commercial estate agent services
+estateagentbusiness.service.lbl.02 = Auctioneering
+estateagentbusiness.service.lbl.03 = Relocation agent services
+estateagentbusiness.service.lbl.04 = Business transfer agent services
+estateagentbusiness.service.lbl.05 = Asset management
+estateagentbusiness.service.lbl.06 = Land management
+estateagentbusiness.service.lbl.07 = Development company services
+estateagentbusiness.service.lbl.08 = Social housing provision
+estateagentbusiness.service.lbl.09 = Residential estate agent services
+
+
