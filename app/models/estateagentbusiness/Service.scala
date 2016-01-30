@@ -1,7 +1,6 @@
 package models.estateagentbusiness
 
 
-import com.fasterxml.jackson.databind.deser.std.StringArrayDeserializer
 import play.api.data.mapping.forms._
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
@@ -19,48 +18,37 @@ case object SocialHousing extends Service
 case class Residential(redressScheme: Option[RedressScheme]) extends Service
 
 object Service {
-  implicit val serviceFormRule : Rule[UrlFormEncoded, Seq[Service]] = From[UrlFormEncoded, Seq[Service]] (
-    reader =>
-  )
+
+  implicit def fromString(str : String) : Option[Service] = {
+    str match {
+      case "01" => Some(Commercial)
+      case "02" => Some(Auction)
+      case "03" => Some(Relocation)
+      case "04" => Some(Auction)
+      case "05" => Some(AssetManagement)
+      case "06" => Some(LandManagement)
+      case "07" => Some(Development)
+      case "08" => Some(SocialHousing)
+      case _ => None
+    }
+  }
+
+  implicit val servicesFormRule : Rule[UrlFormEncoded, Seq[Service]] = new Rule[UrlFormEncoded, Seq[Service]] {
+    def validate(form : UrlFormEncoded) : Validation[(Path, Seq[ValidationError]), Seq[Service]] = {
+
+      form.getOrElse("services", Nil)
+          .foldLeft[(Seq[ValidationError], Seq[Service])](Nil, Nil)((results, next) => {
+                    fromString(next)
+                      .map(service => (results._1, results._2 :+ service))
+                      .getOrElse((results._1 :+ ValidationError(s"Invalid Service Type String $next"), results _2))
+          }) match {
+        case (Nil, services) => Success(services)
+        case (err, _) => Failure(Seq(Path \ "services" -> err))
 
 
-   /*implicit val serviceFormRule : Rule[UrlFormEncoded, Service] = From[UrlFormEncoded]   { __ =>
-    import play.api.data.mapping.forms.Rules._
-    (__ \ "sdsdfkj").read[Seq[String]] fmap { a => a map {
-                                            case "01" => Commercial
-                                            case "02" => Auction
-                                            case "03" => Relocation
-                                            case "04" => Auction
-                                            case "05" => AssetManagement
-                                            case "06" => LandManagement
-                                            case "07" => Development
-                                            case "08" => SocialHousing
-
-                                          }}
-
-  }*/
-  import utils.MappingUtils.Implicits._
-  //implicit val formRule: Rule[UrlFormEncoded, Seq[Service]] = (Path \ "Services").read[UrlFormEncoded, Seq[Service]]
-
-  //implicit val formRuleStr: Rule[UrlFormEncoded, String] =  (Path \ "services").read[UrlFormEncoded, String]
-
-
-  //(Path \ "services").read[UrlFormEncoded, Seq[String]]
-
-
-//  { __ =>
-//
-//
-////    import play.api.data.mapping.forms.Rules._
-////    (__ \ "services1").read[String] fmap { case "01" =>print("Yesssssss11111")
-////      Commercial }
-////    (__ \ "services2").read[String] fmap { case "02" => print("Yesssssss22222222")
-////      Auction }
-////    (__ \ "services3").read[String] fmap { case "03" => print("Yesssssss333333333333")
-////      Relocation  case _ => SocialHousing
-//    }
-//   }
-
+      }
+    }
+  }
 }
 
 
