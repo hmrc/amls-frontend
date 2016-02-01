@@ -4,15 +4,14 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2}
-import models.tradingpremises.{TradingPremisesAddress, TradingPremises, TradingPremisesAddressUK}
+import models.tradingpremises.TradingPremisesAddress
+import models.tradingpremises._
 
 import scala.concurrent.Future
 
 trait WhereAreTradingPremisesController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
-
-  private val premisesAddressUK = TradingPremisesAddressUK("", "", None, None, "")
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => Future.successful(Ok(views.html.where_are_trading_premises(EmptyForm, edit)))
