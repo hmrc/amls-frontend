@@ -1,8 +1,8 @@
 package models.tradingpremises
 
+import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json._
-import org.joda.time.LocalDate
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers {
   "YourTradingPremises JSON serialisation" must {
@@ -10,27 +10,33 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       val input = Json.obj(
         "tradingName" -> "Test Business Name",
         "startOfTrading" -> "2014-04-03",
+        "premiseOwner" -> false,
         "isUK" -> true,
         "tradingPremisesAddressLine1" -> "test Address Line 1",
         "tradingPremisesAddressLine2" -> "test Address Line 2",
         "tradingPremisesAddressLine3" -> "test Address Line 3",
         "tradingPremisesAddressLine4" -> "test Address Line 4",
         "postcode" -> "AA67 HJU",
+        "country" -> "UK",
         "isResidential" -> true)
 
-      YourTradingPremises.jsonReadsYourTradingPremises.reads(input) must be(JsSuccess(
-        YourTradingPremises(
-          "Test Business Name",
-          UKTradingPremises(
-            "test Address Line 1",
-            "test Address Line 2",
-            Some("test Address Line 3"),
-            Some("test Address Line 4"),
-            Some("AA67 HJU"),"UK"),
-          new LocalDate(2014, 4, 3),
-          ResidentialYes
-        )
-      ))
+      val ukPremise = UKTradingPremises(
+        "test Address Line 1",
+        "test Address Line 2",
+        Some("test Address Line 3"),
+        Some("test Address Line 4"),
+        Some("AA67 HJU"),
+        "UK")
+
+      val outputObj = YourTradingPremises(
+        "Test Business Name",
+        ukPremise,
+        PremiseOwnerSelf,
+        new LocalDate(2014, 4, 3),
+        ResidentialYes)
+
+      YourTradingPremises.jsonReadsYourTradingPremises.reads(input) must be(JsSuccess(outputObj))
+
     }
 
     "Write details correctly to JSON" in {
@@ -41,7 +47,8 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
           "test Address Line 2",
           Some("test Address Line 3"),
           Some("test Address Line 4"),
-          Some("AA67 HJU"),"UK"),
+          Some("AA67 HJU"), "UK"),
+        PremiseOwnerAnother,
         new LocalDate(2014, 4, 3),
         ResidentialYes)
 
@@ -53,6 +60,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "tradingPremisesAddressLine3" -> "test Address Line 3",
         "tradingPremisesAddressLine4" -> "test Address Line 4",
         "postcode" -> "AA67 HJU",
+        "premiseOwner" -> true,
         "startOfTrading" -> "2014-04-03",
         "isResidential" -> true))
     }
@@ -89,7 +97,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "test Address Line 2",
         Some("test Address Line 3"),
         Some("test Address Line 4"),
-        Some("560093"),"IN")
+        Some("560093"), "IN")
 
       val addressJson = Json.obj("isUK" -> false,
         "tradingPremisesAddressLine1" -> "test Address Line 1",
