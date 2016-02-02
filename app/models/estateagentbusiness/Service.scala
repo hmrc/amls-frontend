@@ -36,6 +36,21 @@ object Service {
     }
   }
 
+  implicit def fromString(str : String) : Service = {
+    str match {
+      case "01" => Commercial
+      case "02" => Auction
+      case "03" => Relocation
+      case "04" => Auction
+      case "05" => AssetManagement
+      case "06" => LandManagement
+      case "07" => Development
+      case "08" => SocialHousing
+      case "09" => Residential(None)
+    }
+  }
+
+
   implicit def servicesToString(obj : Service) : String = {
     obj match {
       case Commercial => "01"
@@ -69,18 +84,11 @@ object Service {
     case services => Map("services" -> services.map(servicesToString))
   }
 
-  val jsonServiceReads = Rule.fromMapping[JsValue, Service] {
-    case JsString(x) => fromString(x, Map("gfklhj" -> Seq("fghg")))
-                          .map(x => Success(x))
-                          .getOrElse(Failure(Seq(ValidationError("error.required"))))
-
-    case _ => Failure(Seq(ValidationError("Non JsString value passed into conversion")))
-  }
-
-  implicit val jsonReads = From[JsValue] { __ =>
+  implicit val placeReads:Reads[Seq[Service]] = {
     import play.api.libs.json.Reads.StringReads
-    import play.api.data.mapping.json.Rules._
-     (__ \ "services").read(seqR(jsonServiceReads))
+    (__ \ "services").read[Seq[String]].flatMap {
+        x => Reads(i => JsSuccess(x.map(fromString)))
+     }
   }
 
   implicit val jsonWrites = Writes[Seq[Service]] {

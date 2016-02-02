@@ -17,6 +17,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
       Service.servicesFormRule.validate(model) must
         be(Success(Seq(Auction, Commercial, Relocation)))
+
     }
 
     "validate model with residential estate agency check box selected" in {
@@ -36,7 +37,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
       Service.servicesFormRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "services") -> Seq(ValidationError("error.required"))
+          (Path \ "services") -> Seq(ValidationError("Invalid Service Type String "))
         )))
     }
 
@@ -58,8 +59,24 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "JSON validation" must {
 
       "successfully validate given an enum value" in {
+//        val js = Json.obj("services" -> Seq("01","02"))
+//        val k: JsResult[Service] = Json.fromJson[Service](js)
+//        k match
+//          {
+//          case d:JsSuccess[Service] => println(d)
+//        }
+
+        val noData = Json.fromJson[Seq[Service]](Json.obj("services" -> ""))
+
+        val k = Json.fromJson[Seq[Service]](Json.obj("services" -> Seq("01","02")))
+        println(k)
         Json.fromJson[Seq[Service]](Json.obj("services" -> Seq("01","02"))) must
           be(JsSuccess(Seq(Commercial, Auction), JsPath \ "services"))
+
+//        Json.fromJson[Seq[Service]](Json.obj("services" -> Seq("01","05"))) must
+//          be(JsSuccess(Seq(Commercial, Auction), JsPath \ "services"))
+
+        noData must be(JsSuccess(Seq(Commercial, Auction), JsPath \ "services"))
       }
     }
 

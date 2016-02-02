@@ -143,7 +143,6 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
     "fail to validate when given an invalid enum value" in {
 
       val json = Json.obj(
-        "roleWithinBusiness" -> "10"
       )
 
       Json.fromJson[RoleWithinBusiness](json) must
