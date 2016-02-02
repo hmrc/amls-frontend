@@ -26,6 +26,7 @@ object RedressScheme {
     (__ \"isRedress").read[Boolean] flatMap {
       case true =>
       (__ \ "PropertyRedressScheme").read[RedressScheme] fmap (RedressRegisteredYes.apply)
+
       case false => Rule.fromMapping { _ => Success(RedressRegisteredNo) }
     }
   }
