@@ -65,7 +65,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
     }
 
 
-    "successfully validate a UK Address" in new Fixture {
+    "successfully validate a URLEncoded UK Address" in new Fixture {
 
       val validUKAddress = Map(
         "isUK" -> Seq("true"),
@@ -80,7 +80,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         be(Success(UKTradingPremises("Address Line 1", "Address Line 2", Some("Address Line 3"), Some("Address Line 4"), Some("NE98 1ZZ"), "UK")))
     }
 
-    "successfully validate a Non UK Address" in new Fixture {
+    "successfully validate a URLEncoded Non UK Address" in new Fixture {
 
       val nonValidUKAddress = Map(
         "isUK" -> Seq("false"),
@@ -96,15 +96,31 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         be(Success(NonUKTradingPremises("Address Line 1", "Address Line 2", Some("Address Line 3"), Some("Address Line 4"), Some("226001"), "IN")))
     }
 
-    "on post of the page with invalid data must reload the page" in new Fixture {
+    "on post of the page with valid data must load the next page" in new Fixture {
+
+      val tradingPremises = TradingPremises(Some(yourTradingPremises), None)
 
       val newRequest = request.withFormUrlEncodedBody()
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())(any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises)))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(NOT_IMPLEMENTED)
+
+    }
+
+
+    "on post of the page with invalid data must reload the page" in new Fixture {
+
+      val tradingPremises = TradingPremises(Some(yourTradingPremises), None)
+
+      val newRequest = request.withFormUrlEncodedBody()
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())(any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises)))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
     }
+
 
   }
 
