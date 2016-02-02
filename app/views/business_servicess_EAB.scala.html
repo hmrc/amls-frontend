@@ -41,7 +41,7 @@
                     @radio(f("isRedress"), "lbl.no", "false")
                 }
             </fieldset>
-        }
+
         @fieldset("TODO", jsHidden = true, id = s"""${f("propertyRedress").id}-fieldset""") {
             <fieldset class="">
                 <legend class="form-label-bold">
@@ -60,6 +60,7 @@
                 }
             </fieldset>
         }
+    }
         @submit(edit)
     }
 }
