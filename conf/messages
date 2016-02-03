@@ -166,6 +166,9 @@ tradingpremises.yourtradingpremises.whose.another=Another business'' premises
 tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.startdate.example=For example, 31 3 2017
+tradingpremises.yourtradingpremises.startdate.day=Day
+tradingpremises.yourtradingpremises.startdate.month=Month
+tradingpremises.yourtradingpremises.startdate.year=Year
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 
 

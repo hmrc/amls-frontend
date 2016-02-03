@@ -1,0 +1,46 @@
+@import forms.{Field, Form2}
+
+@(
+field: Field,
+labelText: String = "",
+hintText: String = "",
+bold: Boolean = true,
+classes: Seq[String] = Seq.empty
+)(implicit lang: Lang)
+<span class='date-of-birth'>
+<div class="form-group @if(field.hasErrors) {form-field--error}">
+    <label>
+        <span class="form-label">@Messages("tradingpremises.yourtradingpremises.startdate.day")</span>
+        @if(field.hasErrors) {
+        <span class="error-notification">@field.error</span>
+        }
+        <input name="@field.name" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="2" min="1" max="31" value="@field.value" id="@field.id"
+        @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
+        >
+    </label>
+</div>
+
+<div class="form-group @if(field.hasErrors) {form-field--error}">
+    <label>
+        <span class="form-label">@Messages("tradingpremises.yourtradingpremises.startdate.month")</span>
+    </label>
+    @if(field.hasErrors) {
+    <span class="error-notification">@field.error</span>
+    }
+    <input name="@field.name" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="2" min="1" max="12" value="@field.value" id="@field.id"
+    @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
+    >
+</div>
+
+<div class="form-group @if(field.hasErrors) {form-field--error}">
+    <label>
+        <span class="form-label">@Messages("tradingpremises.yourtradingpremises.startdate.year")</span>
+    </label>
+    @if(field.hasErrors) {
+    <span class="error-notification">@field.error</span>
+    }
+    <input name="@field.name" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="4" min="1990" max="2016" value="@field.value" id="@field.id"
+    @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
+    >
+</div>
+</span>

@@ -62,10 +62,10 @@ classes = Seq("country")
 <p>@Messages("tradingpremises.yourtradingpremises.startdate.sub")</p>
 <p>@Messages("tradingpremises.yourtradingpremises.startdate.example")</p>
 
-
-<p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.isresidential")</p>
+    @inputDate(field = f("startdate"))
 
 @inlineRadioGroup(f("isResidential")) {
+<p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.isresidential")</p>
   @legend("TODO", jsHidden = true)
   @radio(f("isResidential"), "lbl.yes", "true")
   @radio(f("isResidential"), "lbl.no", "false")
