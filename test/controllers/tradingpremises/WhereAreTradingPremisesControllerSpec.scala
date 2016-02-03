@@ -1,7 +1,6 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.AboutTheBusiness
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
@@ -100,7 +99,16 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
       val tradingPremises = TradingPremises(Some(yourTradingPremises), None)
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address Line 1",
+        "addressLine2" -> "Address Line 2",
+        "country" -> "IN",
+        "premiseOwner" -> "true",
+        "startOfTradingDate" -> "01-02-2016",
+        "isResidential" -> "true"
+      )
+
       when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())(any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises)))
 
       val result = controller.post()(newRequest)

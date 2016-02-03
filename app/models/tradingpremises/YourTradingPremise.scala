@@ -1,9 +1,8 @@
 package models.tradingpremises
 
 import org.joda.time.LocalDate
-import play.api.data.mapping._
 import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, To, Write}
+import play.api.data.mapping.{From, Rule, To, Write, _}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Writes._
 import play.api.libs.json.{Writes, _}
@@ -45,19 +44,25 @@ object YourTradingPremises {
     }
 
 
-  implicit val formWrites : Write[YourTradingPremises, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWrites: Write[YourTradingPremises, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
 
-      import play.api.data.mapping.forms.Writes._
-      import play.api.libs.functional.syntax.unlift
-      import models.FormTypes._
+    import play.api.data.mapping.forms.Writes._
+    import play.api.libs.functional.syntax.unlift
 
-      (
-        (__ \ "tradingName").write[String] ~
+    (
+      (__ \ "tradingName").write[String] ~
         __.write[TradingPremisesAddress] ~
         __.write[PremiseOwner] ~
         (__ \ "startOfTradingDate").write[LocalDate] ~
         __.write[IsResidential]) (unlift(YourTradingPremises.unapply _))
   }
+
+
+  implicit val dateFormatReads: Reads[JsSuccess[LocalDate]] = {
+    (JsPath \ "startOfTradingDate").read[String].map(y => JsSuccess(LocalDate.parse(y)))
+  }
+
+  //Format[LocalDate](Reads.jodaDateReads(pattern), Writes.jodaDateWrites(pattern))
 
 }
 
@@ -84,20 +89,16 @@ object PremiseOwner {
     case PremiseOwnerAnother => (JsPath \ "premiseOwner").write[Boolean].writes(false)
   }
 
-  implicit val formRule : Rule[UrlFormEncoded, PremiseOwner] = From[UrlFormEncoded]  {__ =>
+  implicit val formRule: Rule[UrlFormEncoded, PremiseOwner] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
 
     (__ \ "premiseOwner").read[Boolean] flatMap {
-      case true => Rule.fromMapping{ _ => Success(PremiseOwnerSelf)}
-      case false => Rule.fromMapping{ _ => Success(PremiseOwnerAnother)}
+      case true => Rule.fromMapping { _ => Success(PremiseOwnerSelf) }
+      case false => Rule.fromMapping { _ => Success(PremiseOwnerAnother) }
     }
   }
 
-  implicit val formWrites : Write[PremiseOwner, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-
-    import play.api.data.mapping.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    import models.FormTypes._
+  implicit val formWrites: Write[PremiseOwner, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
 
     Write {
       case PremiseOwnerSelf => Map("premiseOwner" -> Seq("true"))
@@ -115,20 +116,16 @@ case object ResidentialNo extends IsResidential
 
 object IsResidential {
 
-  implicit val formRule : Rule[UrlFormEncoded, IsResidential] = From[UrlFormEncoded]  {__ =>
+  implicit val formRule: Rule[UrlFormEncoded, IsResidential] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
 
     (__ \ "isResidential").read[Boolean] flatMap {
-      case true => Rule.fromMapping{ _ => Success(ResidentialYes)}
-      case false => Rule.fromMapping{ _ => Success(ResidentialNo)}
+      case true => Rule.fromMapping { _ => Success(ResidentialYes) }
+      case false => Rule.fromMapping { _ => Success(ResidentialNo) }
     }
   }
 
-  implicit val formWrites : Write[IsResidential, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-
-    import play.api.data.mapping.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    import models.FormTypes._
+  implicit val formWrites: Write[IsResidential, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
 
     Write {
       case ResidentialYes => Map("isResidential" -> Seq("true"))
