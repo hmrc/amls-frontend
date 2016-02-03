@@ -25,7 +25,7 @@ object RedressScheme {
     import models.FormTypes._
     (__ \"isRedress").read[Boolean] flatMap {
       case true =>
-      (__ \ "PropertyRedressScheme").read[RedressScheme] fmap (RedressRegisteredYes.apply)
+        __.read[RedressScheme] fmap (RedressRegisteredYes.apply)
 
       case false => Rule.fromMapping { _ => Success(RedressRegisteredNo) }
     }
@@ -34,42 +34,43 @@ object RedressScheme {
   implicit val formWrites: Write[RedressRegistered, UrlFormEncoded] = Write {
     case RedressRegisteredYes(redress) =>
         redress match {
-          case ThePropertyOmbudsman => "PropertyRedressScheme" -> "01"
-          case OmbudsmanServices => "PropertyRedressScheme" -> "02"
-          case PropertyRedressScheme => "PropertyRedressScheme" -> "03"
+          case ThePropertyOmbudsman => "propertyRedressScheme" -> "01"
+          case OmbudsmanServices => "propertyRedressScheme" -> "02"
+          case PropertyRedressScheme => "propertyRedressScheme" -> "03"
           case Other(value) =>
-           Map ("PropertyRedressScheme" -> "04",
+           Map ("propertyRedressScheme" -> "04",
               "other" -> value)
         }
-    case RedressRegisteredNo => Map("PropertyRedressScheme" -> Seq("false"))
-
+    case RedressRegisteredNo => Map("propertyRedressScheme" -> Seq("false"))
   }
 
 
   implicit val formRedressRule: Rule[UrlFormEncoded, RedressScheme] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "roleWithinBusiness").read[String] flatMap {
+    ( __ \ "propertyRedressScheme").read[String] flatMap {
       case "01" => ThePropertyOmbudsman
       case "02" => OmbudsmanServices
       case "03" => PropertyRedressScheme
       case "04" =>
         (__ \ "other").read(descriptionType) fmap Other.apply
       case _ =>
-        (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
+        (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.invalid"))
     }
   }
 
   implicit val formRedressWrites: Write[RedressScheme, UrlFormEncoded] = Write {
-    case ThePropertyOmbudsman => "roleWithinBusiness" -> "01"
-    case OmbudsmanServices => "roleWithinBusiness" -> "02"
-    case PropertyRedressScheme => "roleWithinBusiness" -> "03"
+    case ThePropertyOmbudsman => "propertyRedressScheme" -> "01"
+    case OmbudsmanServices => "propertyRedressScheme" -> "02"
+    case PropertyRedressScheme => "propertyRedressScheme" -> "03"
     case Other(value) =>
       Map(
-        "roleWithinBusiness" -> "08",
+        "propertyRedressScheme" -> "08",
         "other" -> value
       )
   }
+
+
 
 
 }

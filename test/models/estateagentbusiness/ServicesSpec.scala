@@ -10,7 +10,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
   "ServicesSpec" must {
 
-    "validate model with only 2 check box selected" in {
+    "validate model with few check box selected" in {
       val model = Map(
         "services" -> Seq("02", "01", "03")
       )
@@ -19,6 +19,18 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         be(Success(Seq(Auction, Commercial, Relocation)))
 
     }
+
+   /* "validate model with residential estate option selected and redress option yes selected" in {
+      val model = Map(
+        "services" -> Seq("02", "01", "05"),
+        "isRedress" -> true ,
+        "PropertyRedressScheme" -> ""
+      )
+
+      Service.servicesFormRule.validate(model) must
+        be(Success(Seq(Auction, Commercial, Relocation), RedressRegisteredYes(OmbudsmanServices)))
+
+    }*/
 
     "validate model with residential estate agency check box selected" in {
       val model = Map(
@@ -59,24 +71,13 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "JSON validation" must {
 
       "successfully validate given an enum value" in {
-//        val js = Json.obj("services" -> Seq("01","02"))
-//        val k: JsResult[Service] = Json.fromJson[Service](js)
-//        k match
-//          {
-//          case d:JsSuccess[Service] => println(d)
-//        }
-
-        val noData = Json.fromJson[Seq[Service]](Json.obj("services" -> ""))
-
-        val k = Json.fromJson[Seq[Service]](Json.obj("services" -> Seq("01","02")))
-        println(k)
         Json.fromJson[Seq[Service]](Json.obj("services" -> Seq("01","02"))) must
           be(JsSuccess(Seq(Commercial, Auction), JsPath \ "services"))
+      }
 
-//        Json.fromJson[Seq[Service]](Json.obj("services" -> Seq("01","05"))) must
-//          be(JsSuccess(Seq(Commercial, Auction), JsPath \ "services"))
-
-        noData must be(JsSuccess(Seq(Commercial, Auction), JsPath \ "services"))
+      "fail when on invalid data" in {
+        Json.fromJson[Seq[Service]](Json.obj("service" -> "01")) must
+          be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
       }
     }
 

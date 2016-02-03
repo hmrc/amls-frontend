@@ -42,25 +42,25 @@
                 }
             </fieldset>
 
-        @fieldset("TODO", jsHidden = true, id = s"""${f("propertyRedress").id}-fieldset""") {
-            <fieldset class="">
-                <legend class="form-label-bold">
-                    @Messages("estateagentbusiness.which.redress.scheme.lbl")
-                </legend>
-                @radioGroup(f("PropertyRedressScheme")) {
-                    @legend("TODO", jsHidden = true)
-                    @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.01", "01")
-                    @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.02", "02")
-                    @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.03", "03")
-                    @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.04", "04", target = s"#${f("other").id}-fieldset")
+            @fieldset("TODO", jsHidden = true, id = s"""${f("propertyRedress").id}-fieldset""") {
+                <fieldset class="">
+                    <legend class="form-label-bold">
+                        @Messages("estateagentbusiness.which.redress.scheme.lbl")
+                    </legend>
+                    @radioGroup(f("PropertyRedressScheme")) {
+                        @legend("TODO", jsHidden = true)
+                        @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.01", "01")
+                        @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.02", "02")
+                        @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.03", "03")
+                        @radio(f("PropertyRedressScheme"), "estateagentbusiness.redress.lbl.04", "04", target = s"#${f("other").id}-fieldset")
 
-                    @fieldset("TODO", jsHidden = true, id = s"""${f("other").id}-fieldset""") {
-                         @input(f("other"), "lbl.pleasespecify", bold = false)
+                        @fieldset("TODO", jsHidden = true, id = s"""${f("other").id}-fieldset""") {
+                             @input(f("other"), "lbl.pleasespecify", bold = false)
+                        }
                     }
-                }
-            </fieldset>
+                </fieldset>
+            }
         }
-    }
         @submit(edit)
     }
 }

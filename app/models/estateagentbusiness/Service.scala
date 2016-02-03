@@ -1,7 +1,5 @@
 package models.estateagentbusiness
 
-
-import play.api.data.mapping
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
@@ -17,7 +15,7 @@ case object AssetManagement extends Service
 case object LandManagement extends Service
 case object Development extends Service
 case object SocialHousing extends Service
-case class Residential(redressScheme: Option[RedressScheme]) extends Service
+case class Residential(redressScheme: RedressRegistered) extends Service
 
 object Service {
 
@@ -31,7 +29,11 @@ object Service {
       case "06" => Some(LandManagement)
       case "07" => Some(Development)
       case "08" => Some(SocialHousing)
-      case "09" => Some(Residential(None))
+      case "09" =>  {
+        val x = __.read[RedressRegistered].flatMap(x => Reads(Residential.apply(x)))
+
+        Some(Residential(None))
+      }
       case _ => None
     }
   }
@@ -84,11 +86,11 @@ object Service {
     case services => Map("services" -> services.map(servicesToString))
   }
 
-  implicit val placeReads:Reads[Seq[Service]] = {
+  implicit val jsonReads: Reads[Seq[Service]] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "services").read[Seq[String]].flatMap {
-        x => Reads(i => JsSuccess(x.map(fromString)))
-     }
+      x => Reads(i => JsSuccess(x.map(fromString)))
+    }
   }
 
   implicit val jsonWrites = Writes[Seq[Service]] {
