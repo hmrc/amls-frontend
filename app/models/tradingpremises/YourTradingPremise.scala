@@ -17,9 +17,9 @@ object YourTradingPremises {
   implicit val jsonReadsYourTradingPremises = {
     ((JsPath \ "tradingName").read[String] and
       JsPath.read[TradingPremisesAddress] and
-      (JsPath).read[PremiseOwner] and
-      (JsPath \ "startOfTrading").read[LocalDate] and
-      (JsPath).read[IsResidential]) (YourTradingPremises.apply _)
+      JsPath.read[PremiseOwner] and
+      JsPath.read[LocalDate] and
+      JsPath.read[IsResidential]) (YourTradingPremises.apply _)
   }
 
   implicit val jsonWritesYourTradingPremises: Writes[YourTradingPremises] = (
@@ -57,12 +57,11 @@ object YourTradingPremises {
         __.write[IsResidential]) (unlift(YourTradingPremises.unapply _))
   }
 
+  implicit val readsLocalDate: Reads[LocalDate] = (JsPath \ "startOfTrading").read[String].map(d => LocalDate.parse(d))
 
-  implicit val dateFormatReads: Reads[JsSuccess[LocalDate]] = {
-    (JsPath \ "startOfTradingDate").read[String].map(y => JsSuccess(LocalDate.parse(y)))
+  implicit val writeLocalDate: Writes[LocalDate] = Writes[LocalDate] {
+    case d => (JsPath \ "startOfTrading").write[String].writes(d.toString)
   }
-
-  //Format[LocalDate](Reads.jodaDateReads(pattern), Writes.jodaDateWrites(pattern))
 
 }
 
