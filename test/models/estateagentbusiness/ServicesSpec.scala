@@ -20,26 +20,25 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
     }
 
-   /* "validate model with residential estate option selected and redress option yes selected" in {
+    "validate model with residential estate option selected and redress option yes selected" in {
       val model = Map(
-        "services" -> Seq("02", "01", "05"),
-        "isRedress" -> true ,
-        "PropertyRedressScheme" -> ""
-      )
+        "services" -> Seq("02", "01", "09"),
+       "services\\isRedress" -> Seq("true"),
+        "services\\PropertyRedressScheme" -> Seq("02"))
 
       Service.servicesFormRule.validate(model) must
-        be(Success(Seq(Auction, Commercial, Relocation), RedressRegisteredYes(OmbudsmanServices)))
+        be(Success(Seq(Auction, Commercial, Residential)))
 
-    }*/
+    }
 
-    "validate model with residential estate agency check box selected" in {
+   /* "validate model with residential estate agency check box selected" in {
       val model = Map(
         "services" -> Seq("09")
       )
 
       Service.servicesFormRule.validate(model) must
         be(Success(Seq(Residential(None))))
-    }
+    }*/
 
     "fail to validate given an `other` with no value" in {
 

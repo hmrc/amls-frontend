@@ -29,11 +29,14 @@ object Service {
       case "06" => Some(LandManagement)
       case "07" => Some(Development)
       case "08" => Some(SocialHousing)
-      case "09" =>  {
-        val x = __.read[RedressRegistered].flatMap(x => Reads(Residential.apply(x)))
+      case "09" => Some(Residential(RedressRegisteredNo))
+     /* {
+        println("reched hereeeeeeeeeeeeeeeeeee "+ __)
 
-        Some(Residential(None))
-      }
+       __.read[RedressRegistered] map(x=>Some(Residential(x)))
+
+        Some(Residential(RedressRegisteredNo))
+      }*/
       case _ => None
     }
   }
@@ -48,7 +51,9 @@ object Service {
       case "06" => LandManagement
       case "07" => Development
       case "08" => SocialHousing
-      case "09" => Residential(None)
+      /*case "09" => {
+        Residential(None)
+      }*/
     }
   }
 
@@ -63,7 +68,7 @@ object Service {
       case LandManagement => "06"
       case Development => "07"
       case SocialHousing => "08"
-      case Residential(None) => "09"
+     // case Residential(None) => "09"
     }
   }
 
