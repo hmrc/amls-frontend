@@ -14,6 +14,7 @@ case class YourTradingPremises(tradingName: String,
                                isResidential: IsResidential)
 
 object YourTradingPremises {
+
   implicit val jsonReadsYourTradingPremises = {
     ((JsPath \ "tradingName").read[String] and
       JsPath.read[TradingPremisesAddress] and
@@ -26,7 +27,7 @@ object YourTradingPremises {
     (__ \ "tradingName").write[String] and
       (__).write[TradingPremisesAddress] and
       (__).write[PremiseOwner] and
-      (__ \ "startOfTrading").write[LocalDate] and
+      (__ \ "startOfTradingDate").write[LocalDate] and
       (__).write[IsResidential]
     ) (unlift(YourTradingPremises.unapply))
 
@@ -57,11 +58,12 @@ object YourTradingPremises {
         __.write[IsResidential]) (unlift(YourTradingPremises.unapply _))
   }
 
-  implicit val readsLocalDate: Reads[LocalDate] = (JsPath \ "startOfTrading").read[String].map(d => LocalDate.parse(d))
-
-  implicit val writeLocalDate: Writes[LocalDate] = Writes[LocalDate] {
-    case d => (JsPath \ "startOfTrading").write[String].writes(d.toString)
+  //Read and Write for LocalDate
+  implicit val readsJSONStringToLocalDate: Reads[LocalDate] =  {
+    (JsPath \ "startOfTradingDate").read[String].map(dateString => LocalDate.parse(dateString))
   }
+
+  implicit val writeLocalDateToJSONString: Writes[LocalDate] = Writes[LocalDate] { case localDate => (JsPath \ "startOfTradingDate").write[String].writes(localDate.toString) }
 
 }
 
@@ -73,8 +75,6 @@ case object PremiseOwnerAnother extends PremiseOwner
 
 
 object PremiseOwner {
-
-  //implicit val formats = Json.format[PremiseOwner]
 
   implicit val jsonReadsPremiseOwner: Reads[PremiseOwner] = {
     (JsPath \ "premiseOwner").read[Boolean] fmap {

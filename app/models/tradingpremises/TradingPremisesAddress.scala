@@ -52,29 +52,19 @@ case class NonUKTradingPremises(
 object TradingPremisesAddress {
 
   implicit val jsonReadsTradingPremisesAddress: Reads[TradingPremisesAddress] = {
+    println("TPA HERE ")
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
+    (
+    (JsPath \ "addressLine1").read[String] and
+      (JsPath \ "addressLine2").read[String] and
+      (JsPath \ "addressLine3").readNullable[String] and
+      (JsPath \ "addressLine4").readNullable[String] and
+      (JsPath \ "postcode").read[Option[String]] and
+      (JsPath \ "country").read[String]
+    ) (UKTradingPremises.apply _)
 
-    (JsPath \ "isUK").read[Boolean].flatMap {
-      case true => (
-        (JsPath \ "addressLine1").read[String] and
-          (JsPath \ "addressLine2").read[String] and
-          (JsPath \ "addressLine3").readNullable[String] and
-          (JsPath \ "addressLine4").readNullable[String] and
-          (JsPath \ "postcode").read[Option[String]] and
-          (JsPath \ "country").read[String]
-        ).apply(UKTradingPremises.apply _)
-
-      case false => (
-        (JsPath \ "addressLine1").read[String] and
-          (JsPath \ "addressLine2").read[String] and
-          (JsPath \ "addressLine3").readNullable[String] and
-          (JsPath \ "addressLine4").readNullable[String] and
-          (JsPath \ "postcode").read[Option[String]] and
-          (JsPath \ "country").read[String]
-        ).apply(NonUKTradingPremises.apply _)
-    }
   }
 
   implicit val jsonWritesTradingPremisesAddress: Writes[TradingPremisesAddress] = {
