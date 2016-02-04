@@ -9,40 +9,40 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
   "YourTradingPremises JSON serialisation" must {
 
     //TODO To fix NullPointer Exception
-/*
-   "Read details correctly from JSON" in {
+    /*
+       "Read details correctly from JSON" in {
 
-      val input = Json.parse(
-        """{
-          |"isUK":true,
-          |"tradingName":"Test Business Name",
-          |"addressLine1":"test Address Line 1",
-          |"addressLine2":"test Address Line 2",
-          |"addressLine3":"test Address Line 3",
-          |"addressLine4":"test Address Line 4",
-          |"postcode":"AA67 HJU",
-          |"country":"UK",
-          |"premiseOwner":false,
-          |"startOfTradingDate":"2014-04-03",
-          |"isResidential":true}""".stripMargin)
+          val input = Json.parse(
+            """{
+              |"isUK":true,
+              |"tradingName":"Test Business Name",
+              |"addressLine1":"test Address Line 1",
+              |"addressLine2":"test Address Line 2",
+              |"addressLine3":"test Address Line 3",
+              |"addressLine4":"test Address Line 4",
+              |"postcode":"AA67 HJU",
+              |"country":"UK",
+              |"premiseOwner":false,
+              |"startOfTradingDate":"2014-04-03",
+              |"isResidential":true}""".stripMargin)
 
-      val outputObj = YourTradingPremises(
-        "Test Business Name",
-        UKTradingPremises(
-          "test Address Line 1",
-          "test Address Line 2",
-          Some("test Address Line 3"),
-          Some("test Address Line 4"),
-          Some("AA67 HJU"),
-          "UK"),
-        PremiseOwnerSelf,
-        new LocalDate(2014, 4, 3),
-        ResidentialYes)
+          val outputObj = YourTradingPremises(
+            "Test Business Name",
+            UKTradingPremises(
+              "test Address Line 1",
+              "test Address Line 2",
+              Some("test Address Line 3"),
+              Some("test Address Line 4"),
+              Some("AA67 HJU"),
+              "UK"),
+            PremiseOwnerSelf,
+            CreateLocalDate("3", "4", "2015"),//new LocalDate(2014, 4, 3),
+            ResidentialYes)
 
-      YourTradingPremises.jsonReadsYourTradingPremises.reads(input) must be(JsSuccess(outputObj))
+          YourTradingPremises.jsonReadsYourTradingPremises.reads(input) must be(JsSuccess(outputObj))
 
-    }
-*/
+        }
+    */
 
     "Write details correctly to JSON including the LocalDate Conversion" in {
       val input = YourTradingPremises(
@@ -55,7 +55,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
           Some("AA67 HJU"),
           "UK"),
         PremiseOwnerAnother,
-        new LocalDate(2014, 4, 3),
+        CreateLocalDate("3", "4", "2015"), //new LocalDate(2014, 4, 3),
         ResidentialYes)
 
       YourTradingPremises.jsonWritesYourTradingPremises.writes(input) must be(Json.obj(
@@ -67,7 +67,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "postcode" -> "AA67 HJU",
         "country" -> "UK",
         "premiseOwner" -> false,
-        "startOfTradingDate" -> "2014-04-03",
+        "startOfTradingDate" -> "3-4-2015",
         "isResidential" -> true))
     }
   }
@@ -151,11 +151,26 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
   }
 
 
+  "Take the individual Form Fields and create the custom Date objject" must {
+
+    "Read the URLFormEncoded and convert to Custo Date Object" in {
+      val jsonLocalDate: JsObject = Json.obj("startOfTradingDate" -> "2015-08-15")
+      YourTradingPremises.jsonReadsToLocalDate.reads(jsonLocalDate) must be(JsSuccess(LocalDate.parse("2015-08-15"), JsPath \ "startOfTradingDate"))
+    }
+
+    "Write the LocalDate to JSON String" in {
+      val localDate: LocalDate = LocalDate.parse("2015-08-15")
+      YourTradingPremises.writeLocalDateToJSONString.writes(localDate) must be(Json.obj("startOfTradingDate" -> "2015-08-15"))
+    }
+
+  }
+
+
   "Json String must successfully convert to LocalDate" must {
 
     "Read the JSON String and convert to LocalDate" in {
       val jsonLocalDate: JsObject = Json.obj("startOfTradingDate" -> "2015-08-15")
-      YourTradingPremises.readsJSONStringToLocalDate.reads(jsonLocalDate) must be(JsSuccess(LocalDate.parse("2015-08-15"), JsPath \ "startOfTradingDate"))
+      YourTradingPremises.jsonReadsToLocalDate.reads(jsonLocalDate) must be(JsSuccess(LocalDate.parse("2015-08-15"), JsPath \ "startOfTradingDate"))
     }
 
     "Write the LocalDate to JSON String" in {

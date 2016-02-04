@@ -91,7 +91,7 @@ object TradingPremisesAddress {
     }
   }
 
-  implicit val formRule: Rule[UrlFormEncoded, TradingPremisesAddress] =
+  implicit val formRuleTradingPremiseAddress: Rule[UrlFormEncoded, TradingPremisesAddress] =
     From[UrlFormEncoded] { __ =>
       import models.FormTypes._
       import play.api.data.mapping.forms.Rules._
@@ -119,7 +119,7 @@ object TradingPremisesAddress {
     }
 
 
-  implicit val formWrites = Write[TradingPremisesAddress, UrlFormEncoded] {
+  implicit val formWritesTradingPremiseAddress = Write[TradingPremisesAddress, UrlFormEncoded] {
     case tpa: UKTradingPremises =>
       Map(
         "isUK" -> Seq("true"),

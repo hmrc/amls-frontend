@@ -14,7 +14,7 @@ classes: Seq[String] = Seq.empty
         @if(field.hasErrors) {
         <span class="error-notification">@field.error</span>
         }
-        <input name="@field.name" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="2" min="1" max="31" value="@field.value" id="@field.id"
+        <input name="dd" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="2" min="1" max="31" value="@field.value" id="@field.id"
         @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
         >
     </label>
@@ -27,7 +27,7 @@ classes: Seq[String] = Seq.empty
     @if(field.hasErrors) {
     <span class="error-notification">@field.error</span>
     }
-    <input name="@field.name" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="2" min="1" max="12" value="@field.value" id="@field.id"
+    <input name="mm" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="2" min="1" max="12" value="@field.value" id="@field.id"
     @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
     >
 </div>
@@ -39,7 +39,7 @@ classes: Seq[String] = Seq.empty
     @if(field.hasErrors) {
     <span class="error-notification">@field.error</span>
     }
-    <input name="@field.name" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="4" min="1990" max="2016" value="@field.value" id="@field.id"
+    <input name="yyyy" class="@classes.mkString(" ")" type="text" pattern="[0-9]*" maxlength="4" min="1990" max="2016" value="@field.value" id="@field.id"
     @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
     >
 </div>

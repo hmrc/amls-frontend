@@ -29,7 +29,8 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
     val ukAddress = UKTradingPremises("ukline_1", "ukline_2", Some("ukline_3"), Some("ukline_4"), Some("NE98 1ZZ"), "UK")
     val nonUKAddress = UKTradingPremises("nonline _1", "nonline_2", Some("nonline_3"), Some("nonline_4"), Some("226001"), "IN")
-    val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, new LocalDate("2016-02-01"), ResidentialYes)
+    val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, CreateLocalDate("3", "4", "2015"), ResidentialYes)
+    //val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, new LocalDate("2016-02-01"), ResidentialYes)
 
 
     "load a blank where are trading premises page when the user visits for the first time" in new Fixture {
@@ -75,7 +76,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         "postCode" -> Seq("NE98 1ZZ"),
         "country" -> Seq("UK"))
 
-      TradingPremisesAddress.formRule.validate(validUKAddress) must
+      TradingPremisesAddress.formRuleTradingPremiseAddress.validate(validUKAddress) must
         be(Success(UKTradingPremises("Address Line 1", "Address Line 2", Some("Address Line 3"), Some("Address Line 4"), Some("NE98 1ZZ"), "UK")))
     }
 
@@ -91,7 +92,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         "country" -> Seq("IN")
       )
 
-      TradingPremisesAddress.formRule.validate(nonValidUKAddress) must
+      TradingPremisesAddress.formRuleTradingPremiseAddress.validate(nonValidUKAddress) must
         be(Success(NonUKTradingPremises("Address Line 1", "Address Line 2", Some("Address Line 3"), Some("Address Line 4"), Some("226001"), "IN")))
     }
 
@@ -127,9 +128,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-
     }
-
 
   }
 

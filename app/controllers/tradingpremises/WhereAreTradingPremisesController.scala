@@ -12,7 +12,8 @@ import scala.concurrent.Future
 trait WhereAreTradingPremisesController extends BaseController {
 
   private val blankUKAddress = UKTradingPremises("", "", None, None, None, "UK")
-  private val blankDate = LocalDate.now()
+  private val blankDate = CreateLocalDate("","","")
+  private val localDate = LocalDate.now()
   private val blankYourTradingPremise = YourTradingPremises("", blankUKAddress, PremiseOwnerSelf, blankDate, ResidentialNo)
 
   def dataCacheConnector: DataCacheConnector
