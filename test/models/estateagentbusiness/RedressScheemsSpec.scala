@@ -10,14 +10,24 @@ class RedressScheemsSpec extends PlaySpec with MockitoSugar {
 
   "RedressScheemsSpec" must {
 
-    "validate model with few check box selected" in {
+    "validate model with redress option selected as yes" in {
       val model = Map(
         "isRedress" -> Seq("true"),
         "propertyRedressScheme" -> Seq("02")
       )
 
-      RedressRegistered.formRule.validate(model) must
-        be(Success(RedressRegisteredYes(OmbudsmanServices)))
+      RedressScheme.formRedressRule.validate(model) must
+        be(Success(OmbudsmanServices))
+    }
+
+    "validate model redress option selected as No" in {
+      val model = Map(
+        "isRedress" -> Seq("false"),
+        "propertyRedressScheme" -> Seq("02")
+      )
+
+      RedressScheme.formRedressRule.validate(model) must
+        be(Success(RedressSchemedNo))
     }
 
     "successfully validate given an `other` value" in {
@@ -28,8 +38,8 @@ class RedressScheemsSpec extends PlaySpec with MockitoSugar {
         "other" -> Seq("foobar")
       )
 
-      RedressRegistered.formRule.validate(data) must
-        be(Success(RedressRegisteredYes(Other("foobar"))))
+      RedressScheme.formRedressRule.validate(data) must
+        be(Success(Other("foobar")))
     }
 
     "fail to validate given an `other` with no value" in {
@@ -39,7 +49,7 @@ class RedressScheemsSpec extends PlaySpec with MockitoSugar {
         "propertyRedressScheme" -> Seq("04")
       )
 
-      RedressRegistered.formRule.validate(data) must
+      RedressScheme.formRedressRule.validate(data) must
         be(Failure(Seq(
           (Path \ "other") -> Seq(ValidationError("error.required"))
         )))
@@ -47,15 +57,15 @@ class RedressScheemsSpec extends PlaySpec with MockitoSugar {
 
     "write correct data from enum value" in {
 
-      RedressRegistered.formWrites.writes(RedressRegisteredYes(Other("foobar"))) must
+      RedressScheme.formRedressWrites.writes(Other("foobar")) must
         be(Map("isRedress" -> Seq("true"),"propertyRedressScheme" -> Seq("04"), "other" -> Seq("foobar")))
     }
 
     "JSON validation" must {
       "successfully validate selecting redress option no" in {
 
-        Json.fromJson[RedressRegistered](Json.obj("isRedress"-> false)) must
-          be(JsSuccess(RedressRegisteredNo, JsPath \ "isRedress"))
+        Json.fromJson[RedressScheme](Json.obj("isRedress"-> false)) must
+          be(JsSuccess(RedressSchemedNo, JsPath \ "isRedress"))
 
       }
 
@@ -64,8 +74,8 @@ class RedressScheemsSpec extends PlaySpec with MockitoSugar {
                             "propertyRedressScheme" -> "04",
                             "propertyRedressSchemeOther" -> "test")
 
-        Json.fromJson[RedressRegistered](json) must
-          be(JsSuccess(RedressRegisteredYes(Other("test")), JsPath \ "isRedress" \ "propertyRedressScheme" \ "propertyRedressSchemeOther"))
+        Json.fromJson[RedressScheme](json) must
+          be(JsSuccess(Other("test"), JsPath \ "isRedress" \ "propertyRedressScheme" \ "propertyRedressSchemeOther"))
 
       }
 
@@ -75,7 +85,7 @@ class RedressScheemsSpec extends PlaySpec with MockitoSugar {
                              "propertyRedressScheme" -> "04"
                             )
 
-        Json.fromJson[RedressRegistered](json) must
+        Json.fromJson[RedressScheme](json) must
           be(JsError((JsPath \ "isRedress" \ "propertyRedressScheme" \ "propertyRedressSchemeOther") -> ValidationError("error.path.missing")))
       }
 
@@ -84,8 +94,7 @@ class RedressScheemsSpec extends PlaySpec with MockitoSugar {
           "propertyRedressScheme" -> "04",
           "propertyRedressSchemeOther" -> "test")
 
-        Json.toJson(RedressRegisteredYes(Other("test"))) must
-          be(json)
+        Json.toJson(Other("test")) must be(json)
 
       }
     }

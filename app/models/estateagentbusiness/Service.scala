@@ -15,7 +15,7 @@ case object AssetManagement extends Service
 case object LandManagement extends Service
 case object Development extends Service
 case object SocialHousing extends Service
-case class Residential(redressScheme: RedressRegistered) extends Service
+case class Residential(redressScheme: Option[RedressScheme]) extends Service
 
 object Service {
 
@@ -24,19 +24,16 @@ object Service {
       case "01" => Some(Commercial)
       case "02" => Some(Auction)
       case "03" => Some(Relocation)
-      case "04" => Some(Auction)
+      case "04" => Some(BusinessTransfer)
       case "05" => Some(AssetManagement)
       case "06" => Some(LandManagement)
       case "07" => Some(Development)
       case "08" => Some(SocialHousing)
-      case "09" => Some(Residential(RedressRegisteredNo))
-     /* {
-        println("reched hereeeeeeeeeeeeeeeeeee "+ __)
-
-       __.read[RedressRegistered] map(x=>Some(Residential(x)))
-
-        Some(Residential(RedressRegisteredNo))
-      }*/
+      case "09" =>
+      {
+        val validateRedress = RedressScheme.formRedressRule.validate(form)
+        Some(Residential(Some(validateRedress.get)))
+      }
       case _ => None
     }
   }
@@ -46,17 +43,23 @@ object Service {
       case "01" => Commercial
       case "02" => Auction
       case "03" => Relocation
-      case "04" => Auction
+      case "04" => BusinessTransfer
       case "05" => AssetManagement
       case "06" => LandManagement
       case "07" => Development
       case "08" => SocialHousing
-      /*case "09" => {
-        Residential(None)
-      }*/
+      case "09" => {
+        val test: Reads[RedressScheme] = __.read[RedressScheme] map (x => (x))
+        test match {
+          case s: JsSuccess[RedressScheme] => {
+            val place: RedressScheme = s.get
+            Residential(Some(place))
+          }
+          case e: JsError => Residential(None)
+        }
+      }
     }
   }
-
 
   implicit def servicesToString(obj : Service) : String = {
     obj match {
@@ -68,7 +71,9 @@ object Service {
       case LandManagement => "06"
       case Development => "07"
       case SocialHousing => "08"
-     // case Residential(None) => "09"
+      case Residential(None) => {
+        __.write[RedressScheme]
+      }
     }
   }
 

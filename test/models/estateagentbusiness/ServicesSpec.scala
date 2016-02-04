@@ -23,22 +23,23 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "validate model with residential estate option selected and redress option yes selected" in {
       val model = Map(
         "services" -> Seq("02", "01", "09"),
-       "services\\isRedress" -> Seq("true"),
-        "services\\PropertyRedressScheme" -> Seq("02"))
+        "isRedress" -> Seq("true"),
+        "propertyRedressScheme" -> Seq("02"))
 
       Service.servicesFormRule.validate(model) must
-        be(Success(Seq(Auction, Commercial, Residential)))
+        be(Success(Seq(Auction, Commercial, Residential(Some(OmbudsmanServices)))))
 
     }
 
-   /* "validate model with residential estate agency check box selected" in {
+    "validate model with residential estate agency check box selected" in {
       val model = Map(
-        "services" -> Seq("09")
+        "services" -> Seq("09"),
+        "isRedress" -> Seq("false")
       )
 
       Service.servicesFormRule.validate(model) must
-        be(Success(Seq(Residential(None))))
-    }*/
+        be(Success(Seq(Residential(Some(RedressSchemedNo)))))
+    }
 
     "fail to validate given an `other` with no value" in {
 
@@ -67,11 +68,22 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         be(Map("services" -> Seq("02","01", "03")))
     }
 
+    "write correct data for services value when residential option is selected" in {
+
+      Service.formWrites.writes(Seq(Auction, Commercial, Residential(Some(OmbudsmanServices)))) must
+        be(Map("services" -> Seq("02","01", "09")))
+    }
+
     "JSON validation" must {
 
       "successfully validate given an enum value" in {
-        Json.fromJson[Seq[Service]](Json.obj("services" -> Seq("01","02"))) must
-          be(JsSuccess(Seq(Commercial, Auction), JsPath \ "services"))
+        val json =  Json.obj("services" -> Seq("01","02", "09"),
+          "isRedress"-> true,
+          "propertyRedressScheme" -> "04",
+          "propertyRedressSchemeOther" -> "test")
+
+        Json.fromJson[Seq[Service]](json) must
+          be(JsSuccess(Seq(Commercial, Auction, Residential(Some(OmbudsmanServices))), JsPath \ "services"))
       }
 
       "fail when on invalid data" in {
@@ -83,6 +95,16 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "json write" must {
       Json.toJson(Seq(Auction)) must
         be(Json.obj("services" -> Seq("02")))
+    }
+
+    "successfully validate json write" in {
+      val json = Json.obj("services" -> Seq("01","02", "09"),
+        "isRedress"-> true,
+        "propertyRedressScheme" -> "04",
+        "propertyRedressSchemeOther" -> "test")
+
+      Json.toJson(Seq(Commercial, Auction, Other("test"))) must be(json)
+
     }
   }
 }
