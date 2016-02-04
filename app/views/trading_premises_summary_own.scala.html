@@ -1,0 +1,38 @@
+@import include._
+@import models.tradingpremises._
+
+@(model: TradingPremises)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.businesspremises.title")
+) {
+
+    @heading("summary.checkyouranswers.businesspremises.title", "summary.tradingpremises")
+
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("tradingpremises.whatyouneed.title")</th>
+                <td><a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <br>
+                </td>
+            </tr>
+        </table>
+
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("tradingpremises.whatyouneed.title")</th>
+            <td><a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <br>
+            </td>
+        </tr>
+    </table>
+
+
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Return to Summary</a>
+}
