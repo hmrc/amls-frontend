@@ -49,32 +49,34 @@ object Service {
       case "07" => Development
       case "08" => SocialHousing
       case "09" => {
-        val test: Reads[RedressScheme] = __.read[RedressScheme] map (x => (x))
+        val validateRedress =  RedressScheme.json
+       // Residential(Some(validateRedress.asInstanceOf[RedressScheme]))
+       /* val test: Reads[RedressScheme] = __.read[RedressScheme] map (x => (x))
         test match {
           case s: JsSuccess[RedressScheme] => {
             val place: RedressScheme = s.get
             Residential(Some(place))
           }
           case e: JsError => Residential(None)
-        }
+        }*/
+
+        Residential(None)
       }
     }
   }
 
   implicit def servicesToString(obj : Service) : String = {
-    obj match {
-      case Commercial => "01"
-      case Auction => "02"
-      case Relocation => "03"
-      case Auction => "04"
-      case AssetManagement => "05"
-      case LandManagement => "06"
-      case Development => "07"
-      case SocialHousing => "08"
-      case Residential(None) => {
-        __.write[RedressScheme]
-      }
-    }
+   obj match {
+     case Commercial => "01"
+     case Auction => "02"
+     case Relocation => "03"
+     case Auction => "04"
+     case AssetManagement => "05"
+     case LandManagement => "06"
+     case Development => "07"
+     case SocialHousing => "08"
+     case Residential(Some(x)) => "09"
+   }
   }
 
   implicit val servicesFormRule : Rule[UrlFormEncoded, Seq[Service]] = new Rule[UrlFormEncoded, Seq[Service]] {
@@ -93,8 +95,18 @@ object Service {
   }
 
   implicit val formWrites: Write[Seq[Service], UrlFormEncoded]= Write {
-    case services => Map("services" -> services.map(servicesToString))
+    case services => {
+      val serMap = services.map(servicesToString)
+      services.map { x => x match {
+        case Residential(Some(x)) =>
+          val fwrite = RedressScheme.formRedressWrites.writes(x)
+          Map("services" -> serMap) ++ fwrite
+        case _ => Map("services" -> serMap)
+      }
+      }.apply(0)
+    }
   }
+
 
   implicit val jsonReads: Reads[Seq[Service]] = {
     import play.api.libs.json.Reads.StringReads
@@ -106,7 +118,9 @@ object Service {
   implicit val jsonWrites = Writes[Seq[Service]] {
     case services => Json.obj("services" -> services.map(servicesToString))
     case _ => JsNull
+
   }
+
 }
 
 

@@ -108,36 +108,31 @@ object RedressScheme {
 
   implicit val jsonRedressReads : Reads[RedressScheme] = {
     import play.api.libs.json.Reads.StringReads
-    println("--------------------------------------------")
-    val ss =  (__ \ "isRedress").read[Boolean].map{x=>
-      println("+++++++++++++++++++++++++++++++++"+x)
-    }
-
     (__ \ "isRedress").read[Boolean] flatMap {
-      case true => {
-        println("--------------------------------------------")
+      case true =>
+      {
         (__ \ "propertyRedressScheme").read[String].flatMap[RedressScheme] {
-          case "01" => ThePropertyOmbudsman
-          case "02" =>  println("--------------------------------------------")
+          case "01" => println("---------------1---------------")
+            ThePropertyOmbudsman
+          case "02" =>  println("---------------2---------------")
             OmbudsmanServices
-          case "03" => PropertyRedressScheme
-          case "04" =>
+          case "03" => println("---------------3---------------")
+            PropertyRedressScheme
+          case "04" => println("---------------4---------------")
             (JsPath \ "propertyRedressSchemeOther").read[String] map {
               Other(_)
             }
-          case _ =>
-            println("--------------++------------------------------")
+          case _ => println("---------------5---------------")
             ValidationError("error.invalid")
         }
       }
-      case false =>  println("-----------------------------false---------------")
-        Reads(_ => JsSuccess(RedressSchemedNo))
+      case false => Reads(_ => JsSuccess(RedressSchemedNo))
     }
   }
 
   implicit val jsonRedressWrites = Writes[RedressScheme] {
       case ThePropertyOmbudsman => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "01")
-      case OmbudsmanServices => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "01")
+      case OmbudsmanServices => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "02")
       case PropertyRedressScheme => Json.obj("isRedress" -> true,"propertyRedressScheme" -> "03")
       case Other(value) =>
         Json.obj(

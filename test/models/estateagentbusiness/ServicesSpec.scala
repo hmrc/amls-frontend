@@ -70,8 +70,16 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
     "write correct data for services value when residential option is selected" in {
 
-      Service.formWrites.writes(Seq(Auction, Commercial, Residential(Some(OmbudsmanServices)))) must
-        be(Map("services" -> Seq("02","01", "09")))
+      Service.formWrites.writes(Seq(Auction, Commercial)) must
+        be(Map("services" -> Seq("02","01")))
+    }
+
+    "write correct data for services value when residential option is selected1" in {
+
+      Service.formWrites.writes(Seq(Residential(Some(OmbudsmanServices)))) must
+        be(Map("services" -> Seq( "09"),
+          "isRedress" -> Seq("true"),
+          "propertyRedressScheme" -> Seq("02")))
     }
 
     "JSON validation" must {
@@ -103,7 +111,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         "propertyRedressScheme" -> "04",
         "propertyRedressSchemeOther" -> "test")
 
-      Json.toJson(Seq(Commercial, Auction, Other("test"))) must be(json)
+      Json.toJson(Seq(Commercial, Auction, Residential(Some(Other("test"))))) must be(json)
 
     }
   }

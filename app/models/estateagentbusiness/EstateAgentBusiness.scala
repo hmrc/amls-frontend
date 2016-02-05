@@ -1,10 +1,14 @@
 package models.estateagentbusiness
 
 case class EstateAgentBusiness(
+                                //services: Option[Seq[Service]] = None,
                                 estateAgentAct: Option[String] = None,
                                 professionalBody: Option[ProfessionalBody] = None,
                                 penalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = None
                               ) {
+/*  def services(p: Seq[Service]): Seq[Service] =
+    this.copy(services = Some(p))*/
+
   def professionalBody(p: ProfessionalBody): EstateAgentBusiness =
     this.copy(professionalBody = Some(p))
 
