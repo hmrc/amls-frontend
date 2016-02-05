@@ -116,13 +116,13 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "successfully validate" in {
 
-      postCodeType.validate("177A") must
+      postcodeType.validate("177A") must
         be(Success("177A"))
     }
 
     "fail to validate an empty string" in {
 
-      postCodeType.validate("") must
+      postcodeType.validate("") must
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.required"))
         )))
@@ -130,7 +130,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail to validate a string longer than 255" in {
 
-      postCodeType.validate("a" * 11) must
+      postcodeType.validate("a" * 11) must
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.maxLength", FormTypes.maxPostCodeTypeLength))
         )))

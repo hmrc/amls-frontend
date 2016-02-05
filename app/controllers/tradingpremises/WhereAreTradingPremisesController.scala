@@ -12,7 +12,7 @@ import scala.concurrent.Future
 trait WhereAreTradingPremisesController extends BaseController {
 
   private val blankUKAddress = UKTradingPremises("", "", None, None, None, "UK")
-  private val blankDate = CreateLocalDate("","","")
+  private val blankDate = HMRCLocalDate("","","")
   private val localDate = LocalDate.now()
   private val blankYourTradingPremise = YourTradingPremises("", blankUKAddress, PremiseOwnerSelf, blankDate, ResidentialNo)
 

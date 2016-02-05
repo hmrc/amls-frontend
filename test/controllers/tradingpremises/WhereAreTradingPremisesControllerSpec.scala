@@ -29,7 +29,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
     val ukAddress = UKTradingPremises("ukline_1", "ukline_2", Some("ukline_3"), Some("ukline_4"), Some("NE98 1ZZ"), "UK")
     val nonUKAddress = UKTradingPremises("nonline _1", "nonline_2", Some("nonline_3"), Some("nonline_4"), Some("226001"), "IN")
-    val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, CreateLocalDate("3", "4", "2015"), ResidentialYes)
+    val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, HMRCLocalDate("3", "4", "2015"), ResidentialYes)
     //val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, new LocalDate("2016-02-01"), ResidentialYes)
 
 
@@ -62,38 +62,6 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
       contentAsString(result) must include(ukAddress.addressLine2)
       contentAsString(result) must include(ukAddress.addressLine3.get)
       contentAsString(result) must include(ukAddress.addressLine4.get)
-    }
-
-
-    "successfully validate a URLEncoded UK Address" in new Fixture {
-
-      val validUKAddress = Map(
-        "isUK" -> Seq("true"),
-        "addressLine1" -> Seq("Address Line 1"),
-        "addressLine2" -> Seq("Address Line 2"),
-        "addressLine3" -> Seq("Address Line 3"),
-        "addressLine4" -> Seq("Address Line 4"),
-        "postCode" -> Seq("NE98 1ZZ"),
-        "country" -> Seq("UK"))
-
-      TradingPremisesAddress.formRuleTradingPremiseAddress.validate(validUKAddress) must
-        be(Success(UKTradingPremises("Address Line 1", "Address Line 2", Some("Address Line 3"), Some("Address Line 4"), Some("NE98 1ZZ"), "UK")))
-    }
-
-    "successfully validate a URLEncoded Non UK Address" in new Fixture {
-
-      val nonValidUKAddress = Map(
-        "isUK" -> Seq("false"),
-        "addressLine1" -> Seq("Address Line 1"),
-        "addressLine2" -> Seq("Address Line 2"),
-        "addressLine3" -> Seq("Address Line 3"),
-        "addressLine4" -> Seq("Address Line 4"),
-        "postCode" -> Seq("226001"),
-        "country" -> Seq("IN")
-      )
-
-      TradingPremisesAddress.formRuleTradingPremiseAddress.validate(nonValidUKAddress) must
-        be(Success(NonUKTradingPremises("Address Line 1", "Address Line 2", Some("Address Line 3"), Some("Address Line 4"), Some("226001"), "IN")))
     }
 
     //TODO Fix the Read in YourTradingPremise

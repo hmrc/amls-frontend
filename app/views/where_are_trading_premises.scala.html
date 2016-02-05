@@ -38,7 +38,7 @@ classes = Seq("tradingname")
     @input(f("addressLine4"))
 </fieldset>
 @input(
-field = f("postCode"),
+field = f("postcode"),
 labelText = "tradingpremises.yourtradingpremises.postcode",
 classes = Seq("postcode")
 )
@@ -52,10 +52,10 @@ classes = Seq("country")
 
 <p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.whose")</p>
 
-@inlineRadioGroup(f("whosePremise")) {
+@inlineRadioGroup(f("premiseOwner")) {
 @legend("TODO", jsHidden = true)
-@radio(f("whosePremise"), "tradingpremises.yourtradingpremises.whose.my", "01")
-@radio(f("whosePremise"), "tradingpremises.yourtradingpremises.whose.another", "02")
+@radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
+@radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
 }
 
 <p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.startdate")</p>

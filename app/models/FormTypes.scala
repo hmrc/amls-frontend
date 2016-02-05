@@ -15,6 +15,8 @@ object FormTypes {
   val maxEMailLength = 100
   val maxPenalisedTypeLength = 255
   val maxAgentNameLength = 140
+  val dayOrMonthLength = 2
+  val yearLength = 4
 
   val indivNameType =
     notEmpty compose maxLength(maxNameTypeLength)
@@ -29,7 +31,7 @@ object FormTypes {
   val addressType =
     notEmpty compose maxLength(maxAddressLength)
 
-  val postCodeType =
+  val postcodeType =
     notEmpty compose maxLength(maxPostCodeTypeLength)
 
   val countryType =
@@ -42,5 +44,9 @@ object FormTypes {
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
   val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
+
+  val dayOrMonthType = notEmpty compose minLength(dayOrMonthLength) compose maxLength(dayOrMonthLength) compose pattern("[0-9]+".r)
+
+  val yearType = notEmpty compose minLength(yearLength) compose maxLength(yearLength) compose pattern("[0-9]+".r)
 }
 

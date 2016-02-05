@@ -7,12 +7,10 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Writes._
 import play.api.libs.json.{Writes, _}
 
-import scala.util.Try
-
 case class YourTradingPremises(tradingName: String,
                                tradingPremisesAddress: TradingPremisesAddress,
                                premiseOwner: PremiseOwner,
-                               startOfTradingDate: CreateLocalDate,
+                               startOfTradingDate: HMRCLocalDate,
                                isResidential: IsResidential)
 
 object YourTradingPremises {
@@ -21,7 +19,7 @@ object YourTradingPremises {
     ((JsPath \ "tradingName").read[String] and
       JsPath.read[TradingPremisesAddress] and
       JsPath.read[PremiseOwner] and
-      JsPath.read[CreateLocalDate] and
+      JsPath.read[HMRCLocalDate] and
       JsPath.read[IsResidential]) (YourTradingPremises.apply _)
   }
 
@@ -29,7 +27,7 @@ object YourTradingPremises {
     (__ \ "tradingName").write[String] and
       (__).write[TradingPremisesAddress] and
       (__).write[PremiseOwner] and
-      (__).write[CreateLocalDate] and
+      (__).write[HMRCLocalDate] and
       (__).write[IsResidential]
     ) (unlift(YourTradingPremises.unapply))
 
@@ -41,7 +39,7 @@ object YourTradingPremises {
         (__ \ "tradingName").read[String] ~
           (__).read[TradingPremisesAddress] ~
           (__).read[PremiseOwner] ~
-          (__).read[CreateLocalDate] ~
+          (__).read[HMRCLocalDate] ~
           (__).read[IsResidential]
         ).apply(YourTradingPremises.apply _)
     }
@@ -56,7 +54,7 @@ object YourTradingPremises {
       (__ \ "tradingName").write[String] ~
         __.write[TradingPremisesAddress] ~
         __.write[PremiseOwner] ~
-        (__ \ "startOfTradingDate").write[CreateLocalDate] ~
+        (__ \ "startOfTradingDate").write[HMRCLocalDate] ~
         __.write[IsResidential]) (unlift(YourTradingPremises.unapply _))
   }
 
@@ -69,68 +67,42 @@ object YourTradingPremises {
 
 }
 
-case class CreateLocalDate(yyyy: String,
-                           mm: String,
-                           dd: String)
+case class HMRCLocalDate(yyyy: String,
+                         mm: String,
+                         dd: String)
 
 
-object CreateLocalDate {
+object HMRCLocalDate {
 
 
-  implicit val jsonReadsToCreateLocalDate: Reads[CreateLocalDate] = {
+  implicit val jsonReadsToCreateLocalDate: Reads[HMRCLocalDate] = {
     (JsPath \ "startOfTradingDate").read[String].map {
       dateString => {
-        val Array(yyyy, mm, dd) = dateString.split("_")
-        CreateLocalDate(yyyy, mm, dd)
+        val Array(yyyy, mm, dd) = dateString.split("-")
+        HMRCLocalDate(yyyy, mm, dd)
       }
     }
   }
 
-  implicit val writeLocalDateToJSONString: Writes[CreateLocalDate] = Writes[CreateLocalDate] { case localDate => (JsPath \ "startOfTradingDate").write[String]
+  implicit val writeLocalDateToJSONString: Writes[HMRCLocalDate] = Writes[HMRCLocalDate] { case localDate => (JsPath \ "startOfTradingDate").write[String]
     .writes(localDate.yyyy + "-" +
       localDate.mm + "-" +
       localDate.dd
     )
   }
 
-  /*  implicit val jsonReadsToLocalDate: Reads[CreateLocalDate] = {
-      import play.api.libs.functional.syntax._
-      import play.api.libs.json.Reads._
-      import play.api.libs.json._
-
-      (
-        (__ \ "day").read[String] ~
-          (__ \ "month").read[String] ~
-          (__ \ "year").read[String]
-        ).apply(CreateLocalDate.apply _)
-    }
-
-
-    implicit val jsonWritesLocalDate: Writes[CreateLocalDate] = {
-
-      import play.api.libs.json.Writes._
-      import play.api.libs.json._
-
-      Writes[CreateLocalDate] {
-        case tpa: CreateLocalDate => Json.obj(
-          "day" -> tpa.day,
-          "month" -> tpa.month,
-          "year" -> tpa.year)
-      }
-    }*/
-
-
-  implicit val formRule: Rule[UrlFormEncoded, CreateLocalDate] = From[UrlFormEncoded] { __ =>
+  implicit val formRuleHMRCLocalDate: Rule[UrlFormEncoded, HMRCLocalDate] = From[UrlFormEncoded] { __ =>
+    import models.FormTypes._
     import play.api.data.mapping.forms.Rules._
 
     (
-      (__ \ "yyyy").read[String] ~
-        (__ \ "mm").read[String] ~
-        (__ \ "dd").read[String]
-      ).apply(CreateLocalDate.apply _)
+      (__ \ "yyyy").read(yearType) ~
+        (__ \ "mm").read(dayOrMonthType) ~
+        (__ \ "dd").read(dayOrMonthType)
+      ).apply(HMRCLocalDate.apply _)
   }
 
-  implicit val formWritesYourTradingPremises: Write[CreateLocalDate, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWritesToFormHMRCLocalDate: Write[HMRCLocalDate, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
 
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
@@ -138,7 +110,7 @@ object CreateLocalDate {
     (
       (__ \ "yyyy").write[String] ~
         (__ \ "mm").write[String] ~
-        (__ \ "dd").write[String]) (unlift(CreateLocalDate.unapply _))
+        (__ \ "dd").write[String]) (unlift(HMRCLocalDate.unapply _))
   }
 
 }
