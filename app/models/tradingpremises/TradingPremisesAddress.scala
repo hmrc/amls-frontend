@@ -7,7 +7,7 @@ import play.api.libs.json.{Reads, Writes}
 sealed trait TradingPremisesAddress {
 
   def toLines: Seq[String] = this match {
-    case a: UKTradingPremises =>
+    case a: UKAddress =>
       Seq(
         Some(a.addressLine1),
         Some(a.addressLine2),
@@ -17,7 +17,7 @@ sealed trait TradingPremisesAddress {
         Some(a.country)
       ).flatten
 
-    case a: NonUKTradingPremises =>
+    case a: NonUKAddress =>
       Seq(
         Some(a.addressLine1),
         Some(a.addressLine2),
@@ -30,28 +30,28 @@ sealed trait TradingPremisesAddress {
   }
 }
 
-case class UKTradingPremises(
-                              addressLine1: String,
-                              addressLine2: String,
-                              addressLine3: Option[String] = None,
-                              addressLine4: Option[String] = None,
-                              postcode: Option[String],
-                              country: String
-                            ) extends TradingPremisesAddress
+case class UKAddress(
+                      addressLine1: String,
+                      addressLine2: String,
+                      addressLine3: Option[String] = None,
+                      addressLine4: Option[String] = None,
+                      postcode: Option[String],
+                      country: String
+                    ) extends TradingPremisesAddress
 
-case class NonUKTradingPremises(
-                                 addressLine1: String,
-                                 addressLine2: String,
-                                 addressLine3: Option[String] = None,
-                                 addressLine4: Option[String] = None,
-                                 postcode: Option[String],
-                                 country: String
-                               ) extends TradingPremisesAddress
+case class NonUKAddress(
+                         addressLine1: String,
+                         addressLine2: String,
+                         addressLine3: Option[String] = None,
+                         addressLine4: Option[String] = None,
+                         postcode: Option[String],
+                         country: String
+                       ) extends TradingPremisesAddress
 
 
 object TradingPremisesAddress {
 
-  implicit val jsonReadsTradingPremisesAddress: Reads[TradingPremisesAddress] = {
+  implicit val jsonReadsAddress: Reads[TradingPremisesAddress] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
@@ -62,18 +62,18 @@ object TradingPremisesAddress {
         (JsPath \ "addressLine4").readNullable[String] and
         (JsPath \ "postcode").read[Option[String]] and
         (JsPath \ "country").read[String]
-      ) (UKTradingPremises.apply _)
+      ) (UKAddress.apply _)
 
   }
 
-  implicit val jsonWritesTradingPremisesAddress: Writes[TradingPremisesAddress] = {
+  implicit val jsonWritesAddress: Writes[TradingPremisesAddress] = {
 
     import play.api.libs.json.Writes._
     import play.api.libs.json._
 
 
     Writes[TradingPremisesAddress] {
-      case tpa: UKTradingPremises => Json.obj(
+      case tpa: UKAddress => Json.obj(
         "addressLine1" -> tpa.addressLine1,
         "addressLine2" -> tpa.addressLine2,
         "addressLine3" -> tpa.addressLine3,
@@ -83,12 +83,12 @@ object TradingPremisesAddress {
     }
   }
 
-  implicit val formRuleTradingPremiseAddress: Rule[UrlFormEncoded, TradingPremisesAddress] =
+  implicit val formRuleAddress: Rule[UrlFormEncoded, TradingPremisesAddress] =
     From[UrlFormEncoded] { __ =>
       import models.FormTypes._
       import play.api.data.mapping.forms.Rules._
 
-      val nameType = notEmpty compose maxLength(140)
+      val nameType = notEmpty compose maxLength(maxAgentNameLength)
       (
         (__ \ "addressLine1").read(addressType) ~
           (__ \ "addressLine2").read(addressType) ~
@@ -96,12 +96,12 @@ object TradingPremisesAddress {
           (__ \ "addressLine4").read(optionR(addressType)) ~
           (__ \ "postcode").read(optionR(postcodeType)) ~
           (__ \ "country").read(countryType)
-        ) (UKTradingPremises.apply _)
+        ) (UKAddress.apply _)
     }
 
 
-  implicit val formWritesTradingPremiseAddress = Write[TradingPremisesAddress, UrlFormEncoded] {
-    case tpa: UKTradingPremises =>
+  implicit val formWritesAddress = Write[TradingPremisesAddress, UrlFormEncoded] {
+    case tpa: UKAddress =>
       Map(
         "addressLine1" -> Seq(tpa.addressLine1),
         "addressLine2" -> Seq(tpa.addressLine2),

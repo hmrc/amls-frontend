@@ -1,5 +1,6 @@
 package models
 
+import models.tradingpremises.HMRCLocalDate
 import org.scalatestplus.play.PlaySpec
 import org.specs2.mock.mockito.MockitoMatchers
 import play.api.data.mapping.{Path, Failure, Success}
@@ -232,6 +233,36 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.maxLength", 100))
         )))
+    }
+  }
+
+  "Date validation for Year Month and Day" must {
+
+    "Year Validation for FORM RULE" in {
+      val formDateField = Map(
+        "yyyy" -> Seq("2015873434"),
+        "mm" -> Seq("08"),
+        "dd" -> Seq("15")
+      )
+      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "yyyy") -> Seq(ValidationError("error.maxLength", FormTypes.yearLength)))))
+    }
+
+    "Month Validation for FORM RULE" in {
+      val formDateField = Map(
+        "yyyy" -> Seq("2015"),
+        "mm" -> Seq("008"),
+        "dd" -> Seq("15")
+      )
+      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "mm") -> Seq(ValidationError("error.maxLength", FormTypes.maxLengthDayOrMonth)))))
+    }
+
+    "Day Validation for FORM RULE" in {
+      val formDateField = Map(
+        "yyyy" -> Seq("2015"),
+        "mm" -> Seq("08"),
+        "dd" -> Seq("1500")
+      )
+      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "dd") -> Seq(ValidationError("error.maxLength", FormTypes.maxLengthDayOrMonth)))))
     }
   }
 }

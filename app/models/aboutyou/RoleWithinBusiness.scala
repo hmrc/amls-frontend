@@ -73,7 +73,7 @@ object RoleWithinBusiness {
     }
   }
 
-  implicit val jsonWrites: Writes[RoleWithinBusiness] = Writes[RoleWithinBusiness] {
+  implicit val jsonWrites = Writes[RoleWithinBusiness] {
     case BeneficialShareholder => Json.obj("roleWithinBusiness" -> "01")
     case Director => Json.obj("roleWithinBusiness" -> "02")
     case ExternalAccountant => Json.obj("roleWithinBusiness" -> "03")

@@ -24,46 +24,39 @@ object YourTradingPremises {
   }
 
   implicit val jsonWritesYourTradingPremises: Writes[YourTradingPremises] = (
-    (__ \ "tradingName").write[String] and
-      (__).write[TradingPremisesAddress] and
-      (__).write[PremiseOwner] and
-      (__).write[HMRCLocalDate] and
-      (__).write[IsResidential]
+    (JsPath \ "tradingName").write[String] and
+      JsPath.write[TradingPremisesAddress] and
+      JsPath.write[PremiseOwner] and
+      JsPath.write[HMRCLocalDate] and
+      JsPath.write[IsResidential]
     ) (unlift(YourTradingPremises.unapply))
 
 
-  implicit val formRuleYourTradingPremises: Rule[UrlFormEncoded, YourTradingPremises] =
-    From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
-      (
-        (__ \ "tradingName").read[String] ~
-          (__).read[TradingPremisesAddress] ~
-          (__).read[PremiseOwner] ~
-          (__).read[HMRCLocalDate] ~
-          (__).read[IsResidential]
-        ).apply(YourTradingPremises.apply _)
-    }
+  implicit val formRuleYourTradingPremises: Rule[UrlFormEncoded, YourTradingPremises] = From[UrlFormEncoded] { urlFormValue =>
+    import play.api.data.mapping.forms.Rules._
+    import models.FormTypes._
+    (
+      (urlFormValue \ "tradingName").read(descriptionType) ~
+        urlFormValue.read[TradingPremisesAddress] ~
+        urlFormValue.read[PremiseOwner] ~
+        urlFormValue.read[HMRCLocalDate] ~
+        urlFormValue.read[IsResidential]
+      ).apply(YourTradingPremises.apply _)
+  }
 
 
-  implicit val formWritesYourTradingPremises: Write[YourTradingPremises, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWriteYourTradingPremises: Write[YourTradingPremises, UrlFormEncoded] = To[UrlFormEncoded] { yourTradingPremises =>
 
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
 
     (
-      (__ \ "tradingName").write[String] ~
-        __.write[TradingPremisesAddress] ~
-        __.write[PremiseOwner] ~
-        (__ \ "startOfTradingDate").write[HMRCLocalDate] ~
-        __.write[IsResidential]) (unlift(YourTradingPremises.unapply _))
+      (yourTradingPremises \ "tradingName").write[String] ~
+        yourTradingPremises.write[TradingPremisesAddress] ~
+        yourTradingPremises.write[PremiseOwner] ~
+        yourTradingPremises.write[HMRCLocalDate] ~
+        yourTradingPremises.write[IsResidential]) (unlift(YourTradingPremises.unapply _))
   }
-
-  //Read and Write for LocalDate
-  implicit val jsonReadsToLocalDate: Reads[LocalDate] = {
-    (JsPath \ "startOfTradingDate").read[String].map(dateString => LocalDate.parse(dateString))
-  }
-
-  implicit val writeLocalDateToJSONString: Writes[LocalDate] = Writes[LocalDate] { case localDate => (JsPath \ "startOfTradingDate").write[String].writes(localDate.toString) }
 
 }
 
@@ -75,50 +68,46 @@ case class HMRCLocalDate(yyyy: String,
 object HMRCLocalDate {
 
 
-  implicit val jsonReadsToCreateHMRCLocalDate: Reads[HMRCLocalDate] = {
+  implicit val jsonReadsHMRCLocalDate: Reads[HMRCLocalDate] = {
     (JsPath \ "startOfTradingDate").read[String].map {
       dateString => {
-        println("Inside READ Local date :" + dateString)
         val Array(yyyy, mm, dd) = dateString.split("-")
         HMRCLocalDate(yyyy, mm, dd)
       }
     }
   }
 
-  implicit val writeHMRCLocalDateToJSONString: Writes[HMRCLocalDate] = Writes[HMRCLocalDate] {
-    case localDate =>  {
-      println("Inside Write Local date :" + localDate)
+  implicit val jsonWritesHMRCLocalDate: Writes[HMRCLocalDate] = Writes[HMRCLocalDate] {
+    case localDate => {
       (JsPath \ "startOfTradingDate").write[String]
         .writes(localDate.yyyy + "-" +
           localDate.mm + "-" +
           localDate.dd
-        )}
+        )
+    }
   }
 
-  implicit val formRuleHMRCLocalDate: Rule[UrlFormEncoded, HMRCLocalDate] = From[UrlFormEncoded] { __ =>
+  implicit val formRuleHMRCLocalDate: Rule[UrlFormEncoded, HMRCLocalDate] = From[UrlFormEncoded] { urlFormEncoded =>
     import models.FormTypes._
     import play.api.data.mapping.forms.Rules._
 
-    println("********************************Inside FORM RULE Local date******************************")
     (
-      (__ \ "yyyy").read(yearType) ~
-        (__ \ "mm").read(dayOrMonthType) ~
-        (__ \ "dd").read(dayOrMonthType)
+      (urlFormEncoded \ "yyyy").read(yearType) ~
+        (urlFormEncoded \ "mm").read(monthType) ~
+        (urlFormEncoded \ "dd").read(dayType)
       ).apply(HMRCLocalDate.apply _)
   }
 
-  implicit val formWritesToFormHMRCLocalDate: Write[HMRCLocalDate, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWriteHMRCLocalDate: Write[HMRCLocalDate, UrlFormEncoded] = To[UrlFormEncoded] { hmrcLocalDate =>
 
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
-
-    println("********************************Inside FORM WRITE Local date******************************")
     (
-      (__ \ "yyyy").write[String] ~
-        (__ \ "mm").write[String] ~
-        (__ \ "dd").write[String]) (unlift(HMRCLocalDate.unapply _))
+      (hmrcLocalDate \ "yyyy").write[String] ~
+        (hmrcLocalDate \ "mm").write[String] ~
+        (hmrcLocalDate \ "dd").write[String]) (unlift(HMRCLocalDate.unapply _)
+    )
   }
-
 }
 
 sealed trait PremiseOwner
@@ -142,7 +131,7 @@ object PremiseOwner {
     case PremiseOwnerAnother => (JsPath \ "premiseOwner").write[Boolean].writes(false)
   }
 
-  implicit val formRuleFromForm: Rule[UrlFormEncoded, PremiseOwner] = From[UrlFormEncoded] { __ =>
+  implicit val formRulePremiseOwner: Rule[UrlFormEncoded, PremiseOwner] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
 
     (__ \ "premiseOwner").read[Boolean] flatMap {
@@ -151,11 +140,12 @@ object PremiseOwner {
     }
   }
 
-  implicit val formWritesToForm: Write[PremiseOwner, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWritePremiseOwner: Write[PremiseOwner, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
 
     Write {
       case PremiseOwnerSelf => Map("premiseOwner" -> Seq("true"))
       case PremiseOwnerAnother => Map("premiseOwner" -> Seq("false"))
+      case _ => Map("premiseOwner" -> Seq(""))
     }
   }
 
@@ -182,7 +172,7 @@ object IsResidential {
   }
 
 
-  implicit val formRuleFromForm: Rule[UrlFormEncoded, IsResidential] = From[UrlFormEncoded] { __ =>
+  implicit val formRuleIsResidential: Rule[UrlFormEncoded, IsResidential] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
 
     (__ \ "isResidential").read[Boolean] flatMap {
@@ -191,7 +181,7 @@ object IsResidential {
     }
   }
 
-  implicit val formWritesToForm: Write[IsResidential, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWriteIsResidential: Write[IsResidential, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
 
     Write {
       case ResidentialYes => Map("isResidential" -> Seq("true"))

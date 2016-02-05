@@ -48,6 +48,7 @@ POST        /trading-premises/premises                 controllers.tradingpremis
 GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(edit: Boolean ?= false)
 POST        /trading-premises/agent                    controllers.tradingpremises.YourAgentController.post(edit: Boolean ?= false)
 
+
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
