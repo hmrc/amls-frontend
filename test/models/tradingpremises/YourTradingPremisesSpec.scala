@@ -10,38 +10,38 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
   "YourTradingPremises JSON serialisation" must {
 
     //TODO To fix NullPointer Exception
-       "Read details correctly from JSON" in {
+    "Read details correctly from JSON" in {
 
-          val input = Json.parse(
-            """{
-              |"isUK":true,
-              |"tradingName":"Test Business Name",
-              |"addressLine1":"test Address Line 1",
-              |"addressLine2":"test Address Line 2",
-              |"addressLine3":"test Address Line 3",
-              |"addressLine4":"test Address Line 4",
-              |"postcode":"AA67 HJU",
-              |"country":"UK",
-              |"premiseOwner":false,
-              |"startOfTradingDate":"2015-8-15",
-              |"isResidential":true}""".stripMargin)
+      val input = Json.parse(
+        """{
+          |"isUK":true,
+          |"tradingName":"Test Business Name",
+          |"addressLine1":"test Address Line 1",
+          |"addressLine2":"test Address Line 2",
+          |"addressLine3":"test Address Line 3",
+          |"addressLine4":"test Address Line 4",
+          |"postcode":"AA67 HJU",
+          |"country":"UK",
+          |"premiseOwner":false,
+          |"startOfTradingDate":"2015-8-15",
+          |"isResidential":true}""".stripMargin)
 
-          val outputObj = YourTradingPremises(
-            "Test Business Name",
-            UKTradingPremises(
-              "test Address Line 1",
-              "test Address Line 2",
-              Some("test Address Line 3"),
-              Some("test Address Line 4"),
-              Some("AA67 HJU"),
-              "UK"),
-            PremiseOwnerAnother,
-            HMRCLocalDate("2015", "8", "15"),//new LocalDate(2014, 4, 3),
-            ResidentialYes)
+      val outputObj = YourTradingPremises(
+        "Test Business Name",
+        UKTradingPremises(
+          "test Address Line 1",
+          "test Address Line 2",
+          Some("test Address Line 3"),
+          Some("test Address Line 4"),
+          Some("AA67 HJU"),
+          "UK"),
+        PremiseOwnerAnother,
+        HMRCLocalDate("2015", "8", "15"), //new LocalDate(2014, 4, 3),
+        ResidentialYes)
 
-          YourTradingPremises.jsonReadsYourTradingPremises.reads(input) must be(JsSuccess(outputObj))
+      YourTradingPremises.jsonReadsYourTradingPremises.reads(input) must be(JsSuccess(outputObj))
 
-        }
+    }
 
     "Write details correctly to JSON including the LocalDate Conversion" in {
       val input = YourTradingPremises(
@@ -160,6 +160,20 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
     "Write the LocalDate to JSON String" in {
       val localDate: LocalDate = LocalDate.parse("2015-08-15")
       YourTradingPremises.writeLocalDateToJSONString.writes(localDate) must be(Json.obj("startOfTradingDate" -> "2015-08-15"))
+    }
+
+  }
+
+  "Test the JSON Read Write to the HMRCLocalDate" must {
+
+    "Read the JSON and convert to Custom Date Object" in {
+      val jsonLocalDate: JsObject = Json.obj("startOfTradingDate" -> "2015-08-15")
+      HMRCLocalDate.jsonReadsToCreateHMRCLocalDate.reads(jsonLocalDate) must be(JsSuccess(HMRCLocalDate("2015", "08", "15"), JsPath \ "startOfTradingDate"))
+    }
+
+    "Write the LocalDate to JSON String" in {
+      val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
+      HMRCLocalDate.writeHMRCLocalDateToJSONString.writes(hmrcLocalDate) must be(Json.obj("startOfTradingDate" -> "2015-08-15"))
     }
 
   }

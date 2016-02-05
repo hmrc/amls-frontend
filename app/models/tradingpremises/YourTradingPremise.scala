@@ -75,26 +75,31 @@ case class HMRCLocalDate(yyyy: String,
 object HMRCLocalDate {
 
 
-  implicit val jsonReadsToCreateLocalDate: Reads[HMRCLocalDate] = {
+  implicit val jsonReadsToCreateHMRCLocalDate: Reads[HMRCLocalDate] = {
     (JsPath \ "startOfTradingDate").read[String].map {
       dateString => {
+        println("Inside READ Local date :" + dateString)
         val Array(yyyy, mm, dd) = dateString.split("-")
         HMRCLocalDate(yyyy, mm, dd)
       }
     }
   }
 
-  implicit val writeLocalDateToJSONString: Writes[HMRCLocalDate] = Writes[HMRCLocalDate] { case localDate => (JsPath \ "startOfTradingDate").write[String]
-    .writes(localDate.yyyy + "-" +
-      localDate.mm + "-" +
-      localDate.dd
-    )
+  implicit val writeHMRCLocalDateToJSONString: Writes[HMRCLocalDate] = Writes[HMRCLocalDate] {
+    case localDate =>  {
+      println("Inside Write Local date :" + localDate)
+      (JsPath \ "startOfTradingDate").write[String]
+        .writes(localDate.yyyy + "-" +
+          localDate.mm + "-" +
+          localDate.dd
+        )}
   }
 
   implicit val formRuleHMRCLocalDate: Rule[UrlFormEncoded, HMRCLocalDate] = From[UrlFormEncoded] { __ =>
     import models.FormTypes._
     import play.api.data.mapping.forms.Rules._
 
+    println("********************************Inside FORM RULE Local date******************************")
     (
       (__ \ "yyyy").read(yearType) ~
         (__ \ "mm").read(dayOrMonthType) ~
@@ -107,6 +112,7 @@ object HMRCLocalDate {
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
 
+    println("********************************Inside FORM WRITE Local date******************************")
     (
       (__ \ "yyyy").write[String] ~
         (__ \ "mm").write[String] ~
