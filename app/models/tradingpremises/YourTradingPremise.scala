@@ -78,7 +78,7 @@ object HMRCLocalDate {
   implicit val jsonReadsToCreateHMRCLocalDate: Reads[HMRCLocalDate] = {
     (JsPath \ "startOfTradingDate").read[String].map {
       dateString => {
-        println("Inside READ Local date :" + dateString)
+        println("******************JSON READ Local date******************" + dateString)
         val Array(yyyy, mm, dd) = dateString.split("-")
         HMRCLocalDate(yyyy, mm, dd)
       }
@@ -86,13 +86,14 @@ object HMRCLocalDate {
   }
 
   implicit val writeHMRCLocalDateToJSONString: Writes[HMRCLocalDate] = Writes[HMRCLocalDate] {
-    case localDate =>  {
-      println("Inside Write Local date :" + localDate)
+    case localDate => {
+      println("*********************JSON WRITE Local date*****************" + localDate)
       (JsPath \ "startOfTradingDate").write[String]
         .writes(localDate.yyyy + "-" +
           localDate.mm + "-" +
           localDate.dd
-        )}
+        )
+    }
   }
 
   implicit val formRuleHMRCLocalDate: Rule[UrlFormEncoded, HMRCLocalDate] = From[UrlFormEncoded] { __ =>
@@ -117,6 +118,18 @@ object HMRCLocalDate {
       (__ \ "yyyy").write[String] ~
         (__ \ "mm").write[String] ~
         (__ \ "dd").write[String]) (unlift(HMRCLocalDate.unapply _))
+
+    /*
+        Write {
+          case x: HMRCLocalDate =>
+            Map("yyyy" -> Seq("1999"),
+              "mm" -> Seq("09"),
+              "dd" -> Seq("09")
+            )
+        }
+    */
+
+
   }
 
 }
