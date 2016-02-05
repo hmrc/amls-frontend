@@ -26,6 +26,7 @@ button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Edit
 button.continue=Continue
+button.returntosummary = Return to Summary
 
 lbl.other = Other
 lbl.yes = Yes
@@ -67,6 +68,9 @@ summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
 
 summary.checkyouranswers.title = Check your answers
+summary.checkyouranswers.businesspremises.title = Your business'' premises
+summary.checkyouranswers.businesspremises.section1 = Premises
+summary.checkyouranswers.businesspremises.section2 = Trading activities
 button.summary.acceptandcomplete = Accept and complete section
 
 
