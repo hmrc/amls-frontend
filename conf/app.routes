@@ -52,6 +52,10 @@ POST        /estate-agents/penalties                   controllers.estateagentbu
 GET         /estate-agents/services                   controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
 POST        /estate-agents/services                   controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
 
+GET         /estate-agents/redress-scheme             controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
+POST        /estate-agents/redress-scheme             controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
+
+
 GET         /estate-agents/summary                     controllers.estateagentbusiness.SummaryController.get()
 
 

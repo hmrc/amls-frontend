@@ -10,6 +10,17 @@
     @heading("summary.checkyouranswers.title", "summary.estateagentbusiness")
     <table>
         <tr>
+            <th class="summary-title">@Messages("estateagentbusiness.servicess.title")</th>
+            <td colspan="2"><a href="@controllers.estateagentbusiness.routes.BusinessServicesController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
             <th class="summary-title">@Messages("estateagentbusiness.penalisedbyprofessional.title")</th>
             <td colspan="2"><a href="@controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
         </tr>

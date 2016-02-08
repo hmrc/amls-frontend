@@ -1,13 +1,16 @@
 package models.estateagentbusiness
 
 case class EstateAgentBusiness(
-                                //services: Option[Seq[Service]] = None,
-                                estateAgentAct: Option[String] = None,
+                                services: Option[Seq[Service]] = None,
+                                redressScheme: Option[RedressScheme] = None,
                                 professionalBody: Option[ProfessionalBody] = None,
                                 penalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = None
                               ) {
-/*  def services(p: Seq[Service]): Seq[Service] =
-    this.copy(services = Some(p))*/
+  def services(p: Seq[Service]): EstateAgentBusiness =
+    this.copy(services = Some(p))
+
+  def redressScheme(p: RedressScheme): EstateAgentBusiness =
+    this.copy(redressScheme = Some(p))
 
   def professionalBody(p: ProfessionalBody): EstateAgentBusiness =
     this.copy(professionalBody = Some(p))
@@ -25,7 +28,8 @@ object EstateAgentBusiness {
   val key = "estate-agent-business"
 
   implicit val reads: Reads[EstateAgentBusiness] = (
-    __.read[Option[String]] and
+    __.read[Option[Seq[Service]]] and
+    __.read[Option[RedressScheme]] and
       __.read[Option[ProfessionalBody]] and
       __.read[Option[PenalisedUnderEstateAgentsAct]]
     ) (EstateAgentBusiness.apply _)
@@ -34,7 +38,8 @@ object EstateAgentBusiness {
     Writes[EstateAgentBusiness] {
       model =>
         Seq(
-          Json.toJson(model.estateAgentAct).asOpt[JsObject],
+          Json.toJson(model.services).asOpt[JsObject],
+          Json.toJson(model.redressScheme).asOpt[JsObject],
           Json.toJson(model.professionalBody).asOpt[JsObject],
           Json.toJson(model.penalisedUnderEstateAgentsAct).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {

@@ -15,7 +15,7 @@ trait PenalisedUnderEstateAgentsActController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
-        case Some(EstateAgentBusiness(_, _, Some(data))) => Ok(views.html.penalised_under_estate_agents_act(Form2[PenalisedUnderEstateAgentsAct](data), edit))
+        case Some(EstateAgentBusiness(_, _, _, Some(data))) => Ok(views.html.penalised_under_estate_agents_act(Form2[PenalisedUnderEstateAgentsAct](data), edit))
         case _ => Ok(views.html.penalised_under_estate_agents_act(EmptyForm, edit))
       }
     }

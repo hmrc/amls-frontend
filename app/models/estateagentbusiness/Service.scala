@@ -15,67 +15,51 @@ case object AssetManagement extends Service
 case object LandManagement extends Service
 case object Development extends Service
 case object SocialHousing extends Service
-case class Residential(redressScheme: Option[RedressScheme]) extends Service
+case object Residential extends Service
 
 object Service {
 
-  implicit def fromString(str : String, form:UrlFormEncoded) : Option[Service] = {
+ implicit def fromString(str : String, form:UrlFormEncoded) : Option[Service] = {
     str match {
-      case "01" => Some(Commercial)
-      case "02" => Some(Auction)
-      case "03" => Some(Relocation)
-      case "04" => Some(BusinessTransfer)
-      case "05" => Some(AssetManagement)
-      case "06" => Some(LandManagement)
-      case "07" => Some(Development)
-      case "08" => Some(SocialHousing)
-      case "09" =>
-      {
-        val validateRedress = RedressScheme.formRedressRule.validate(form)
-        Some(Residential(Some(validateRedress.get)))
-      }
+      case "01" => Some(Residential)
+      case "02" => Some(Commercial)
+      case "03" => Some(Auction)
+      case "04" => Some(Relocation)
+      case "05" => Some(BusinessTransfer)
+      case "06" => Some(AssetManagement)
+      case "07" => Some(LandManagement)
+      case "08" => Some(Development)
+      case "09" => Some(SocialHousing)
       case _ => None
     }
   }
 
   implicit def fromString(str : String) : Service = {
     str match {
-      case "01" => Commercial
-      case "02" => Auction
-      case "03" => Relocation
-      case "04" => BusinessTransfer
-      case "05" => AssetManagement
-      case "06" => LandManagement
-      case "07" => Development
-      case "08" => SocialHousing
-      case "09" => {
-        val validateRedress =  RedressScheme.json
-       // Residential(Some(validateRedress.asInstanceOf[RedressScheme]))
-       /* val test: Reads[RedressScheme] = __.read[RedressScheme] map (x => (x))
-        test match {
-          case s: JsSuccess[RedressScheme] => {
-            val place: RedressScheme = s.get
-            Residential(Some(place))
-          }
-          case e: JsError => Residential(None)
-        }*/
-
-        Residential(None)
-      }
+      case "01" => Residential
+      case "02" => Commercial
+      case "03" => Auction
+      case "04" => Relocation
+      case "05" => BusinessTransfer
+      case "06" => AssetManagement
+      case "07" => LandManagement
+      case "08" => Development
+      case "09" => SocialHousing
     }
   }
 
   implicit def servicesToString(obj : Service) : String = {
    obj match {
-     case Commercial => "01"
-     case Auction => "02"
-     case Relocation => "03"
-     case Auction => "04"
-     case AssetManagement => "05"
-     case LandManagement => "06"
-     case Development => "07"
-     case SocialHousing => "08"
-     case Residential(Some(x)) => "09"
+     case Residential => "01"
+     case Commercial => "02"
+     case Auction => "03"
+     case Relocation => "04"
+     case BusinessTransfer => "05"
+     case AssetManagement => "06"
+     case LandManagement => "07"
+     case Development => "08"
+     case SocialHousing => "09"
+     case _ => ""
    }
   }
 
@@ -95,16 +79,7 @@ object Service {
   }
 
   implicit val formWrites: Write[Seq[Service], UrlFormEncoded]= Write {
-    case services => {
-      val serMap = services.map(servicesToString)
-      services.map { x => x match {
-        case Residential(Some(x)) =>
-          val fwrite = RedressScheme.formRedressWrites.writes(x)
-          Map("services" -> serMap) ++ fwrite
-        case _ => Map("services" -> serMap)
-      }
-      }.apply(0)
-    }
+    case services => Map("services" -> services.map(servicesToString))
   }
 
 
@@ -117,10 +92,5 @@ object Service {
 
   implicit val jsonWrites = Writes[Seq[Service]] {
     case services => Json.obj("services" -> services.map(servicesToString))
-    case _ => JsNull
-
   }
-
 }
-
-

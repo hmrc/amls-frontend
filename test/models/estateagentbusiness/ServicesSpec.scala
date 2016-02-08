@@ -12,33 +12,32 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
     "validate model with few check box selected" in {
       val model = Map(
-        "services" -> Seq("02", "01", "03")
+        "services" -> Seq("03", "01", "02")
       )
 
       Service.servicesFormRule.validate(model) must
-        be(Success(Seq(Auction, Commercial, Relocation)))
+        be(Success(Seq(Auction, Residential , Commercial)))
 
     }
 
     "validate model with residential estate option selected and redress option yes selected" in {
       val model = Map(
-        "services" -> Seq("02", "01", "09"),
+        "services" -> Seq("03", "02", "01"),
         "isRedress" -> Seq("true"),
         "propertyRedressScheme" -> Seq("02"))
 
       Service.servicesFormRule.validate(model) must
-        be(Success(Seq(Auction, Commercial, Residential(Some(OmbudsmanServices)))))
+        be(Success(Seq(Auction, Commercial, Residential)))
 
     }
 
     "validate model with residential estate agency check box selected" in {
       val model = Map(
-        "services" -> Seq("09"),
-        "isRedress" -> Seq("false")
+        "services" -> Seq("09")
       )
 
       Service.servicesFormRule.validate(model) must
-        be(Success(Seq(Residential(Some(RedressSchemedNo)))))
+        be(Success(Seq(SocialHousing)))
     }
 
     "fail to validate given an `other` with no value" in {
@@ -65,33 +64,22 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "write correct data for services value" in {
 
       Service.formWrites.writes(Seq(Auction, Commercial, Relocation)) must
-        be(Map("services" -> Seq("02","01", "03")))
+        be(Map("services" -> Seq("03","02", "04")))
     }
 
     "write correct data for services value when residential option is selected" in {
 
-      Service.formWrites.writes(Seq(Auction, Commercial)) must
-        be(Map("services" -> Seq("02","01")))
-    }
-
-    "write correct data for services value when residential option is selected1" in {
-
-      Service.formWrites.writes(Seq(Residential(Some(OmbudsmanServices)))) must
-        be(Map("services" -> Seq( "09"),
-          "isRedress" -> Seq("true"),
-          "propertyRedressScheme" -> Seq("02")))
+      Service.formWrites.writes(Seq(Residential)) must
+        be(Map("services" -> Seq("01")))
     }
 
     "JSON validation" must {
 
       "successfully validate given an enum value" in {
-        val json =  Json.obj("services" -> Seq("01","02", "09"),
-          "isRedress"-> true,
-          "propertyRedressScheme" -> "04",
-          "propertyRedressSchemeOther" -> "test")
+        val json =  Json.obj("services" -> Seq("02","03", "01"))
 
         Json.fromJson[Seq[Service]](json) must
-          be(JsSuccess(Seq(Commercial, Auction, Residential(Some(OmbudsmanServices))), JsPath \ "services"))
+          be(JsSuccess(Seq(Commercial, Auction, Residential), JsPath \ "services"))
       }
 
       "fail when on invalid data" in {
@@ -102,16 +90,12 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
     "json write" must {
       Json.toJson(Seq(Auction)) must
-        be(Json.obj("services" -> Seq("02")))
+        be(Json.obj("services" -> Seq("03")))
     }
 
     "successfully validate json write" in {
-      val json = Json.obj("services" -> Seq("01","02", "09"),
-        "isRedress"-> true,
-        "propertyRedressScheme" -> "04",
-        "propertyRedressSchemeOther" -> "test")
-
-      Json.toJson(Seq(Commercial, Auction, Residential(Some(Other("test"))))) must be(json)
+      val json = Json.obj("services" -> Seq("02","03", "01"))
+      Json.toJson(Seq(Commercial, Auction, Residential)) must be(json)
 
     }
   }
