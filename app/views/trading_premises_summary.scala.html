@@ -4,17 +4,17 @@
 @(model: TradingPremises)(implicit request: Request[_], lang: Lang)
 
 @main(
-    title = Messages("summary.checkyouranswers.businesspremises.title")
+    title = Messages("summary.checkyouranswers.title")
 ) {
 
-    @heading("summary.checkyouranswers.businesspremises.title", "summary.tradingpremises")
+    @heading("summary.checkyouranswers.title", "summary.tradingpremises")
     <p>
         @Messages("summary.linetext")
     </p>
         <table>
             <tr>
-                <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section1")</th>
-                <td><a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("button.edit")</a></td>
+                <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.title")</th>
+                <td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get()">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -35,8 +35,8 @@
 
     <table>
         <tr>
-            <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section2")</th>
-            <td><a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("button.edit")</a></td>
+            <th class="summary-title">@Messages("summary.checkyouranswers.agentspremises.title")</th>
+            <td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get()">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -56,5 +56,5 @@
     </table>
 
 
-    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.returntosummary")</a>
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
 }

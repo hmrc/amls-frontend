@@ -71,7 +71,9 @@ summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises
 summary.checkyouranswers.businesspremises.section1 = Premises
 summary.checkyouranswers.businesspremises.section2 = Trading activities
+summary.checkyouranswers.agentspremises.title = Your agents'' premises
 button.summary.acceptandcomplete = Accept and complete section
+summary.linetext = Please check all the information you have provided.
 
 
 aboutyou.yourdetails.title = What is your name?

@@ -39,13 +39,16 @@ POST        /business-details/correspondence-address   controllers.aboutthebusin
 
 GET         /business-details/summary                  controllers.aboutthebusiness.SummaryController.get()
 
-GET         /trading-premises/summary-own              controllers.tradingpremises.OwnSummaryController.get()
+
 
 GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
 #GET         /trading-premises/premises                 controllers.tradingpremises.YourTradingPremisesController.get()
 
 GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(edit: Boolean ?= false)
 POST        /trading-premises/agent                    controllers.tradingpremises.YourAgentController.post(edit: Boolean ?= false)
+
+GET         /trading-premises/summary                  controllers.tradingpremises.SummaryController.get()
+GET         /trading-premises/summary-own              controllers.tradingpremises.OwnSummaryController.get()
 
 
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
