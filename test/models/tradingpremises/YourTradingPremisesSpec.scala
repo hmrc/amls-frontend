@@ -1,10 +1,7 @@
 package models.tradingpremises
 
-import models.FormTypes
-import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import play.api.data.mapping.Success
 import play.api.libs.json._
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers {
@@ -67,43 +64,67 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
     "FORM WRITE populates all the Fields TO the Form" in {
       YourTradingPremises.formWriteYourTradingPremises.writes(yourTradingPremises) must be(urlFormEncodedYourTradingPremises)
     }
-  }
 
+  }
 
   "JSON and HMRCLocalDate serialisation" must {
 
-    "JSON READ convert to Domain" in {
-      val jsonLocalDate: JsObject = Json.obj("startOfTradingDate" -> "2015-08-15")
-      HMRCLocalDate.jsonReadsHMRCLocalDate.reads(jsonLocalDate) must be(JsSuccess(HMRCLocalDate("2015", "08", "15"), JsPath \ "startOfTradingDate"))
+    "HMRCLocalDate serialisation" must {
+
+      "JSON READ convert to Domain" in {
+        val jsonLocalDate: JsObject = Json.obj("startOfTradingDate" -> "2015-08-15")
+        HMRCLocalDate.jsonReadsHMRCLocalDate.reads(jsonLocalDate) must be(JsSuccess(HMRCLocalDate("2015", "08", "15"), JsPath \ "startOfTradingDate"))
+      }
+
+      "JSON WRITE the LocalDate to JSON String" in {
+        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
+        HMRCLocalDate.jsonWritesHMRCLocalDate.writes(hmrcLocalDate) must be(Json.obj("startOfTradingDate" -> "2015-08-15"))
+      }
+
+      "FORM RULE validate the input and create the Domain" in {
+        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
+        val urlFormEncoded = Map(
+          "yyyy" -> Seq("2015"),
+          "mm" -> Seq("08"),
+          "dd" -> Seq("15")
+        )
+        HMRCLocalDate.formRuleHMRCLocalDate.validate(urlFormEncoded) must be(Success(hmrcLocalDate))
+      }
+
+      "FORM WRITE to create the FORM from the Domain" in {
+        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
+
+        val urlFormEncoded = Map(
+          "yyyy" -> Seq("2015"),
+          "mm" -> Seq("08"),
+          "dd" -> Seq("15")
+        )
+        HMRCLocalDate.formWriteHMRCLocalDate.writes(hmrcLocalDate) must be(urlFormEncoded)
+      }
+
     }
 
-    "JSON WRITE the LocalDate to JSON String" in {
-      val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
-      HMRCLocalDate.jsonWritesHMRCLocalDate.writes(hmrcLocalDate) must be(Json.obj("startOfTradingDate" -> "2015-08-15"))
+    "FORM and HMRCLocalDate conversion. Must successfully" must {
+
+      "FORM RULE String and convert to LocalDate" in {
+        val formDateField = Map(
+          "yyyy" -> Seq("2015"),
+          "mm" -> Seq("08"),
+          "dd" -> Seq("15")
+        )
+        HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Success(HMRCLocalDate("2015", "08", "15")))
+      }
+
+      "FORM WRITE the LocalDate to Form" in {
+        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
+        HMRCLocalDate.formWriteHMRCLocalDate.writes(hmrcLocalDate) must be(Map(
+          "yyyy" -> Seq("2015"),
+          "mm" -> Seq("08"),
+          "dd" -> Seq("15")
+        ))
+      }
+
     }
-
-  }
-
-  "FORM and HMRCLocalDate conversion. Must successfully" must {
-
-    "FORM RULE String and convert to LocalDate" in {
-      val formDateField = Map(
-        "yyyy" -> Seq("2015"),
-        "mm" -> Seq("08"),
-        "dd" -> Seq("15")
-      )
-      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Success(HMRCLocalDate("2015", "08", "15")))
-    }
-
-    "FORM WRITE the LocalDate to Form" in {
-      val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
-      HMRCLocalDate.formWriteHMRCLocalDate.writes(hmrcLocalDate) must be(Map(
-        "yyyy" -> Seq("2015"),
-        "mm" -> Seq("08"),
-        "dd" -> Seq("15")
-      ))
-    }
-
   }
 
 
@@ -158,7 +179,5 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       )
       IsResidential.formWriteIsResidential.writes(ResidentialNo) must be(urlFormEncoded)
     }
-
   }
-
 }

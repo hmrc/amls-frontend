@@ -32,7 +32,7 @@ trait WhereAreTradingPremisesController extends BaseController {
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourTradingPremises(data))
-          } yield Redirect(routes.WhereAreTradingPremisesController.get())
+          } yield Redirect(routes.YourAgentController.get())
       }
 
   }
