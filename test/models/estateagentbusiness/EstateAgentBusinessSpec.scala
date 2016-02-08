@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 
 class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
 
-  val services = Services(Set(Residential,Commercial, Auction))
+  val services = Services(Set(Residential, Commercial, Auction))
   val professionalBody = ProfessionalBodyYes("details")
   val penalisedUnderEAAct =  PenalisedUnderEstateAgentsActYes("test")
   val redressSchemeOther = Other("test")

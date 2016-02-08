@@ -16,20 +16,8 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         "services[]" -> Seq("03","01")
       )
 
-
       Services.formReads.validate(model) must
         be(Success(Services(Set(Auction, Residential))))
-
-    }
-
-    "validate model with residential estate option selected and redress option yes selected" in {
-      val model = Map(
-        "services" -> Seq("03", "02", "01"),
-        "isRedress" -> Seq("true"),
-        "propertyRedressScheme" -> Seq("02"))
-
-      Services.formReads.validate(model) must
-        be(Success(Seq(Auction, Commercial, Residential)))
 
     }
 
@@ -39,28 +27,27 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
       )
 
       Services.formReads.validate(model) must
-        be(Success(Seq(SocialHousing)))
+        be(Success(Services(Set(SocialHousing))))
     }
 
-    "fail to validate given an `other` with no value" in {
+    "fail to validate on no selection" in {
 
       val data = Map(
         "services" -> Seq("")
       )
 
       Services.formReads.validate(data) must
-        be(Failure(Seq(
-          (Path \ "services") -> Seq(ValidationError("Invalid Service Type String "))
-        )))
+        be(Failure(Seq((Path \"services[0]" \ "services") -> Seq(ValidationError("error.invalid")))))
+
     }
 
     "fail to validate when given invalid data" in {
       val model = Map(
-        "services" -> Seq("02", "99", "03")
+        "services[]" -> Seq("02", "99", "03")
       )
 
       Services.formReads.validate(model) must
-        be(Failure(Seq((Path \ "services", Seq(ValidationError("Invalid Service Type String 99"))))))
+        be(Failure(Seq((Path \ "services[1]" \ "services", Seq(ValidationError("error.invalid"))))))
     }
 
     "write correct data for services value" in {
@@ -80,17 +67,17 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
       "successfully validate given an enum value" in {
         val json =  Json.obj("services" -> Seq("02","03", "01"))
 
-        Json.fromJson[Seq[Service]](json) must
-          be(JsSuccess(Seq(Commercial, Auction, Residential), JsPath \ "services"))
+        Json.fromJson[Services](json) must
+          be(JsSuccess(Services(Set(Commercial, Auction, Residential)), JsPath \ "services"))
       }
 
       "fail when on invalid data" in {
-        Json.fromJson[Seq[Service]](Json.obj("service" -> "01")) must
+        Json.fromJson[Services](Json.obj("service" -> "01")) must
           be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
       }
     }
 
-    "json write" must {
+    "validate json write" in {
       Json.toJson(Services(Set(Auction))) must
         be(Json.obj("services" -> Seq("03")))
     }

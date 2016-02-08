@@ -70,7 +70,7 @@ object Service {
       case _ => JsError((JsPath \ "services") -> ValidationError("error.invalid"))
     }
 
-  implicit def jsonServicesWrite =
+  implicit val jsonServiceWrites =
     Writes[Service] {
       case Residential => JsString("01")
       case Commercial => JsString("02")

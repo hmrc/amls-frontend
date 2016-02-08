@@ -35,11 +35,10 @@ trait BusinessServicesController extends BaseController {
               estateAgentBusiness.services(data))
           } yield edit match {
             case true =>
-//              Redirect(routes.SummaryController.get())
-              Ok(data.toString)
+              Redirect(routes.SummaryController.get())
             case false => {
               if(data.services.contains(Residential)) {
-                Ok(data.toString) //Redirect(routes.ResidentialRedressSchemeController.get())
+                Redirect(routes.ResidentialRedressSchemeController.get())
               } else {
                 Redirect(routes.PenalisedUnderEstateAgentsActController.get())
               }
@@ -47,7 +46,6 @@ trait BusinessServicesController extends BaseController {
           }
       }
   }
-
 }
 
 object BusinessServicesController extends BusinessServicesController {

@@ -6,7 +6,7 @@ import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
-class RedressScheemsSpec extends PlaySpec with MockitoSugar {
+class RedressSchemeSpec extends PlaySpec with MockitoSugar {
 
   "RedressScheemsSpec" must {
 

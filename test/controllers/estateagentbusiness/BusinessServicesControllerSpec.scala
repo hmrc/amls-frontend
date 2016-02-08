@@ -44,7 +44,7 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       val newRequest = request.withFormUrlEncodedBody(
         "services" -> "02",
-        "services"  -> "08"
+        "services" -> "08"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
@@ -59,47 +59,42 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "load the page with data when the user revisits at a later time" in new Fixture {
-     /* when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(Some(Seq(Auction)), None, None, None))))*/
-      /* val test = EstateAgentBusiness(Some(Seq(Auction, Residential)), None, None, None)
-       val data:Seq[String] = test.services match {
-         case Some(x) => println(x)
-           x.map(servicesToString)
-         case None => Seq("")
-       }
-
-       println("---------------------------"+data map { line =>line })*/
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(Some(Services(Set(Auction, Residential))), None, None, None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[value=03]").hasAttr("checked") must be(true)
+      document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
-/*    def servicesToString(obj : Service) : String = {
-      obj match {
-        case Residential =>println("01-------------")
-          "01"
-        case Commercial => "02"
-        case Auction => println("02-------------")
-          "03"
-        case Relocation => "04"
-        case BusinessTransfer => "05"
-        case AssetManagement => "06"
-        case LandManagement => "07"
-        case Development => "08"
-        case SocialHousing => "09"
-        case _ => ""
-      }
-    }*/
+    "fail submission on error" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "services" -> "0299999"
+      )
+
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include("Invalid value")
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#services[0].services]").html() must include("Invalid value")
+    }
 
     "submit with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "services" -> "02",
-        "services"  -> "01",
-        "services"  -> "03"
+        "services[1]" -> "02",
+        "services[0]" -> "01",
+        "services[2]" -> "03"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
@@ -116,9 +111,9 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     "submit with valid data with Residential option from business services" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "services" -> "02",
-        "services"  -> "01",
-        "services"  -> "03"
+        "services[0]" -> "01",
+        "services[1]" -> "02",
+        "services[2]" -> "03"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
@@ -135,8 +130,8 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     "submit with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "services" -> "02",
-        "services"  -> "08"
+        "services[0]" -> "02",
+        "services[1]" -> "08"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
@@ -150,5 +145,4 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
       redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get().url))
     }
   }
-
 }
