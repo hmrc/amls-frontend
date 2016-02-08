@@ -28,7 +28,6 @@ s"""${f("professionalBody").id}-fieldset"""
         </ul>
 
         <div class="form-field">
-            @if(f("penalised").value == Some("true"))
             @inlineRadioGroup(f("penalised")) {
                 @legend("TODO", jsHidden = true)
                 @radio(f("penalised"), "lbl.yes", "true", target = s"#$target")
