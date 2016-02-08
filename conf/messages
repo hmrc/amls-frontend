@@ -150,6 +150,9 @@ tradingpremises.youragent.businessstructure.lbl.03=Partnership
 tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
 tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
 
+tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
+tradingpremises.whatdoesyourbusinessdo.linetext = Select all that apply
+
 
 
 estateagentbusiness.whatyouneed.title = Estate agent business - What you need
