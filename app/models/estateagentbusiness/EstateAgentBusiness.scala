@@ -1,12 +1,12 @@
 package models.estateagentbusiness
 
 case class EstateAgentBusiness(
-                                services: Option[Seq[Service]] = None,
+                                services: Option[Services] = None,
                                 redressScheme: Option[RedressScheme] = None,
                                 professionalBody: Option[ProfessionalBody] = None,
                                 penalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = None
                               ) {
-  def services(p: Seq[Service]): EstateAgentBusiness =
+  def services(p: Services): EstateAgentBusiness =
     this.copy(services = Some(p))
 
   def redressScheme(p: RedressScheme): EstateAgentBusiness =
@@ -28,7 +28,7 @@ object EstateAgentBusiness {
   val key = "estate-agent-business"
 
   implicit val reads: Reads[EstateAgentBusiness] = (
-    __.read[Option[Seq[Service]]] and
+    __.read[Option[Services]] and
     __.read[Option[RedressScheme]] and
       __.read[Option[ProfessionalBody]] and
       __.read[Option[PenalisedUnderEstateAgentsAct]]

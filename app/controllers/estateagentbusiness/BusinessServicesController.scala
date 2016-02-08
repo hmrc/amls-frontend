@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.estateagentbusiness.{Residential, EstateAgentBusiness, Service}
+import models.estateagentbusiness.{Services, Residential, EstateAgentBusiness}
 
 import scala.concurrent.Future
 
@@ -16,15 +16,16 @@ trait BusinessServicesController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
         case Some(EstateAgentBusiness(Some(data), _, _, _)) =>
-          Ok(views.html.business_servicess_EAB(Form2[Seq[Service]](data), edit))
+          Ok(views.html.business_servicess_EAB(Form2[Services](data), edit))
         case _ =>
           Ok(views.html.business_servicess_EAB(EmptyForm, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
+    import play.api.data.mapping.forms.Rules._
     implicit authContext => implicit request =>
-      Form2[Seq[Service]](request.body) match {
+      Form2[Services](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.business_servicess_EAB(f, edit)))
         case ValidForm(_, data) =>
@@ -33,14 +34,15 @@ trait BusinessServicesController extends BaseController {
             _ <- dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key,
               estateAgentBusiness.services(data))
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true =>
+//              Redirect(routes.SummaryController.get())
+              Ok(data.toString)
             case false => {
-              if(data.contains(Residential)) {
-                Redirect(routes.ResidentialRedressSchemeController.get())
+              if(data.services.contains(Residential)) {
+                Ok(data.toString) //Redirect(routes.ResidentialRedressSchemeController.get())
               } else {
                 Redirect(routes.PenalisedUnderEstateAgentsActController.get())
               }
-
             }
           }
       }

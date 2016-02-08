@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 
 class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
 
-  val services = Seq(Residential,Commercial, Auction)
+  val services = Services(Set(Residential,Commercial, Auction))
   val professionalBody = ProfessionalBodyYes("details")
   val penalisedUnderEAAct =  PenalisedUnderEstateAgentsActYes("test")
   val redressSchemeOther = Other("test")
@@ -93,7 +93,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
 
     "Merged with services" must {
       "return EstateAgentBusiness with correct business services" in {
-        val newServices = Seq(Commercial, Auction, Residential)
+        val newServices = Services(Set(Commercial, Auction, Residential))
         val result = initial.services(newServices)
         result must be (EstateAgentBusiness(Some(newServices),  Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct)))
       }

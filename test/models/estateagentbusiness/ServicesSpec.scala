@@ -9,14 +9,16 @@ import play.api.libs.json._
 class ServicesSpec extends PlaySpec with MockitoSugar {
 
   "ServicesSpec" must {
+    import play.api.data.mapping.forms.Rules._
 
     "validate model with few check box selected" in {
       val model = Map(
-        "services" -> Seq("03", "01", "02")
+        "services[]" -> Seq("03","01")
       )
 
-      Service.servicesFormRule.validate(model) must
-        be(Success(Seq(Auction, Residential , Commercial)))
+
+      Services.formReads.validate(model) must
+        be(Success(Services(Set(Auction, Residential))))
 
     }
 
@@ -26,7 +28,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         "isRedress" -> Seq("true"),
         "propertyRedressScheme" -> Seq("02"))
 
-      Service.servicesFormRule.validate(model) must
+      Services.formReads.validate(model) must
         be(Success(Seq(Auction, Commercial, Residential)))
 
     }
@@ -36,7 +38,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         "services" -> Seq("09")
       )
 
-      Service.servicesFormRule.validate(model) must
+      Services.formReads.validate(model) must
         be(Success(Seq(SocialHousing)))
     }
 
@@ -46,7 +48,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         "services" -> Seq("")
       )
 
-      Service.servicesFormRule.validate(data) must
+      Services.formReads.validate(data) must
         be(Failure(Seq(
           (Path \ "services") -> Seq(ValidationError("Invalid Service Type String "))
         )))
@@ -57,19 +59,19 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         "services" -> Seq("02", "99", "03")
       )
 
-      Service.servicesFormRule.validate(model) must
+      Services.formReads.validate(model) must
         be(Failure(Seq((Path \ "services", Seq(ValidationError("Invalid Service Type String 99"))))))
     }
 
     "write correct data for services value" in {
 
-      Service.formWrites.writes(Seq(Auction, Commercial, Relocation)) must
+      Services.formWrites.writes(Services(Set(Auction, Commercial, Relocation))) must
         be(Map("services" -> Seq("03","02", "04")))
     }
 
     "write correct data for services value when residential option is selected" in {
 
-      Service.formWrites.writes(Seq(Residential)) must
+      Services.formWrites.writes(Services(Set(Residential))) must
         be(Map("services" -> Seq("01")))
     }
 
@@ -89,13 +91,13 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     }
 
     "json write" must {
-      Json.toJson(Seq(Auction)) must
+      Json.toJson(Services(Set(Auction))) must
         be(Json.obj("services" -> Seq("03")))
     }
 
     "successfully validate json write" in {
       val json = Json.obj("services" -> Seq("02","03", "01"))
-      Json.toJson(Seq(Commercial, Auction, Residential)) must be(json)
+      Json.toJson(Services(Set(Commercial, Auction, Residential))) must be(json)
 
     }
   }

@@ -7,7 +7,7 @@ import play.api.i18n.Lang
 sealed trait Field {
 
   def path: Path
-  def value: Option[String]
+  def value: Seq[String]
   def errors: Seq[ValidationError]
 
   val name: String =
@@ -25,13 +25,13 @@ sealed trait Field {
 
 case class ValidField(
                        path: Path,
-                       value: Option[String]
+                       value: Seq[String]
                      ) extends Field {
   override val errors = Seq.empty
 }
 
 case class InvalidField(
                          path: Path,
-                         value: Option[String],
+                         value: Seq[String],
                          errors: Seq[ValidationError]
                        ) extends Field
