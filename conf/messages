@@ -166,6 +166,7 @@ estateagentbusiness.service.lbl.06 = Asset management
 estateagentbusiness.service.lbl.07 = Land management
 estateagentbusiness.service.lbl.08 = Development company services
 estateagentbusiness.service.lbl.09 = Social housing provision
+estateagentbusiness.select.all = Select all that apply
 
 estateagentbusiness.redress.lbl.01 = The Property Ombudsman Limited
 estateagentbusiness.redress.lbl.02 = Ombudsman Services
@@ -175,4 +176,5 @@ estateagentbusiness.redress.lbl.04 = Other
 estateagentbusiness.registered.redress.title = Is this business registered with a redress scheme?
 estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agent business and its customers.
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
+
 

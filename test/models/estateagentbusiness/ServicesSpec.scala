@@ -30,14 +30,10 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
         be(Success(Services(Set(SocialHousing))))
     }
 
-    "fail to validate on no selection" in {
+    "fail to validate on empty Map" in {
 
-      val data = Map(
-        "services" -> Seq("")
-      )
-
-      Services.formReads.validate(data) must
-        be(Failure(Seq((Path \"services[0]" \ "services") -> Seq(ValidationError("error.invalid")))))
+      Services.formReads.validate(Map.empty) must
+        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required")))))
 
     }
 

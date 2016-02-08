@@ -85,14 +85,21 @@ object Service {
 }
 
 object Services {
+  import utils.MappingUtils.Implicits._
 
   implicit def formReads
   (implicit
    p: Path => RuleLike[UrlFormEncoded, Set[Service]]
   ): Rule[UrlFormEncoded, Services] =
     From[UrlFormEncoded] { __ =>
-      (__ \ "services").read[Set[Service]] fmap Services.apply
-    }
+      val data = (__ \ "services").read[Set[Service]]
+      data flatMap(f =>
+        if(f.seq.isEmpty){
+          (Path \ "services") -> Seq(ValidationError("error.required"))
+        } else {
+          data fmap Services.apply
+        })
+  }
 
 
   implicit def formWrites

@@ -89,6 +89,26 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
       document.select("a[href=#services[0].services]").html() must include("Invalid value")
     }
 
+    "fail submission when no check boxes were selected" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+
+      )
+
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include("This field is required")
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#services]").html() must include("This field is required")
+    }
+
+
     "submit with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
