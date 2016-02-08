@@ -3,9 +3,9 @@ package models.tradingpremises
 case class TradingPremises(
                             yourTradingPremises: Option[YourTradingPremises] = None,
                             yourAgent: Option[YourAgent] = None
-                           ) {
+                          ) {
 
-  def yourAgent(v: YourAgent): TradingPremises=
+  def yourAgent(v: YourAgent): TradingPremises =
     this.copy(yourAgent = Some(v))
 
 
@@ -34,6 +34,6 @@ object TradingPremises {
       }
   }
 
-  implicit def default(aboutYou: Option[TradingPremises]): TradingPremises =
-    aboutYou.getOrElse(TradingPremises())
+  implicit def default(tradingPremises: Option[TradingPremises]): TradingPremises =
+    tradingPremises.getOrElse(TradingPremises())
 }

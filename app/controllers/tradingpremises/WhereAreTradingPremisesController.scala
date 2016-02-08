@@ -3,18 +3,13 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 
 import scala.concurrent.Future
 
 trait WhereAreTradingPremisesController extends BaseController {
-
-  private val blankUKAddress = UKTradingPremises("", "", None, None, None, "UK")
-  private val blankDate = HMRCLocalDate("","","")
-  private val localDate = LocalDate.now()
-  private val blankYourTradingPremise = YourTradingPremises("", blankUKAddress, PremiseOwnerSelf, blankDate, ResidentialNo)
 
   def dataCacheConnector: DataCacheConnector
 
@@ -24,7 +19,7 @@ trait WhereAreTradingPremisesController extends BaseController {
         case Some(TradingPremises(Some(data), _)) =>
           Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit))
         case _ =>
-          Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](blankYourTradingPremise), edit))
+          Ok(views.html.where_are_trading_premises(EmptyForm, edit))
       }
   }
 
@@ -37,7 +32,7 @@ trait WhereAreTradingPremisesController extends BaseController {
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourTradingPremises(data))
-          } yield NotImplemented // Redirect(routes.WhereAreTradingPremisesController.get())
+          } yield Redirect(routes.WhereAreTradingPremisesController.get())
       }
 
   }

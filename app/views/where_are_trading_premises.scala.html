@@ -37,38 +37,44 @@ classes = Seq("tradingname")
     @input(f("addressLine3"))
     @input(f("addressLine4"))
 </fieldset>
-@input(
-field = f("postcode"),
-labelText = "tradingpremises.yourtradingpremises.postcode",
-classes = Seq("postcode")
-)
-
 
 @input(
-field = f("country"),
-labelText = "tradingpremises.yourtradingpremises.country",
-classes = Seq("country")
+    field = f("postcode"),
+    labelText = "tradingpremises.yourtradingpremises.postcode",
+    classes = Seq("postcode")
 )
+
+@input(
+    field = f("country"),
+    labelText = "tradingpremises.yourtradingpremises.country",
+    classes = Seq("country")
+)
+
 
 <p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.whose")</p>
 
 @inlineRadioGroup(f("premiseOwner")) {
-@legend("TODO", jsHidden = true)
-@radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
-@radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
+    @legend("TODO", jsHidden = true)
+    @radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
+    @radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
 }
 
 <p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.startdate")</p>
 <p>@Messages("tradingpremises.yourtradingpremises.startdate.sub")</p>
 <p>@Messages("tradingpremises.yourtradingpremises.startdate.example")</p>
 
-    @inputDate(field = f("startdate"))
+
+@inputDate(
+    dd = f("dd"),
+    mm = f("mm"),
+    yyyy = f("yyyy")
+)
 
 @inlineRadioGroup(f("isResidential")) {
 <p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.isresidential")</p>
-  @legend("TODO", jsHidden = true)
-  @radio(f("isResidential"), "lbl.yes", "true")
-  @radio(f("isResidential"), "lbl.no", "false")
+    @legend("TODO", jsHidden = true)
+    @radio(f("isResidential"), "lbl.yes", "true")
+    @radio(f("isResidential"), "lbl.no", "false")
 }
 
 @submit(edit)

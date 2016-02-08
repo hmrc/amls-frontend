@@ -27,9 +27,11 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
   "WhereAreTradingPremisesController" must {
 
-    val ukAddress = UKTradingPremises("ukline_1", "ukline_2", Some("ukline_3"), Some("ukline_4"), Some("NE98 1ZZ"), "UK")
-    val nonUKAddress = UKTradingPremises("nonline _1", "nonline_2", Some("nonline_3"), Some("nonline_4"), Some("226001"), "IN")
-    val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, HMRCLocalDate("3", "4", "2015"), ResidentialYes)
+    val ukAddress = UKAddress("ukline_1", "ukline_2", Some("ukline_3"), Some("ukline_4"), Some("NE98 1ZZ"), "UK")
+    val nonUKAddress = UKAddress("nonline _1", "nonline_2", Some("nonline_3"),
+      Some("nonline_4"), Some("226001"), "IN")
+    val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf,
+      HMRCLocalDate("3", "4", "2015"), ResidentialYes)
     //val yourTradingPremises = YourTradingPremises("Trading Name", ukAddress, PremiseOwnerSelf, new LocalDate("2016-02-01"), ResidentialYes)
 
 
@@ -64,8 +66,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
       contentAsString(result) must include(ukAddress.addressLine4.get)
     }
 
-    //TODO Fix the Read in YourTradingPremise
-/*    "on post of the page with valid data must load the next page" in new Fixture {
+    "on post of the page with valid data must load the next page" in new Fixture {
 
       val tradingPremises = TradingPremises(Some(yourTradingPremises), None)
 
@@ -79,22 +80,41 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         "isResidential" -> "true"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())(any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises)))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(tradingPremises)))
 
-      val result = controller.post()(newRequest)
-      status(result) must be(NOT_IMPLEMENTED)
+      val futureResult = controller.post()(newRequest)
 
-    }*/
+      //TODO This will change when the next page is ready
+      contentAsString(futureResult) must include(yourTradingPremises.tradingName)
+      contentAsString(futureResult) must include(Messages("tradingpremises.yourtradingpremises.title"))
+      contentAsString(futureResult) must include("Address Line 1")
+      contentAsString(futureResult) must include("Address Line 2")
+      contentAsString(futureResult) must include("IN")
+    }
 
 
     "on post of the page with invalid data must reload the page" in new Fixture {
 
       val tradingPremises = TradingPremises(Some(yourTradingPremises), None)
 
-      val newRequest = request.withFormUrlEncodedBody()
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())(any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises)))
+      val postRequestWithDataPopulated = request.withFormUrlEncodedBody(
+        "tradingName" -> "Test Business Name",
+        "addressLine1" -> "test Address Line 1",
+        "addressLine2" -> "test Address Line 2",
+        "addressLine3" -> "test Address Line 3",
+        "addressLine4" -> "test Address Line 4",
+        "postcode" -> "AA67 HJU",
+        "country" -> "UK",
+        "premiseOwner" -> "false",
+        "startOfTradingDate" -> "3-4-2015",
+        "isResidential" -> "true"
+      )
 
-      val result = controller.post()(newRequest)
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(tradingPremises)))
+
+      val result = controller.post()(postRequestWithDataPopulated)
       status(result) must be(BAD_REQUEST)
     }
 
