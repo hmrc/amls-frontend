@@ -14,7 +14,7 @@ object FormTypes {
   val maxPhoneNumberLength = 30
   val maxEMailLength = 100
   val maxPenalisedTypeLength = 255
-  val maxRedressOtherType = 255
+  val maxRedressOtherTypeLength = 255
 
   val indivNameType =
     notEmpty compose maxLength(maxNameTypeLength)
@@ -41,6 +41,6 @@ object FormTypes {
 
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
-  val redressOtherType = notEmpty compose maxLength(maxRedressOtherType)
+  val redressOtherType = notEmpty compose maxLength(maxRedressOtherTypeLength)
 
 }
