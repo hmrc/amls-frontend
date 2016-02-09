@@ -8,18 +8,47 @@
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.estateagentbusiness")
-    <table>
-        <tr>
-            <th class="summary-title">@Messages("estateagentbusiness.servicess.title")</th>
-            <td colspan="2"><a href="@controllers.estateagentbusiness.routes.BusinessServicesController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-               
+    @model.services.map { a =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("estateagentbusiness.servicess.title")</th>
+                <td colspan="2"><a href="@controllers.estateagentbusiness.routes.BusinessServicesController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @a.services.map { line =>
+            <tr>
+                <td colspan="2">
+                    @line.getServiceText
+                </td>
+            </tr>
+            }
 
-            </td>
-        </tr>
-    </table>
+        </table>
+    }
+
+        @model.services.map { a =>
+            @if(a.services.contains(Residential)) {
+            <table>
+                <tr>
+                    <th class="summary-title">@Messages("estateagentbusiness.registered.redress.title")</th>
+                    <td colspan="2"><a href="@controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true)">@Messages("button.edit")</a></td>
+                </tr>
+                @model.redressScheme.map { a =>
+                    <tr>
+                        <td colspan="2"> @Messages("estateagentbusiness.redress.lbl")
+                            @a match {
+                            case ThePropertyOmbudsman => { @Messages("estateagentbusiness.redress.lbl.01") }
+                            case OmbudsmanServices => { @Messages("estateagentbusiness.redress.lbl.02") }
+                            case PropertyRedressScheme => { @Messages("estateagentbusiness.redress.lbl.03") }
+                            case Other(value) => { @value }
+                            case RedressSchemedNo => {@Messages("lbl.na")}
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+            }
+        }
+
     <table>
         <tr>
             <th class="summary-title">@Messages("estateagentbusiness.penalisedbyprofessional.title")</th>

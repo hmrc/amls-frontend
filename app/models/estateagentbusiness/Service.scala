@@ -3,11 +3,28 @@ package models.estateagentbusiness
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
+import play.api.i18n.Messages
 import play.api.libs.json._
 
 case class Services(services: Set[Service])
 
-sealed trait Service
+sealed trait Service {
+
+  def getServiceText: String =  this match {
+
+    case Residential => Messages("estateagentbusiness.service.lbl.01")
+    case Commercial => Messages("estateagentbusiness.service.lbl.02")
+    case Auction => Messages("estateagentbusiness.service.lbl.03")
+    case Relocation => Messages("estateagentbusiness.service.lbl.04")
+    case BusinessTransfer => Messages("estateagentbusiness.service.lbl.05")
+    case AssetManagement => Messages("estateagentbusiness.service.lbl.06")
+    case LandManagement => Messages("estateagentbusiness.service.lbl.07")
+    case Development => Messages("estateagentbusiness.service.lbl.08")
+    case SocialHousing => Messages("estateagentbusiness.service.lbl.09")
+
+  }
+
+}
 
 case object Commercial extends Service
 
@@ -101,7 +118,6 @@ object Services {
         })
   }
 
-
   implicit def formWrites
   (implicit
    w: Write[Service, String]
@@ -110,4 +126,5 @@ object Services {
   }
 
   implicit val formats = Json.format[Services]
+
 }
