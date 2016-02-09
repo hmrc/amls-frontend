@@ -1,0 +1,83 @@
+@import include.{forms => deprecated, _}
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@main(
+title = Messages("tradingpremises.yourtradingpremises.title")
+) {
+
+@heading("tradingpremises.yourtradingpremises.heading", "summary.tradingpremises")
+
+
+@form(f, controllers.tradingpremises.routes.WhereAreTradingPremisesController.post(edit)) {
+
+
+<p>@Messages("tradingpremises.yourtradingpremises.include.heading")</p>
+<ul class="list-bullet form-group">
+    <li class="no-padding no-margin">@Messages("tradingpremises.yourtradingpremises.include.text.1")</li>
+    <li class="no-padding no-margin">@Messages("tradingpremises.yourtradingpremises.include.text.2")</li>
+</ul>
+
+
+@input(
+field = f("tradingName"),
+labelText = "tradingpremises.yourtradingpremises.tradingname"
+)
+
+<fieldset class="">
+    <legend class="form-label-bold">
+        @Messages("tradingpremises.yourtradingpremises.address")
+    </legend>
+    @input(f("addressLine1"))
+    @input(f("addressLine2"))
+    @input(f("addressLine3"))
+    @input(f("addressLine4"))
+</fieldset>
+
+@input(
+    field = f("postcode"),
+    labelText = "tradingpremises.yourtradingpremises.postcode",
+    classes = Seq("postcode")
+)
+
+@input(
+    field = f("country"),
+    labelText = "tradingpremises.yourtradingpremises.country",
+    classes = Seq("country")
+)
+
+
+<p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.whose")</p>
+
+@inlineRadioGroup(f("premiseOwner")) {
+    @legend("TODO", jsHidden = true)
+    @radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
+    @radio(f("premiseOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
+}
+
+<p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.startdate")</p>
+<p>@Messages("tradingpremises.yourtradingpremises.startdate.sub")</p>
+<p>@Messages("tradingpremises.yourtradingpremises.startdate.example")</p>
+
+
+@inputDate(
+    dd = f("dd"),
+    mm = f("mm"),
+    yyyy = f("yyyy")
+)
+
+@inlineRadioGroup(f("isResidential")) {
+<p class="form-label-bold">@Messages("tradingpremises.yourtradingpremises.isresidential")</p>
+    @legend("TODO", jsHidden = true)
+    @radio(f("isResidential"), "lbl.yes", "true")
+    @radio(f("isResidential"), "lbl.no", "false")
+}
+
+@submit(edit)
+
+}
+
+}

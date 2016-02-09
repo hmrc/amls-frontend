@@ -11,28 +11,39 @@
     <p>
         @Messages("summary.linetext")
     </p>
+        @model.yourTradingPremises.map { ytp=>
         <table>
             <tr>
                 <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section1")</th>
-                <td><a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("button.edit")</a></td>
+                <td><a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get()">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 <td colspan="2">
+                    @ytp.tradingName
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @ytp.tradingPremisesAddress.toLines.map{ line =>
+                    @line
+                    <br>}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @{ytp.isResidential match { case ResidentialYes => "Residential"
+                                                case _ => "Non-Residential"}}
                     <br>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <br>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
+                    Trading start date of @{ytp.startOfTradingDate}
                     <br>
                 </td>
             </tr>
         </table>
-
+        }
     <table>
         <tr>
             <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section2")</th>

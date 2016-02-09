@@ -159,6 +159,26 @@ tradingpremises.youragent.businessstructure.lbl.03=Partnership
 tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
 tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
 
+tradingpremises.yourtradingpremises.title=Trading premises - Where are your trading premises?
+tradingpremises.yourtradingpremises.heading=Where are your trading premises?
+tradingpremises.yourtradingpremises.include.heading=Include:
+tradingpremises.yourtradingpremises.include.text.1=your own business premises
+tradingpremises.yourtradingpremises.include.text.2=other businesses'' premises, if you have a contractual agreement for them to act as your agents and offer your services
+
+tradingpremises.yourtradingpremises.tradingname=Trading name
+tradingpremises.yourtradingpremises.address=Address
+tradingpremises.yourtradingpremises.postcode=Postcode
+tradingpremises.yourtradingpremises.country=Country
+tradingpremises.yourtradingpremises.whose=Whose premises are these?
+tradingpremises.yourtradingpremises.whose.my=My business'' premises
+tradingpremises.yourtradingpremises.whose.another=Another business'' premises
+tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
+tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
+tradingpremises.yourtradingpremises.startdate.example=For example, 31 3 2017
+tradingpremises.yourtradingpremises.startdate.day=Day
+tradingpremises.yourtradingpremises.startdate.month=Month
+tradingpremises.yourtradingpremises.startdate.year=Year
+tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 
 
 estateagentbusiness.whatyouneed.title = Estate agent business - What you need

@@ -12,8 +12,8 @@ trait SummaryController extends BaseController {
   def get = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
-        case _ => Ok(views.html.trading_premises_summary(TradingPremises(None,None)))
-        //case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+        case Some(data) => Ok(views.html.trading_premises_summary(data))
+        case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }
   }
 }

@@ -11,6 +11,7 @@
     <p>
         @Messages("summary.linetext")
     </p>
+        @model.yourTradingPremises.map { ytp=>
         <table>
             <tr>
                 <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.title")</th>
@@ -18,21 +19,26 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <br>
+                    @ytp.tradingName
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <br>
+                    @ytp.tradingPremisesAddress.toLines.map{ line =>
+                    @line
+                    <br>}
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <br>
+                    @{ytp.premiseOwner match { case PremiseOwnerSelf => "Own"
+                                                case _ => "Agent's"
+                    }}
                 </td>
             </tr>
         </table>
-
+        }
+    @model.yourAgent.map { agent=>
     <table>
         <tr>
             <th class="summary-title">@Messages("summary.checkyouranswers.agentspremises.title")</th>
@@ -40,20 +46,24 @@
         </tr>
         <tr>
             <td colspan="2">
-                <br>
-            </td>
-        <tr>
-            <td colspan="2">
-                <br>
+                @agent.agentsRegisteredName.value
             </td>
         </tr>
         <tr>
             <td colspan="2">
-                <br>
+                @{agent.taxType match {
+                case TaxTypeSelfAssesment => "Self Assessment"
+                case _ => "Corporation tax"
+                }}
             </td>
         </tr>
+        <tr>
+            <td colspan="2">
+                @agent.businessStructure
+            </td>
         </tr>
     </table>
+    }
 
 
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>

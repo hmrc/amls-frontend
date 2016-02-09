@@ -67,7 +67,7 @@ object CorrespondenceAddress {
             (__ \ "addressLine2").read(addressType) ~
             (__ \ "addressLine3").read(optionR(addressType)) ~
             (__ \ "addressLine4").read(optionR(addressType)) ~
-            (__ \ "postCode").read(postCodeType)
+            (__ \ "postCode").read(postcodeType)
           )(UKCorrespondenceAddress.apply _)
         case false => (
             (__ \ "yourName").read(nameType) ~

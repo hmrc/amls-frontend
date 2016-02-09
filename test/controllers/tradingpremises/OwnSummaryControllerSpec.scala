@@ -41,13 +41,13 @@ class OwnSummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mock
       status(result) must be(OK)
     }
 
-/*    "redirect to the trading premises summary page when section data is unavailable" in new Fixture {
+    "redirect to the trading premises summary page when section data is unavailable" in new Fixture {
 
       when(controller.dataCache.fetchDataShortLivedCache[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
-    }*/
+    }
   }
 }

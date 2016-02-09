@@ -13,8 +13,8 @@ trait AgentSummaryController extends BaseController {
   def get = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
-        case _ => Ok(views.html.trading_premises_summary_agents(TradingPremises(None,None)))
-        //case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+        case Some(data) => Ok(views.html.trading_premises_summary_agents(data))
+        case _ => Redirect(controllers.tradingpremises.routes.SummaryController.get())
       }
   }
 }
