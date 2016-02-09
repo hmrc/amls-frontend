@@ -27,7 +27,7 @@ object RedressScheme {
           case "02" => OmbudsmanServices
           case "03" => PropertyRedressScheme
           case "04" =>
-            (__ \ "other").read(descriptionType) fmap Other.apply
+            (__ \ "other").read(redressOtherType) fmap Other.apply
           case _ =>
             (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.invalid"))
         }
