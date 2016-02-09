@@ -4,7 +4,7 @@ case class BusinessMatching(
                                 activities: Option[BusinessActivities] = None,
                                 activities1: Option[BusinessActivities] = None
                            ) {
-  def professionalBody(ba: BusinessActivities): BusinessMatching =
+  def activities(ba: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(ba))
 }
 

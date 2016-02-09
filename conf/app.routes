@@ -2,8 +2,6 @@
 
 GET         /assets/*file                   controllers.AssetsController.at(path="/public", file)
 
-#GET        /example                        controllers.ExampleController.onPageLoad
-#POST       /example                        controllers.ExampleController.onSubmit
 GET         /                               controllers.WelcomeController.get
 GET         /welcome                        controllers.WelcomeController.get
 
@@ -57,6 +55,6 @@ GET         /estate-agents/penalties                   controllers.estateagentbu
 POST        /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
 GET         /estate-agents/summary                     controllers.estateagentbusiness.SummaryController.get()
 
-#GET         /business-matching/activities              controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
-#POST        /business-matching/activities              controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
-
+GET         /business-matching/activities              controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /business-matching/activities              controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+GET         /business-matching/summary                 controllers.businessmatching.SummaryController.get()
