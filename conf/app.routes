@@ -45,7 +45,6 @@ GET         /trading-premises/index                    controllers.tradingpremis
 GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(edit: Boolean ?= false)
 POST        /trading-premises/agent                    controllers.tradingpremises.YourAgentController.post(edit: Boolean ?= false)
 
-
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
@@ -54,4 +53,6 @@ GET         /estate-agents/penalties                   controllers.estateagentbu
 POST        /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
 GET         /estate-agents/summary                     controllers.estateagentbusiness.SummaryController.get()
 
+GET         /business-matching/activities              controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /business-matching/activities              controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
