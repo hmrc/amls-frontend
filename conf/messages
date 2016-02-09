@@ -65,6 +65,7 @@ summary.aboutyou = About you
 summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
+summary.businessmatching=Business Matching
 
 summary.checkyouranswers.title = Check your answers
 button.summary.acceptandcomplete = Accept and complete section

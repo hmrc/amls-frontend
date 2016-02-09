@@ -25,7 +25,7 @@ object BusinessMatching {
       model =>
         Seq(
           Json.toJson(model.activities).asOpt[JsObject],
-          Json.toJson(model.activities).asOpt[JsObject]
+          Json.toJson(model.activities1).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
         }
