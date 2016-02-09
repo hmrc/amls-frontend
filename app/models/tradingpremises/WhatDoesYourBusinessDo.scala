@@ -1,14 +1,19 @@
 package models.tradingpremises
 
 import models.businessmatching.BusinessActivity
-import play.api.data.mapping.{Path, RuleLike, From}
+import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.forms.Rules._
+import play.api.data.mapping.forms.Writes._
 
 case class WhatDoesYourBusinessDo(activities : Set[BusinessActivity])
 
 object WhatDoesYourBusinessDo {
-  implicit def formRule = From[UrlFormEncoded] { __ =>
+  implicit val formRule = From[UrlFormEncoded] { __ =>
     (__ \ "activities").read[Set[BusinessActivity]].fmap(WhatDoesYourBusinessDo.apply _)
+  }
+
+  implicit val formWrite = Write[WhatDoesYourBusinessDo, UrlFormEncoded] { data =>
+    Map("activities" -> data.activities.toSeq.map(BusinessActivity.activityFormWrite.writes))
   }
 }
