@@ -1,0 +1,47 @@
+@import forms.{Field, Form2}
+
+@(
+dd: Field,
+mm: Field,
+yyyy: Field,
+labelText: String = "",
+hintText: String = "",
+bold: Boolean = true
+)(implicit lang: Lang)
+<span class='date-of-birth'>
+<div class="form-group @if(dd.hasErrors) {form-field--error}">
+    <label>
+        <span class="form-label@if(bold){-bold}">@Messages("tradingpremises.yourtradingpremises.startdate.day")</span>
+        @if(dd.hasErrors) {
+        <span class="error-notification">@dd.error</span>
+        }
+        <input name="@dd.name" type="number" pattern="[0-9]*" maxlength="2" min="1" max="31" value="@dd.value"
+               id="@dd.id" @if(hintText.nonEmpty) { aria-describedby="@{dd.id}-hint" }
+        >
+    </label>
+</div>
+
+<div class="form-group @if(mm.hasErrors) {form-field--error}">
+    <label>
+        <span class="form-label@if(bold){-bold}">@Messages("tradingpremises.yourtradingpremises.startdate.month")</span>
+    </label>
+    @if(mm.hasErrors) {
+    <span class="error-notification">@mm.error</span>
+    }
+    <input name="@mm.name" type="number" pattern="[0-9]*" maxlength="2" min="1" max="12" value="@mm.value"
+           id="@mm.id" @if(hintText.nonEmpty) { aria-describedby="@{mm.id}-hint" }
+    >
+</div>
+
+<div class="form-group @if(yyyy.hasErrors) {form-field--error}">
+    <label>
+        <span class="form-label@if(bold){-bold}">@Messages("tradingpremises.yourtradingpremises.startdate.year")</span>
+    </label>
+    @if(yyyy.hasErrors) {
+    <span class="error-notification">@yyyy.error</span>
+    }
+    <input name="@yyyy.name" type="number" pattern="[0-9]*" size="4" maxlength="4" min="1990" max="2100"
+           value="@yyyy.value" id="@yyyy.id" @if(hintText.nonEmpty) { aria-describedby="@{yyyy.id}-hint" }
+    >
+</div>
+</span>
