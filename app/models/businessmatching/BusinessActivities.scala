@@ -5,7 +5,7 @@ import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
-case class BusinessActivities(activites: Set[BusinessActivity])
+case class BusinessActivities(businessActivities: Set[BusinessActivity])
 
 sealed trait BusinessActivity
 case object AccountancyServices extends BusinessActivity
@@ -27,7 +27,7 @@ object BusinessActivity {
       case "05" => Success(MoneyServiceBusiness)
       case "06" => Success(TrustAndCompanyServices)
       case "07" => Success(TelephonePaymentService)
-      case _ => Failure(Seq((Path \ "businessActivies") -> Seq(ValidationError("error.invalid"))))
+      case _ => Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val activityFormWrite = Write[BusinessActivity, String] {
@@ -48,7 +48,7 @@ object BusinessActivity {
     case JsString("05") => JsSuccess(MoneyServiceBusiness)
     case JsString("06") => JsSuccess(TrustAndCompanyServices)
     case JsString("07") => JsSuccess(TelephonePaymentService)
-    case _ => JsError((JsPath \ "businessActivies") -> ValidationError("error.invalid"))
+    case _ => JsError((JsPath \ "businessActivities") -> ValidationError("error.invalid"))
   }
 
   implicit val jsonActivityWrite = Writes[BusinessActivity] {
@@ -64,16 +64,22 @@ object BusinessActivity {
 
 object BusinessActivities {
   import utils.MappingUtils.Implicits._
-  val key = "business-activities"
 
     implicit def formReads
     (implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
-      From[UrlFormEncoded] { __ => (__ \ "businessActivities").read[Set[BusinessActivity]] fmap BusinessActivities.apply
+      From[UrlFormEncoded] { __ =>
+        val data = (__ \ "businessActivities").read[Set[BusinessActivity]]
+        data flatMap(f =>
+          if(f.seq.isEmpty) {
+            (Path \ "businessActivities") -> Seq(ValidationError("error.required"))
+          } else {
+            data fmap BusinessActivities.apply
+          })
       }
 
     implicit def formWrites
     (implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded] { data =>
-      Map("businessActivities" -> data.activites.toSeq.map(w.writes))
+      Map("businessActivities" -> data.businessActivities.toSeq.map(w.writes))
     }
 
     implicit val formats = Json.format[BusinessActivities]

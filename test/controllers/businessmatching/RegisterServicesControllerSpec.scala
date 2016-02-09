@@ -3,6 +3,7 @@ package controllers.businessmatching
 import connectors.DataCacheConnector
 import models.businessmatching._
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -30,12 +31,14 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     val activityData2:Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
     val activityData3:Set[BusinessActivity] = Set(TrustAndCompanyServices, TelephonePaymentService)
 
-    val tradingPremises1 = BusinessActivities(activityData1)
-    val tradingPremises2 = BusinessActivities(activityData2)
+    val businessActivities1 = BusinessActivities(activityData1)
+    val businessActivities2 = BusinessActivities(activityData2)
+
+    val businessMatching1 = BusinessMatching(Some(businessActivities1))
 
 
     "on get display who is your agent page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -45,9 +48,8 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "on get() display the who is your agent page with pre populated data" in new Fixture {
 
-
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises1)))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -57,64 +59,88 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "on post with valid data" in new Fixture {
 
-      val tradingPremisesWithData = BusinessActivities(activites = activityData1)
+      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+      val businessMatchingWithData = BusinessMatching(Some(businessActivitiesWithData))
 
-      val agentName = "XYZ"
       val newRequest = request.withFormUrlEncodedBody(
-        "agentsRegisteredName" -> agentName,
-        "taxType" -> "01",
-        "agentsBusinessStructure" -> "01"
-      )
+        "businessActivities" -> "01",
+        "businessActivities" -> "02",
+        "businessActivities" -> "03")
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithData)))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessmatching.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
 
-      val agentName = "XYZ"
+      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+      val businessMatchingWithData = BusinessMatching(Some(businessActivitiesWithData))
+
       val newRequest = request.withFormUrlEncodedBody(
-        "agentsRegisteredName" -> agentName,
-        "taxType" -> "09",
-        "businessStructure" -> "07"
-      )
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
+        "businessActivities" -> "11")
+
+
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
+
+      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessMatching](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-
 
     }
 
     // to be valid after summary edit page is ready
     "on post with valid data in edit mode" in new Fixture {
 
-      val tradingPremisesWithData = BusinessActivities(services = Some(serviceData2))
+      val businessActivitiesWithData = BusinessActivities(businessActivities = activityData2)
+      val businessMatchingWithData = BusinessMatching(Some(businessActivitiesWithData))
+
 
       val newRequest = request.withFormUrlEncodedBody(
-        "agentsRegisteredName" -> "XYZ",
-        "taxType" -> "01",
-        "agentsBusinessStructure" -> "01"
-      )
+        "businessActivities" -> "01",
+        "businessActivities" -> "02",
+        "businessActivities" -> "03")
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithData)))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessMatching](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.InProgressController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
+
+
+    "fail submission when no check boxes were selected" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+
+      )
+
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include("This field is required")
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#businessActivities]").html() must include("This field is required")
+    }
+
   }
 }
 

@@ -1,4 +1,3 @@
-@import include.{forms => deprecated, _}
 @import forms.Form2
 @import include._
 @import include.forms2._
@@ -11,7 +10,7 @@
 
 @heading("businessmatching.registerservices.heading", "summary.businessmatching")
 
-@form(f, controllers.businessmatching.routes.YourAgentController.post(edit)) {
+@form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
 
 <div class="form-field">
     <span class="form-field">@Messages("businessmatching.registerservices.text")</span>
