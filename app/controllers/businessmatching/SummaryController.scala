@@ -14,7 +14,7 @@ trait SummaryController extends BaseController {
   def get = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) map {
-        case Some(data) => Ok(views.html.what_you_need_to_register(EmptyForm, false))
+        case Some(data) => Ok(views.html.unauthorised(request))
         case _ => Redirect(routes.SummaryController.get())
       }
   }
