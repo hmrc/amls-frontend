@@ -1,0 +1,35 @@
+@import include.{forms => deprecated, _}
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("businessmatching.registerservices.title")
+) {
+
+@heading("businessmatching.registerservices.heading", "summary.businessmatching")
+
+@form(f, controllers.businessmatching.routes.YourAgentController.post(edit)) {
+
+<div class="form-field">
+    <span class="form-field">@Messages("businessmatching.registerservices.text")</span>
+</div>
+
+@radioGroup(f("services")) {
+@legend("TODO", jsHidden = true)
+@checkbox(f("services"), "businessmatching.registerservices.servicename.lbl.01", "01")
+@checkbox(f("services"), "businessmatching.registerservices.servicename.lbl.02", "02")
+@checkbox(f("services"), "businessmatching.registerservices.servicename.lbl.03", "03")
+@checkbox(f("services"), "businessmatching.registerservices.servicename.lbl.04", "04")
+@checkbox(f("services"), "businessmatching.registerservices.servicename.lbl.05", "05")
+@checkbox(f("services"), "businessmatching.registerservices.servicename.lbl.06", "06")
+@checkbox(f("services"), "businessmatching.registerservices.servicename.lbl.07", "07")
+}
+
+@submit(edit)
+
+}
+
+}
