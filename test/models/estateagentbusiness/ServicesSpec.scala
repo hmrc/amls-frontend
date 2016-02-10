@@ -1,33 +1,27 @@
 package models.estateagentbusiness
-
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
+
+
 
 class ServicesSpec extends PlaySpec with MockitoSugar {
 
   "ServicesSpec" must {
+    val businessServices:Set[Service] = Set(Residential, Commercial, Auction, Relocation, BusinessTransfer, AssetManagement, LandManagement, Development, SocialHousing)
     import play.api.data.mapping.forms.Rules._
 
     "validate model with few check box selected" in {
+
       val model = Map(
-        "services[]" -> Seq("03","01")
+        "services[]" -> Seq("01","02","03","04","05","06","07","08","09")
       )
 
       Services.formReads.validate(model) must
-        be(Success(Services(Set(Auction, Residential))))
+        be(Success(Services(businessServices)))
 
-    }
-
-    "validate model with residential estate agency check box selected" in {
-      val model = Map(
-        "services" -> Seq("09")
-      )
-
-      Services.formReads.validate(model) must
-        be(Success(Services(Set(SocialHousing))))
     }
 
     "fail to validate on empty Map" in {
@@ -37,50 +31,51 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
     }
 
-  /*  "fail to validate when given invalid data" in {
+    "fail to validate when given invalid data" in {
       val model = Map(
         "services[]" -> Seq("02", "99", "03")
       )
 
       Services.formReads.validate(model) must
-        be(Failure(Seq((Path \ "services[1]" \ "services", Seq(ValidationError("error.invalid"))))))
-    }*/
+        be(Failure(Seq((Path \ "services"\ 1 \ "services", Seq(ValidationError("error.invalid"))))))
+    }
 
     "write correct data for services value" in {
 
-      Services.formWrites.writes(Services(Set(Auction, Commercial, Relocation))) must
-        be(Map("services" -> Seq("03","02", "04")))
-    }
+      Services.formWrites.writes(Services(Set(Residential, Commercial, Auction))) must
+        be(Map("services" -> Seq("01","02","03")))
 
-    "write correct data for services value when residential option is selected" in {
+      Services.formWrites.writes(Services(Set(AssetManagement, BusinessTransfer, LandManagement))) must
+        be(Map("services" -> Seq("06","05","07")))
 
-      Services.formWrites.writes(Services(Set(Residential))) must
-        be(Map("services" -> Seq("01")))
+      Services.formWrites.writes(Services(Set(Relocation, Development, SocialHousing))) must
+        be(Map("services" -> Seq("04","08","09")))
+
     }
 
     "JSON validation" must {
 
       "successfully validate given an enum value" in {
-        val json =  Json.obj("services" -> Seq("02","03", "01"))
+        val json =  Json.obj("services" -> Seq("01","02","03","04","05","06","07","08","09"))
 
         Json.fromJson[Services](json) must
-          be(JsSuccess(Services(Set(Commercial, Auction, Residential)), JsPath \ "services"))
+          be(JsSuccess(Services(businessServices), JsPath \ "services"))
       }
 
-      "fail when on invalid data" in {
+      "fail when on path is missing" in {
         Json.fromJson[Services](Json.obj("service" -> "01")) must
           be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
       }
-    }
 
-    "validate json write" in {
-      Json.toJson(Services(Set(Auction))) must
-        be(Json.obj("services" -> Seq("03")))
+      "fail when on invalid data" in {
+        Json.fromJson[Services](Json.obj("services" -> "100")) must
+          be(JsError((JsPath \ "services") -> ValidationError("error.expected.jsarray")))
+      }
     }
 
     "successfully validate json write" in {
-      val json = Json.obj("services" -> Seq("02","03", "01"))
-      Json.toJson(Services(Set(Commercial, Auction, Residential))) must be(json)
+      val json = Json.obj("services" -> Set("01","02","03","04","05","06","07","08","09"))
+      Json.toJson(Services(businessServices)) must be(json)
 
     }
   }

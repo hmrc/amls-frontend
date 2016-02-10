@@ -36,11 +36,11 @@
                     <tr>
                         <td colspan="2"> @Messages("estateagentbusiness.redress.lbl")
                             @a match {
-                            case ThePropertyOmbudsman => { @Messages("estateagentbusiness.redress.lbl.01") }
-                            case OmbudsmanServices => { @Messages("estateagentbusiness.redress.lbl.02") }
-                            case PropertyRedressScheme => { @Messages("estateagentbusiness.redress.lbl.03") }
-                            case Other(value) => { @value }
-                            case RedressSchemedNo => {@Messages("lbl.na")}
+                                case ThePropertyOmbudsman => { @Messages("estateagentbusiness.redress.lbl.01") }
+                                case OmbudsmanServices => { @Messages("estateagentbusiness.redress.lbl.02") }
+                                case PropertyRedressScheme => { @Messages("estateagentbusiness.redress.lbl.03") }
+                                case Other(value) => { @value }
+                                case RedressSchemedNo => {@Messages("lbl.na")}
                             }
                         </td>
                     </tr>
