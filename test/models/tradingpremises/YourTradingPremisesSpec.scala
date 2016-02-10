@@ -101,7 +101,6 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         )
         HMRCLocalDate.formWriteHMRCLocalDate.writes(hmrcLocalDate) must be(urlFormEncoded)
       }
-
     }
 
     "FORM and HMRCLocalDate conversion. Must successfully" must {
@@ -153,7 +152,6 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       PremiseOwner.formWritePremiseOwner.writes(PremiseOwnerAnother) must be(urlFormEncoded)
     }
   }
-
 
   "IsResidential serialisation" must {
 

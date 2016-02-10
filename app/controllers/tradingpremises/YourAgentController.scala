@@ -15,7 +15,7 @@ trait YourAgentController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
-        case Some(TradingPremises(_, Some(data))) =>
+        case Some(TradingPremises(_, Some(data), _)) =>
           Ok(views.html.who_is_your_agent(Form2[YourAgent](data), edit))
         case _ => Ok(views.html.who_is_your_agent(EmptyForm, edit))
       }

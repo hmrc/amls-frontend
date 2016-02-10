@@ -42,7 +42,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       )
       val ba = BusinessActivities.formReads.validate(model)
       ba must
-        be(Failure(Seq((Path \ "businessActivities[1]" \ "businessActivities", Seq(ValidationError("error.invalid"))))))
+        be(Failure(Seq((Path \ "businessActivities" \ 1 \ "businessActivities", Seq(ValidationError("error.invalid"))))))
     }
 
     "write correct data for businessActivities value" in {

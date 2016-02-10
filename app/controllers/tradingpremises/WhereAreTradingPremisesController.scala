@@ -16,7 +16,7 @@ trait WhereAreTradingPremisesController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
-        case Some(TradingPremises(Some(data), _)) =>
+        case Some(TradingPremises(Some(data), _, _)) =>
           Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit))
         case _ =>
           Ok(views.html.where_are_trading_premises(EmptyForm, edit))

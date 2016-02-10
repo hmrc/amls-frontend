@@ -15,7 +15,7 @@ trait TradingActivitiesController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
-        case Some(TradingPremises(_, Some(data))) => Ok(views.html.what_does_your_business_do(EmptyForm, edit))
+        case Some(TradingPremises(_, Some(data), _)) => Ok(views.html.what_does_your_business_do(EmptyForm, edit))
         case _ => Ok(views.html.what_does_your_business_do(EmptyForm, edit))
       }
   }

@@ -2,7 +2,8 @@ package models.tradingpremises
 
 case class TradingPremises(
                             yourTradingPremises: Option[YourTradingPremises] = None,
-                            yourAgent: Option[YourAgent] = None
+                            yourAgent: Option[YourAgent] = None,
+                            whatDoesYourBusinessDoAtThisAddress : Option[WhatDoesYourBusinessDo] = None
                           ) {
 
   def yourAgent(v: YourAgent): TradingPremises =
@@ -20,8 +21,9 @@ object TradingPremises {
 
   val key = "trading-premises"
   implicit val reads: Reads[TradingPremises] = (
-    __.read[Option[YourTradingPremises]] and
-      __.read[Option[YourAgent]]
+      __.read[Option[YourTradingPremises]] and
+      __.read[Option[YourAgent]] and
+      __.read[Option[WhatDoesYourBusinessDo]]
     ) (TradingPremises.apply _)
 
   implicit val writes: Writes[TradingPremises] = Writes[TradingPremises] {

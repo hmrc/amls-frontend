@@ -5,6 +5,8 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.Writes._
+import play.api.libs.json.{Json, Reads}
+
 
 case class WhatDoesYourBusinessDo(activities : Set[BusinessActivity])
 
@@ -16,4 +18,6 @@ object WhatDoesYourBusinessDo {
   implicit val formWrite = Write[WhatDoesYourBusinessDo, UrlFormEncoded] { data =>
     Map("activities" -> data.activities.toSeq.map(BusinessActivity.activityFormWrite.writes))
   }
+
+  implicit val format = Json.format[WhatDoesYourBusinessDo]
 }
