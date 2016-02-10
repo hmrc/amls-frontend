@@ -8,23 +8,7 @@ import play.api.libs.json._
 
 case class Services(services: Set[Service])
 
-sealed trait Service {
-
-  def getServiceText: String =  this match {
-
-    case Residential => Messages("estateagentbusiness.service.lbl.01")
-    case Commercial => Messages("estateagentbusiness.service.lbl.02")
-    case Auction => Messages("estateagentbusiness.service.lbl.03")
-    case Relocation => Messages("estateagentbusiness.service.lbl.04")
-    case BusinessTransfer => Messages("estateagentbusiness.service.lbl.05")
-    case AssetManagement => Messages("estateagentbusiness.service.lbl.06")
-    case LandManagement => Messages("estateagentbusiness.service.lbl.07")
-    case Development => Messages("estateagentbusiness.service.lbl.08")
-    case SocialHousing => Messages("estateagentbusiness.service.lbl.09")
-
-  }
-
-}
+sealed trait Service
 
 case object Commercial extends Service
 
