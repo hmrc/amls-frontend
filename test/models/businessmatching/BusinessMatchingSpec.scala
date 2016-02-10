@@ -2,7 +2,6 @@ package models.businessmatching
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
 
 class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
@@ -12,14 +11,22 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
     "JSON validation" must {
 
-      "successfully validate given an enum value" in {
+      "READ the JSON successfully and return the domain Object" in {
 
         val businessActivities = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
         val businessMatching = BusinessMatching(Some(businessActivities))
 
         val jsonBusinessActivities = Json.obj("businessActivities" -> Seq("05", "06", "07"))
-
         Json.fromJson[BusinessMatching](jsonBusinessActivities) must be(JsSuccess(businessMatching, JsPath))
+      }
+
+      "WRITE the JSON successfully from the domain Object" in {
+
+        val businessActivities = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+        val businessMatching = BusinessMatching(Some(businessActivities))
+
+        val jsonBusinessActivities = Json.obj("businessActivities" -> Seq("05", "06", "07"))
+        Json.toJson(businessActivities) must be(jsonBusinessActivities)
       }
 
     }
