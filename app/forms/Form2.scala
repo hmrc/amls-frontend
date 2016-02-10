@@ -25,12 +25,10 @@ case class ValidForm[A](data: UrlFormEncoded, model: A) extends CompletedForm[A]
   override def errors: Seq[(Path, Seq[ValidationError])] = Seq.empty
   override def errors(path: Path): Seq[mapping.ValidationError] = Seq.empty
 
-  private def collapse(seq: Seq[String]) = seq.mkString("")
-
   override def apply(path: Path): Field =
-    data.get(PM.asKey(path)).fold[Field](InvalidField(path, None, Seq.empty)) {
+    data.get(PM.asKey(path)).fold[Field](InvalidField(path, Seq.empty, Seq.empty)) {
       v =>
-        ValidField(path, Some(collapse(v)))
+        ValidField(path, v)
     }
 }
 
@@ -43,7 +41,7 @@ case class InvalidForm(
     errors.toMap.get(path).getOrElse(Seq.empty)
 
   override def apply(path: Path): Field = {
-    val v = data.get(PM.asKey(path)) map { _.mkString("") }
+    val v = data.get(PM.asKey(path)).getOrElse(Seq.empty)
     val e = errors.toMap.get(path).getOrElse(Seq.empty)
     InvalidField(path, v, e)
   }
@@ -51,7 +49,7 @@ case class InvalidForm(
 
 case object EmptyForm extends Form2[Nothing] {
   override val data: UrlFormEncoded = Map.empty
-  override def apply(path: Path): Field = InvalidField(path, None, Seq.empty)
+  override def apply(path: Path): Field = InvalidField(path, Seq.empty, Seq.empty)
   override def errors(path: Path): Seq[mapping.ValidationError] = Seq.empty
   override val errors: Seq[(Path, Seq[mapping.ValidationError])] = Seq.empty
 }

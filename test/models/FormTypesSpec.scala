@@ -128,7 +128,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
 
-    "fail to validate a string longer than 255" in {
+    "fail to validate a string longer than 10" in {
 
       postcodeType.validate("a" * 11) must
         be(Failure(Seq(
@@ -153,7 +153,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
 
-    "fail to validate a string longer than 255" in {
+    "fail to validate a string longer than 3" in {
 
       countryType.validate("a" * 3) must
         be(Failure(Seq(
@@ -301,6 +301,31 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "successfully serialise" in {
       localDateWrite.writes(model) must be(data)
+    }
+  }
+
+  "redressOtherType" must {
+
+    "successfully validate" in {
+
+      redressOtherType.validate("foobar") must
+        be(Success("foobar"))
+    }
+
+    "fail to validate an empty string" in {
+
+      redressOtherType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 255" in {
+
+      redressOtherType.validate("a" * 256) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxRedressOtherTypeLength))
+        )))
     }
   }
 }

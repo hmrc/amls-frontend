@@ -19,24 +19,26 @@ object FormTypes {
   val maxEMailLength = 100
   val maxPenalisedTypeLength = 255
   val maxAgentNameLength = 140
-  val minLengthDayOrMonth = 1
-  val maxLengthDayOrMonth = 2
-  val yearLength = 4
-  val maxLengthPremisesTradingName = 120
+  val maxRedressOtherTypeLength = 255
 
-  val indivNameType = notEmpty compose maxLength(maxNameTypeLength)
+  val indivNameType =
+    notEmpty compose maxLength(maxNameTypeLength)
 
-  val descriptionType = notEmpty compose maxLength(maxDescriptionTypeLength)
+  val descriptionType =
+    notEmpty compose maxLength(maxDescriptionTypeLength)
 
-  val prevMLRRegNoType = notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
+  val prevMLRRegNoType =  notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 
   val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
 
-  val addressType = notEmpty compose maxLength(maxAddressLength)
+  val addressType =
+    notEmpty compose maxLength(maxAddressLength)
 
-  val postcodeType = notEmpty compose maxLength(maxPostCodeTypeLength)
+  val postCodeType =
+    notEmpty compose maxLength(maxPostCodeTypeLength)
 
-  val countryType = notEmpty compose maxLength(maxCountryTypeLength)
+  val countryType =
+    notEmpty compose maxLength(maxCountryTypeLength)
 
   val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
 
@@ -45,6 +47,7 @@ object FormTypes {
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
   val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
+  val redressOtherType = notEmpty compose maxLength(maxRedressOtherTypeLength)
 
   val dayType = notEmpty compose minLength(minLengthDayOrMonth) compose maxLength(maxLengthDayOrMonth) compose pattern("(0?[1-9]|[12][0-9]|3[01])".r)
 
@@ -72,4 +75,6 @@ object FormTypes {
        (__ \ "day").write[String]
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
+}
+
 }
