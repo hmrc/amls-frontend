@@ -38,7 +38,7 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
 
     "load the page with data when the user revisits at a later time" in new Fixture {
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None,
+        (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None, None,
         Some(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before"))))))
 
       val result = controller.get()(request)
