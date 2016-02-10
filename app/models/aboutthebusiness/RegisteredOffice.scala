@@ -56,7 +56,7 @@ object RegisteredOffice {
             (__ \ "addressLine2").read(addressType) and
             (__ \ "addressLine3").read(optionR(addressType)) and
             (__ \ "addressLine4").read(optionR(addressType)) and
-            (__ \ "postCode").read(postcodeType)
+            (__ \ "postCode").read(postCodeType)
           ) (RegisteredOfficeUK.apply _)
       case false =>
         (

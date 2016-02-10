@@ -20,6 +20,7 @@ object FormTypes {
   val maxPenalisedTypeLength = 255
   val maxAgentNameLength = 140
   val maxRedressOtherTypeLength = 255
+  val maxLengthPremisesTradingName = 120
 
   val indivNameType =
     notEmpty compose maxLength(maxNameTypeLength)
@@ -47,13 +48,8 @@ object FormTypes {
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
   val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
+
   val redressOtherType = notEmpty compose maxLength(maxRedressOtherTypeLength)
-
-  val dayType = notEmpty compose minLength(minLengthDayOrMonth) compose maxLength(maxLengthDayOrMonth) compose pattern("(0?[1-9]|[12][0-9]|3[01])".r)
-
-  val monthType = notEmpty compose minLength(minLengthDayOrMonth) compose maxLength(maxLengthDayOrMonth) compose pattern("(0?[1-9]|1[012])".r)
-
-  val yearType = notEmpty compose minLength(yearLength) compose maxLength(yearLength) compose pattern("((19|20)\\d\\d)".r)
 
   val premisesTradingNameType = maxLength(maxLengthPremisesTradingName)
 
@@ -75,6 +71,4 @@ object FormTypes {
        (__ \ "day").write[String]
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
-}
-
 }

@@ -32,7 +32,7 @@ object Address {
           (__ \ "addressLine2").read(addressType) ~
           (__ \ "addressLine3").read(optionR(addressType)) ~
           (__ \ "addressLine4").read(optionR(addressType)) ~
-          (__ \ "postcode").read(postcodeType)
+          (__ \ "postcode").read(postCodeType)
         )(Address.apply _)
     }
 
