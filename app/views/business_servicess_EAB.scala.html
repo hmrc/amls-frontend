@@ -1,0 +1,27 @@
+@import include.{forms => deprecated, _}
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@main(
+    title = Messages("estateagentbusiness.servicess.title")
+) {
+
+    @heading("estateagentbusiness.servicess.title", "summary.estateagentbusiness")
+
+    @form(f, controllers.estateagentbusiness.routes.BusinessServicesController.post(edit)) {
+        <span>@Messages("estateagentbusiness.select.all")</span>
+        @radioGroup(f("services")) {
+            @legend("TODO", jsHidden = true)
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.01", "01")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.02", "02")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.03", "03")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.04", "04")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.05", "05")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.06", "06")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.07", "07")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.08", "08")
+            @checkbox(f("services"), "estateagentbusiness.service.lbl.09", "09")
+        }
+        @submit(edit)
+    }
+}
