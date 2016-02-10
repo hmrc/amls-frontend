@@ -10,7 +10,9 @@ import play.api.libs.json._
 class ServicesSpec extends PlaySpec with MockitoSugar {
 
   "ServicesSpec" must {
-    val businessServices:Set[Service] = Set(Residential, Commercial, Auction, Relocation, BusinessTransfer, AssetManagement, LandManagement, Development, SocialHousing)
+
+    val businessServices:Set[Service] = Set(Residential, Commercial, Auction, Relocation,
+                                            BusinessTransfer, AssetManagement, LandManagement, Development, SocialHousing)
     import play.api.data.mapping.forms.Rules._
 
     "validate model with few check box selected" in {
@@ -55,7 +57,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
 
     "JSON validation" must {
 
-      "successfully validate given an enum value" in {
+      "successfully validate given values" in {
         val json =  Json.obj("services" -> Seq("01","02","03","04","05","06","07","08","09"))
 
         Json.fromJson[Services](json) must
@@ -68,7 +70,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
       }
 
       "fail when on invalid data" in {
-        Json.fromJson[Services](Json.obj("services" -> "100")) must
+        Json.fromJson[Services](Json.obj("services" -> "40")) must
           be(JsError((JsPath \ "services") -> ValidationError("error.expected.jsarray")))
       }
     }
