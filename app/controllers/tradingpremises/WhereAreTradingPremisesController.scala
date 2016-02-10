@@ -32,14 +32,13 @@ trait WhereAreTradingPremisesController extends BaseController {
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourTradingPremises(data))
+//            TODO: Redirect to summary in edit mode
           } yield Redirect(routes.YourAgentController.get())
       }
-
   }
 }
 
 object WhereAreTradingPremisesController extends WhereAreTradingPremisesController {
-
-  val authConnector = AMLSAuthConnector
+  override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

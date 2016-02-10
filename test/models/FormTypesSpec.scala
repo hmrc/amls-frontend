@@ -1,6 +1,5 @@
 package models
 
-import models.tradingpremises.HMRCLocalDate
 import org.scalatestplus.play.PlaySpec
 import org.specs2.mock.mockito.MockitoMatchers
 import play.api.data.mapping.{Path, Failure, Success}
@@ -236,33 +235,72 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-  "Date validation for Year Month and Day" must {
+  "premisesTradingNameType" must {
 
-    "Year Validation for FORM RULE" in {
-      val formDateField = Map(
-        "yyyy" -> Seq("2015873434"),
-        "mm" -> Seq("08"),
-        "dd" -> Seq("15")
-      )
-      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "yyyy") -> Seq(ValidationError("error.maxLength", FormTypes.yearLength)))))
+    "successfully validate" in {
+      premisesTradingNameType.validate("asdf") must
+        be(Success("asdf"))
     }
 
-    "Month Validation for FORM RULE" in {
-      val formDateField = Map(
-        "yyyy" -> Seq("2015"),
-        "mm" -> Seq("008"),
-        "dd" -> Seq("15")
-      )
-      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "mm") -> Seq(ValidationError("error.maxLength", FormTypes.maxLengthDayOrMonth)))))
+    "fail to validate a string longer than 120" in {
+      premisesTradingNameType.validate("a" * 121) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 120))
+        )))
+    }
+  }
+
+  "localDateRule" must {
+
+    import org.joda.time.LocalDate
+
+    val data = Map(
+      "day" -> Seq("24"),
+      "month" -> Seq("2"),
+      "year" -> Seq("1990")
+    )
+
+    val model = new LocalDate(1990, 2, 24)
+
+    "successfully validate" in {
+      localDateRule.validate(data) must
+        be(Success(model))
     }
 
-    "Day Validation for FORM RULE" in {
-      val formDateField = Map(
-        "yyyy" -> Seq("2015"),
-        "mm" -> Seq("08"),
-        "dd" -> Seq("1500")
-      )
-      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "dd") -> Seq(ValidationError("error.maxLength", FormTypes.maxLengthDayOrMonth)))))
+    "fail to validate an invalid date" in {
+      localDateRule.validate(Map(
+        "day" -> Seq("24"),
+        "month" -> Seq("13"),
+        "year" -> Seq("1990")
+      )) must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+      )))
+    }
+
+    "fail to validate missing fields" in {
+      localDateRule.validate(Map.empty) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required")),
+          Path -> Seq(ValidationError("error.required")),
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+  }
+
+  "localDateWrite" must {
+
+    import org.joda.time.LocalDate
+
+    val data = Map(
+      "day" -> Seq("24"),
+      "month" -> Seq("2"),
+      "year" -> Seq("1990")
+    )
+
+    val model = new LocalDate(1990, 2, 24)
+
+    "successfully serialise" in {
+      localDateWrite.writes(model) must be(data)
     }
   }
 }
