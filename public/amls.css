@@ -15,7 +15,7 @@
  */
 
 
-/* required as js-hidden in assets frontend ia !important */
+/* required as js-hidden in assets frontend is !important */
 .amls-js-hidden {
     display : none;
 }
@@ -82,6 +82,15 @@ form .block-label + fieldset {
 form .inline .block-label + fieldset {
     float: none;
     margin-top : 0;
+}
+form .date .form-group {
+    width: 60px;
+    float: left;
+    margin-right: 20px;
+    clear: none;
+}
+form .date .form-group input[type=text] {
+    width : 100%;
 }
 
 

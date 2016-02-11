@@ -1,5 +1,9 @@
 package models
 
+import org.joda.time.LocalDate
+import play.api.data.mapping._
+import play.api.data.mapping.forms.UrlFormEncoded
+
 object FormTypes {
 
   import play.api.data.mapping.forms.Rules._
@@ -16,6 +20,7 @@ object FormTypes {
   val maxPenalisedTypeLength = 255
   val maxAgentNameLength = 140
   val maxRedressOtherTypeLength = 255
+  val maxLengthPremisesTradingName = 120
 
   val indivNameType =
     notEmpty compose maxLength(maxNameTypeLength)
@@ -43,6 +48,27 @@ object FormTypes {
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
   val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
+
   val redressOtherType = notEmpty compose maxLength(maxRedressOtherTypeLength)
 
+  val premisesTradingNameType = maxLength(maxLengthPremisesTradingName)
+
+  val localDateRule: Rule[UrlFormEncoded, LocalDate] =
+    From[UrlFormEncoded] { __ =>
+      (
+        (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      )( (y, m, d) => s"$y-$m-$d" ) compose jodaLocalDateRule("yyyy-MM-dd")
+    }.repath( _ => Path)
+
+  val localDateWrite: Write[LocalDate, UrlFormEncoded] =
+   To[UrlFormEncoded] { __ =>
+     import play.api.data.mapping.forms.Writes._
+     (
+       (__ \ "year").write[String] ~
+       (__ \ "month").write[String] ~
+       (__ \ "day").write[String]
+     )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
+   }
 }
