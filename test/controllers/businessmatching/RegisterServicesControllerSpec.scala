@@ -4,6 +4,7 @@ import connectors.DataCacheConnector
 import models.businessmatching._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -55,6 +56,9 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
+
+      private val checkbox = document.select("input[id=businessActivities-01]")
+      document.select("input[id=businessActivities-01]").attr("checked") must be("checked")
     }
 
     "on post with valid data" in new Fixture {

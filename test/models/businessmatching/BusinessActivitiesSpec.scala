@@ -21,13 +21,13 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     }
 
-    "validate model with residential estate agency check box selected" in {
+    "validate model with residential business activity check box selected" in {
       val model = Map(
         "businessActivities" -> Seq("07")
       )
 
       BusinessActivities.formReads.validate(model) must
-        be(Success(BusinessActivities(Set(TelephonePaymentService))))
+      be(Success(BusinessActivities(Set(TelephonePaymentService))))
     }
 
     "fail to validate on empty Map" in {
@@ -38,11 +38,11 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "fail to validate when given invalid data" in {
       val model = Map(
-        "businessActivities[]" -> Seq("02", "99", "03")
+        "businessActivities[]" -> Seq("01", "99", "03")
       )
       val ba = BusinessActivities.formReads.validate(model)
       ba must
-        be(Failure(Seq((Path \ "businessActivities" \ 1 \ "businessActivities", Seq(ValidationError("error.invalid"))))))
+        be(Failure(Seq((Path \ "businessActivities" \ 1 \ "businessActivities") -> Seq(ValidationError("error.invalid")))))
     }
 
     "write correct data for businessActivities value" in {

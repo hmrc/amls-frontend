@@ -1,6 +1,5 @@
 package models
 
-import models.tradingpremises.HMRCLocalDate
 import org.scalatestplus.play.PlaySpec
 import org.specs2.mock.mockito.MockitoMatchers
 import play.api.data.mapping.{Path, Failure, Success}
@@ -129,7 +128,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
 
-    "fail to validate a string longer than 255" in {
+    "fail to validate a string longer than 10" in {
 
       postcodeType.validate("a" * 11) must
         be(Failure(Seq(
@@ -154,7 +153,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
 
-    "fail to validate a string longer than 255" in {
+    "fail to validate a string longer than 3" in {
 
       countryType.validate("a" * 3) must
         be(Failure(Seq(
@@ -236,33 +235,28 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-  "Date validation for Year Month and Day" must {
+  "redressOtherType" must {
 
-    "Year Validation for FORM RULE" in {
-      val formDateField = Map(
-        "yyyy" -> Seq("2015873434"),
-        "mm" -> Seq("08"),
-        "dd" -> Seq("15")
-      )
-      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "yyyy") -> Seq(ValidationError("error.maxLength", FormTypes.yearLength)))))
+    "successfully validate" in {
+
+      redressOtherType.validate("foobar") must
+        be(Success("foobar"))
     }
 
-    "Month Validation for FORM RULE" in {
-      val formDateField = Map(
-        "yyyy" -> Seq("2015"),
-        "mm" -> Seq("008"),
-        "dd" -> Seq("15")
-      )
-      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "mm") -> Seq(ValidationError("error.maxLength", FormTypes.maxLengthDayOrMonth)))))
+    "fail to validate an empty string" in {
+
+      redressOtherType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
     }
 
-    "Day Validation for FORM RULE" in {
-      val formDateField = Map(
-        "yyyy" -> Seq("2015"),
-        "mm" -> Seq("08"),
-        "dd" -> Seq("1500")
-      )
-      HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Failure(Seq((Path \ "dd") -> Seq(ValidationError("error.maxLength", FormTypes.maxLengthDayOrMonth)))))
+    "fail to validate a string longer than 255" in {
+
+      redressOtherType.validate("a" * 256) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxRedressOtherTypeLength))
+        )))
     }
   }
 }

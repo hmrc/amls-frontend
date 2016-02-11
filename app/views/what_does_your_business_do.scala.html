@@ -1,7 +1,8 @@
-@import include.{forms => deprecated, _}
-@import forms2._
+@import forms.Form2
+@import include._
+@import include.forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f:Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 @main(
 title = Messages("tradingpremises.whatdoesyourbusinessdo.title")
 ) {
@@ -9,9 +10,8 @@ title = Messages("tradingpremises.whatdoesyourbusinessdo.title")
 @heading("tradingpremises.whatdoesyourbusinessdo.title", "summary.tradingpremises")
 
 @form(f, controllers.tradingpremises.routes.TradingActivitiesController.post(edit)) {
-<p>@Messages("tradingpremises.whatdoesyourbusinessdo.linetext")</p>
 @radioGroup(f("activities")) {
-@legend("TODO", jsHidden = true)
+@legend("tradingpremises.whatdoesyourbusinessdo.linetext", jsHidden = false)
 @checkbox(f("activities"), "tradingpremises.activities.lbl.01", "01")
 @checkbox(f("activities"), "tradingpremises.activities.lbl.02", "02")
 @checkbox(f("activities"), "tradingpremises.activities.lbl.03", "03")

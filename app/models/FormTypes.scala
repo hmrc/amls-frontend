@@ -18,12 +18,15 @@ object FormTypes {
   val minLengthDayOrMonth = 1
   val maxLengthDayOrMonth = 2
   val yearLength = 4
+  val maxRedressOtherTypeLength = 255
 
-  val indivNameType = notEmpty compose maxLength(maxNameTypeLength)
+  val indivNameType =
+    notEmpty compose maxLength(maxNameTypeLength)
 
-  val descriptionType = notEmpty compose maxLength(maxDescriptionTypeLength)
+  val descriptionType =
+    notEmpty compose maxLength(maxDescriptionTypeLength)
 
-  val prevMLRRegNoType = notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
+  val prevMLRRegNoType =  notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 
   val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
 
@@ -46,4 +49,7 @@ object FormTypes {
   val monthType = notEmpty compose minLength(minLengthDayOrMonth) compose maxLength(maxLengthDayOrMonth) compose pattern("(0?[1-9]|1[012])".r)
 
   val yearType = notEmpty compose minLength(yearLength) compose maxLength(yearLength) compose pattern("((19|20)\\d\\d)".r)
+
+  val redressOtherType = notEmpty compose maxLength(maxRedressOtherTypeLength)
+
 }

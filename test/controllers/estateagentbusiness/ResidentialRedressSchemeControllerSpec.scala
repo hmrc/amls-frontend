@@ -16,48 +16,49 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 
-class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new PenalisedByProfessionalController {
+    val controller = new ResidentialRedressSchemeController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
   }
 
-  "PenalisedByProfessionalController" must {
+  "ResidentialRedressSchemeController" must {
 
     "use correct services" in new Fixture {
       PenalisedByProfessionalController.authConnector must be(AMLSAuthConnector)
       PenalisedByProfessionalController.dataCacheConnector must be(DataCacheConnector)
     }
 
-    "on get display the Penalised By Professional Body page" in new Fixture {
+    "on get load Residential Redress Scheme page" in new Fixture {
       when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("estateagentbusiness.penalisedbyprofessional.title"))
+      contentAsString(result) must include(Messages("estateagentbusiness.registered.redress.title"))
     }
   }
 
-  "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
+  "on get load redress scheme page with pre populated data" in new Fixture {
 
     when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None,Some(ProfessionalBodyYes("details"))))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, Some(Other("test")),None, None))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
-    contentAsString(result) must include ("details")
+    contentAsString(result) must include ("test")
 
   }
 
   "on post with valid data" in new Fixture {
 
     val newRequest = request.withFormUrlEncodedBody(
-      "penalised" -> "true",
-      "professionalBody" -> "details"
+      "isRedress" -> "true",
+      "propertyRedressScheme" -> "04",
+      "other" -> "test"
     )
 
     when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
@@ -68,27 +69,28 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
+    redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get().url))
   }
 
   "on post with invalid data" in new Fixture {
 
     val newRequest = request.withFormUrlEncodedBody(
-      "penalisedYes" -> "details"
+      "isRedress" -> "true",
+      "propertyRedressScheme" -> "04"
     )
 
     val result = controller.post()(newRequest)
     status(result) must be(BAD_REQUEST)
 
     val document = Jsoup.parse(contentAsString(result))
-    // TODO
+    contentAsString(result) must include("This field is required")
   }
 
    "on post with valid data in edit mode" in new Fixture {
 
      val newRequest = request.withFormUrlEncodedBody(
-       "penalised" -> "true",
-      "professionalBody" -> "details"
+       "isRedress" -> "true",
+       "propertyRedressScheme" -> "01"
      )
 
      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
