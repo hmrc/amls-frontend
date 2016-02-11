@@ -8,13 +8,14 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 
-class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -31,7 +32,7 @@ class BusinessRegisteredWithHMRCBeforeControllerSpec extends PlaySpec with OneSe
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include("Has this business been registered with HMRC before?")
+      contentAsString(result) must include(Messages("aboutthebusiness.registeredformlr.title"))
     }
   }
 
