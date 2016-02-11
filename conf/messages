@@ -111,8 +111,8 @@ aboutthebusiness.correspondenceaddress.address = Address
 aboutthebusiness.correspondenceaddress.postCode = Postcode
 aboutthebusiness.correspondenceaddress.country = Country
 
-aboutthebusiness.registeredformlr.title = Has this business been registered with HMRC before?
-aboutthebusiness.registeredformlr.lbl = This only refers to registration for anti-money laundering supervision with HMRC.
+aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision?
+aboutthebusiness.registeredformlr.lbl = This only refers to registration with HMRC
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulation registration number
 
 aboutthebusiness.confirmingyouraddress.title = Is this your registered office or main place of business?
