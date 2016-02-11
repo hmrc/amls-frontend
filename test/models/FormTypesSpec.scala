@@ -235,6 +235,75 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "premisesTradingNameType" must {
+
+    "successfully validate" in {
+      premisesTradingNameType.validate("asdf") must
+        be(Success("asdf"))
+    }
+
+    "fail to validate a string longer than 120" in {
+      premisesTradingNameType.validate("a" * 121) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 120))
+        )))
+    }
+  }
+
+  "localDateRule" must {
+
+    import org.joda.time.LocalDate
+
+    val data = Map(
+      "day" -> Seq("24"),
+      "month" -> Seq("2"),
+      "year" -> Seq("1990")
+    )
+
+    val model = new LocalDate(1990, 2, 24)
+
+    "successfully validate" in {
+      localDateRule.validate(data) must
+        be(Success(model))
+    }
+
+    "fail to validate an invalid date" in {
+      localDateRule.validate(Map(
+        "day" -> Seq("24"),
+        "month" -> Seq("13"),
+        "year" -> Seq("1990")
+      )) must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+      )))
+    }
+
+    "fail to validate missing fields" in {
+      localDateRule.validate(Map.empty) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required")),
+          Path -> Seq(ValidationError("error.required")),
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+  }
+
+  "localDateWrite" must {
+
+    import org.joda.time.LocalDate
+
+    val data = Map(
+      "day" -> Seq("24"),
+      "month" -> Seq("2"),
+      "year" -> Seq("1990")
+    )
+
+    val model = new LocalDate(1990, 2, 24)
+
+    "successfully serialise" in {
+      localDateWrite.writes(model) must be(data)
+    }
+  }
+
   "redressOtherType" must {
 
     "successfully validate" in {

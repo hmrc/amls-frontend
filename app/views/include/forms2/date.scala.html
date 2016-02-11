@@ -1,0 +1,39 @@
+@import forms.{Field, Form2}
+
+@(
+    f: Form2[_],
+    p: String,
+    labelText: String,
+    hintText: String = "",
+    example: Boolean = true
+)(implicit lang: Lang)
+
+@field = @{ f(p) }
+
+<fieldset class="form-group date @if(field.hasErrors) {form-field--error}" id="@field.id">
+    @legend(labelText)
+    @if(hintText.nonEmpty) {
+        <span class="form-hint">@Messages(hintText)</span>
+    }
+    @if(example) {
+        <span class="form-hint">@Messages("lbl.date.example")</span>
+    }
+    @if(field.hasErrors) {
+        <span class="error-notification">@field.error</span>
+    }
+    @input(
+        labelText = "lbl.day",
+        field = f(s"${p}.day"),
+        bold = false
+    )
+    @input(
+        labelText = "lbl.month",
+        field = f(s"${p}.month"),
+        bold = false
+    )
+    @input(
+        labelText = "lbl.year",
+        field = f(s"${p}.year"),
+        bold = false
+    )
+</fieldset>
