@@ -1,17 +1,15 @@
 # microservice specific routes
 
-GET         /assets/*file                   controllers.AssetsController.at(path="/public", file)
+GET         /assets/*file                               controllers.AssetsController.at(path="/public", file)
 
-GET         /example                        controllers.ExampleController.onPageLoad
-POST        /example                        controllers.ExampleController.onSubmit
-GET         /                               controllers.WelcomeController.get
-GET         /welcome                        controllers.WelcomeController.get
+GET         /                                           controllers.WelcomeController.get
+GET         /welcome                                    controllers.WelcomeController.get
 
-GET         /unauthorised                   controllers.AmlsController.unauthorised
-GET         /summary                        controllers.MainSummaryController.onPageLoad
+GET         /unauthorised                               controllers.AmlsController.unauthorised
+GET         /summary                                    controllers.MainSummaryController.onPageLoad
 
-GET         /login                          controllers.AmlsController.onPageLoad
-POST        /login                          controllers.AmlsController.onSubmit
+GET         /login                                      controllers.AmlsController.onPageLoad
+POST        /login                                      controllers.AmlsController.onSubmit
 
 GET         /about-you/your-details                    controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
 POST        /about-you/your-details                    controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)
@@ -48,7 +46,6 @@ POST        /trading-premises/premises                 controllers.tradingpremis
 GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(edit: Boolean ?= false)
 POST        /trading-premises/agent                    controllers.tradingpremises.YourAgentController.post(edit: Boolean ?= false)
 
-
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
@@ -62,7 +59,10 @@ POST        /estate-agents/services                   controllers.estateagentbus
 GET         /estate-agents/redress-scheme             controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
 POST        /estate-agents/redress-scheme             controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
 
-
 GET         /estate-agents/summary                     controllers.estateagentbusiness.SummaryController.get()
 
 
+GET         /business-matching/activities              controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /business-matching/activities              controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+
+GET         /business-matching/summary                 controllers.businessmatching.SummaryController.get()
