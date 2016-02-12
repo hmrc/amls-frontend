@@ -30,7 +30,7 @@ trait YourAgentController extends BaseController {
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourAgent(data))
-          } yield  Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get())
+          } yield  Redirect(controllers.tradingpremises.routes.TradingActivitiesController.get())
       }
     }
   }

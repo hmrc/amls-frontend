@@ -75,7 +75,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.TradingActivitiesController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -114,7 +114,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.TradingActivitiesController.get().url))
     }
   }
 }
