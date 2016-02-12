@@ -67,4 +67,7 @@ POST        /business-matching/activities              controllers.businessmatch
 
 GET         /business-matching/summary                 controllers.businessmatching.SummaryController.get()
 
-GET         /bank-details/index                    controllers.bankdetails.WhatYouNeedController.get()
+GET         /bank-details/index                        controllers.bankdetails.WhatYouNeedController.get()
+
+GET         /about-the-business/index                   controllers.aboutthebusiness.WhatYouNeedController.get()
+

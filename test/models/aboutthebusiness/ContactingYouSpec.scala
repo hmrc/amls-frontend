@@ -11,11 +11,10 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
     val completeJson = Json.obj(
       "phoneNumber" -> "1234567890",
       "email" -> "test@test.com",
-      "website" -> "http://www.test.com",
       "letterToThisAddress" -> true
     )
 
-    val completeModel = ContactingYouForm("1234567890", "test@test.com", Some("http://www.test.com"), true)
+    val completeModel = ContactingYouForm("1234567890", "test@test.com", true)
 
     "successfully validate given a phone number, email and letterToThisAddress" in {
 
@@ -26,7 +25,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
       )
 
       ContactingYouForm.formRule.validate(data) must
-        be(Success(ContactingYouForm("1234567890", "test@test.com", None, true)))
+        be(Success(ContactingYouForm("1234567890", "test@test.com", true)))
     }
 
     "successfully validate given a phone number, email, website address and letterToThisAddress " in {
@@ -34,12 +33,11 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
       val data = Map(
         "phoneNumber" -> Seq("1234567890"),
         "email" -> Seq("test@test.com"),
-        "website" -> Seq("http://www.test.com"),
         "letterToThisAddress" -> Seq("true")
       )
 
       ContactingYouForm.formRule.validate(data) must
-        be(Success(ContactingYouForm("1234567890", "test@test.com", Some("http://www.test.com"), true)))
+        be(Success(ContactingYouForm("1234567890", "test@test.com", true)))
     }
 
     "serialize as expected" in {
@@ -51,12 +49,11 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
     }
 
     "write correct data" in {
-      val model = ContactingYou("1234567890", "test@test.com", Some("http://www.test.com"))
+      val model = ContactingYou("1234567890", "test@test.com")
       ContactingYou.formWrites.writes(model) must
         be(Map(
           "phoneNumber" -> Seq("1234567890"),
-          "email" -> Seq("test@test.com"),
-          "website" -> Seq("http://www.test.com")
+          "email" -> Seq("test@test.com")
         ))
     }
 
