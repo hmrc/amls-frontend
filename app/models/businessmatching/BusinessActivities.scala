@@ -5,7 +5,21 @@ import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
-case class BusinessActivities(businessActivities: Set[BusinessActivity])
+case class BusinessActivities(businessActivities: Set[BusinessActivity]){
+  def getValue(ba:BusinessActivity): String =
+  {
+    ba match {
+      case AccountancyServices => "01"
+      case BillPaymentServices => "02"
+      case EstateAgentBusinessService => "03"
+      case HighValueDealing => "04"
+      case MoneyServiceBusiness => "05"
+      case TrustAndCompanyServices => "06"
+      case TelephonePaymentService => "07"
+    }
+
+  }
+}
 
 sealed trait BusinessActivity
 case object AccountancyServices extends BusinessActivity
@@ -64,7 +78,6 @@ object BusinessActivity {
 
 object BusinessActivities {
   import utils.MappingUtils.Implicits._
-
     implicit def formReads
     (implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
       From[UrlFormEncoded] { __ =>
@@ -83,6 +96,9 @@ object BusinessActivities {
     }
 
     implicit val formats = Json.format[BusinessActivities]
+
+
+
 }
 
 

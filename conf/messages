@@ -37,6 +37,10 @@ lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
 lbl.pleasespecify = Please specify
 lbl.na = Not applicable
+lbl.day = Day
+lbl.month = Month
+lbl.year = Year
+lbl.date.example = For example, 31 3 2017
 
 lbl.uk = UK
 lbl.overseas = Overseas
@@ -106,18 +110,18 @@ aboutthebusiness.contactingyou.businessaddress = Business address:
 aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
 aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
 
-aboutthebusiness.correspondenceaddress.title = What is your postal address?
+aboutthebusiness.correspondenceaddress.title = What''s your postal address?
 aboutthebusiness.correspondenceaddress.p = We will send letters relating to anti-money laundering supervision to this address
 aboutthebusiness.correspondenceaddress.yourName = Your name
 aboutthebusiness.correspondenceaddress.businessName = Business name
-aboutthebusiness.correspondenceaddress.ukAddress = This is a UK address
-aboutthebusiness.correspondenceaddress.nonUkAddress = This is an overseas address
+aboutthebusiness.correspondenceaddress.ukAddress = UK
+aboutthebusiness.correspondenceaddress.nonUkAddress = Overseas
 aboutthebusiness.correspondenceaddress.address = Address
 aboutthebusiness.correspondenceaddress.postCode = Postcode
 aboutthebusiness.correspondenceaddress.country = Country
 
-aboutthebusiness.registeredformlr.title = Has this business been registered with HMRC before?
-aboutthebusiness.registeredformlr.lbl = This only refers to registration for anti-money laundering supervision with HMRC.
+aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision?
+aboutthebusiness.registeredformlr.lbl = This only refers to registration with HMRC
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulation registration number
 
 aboutthebusiness.confirmingyouraddress.title = Is this your registered office or main place of business?
@@ -179,10 +183,6 @@ tradingpremises.yourtradingpremises.whose.my=My business'' premises
 tradingpremises.yourtradingpremises.whose.another=Another business'' premises
 tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
-tradingpremises.yourtradingpremises.startdate.example=For example, 31 3 2017
-tradingpremises.yourtradingpremises.startdate.day=Day
-tradingpremises.yourtradingpremises.startdate.month=Month
-tradingpremises.yourtradingpremises.startdate.year=Year
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 
 

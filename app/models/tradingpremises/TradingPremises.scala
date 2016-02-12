@@ -33,7 +33,8 @@ object TradingPremises {
     model =>
       Seq(
         Json.toJson(model.yourTradingPremises).asOpt[JsObject],
-        Json.toJson(model.yourAgent).asOpt[JsObject]
+        Json.toJson(model.yourAgent).asOpt[JsObject],
+        Json.toJson(model.whatDoesYourBusinessDoAtThisAddress).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }

@@ -1,181 +1,73 @@
 package models.tradingpremises
 
+import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.data.mapping.Success
+import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.mapping.{Write, Rule, Success}
 import play.api.libs.json._
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers {
 
-  "For YourTradingPremises" must {
+  "YourTradingPremises" must {
 
-    val jsonReadsOrWritesMongo = Json.parse(
-      """{
-        |"tradingName":"Test Business Name",
-        |"addressLine1":"test Address Line 1",
-        |"addressLine2":"test Address Line 2",
-        |"addressLine3":"test Address Line 3",
-        |"addressLine4":"test Address Line 4",
-        |"postcode":"AA67 HJU",
-        |"country":"UK",
-        |"premiseOwner":false,
-        |"startOfTradingDate":"2015-08-15",
-        |"isResidential":true}""".stripMargin)
+    val data = Map(
+      "tradingName" -> Seq("foo"),
+      "addressLine1" -> Seq("1"),
+      "addressLine2" -> Seq("2"),
+      "postcode" -> Seq("asdfasdf"),
+      "isOwner" -> Seq("true"),
+      "startDate.day" -> Seq("24"),
+      "startDate.month" -> Seq("2"),
+      "startDate.year" -> Seq("1990"),
+      "isResidential" -> Seq("true")
+    )
 
-    val yourTradingPremises = YourTradingPremises(
-      "Test Business Name",
-      UKAddress(
-        "test Address Line 1",
-        "test Address Line 2",
-        Some("test Address Line 3"),
-        Some("test Address Line 4"),
-        Some("AA67 HJU"),
-        "UK"),
-      PremiseOwnerAnother,
-      HMRCLocalDate("2015", "08", "15"), //new LocalDate(2014, 4, 3),
-      ResidentialYes)
+    val json = Json.obj(
+      "tradingName" -> "foo",
+      "addressLine1" -> "1",
+      "addressLine2" -> "2",
+      "postcode" -> "asdfasdf",
+      "isOwner" -> true,
+      "startDate" -> new LocalDate(1990, 2, 24),
+      "isResidential" -> true
+    )
 
-    "JSON READS must includes all fields" in {
-      YourTradingPremises.jsonReadsYourTradingPremises.reads(jsonReadsOrWritesMongo) must be(JsSuccess(yourTradingPremises))
+    val model = YourTradingPremises(
+      "foo",
+      Address(
+        "1",
+        "2",
+        None,
+        None,
+        "asdfasdf"
+      ),
+      true,
+      new LocalDate(1990, 2, 24),
+      true
+    )
+
+    "Correctly serialise from form data" in {
+
+      implicitly[Rule[UrlFormEncoded, YourTradingPremises]].validate(data) must
+        be(Success(model))
     }
 
-    "JSON WRITES includes the Date Formed" in {
-      YourTradingPremises.jsonWritesYourTradingPremises.writes(yourTradingPremises) must be(jsonReadsOrWritesMongo)
+    "Correctly write from model to form" in {
+
+      implicitly[Write[YourTradingPremises, UrlFormEncoded]].writes(model) must
+        be(data)
     }
 
-    val urlFormEncodedYourTradingPremises = Map(
-      "tradingName" -> Seq("Test Business Name"),
-      "addressLine1" -> Seq("test Address Line 1"),
-      "addressLine2" -> Seq("test Address Line 2"),
-      "addressLine3" -> Seq("test Address Line 3"),
-      "addressLine4" -> Seq("test Address Line 4"),
-      "postcode" -> Seq("AA67 HJU"),
-      "country" -> Seq("UK"),
-      "premiseOwner" -> Seq("false"),
-      "yyyy" -> Seq("2015"),
-      "mm" -> Seq("08"),
-      "dd" -> Seq("15"),
-      "isResidential" -> Seq("true"))
+    "Correctly serialise from json" in {
 
-
-    "FORM RULE validates the Fields FROM the Form" in {
-      YourTradingPremises.formRuleYourTradingPremises.validate(urlFormEncodedYourTradingPremises) must be(Success(yourTradingPremises))
+      implicitly[Reads[YourTradingPremises]].reads(json) must
+        be(JsSuccess(model))
     }
 
-    "FORM WRITE populates all the Fields TO the Form" in {
-      YourTradingPremises.formWriteYourTradingPremises.writes(yourTradingPremises) must be(urlFormEncodedYourTradingPremises)
-    }
+    "Correctly write form model to json" in {
 
-  }
-
-  "JSON and HMRCLocalDate serialisation" must {
-
-    "HMRCLocalDate serialisation" must {
-
-      "JSON READ convert to Domain" in {
-        val jsonLocalDate: JsObject = Json.obj("startOfTradingDate" -> "2015-08-15")
-        HMRCLocalDate.jsonReadsHMRCLocalDate.reads(jsonLocalDate) must be(JsSuccess(HMRCLocalDate("2015", "08", "15"), JsPath \ "startOfTradingDate"))
-      }
-
-      "JSON WRITE the LocalDate to JSON String" in {
-        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
-        HMRCLocalDate.jsonWritesHMRCLocalDate.writes(hmrcLocalDate) must be(Json.obj("startOfTradingDate" -> "2015-08-15"))
-      }
-
-      "FORM RULE validate the input and create the Domain" in {
-        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
-        val urlFormEncoded = Map(
-          "yyyy" -> Seq("2015"),
-          "mm" -> Seq("08"),
-          "dd" -> Seq("15")
-        )
-        HMRCLocalDate.formRuleHMRCLocalDate.validate(urlFormEncoded) must be(Success(hmrcLocalDate))
-      }
-
-      "FORM WRITE to create the FORM from the Domain" in {
-        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
-
-        val urlFormEncoded = Map(
-          "yyyy" -> Seq("2015"),
-          "mm" -> Seq("08"),
-          "dd" -> Seq("15")
-        )
-        HMRCLocalDate.formWriteHMRCLocalDate.writes(hmrcLocalDate) must be(urlFormEncoded)
-      }
-    }
-
-    "FORM and HMRCLocalDate conversion. Must successfully" must {
-
-      "FORM RULE String and convert to LocalDate" in {
-        val formDateField = Map(
-          "yyyy" -> Seq("2015"),
-          "mm" -> Seq("08"),
-          "dd" -> Seq("15")
-        )
-        HMRCLocalDate.formRuleHMRCLocalDate.validate(formDateField) must be(Success(HMRCLocalDate("2015", "08", "15")))
-      }
-
-      "FORM WRITE the LocalDate to Form" in {
-        val hmrcLocalDate = HMRCLocalDate("2015", "08", "15")
-        HMRCLocalDate.formWriteHMRCLocalDate.writes(hmrcLocalDate) must be(Map(
-          "yyyy" -> Seq("2015"),
-          "mm" -> Seq("08"),
-          "dd" -> Seq("15")
-        ))
-      }
-
-    }
-  }
-
-
-  "premiseOwner serialisation" must {
-
-    "JSON READ Yes correctly from JSON" in {
-      val input = Json.obj("premiseOwner" -> true)
-      PremiseOwner.jsonReadsPremiseOwner.reads(input) must be(JsSuccess(PremiseOwnerSelf, JsPath \ "premiseOwner"))
-    }
-
-    "JSON WRITE No as false" in {
-      PremiseOwner.jsonWritesPremiseOwner.writes(PremiseOwnerAnother) must be(Json.obj("premiseOwner" -> false))
-    }
-
-    "FORM RULE validate and create the Domain" in {
-      val urlFormEncoded = Map(
-        "premiseOwner" -> Seq("true")
-      )
-      PremiseOwner.formRulePremiseOwner.validate(urlFormEncoded) must be(Success(PremiseOwnerSelf))
-    }
-
-    "FORM WRITE create the Form Field" in {
-      val urlFormEncoded = Map("" +
-        "premiseOwner" -> Seq("false")
-      )
-      PremiseOwner.formWritePremiseOwner.writes(PremiseOwnerAnother) must be(urlFormEncoded)
-    }
-  }
-
-  "IsResidential serialisation" must {
-
-    "JSON READ Yes correctly from JSON" in {
-      val input = Json.obj("isResidential" -> true)
-      IsResidential.jsonReadsIsResidential.reads(input) must be(JsSuccess(ResidentialYes, JsPath \ "isResidential"))
-    }
-
-    "JSON WRITE No as false" in {
-      IsResidential.jsonWritesIsResidential.writes(ResidentialNo) must be(Json.obj("isResidential" -> false))
-    }
-
-    "FORM RULE validate and create the Domain" in {
-      val urlFormEncoded = Map(
-        "isResidential" -> Seq("true")
-      )
-      IsResidential.formRuleIsResidential.validate(urlFormEncoded) must be(Success(ResidentialYes))
-    }
-
-    "FORM WRITE create the Form Field" in {
-      val urlFormEncoded = Map("" +
-        "isResidential" -> Seq("false")
-      )
-      IsResidential.formWriteIsResidential.writes(ResidentialNo) must be(urlFormEncoded)
+      implicitly[Writes[YourTradingPremises]].writes(model) must
+        be(json)
     }
   }
 }

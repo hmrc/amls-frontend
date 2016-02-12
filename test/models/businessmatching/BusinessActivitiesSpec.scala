@@ -57,6 +57,11 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
         be(Map("businessActivities" -> Seq("01")))
     }
 
+    "get the value for each activity type" in {
+      val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices))
+      ba.getValue(EstateAgentBusinessService) must be ("03")
+    }
+
     "JSON validation" must {
 
       "successfully validate given an enum value" in {
