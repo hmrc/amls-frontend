@@ -4,7 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.tradingpremises.{YourAgent, TradingPremises}
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -28,9 +30,20 @@ trait YourAgentController extends BaseController {
           Future.successful(BadRequest(views.html.who_is_your_agent(f, edit)))
         case ValidForm(_, data) =>
           for {
-            tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourAgent(data))
-          } yield  Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get())
+            //Cant have 2 calls to dataCacheConnector so we get data for all the Keys.
+            models <- dataCacheConnector.fetchAll map { _.getOrElse(CacheMap("", Map.empty))}
+            tradingPremises = models.getEntry[TradingPremises](TradingPremises.key).getOrElse(TradingPremises())
+            _ <- { dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourAgent(data))}}
+            yield {
+              models.getEntry[BusinessMatching](BusinessMatching.key) match {
+                case Some(BusinessMatching(Some(data))) => {
+                  if (data.businessActivities.size == 1)
+                    Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get())
+                  else Redirect(controllers.tradingpremises.routes.TradingActivitiesController.get())
+                }
+                case None => Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get())
+            }
+          }
       }
     }
   }

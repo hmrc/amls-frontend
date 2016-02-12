@@ -33,6 +33,10 @@ trait DataCacheConnector {
     }
   }
 
+  def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] = {
+    shortLivedCache.fetch(authContext.user.oid)
+  }
+
   def fetchAll(key: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
     shortLivedCache.fetch(key)
   }
