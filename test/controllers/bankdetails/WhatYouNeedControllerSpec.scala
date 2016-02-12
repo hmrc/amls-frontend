@@ -32,7 +32,6 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("button.continue"))
-      //  contentAsString(result) must include("/anti-money-laundering/trading-premises/premises")
     }
   }
 
