@@ -12,6 +12,9 @@ case class TradingPremises(
 
   def yourTradingPremises(v: YourTradingPremises): TradingPremises =
     this.copy(yourTradingPremises = Some(v))
+
+  def whatDoesYourBusinessDoAtThisAddress(v: WhatDoesYourBusinessDo): TradingPremises =
+    this.copy(whatDoesYourBusinessDoAtThisAddress = Some(v))
 }
 
 object TradingPremises {

@@ -72,10 +72,10 @@ object CorrespondenceAddress {
         case false => (
             (__ \ "yourName").read(nameType) ~
             (__ \ "businessName").read(nameType) ~
-            (__ \ "addressLine1").read(addressType) ~
-            (__ \ "addressLine2").read(addressType) ~
-            (__ \ "addressLine3").read(optionR(addressType)) ~
-            (__ \ "addressLine4").read(optionR(addressType)) ~
+            (__ \ "addressLineNonUK1").read(addressType) ~
+            (__ \ "addressLineNonUK2").read(addressType) ~
+            (__ \ "addressLineNonUK3").read(optionR(addressType)) ~
+            (__ \ "addressLineNonUK4").read(optionR(addressType)) ~
             (__ \ "country").read(countryType)
           )(NonUKCorrespondenceAddress.apply _)
       }
@@ -98,10 +98,10 @@ object CorrespondenceAddress {
         "isUK" -> Seq("false"),
         "yourName" -> Seq(a.yourName),
         "businessName" -> Seq(a.businessName),
-        "addressLine1" -> Seq(a.addressLineNonUK1),
-        "addressLine2" -> Seq(a.addressLineNonUK2),
-        "addressLine3" -> a.addressLineNonUK3.toSeq,
-        "addressLine4" -> a.addressLineNonUK4.toSeq,
+        "addressLineNonUK1" -> Seq(a.addressLineNonUK1),
+        "addressLineNonUK2" -> Seq(a.addressLineNonUK2),
+        "addressLineNonUK3" -> a.addressLineNonUK3.toSeq,
+        "addressLineNonUK4" -> a.addressLineNonUK4.toSeq,
         "country" -> Seq(a.country)
       )
   }

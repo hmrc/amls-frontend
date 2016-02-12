@@ -26,6 +26,7 @@ button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Edit
 button.continue=Continue
+button.returntosummary = Return to Summary
 
 lbl.other = Other
 lbl.yes = Yes
@@ -68,7 +69,15 @@ summary.declarationlocked.title = You can’t complete this section yet
 summary.businessmatching=Business Matching
 
 summary.checkyouranswers.title = Check your answers
+summary.checkyouranswers.businesspremises.title = Your business'' premises
+summary.checkyouranswers.businesspremises.section1 = Premises
+summary.checkyouranswers.businesspremises.section2 = Trading activities
+summary.checkyouranswers.agentspremises.title = Your agents'' premises
+summary.checkyouranswers.agentspremises.section1 = Premises
+summary.checkyouranswers.agentspremises.section2 = Trading activities
+summary.checkyouranswers.agentspremises.section3 = Agents'' details
 button.summary.acceptandcomplete = Accept and complete section
+summary.linetext = Please check all the information you have provided.
 
 
 aboutyou.yourdetails.title = What is your name?
