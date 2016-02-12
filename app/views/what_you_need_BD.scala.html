@@ -1,0 +1,29 @@
+@import include._
+@()(implicit request: Request[_])
+
+@main(
+    title = Messages("bankdetails.whatyouneed.title")
+) {
+
+    @heading("bankdetails.whatyouneed.heading", "summary.bankdetails")
+
+    <div class="panel-indent">
+        <div class="notice">
+            <i class="icon icon-information">
+                <span class="visuallyhidden">Warning</span>
+            </i>
+            <span>@Messages("bankdetails.whatyouneed.paragraph1.text")</span>
+        </div>
+    </div>
+
+    <p class="form-field">@Messages("bankdetails.whatyouneed.requiredinfo.heading")</p>
+
+    <ul class="list-bullet form-group">
+        <li class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_1")</li>
+        <li  class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_2")</li>
+        <li  class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_3")</li>
+        <li  class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_4")</li>
+    </ul>
+
+    <div class="form-field"><a id="what-you-need-continue" class="button" href="@controllers.bankdetails.routes.WhatYouNeedController.get()">@Messages("button.continue")</a></div>
+}
