@@ -99,6 +99,18 @@ form .date .form-group input[type=text] {
     width : 90%;
 }
 
+/* icons */
+.notice .icon {
+    width: 27px;
+    height: 27px;
+    margin-right: 10px;
+}
+.notice * {
+    display: inline-block;
+    line-height: 35px;
+    vertical-align: middle;
+}
+
 
 .touchevents .date-of-birth {
     display:block;
