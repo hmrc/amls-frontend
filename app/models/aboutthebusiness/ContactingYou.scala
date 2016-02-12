@@ -6,8 +6,7 @@ import play.api.libs.json.Json
 
 case class ContactingYou(
                           phoneNumber: String,
-                          email: String,
-                          website: Option[String]
+                          email: String
                         )
 
 object ContactingYou {
@@ -15,8 +14,7 @@ object ContactingYou {
   implicit def convert(c: ContactingYouForm): ContactingYou =
     ContactingYou(
       phoneNumber = c.phoneNumber,
-      email = c.email,
-      website = c.website
+      email = c.email
     )
 
   implicit val formats = Json.format[ContactingYou]
@@ -26,8 +24,7 @@ object ContactingYou {
     import play.api.libs.functional.syntax.unlift
     (
       (__ \ "phoneNumber").write[String] and
-        (__ \ "email").write[String] and
-        (__ \ "website").write[Option[String]]
+        (__ \ "email").write[String]
       ) (unlift(ContactingYou.unapply _))
   }
 }
@@ -35,7 +32,6 @@ object ContactingYou {
 case class ContactingYouForm(
                               phoneNumber: String,
                               email: String,
-                              website: Option[String],
                               letterToThisAddress: Boolean
                             )
 
@@ -50,7 +46,6 @@ object ContactingYouForm {
       (
         (__ \ "phoneNumber").read(phoneNumberType) and
           (__ \ "email").read(emailType) and
-          (__ \ "website").read(optionR(emailType)) and
           (__ \ "letterToThisAddress").read[Boolean]
         )(ContactingYouForm.apply _)
     }
