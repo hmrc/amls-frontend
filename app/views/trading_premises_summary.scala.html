@@ -31,8 +31,8 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    @{ytp.premiseOwner match { case PremiseOwnerSelf => "Own"
-                                                case _ => "Agent's"
+                    @{ytp.isOwner match { case true => "Own"
+                                            case _ => "Agent's"
                     }}
                 </td>
             </tr>

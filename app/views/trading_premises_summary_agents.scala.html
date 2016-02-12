@@ -31,14 +31,14 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    @{ytp.isResidential match { case ResidentialYes => "Residential"
+                    @{ytp.isResidential match { case true => "Residential"
                     case _ => "Non-Residential"}}
                     <br>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    Trading start date of @{ytp.startOfTradingDate}
+                    Trading start date of @{ytp.startDate}
                     <br>
                 </td>
             </tr>
