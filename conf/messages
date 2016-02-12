@@ -219,8 +219,6 @@ estateagentbusiness.registered.redress.title = Is this business registered with 
 estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agent business and its customers.
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
-
-
 businessmatching.registerservices.title=Business Matching - What do you need to register?
 businessmatching.registerservices.heading=What do you need to register?
 businessmatching.registerservices.text=Select all that apply
@@ -231,3 +229,12 @@ businessmatching.registerservices.servicename.lbl.04=High value dealing
 businessmatching.registerservices.servicename.lbl.05=Money service business
 businessmatching.registerservices.servicename.lbl.06=Trust and company services
 businessmatching.registerservices.servicename.lbl.07=Telephone, digital and IT payment services
+
+bankdetails.whatyouneed.title = Bank details - What you need
+bankdetails.whatyouneed.heading = What you need
+bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn''t the place to pay registration fees.
+bankdetails.whatyouneed.requiredinfo.heading= For each bank account used by the business, you''ll need:
+bankdetails.whatyouneed.line_1 = the account name
+bankdetails.whatyouneed.line_2 = the account number
+bankdetails.whatyouneed.line_3 = if it''s a UK or overseas account
+bankdetails.whatyouneed.line_4 = whose account it is
