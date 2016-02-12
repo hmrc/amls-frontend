@@ -1,7 +1,9 @@
 package models.tradingpremises
 
+import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.data.mapping.Success
+import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.mapping.{Write, Rule, Success}
 import play.api.libs.json._
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers {
