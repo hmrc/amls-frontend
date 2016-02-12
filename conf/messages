@@ -37,6 +37,10 @@ lbl.middle_name  = Middle name (optional)
 lbl.last_name = Last name
 lbl.pleasespecify = Please specify
 lbl.na = Not applicable
+lbl.day = Day
+lbl.month = Month
+lbl.year = Year
+lbl.date.example = For example, 31 3 2017
 
 lbl.uk = UK
 lbl.overseas = Overseas
@@ -66,6 +70,7 @@ summary.aboutyou = About you
 summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
+summary.businessmatching=Business Matching
 
 summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises
@@ -105,18 +110,18 @@ aboutthebusiness.contactingyou.businessaddress = Business address:
 aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
 aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
 
-aboutthebusiness.correspondenceaddress.title = What is your postal address?
+aboutthebusiness.correspondenceaddress.title = What''s your postal address?
 aboutthebusiness.correspondenceaddress.p = We will send letters relating to anti-money laundering supervision to this address
 aboutthebusiness.correspondenceaddress.yourName = Your name
 aboutthebusiness.correspondenceaddress.businessName = Business name
-aboutthebusiness.correspondenceaddress.ukAddress = This is a UK address
-aboutthebusiness.correspondenceaddress.nonUkAddress = This is an overseas address
+aboutthebusiness.correspondenceaddress.ukAddress = UK
+aboutthebusiness.correspondenceaddress.nonUkAddress = Overseas
 aboutthebusiness.correspondenceaddress.address = Address
 aboutthebusiness.correspondenceaddress.postCode = Postcode
 aboutthebusiness.correspondenceaddress.country = Country
 
-aboutthebusiness.registeredformlr.title = Has this business been registered with HMRC before?
-aboutthebusiness.registeredformlr.lbl = This only refers to registration for anti-money laundering supervision with HMRC.
+aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision?
+aboutthebusiness.registeredformlr.lbl = This only refers to registration with HMRC
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulation registration number
 
 aboutthebusiness.confirmingyouraddress.title = Is this your registered office or main place of business?
@@ -130,7 +135,7 @@ summary.tradingpremises=Trading premises
 tradingpremises.whatyouneed.title=Trading premises - What you need
 tradingpremises.whatyouneed.heading=What you need
 tradingpremises.whatyouneed.paragraph1.text=We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
-tradingpremises.whatyouneed.requiredinfo.heading=For each of your trading premises, you'll need:
+tradingpremises.whatyouneed.requiredinfo.heading=For each of your trading premises, you''ll need:
 tradingpremises.whatyouneed.requiredinfo.text.1=your trading name
 tradingpremises.whatyouneed.requiredinfo.text.2=your trading address
 tradingpremises.whatyouneed.requiredinfo.text.3=whose premises they are
@@ -159,12 +164,16 @@ tradingpremises.youragent.businessstructure.lbl.03=Partnership
 tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
 tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
 
+
+tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
+tradingpremises.whatdoesyourbusinessdo.linetext = Select all that apply
+
+
 tradingpremises.yourtradingpremises.title=Trading premises - Where are your trading premises?
 tradingpremises.yourtradingpremises.heading=Where are your trading premises?
 tradingpremises.yourtradingpremises.include.heading=Include:
 tradingpremises.yourtradingpremises.include.text.1=your own business premises
 tradingpremises.yourtradingpremises.include.text.2=other businesses'' premises, if you have a contractual agreement for them to act as your agents and offer your services
-
 tradingpremises.yourtradingpremises.tradingname=Trading name
 tradingpremises.yourtradingpremises.address=Address
 tradingpremises.yourtradingpremises.postcode=Postcode
@@ -174,11 +183,8 @@ tradingpremises.yourtradingpremises.whose.my=My business'' premises
 tradingpremises.yourtradingpremises.whose.another=Another business'' premises
 tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
-tradingpremises.yourtradingpremises.startdate.example=For example, 31 3 2017
-tradingpremises.yourtradingpremises.startdate.day=Day
-tradingpremises.yourtradingpremises.startdate.month=Month
-tradingpremises.yourtradingpremises.startdate.year=Year
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
+
 
 
 estateagentbusiness.whatyouneed.title = Estate agent business - What you need
@@ -204,3 +210,38 @@ estateagentbusiness.penalisedbyprofessional.line_2 = a warning
 estateagentbusiness.penalisedbyprofessional.line_3 = suspension
 estateagentbusiness.penalisedbyprofessional.line_4 = expulsion
 estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Please provide details
+
+estateagentbusiness.servicess.title = Which services does your business provide?
+estateagentbusiness.service.lbl.01 = Residential estate agent services
+estateagentbusiness.service.lbl.02 = Commercial estate agent services
+estateagentbusiness.service.lbl.03 = Auctioneering
+estateagentbusiness.service.lbl.04 = Relocation agent services
+estateagentbusiness.service.lbl.05 = Business transfer agent services
+estateagentbusiness.service.lbl.06 = Asset management
+estateagentbusiness.service.lbl.07 = Land management
+estateagentbusiness.service.lbl.08 = Development company services
+estateagentbusiness.service.lbl.09 = Social housing provision
+estateagentbusiness.select.all = Select all that apply
+
+estateagentbusiness.redress.lbl = Redress scheme:
+estateagentbusiness.redress.lbl.01 = The Property Ombudsman Limited
+estateagentbusiness.redress.lbl.02 = Ombudsman Services
+estateagentbusiness.redress.lbl.03 = Property Redress Scheme
+estateagentbusiness.redress.lbl.04 = Other
+
+estateagentbusiness.registered.redress.title = Is this business registered with a redress scheme?
+estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agent business and its customers.
+estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
+
+
+
+businessmatching.registerservices.title=Business Matching - What do you need to register?
+businessmatching.registerservices.heading=What do you need to register?
+businessmatching.registerservices.text=Select all that apply
+businessmatching.registerservices.servicename.lbl.01=Accountancy services
+businessmatching.registerservices.servicename.lbl.02=Bill payment services
+businessmatching.registerservices.servicename.lbl.03=Estate agent business
+businessmatching.registerservices.servicename.lbl.04=High value dealing
+businessmatching.registerservices.servicename.lbl.05=Money service business
+businessmatching.registerservices.servicename.lbl.06=Trust and company services
+businessmatching.registerservices.servicename.lbl.07=Telephone, digital and IT payment services

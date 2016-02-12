@@ -47,7 +47,6 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on get() display the who is your agent page with pre populated data" in new Fixture {
 
-
       when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremises1)))
 

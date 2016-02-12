@@ -65,7 +65,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
     "return data for a field when given a path" in new Fixture {
 
       Form2[Foobar](model).apply(Path \ "s") must
-        be(ValidField(Path \ "s", Some("foo")))
+        be(ValidField(Path \ "s", Seq("foo")))
     }
   }
 
