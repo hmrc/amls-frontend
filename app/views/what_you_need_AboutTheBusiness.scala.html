@@ -1,0 +1,23 @@
+@import include._
+@()(implicit request: Request[_])
+@main(
+    title = Messages("aboutthebusiness.whatyouneed.title")
+) {
+
+    @heading("aboutthebusiness.whatyouneed.heading", "aboutthebusiness.sectiontitle")
+
+    <div class="form-field">
+        <span class="panel-indent">@Messages("aboutthebusiness.whatyouneed.subheading")</span>
+    </div>
+
+
+        <ul class="list-bullet form-group">
+            <li class="no-padding no-margin" >@Messages("aboutthebusiness.whatyouneed.line_1")</li>
+            <li class="no-padding no-margin" >@Messages("aboutthebusiness.whatyouneed.line_2")</li>
+            <li class="no-padding no-margin" >@Messages("aboutthebusiness.whatyouneed.line_3")</li>
+            <li class="no-padding no-margin" >@Messages("aboutthebusiness.whatyouneed.line_4")</li>
+        </ul>
+
+        <div class="form-field"><a class="button" href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get()">@Messages("button.continue")</a></div>
+
+    }
