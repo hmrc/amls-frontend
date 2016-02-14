@@ -31,8 +31,8 @@ trait BankAccountTypeController extends BaseController {
               bankDetails.bankAccountType(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.WhatYouNeedController.get())
+            case true => Redirect(routes.BankAccountTypeController.get())
+            case false => Redirect(routes.BankAccountTypeController.get())
           }
       }
     }

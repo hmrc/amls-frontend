@@ -12,12 +12,11 @@ case object BelongsToBusiness extends BankAccountType
 case object BelongsToOtherBusiness extends BankAccountType
 case object NoBankAccount extends BankAccountType
 
-
 object BankAccountType {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val formRead:Rule[UrlFormEncoded, BankAccountType] = From[UrlFormEncoded] { __ =>
+  implicit val formReads:Rule[UrlFormEncoded, BankAccountType] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     (__ \ "bankAccountType").read[String] flatMap {
       case "01" => PersonalAccount
@@ -29,16 +28,16 @@ object BankAccountType {
     }
   }
 
-  implicit val formWrite:Write[BankAccountType, UrlFormEncoded] = Write {
+  implicit val formWrites:Write[BankAccountType, UrlFormEncoded] = Write {
     case PersonalAccount => "bankAccountType" -> "01"
     case BelongsToBusiness => "bankAccountType" -> "02"
     case BelongsToOtherBusiness => "bankAccountType" -> "03"
     case NoBankAccount => "bankAccountType" -> "04"
   }
 
-  implicit val jsonRead = {
+  implicit val jsonReads : Reads[BankAccountType] = {
     import play.api.libs.json.Reads.StringReads
-    (__ \ "bankAccountType").read[String] flatMap[BankAccountType] {
+    (__ \ "bankAccountType").read[String] flatMap {
       case "01" => PersonalAccount
       case "02" => BelongsToBusiness
       case "03" => BelongsToOtherBusiness
@@ -48,7 +47,7 @@ object BankAccountType {
     }
   }
 
-  implicit val jsonWrite = Writes[BankAccountType] {
+  implicit val jsonWrites = Writes[BankAccountType] {
     case PersonalAccount => Json.obj("bankAccountType"->"01")
     case BelongsToBusiness => Json.obj("bankAccountType" -> "02")
     case BelongsToOtherBusiness => Json.obj("bankAccountType" -> "03")
