@@ -20,10 +20,10 @@ case class UKAccount(
                        sortCode: String
                      ) extends Account
 
-sealed trait NonUKAccount
+sealed trait NonUKAccount extends Account
 
-case class AccountNumber(accountNumber: String) extends NonUKAccount with Account
-case class IBANNumber(IBANNumber: String) extends NonUKAccount with Account
+case class AccountNumber(accountNumber: String) extends NonUKAccount
+case class IBANNumber(IBANNumber: String) extends NonUKAccount
 
 object BankAccount {
 
@@ -51,12 +51,11 @@ object BankAccount {
             (__ \ "sortCode").read(addressType)
           ) (UKAccount.apply _)
       case false =>
-        (__ \ "accountNumber").read[String] flatMap { x =>
-          if (x.isEmpty) {
+        (__ \ "accountNumber").read[String] flatMap {
+          case "" =>
             (__ \ "IBANNumber").read(addressType) fmap IBANNumber.apply
-          } else {
+          case _ =>
             (__ \ "accountNumber").read(addressType) fmap AccountNumber.apply
-          }
         }
     }
   }
