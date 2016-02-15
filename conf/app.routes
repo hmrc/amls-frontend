@@ -37,8 +37,8 @@ POST        /business-details/correspondence-address   controllers.aboutthebusin
 
 GET         /business-details/summary                  controllers.aboutthebusiness.SummaryController.get()
 
+
 GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
-#GET        /trading-premises/premises                 controllers.tradingpremises.YourTradingPremisesController.get()
 
 GET         /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.get(edit: Boolean ?= false)
 POST        /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.post(edit: Boolean ?= false)
@@ -49,15 +49,16 @@ POST        /trading-premises/agent                    controllers.tradingpremis
 GET         /trading-premises/activities               controllers.tradingpremises.TradingActivitiesController.get(edit: Boolean ?= false)
 POST        /trading-premises/activities               controllers.tradingpremises.TradingActivitiesController.post(edit: Boolean ?= false)
 
+GET         /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.get()
+POST        /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.post()
+
 GET         /trading-premises/summary                  controllers.tradingpremises.SummaryController.get()
 GET         /trading-premises/summary-own              controllers.tradingpremises.OwnSummaryController.get()
 GET         /trading-premises/summary-agent            controllers.tradingpremises.AgentSummaryController.get()
 
-GET         /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.get()
-POST        /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.post()
-
 
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
+
 GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
