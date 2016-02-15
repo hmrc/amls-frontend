@@ -18,7 +18,7 @@ trait BankAccountUtilController extends BaseController {
         _.fold(Seq.empty[BankDetails]){identity} }
   }
 
-  def getBankDetail(index:Int)(implicit user: AuthContext, hc: HeaderCarrier):Future[Option[BankDetails]] ={
+  def getBankDetails(index:Int)(implicit user: AuthContext, hc: HeaderCarrier):Future[Option[BankDetails]] ={
     getBankDetails map {
       case accounts if index > 0 && index <= accounts.length + 1 =>accounts lift (index - 1)
       case _ => None

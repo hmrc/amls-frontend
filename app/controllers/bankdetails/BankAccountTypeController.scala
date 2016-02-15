@@ -16,7 +16,7 @@ trait BankAccountTypeController extends BankAccountUtilController {
 
   def get(index:Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      getBankDetail(index) map {
+      getBankDetails(index) map {
         case Some(BankDetails(Some(data), _)) => Ok(views.html.bank_account_types(Form2[BankAccountType](data), edit, index))
         case _ => Ok(views.html.bank_account_types(EmptyForm, edit, index))
       }
@@ -27,10 +27,13 @@ trait BankAccountTypeController extends BankAccountUtilController {
       Form2[BankAccountType](request.body) match {
         case f: InvalidForm => Future.successful(BadRequest(views.html.bank_account_types(f, edit, index)))
         case ValidForm(_, data) => {
-          updateBankDetails(index, BankDetails(Some(data), None))
-          data match {
-            case NoBankAccount => Future.successful(Redirect(routes.WhatYouNeedController.get()))
-            case _ => Future.successful(Redirect(routes.BankAccountTypeController.get()))
+          for {
+            result <- updateBankDetails(index, BankDetails(Some(data), None))
+          } yield {
+            data match {
+              case NoBankAccount => Redirect(routes.WhatYouNeedController.get())
+              case _ => Redirect(routes.BankAccountTypeController.get())
+            }
           }
         }
       }
