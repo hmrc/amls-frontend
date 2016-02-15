@@ -38,10 +38,10 @@ trait YourAgentController extends BaseController {
               models.getEntry[BusinessMatching](BusinessMatching.key) match {
                 case Some(BusinessMatching(Some(data))) => {
                   if (data.businessActivities.size == 1)
-                    Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get())
-                  else Redirect(controllers.tradingpremises.routes.TradingActivitiesController.get())
+                    Redirect(controllers.tradingpremises.routes.SummaryController.get())
+                  else Redirect(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get())
                 }
-                case None => Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get())
+                case None => Redirect(controllers.tradingpremises.routes.SummaryController.get())
             }
           }
       }

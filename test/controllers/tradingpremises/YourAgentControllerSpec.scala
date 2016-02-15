@@ -12,6 +12,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -67,15 +70,14 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "agentsBusinessStructure" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithData)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext])).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -103,15 +105,14 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "agentsBusinessStructure" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithData)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext])).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
     }
   }
 }

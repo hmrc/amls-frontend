@@ -44,28 +44,21 @@
             </tr>
         </table>
         }
-
+    @model.whatDoesYourBusinessDoAtThisAddress.map { ba=>
     <table>
         <tr>
             <th class="summary-title">@Messages("summary.checkyouranswers.agentspremises.section2")</th>
-            <td><a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("button.edit")</a></td>
+            <td><a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get()">@Messages("button.edit")</a></td>
         </tr>
+        @ba.activities.map{ line =>
         <tr>
             <td colspan="2">
-                <br>
-            </td>
-        <tr>
-            <td colspan="2">
-                <br>
+                @line
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                <br>
-            </td>
-        </tr>
-        </tr>
+        }
     </table>
+    }
 
     @model.yourAgent.map { agent=>
     <table>
