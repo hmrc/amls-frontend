@@ -3,7 +3,7 @@ package controllers.bankdetails
 import connectors.DataCacheConnector
 import controllers.aboutyou.RoleWithinBusinessController
 import models.aboutyou.{BeneficialShareholder, AboutYou, RoleWithinBusiness}
-import models.bankdetails.{PersonalAccount, BankDetails, BankAccountType}
+import models.bankdetails.{NoBankAccount, PersonalAccount, BankDetails, BankAccountType}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -32,7 +32,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
 
     "on get display kind of bank account page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BankAccountType](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -42,14 +42,14 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
 
     "on get display kind of bank account page with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BankDetails](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BankDetails(Some(PersonalAccount), None))))
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(NoBankAccount), None)))))
 
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
+      document.select("input[value=04]").hasAttr("checked") must be(true)
     }
 
     "on post with valid data" in new Fixture {
@@ -58,10 +58,10 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
         "bankAccountType" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BankDetails](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BankDetails](any(), any())
+      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
@@ -72,18 +72,18 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "bankAccountType" -> "01"
+        "bankAccountType" -> "04"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BankDetails](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BankDetails](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(NoBankAccount), None)))))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BankAccountTypeController.get().url))
+      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -92,10 +92,10 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
         "bankAccountType" -> "10"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BankDetails](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BankDetails](any(), any())
+      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)

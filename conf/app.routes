@@ -71,6 +71,6 @@ GET         /bank-details/index                        controllers.bankdetails.W
 
 GET         /about-the-business/index                   controllers.aboutthebusiness.WhatYouNeedController.get()
 
-GET         /bank-details/accounts                      controllers.bankdetails.BankAccountTypeController.get(edit: Boolean ?= false)
-POST        /bank-details/accounts                      controllers.bankdetails.BankAccountTypeController.post(edit: Boolean ?= false)
+GET         /bank-details/accounts                      controllers.bankdetails.BankAccountTypeController.get(index:Int ?= 0, edit: Boolean ?= false)
+POST        /bank-details/accounts                      controllers.bankdetails.BankAccountTypeController.post(index:Int ?= 0, edit: Boolean ?= false)
 
