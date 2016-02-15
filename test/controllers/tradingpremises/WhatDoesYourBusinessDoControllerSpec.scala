@@ -133,11 +133,6 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
 
     "Post is called" when {
       "Data is valid" when {
-        "in edit mode" must {
-          "Save the data" in Pending
-        }
-
-        "not in edit mode" must {
           "Save the data" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "activities[]" -> "02",
@@ -160,11 +155,26 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
 
             verify(controller.dataCacheConnector).saveDataShortLivedCache(Matchers.eq(TradingPremises.key), Matchers.eq(expected))(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]])
           }
-        }
       }
 
       "Data is invalid" must {
-        "Not save the data" in Pending
+        "reject the data" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "activities[]" -> "98",
+            "activities[]" -> "04"
+          )
+
+          when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
+            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithTwoBusinessActivities)))
+          when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
+            (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithAgentSet)))
+
+          when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+        }
       }
     }
   }
