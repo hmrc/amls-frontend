@@ -16,7 +16,7 @@ trait WhereAreTradingPremisesController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
-        case Some(TradingPremises(Some(data), _)) =>
+        case Some(TradingPremises(Some(data), _, _)) =>
           Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit))
         case _ =>
           Ok(views.html.where_are_trading_premises(EmptyForm, edit))
@@ -33,7 +33,15 @@ trait WhereAreTradingPremisesController extends BaseController {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourTradingPremises(data))
 //            TODO: Redirect to summary in edit mode
-          } yield Redirect(routes.YourAgentController.get())
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false =>
+              if (data.isOwner) {
+                Redirect(routes.WhatDoesYourBusinessDoController.get(edit))
+              } else {
+                Redirect(routes.YourAgentController.get(edit))
+              }
+          }
       }
   }
 }

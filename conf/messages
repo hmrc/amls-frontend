@@ -26,6 +26,7 @@ button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Edit
 button.continue=Continue
+button.returntosummary = Return to Summary
 
 lbl.other = Other
 lbl.yes = Yes
@@ -72,7 +73,15 @@ summary.declarationlocked.title = You can’t complete this section yet
 summary.businessmatching=Business Matching
 
 summary.checkyouranswers.title = Check your answers
+summary.checkyouranswers.businesspremises.title = Your business'' premises
+summary.checkyouranswers.businesspremises.section1 = Premises
+summary.checkyouranswers.businesspremises.section2 = Trading activities
+summary.checkyouranswers.agentspremises.title = Your agents'' premises
+summary.checkyouranswers.agentspremises.section1 = Premises
+summary.checkyouranswers.agentspremises.section2 = Trading activities
+summary.checkyouranswers.agentspremises.section3 = Agents'' details
 button.summary.acceptandcomplete = Accept and complete section
+summary.linetext = Please check all the information you have provided.
 
 
 aboutyou.yourdetails.title = What is your name?
@@ -163,12 +172,16 @@ tradingpremises.youragent.businessstructure.lbl.03=Partnership
 tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
 tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
 
+
+tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
+tradingpremises.whatdoesyourbusinessdo.linetext = Select all that apply
+
+
 tradingpremises.yourtradingpremises.title=Trading premises - Where are your trading premises?
 tradingpremises.yourtradingpremises.heading=Where are your trading premises?
 tradingpremises.yourtradingpremises.include.heading=Include:
 tradingpremises.yourtradingpremises.include.text.1=your own business premises
 tradingpremises.yourtradingpremises.include.text.2=other businesses'' premises, if you have a contractual agreement for them to act as your agents and offer your services
-
 tradingpremises.yourtradingpremises.tradingname=Trading name
 tradingpremises.yourtradingpremises.address=Address
 tradingpremises.yourtradingpremises.postcode=Postcode
@@ -179,6 +192,7 @@ tradingpremises.yourtradingpremises.whose.another=Another business'' premises
 tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
+
 
 
 estateagentbusiness.whatyouneed.title = Estate agent business - What you need
