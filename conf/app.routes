@@ -53,6 +53,9 @@ GET         /trading-premises/summary                  controllers.tradingpremis
 GET         /trading-premises/summary-own              controllers.tradingpremises.OwnSummaryController.get()
 GET         /trading-premises/summary-agent            controllers.tradingpremises.AgentSummaryController.get()
 
+GET         /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.get()
+POST        /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.post()
+
 
 GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)

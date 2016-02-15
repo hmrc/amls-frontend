@@ -26,22 +26,20 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
       with MockitoSugar
       with ScalaFutures {
 
-//  val yourAgent1 = YourAgent(AgentsRegisteredName("ABC Corporation"), TaxTypeCorporationTax, SoleProprietor)
   val yourAgent2 = YourAgent(AgentsRegisteredName("PQR Corporation"), TaxTypeCorporationTax, SoleProprietor)
-//  val yourAgent3 = YourAgent(AgentsRegisteredName("XYZ Corporation"), TaxTypeCorporationTax, SoleProprietor)
 
   val whatDoesYourBusinessDoWithOneActivity = WhatDoesYourBusinessDo(Set(EstateAgentBusinessService))
   val tradingPremisesWithSingleBusinessActivity = TradingPremises(None, None, Some(whatDoesYourBusinessDoWithOneActivity) )
   val tradingPremisesWithAgentSet = TradingPremises(None, Some(yourAgent2))
 
   val activityData1:Set[BusinessActivity] = Set(EstateAgentBusinessService)
-//  val activityData2:Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
-//  val activityData3:Set[BusinessActivity] = Set(TrustAndCompanyServices, TelephonePaymentService)
+  val activityData2:Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
 
-  val businessActivities1 = BusinessActivities(activityData1)
-//  val businessActivities2 = BusinessActivities(activityData2)
+  val singleBusinessActivity = BusinessActivities(activityData1)
+  val twoBusinessActivities = BusinessActivities(activityData2)
 
-  val businessMatching1 = BusinessMatching(Some(businessActivities1))
+  val businessMatchingWithSingleBusinessActivity = BusinessMatching(Some(singleBusinessActivity))
+  val businessMatchingWithTwoBusinessActivities = BusinessMatching(Some(twoBusinessActivities))
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -58,7 +56,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
         "get is called" should {
           "redirect to check your answers page" in new Fixture {
             when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
             when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
               (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -66,12 +64,12 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result).getOrElse("FAILED") must endWith("trading-premises/summary")
+            redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
           }
 
           "Automatically write the appropriate value to dataCache" in new Fixture {
             when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
             when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
               (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -87,7 +85,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
         "get is called" should {
           "redirect to check your answers page" in new Fixture {
             when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
             when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
               (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithAgentSet)))
 
@@ -99,7 +97,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
 
           "Automatically write the appropriate value to dataCache" in new Fixture {
             when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
+              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
             when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
               (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithAgentSet)))
 
@@ -115,12 +113,59 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
 
       "The business engages in multiple activities" when {
         "get is called" should {
-          "display WhatDoesYourBusinessDo Page" in Pending
-          "include only the appropriate options in the list" in Pending
+          "include only the appropriate options in the list" in new Fixture {
+            when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
+              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithTwoBusinessActivities)))
+
+            val result = controller.get()(request)
+
+            status(result) must be(OK)
+
+            val document = Jsoup.parse(contentAsString(result))
+            document.title() must be ("What does your business do at these premises?")
+            val opts = document.select("input[type=checkbox]")
+            opts.size() must be (2)
+
+          }
         }
       }
     }
 
-    "Post is called" in Pending
+    "Post is called" when {
+      "Data is valid" when {
+        "in edit mode" must {
+          "Save the data" in Pending
+        }
+
+        "not in edit mode" must {
+          "Save the data" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "activities[]" -> "02",
+              "activities[]" -> "04"
+            )
+
+            when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithAgentSet)))
+
+            when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(None))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+
+            val expected = tradingPremisesWithAgentSet.whatDoesYourBusinessDoAtThisAddress(
+                  WhatDoesYourBusinessDo(Set(BillPaymentServices, HighValueDealing))
+            )
+
+            verify(controller.dataCacheConnector).saveDataShortLivedCache(Matchers.eq(TradingPremises.key), Matchers.eq(expected))(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]])
+          }
+        }
+      }
+
+      "Data is invalid" must {
+        "Not save the data" in Pending
+      }
+    }
   }
 }

@@ -79,7 +79,6 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
     }
 
     "on post with invalid data" in new Fixture {
-
       val agentName = "XYZ"
       val newRequest = request.withFormUrlEncodedBody(
         "agentsRegisteredName" -> agentName,
@@ -91,8 +90,6 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-
-
     }
 
     // to be valid after summary edit page is ready
