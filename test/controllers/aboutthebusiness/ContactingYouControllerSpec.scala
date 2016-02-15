@@ -3,7 +3,7 @@ package controllers.aboutthebusiness
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{RegisteredOfficeUK, AboutTheBusiness, ContactingYou}
+import models.aboutthebusiness.{AboutTheBusiness, ContactingYou, RegisteredOfficeUK}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
-  val contactingYou = Some(ContactingYou("1234567890", "test@test.com", Some("http://mywebsite.co.uk")))
+  val contactingYou = Some(ContactingYou("1234567890", "test@test.com"))
   val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
   val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou, registeredOffice = Some(ukAddress))
 
@@ -51,7 +51,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
       "load the page with the pre populated data" in new Fixture {
 
         when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
         status(result) must be(OK)

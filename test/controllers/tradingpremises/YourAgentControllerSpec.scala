@@ -12,6 +12,8 @@ import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -71,14 +73,15 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         TradingPremises.key -> Json.toJson(tradingPremisesWithData)
       ))
 
-      when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext])).thenReturn(Future.successful(Some(cacheMap)))
+
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -117,7 +120,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
     }
 
 
@@ -143,7 +146,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
     }
 
 
@@ -173,7 +176,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.TradingActivitiesController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get().url))
     }
   }
 }
