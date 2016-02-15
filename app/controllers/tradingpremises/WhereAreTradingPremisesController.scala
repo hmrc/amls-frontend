@@ -33,7 +33,15 @@ trait WhereAreTradingPremisesController extends BaseController {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourTradingPremises(data))
 //            TODO: Redirect to summary in edit mode
-          } yield Redirect(routes.YourAgentController.get())
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false =>
+              if (data.isOwner) {
+                Redirect(routes.WhatDoesYourBusinessDoController.get(edit))
+              } else {
+                Redirect(routes.YourAgentController.get(edit))
+              }
+          }
       }
   }
 }
