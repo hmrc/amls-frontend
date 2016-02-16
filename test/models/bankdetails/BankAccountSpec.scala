@@ -8,7 +8,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
   "BankAccount" must {
 
-    "validate form successfully" in {
+    "validate form successfully for UKAccount" in {
       val model = Map (
         "accountName" -> Seq("test"),
         "isUK" -> Seq("true"),
@@ -16,10 +16,10 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> Seq("11-22-33")
       )
 
-      BankAccount.formRule.validate(model) must be (Success(BankAccount(AccountName("test"), UKAccount("12345678", "11-22-33"))))
+      BankAccount.formRule.validate(model) must be (Success(BankAccount("test", UKAccount("12345678", "11-22-33"))))
     }
 
-    "validate form successfully1" in {
+    "validate form successfully for nonUKAccount" in {
       val model = Map (
         "accountName" -> Seq("test"),
         "isUK" -> Seq("false"),
@@ -27,7 +27,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       )
 
-      BankAccount.formRule.validate(model) must be (Success(BankAccount(AccountName("test"),AccountNumber("12345678"))))
+      BankAccount.formRule.validate(model) must be (Success(BankAccount("test",AccountNumber("12345678"))))
     }
   }
 
