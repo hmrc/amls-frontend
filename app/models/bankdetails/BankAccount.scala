@@ -137,7 +137,7 @@ object BankAccount {
 
   implicit val formRule: Rule[UrlFormEncoded, BankAccount] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__.read[String] and
+    ((__ \ "accountName").read[String] and
       __.read[Account]
       ).apply(BankAccount.apply _)
   }
@@ -145,7 +145,7 @@ object BankAccount {
   implicit val formWrite: Write[BankAccount, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
-    (__.write[String] and
+    ((__ \ "accountName").write[String] and
       __.write[Account]
       ) (unlift(BankAccount.unapply _))
   }
@@ -155,7 +155,7 @@ object BankAccount {
     import play.api.libs.json._
 
     (
-      (__).read[String] and
+      (__ \ "accountName").read[String] and
         (__).read[Account]
       ) (BankAccount.apply _)
   }
@@ -164,7 +164,7 @@ object BankAccount {
     import play.api.libs.functional.syntax._
 
     (
-      (__).write[String] and
+      (__ \ "accountName").write[String] and
         (__).write[Account]
       ) (unlift(BankAccount.unapply _))
 
