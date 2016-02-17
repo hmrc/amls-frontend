@@ -31,8 +31,8 @@ trait BankAccountTypeController extends BankAccountUtilController {
             result <- updateBankDetails(index, BankDetails(Some(data), None))
           } yield {
             data match {
-              case NoBankAccount => Redirect(routes.WhatYouNeedController.get())
-              case _ => Redirect(routes.BankAccountTypeController.get())
+              case NoBankAccount => Redirect(routes.SummaryController.get())
+              case _ => Redirect(routes.SummaryController.get())
             }
           }
         }

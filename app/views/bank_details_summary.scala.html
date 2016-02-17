@@ -1,0 +1,40 @@
+@import include._
+@import models.bankdetails._
+@import forms2._
+
+@(model: Seq[BankDetails])(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.bankdetails")
+
+    @fieldset("", jsHidden = false, id = "ttt") {
+        <span>@Messages("bankdetails.summary.check.info")</span> <br>
+        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, true)">@Messages("bankdetails.summary.add.account")</a>
+    }
+
+    @model.zipWithIndex.map { a =>
+        <table>
+            <tr>
+                <th class="summary-title">sasvasbb</th>
+                <td ><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(a._2+1, true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+               <td  colspan="2">
+                   @a._1.bankAccountType.map {accountType =>
+                        @accountType match {
+                            case PersonalAccount => {@Messages("bankdetails.accounttype.lbl.01")}
+                            case BelongsToBusiness => {@Messages("bankdetails.accounttype.lbl.02")}
+                            case BelongsToOtherBusiness => {@Messages("bankdetails.accounttype.lbl.03")}
+                            case NoBankAccount => {@Messages("bankdetails.accounttype.lbl.04")}
+                        }
+                   }
+               </td>
+            </tr>
+
+        </table>
+    }
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
+}
