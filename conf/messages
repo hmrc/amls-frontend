@@ -268,3 +268,4 @@ bankdetails.bankaccount.accounttype = Is this a UK bank account?
 bankdetails.bankaccount.accountnumber = Account number
 bankdetails.bankaccount.sortcode = Sort code
 bankdetails.bankaccount.iban = IBAN number
+bankdetails.accountdetails.title = Bank account

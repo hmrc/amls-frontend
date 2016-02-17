@@ -81,3 +81,6 @@ GET         /about-the-business/index                   controllers.aboutthebusi
 GET         /bank-details/accounts                      controllers.bankdetails.BankAccountTypeController.get(index:Int ?= 0, edit: Boolean ?= false)
 POST        /bank-details/accounts                      controllers.bankdetails.BankAccountTypeController.post(index:Int ?= 0, edit: Boolean ?= false)
 
+GET         /bank-details/account-details               controllers.bankdetails.BankAccountController.get(index:Int ?= 0, edit: Boolean ?= false)
+POST        /bank-details/account-details               controllers.bankdetails.BankAccountController.post(index:Int ?= 0, edit: Boolean ?= false)
+

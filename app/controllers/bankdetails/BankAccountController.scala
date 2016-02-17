@@ -3,34 +3,37 @@ package controllers.bankdetails
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, EmptyForm}
-import models.bankdetails.BankAccount
-import models.businessmatching.BusinessActivities
-import models.tradingpremises.TradingPremises
-
+import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import models.bankdetails.{NoBankAccount, BankDetails, BankAccountType, BankAccount}
 import scala.concurrent.Future
 
-trait BankAccountController extends BaseController {
+trait BankAccountController extends BankAccountUtilController {
 
-  def dataCacheConnector: DataCacheConnector
+  val dataCacheConnector : DataCacheConnector
 
-  def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
+  def get(index:Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BankAccount](BankAccount.key) map {
-        case Some(BankAccount(accountName, account)) => Ok(views.html.bank_account(EmptyForm, edit, index))
-        //Future.successful(Ok(views.html.what_you_need_BD()))
-        case _ => Ok(views.html.bank_account_types(EmptyForm, edit, index))
+      getBankDetails(index) map {
+        case Some(BankDetails(_, Some(data))) => Ok(views.html.bank_account_details(Form2[BankAccount](data), edit, index))
+        case _ => Ok(views.html.bank_account_details(EmptyForm, edit, index))
       }
   }
 
-  /*  def post(index: Int = 0, edit: Boolean = false) = Authorised.async {
-      implicit authContext => implicit request => {
-        Form2[BusinessActivities](request.body) match {
+  def post(index:Int = 0, edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request => {
+      Form2[BankAccount](request.body) match {
+        case f: InvalidForm => Future.successful(BadRequest(views.html.bank_account_details(f, edit, index)))
+        case ValidForm(_, data) => {
+          for {
+            result <- updateBankDetails(index, BankDetails(None, Some(data)))
+          } yield {Redirect(routes.BankAccountController.get(index))
 
-          //Future.successful(Redirect(routes.BankAccountTypeController.get()))
-          case _ => Redirect (routes.WhatYouNeedController.get () )
+          }
         }
-    }*/
+      }
+    }
+  }
+
 }
 
 object BankAccountController extends BankAccountController {
