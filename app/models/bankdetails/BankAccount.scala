@@ -6,7 +6,6 @@ import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{To, Write, From, Rule}
 
 
-
 sealed trait Account
 
 object Account {
@@ -18,15 +17,16 @@ object Account {
     (__ \ "isUK").read[Boolean] flatMap {
       case true =>
         (
-          (__ \ "accountNumber").read(addressType) and
-            (__ \ "sortCode").read(addressType)
+          (__ \ "accountNumber").read(ukBankAccountNumberType) and
+            (__ \ "sortCode").read[String]
           ) (UKAccount.apply _)
       case false =>
+        println("Here inside false")
         (__ \ "accountNumber").read[String] flatMap {
           case "" =>
-            (__ \ "IBANNumber").read(addressType) fmap IBANNumber.apply
+            (__ \ "IBANNumber").read(ibanType) fmap IBANNumber.apply
           case _ =>
-            (__ \ "accountNumber").read(addressType) fmap AccountNumber.apply
+            (__ \ "accountNumber").read(nonUKBankAccountNumberType) fmap AccountNumber.apply
         }
     }
   }
@@ -87,7 +87,7 @@ object Account {
       }
     }
 
- }
+  }
 
 }
 
@@ -96,6 +96,28 @@ case class UKAccount(
                       accountNumber: String,
                       sortCode: String
                     ) extends Account
+
+
+/*
+object UKAccount {
+
+  implicit val formRule: Rule[UrlFormEncoded, UKAccount] = From[UrlFormEncoded] { __ =>
+    println("HERHEHRERERRERE")
+    import play.api.data.mapping.forms.Rules._
+    (__.read[String] and
+      __.read[String]
+      ).apply(UKAccount.apply _)
+  }
+
+  implicit val formWrite: Write[UKAccount, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Writes._
+    import play.api.libs.functional.syntax.unlift
+    (__.write[String] and
+      __.write[String]
+      ) (unlift(UKAccount.unapply _))
+  }
+}
+*/
 
 
 sealed trait NonUKAccount extends Account
