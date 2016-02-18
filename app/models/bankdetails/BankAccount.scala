@@ -24,9 +24,9 @@ object Account {
         println("Here inside false")
         (__ \ "accountNumber").read[String] flatMap {
           case "" =>
-            (__ \ "IBANNumber").read(ibanType) fmap IBANNumber.apply
+            (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
           case _ =>
-            (__ \ "accountNumber").read(nonUKBankAccountNumberType) fmap AccountNumber.apply
+            (__ \ "accountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
         }
     }
   }
@@ -40,11 +40,11 @@ object Account {
       )
     case f: NonUKAccount =>
       f match {
-        case acc: AccountNumber =>
+        case acc: NonUKAccountNumber =>
           Map(
             "isUK" -> Seq("false"),
             "accountNumber" -> acc.accountNumber)
-        case iban: IBANNumber =>
+        case iban: NonUKIBANNumber =>
           Map(
             "isUK" -> Seq("false"),
             "IBANNumber" -> iban.IBANNumber)
@@ -66,9 +66,9 @@ object Account {
       case false =>
         (__ \ "accountNumber").read[String] flatMap {
           case "" =>
-            (__ \ "IBANNumber").read[String] fmap IBANNumber.apply
+            (__ \ "IBANNumber").read[String] fmap NonUKIBANNumber.apply
           case _ =>
-            (__ \ "accountNumber").read[String] fmap AccountNumber.apply
+            (__ \ "accountNumber").read[String] fmap NonUKAccountNumber.apply
         }
     }
   }
@@ -80,9 +80,9 @@ object Account {
         "sortCode" -> m.sortCode)
     case m: NonUKAccount => {
       m match {
-        case acc: AccountNumber => Json.obj("isUK" -> false,
+        case acc: NonUKAccountNumber => Json.obj("isUK" -> false,
           "accountNumber" -> acc.accountNumber)
-        case iban: IBANNumber => Json.obj("isUK" -> false,
+        case iban: NonUKIBANNumber => Json.obj("isUK" -> false,
           "IBANNumber" -> iban.IBANNumber)
       }
     }
@@ -91,40 +91,17 @@ object Account {
 
 }
 
-
 case class UKAccount(
                       accountNumber: String,
                       sortCode: String
                     ) extends Account
 
 
-/*
-object UKAccount {
-
-  implicit val formRule: Rule[UrlFormEncoded, UKAccount] = From[UrlFormEncoded] { __ =>
-    println("HERHEHRERERRERE")
-    import play.api.data.mapping.forms.Rules._
-    (__.read[String] and
-      __.read[String]
-      ).apply(UKAccount.apply _)
-  }
-
-  implicit val formWrite: Write[UKAccount, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (__.write[String] and
-      __.write[String]
-      ) (unlift(UKAccount.unapply _))
-  }
-}
-*/
-
-
 sealed trait NonUKAccount extends Account
 
-case class AccountNumber(accountNumber: String) extends NonUKAccount
+case class NonUKAccountNumber(accountNumber: String) extends NonUKAccount
 
-case class IBANNumber(IBANNumber: String) extends NonUKAccount
+case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
 
 
 case class BankAccount(accountName: String, account: Account)
