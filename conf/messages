@@ -54,6 +54,7 @@ unauthorised.title = Unauthorised
 aboutyou.sectiontitle = About you
 aboutthebusiness.sectiontitle = About the business
 estateagentbusiness.sectiontitle = Estate agent business
+businessactivities.sectiontitle = Business Activities
 
 # Individual pages
 
@@ -261,3 +262,6 @@ bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
 bankdetails.accounttype.lbl.03 = A business account belonging to another business
 bankdetails.accounttype.lbl.04 = The business doesn't use a bank account
+
+businessactivities.whatyouneed.title = Business Activities - What you need
+
