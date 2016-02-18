@@ -25,20 +25,20 @@
                 @x.bankAccount.map {bankAccount =>
                     @bankAccount.account match {
                         case f:UKAccount => {
-                            <td width="25%">
+                            <td>
                                 @f.accountNumber
                             </td>
-                            <td width="25%">
+                            <td>
                                 @f.sortCode
                             </td>
                         }
                         case f:NonUKAccountNumber => {
-                            <td width="50%">
+                            <td>
                                 @f.accountNumber
                             </td>
                         }
                         case f:NonUKIBANNumber => {
-                            <td width="50%">
+                            <td>
                                 @f.IBANNumber
                             </td>
                         }
@@ -57,17 +57,17 @@
                 @x.bankAccount.map {bankAccount =>
                     @bankAccount.account match {
                         case f:UKAccount => {
-                            <td width="25%">
+                            <td>
                                 @Messages("lbl.uk")
                             </td>
                         }
                         case f:NonUKAccountNumber => {
-                            <td width="50%">
+                            <td>
                                 @Messages("lbl.nonuk")
                             </td>
                         }
                         case f:NonUKIBANNumber => {
-                            <td width="50%">
+                            <td>
                                 @Messages("lbl.nonuk")
                             </td>
                         }

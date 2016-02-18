@@ -28,10 +28,13 @@ trait BankAccountTypeController extends BankAccountUtilController {
         case f: InvalidForm => Future.successful(BadRequest(views.html.bank_account_types(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-            result <- updateBankDetails(index, BankDetails(Some(data), None))
+            model <- getBankDetails(index) map {
+              case Some(model) => updateBankDetails(index, model.bankAccountType(data))
+              case _ => updateBankDetails(index, BankDetails(Some(data), None))
+            }
           } yield {
             edit match {
-              case true => Redirect(routes.SummaryController.get())
+              case true => Redirect(routes.BankAccountController.get(index))
               case false => {
                 data match {
                   case NoBankAccount => Redirect(routes.SummaryController.get())
