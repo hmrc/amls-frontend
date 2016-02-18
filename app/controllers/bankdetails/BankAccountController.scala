@@ -25,15 +25,15 @@ trait BankAccountController extends BankAccountUtilController {
         case f: InvalidForm => Future.successful(BadRequest(views.html.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-            result <- updateBankDetails(index, BankDetails(None, Some(data)))
-          } yield {Redirect(routes.BankAccountController.get(index))
-
-          }
+            model <- getBankDetails(index) map {
+              case Some(model) => updateBankDetails(index, model.bankAccount(data))
+              case _ => updateBankDetails(index, BankDetails(None, Some(data)))
+            }
+          } yield {Redirect(routes.BankAccountController.get(index))}
         }
       }
     }
   }
-
 }
 
 object BankAccountController extends BankAccountController {
