@@ -1,7 +1,7 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import models.bankdetails.{NonUKAccountNumber, UKAccount, BankAccount}
+import models.bankdetails._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -38,7 +38,7 @@ class BankAccountControllerSpec extends PlaySpec with OneServerPerSuite with Moc
         document.select(s"input[name=$field]").`val` must be(empty)
     }
 
-/*    "get the page with values when the page is loaded again " in new Fixture {
+    "get the page with values when the page is loaded again " in new Fixture {
 
       val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
       val nonUKBankAccount = BankAccount("My Account", NonUKAccountNumber("00081050223857232"))
@@ -46,15 +46,43 @@ class BankAccountControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankAccount]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ukBankAccount))))
       val result = controller.get()(request)
-      val document: Document = Jsoup.parse(contentAsString(result))
+    }
 
-      //document.select(s"input[name=accountName]").`val` must be("My Account")
-      document.select(s"input[name=sortCode]").`val` must be("202502")
-      //document.select(s"input[name=nonUKAccountNumber]").`val` must be("12345678")
+    "on post with valid data in edit mode" in new Fixture {
 
-    }*/
+      val newRequest = request.withFormUrlEncodedBody(
+        "accountName" ->"test",
+        "isUK" -> "false",
+        "nonUKAccountNumber" -> "12345678"
+      )
 
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
+      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount),Some(BankAccount("test", UKAccount("12345678", "11-22-33"))))))))
+
+      val result = controller.post(1, true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+    }
+
+    "on post with invalid data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "accountName" ->"test",
+        "isUK" -> "true"
+      )
+
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+    }
   }
 
 }

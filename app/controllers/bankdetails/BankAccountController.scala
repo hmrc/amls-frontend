@@ -2,9 +2,9 @@ package controllers.bankdetails
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.bankdetails.{NoBankAccount, BankDetails, BankAccountType, BankAccount}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.bankdetails.{BankAccount, BankDetails}
+
 import scala.concurrent.Future
 
 trait BankAccountController extends BankAccountUtilController {
@@ -29,7 +29,7 @@ trait BankAccountController extends BankAccountUtilController {
               case Some(model) => updateBankDetails(index, model.bankAccount(data))
               case _ => updateBankDetails(index, BankDetails(None, Some(data)))
             }
-          } yield {Redirect(routes.BankAccountController.get(index))}
+          } yield {Redirect(routes.WhatYouNeedController.get())}
         }
       }
     }
