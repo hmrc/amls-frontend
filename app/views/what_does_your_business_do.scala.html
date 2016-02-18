@@ -5,15 +5,14 @@
 @import models.businessmatching._
 
 @(f:Form2[_], model : BusinessActivities, edit: Boolean)(implicit lang: Lang, request: Request[_])
+@main(title = Messages("tradingpremises.whatdoesyourbusinessdo.title")) {
 
-@main(
-    title = Messages("tradingpremises.whatdoesyourbusinessdo.title")
-) {
     @heading("tradingpremises.whatdoesyourbusinessdo.title", "summary.tradingpremises")
 
     @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(edit)) {
         @radioGroup(f("activities")) {
             @legend("tradingpremises.whatdoesyourbusinessdo.linetext", jsHidden = false)
+
             @model.businessActivities.map { ba =>
                 @checkbox(f("activities"), Messages("businessmatching.registerservices.servicename.lbl."+model.getValue(ba)), model.getValue(ba))
             }
