@@ -9,7 +9,7 @@ trait WhatYouNeedController extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.what_you_need_ATB()))
+      Future.successful(Ok(views.html.what_you_need_BA()))
   }
 
 }
