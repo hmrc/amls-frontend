@@ -21,14 +21,13 @@ object Account {
             (__ \ "sortCode").read[String]
           ) (UKAccount.apply _)
       case false =>
-        (__ \ "accountNumber").read[String] flatMap {
-          case "" =>
-            (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
-          case _ =>
-            (__ \ "accountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
+        ( (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply )orElse(
+        (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
+      )
+
         }
     }
-  }
+
 
   implicit val formWrites: Write[Account, UrlFormEncoded] = Write {
     case f: UKAccount =>
@@ -39,10 +38,10 @@ object Account {
       )
     case f: NonUKAccount =>
       f match {
-        case acc: NonUKAccountNumber =>
+        case nonukacc: NonUKAccountNumber =>
           Map(
             "isUK" -> Seq("false"),
-            "accountNumber" -> acc.accountNumber)
+            "nonUKAccountNumber" -> nonukacc.accountNumber)
         case iban: NonUKIBANNumber =>
           Map(
             "isUK" -> Seq("false"),
@@ -63,11 +62,11 @@ object Account {
         ) (UKAccount.apply _)
 
       case false =>
-        (__ \ "accountNumber").read[String] flatMap {
+        (__ \ "nonUKAccountNumber").read[String] flatMap {
           case "" =>
             (__ \ "IBANNumber").read[String] fmap NonUKIBANNumber.apply
           case _ =>
-            (__ \ "accountNumber").read[String] fmap NonUKAccountNumber.apply
+            (__ \ "nonUKAccountNumber").read[String] fmap NonUKAccountNumber.apply
         }
     }
   }
@@ -80,7 +79,7 @@ object Account {
     case m: NonUKAccount => {
       m match {
         case acc: NonUKAccountNumber => Json.obj("isUK" -> false,
-          "accountNumber" -> acc.accountNumber)
+          "nonUKAccountNumber" -> acc.accountNumber)
         case iban: NonUKIBANNumber => Json.obj("isUK" -> false,
           "IBANNumber" -> iban.IBANNumber)
       }

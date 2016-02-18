@@ -9,7 +9,7 @@ s"""${f("sortCode").id}-fieldset"""
 }
 
 @target1 = @{
-s"""${f("accountNumber").id}-fieldset"""
+s"""${f("nonUKAccountNumber").id}-fieldset"""
 s"""${f("IBANNumber").id}-fieldset"""
 }
 
@@ -35,13 +35,12 @@ s"""${f("IBANNumber").id}-fieldset"""
             @input(f("sortCode"), "bankdetails.bankaccount.sortcode", bold = false)
         }
         @fieldset("TODO", jsHidden = true, id = target1) {
-            @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
+            @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
             <p>or</p>
             @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
         }
     }
     @submit(edit)
 }
-
 
 }

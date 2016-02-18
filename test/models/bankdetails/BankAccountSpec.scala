@@ -39,7 +39,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("test"),
         "isUK" -> Seq("false"),
-        "accountNumber" -> Seq("12345678")
+        "nonUKAccountNumber" -> Seq("12345678")
       )
 
       Account.formRule.validate(urlFormEncoded) must be(Success(NonUKAccountNumber("12345678")))
@@ -64,7 +64,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       val urlFormEncoded = Map(
         "isUK" -> Seq("false"),
-        "accountNumber" -> Seq("3242423424290788979345897345907")
+        "nonUKAccountNumber" -> Seq("3242423424290788979345897345907")
       )
 
       Account.formWrites.writes(nonUKAccount) must be(urlFormEncoded)
@@ -93,6 +93,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val bankAccount = BankAccount("My Account", ukAccount)
 
       val urlFormEncoded = Map(
+        "accountName" -> Seq("My Account"),
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
         "sortCode" -> Seq("11-22-33")
@@ -107,7 +108,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),
         "isUK" -> Seq("false"),
-        "accountNumber" -> Seq("12345678123456781234567812345678"),
+        "nonUKAccountNumber" -> Seq("12345678123456781234567812345678"),
         "sortCode" -> Seq("11-22-33")
       )
 
