@@ -31,7 +31,7 @@ class BankAccountControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       val result = controller.get()(request)
       status(result) must be(OK)
 
-      Jsoup.parse()
+      //Jsoup.parse()
 
     }
 

@@ -117,6 +117,7 @@ object BankAccount {
     ((__ \ "accountName").read[String] and
       __.read[Account]
       ).apply(BankAccount.apply _)
+
   }
 
   implicit val formWrite: Write[BankAccount, UrlFormEncoded] = To[UrlFormEncoded] { __ =>

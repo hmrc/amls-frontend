@@ -44,6 +44,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
       "return bank details with correct data set" in {
         val accountTypeNew = NoBankAccount
         val result = initial.bankAccountType(accountTypeNew)
+
         result must be(BankDetails(Some(accountTypeNew), None))
 
       }

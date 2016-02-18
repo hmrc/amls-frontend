@@ -12,26 +12,67 @@
 
     @fieldset("", jsHidden = false, id = "ttt") {
         <span>@Messages("bankdetails.summary.check.info")</span> <br>
-        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, true)">@Messages("bankdetails.summary.add.account")</a>
+        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, false)">@Messages("bankdetails.summary.add.account")</a>
     }
 
-    @model.zipWithIndex.map { a =>
+    @model.zipWithIndex.map { case(x, y) =>
         <table>
             <tr>
-                <th class="summary-title">sasvasbb</th>
-                <td ><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(a._2+1, true)">@Messages("button.edit")</a></td>
+                <th class="summary-title" colspan="3">@x.bankAccount.map {z => @z.accountName}</th>
+                <td><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
-               <td  colspan="2">
-                   @a._1.bankAccountType.map {accountType =>
+                @x.bankAccount.map {bankAccount =>
+                    @bankAccount.account match {
+                        case f:UKAccount => {
+                            <td width="25%">
+                                @f.accountNumber
+                            </td>
+                            <td width="25%">
+                                @f.sortCode
+                            </td>
+                        }
+                        case f:NonUKAccountNumber => {
+                            <td width="50%">
+                                @f.accountNumber
+                            </td>
+                        }
+                        case f:NonUKIBANNumber => {
+                            <td width="50%">
+                                @f.IBANNumber
+                            </td>
+                        }
+                    }
+                }
+               <td>
+                   @x.bankAccountType.map {accountType =>
                         @accountType match {
-                            case PersonalAccount => {@Messages("bankdetails.accounttype.lbl.01")}
-                            case BelongsToBusiness => {@Messages("bankdetails.accounttype.lbl.02")}
-                            case BelongsToOtherBusiness => {@Messages("bankdetails.accounttype.lbl.03")}
+                            case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                            case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                            case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                             case NoBankAccount => {@Messages("bankdetails.accounttype.lbl.04")}
                         }
                    }
                </td>
+                @x.bankAccount.map {bankAccount =>
+                    @bankAccount.account match {
+                        case f:UKAccount => {
+                            <td width="25%">
+                                @Messages("lbl.uk")
+                            </td>
+                        }
+                        case f:NonUKAccountNumber => {
+                            <td width="50%">
+                                @Messages("lbl.nonuk")
+                            </td>
+                        }
+                        case f:NonUKIBANNumber => {
+                            <td width="50%">
+                                @Messages("lbl.nonuk")
+                            </td>
+                        }
+                    }
+                }
             </tr>
 
         </table>
