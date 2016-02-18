@@ -17,11 +17,11 @@ trait WhatDoesYourBusinessDoController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      buildView(edit, Ok)
+      buildView(EmptyForm, edit, Ok)
     }
   }
 
-  private def buildView(edit: Boolean, status: Status)(implicit authContext:AuthContext, request:Request[_]): Future[Result] = {
+  private def buildView(form :Form2[_],  edit: Boolean, status: Status)(implicit authContext:AuthContext, request:Request[_]): Future[Result] = {
 
     dataCacheConnector.fetchAll map { x =>
       (for {
@@ -35,7 +35,7 @@ trait WhatDoesYourBusinessDoController extends BaseController {
           ) map ( _ => SeeOther(controllers.tradingpremises.routes.SummaryController.get.url) )
         }
         case BusinessMatching(Some(businessActivities)) =>
-          Future.successful(status(views.html.what_does_your_business_do(EmptyForm, businessActivities, edit)))
+          Future.successful(status(views.html.what_does_your_business_do(form, businessActivities, edit)))
       }) getOrElse Future.successful(NotFound)
     } flatMap (identity)
   }
@@ -43,7 +43,7 @@ trait WhatDoesYourBusinessDoController extends BaseController {
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[WhatDoesYourBusinessDo](request.body) match {
-        case f: InvalidForm => buildView(edit, BadRequest)
+        case f: InvalidForm => buildView(f, edit, BadRequest)
         case ValidForm(_, data) =>
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
