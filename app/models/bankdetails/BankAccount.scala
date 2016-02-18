@@ -21,7 +21,6 @@ object Account {
             (__ \ "sortCode").read[String]
           ) (UKAccount.apply _)
       case false =>
-        println("Here inside false")
         (__ \ "accountNumber").read[String] flatMap {
           case "" =>
             (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
@@ -114,7 +113,7 @@ object BankAccount {
 
   implicit val formRule: Rule[UrlFormEncoded, BankAccount] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    ((__ \ "accountName").read[String] and
+    ((__ \ "accountName").read(accountNameType) and
       __.read[Account]
       ).apply(BankAccount.apply _)
   }
