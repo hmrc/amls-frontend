@@ -329,11 +329,11 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-  "accountName must " must {
+  "accountName" must {
 
-    "be mandatory" in {
+    "must be mandatory" in {
       accountNameType.validate("") must be(
-        Failure(Seq(Path -> Seq(ValidationError("notEmpty", FormTypes.maxAccountName)))))
+        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
     }
 
     "be not more than 40 characters" in {
