@@ -31,6 +31,8 @@ class BankAccountControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       val result = controller.get()(request)
       status(result) must be(OK)
 
+      Jsoup.parse()
+
     }
 
     "get the page with values when the page is loaded again " in new Fixture {
