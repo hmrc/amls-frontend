@@ -343,22 +343,31 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-  "sortCode must successfully" must {
+  "sortCode must" must {
 
     "validate when 6 digits are supplied without - " in {
       sortCodeType.validate("654321") must be(Success("654321"))
     }
 
-    "validate when 8 characters are supplied with - " in {
-      sortCodeType.validate("65-43-21") must be(Success("65-43-21"))
-    }
+    /*
+        "fail validation when more than 6 digits are supplied without - " in {
+          sortCodeType.validate("87654321") must be(
+          Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}")))))
+        }
 
-    /*   "fail validation for sort code with any other pattern" in {
-         sortCodeType.validate("8712341241431243124124654321") must be(
-           Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}"))))
-         )
-       }*/
+        "fail when 8 non digits are supplied with - " in {
+          sortCodeType.validate("ab-cd-ef") must be(
+            Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}")))))
+        }
+
+        "fail validation for sort code with any other pattern" in {
+          sortCodeType.validate("8712341241431243124124654321") must be(
+            Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}"))))
+          )
+        }
+        */
   }
+
 
   "UK Bank Account must successfully" must {
 
