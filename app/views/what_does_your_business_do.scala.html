@@ -7,9 +7,9 @@
 @(f:Form2[_], model : BusinessActivities, edit: Boolean)(implicit lang: Lang, request: Request[_])
 @main(title = Messages("tradingpremises.whatdoesyourbusinessdo.title")) {
 
-@heading("tradingpremises.whatdoesyourbusinessdo.title", "summary.tradingpremises")
+    @heading("tradingpremises.whatdoesyourbusinessdo.title", "summary.tradingpremises")
 
-    @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post) {
+    @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(edit)) {
         @radioGroup(f("activities")) {
             @legend("tradingpremises.whatdoesyourbusinessdo.linetext", jsHidden = false)
 

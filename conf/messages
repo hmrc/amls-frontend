@@ -64,7 +64,7 @@ summary.businessactivities = Business activities
 summary.aboutbusiness = About the business
 summary.estateagentbusiness = Estate agent business
 summary.tradingpremises = Trading premises
-summary.bankdetails = Bank account details
+summary.bankdetails = Bank details
 summary.responsiblepersons = Responsible persons
 summary.aboutyou = About you
 summary.payment = Payment
@@ -95,6 +95,14 @@ aboutyou.rolewithinbusiness.lbl.05=Nominated officer
 aboutyou.rolewithinbusiness.lbl.06=Partner
 aboutyou.rolewithinbusiness.lbl.07=Sole proprietor
 aboutyou.rolewithinbusiness.lbl.08=Other
+
+aboutthebusiness.whatyouneed.title = About the business - What you need
+aboutthebusiness.whatyouneed.heading = What you need
+aboutthebusiness.whatyouneed.subheading = For this section you''ll need your:
+aboutthebusiness.whatyouneed.line_1 = VAT and Corporation Tax numbers, if relevant
+aboutthebusiness.whatyouneed.line_2 = registered office or main place of business address
+aboutthebusiness.whatyouneed.line_3 = phone number
+aboutthebusiness.whatyouneed.line_4 = email address
 
 aboutthebusiness.registeredforvat.title = Is this business registered for VAT?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
@@ -185,17 +193,12 @@ tradingpremises.yourtradingpremises.startdate=Date you will start trading from t
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 
-
-
-estateagentbusiness.whatyouneed.title = Estate agent business - What you need
+estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
-estateagentbusiness.whatyouneed.subheading = You need the following information to complete this section
-
-estateagentbusiness.whatyouneed.line_1 = anticipated turnover for the next 12 months
-estateagentbusiness.whatyouneed.line_2 = franchisor''s name, if relevant
-estateagentbusiness.whatyouneed.line_3 = number of employees
-estateagentbusiness.whatyouneed.line_4 = list of countries where your most high-value customers live
-estateagentbusiness.whatyouneed.line_5 = how you record transactions, if relevant
+estateagentbusiness.whatyouneed.subheading = For this section you''ll need:
+estateagentbusiness.whatyouneed.line_1 = a list of which services you provide
+estateagentbusiness.whatyouneed.line_2 = which redress scheme you''re registered with, if relevant
+estateagentbusiness.whatyouneed.line_3 = information about any penalties you''ve received, if relevant
 
 estateagentbusiness.penalisedunderestateagentsact.title = Has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 estateagentbusiness.penalisedunderestateagentsact.subtitle = Examples of a penalty include:
@@ -253,10 +256,8 @@ bankdetails.whatyouneed.line_2 = the account number
 bankdetails.whatyouneed.line_3 = if it''s a UK or overseas account
 bankdetails.whatyouneed.line_4 = whose account it is
 
-aboutthebusiness.whatyouneed.title = About the business - What you need
-aboutthebusiness.whatyouneed.heading = What you need
-aboutthebusiness.whatyouneed.subheading = For this section you''ll need your:
-aboutthebusiness.whatyouneed.line_1 = VAT and Corporation Tax numbers, if relevant
-aboutthebusiness.whatyouneed.line_2 = registered office or main place of business address
-aboutthebusiness.whatyouneed.line_3 = phone number
-aboutthebusiness.whatyouneed.line_4 = email address
+bankdetails.accounttype.title = What kind of bank account does your business use?
+bankdetails.accounttype.lbl.01 = A personal bank account
+bankdetails.accounttype.lbl.02 = A business account belonging to this business
+bankdetails.accounttype.lbl.03 = A business account belonging to another business
+bankdetails.accounttype.lbl.04 = The business doesn't use a bank account

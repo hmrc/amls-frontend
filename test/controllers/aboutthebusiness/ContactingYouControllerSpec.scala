@@ -3,7 +3,7 @@ package controllers.aboutthebusiness
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{RegisteredOfficeUK, AboutTheBusiness, ContactingYou}
+import models.aboutthebusiness.{AboutTheBusiness, ContactingYou, RegisteredOfficeUK}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -51,7 +51,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
       "load the page with the pre populated data" in new Fixture {
 
         when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
