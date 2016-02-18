@@ -66,7 +66,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BankAccountController.get().url))
+      //redirectLocation(result) must be(Some(routes.BankAccountController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {

@@ -1,0 +1,16 @@
+@import include._
+@import forms2._
+
+@()(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.bankdetails")
+
+    @fieldset("", jsHidden = false, id = "ttt") {
+        <span>@Messages("bankdetails.summary.nobank.account")</span> <br>
+    }
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
+}

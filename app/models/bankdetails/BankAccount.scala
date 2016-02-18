@@ -22,9 +22,7 @@ object Account {
           ) (UKAccount.apply _)
       case false =>
         ( (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply )orElse(
-        (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
-      )
-
+        (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply)
         }
     }
 
@@ -62,6 +60,7 @@ object Account {
         ) (UKAccount.apply _)
 
       case false =>
+
         (__ \ "nonUKAccountNumber").read[String] flatMap {
           case "" =>
             (__ \ "IBANNumber").read[String] fmap NonUKIBANNumber.apply
@@ -70,6 +69,7 @@ object Account {
         }
     }
   }
+
 
   implicit val jsonWrites = Writes[Account] {
     case m: UKAccount =>

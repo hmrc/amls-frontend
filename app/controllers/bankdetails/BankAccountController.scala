@@ -25,7 +25,8 @@ trait BankAccountController extends BankAccountUtilController {
         case ValidForm(_, data) => {
           for {
             model <- getBankDetails(index) map {
-              case Some(model) => updateBankDetails(index, model.bankAccount(data))
+              case Some(model) => println("----------------------------------"+model)
+                updateBankDetails(index, model.bankAccount(data))
               case _ => updateBankDetails(index, BankDetails(None, Some(data)))
             }
           } yield Redirect(routes.SummaryController.get())

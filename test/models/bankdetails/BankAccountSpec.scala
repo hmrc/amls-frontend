@@ -3,6 +3,7 @@ package models.bankdetails
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.Success
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
@@ -43,6 +44,17 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       )
 
       Account.formRule.validate(urlFormEncoded) must be(Success(NonUKAccountNumber("12345678")))
+    }
+
+    "Form Rule validation for Non UKAccount IBAN Number" in {
+
+      val urlFormEncoded = Map(
+        "accountName" -> Seq("test"),
+        "isUK" -> Seq("false"),
+        "IBANNumber" -> Seq("1234554787876868")
+      )
+
+      Account.formRule.validate(urlFormEncoded) must be(Success(NonUKIBANNumber("1234554787876868")))
     }
 
     "Form Write validation for IBAN Non UK Account" in {
@@ -101,6 +113,14 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       BankAccount.formWrite.writes(bankAccount) must be(urlFormEncoded)
     }
+
+
+    "validate Json read" in {
+      Json.fromJson[BankAccount](Json.obj("accountName" -> "test", "isUK" -> false, "nonUKAccountNumber" -> "", "IBANNumber" -> "12345678")) must
+        be (JsSuccess(NonUKIBANNumber("12345678")))
+
+    }
+
 
 
     "Form Rule validation Non UK Account" in {

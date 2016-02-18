@@ -15,32 +15,34 @@
         <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, false)">@Messages("bankdetails.summary.add.account")</a>
     }
 
-    @model.zipWithIndex.map { case(x, y) =>
+    @model.zipWithIndex.map { case (x, y) =>
         <table>
             <tr>
                 <th class="summary-title" colspan="3">@x.bankAccount.map {z => @z.accountName}</th>
-                <td><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
+                <td><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, false)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 @x.bankAccount.map {bankAccount =>
                     @bankAccount.account match {
                         case f:UKAccount => {
-                            <td>
+                            <td width="25%">
                                 @f.accountNumber
                             </td>
-                            <td>
+                            <td width="25%">
                                 @f.sortCode
                             </td>
                         }
                         case f:NonUKAccountNumber => {
-                            <td>
+                            <td width="25%">
                                 @f.accountNumber
                             </td>
+                            <td width="25%">&nbsp;</td>
                         }
                         case f:NonUKIBANNumber => {
-                            <td>
+                            <td width="25%">
                                 @f.IBANNumber
                             </td>
+                            <td width="25%">&nbsp;</td>
                         }
                     }
                 }
@@ -61,12 +63,7 @@
                                 @Messages("lbl.uk")
                             </td>
                         }
-                        case f:NonUKAccountNumber => {
-                            <td>
-                                @Messages("lbl.nonuk")
-                            </td>
-                        }
-                        case f:NonUKIBANNumber => {
+                        case _ => {
                             <td>
                                 @Messages("lbl.nonuk")
                             </td>

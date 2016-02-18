@@ -6,6 +6,8 @@ import controllers.BaseController
 import models.bankdetails.BankDetails
 import models.estateagentbusiness.EstateAgentBusiness
 
+import scala.concurrent.Future
+
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
@@ -16,6 +18,11 @@ trait SummaryController extends BaseController {
         case Some(data) => Ok(views.html.bank_details_summary(data))
         case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }
+  }
+
+  def getNoBankAccount = Authorised.async {
+    implicit authContext => implicit request =>
+         Future.successful(Ok(views.html.no_bank_account_summary()))
   }
 }
 

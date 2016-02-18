@@ -34,7 +34,7 @@ trait BankAccountTypeController extends BankAccountUtilController {
             }
           } yield {
             edit match {
-              case true => Redirect(routes.BankAccountController.get(index))
+              case true => Redirect(routes.SummaryController.get())
               case false => {
                 data match {
                   case NoBankAccount => Redirect(routes.SummaryController.get())
