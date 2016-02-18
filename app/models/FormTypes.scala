@@ -24,6 +24,8 @@ object FormTypes {
   val yearLength = 4
   val maxRedressOtherTypeLength = 255
   val maxLengthPremisesTradingName = 120
+
+  val maxAccountName = 40
   val maxIBANLength = 34
   val maxNonUKBankAccountNumberLength = 40
   val maxUKBankAccountNumberLength = 8
@@ -80,9 +82,11 @@ object FormTypes {
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
 
-  val sortCodeType = notEmpty compose maxLength(maxSortCodeLength)
+  val accountNameType = notEmpty compose maxLength(maxAccountName)
 
-  val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength)
+  val sortCodeType = notEmpty compose maxLength(maxSortCodeLength) compose pattern("[0-9]+".r)
+
+  val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength) compose pattern("[0-9]+".r)
 
   val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength)
 
