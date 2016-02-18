@@ -1,0 +1,47 @@
+@import include.{forms => deprecated, _}
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean, index:Int)(implicit lang: Lang, request: Request[_])
+
+@target = @{
+s"""${f("accNumber").id}-fieldset"""
+s"""${f("sortCode").id}-fieldset"""
+}
+
+@target1 = @{
+s"""${f("accNumber").id}-fieldset"""
+s"""${f("ibanNumber").id}-fieldset"""
+}
+
+@main(
+    title = Messages("bankdetails.accountdetails.title")
+) {
+
+    @heading("bankdetails.accountdetails.title", "summary.bankdetails")
+    @form(f, controllers.bankdetails.routes.BankAccountController.post(index, edit)) {
+
+    @input(
+    field = f("accountname"),
+    labelText = "bankdetails.bankaccount.accountname",
+    bold = false
+    )
+
+    @inlineRadioGroup(f("bankaccount")) {
+    @legend("bankdetails.bankaccount.accounttype", jsHidden = false, bold = false)
+    @radio(f("bankaccount"), "lbl.yes", "true", target = s"#$target")
+    @radio(f("bankaccount"), "lbl.no", "false", target = s"#$target1")
+        @fieldset("TODO", jsHidden = true, id = target) {
+            @input(f("accNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
+            @input(f("sortCode"), "bankdetails.bankaccount.sortcode", bold = false)
+        }
+        @fieldset("TODO", jsHidden = true, id = target1) {
+            @input(f("accNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
+            <p>or</p>
+            @input(f("ibanNumber"), "bankdetails.bankaccount.iban", bold = false)
+        }
+    }
+    @submit(edit)
+}
+
+
+}
