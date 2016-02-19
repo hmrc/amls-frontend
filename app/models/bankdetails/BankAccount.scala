@@ -21,19 +21,14 @@ object Account {
             (__ \ "sortCode").read(sortCodeType)
           ) (UKAccount.apply _)
       case false =>
-<<<<<<< HEAD
-        ( (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply )orElse(
-        (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply)
-=======
-            ((__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply)orElse(
-              (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply)
-
+        (__ \ "nonUKAccountNumber").read[String] flatMap {
+          case "" =>
+            (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
+          case _ =>
+            (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
         }
-
->>>>>>> AMLS-234
-        }
-
-
+      }
+  }
 
   implicit val formWrites: Write[Account, UrlFormEncoded] = Write {
     case f: UKAccount =>
@@ -51,8 +46,8 @@ object Account {
         case iban: NonUKIBANNumber =>
           Map(
             "isUK" -> Seq("false"),
+            "nonUKAccountNumber" -> Seq(""),
             "IBANNumber" -> iban.IBANNumber)
-
       }
 
   }
@@ -68,16 +63,14 @@ object Account {
         ) (UKAccount.apply _)
 
       case false =>
-
         (__ \ "nonUKAccountNumber").read[String] flatMap {
           case "" =>
             (__ \ "IBANNumber").read[String] fmap NonUKIBANNumber.apply
           case _ =>
             (__ \ "nonUKAccountNumber").read[String] fmap NonUKAccountNumber.apply
         }
-        }
+    }
   }
-
 
   implicit val jsonWrites = Writes[Account] {
     case m: UKAccount =>
@@ -89,6 +82,7 @@ object Account {
         case acc: NonUKAccountNumber => Json.obj("isUK" -> false,
           "nonUKAccountNumber" -> acc.accountNumber)
         case iban: NonUKIBANNumber => Json.obj("isUK" -> false,
+          "nonUKAccountNumber" -> "",
           "IBANNumber" -> iban.IBANNumber)
       }
     }
@@ -123,7 +117,6 @@ object BankAccount {
     ((__ \ "accountName").read(accountNameType) and
       __.read[Account]
       ).apply(BankAccount.apply _)
-
   }
 
   implicit val formWrite: Write[BankAccount, UrlFormEncoded] = To[UrlFormEncoded] { __ =>

@@ -2,12 +2,11 @@ package models.bankdetails
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.Success
-<<<<<<< HEAD
-import play.api.libs.json.{JsPath, JsSuccess, Json}
-=======
+import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.validation.ValidationError
+
 import play.api.libs.json.{JsSuccess, JsPath, Json}
->>>>>>> AMLS-234
+
 
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
@@ -18,21 +17,50 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "accountName" -> Seq("test"),
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("11-22-33")
+        "sortCode" -> Seq("112233")
       )
 
-      Account.formRule.validate(urlFormEncoded) must be(Success(UKAccount("12345678", "11-22-33")))
+      Account.formRule.validate(urlFormEncoded) must be(Success(UKAccount("12345678", "112233")))
     }
+
+    "fail on invalid selection" in {
+      Account.formRule.validate(Map("accountName" -> Seq("test"), "isUK" -> Seq("false"))) must be(Failure(Seq(
+        (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.required"))
+      )))
+    }
+
+
+    "Form Rule validation is successful for UKAccount1" in {
+      val urlFormEncoded = Map(
+        "accountName" -> Seq("test"),
+        "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> Seq("12345678")
+      )
+
+      Account.formRule.validate(urlFormEncoded) must be(Success(NonUKAccountNumber("12345678")))
+    }
+
+    "Form Rule validation is successful for UKAccount2" in {
+      val urlFormEncoded = Map(
+        "accountName" -> Seq("test"),
+        "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> Seq(""),
+        "IBANNumber" -> Seq("12345678")
+      )
+
+      Account.formRule.validate(urlFormEncoded) must be(Success(NonUKIBANNumber("12345678")))
+    }
+
 
 
     "Form Write is successful for UKAccount" in {
 
-      val ukAccount = UKAccount("12345678", "11-22-33")
+      val ukAccount = UKAccount("12345678", "112233")
 
       val urlFormEncoded = Map(
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("11-22-33")
+        "sortCode" -> Seq("112233")
       )
 
       Account.formWrites.writes(ukAccount) must be(urlFormEncoded)
@@ -43,21 +71,21 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val jsObject = Json.obj(
         "isUK" -> true,
         "accountNumber" -> "12345678",
-        "sortCode" -> "11-22-33"
+        "sortCode" -> "112233"
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(UKAccount("12345678", "11-22-33"), JsPath \ "isUK"))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(UKAccount("12345678", "112233"), JsPath \ "isUK"))
     }
 
 
     "JSON Write is successful for UKAccount" in {
 
-      val ukAccount = UKAccount("12345678", "11-22-33")
+      val ukAccount = UKAccount("12345678", "112233")
 
       val jsObject = Json.obj(
         "isUK" -> true,
         "accountNumber" -> "12345678",
-        "sortCode" -> "11-22-33"
+        "sortCode" -> "112233"
       )
 
       Account.jsonWrites.writes(ukAccount) must be(jsObject)
@@ -80,10 +108,24 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("test"),
         "isUK" -> Seq("false"),
-        "IBANNumber" -> Seq("1234554787876868")
+        "nonUKAccountNumber" -> Seq(""),
+        "IBANNumber" -> Seq("12334623784623648236482364872364726384762384762384623874554787876868")
       )
 
-      Account.formRule.validate(urlFormEncoded) must be(Success(NonUKIBANNumber("1234554787876868")))
+      Account.formRule.validate(urlFormEncoded) must be(Failure(Seq(
+        (Path \ "IBANNumber") -> Seq(ValidationError("error.maxLength", 34)))))
+    }
+
+    "Form Rule validation for Non UKAccount Account Number" in {
+
+      val urlFormEncoded = Map(
+        "accountName" -> Seq("test"),
+        "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> Seq("12334623784623648236482364872364726384762384762384623874554787876868")
+      )
+
+      Account.formRule.validate(urlFormEncoded) must be(Failure(Seq(
+        (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.maxLength", 40)))))
     }
 
     "Form Write validation for IBAN Non UK Account" in {
@@ -92,6 +134,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       val urlFormEncoded = Map(
         "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> Seq(""),
         "IBANNumber" -> Seq("3242423424290788979345897345907")
       )
 
@@ -145,22 +188,22 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "accountName" -> Seq("test"),
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("11-22-33")
+        "sortCode" -> Seq("112233")
       )
 
-      BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("test", UKAccount("12345678", "11-22-33"))))
+      BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("test", UKAccount("12345678", "112233"))))
     }
 
     "Form Write validation for UKAccount" in {
 
-      val ukAccount = UKAccount("12345678", "11-22-33")
+      val ukAccount = UKAccount("12345678", "112233")
       val bankAccount = BankAccount("My Account", ukAccount)
 
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),
         "isUK" -> Seq("true"),
         "accountNumber" -> Seq("12345678"),
-        "sortCode" -> Seq("11-22-33")
+        "sortCode" -> Seq("112233")
       )
 
       BankAccount.formWrite.writes(bankAccount) must be(urlFormEncoded)
@@ -181,7 +224,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "accountName" -> Seq("My Account"),
         "isUK" -> Seq("false"),
         "nonUKAccountNumber" -> Seq("12345678123456781234567812345678"),
-        "sortCode" -> Seq("11-22-33")
+        "sortCode" -> Seq("112233")
       )
 
       BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("My Account", NonUKAccountNumber("12345678123456781234567812345678"))))
