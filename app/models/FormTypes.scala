@@ -86,7 +86,7 @@ object FormTypes {
 
   val sortCodeType = notEmpty compose maxLength(maxSortCodeLength) compose pattern("^[0-9]{6}".r)//compose pattern("\\d{2}-?\\d{2}-?\\d{2}".r)
 
-  val ukBankAccountNumberType = notEmpty compose pattern("^[0-9]{8}$".r) compose maxLength(maxUKBankAccountNumberLength)
+  val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength) compose pattern("^[0-9]{8}$".r)
 
   val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength)
 
