@@ -42,28 +42,6 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
       status(result) must be(OK)
     }
 
-    "load the summary page when section data is available11" in new Fixture {
-
-      val model = BankDetails(Some(NoBankAccount), None)
-      val test = Seq(BankDetails(Some(NoBankAccount), None),
-        BankDetails(Some(PersonalAccount), None),
-        BankDetails(Some(BelongsToBusiness), None),
-        BankDetails(Some(BelongsToOtherBusiness), None))
-
-      val s = "Test data yuuu"
-      val data = s.split(" ")
-
-     val m =  data map { x =>
-        val d = x.charAt(0).toUpper
-        x.replace(x.charAt(0), d)
-      }
-
-     m.mkString("")
-
-      println("----------------------------------------"+m.mkString(" "))
-
-    }
-
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
       when(controller.dataCache.fetchDataShortLivedCache[Seq[BankDetails]](any())

@@ -22,7 +22,7 @@
         <table>
             <tr>
                 <th class="summary-title" colspan="3">@x.bankAccount.map {z => @z.accountName}</th>
-                <td><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, false)">@Messages("button.edit")</a></td>
+                <td><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 @x.bankAccount.map {bankAccount =>

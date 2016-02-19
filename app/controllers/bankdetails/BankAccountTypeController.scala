@@ -33,15 +33,15 @@ trait BankAccountTypeController extends BankAccountUtilController {
               case _ => updateBankDetails(index, BankDetails(Some(data), None))
             }
           } yield {
-            edit match {
+           /* edit match {
               case true => Redirect(routes.SummaryController.get())
-              case false => {
+              case false => {*/
                 data match {
                   case NoBankAccount => Redirect(routes.SummaryController.getNoBankAccount())
                   case _ => Redirect(routes.BankAccountController.get(index))
                 }
-              }
-            }
+            /*  }
+            }*/
           }
         }
       }

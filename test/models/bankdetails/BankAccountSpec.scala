@@ -25,8 +25,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
     "fail on invalid selection" in {
       Account.formRule.validate(Map("accountName" -> Seq("test"), "isUK" -> Seq("false"))) must be(Failure(Seq(
-        (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.required"))
-      )))
+        (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.required")))))
     }
 
 
