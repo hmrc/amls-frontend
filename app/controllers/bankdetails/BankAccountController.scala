@@ -29,7 +29,7 @@ trait BankAccountController extends BankAccountUtilController {
               case Some(model) => updateBankDetails(index, model.bankAccount(data))
               case _ => updateBankDetails(index, BankDetails(None, Some(data)))
             }
-          } yield {Redirect(routes..get())}
+          } yield {Redirect(routes.SummaryController.get())}
         }
       }
     }
