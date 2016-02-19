@@ -18,13 +18,21 @@ object Account {
       case true =>
         (
           (__ \ "accountNumber").read(ukBankAccountNumberType) and
-            (__ \ "sortCode").read[String]
+            (__ \ "sortCode").read(sortCodeType)
           ) (UKAccount.apply _)
       case false =>
+<<<<<<< HEAD
         ( (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply )orElse(
         (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply)
+=======
+            ((__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply)orElse(
+              (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply)
+
         }
-    }
+
+>>>>>>> AMLS-234
+        }
+
 
 
   implicit val formWrites: Write[Account, UrlFormEncoded] = Write {
@@ -67,7 +75,7 @@ object Account {
           case _ =>
             (__ \ "nonUKAccountNumber").read[String] fmap NonUKAccountNumber.apply
         }
-    }
+        }
   }
 
 

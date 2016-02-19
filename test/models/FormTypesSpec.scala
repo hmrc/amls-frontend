@@ -2,7 +2,7 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 import org.specs2.mock.mockito.MockitoMatchers
-import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 
 class FormTypesSpec extends PlaySpec with MockitoMatchers {
@@ -328,4 +328,72 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
   }
+
+  "accountName" must {
+
+    "must be mandatory" in {
+      accountNameType.validate("") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+    }
+
+    "be not more than 40 characters" in {
+      accountNameType.validate("This name is definitely longer than 40 characters.") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", FormTypes.maxAccountName))))
+      )
+    }
+  }
+
+  "sortCode must" must {
+
+    "validate when 6 digits are supplied without - " in {
+      sortCodeType.validate("654321") must be(Success("654321"))
+    }
+
+    /*
+        "fail validation when more than 6 digits are supplied without - " in {
+          sortCodeType.validate("87654321") must be(
+          Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}")))))
+        }
+
+        "fail when 8 non digits are supplied with - " in {
+          sortCodeType.validate("ab-cd-ef") must be(
+            Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}")))))
+        }
+
+        "fail validation for sort code with any other pattern" in {
+          sortCodeType.validate("8712341241431243124124654321") must be(
+            Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}"))))
+          )
+        }
+        */
+  }
+
+
+  "UK Bank Account must successfully" must {
+
+    "validate when 8 digits are supplied " in {
+      ukBankAccountNumberType.validate("87654321") must be(Success("87654321"))
+    }
+
+    /*"fail validation when anything other than 8 characters are supplied" in {
+      ukBankAccountNumberType.validate("123456") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.pattern", "[0-9]{8}$")))))
+    }*/
+
+    ukBankAccountNumberType.validate("1234567890") must be(
+      Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxUKBankAccountNumberLength)))))
+  }
+
+  "For the Overseas Bank Account it" must {
+
+    "validate IBAN supplied " in {
+      ibanType.validate("1234567890123456789012345678901234") must be(Success("1234567890123456789012345678901234"))
+    }
+
+    "fail validation if IBAN is longer than the permissibile length" in {
+      ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxIBANLength)))))
+    }
+  }
+
 }
