@@ -2,14 +2,9 @@ package controllers.bankdetails
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-<<<<<<< HEAD
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.bankdetails.{BankDetails, BankAccount}
-=======
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccount, BankDetails}
 
->>>>>>> AMLS-234
 import scala.concurrent.Future
 
 trait BankAccountController extends BankAccountUtilController {
@@ -19,7 +14,7 @@ trait BankAccountController extends BankAccountUtilController {
   def get(index:Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getBankDetails(index) map {
-        case Some(BankDetails(_, Some(data))) =>Ok(views.html.bank_account_details(Form2[BankAccount](data), edit, index))
+        case Some(BankDetails(_, Some(data))) => Ok(views.html.bank_account_details(Form2[BankAccount](data), edit, index))
         case _ => Ok(views.html.bank_account_details(EmptyForm, edit, index))
       }
   }
@@ -34,11 +29,7 @@ trait BankAccountController extends BankAccountUtilController {
               case Some(model) => updateBankDetails(index, model.bankAccount(data))
               case _ => updateBankDetails(index, BankDetails(None, Some(data)))
             }
-<<<<<<< HEAD
-          } yield Redirect(routes.SummaryController.get())
-=======
-          } yield {Redirect(routes.WhatYouNeedController.get())}
->>>>>>> AMLS-234
+          } yield {Redirect(routes..get())}
         }
       }
     }
