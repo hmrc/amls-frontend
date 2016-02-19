@@ -11,10 +11,13 @@
     @heading("summary.checkyouranswers.title", "summary.bankdetails")
 
     @fieldset("", jsHidden = false, id = "ttt") {
-        <span>@Messages("bankdetails.summary.check.info")</span> <br>
-        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, false)">@Messages("bankdetails.summary.add.account")</a>
-    }
 
+        <span>@Messages("bankdetails.summary.check.info")</span> <br>
+
+    }
+    <br>
+    <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, false)"> @Messages("bankdetails.summary.add.account") </a>
+    <br><br>
     @model.zipWithIndex.map { case (x, y) =>
         <table>
             <tr>

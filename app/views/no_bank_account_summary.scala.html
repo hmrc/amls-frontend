@@ -10,7 +10,11 @@
     @heading("summary.checkyouranswers.title", "summary.bankdetails")
 
     @fieldset("", jsHidden = false, id = "ttt") {
+
         <span>@Messages("bankdetails.summary.nobank.account")</span> <br>
     }
+
+   <br><br>
+
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
 }
