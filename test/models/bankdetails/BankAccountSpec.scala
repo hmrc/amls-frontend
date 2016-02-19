@@ -209,15 +209,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
     }
 
 
-    "validate Json read" in {
-      Json.fromJson[BankAccount](Json.obj("accountName" -> "test", "isUK" -> false, "nonUKAccountNumber" -> "", "IBANNumber" -> "12345678")) must
-        be (JsSuccess(NonUKIBANNumber("12345678")))
-
-    }
-
-
-
-    "Form Rule validation Non UK Account" in {
+  "Form Rule validation Non UK Account" in {
 
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),
@@ -238,6 +230,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),
         "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> Seq(""),
         "IBANNumber" -> Seq("1234567812345678123456781234567812345678")
       )
 

@@ -31,10 +31,8 @@ trait BankAccountUtilController extends BaseController {
     }
 
   protected def updateBankDetails(index: Int, acc: BankDetails)
-  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] = {
-    println("-------------------------"+ acc)
+  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
     updateBankDetails(index, Seq(acc))
-  }
 
   protected def putBankDetails(accounts: Seq[BankDetails])
   (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
