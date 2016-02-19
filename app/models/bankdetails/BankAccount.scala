@@ -3,7 +3,7 @@ package models.bankdetails
 import models.FormTypes._
 import play.api.libs.json._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{To, Write, From, Rule}
+import play.api.data.mapping._
 
 
 sealed trait Account
