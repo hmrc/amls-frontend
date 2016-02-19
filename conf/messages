@@ -54,6 +54,7 @@ unauthorised.title = Unauthorised
 aboutyou.sectiontitle = About you
 aboutthebusiness.sectiontitle = About the business
 estateagentbusiness.sectiontitle = Estate agent business
+businessactivities.sectiontitle = Business Activities
 
 # Individual pages
 
@@ -261,3 +262,15 @@ bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
 bankdetails.accounttype.lbl.03 = A business account belonging to another business
 bankdetails.accounttype.lbl.04 = The business doesn't use a bank account
+
+businessactivities.whatyouneed.title = Business Activities - What you need
+businessactivities.whatyouneed.heading = What you need
+businessactivities.whatyouneed.requiredinfo.heading = For this section you''ll need to know:
+businessactivities.whatyouneed.line_1 = the anticipated turnover for the next 12 months
+businessactivities.whatyouneed.line_2 = how many employees you have
+businessactivities.whatyouneed.line_3 = where your most high-value customers live
+businessactivities.whatyouneed.possiblerequiredinfo.heading = Depending on your circumstances, you may also need to know:
+businessactivities.whatyouneed.line_4 = your franchisor's name
+businessactivities.whatyouneed.line_5 = how you record transactions
+businessactivities.whatyouneed.line_6 = your accountant's name and address
+businessactivities.whatyouneed.line_7 = your accountant's HMRC Agent Reference Number
