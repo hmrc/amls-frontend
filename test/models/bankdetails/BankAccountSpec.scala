@@ -3,6 +3,7 @@ package models.bankdetails
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.Success
+import play.api.libs.json.{JsSuccess, JsPath, Json}
 
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
@@ -20,7 +21,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
     }
 
 
-    "Form Write validation is successful for UKAccount" in {
+    "Form Write is successful for UKAccount" in {
 
       val ukAccount = UKAccount("12345678", "11-22-33")
 
@@ -31,6 +32,31 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       )
 
       Account.formWrites.writes(ukAccount) must be(urlFormEncoded)
+    }
+
+
+    "JSON Read is successful for UKAccount" in {
+      val jsObject = Json.obj(
+        "isUK" -> true,
+        "accountNumber" -> "12345678",
+        "sortCode" -> "11-22-33"
+      )
+
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(UKAccount("12345678", "11-22-33"), JsPath \ "isUK"))
+    }
+
+
+    "JSON Write is successful for UKAccount" in {
+
+      val ukAccount = UKAccount("12345678", "11-22-33")
+
+      val jsObject = Json.obj(
+        "isUK" -> true,
+        "accountNumber" -> "12345678",
+        "sortCode" -> "11-22-33"
+      )
+
+      Account.jsonWrites.writes(ukAccount) must be(jsObject)
     }
 
 
@@ -57,8 +83,30 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       Account.formWrites.writes(nonUKIBANNumber) must be(urlFormEncoded)
     }
 
+    "JSON Read is successful for Non UKAccount" 
+      val jsObject = Json.obj(
+        "accountName" -> "test",
+        "isUK" -> false,
+        "IBANNumber" -> "IB12345678"
+      )
 
-    "Form Write validation for Non UK Account Number" in {
+      Account.jsonReads.reads(jsObject) must be(Success(NonUKIBANNumber("IB12345678")))
+    }
+
+    "JSON Write is successful for Non UK Account Number" in {
+
+      val nonUKAccountNumber = NonUKAccountNumber("12345678")
+
+      val jsObject = Json.obj(
+        "isUK" -> false,
+        "nonUKAccountNumber" -> "12345678"
+      )
+
+      Account.jsonWrites.writes(nonUKAccountNumber) must be(jsObject)
+    }
+
+
+    "Form Write for Non UK Account Number" in {
 
       val nonUKAccount = NonUKAccountNumber("3242423424290788979345897345907")
 

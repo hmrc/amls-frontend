@@ -18,7 +18,7 @@ object Account {
       case true =>
         (
           (__ \ "accountNumber").read(ukBankAccountNumberType) and
-            (__ \ "sortCode").read[String]
+            (__ \ "sortCode").read(sortCodeType)
           ) (UKAccount.apply _)
       case false =>
         ( (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply )orElse(

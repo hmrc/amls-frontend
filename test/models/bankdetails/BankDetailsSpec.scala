@@ -64,4 +64,34 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
     }
   }
 
+  "BankDetails with only Bank Details" must {
+
+    val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
+    val bankDetails = BankDetails(None, Some(bankAccount))
+
+    "must Merge with existing data set" must {
+      "and return merger result with new data" in {
+        val accountTypeNew  = BelongsToBusiness
+        val result = bankDetails.bankAccountType(accountTypeNew)
+
+        result must be(BankDetails(Some(accountTypeNew), Some(bankAccount)))
+      }
+    }
+  }
+
+  "BankDetails with Bank Account Type and Bank Details" must {
+
+    val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
+    val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
+
+    "Merge with existing data set" must {
+      "return merger result with new data" in {
+        val accountTypeNew  = BelongsToBusiness
+        val result = bankDetails.bankAccountType(accountTypeNew)
+
+        result must be(BankDetails(Some(accountTypeNew), Some(bankAccount)))
+      }
+    }
+  }
+
 }
