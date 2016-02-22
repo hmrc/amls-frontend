@@ -22,8 +22,7 @@ trait BankAccountUtilController extends BaseController {
 
   def getBankDetails(index: Int)(implicit user: AuthContext, hc: HeaderCarrier): Future[Option[BankDetails]] = {
     getBankDetails map {
-      case accounts if index > 0 && index <= accounts.length + 1 => println("----------------get index-----------"+index)
-        accounts lift (index - 1)
+      case accounts if index > 0 && index <= accounts.length + 1 => accounts lift (index - 1)
       case _ => None
     }
   }
@@ -36,8 +35,6 @@ trait BankAccountUtilController extends BaseController {
 
   protected def updateBankDetails(index: Int, acc: BankDetails)
                                  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] = {
-
-  println("---------upadate-------------------------------" + acc+"---index---"+index)
   updateBankDetails(index, Seq(acc))
 }
 

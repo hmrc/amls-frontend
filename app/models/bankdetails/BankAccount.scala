@@ -26,10 +26,8 @@ object Account {
         case false =>
           ((__ \ "IBANNumber").read(optionR(ibanType)) and
             (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
-            case (Some(iban), _) =>  println("---------------ttttttt-------------------------"+iban)
-              NonUKIBANNumber(iban)
-            case (_, Some(accountNo)) => println("---------------ttttttt--acc-----------------------"+accountNo)
-              NonUKAccountNumber(accountNo)
+            case (Some(iban), _) => NonUKIBANNumber(iban)
+            case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
             case (_, _) =>
               (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
           }
