@@ -1,5 +1,6 @@
 package models.bankdetails
 
+import models.FormTypes
 import models.FormTypes._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
@@ -23,10 +24,12 @@ object Account {
               (__ \ "sortCode").read(sortCodeType)
             ) (UKAccount.apply _)
         case false =>
-          ((__ \ "IBANNumber").read[Option[String]] ~
-            (__ \ "nonUKAccountNumber").read[Option[String]]).tupled flatMap {
-            case (Some(iban), _) =>  (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
-            case (_, Some(accountNo)) => (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
+          ((__ \ "IBANNumber").read(optionR(ibanType)) and
+            (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
+            case (Some(iban), _) =>  println("---------------ttttttt-------------------------"+iban)
+              NonUKIBANNumber(iban)
+            case (_, Some(accountNo)) => println("---------------ttttttt--acc-----------------------"+accountNo)
+              NonUKAccountNumber(accountNo)
             case (_, _) =>
               (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
           }
@@ -45,11 +48,13 @@ object Account {
         case nonukacc: NonUKAccountNumber =>
           Map(
             "isUK" -> Seq("false"),
-            "nonUKAccountNumber" -> nonukacc.accountNumber)
+            "nonUKAccountNumber" -> nonukacc.accountNumber,
+            "isIBAN" -> Seq("true"))
         case iban: NonUKIBANNumber =>
           Map(
             "isUK" -> Seq("false"),
-            "IBANNumber" -> iban.IBANNumber)
+            "IBANNumber" -> iban.IBANNumber,
+            "isIBAN" -> Seq("false"))
       }
 
   }
@@ -65,11 +70,9 @@ object Account {
         ) (UKAccount.apply _)
 
       case false =>
-        (__ \ "nonUKAccountNumber").read[String] flatMap {
-          case "" =>
-            (__ \ "IBANNumber").read[String] fmap NonUKIBANNumber.apply
-          case _ =>
-            (__ \ "nonUKAccountNumber").read[String] fmap NonUKAccountNumber.apply
+        (__ \ "isIBAN").read[Boolean] flatMap {
+          case true => (__ \ "IBANNumber").read[String] fmap  NonUKIBANNumber.apply
+          case false =>  (__ \ "nonUKAccountNumber").read[String] fmap  NonUKIBANNumber.apply
         }
     }
   }
@@ -82,9 +85,9 @@ object Account {
     case m: NonUKAccount => {
       m match {
         case acc: NonUKAccountNumber => Json.obj("isUK" -> false,
-          "nonUKAccountNumber" -> acc.accountNumber)
+          "nonUKAccountNumber" -> acc.accountNumber, "isIBAN" -> false)
         case iban: NonUKIBANNumber => Json.obj("isUK" -> false,
-          "IBANNumber" -> iban.IBANNumber)
+          "IBANNumber" -> iban.IBANNumber, "isIBAN" -> true)
       }
     }
   }

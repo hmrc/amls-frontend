@@ -10,29 +10,36 @@ import scala.concurrent.Future
 
 trait BankAccountUtilController extends BaseController {
 
-  val dataCacheConnector : DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
-  def getBankDetails(implicit user: AuthContext, hc: HeaderCarrier): Future[Seq[BankDetails]]= {
-      dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](BankDetails.key) map {
-        _.fold(Seq.empty[BankDetails]){identity} }
+  def getBankDetails(implicit user: AuthContext, hc: HeaderCarrier): Future[Seq[BankDetails]] = {
+    dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](BankDetails.key) map {
+      _.fold(Seq.empty[BankDetails]) {
+        identity
+      }
+    }
   }
 
-  def getBankDetails(index:Int)(implicit user: AuthContext, hc: HeaderCarrier):Future[Option[BankDetails]] ={
+  def getBankDetails(index: Int)(implicit user: AuthContext, hc: HeaderCarrier): Future[Option[BankDetails]] = {
     getBankDetails map {
-      case accounts if index > 0 && index <= accounts.length + 1 =>accounts lift (index - 1)
+      case accounts if index > 0 && index <= accounts.length + 1 => println("----------------get index-----------"+index)
+        accounts lift (index - 1)
       case _ => None
     }
   }
 
   protected def updateBankDetails(index: Int, value: Seq[BankDetails])
-  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
-    getBankDetails map {accounts =>
-        putBankDetails(accounts.patch(index - 1, value, 1))
+                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
+    getBankDetails map { accounts =>
+      putBankDetails(accounts.patch(index - 1, value, 1))
     }
 
   protected def updateBankDetails(index: Int, acc: BankDetails)
-  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
-    updateBankDetails(index, Seq(acc))
+                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] = {
+
+  println("---------upadate-------------------------------" + acc+"---index---"+index)
+  updateBankDetails(index, Seq(acc))
+}
 
   protected def putBankDetails(accounts: Seq[BankDetails])
   (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =

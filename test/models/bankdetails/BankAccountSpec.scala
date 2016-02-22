@@ -126,11 +126,10 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val jsObject = Json.obj(
         "accountName" -> "test",
         "isUK" -> false,
-        "nonUKAccountNumber" -> "",
         "IBANNumber" -> "IB12345678"
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKIBANNumber("IB12345678"), JsPath \ "isUK" \ "nonUKAccountNumber" \"IBANNumber"))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKIBANNumber("IB12345678"), JsPath \ "isUK" \"IBANNumber"))
     }
 
     "JSON Write is successful for Non UK Account Number" in {
