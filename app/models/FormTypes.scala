@@ -88,8 +88,8 @@ object FormTypes {
 
   val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength) compose pattern("^[0-9]{8}$".r)
 
-  val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength)
+  val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength) compose pattern("^[0-9a-zA-Z_]{40}$".r)
 
-  val ibanType = notEmpty compose maxLength(maxIBANLength)
+  val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern("^[0-9a-zA-Z_]{34}$".r)
 
 }

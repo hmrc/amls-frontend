@@ -10,19 +10,12 @@
     @heading("bankdetails.accounttype.title", "summary.bankdetails")
 
     @form(f, controllers.bankdetails.routes.BankAccountTypeController.post(index, edit)) {
-        @if(edit) {
-            @radioGroup(f("bankAccountType")) {
-                @legend("TODO", jsHidden = true)
-                @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.01", "01")
-                @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.02", "02")
-                @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.03", "03")
-            }
-        } else {
-            @radioGroup(f("bankAccountType")) {
-                @legend("TODO", jsHidden = true)
-                @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.01", "01")
-                @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.02", "02")
-                @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.03", "03")
+        @radioGroup(f("bankAccountType")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.01", "01")
+            @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.02", "02")
+            @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.03", "03")
+            @if(!edit) {
                 @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.04", "04")
             }
         }
