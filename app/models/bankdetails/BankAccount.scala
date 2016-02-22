@@ -1,6 +1,7 @@
 package models.bankdetails
 
 import models.FormTypes._
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
@@ -12,23 +13,25 @@ object Account {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val formRule: Rule[UrlFormEncoded, Account] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    (__ \ "isUK").read[Boolean] flatMap {
-      case true =>
-        (
-          (__ \ "accountNumber").read(ukBankAccountNumberType) and
-            (__ \ "sortCode").read(sortCodeType)
-          ) (UKAccount.apply _)
-      case false =>
-        (__ \ "nonUKAccountNumber").read[String] flatMap {
-          case "" =>
-            (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
-          case _ =>
-            (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
-        }
+  implicit val formRead: Rule[UrlFormEncoded, Account] =
+    From[UrlFormEncoded] { __ =>
+      import play.api.data.mapping.forms.Rules._
+      (__ \ "isUK").read[Boolean] flatMap {
+        case true =>
+          (
+            (__ \ "accountNumber").read(ukBankAccountNumberType) and
+              (__ \ "sortCode").read(sortCodeType)
+            ) (UKAccount.apply _)
+        case false =>
+          ((__ \ "IBANNumber").read[Option[String]] ~
+            (__ \ "nonUKAccountNumber").read[Option[String]]).tupled flatMap {
+            case (Some(iban), _) =>  (__ \ "IBANNumber").read(ibanType) fmap NonUKIBANNumber.apply
+            case (_, Some(accountNo)) => (__ \ "nonUKAccountNumber").read(nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
+            case (_, _) =>
+              (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
+          }
       }
-  }
+    }
 
   implicit val formWrites: Write[Account, UrlFormEncoded] = Write {
     case f: UKAccount =>
@@ -46,7 +49,6 @@ object Account {
         case iban: NonUKIBANNumber =>
           Map(
             "isUK" -> Seq("false"),
-            "nonUKAccountNumber" -> Seq(""),
             "IBANNumber" -> iban.IBANNumber)
       }
 
@@ -82,13 +84,10 @@ object Account {
         case acc: NonUKAccountNumber => Json.obj("isUK" -> false,
           "nonUKAccountNumber" -> acc.accountNumber)
         case iban: NonUKIBANNumber => Json.obj("isUK" -> false,
-          "nonUKAccountNumber" -> "",
           "IBANNumber" -> iban.IBANNumber)
       }
     }
-
   }
-
 }
 
 case class UKAccount(
