@@ -15,6 +15,7 @@ import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import org.specs2.execute.Pending
 import play.api.libs.json.Format
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
@@ -55,11 +56,15 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
       "Trading Premises data does not already exists in the cache" when {
         "get is called" should {
           "redirect to check your answers page" in new Fixture {
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
-              (any(), any(), any())).thenReturn(Future.successful(None))
-
+            val mockCacheMap = mock[CacheMap]
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(businessMatchingWithSingleBusinessActivity))
+            when(mockCacheMap.getEntry[TradingPremises](TradingPremises.key))
+              .thenReturn(None)
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(controller.dataCacheConnector.saveDataShortLivedCache(any(), any[TradingPremises])(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]]))
+              .thenReturn(Future.successful(None))
 
             val result = controller.get()(request)
 
@@ -68,10 +73,15 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
           }
 
           "Automatically write the appropriate value to dataCache" in new Fixture {
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
-              (any(), any(), any())).thenReturn(Future.successful(None))
+            val mockCacheMap = mock[CacheMap]
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(businessMatchingWithSingleBusinessActivity))
+            when(mockCacheMap.getEntry[TradingPremises](TradingPremises.key))
+              .thenReturn(None)
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(controller.dataCacheConnector.saveDataShortLivedCache(any(), any[TradingPremises])(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]]))
+              .thenReturn(Future.successful(None))
 
             whenReady(controller.get()(request)) { result  =>
               verify(controller.dataCacheConnector)
@@ -84,10 +94,15 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
       "Trading Premises data already exists in the cache" when {
         "get is called" should {
           "redirect to check your answers page" in new Fixture {
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithAgentSet)))
+            val mockCacheMap = mock[CacheMap]
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(businessMatchingWithSingleBusinessActivity))
+            when(mockCacheMap.getEntry[TradingPremises](TradingPremises.key))
+              .thenReturn(Some(tradingPremisesWithAgentSet))
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(controller.dataCacheConnector.saveDataShortLivedCache(any(), any[TradingPremises])(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]]))
+              .thenReturn(Future.successful(None))
 
             val result = controller.get()(request)
 
@@ -96,10 +111,15 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
           }
 
           "Automatically write the appropriate value to dataCache" in new Fixture {
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithSingleBusinessActivity)))
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithAgentSet)))
+            val mockCacheMap = mock[CacheMap]
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(businessMatchingWithSingleBusinessActivity))
+            when(mockCacheMap.getEntry[TradingPremises](TradingPremises.key))
+              .thenReturn(Some(tradingPremisesWithAgentSet))
+            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(controller.dataCacheConnector.saveDataShortLivedCache(any(), any[TradingPremises])(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]]))
+              .thenReturn(Future.successful(None))
 
             whenReady(controller.get()(request)) { result =>
               verify(controller.dataCacheConnector)
@@ -110,23 +130,30 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
           }
         }
       }
+    }
 
-      "The business engages in multiple activities" when {
-        "get is called" should {
-          "include only the appropriate options in the list" in new Fixture {
-            when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-              (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithTwoBusinessActivities)))
+    "The business engages in multiple activities" when {
+      "get is called" should {
+        "include only the appropriate options in the list" in new Fixture {
+          val mockCacheMap = mock[CacheMap]
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(businessMatchingWithTwoBusinessActivities))
+          when(mockCacheMap.getEntry[TradingPremises](TradingPremises.key))
+            .thenReturn(Some(tradingPremisesWithAgentSet))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(controller.dataCacheConnector.saveDataShortLivedCache(any(), any[TradingPremises])(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]]))
+            .thenReturn(Future.successful(None))
 
-            val result = controller.get()(request)
+          val result = controller.get()(request)
 
-            status(result) must be(OK)
+          status(result) must be(OK)
 
-            val document = Jsoup.parse(contentAsString(result))
-            document.title() must be ("What does your business do at these premises?")
-            val opts = document.select("input[type=checkbox]")
-            opts.size() must be (2)
+          val document = Jsoup.parse(contentAsString(result))
+          document.title() must be ("What does your business do at these premises?")
+          val opts = document.select("input[type=checkbox]")
+          opts.size() must be (2)
 
-          }
         }
       }
     }
@@ -163,14 +190,15 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec
             "activities[]" -> "98",
             "activities[]" -> "04"
           )
-
-          when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](Matchers.eq(BusinessMatching.key))
-            (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithTwoBusinessActivities)))
-          when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](Matchers.eq(TradingPremises.key))
-            (any(), any(), any())).thenReturn(Future.successful(Some(tradingPremisesWithAgentSet)))
-
-          when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          val mockCacheMap = mock[CacheMap]
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(businessMatchingWithTwoBusinessActivities))
+          when(mockCacheMap.getEntry[TradingPremises](TradingPremises.key))
+            .thenReturn(Some(tradingPremisesWithAgentSet))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(controller.dataCacheConnector.saveDataShortLivedCache(any(), any[TradingPremises])(any[AuthContext], any[HeaderCarrier], any[Format[TradingPremises]]))
+            .thenReturn(Future.successful(None))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)

@@ -17,32 +17,33 @@ trait WhatDoesYourBusinessDoController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      buildView(edit, Ok)
+      buildView(EmptyForm, edit, Ok)
     }
   }
 
-  private def buildView(edit: Boolean, status: Status)(implicit authContext:AuthContext, request:Request[_]) = {
-    dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key).flatMap {
-      case Some(BusinessMatching(Some(BusinessActivities(activityList)))) if activityList.size==1 => {
-        dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
-          .map {
-            case Some(existingData) => existingData.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activityList))
-            case _ => TradingPremises(None, None, Some(WhatDoesYourBusinessDo(activityList)))
-          }
-          .map{ tp =>
-            dataCacheConnector.saveDataShortLivedCache(TradingPremises.key, tp)
-            SeeOther(controllers.tradingpremises.routes.SummaryController.get.url)
-          }
-      }
-      case Some(BusinessMatching(Some(activityList))) => Future.successful(status(views.html.what_does_your_business_do(EmptyForm, activityList, edit)))
-      case _ => Future.successful(NotFound)
-    }
+  private def buildView(form :Form2[_],  edit: Boolean, status: Status)(implicit authContext:AuthContext, request:Request[_]): Future[Result] = {
+
+    dataCacheConnector.fetchAll map { x =>
+      (for {
+        allData <- x
+        businessMatchingData <- allData.getEntry[BusinessMatching](BusinessMatching.key)
+        tradingPremisesData <- allData.getEntry[TradingPremises](TradingPremises.key) orElse Some(TradingPremises())
+      } yield businessMatchingData match {
+        case BusinessMatching(Some(BusinessActivities(activityList))) if (activityList.size == 1) => {
+          dataCacheConnector.saveDataShortLivedCache(TradingPremises.key,
+            tradingPremisesData.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activityList))
+          ) map ( _ => SeeOther(controllers.tradingpremises.routes.SummaryController.get.url) )
+        }
+        case BusinessMatching(Some(businessActivities)) =>
+          Future.successful(status(views.html.what_does_your_business_do(form, businessActivities, edit)))
+      }) getOrElse Future.successful(NotFound)
+    } flatMap (identity)
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[WhatDoesYourBusinessDo](request.body) match {
-        case f: InvalidForm => buildView(edit, BadRequest)
+        case f: InvalidForm => buildView(f, edit, BadRequest)
         case ValidForm(_, data) =>
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
