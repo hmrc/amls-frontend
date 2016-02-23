@@ -7,16 +7,19 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.tradingpremises.{YourAgent, TradingPremises}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-trait YourAgentController extends BaseController {
+trait YourAgentController extends TradingPremisesUtilController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
+
+      getPremisesDetails(index) map {
         case Some(TradingPremises(_, Some(data), _)) =>
           Ok(views.html.who_is_your_agent(Form2[YourAgent](data), edit))
         case _ => Ok(views.html.who_is_your_agent(EmptyForm, edit))

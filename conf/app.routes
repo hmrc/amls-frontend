@@ -43,7 +43,7 @@ GET         /trading-premises/index                    controllers.tradingpremis
 GET         /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.get(edit: Boolean ?= false)
 POST        /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.post(edit: Boolean ?= false)
 
-GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(edit: Boolean ?= false)
+GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(index:Int ?= 0, edit: Boolean ?= false)
 POST        /trading-premises/agent                    controllers.tradingpremises.YourAgentController.post(edit: Boolean ?= false)
 
 GET         /trading-premises/summary                  controllers.tradingpremises.SummaryController.get()
