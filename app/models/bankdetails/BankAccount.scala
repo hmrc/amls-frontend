@@ -1,7 +1,7 @@
 package models.bankdetails
 
-import models.FormTypes
 import models.FormTypes._
+import models.FormTypes
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -24,10 +24,10 @@ object Account {
               (__ \ "sortCode").read(sortCodeType)
             ) (UKAccount.apply _)
         case false =>
-          ((__ \ "IBANNumber").read(optionR(ibanType)) and
-            (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
-            case (Some(iban), _) => NonUKIBANNumber(iban)
-            case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
+          ((__ \ "IBANNumber").read[Option[String]] and
+            (__ \ "nonUKAccountNumber").read[Option[String]]).tupled flatMap {
+            case (Some(iban), _) => FormTypes.ibanType fmap NonUKIBANNumber.apply
+            case (_, Some(accountNo)) => FormTypes.nonUKBankAccountNumberType fmap NonUKAccountNumber.apply
             case (_, _) =>
               (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
           }
@@ -41,20 +41,16 @@ object Account {
         "accountNumber" -> f.accountNumber,
         "sortCode" -> f.sortCode
       )
-    case f: NonUKAccount =>
-      f match {
-        case nonukacc: NonUKAccountNumber =>
-          Map(
-            "isUK" -> Seq("false"),
-            "nonUKAccountNumber" -> nonukacc.accountNumber,
-            "isIBAN" -> Seq("true"))
-        case iban: NonUKIBANNumber =>
-          Map(
-            "isUK" -> Seq("false"),
-            "IBANNumber" -> iban.IBANNumber,
-            "isIBAN" -> Seq("false"))
-      }
-
+    case nonukacc: NonUKAccountNumber =>
+      Map(
+        "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> nonukacc.accountNumber
+      )
+    case iban: NonUKIBANNumber =>
+      Map(
+        "isUK" -> Seq("false"),
+        "IBANNumber" -> iban.IBANNumber
+      )
   }
 
   implicit val jsonReads: Reads[Account] = {
@@ -146,4 +142,7 @@ object BankAccount {
       ) (unlift(BankAccount.unapply _))
 
   }
+
+  implicit def convert(s: BankAccount): Option[BankDetails] =
+    Some(BankDetails(None, Some(s)))
 }

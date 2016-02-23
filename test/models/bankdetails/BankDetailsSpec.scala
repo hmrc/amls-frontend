@@ -42,7 +42,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
 
     "merged with bankDetails" must {
       "return bank details with correct data set" in {
-        val accountTypeNew = NoBankAccount
+        val accountTypeNew = BelongsToOtherBusiness
         val result = initial.bankAccountType(accountTypeNew)
 
         result must be(BankDetails(Some(accountTypeNew), None))

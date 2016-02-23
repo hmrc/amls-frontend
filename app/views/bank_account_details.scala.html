@@ -35,9 +35,10 @@ s"""${f("IBANNumber").id}-fieldset"""
             @input(f("sortCode"), "bankdetails.bankaccount.sortcode", bold = false)
         }
         @fieldset("TODO", jsHidden = true, id = target1) {
-            @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
-            <p>or</p>
             @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
+            <p>or</p>
+            @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
+
         }
     }
     @submit(edit)

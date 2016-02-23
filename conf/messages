@@ -292,4 +292,5 @@ bankdetails.summary.accounttype.lbl.02 = My business''s account
 bankdetails.summary.accounttype.lbl.03 = Another business''s account
 
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
+bankdetails.summary.nobank.add.account = Add a bank account
 

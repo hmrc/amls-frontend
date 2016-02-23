@@ -2,7 +2,8 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.bankdetails.BankDetails
+import models.bankdetails.{BankAccountType, BankDetails}
+import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -27,20 +28,32 @@ trait BankAccountUtilController extends BaseController {
     }
   }
 
-  protected def updateBankDetails(index: Int, value: Seq[BankDetails])
-                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
-    getBankDetails map { accounts =>
-      putBankDetails(accounts.patch(index - 1, value, 1))
+  protected def updateBankDetails
+  (index: Int)
+  (fn: Option[BankDetails] => Option[BankDetails])
+  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
+    getBankDetails map {
+      accounts => {
+
+        putBankDetails(accounts.patch(index - 1, fn(accounts.lift(index - 1)).toSeq, 1))
+      }
     }
 
-  protected def updateBankDetails(index: Int, acc: BankDetails)
-                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] = {
-  updateBankDetails(index, Seq(acc))
-}
+//  @deprecated("?")
+//  protected def updateBankDetails(index: Int, value: Seq[BankDetails])
+//                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
+//    updateBankDetails { accounts =>
+//      accounts.patch(index - 1, value, 1)
+//    }
+//
+//  @deprecated("?")
+//  protected def updateBankDetails(index: Int, acc: BankDetails)
+//                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] = {
+//  updateBankDetails(index, Seq(acc))
+//}
 
   protected def putBankDetails(accounts: Seq[BankDetails])
   (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
     dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](BankDetails.key, accounts)
-
 }
 
