@@ -47,12 +47,12 @@ object Account {
           Map(
             "isUK" -> Seq("false"),
             "nonUKAccountNumber" -> nonukacc.accountNumber,
-            "isIBAN" -> Seq("true"))
+            "isIBAN" -> Seq("false"))
         case iban: NonUKIBANNumber =>
           Map(
             "isUK" -> Seq("false"),
             "IBANNumber" -> iban.IBANNumber,
-            "isIBAN" -> Seq("false"))
+            "isIBAN" -> Seq("true"))
       }
 
   }

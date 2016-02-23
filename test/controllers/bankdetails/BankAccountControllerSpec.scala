@@ -53,7 +53,8 @@ class BankAccountControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       val newRequest = request.withFormUrlEncodedBody(
         "accountName" ->"test",
         "isUK" -> "false",
-        "nonUKAccountNumber" -> "12345678"
+        "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
+        "isIBAN" -> "false"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
