@@ -23,7 +23,7 @@
             <span>@Messages("bankdetails.summary.check.info")</span> <br>
         }
         <br>
-        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, false)"> @Messages("bankdetails.summary.add.account") </a>
+        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, true)"> @Messages("bankdetails.summary.add.account") </a>
         <br><br>
         @model.zipWithIndex.map { case (x, y) =>
             <table>
@@ -71,7 +71,6 @@
                            case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
                            case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                        }
-                       @{None == x.bankAccountType}
                    </td>
                 </tr>
 

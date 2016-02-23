@@ -24,13 +24,15 @@ object Account {
               (__ \ "sortCode").read(sortCodeType)
             ) (UKAccount.apply _)
         case false =>
-          ((__ \ "IBANNumber").read(optionR(ibanType)) and
-            (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
-            case (Some(iban), _) => NonUKIBANNumber(iban)
-            case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
-            case (_, _) =>
-              (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
-          }
+          ((__ \ "IBANNumber").read[String] and
+            (__ \ "nonUKAccountNumber").read[String]).tupled flatMap {
+              case ("", "") =>
+                (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
+              case ("", accountNo) =>
+                (__ \ "nonUKAccountNumber").read(FormTypes.nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
+              case (iban, _) =>
+                (__ \ "IBANNumber").read(FormTypes.ibanType) fmap NonUKIBANNumber.apply
+            }
       }
     }
 
@@ -41,26 +43,19 @@ object Account {
         "accountNumber" -> f.accountNumber,
         "sortCode" -> f.sortCode
       )
-    case f: NonUKAccount =>
-      f match {
-        case nonukacc: NonUKAccountNumber =>
-          Map(
-            "isUK" -> Seq("false"),
-            "nonUKAccountNumber" -> nonukacc.accountNumber,
-            "isIBAN" -> Seq("false"))
-        case iban: NonUKIBANNumber =>
-          Map(
-            "isUK" -> Seq("false"),
-            "IBANNumber" -> iban.IBANNumber,
-            "isIBAN" -> Seq("true"))
-      }
-
+    case nonukacc: NonUKAccountNumber =>
+      Map(
+        "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> nonukacc.accountNumber)
+    case iban: NonUKIBANNumber =>
+      Map(
+        "isUK" -> Seq("false"),
+        "IBANNumber" -> iban.IBANNumber)
   }
 
   implicit val jsonReads: Reads[Account] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
-
     (__ \ "isUK").read[Boolean] flatMap {
       case true => (
         (__ \ "accountNumber").read[String] and
@@ -70,24 +65,30 @@ object Account {
       case false =>
         (__ \ "isIBAN").read[Boolean] flatMap {
           case true => (__ \ "IBANNumber").read[String] fmap  NonUKIBANNumber.apply
-          case false =>  (__ \ "nonUKAccountNumber").read[String] fmap  NonUKIBANNumber.apply
+          case false =>  (__ \ "nonUKAccountNumber").read[String] fmap  NonUKAccountNumber.apply
         }
     }
   }
 
   implicit val jsonWrites = Writes[Account] {
     case m: UKAccount =>
-      Json.obj("isUK" -> true,
+      Json.obj(
+        "isUK" -> true,
         "accountNumber" -> m.accountNumber,
-        "sortCode" -> m.sortCode)
-    case m: NonUKAccount => {
-      m match {
-        case acc: NonUKAccountNumber => Json.obj("isUK" -> false,
-          "nonUKAccountNumber" -> acc.accountNumber, "isIBAN" -> false)
-        case iban: NonUKIBANNumber => Json.obj("isUK" -> false,
-          "IBANNumber" -> iban.IBANNumber, "isIBAN" -> true)
-      }
-    }
+        "sortCode" -> m.sortCode
+      )
+    case acc: NonUKAccountNumber =>
+      Json.obj(
+        "isUK" -> false,
+        "nonUKAccountNumber" -> acc.accountNumber,
+        "isIBAN" -> false
+      )
+    case iban: NonUKIBANNumber =>
+      Json.obj(
+        "isUK" -> false,
+        "IBANNumber" -> iban.IBANNumber,
+        "isIBAN" -> true
+      )
   }
 }
 

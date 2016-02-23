@@ -24,7 +24,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
     }
 
     "fail on invalid selection" in {
-      Account.formRead.validate(Map("accountName" -> Seq("test"), "isUK" -> Seq("false"))) must be(Failure(Seq(
+      Account.formRead.validate(Map("accountName" -> Seq("test"), "isUK" -> Seq("false"), "nonUKAccountNumber" -> Seq(""))) must be(Failure(Seq(
         (Path \ "IBANNumber") -> Seq(ValidationError("error.required")))))
     }
 
@@ -33,6 +33,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("test"),
         "isUK" -> Seq("false"),
+        "IBANNumber" -> Seq(""),
         "nonUKAccountNumber" -> Seq("123456789012345678901234567890ABCDefghij")
       )
 
@@ -43,7 +44,8 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("test"),
         "isUK" -> Seq("false"),
-        "IBANNumber" -> Seq("123456789012345678901234567890ABCD")
+        "IBANNumber" -> Seq("123456789012345678901234567890ABCD"),
+        "nonUKAccountNumber" -> Seq("")
       )
 
       Account.formRead.validate(urlFormEncoded) must be(Success(NonUKIBANNumber("123456789012345678901234567890ABCD")))
@@ -128,6 +130,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("test"),
         "isUK" -> Seq("false"),
+        "IBANNumber" -> Seq(""),
         "nonUKAccountNumber" -> Seq("12334623784623648236482364872364726384762384762384623874554787876868")
       )
 
@@ -141,8 +144,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       val urlFormEncoded = Map(
         "isUK" -> Seq("false"),
-        "IBANNumber" -> Seq("3242423424290788979345897345907"),
-        "isIBAN" -> Seq("true")
+        "IBANNumber" -> Seq("3242423424290788979345897345907")
       )
 
       Account.formWrites.writes(nonUKIBANNumber) must be(urlFormEncoded)
@@ -180,8 +182,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       val urlFormEncoded = Map(
         "isUK" -> Seq("false"),
-        "nonUKAccountNumber" -> Seq("3242423424290788979345897345907"),
-        "isIBAN" -> Seq("false")
+        "nonUKAccountNumber" -> Seq("3242423424290788979345897345907")
       )
       Account.formWrites.writes(nonUKAccount) must be(urlFormEncoded)
     }
@@ -222,18 +223,31 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),
         "isUK" -> Seq("false"),
-        "nonUKAccountNumber" -> Seq("123456789012345678901234567890ABCDEFGHIJ"),
-        "sortCode" -> Seq("112233")
+        "IBANNumber" -> Seq(""),
+        "nonUKAccountNumber" -> Seq("123456789012345678901234567890ABCDEFGHIJ")
       )
 
       BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("My Account", NonUKAccountNumber("123456789012345678901234567890ABCDEFGHIJ"))))
+    }
+
+    "Form Write for Non UK Account" in {
+
+      val nonUKBankAccount = BankAccount("My Account", NonUKAccountNumber("12341234"))
+
+      val urlFormEncoded = Map(
+        "accountName" -> Seq("My Account"),
+        "isUK" -> Seq("false"),
+        "nonUKAccountNumber" -> Seq("12341234")
+      )
+
+      BankAccount.formWrite.writes(nonUKBankAccount) must be(urlFormEncoded)
     }
 
 
     "Form Write validation for IBAN Non UK Account" in {
 
       val nonUKIBANNumber = NonUKIBANNumber("1234567812345678123456781234567812345678")
-      val nonUKBankAccount = BankAccount("My Account",  nonUKIBANNumber)
+      val nonUKBankAccount = BankAccount("My Account", nonUKIBANNumber)
 
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),

@@ -2,8 +2,7 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.bankdetails.{BankAccountType, BankDetails}
-import play.api.Logger
+import models.bankdetails.BankDetails
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 

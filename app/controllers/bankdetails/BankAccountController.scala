@@ -16,6 +16,7 @@ trait BankAccountController extends BankAccountUtilController {
     implicit authContext => implicit request =>
       getBankDetails(index) map {
         case Some(BankDetails(_, Some(data))) =>
+          Logger.info(data.toString)
           Ok(views.html.bank_account_details(Form2[BankAccount](data), edit, index))
         case _ =>
           Ok(views.html.bank_account_details(EmptyForm, edit, index))
@@ -24,7 +25,7 @@ trait BankAccountController extends BankAccountUtilController {
 
   def post(index:Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[BankAccount](request.body) match {
+      Form2[BankAccount](request.body)(BankAccount.formRule) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
