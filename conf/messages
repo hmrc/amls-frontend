@@ -193,6 +193,7 @@ tradingpremises.yourtradingpremises.whose.another=Another business'' premises
 tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
+tradingpremises.summary.addanother = Add another premises
 
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need

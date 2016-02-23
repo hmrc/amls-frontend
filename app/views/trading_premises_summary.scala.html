@@ -8,32 +8,34 @@
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
+<div class="panel-indent">
     <p>
         @Messages("summary.linetext")
     </p>
+    <p>
+        <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get()"> @Messages("tradingpremises.summary.addanother") </a>
+    </p>
+</div>
+
         @model.yourTradingPremises.map { ytp=>
         <table>
             <tr>
-                <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.title")</th>
+                <th class="summary-title" colspan="2">@ytp.tradingName</th>
                 <td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get()">@Messages("button.edit")</a></td>
             </tr>
             <tr>
-                <td colspan="2">
-                    @ytp.tradingName
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
+                <td>
                     @ytp.tradingPremisesAddress.toLines.map{ line =>
                     @line
                     <br>}
                 </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @{ytp.isOwner match { case true => "Own"
-                                            case _ => "Agent's"
-                    }}
+                @model.whatDoesYourBusinessDoAtThisAddress.map { ba=>
+                <td>
+                    @ba.activities.map{ line =>
+                    @line <br>}}
+                </td>
+                <td>
+                    <p>Own</p>
                 </td>
             </tr>
         </table>
@@ -41,26 +43,25 @@
     @model.yourAgent.map { agent=>
     <table>
         <tr>
-            <th class="summary-title">@Messages("summary.checkyouranswers.agentspremises.title")</th>
+            <th class="summary-title" colspan="2">@agent.agentsRegisteredName.value</th>
             <td><a href="@controllers.tradingpremises.routes.AgentSummaryController.get()">@Messages("button.edit")</a></td>
         </tr>
         <tr>
-            <td colspan="2">
-                @agent.agentsRegisteredName.value
+            @model.yourTradingPremises.map { ytp=>
+            <td>
+                @ytp.tradingPremisesAddress.toLines.map{ line =>
+                @line
+                <br>}
             </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @agent.businessStructure
+            @model.whatDoesYourBusinessDoAtThisAddress.map { ba=>
+            <td>
+                @ba.activities.map{ line =>
+                @line <br>}}
             </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @{agent.taxType match {
-                case TaxTypeSelfAssesment => "Self Assessment"
-                case _ => "Corporation tax"
-                }}
+            <td>
+                <p>Agent's</p>
             </td>
+            }
         </tr>
     </table>
     }
