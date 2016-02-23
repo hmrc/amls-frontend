@@ -16,7 +16,6 @@ trait BankAccountController extends BankAccountUtilController {
     implicit authContext => implicit request =>
       getBankDetails(index) map {
         case Some(BankDetails(_, Some(data))) =>
-          Logger.info(data.toString)
           Ok(views.html.bank_account_details(Form2[BankAccount](data), edit, index))
         case _ =>
           Ok(views.html.bank_account_details(EmptyForm, edit, index))
@@ -32,7 +31,6 @@ trait BankAccountController extends BankAccountUtilController {
           for {
             result <- updateBankDetails(index) {
               a =>
-                Logger.info("second controller: " + a.toString)
                 a match {
                   case Some(BankDetails(Some(x), _)) => Some(BankDetails(Some(x), Some(data)))
                   case _ => data

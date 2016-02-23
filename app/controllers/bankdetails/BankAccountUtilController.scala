@@ -38,19 +38,6 @@ trait BankAccountUtilController extends BaseController {
       }
     }
 
-//  @deprecated("?")
-//  protected def updateBankDetails(index: Int, value: Seq[BankDetails])
-//                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
-//    updateBankDetails { accounts =>
-//      accounts.patch(index - 1, value, 1)
-//    }
-//
-//  @deprecated("?")
-//  protected def updateBankDetails(index: Int, acc: BankDetails)
-//                                 (implicit user: AuthContext, hc: HeaderCarrier): Future[_] = {
-//  updateBankDetails(index, Seq(acc))
-//}
-
   protected def putBankDetails(accounts: Seq[BankDetails])
   (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
     dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](BankDetails.key, accounts)

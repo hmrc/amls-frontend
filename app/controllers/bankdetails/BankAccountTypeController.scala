@@ -4,7 +4,6 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
 import models.bankdetails.{BankAccountType, BankDetails}
-import play.api.Logger
 
 import scala.concurrent.Future
 
@@ -18,7 +17,6 @@ trait BankAccountTypeController extends BankAccountUtilController {
         case Some(BankDetails(Some(data), _)) =>
           Ok(views.html.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
         case a => {
-          Logger.info(a.toString)
           Ok(views.html.bank_account_types(EmptyForm, edit, index))
         }
       }
@@ -33,11 +31,9 @@ trait BankAccountTypeController extends BankAccountUtilController {
           for {
               result <- updateBankDetails(index) {
                 case Some(BankDetails(_, Some(x))) => {
-                  Logger.info("controller: " + Some(BankDetails(data, Some(x))).toString)
                   Some(BankDetails(data, Some(x)))
                 }
                 case _ => {
-                  Logger.info("controller: " + Some(BankDetails(data, None)).toString)
                   Some(BankDetails(data, None))
                 }
               }
