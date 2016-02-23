@@ -384,16 +384,26 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxUKBankAccountNumberLength)))))
   }
 
-  "For the Overseas Bank Account it" must {
+  "For the Overseas Bank Account" must {
 
     "validate IBAN supplied " in {
-      ibanType.validate("1234567890123456789012345678901234") must be(Success("1234567890123456789012345678901234"))
+      ibanType.validate("IBAN_4323268686686") must be(Success("IBAN_4323268686686"))
     }
 
-    "fail validation if IBAN is longer than the permissibile length" in {
+    "fail validation if IBAN is longer than the permissible length" in {
       ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
         Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxIBANLength)))))
     }
+
+    "validate Non UK Account supplied " in {
+      nonUKBankAccountNumberType.validate("IND22380310500093") must be(Success("IND22380310500093"))
+    }
+
+    "fail validation if Non UK Account is longer than the permissible length" in {
+      nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxNonUKBankAccountNumberLength)))))
+    }
+
   }
 
 }

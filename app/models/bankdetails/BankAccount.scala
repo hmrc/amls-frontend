@@ -24,10 +24,10 @@ object Account {
               (__ \ "sortCode").read(sortCodeType)
             ) (UKAccount.apply _)
         case false =>
-          ((__ \ "IBANNumber").read[Option[String]] and
-            (__ \ "nonUKAccountNumber").read[Option[String]]).tupled flatMap {
-            case (Some(iban), _) => FormTypes.ibanType fmap NonUKIBANNumber.apply
-            case (_, Some(accountNo)) => FormTypes.nonUKBankAccountNumberType fmap NonUKAccountNumber.apply
+          ((__ \ "IBANNumber").read(optionR(ibanType)) and
+            (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
+            case (Some(iban), _) => NonUKIBANNumber(iban)
+            case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
             case (_, _) =>
               (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
           }
@@ -41,16 +41,20 @@ object Account {
         "accountNumber" -> f.accountNumber,
         "sortCode" -> f.sortCode
       )
-    case nonukacc: NonUKAccountNumber =>
-      Map(
-        "isUK" -> Seq("false"),
-        "nonUKAccountNumber" -> nonukacc.accountNumber
-      )
-    case iban: NonUKIBANNumber =>
-      Map(
-        "isUK" -> Seq("false"),
-        "IBANNumber" -> iban.IBANNumber
-      )
+    case f: NonUKAccount =>
+      f match {
+        case nonukacc: NonUKAccountNumber =>
+          Map(
+            "isUK" -> Seq("false"),
+            "nonUKAccountNumber" -> nonukacc.accountNumber,
+            "isIBAN" -> Seq("false"))
+        case iban: NonUKIBANNumber =>
+          Map(
+            "isUK" -> Seq("false"),
+            "IBANNumber" -> iban.IBANNumber,
+            "isIBAN" -> Seq("true"))
+      }
+
   }
 
   implicit val jsonReads: Reads[Account] = {
