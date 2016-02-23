@@ -24,15 +24,13 @@ object Account {
               (__ \ "sortCode").read(sortCodeType)
             ) (UKAccount.apply _)
         case false =>
-          ((__ \ "IBANNumber").read[String] and
-            (__ \ "nonUKAccountNumber").read[String]).tupled flatMap {
-              case ("", "") =>
-                (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
-              case ("", accountNo) =>
-                (__ \ "nonUKAccountNumber").read(FormTypes.nonUKBankAccountNumberType) fmap NonUKAccountNumber.apply
-              case (iban, _) =>
-                (__ \ "IBANNumber").read(FormTypes.ibanType) fmap NonUKIBANNumber.apply
-            }
+          ((__ \ "IBANNumber").read(optionR(ibanType)) and
+            (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
+            case (Some(iban), _) => NonUKIBANNumber(iban)
+            case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
+            case (_, _) =>
+              (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
+          }
       }
     }
 
