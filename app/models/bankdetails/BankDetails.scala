@@ -1,5 +1,7 @@
 package models.bankdetails
 
+import typeclasses.MongoKey
+
 case class BankDetails (
                          bankAccountType: Option[BankAccountType] = None,
                          bankAccount: Option[BankAccount] = None
@@ -19,6 +21,11 @@ object BankDetails {
   import play.api.libs.json._
 
   val key = "bank-details"
+
+  implicit val mongoKey = new MongoKey[BankDetails] {
+    override def apply(): String = "bank-details"
+  }
+
   implicit val reads: Reads[BankDetails] = (
       __.read[Option[BankAccountType]] and
       __.read[Option[BankAccount]]
