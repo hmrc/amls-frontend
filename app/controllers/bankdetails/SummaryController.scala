@@ -19,11 +19,6 @@ trait SummaryController extends BaseController {
         case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }
   }
-
-  def getNoBankAccount = Authorised.async {
-    implicit authContext => implicit request =>
-         Future.successful(Ok(views.html.no_bank_account_summary()))
-  }
 }
 
 object SummaryController extends SummaryController {
