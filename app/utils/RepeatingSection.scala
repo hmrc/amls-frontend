@@ -1,25 +1,24 @@
-package controllers.bankdetails
+package utils
 
 import connectors.DataCacheConnector
-import controllers.BaseController
-import models.bankdetails.BankDetails
 import play.api.libs.json
 import typeclasses.MongoKey
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait BankAccountUtilController extends BaseController {
+trait RepeatingSection {
 
   val dataCacheConnector: DataCacheConnector
 
-  def getBankDetails[T]
+  def getData[T]
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
    formats: json.Format[T],
-   key: MongoKey[T]
+   key: MongoKey[T],
+   ec :ExecutionContext
   ): Future[Seq[T]] = {
     dataCacheConnector.fetchDataShortLivedCache[Seq[T]](key()) map {
       _.fold(Seq.empty[T]) {
@@ -28,41 +27,45 @@ trait BankAccountUtilController extends BaseController {
     }
   }
 
-  def getBankDetails[T]
+  def getData[T]
   (index: Int)
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
    formats: json.Format[T],
-   key: MongoKey[T]
+   key: MongoKey[T],
+   ec :ExecutionContext
   ): Future[Option[T]] = {
-    getBankDetails[T] map {
+    getData[T] map {
       case accounts if index > 0 && index <= accounts.length + 1 => accounts lift (index - 1)
       case _ => None
     }
   }
 
-  protected def updateBankDetails[T]
+  protected def updateData[T]
   (index: Int)
   (fn: Option[T] => Option[T])
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
    formats: json.Format[T],
-   key: MongoKey[T]
+   key: MongoKey[T],
+   ec :ExecutionContext
   ): Future[_] =
-    getBankDetails[T] map {
+    getData[T] map {
       accounts => {
-        putBankDetails(accounts.patch(index - 1, fn(accounts.lift(index - 1)).toSeq, 1))
+        putData(accounts.patch(index - 1, fn(accounts.lift(index - 1)).toSeq, 1))
       }
     }
 
-  protected def putBankDetails[T](accounts: Seq[T])
+  protected def putData[T]
+  (accounts: Seq[T])
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
    formats: json.Format[T],
-   key: MongoKey[T]
+   key: MongoKey[T],
+   ec :ExecutionContext
   ): Future[_] =
     dataCacheConnector.saveDataShortLivedCache[Seq[T]](key(), accounts)
 }
