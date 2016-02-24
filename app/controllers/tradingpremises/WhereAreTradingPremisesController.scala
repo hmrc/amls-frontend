@@ -13,33 +13,33 @@ trait WhereAreTradingPremisesController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
         case Some(TradingPremises(Some(data), _, _)) =>
-          Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit))
+          Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
         case _ =>
-          Ok(views.html.where_are_trading_premises(EmptyForm, edit))
+          Ok(views.html.where_are_trading_premises(EmptyForm, edit, index))
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(index: Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[YourTradingPremises](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.where_are_trading_premises(f, edit)))
+          Future.successful(BadRequest(views.html.where_are_trading_premises(f, edit, index)))
         case ValidForm(_, data) =>
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourTradingPremises(data))
-//            TODO: Redirect to summary in edit mode
+          //            TODO: Redirect to summary in edit mode
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false =>
               if (data.isOwner) {
-                Redirect(routes.WhatDoesYourBusinessDoController.get(edit))
+                Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
               } else {
-                Redirect(routes.YourAgentController.get(edit))
+                Redirect(routes.YourAgentController.get(index, edit))
               }
           }
       }

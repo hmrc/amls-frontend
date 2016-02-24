@@ -3,10 +3,9 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
-import models.estateagentbusiness.EstateAgentBusiness
-import models.tradingpremises.{YourAgent, WhatDoesYourBusinessDo, TradingPremises}
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -15,13 +14,13 @@ import scala.concurrent.Future
 trait WhatDoesYourBusinessDoController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      buildView(EmptyForm, edit, Ok)
+      buildView(EmptyForm, edit, Ok, index)
     }
   }
 
-  private def buildView(form :Form2[_],  edit: Boolean, status: Status)(implicit authContext:AuthContext, request:Request[_]): Future[Result] = {
+  private def buildView(form: Form2[_], edit: Boolean, status: Status, index: Int)(implicit authContext: AuthContext, request: Request[_]): Future[Result] = {
 
     dataCacheConnector.fetchAll map { x =>
       (for {
@@ -32,23 +31,23 @@ trait WhatDoesYourBusinessDoController extends BaseController {
         case BusinessMatching(Some(BusinessActivities(activityList))) if (activityList.size == 1) => {
           dataCacheConnector.saveDataShortLivedCache(TradingPremises.key,
             tradingPremisesData.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activityList))
-          ) map ( _ => SeeOther(controllers.tradingpremises.routes.SummaryController.get.url) )
+          ) map (_ => SeeOther(controllers.tradingpremises.routes.SummaryController.get.url))
         }
         case BusinessMatching(Some(businessActivities)) =>
-          Future.successful(status(views.html.what_does_your_business_do(form, businessActivities, edit)))
+          Future.successful(status(views.html.what_does_your_business_do(form, businessActivities, edit, index)))
       }) getOrElse Future.successful(NotFound)
     } flatMap (identity)
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(index: Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[WhatDoesYourBusinessDo](request.body) match {
-        case f: InvalidForm => buildView(f, edit, BadRequest)
+        case f: InvalidForm => buildView(f, edit, BadRequest, index)
         case ValidForm(_, data) =>
           for {
             tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.whatDoesYourBusinessDoAtThisAddress(data))
-          } yield  Redirect(controllers.tradingpremises.routes.SummaryController.get())
+          } yield Redirect(controllers.tradingpremises.routes.SummaryController.get())
       }
     }
   }

@@ -3,6 +3,7 @@
 
 @(model: TradingPremises)(implicit request: Request[_], lang: Lang)
 
+
 @main(
     title = Messages("summary.checkyouranswers.title")
 ) {
@@ -13,7 +14,7 @@
         @Messages("summary.linetext")
     </p>
     <p>
-        <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get()"> @Messages("tradingpremises.summary.addanother") </a>
+        @*<a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, edit)"> @Messages("tradingpremises.summary.addanother") </a>*@
     </p>
 </div>
 
@@ -21,7 +22,7 @@
         <table>
             <tr>
                 <th class="summary-title" colspan="2">@ytp.tradingName</th>
-                <td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get()">@Messages("button.edit")</a></td>
+                @*<td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get(index)">@Messages("button.edit")</a></td>*@
             </tr>
             <tr>
                 <td>
@@ -44,7 +45,7 @@
     <table>
         <tr>
             <th class="summary-title" colspan="2">@agent.agentsRegisteredName.value</th>
-            <td><a href="@controllers.tradingpremises.routes.AgentSummaryController.get()">@Messages("button.edit")</a></td>
+            @*<td><a href="@controllers.tradingpremises.routes.AgentSummaryController.get(index)">@Messages("button.edit")</a></td>*@
         </tr>
         <tr>
             @model.yourTradingPremises.map { ytp=>

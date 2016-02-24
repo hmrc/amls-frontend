@@ -10,10 +10,10 @@ trait OwnSummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
-  def get = Authorised.async {
+  def get(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
-        case Some(data) => Ok(views.html.trading_premises_summary_own(data))
+        case Some(data) => Ok(views.html.trading_premises_summary_own(data, index))
         case _ => Redirect(controllers.tradingpremises.routes.SummaryController.get())
       }
   }
