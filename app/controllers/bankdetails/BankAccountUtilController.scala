@@ -3,6 +3,7 @@ package controllers.bankdetails
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.bankdetails.BankDetails
+import play.api.libs.json
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -12,34 +13,34 @@ trait BankAccountUtilController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def getBankDetails(implicit user: AuthContext, hc: HeaderCarrier): Future[Seq[BankDetails]] = {
-    dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](BankDetails.key) map {
-      _.fold(Seq.empty[BankDetails]) {
+  def getBankDetails[T](key:String)(implicit user: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Seq[T]] = {
+    dataCacheConnector.fetchDataShortLivedCache[Seq[T]](key) map {
+      _.fold(Seq.empty[T]) {
         identity
       }
     }
   }
 
-  def getBankDetails(index: Int)(implicit user: AuthContext, hc: HeaderCarrier): Future[Option[BankDetails]] = {
-    getBankDetails map {
+  def getBankDetails[T](index: Int)(implicit user: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
+    getBankDetails[T] map {
       case accounts if index > 0 && index <= accounts.length + 1 => accounts lift (index - 1)
       case _ => None
     }
   }
 
-  protected def updateBankDetails
+  protected def updateBankDetails[T]
   (index: Int)
-  (fn: Option[BankDetails] => Option[BankDetails])
-  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
-    getBankDetails map {
+  (fn: Option[T] => Option[T])
+  (implicit user: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[_] =
+    getBankDetails[T] map {
       accounts => {
 
         putBankDetails(accounts.patch(index - 1, fn(accounts.lift(index - 1)).toSeq, 1))
       }
     }
 
-  protected def putBankDetails(accounts: Seq[BankDetails])
-  (implicit user: AuthContext, hc: HeaderCarrier): Future[_] =
-    dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](BankDetails.key, accounts)
+  protected def putBankDetails[T](accounts: Seq[T], key: String)
+  (implicit user: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[_] =
+    dataCacheConnector.saveDataShortLivedCache[Seq[T]](key, accounts)
 }
 

@@ -29,7 +29,7 @@ trait BankAccountTypeController extends BankAccountUtilController {
           Future.successful(BadRequest(views.html.bank_account_types(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-              result <- updateBankDetails(index) {
+              result <- updateBankDetails[BankDetails](index) {
                 case Some(BankDetails(_, Some(x))) => {
                   Some(BankDetails(data, Some(x)))
                 }
