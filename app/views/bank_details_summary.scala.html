@@ -1,0 +1,81 @@
+@import include._
+@import models.bankdetails._
+@import forms2._
+
+@(model: Seq[BankDetails])(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.bankdetails")
+    @if(model.isEmpty) {
+        @fieldset("", jsHidden = false, id = "ttt") {
+
+        <span>@Messages("bankdetails.summary.nobank.account")</span> <br>
+        }
+        <br>
+        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
+        <br><br>
+    } else {
+
+        @fieldset("", jsHidden = false, id = "ttt") {
+            <span>@Messages("bankdetails.summary.check.info")</span> <br>
+        }
+        <br>
+        <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, true)"> @Messages("bankdetails.summary.add.account") </a>
+        <br><br>
+        @model.zipWithIndex.map { case (x, y) =>
+            <table>
+                <tr>
+                    <th class="summary-title" colspan="3">@x.bankAccount.map {z => @z.accountName}</th>
+                    <td><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
+                </tr>
+                <tr>
+                    @x.bankAccount.map {bankAccount =>
+                        @bankAccount.account match {
+                            case f:UKAccount => {
+                                <td width="25%">
+                                    @f.accountNumber
+                                </td>
+                                <td width="25%">
+                                    @f.sortCode
+                                </td>
+                                <td>
+                                    @Messages("lbl.uk")
+                                </td>
+                            }
+                            case f:NonUKAccountNumber => {
+                                <td width="25%">
+                                    @f.accountNumber
+                                </td>
+                                <td width="25%">&nbsp;</td>
+                                <td>
+                                    @Messages("lbl.overseas")
+                                </td>
+                            }
+                            case f:NonUKIBANNumber => {
+                                <td width="25%">
+                                    @f.IBANNumber
+                                </td>
+                                <td width="25%">&nbsp;</td>
+                                <td>
+                                    @Messages("lbl.overseas")
+                                </td>
+                            }
+                        }
+                    }
+                   <td>
+                       @x.bankAccountType.map {
+                           case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                           case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                           case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                       }
+                   </td>
+                </tr>
+
+            </table>
+        }
+    }
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
+}
