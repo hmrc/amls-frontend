@@ -26,7 +26,7 @@ object BusinessFranchise {
   implicit val formWrites: Write[BusinessFranchise, UrlFormEncoded] = Write {
     case BusinessFranchiseYes(value) =>
       Map("businessFranchise" -> Seq("true"),
-        "franchiseName" -> Seq(value)
+          "franchiseName" -> Seq(value)
       )
     case BusinessFranchiseNo => Map("businessFranchise" -> Seq("false"))
   }

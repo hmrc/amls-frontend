@@ -30,7 +30,7 @@ trait BusinessFranchiseController extends BaseController {
     implicit authContext => implicit request => {
       Form2[BusinessFranchise](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.business_reg_for_vat(f, edit)))
+          Future.successful(BadRequest(views.html.business_franchise_name(f, edit)))
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
