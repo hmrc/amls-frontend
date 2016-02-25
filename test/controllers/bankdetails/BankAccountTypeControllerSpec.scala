@@ -79,7 +79,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
 
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.getNoBankAccount().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
