@@ -264,6 +264,8 @@ bankdetails.accounttype.lbl.02 = A business account belonging to this business
 bankdetails.accounttype.lbl.03 = A business account belonging to another business
 bankdetails.accounttype.lbl.04 = The business doesn't use a bank account
 
+summary.businessactivities = Business activities
+
 businessactivities.whatyouneed.title = Business Activities - What you need
 businessactivities.whatyouneed.heading = What you need
 businessactivities.whatyouneed.requiredinfo.heading = For this section you''ll need to know:
@@ -275,6 +277,10 @@ businessactivities.whatyouneed.line_4 = your franchisor's name
 businessactivities.whatyouneed.line_5 = how you record transactions
 businessactivities.whatyouneed.line_6 = your accountant's name and address
 businessactivities.whatyouneed.line_7 = your accountant's HMRC Agent Reference Number
+
+businessactivities.businessfranchise.title = Is your business a franchise?
+businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
+businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor's registration.
 
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname = Account name

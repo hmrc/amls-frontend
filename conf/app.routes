@@ -82,6 +82,9 @@ POST        /bank-details/accounts/:index               controllers.bankdetails.
 
 GET         /business-activities/index                  controllers.businessactivities.WhatYouNeedController.get()
 
+GET         /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.get()
+POST        /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
+
 GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
