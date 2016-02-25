@@ -24,6 +24,7 @@ object FormTypes {
   val yearLength = 4
   val maxRedressOtherTypeLength = 255
   val maxLengthPremisesTradingName = 120
+  val maxOtherBusinessActivityTypeLength = 255
 
   val maxAccountName = 40
   val maxIBANLength = 34
@@ -91,5 +92,7 @@ object FormTypes {
   val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength) compose pattern("^[0-9a-zA-Z_]+$".r)
 
   val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern("^[0-9a-zA-Z_]+$".r)
+
+  val OtherBusinessActivityType = notEmpty compose maxLength(maxOtherBusinessActivityTypeLength)
 
 }
