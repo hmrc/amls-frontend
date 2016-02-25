@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait RepeatingSection {
 
-  val dataCacheConnector: DataCacheConnector
+  def dataCacheConnector: DataCacheConnector
 
   def getData[T]
   (implicit
