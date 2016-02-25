@@ -18,7 +18,7 @@ object BusinessFranchise {
   import play.api.data.mapping.forms.Rules._
     (__ \ "businessFranchise").read[Boolean] flatMap {
       case true =>
-        (__ \ "franchiseName").read(descriptionType) fmap (BusinessFranchiseYes.apply)
+        (__ \ "franchiseName").read(franchiseNameType) fmap (BusinessFranchiseYes.apply)
       case false => Rule.fromMapping { _ => Success(BusinessFranchiseNo) }
     }
   }
