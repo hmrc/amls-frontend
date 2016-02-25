@@ -275,6 +275,8 @@ businessactivities.whatyouneed.line_5 = how you record transactions
 businessactivities.whatyouneed.line_6 = your accountant's name and address
 businessactivities.whatyouneed.line_7 = your accountant's HMRC Agent Reference Number
 
+businessactivities.businessfranchise.title = Is your business a franchise?
+
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname = Account name
 bankdetails.bankaccount.accounttype = Is this a UK bank account?
