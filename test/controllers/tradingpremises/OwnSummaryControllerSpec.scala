@@ -18,7 +18,7 @@ class OwnSummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mock
     self =>
 
     val controller = new OwnSummaryController {
-      override val dataCache = mock[DataCacheConnector]
+      override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
   }
@@ -27,26 +27,26 @@ class OwnSummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mock
 
     "use correct services" in new Fixture {
       OwnSummaryController.authConnector must be(AMLSAuthConnector)
-      OwnSummaryController.dataCache must be(DataCacheConnector)
+      OwnSummaryController.dataCacheConnector must be(DataCacheConnector)
     }
 
     "load the your business premises summary page when section data is available" in new Fixture {
 
       val model = TradingPremises(None, None)
 
-      when(controller.dataCache.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
-      val result = controller.get()(request)
+      val result = controller.get(0)(request)
       status(result) must be(OK)
     }
 
     "redirect to the trading premises summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.get()(request)
+      val result = controller.get(0)(request)
       status(result) must be(SEE_OTHER)
     }
   }

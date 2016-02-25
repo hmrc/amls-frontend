@@ -49,8 +49,8 @@ POST        /trading-premises/agent/:index                          controllers.
 GET         /trading-premises/what-does-your-business-do/:index     controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index     controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/summary/:index                        controllers.tradingpremises.OwnSummaryController.get(index: Int)
 GET         /trading-premises/summary                               controllers.tradingpremises.SummaryController.get()
+GET         /trading-premises/summary/:index                        controllers.tradingpremises.OwnSummaryController.get(index: Int)
 
 GET         /estate-agents/index                        controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised                    controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)

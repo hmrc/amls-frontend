@@ -1,7 +1,6 @@
 package utils
 
 import connectors.DataCacheConnector
-import play.api.libs.json
 import play.api.libs.json.Format
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap

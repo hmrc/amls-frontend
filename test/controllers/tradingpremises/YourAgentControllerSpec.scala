@@ -118,7 +118,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post(0, true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
     }
@@ -144,7 +144,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post(0, true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
     }
@@ -174,9 +174,9 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post(0, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get().url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(0, false).url))
     }
   }
 }
