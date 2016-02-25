@@ -409,20 +409,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   "OtherBusinessActivityType" must {
 
-    "successfully validate" in {
-
-      descriptionType.validate("foobar") must
-        be(Success("foobar"))
-    }
-
-    "fail to validate an empty string" in {
-
-      descriptionType.validate("") must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
-        )))
-    }
-
     "fail to validate a string longer than 255" in {
 
       descriptionType.validate("a" * 256) must

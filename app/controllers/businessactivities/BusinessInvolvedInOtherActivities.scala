@@ -12,6 +12,7 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
+/*
 trait BusinessInvolvedInOtherActivitiesController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
@@ -49,4 +50,4 @@ trait BusinessInvolvedInOtherActivitiesController extends BaseController {
 object BusinessInvolvedInOtherActivitiesController extends BusinessInvolvedInOtherActivitiesController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
-}
+}*/
