@@ -18,7 +18,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
       getData[BankDetails](index) map {
         case Some(BankDetails(Some(data), _)) =>
           Ok(views.html.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
-        case a => {
+        case _ => {
           Ok(views.html.bank_account_types(EmptyForm, edit, index))
         }
       }
@@ -32,12 +32,8 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
         case ValidForm(_, data) => {
           for {
               result <- updateData[BankDetails](index) {
-                case Some(BankDetails(_, Some(x))) => {
-                  Some(BankDetails(data, Some(x)))
-                }
-                case _ => {
-                  Some(BankDetails(data, None))
-                }
+                case Some(BankDetails(_, Some(x))) => Some(BankDetails(data, Some(x)))
+                case _ => data
               }
           } yield {
               data match {
