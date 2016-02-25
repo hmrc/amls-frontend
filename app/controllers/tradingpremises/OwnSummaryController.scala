@@ -3,16 +3,17 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.tradingpremises.{TradingPremises}
+import models.tradingpremises.TradingPremises
+import utils.RepeatingSection
 
 
-trait OwnSummaryController extends BaseController {
+trait OwnSummaryController extends RepeatingSection with BaseController {
 
-  protected def dataCache: DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
   def get(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
+      dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](TradingPremises.key) map {
         case Some(data) => Ok(views.html.trading_premises_summary_own(data, index))
         case _ => Redirect(controllers.tradingpremises.routes.SummaryController.get())
       }
@@ -20,6 +21,6 @@ trait OwnSummaryController extends BaseController {
 }
 
 object OwnSummaryController extends OwnSummaryController {
-  override val dataCache = DataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }

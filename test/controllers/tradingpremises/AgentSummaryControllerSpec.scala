@@ -17,8 +17,8 @@ class AgentSummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mo
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new AgentSummaryController {
-      override val dataCache = mock[DataCacheConnector]
+    val controller = new SummaryController {
+      override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
   }
@@ -26,15 +26,15 @@ class AgentSummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mo
   "Get" must {
 
     "use correct services" in new Fixture {
-      AgentSummaryController.authConnector must be(AMLSAuthConnector)
-      AgentSummaryController.dataCache must be(DataCacheConnector)
+      SummaryController.authConnector must be(AMLSAuthConnector)
+      SummaryController.dataCacheConnector must be(DataCacheConnector)
     }
 
     "load the your agents' premises summary page when section data is available" in new Fixture {
 
       val model = TradingPremises(None, None)
 
-      when(controller.dataCache.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -43,7 +43,7 @@ class AgentSummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
     "redirect to the trading premises summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)

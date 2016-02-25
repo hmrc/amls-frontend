@@ -7,11 +7,11 @@ import models.tradingpremises.TradingPremises
 
 trait SummaryController extends BaseController {
 
-  protected def dataCache: DataCacheConnector
+  protected def dataCacheConnector: DataCacheConnector
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
+      dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](TradingPremises.key) map {
         case Some(data) => Ok(views.html.trading_premises_summary(data))
         case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }
@@ -19,7 +19,7 @@ trait SummaryController extends BaseController {
 }
 
 object SummaryController extends SummaryController {
-  override val dataCache = DataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }
 

@@ -1,7 +1,7 @@
 @import include._
 @import models.tradingpremises._
 
-@(model: TradingPremises)(implicit request: Request[_], lang: Lang)
+@(model: Seq[TradingPremises])(implicit request: Request[_], lang: Lang)
 
 
 @main(
@@ -14,15 +14,16 @@
         @Messages("summary.linetext")
     </p>
     <p>
-        @*<a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, edit)"> @Messages("tradingpremises.summary.addanother") </a>*@
+        <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(model.length+1, false)"> @Messages("tradingpremises.summary.addanother") </a>
     </p>
 </div>
 
-        @model.yourTradingPremises.map { ytp=>
+        @model.zipWithIndex.map { case (tp, y) =>
+            @tp.yourTradingPremises.map { ytp =>
         <table>
             <tr>
                 <th class="summary-title" colspan="2">@ytp.tradingName</th>
-                @*<td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get(index)">@Messages("button.edit")</a></td>*@
+                @*<td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get(model.length+1, true)">@Messages("button.edit")</a></td>*@
             </tr>
             <tr>
                 <td>
@@ -30,7 +31,7 @@
                     @line
                     <br>}
                 </td>
-                @model.whatDoesYourBusinessDoAtThisAddress.map { ba=>
+                @tp.whatDoesYourBusinessDoAtThisAddress.map { ba=>
                 <td>
                     @ba.activities.map{ line =>
                     @line <br>}}
@@ -41,20 +42,20 @@
             </tr>
         </table>
         }
-    @model.yourAgent.map { agent=>
+    @tp.yourAgent.map { agent=>
     <table>
         <tr>
             <th class="summary-title" colspan="2">@agent.agentsRegisteredName.value</th>
-            @*<td><a href="@controllers.tradingpremises.routes.AgentSummaryController.get(index)">@Messages("button.edit")</a></td>*@
+            <td><a href="@controllers.tradingpremises.routes.SummaryController.get()">@Messages("button.edit")</a></td>
         </tr>
         <tr>
-            @model.yourTradingPremises.map { ytp=>
+            @tp.yourTradingPremises.map { ytp=>
             <td>
                 @ytp.tradingPremisesAddress.toLines.map{ line =>
                 @line
                 <br>}
             </td>
-            @model.whatDoesYourBusinessDoAtThisAddress.map { ba=>
+            @tp.whatDoesYourBusinessDoAtThisAddress.map { ba=>
             <td>
                 @ba.activities.map{ line =>
                 @line <br>}}
@@ -67,6 +68,6 @@
     </table>
     }
 
-
+    }
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
 }

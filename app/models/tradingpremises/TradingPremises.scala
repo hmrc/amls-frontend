@@ -1,5 +1,7 @@
 package models.tradingpremises
 
+import typeclasses.MongoKey
+
 case class TradingPremises(
                             yourTradingPremises: Option[YourTradingPremises] = None,
                             yourAgent: Option[YourAgent] = None,
@@ -23,6 +25,11 @@ object TradingPremises {
   import play.api.libs.json._
 
   val key = "trading-premises"
+
+  implicit val mongoKey = new MongoKey[TradingPremises] {
+    override def apply(): String = "trading-premises"
+  }
+
   implicit val reads: Reads[TradingPremises] = (
       __.read[Option[YourTradingPremises]] and
       __.read[Option[YourAgent]] and

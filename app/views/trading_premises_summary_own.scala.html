@@ -1,7 +1,7 @@
 @import include._
 @import models.tradingpremises._
 
-@(model: TradingPremises, index: Int)(implicit request: Request[_], lang: Lang)
+@(model: Seq[TradingPremises], index: Int)(implicit request: Request[_], lang: Lang)
 
 @main(
     title = Messages("summary.checkyouranswers.businesspremises.title")
@@ -11,7 +11,9 @@
     <p>
         @Messages("summary.linetext")
     </p>
-        @model.yourTradingPremises.map { ytp=>
+
+    @model.zipWithIndex.map { case (tp, y) =>
+        @tp.yourTradingPremises.map { ytp=>
         <table>
             <tr>
                 <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section1")</th>
@@ -44,7 +46,8 @@
             </tr>
         </table>
         }
-    @model.whatDoesYourBusinessDoAtThisAddress.map { ba=>
+
+    @tp.whatDoesYourBusinessDoAtThisAddress.map { ba=>
     <table>
         <tr>
             <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section2")</th>
@@ -58,8 +61,8 @@
         </tr>
         }
     </table>
+ }
 }
-
 
     <div class="form-field">
         <a class="button" href="@controllers.tradingpremises.routes.SummaryController.get()">@Messages("button.returntosummary")</a>

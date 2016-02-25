@@ -15,9 +15,13 @@ trait WhatDoesYourBusinessDoController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      buildView(EmptyForm, edit, Ok, index)
-    }
+    implicit authContext =>
+      implicit request => {
+        //views.html.what_does_your_business_do(EmptyForm, BusinessActivities(Seq(AccountancyServices)), edit, index)
+        //buildView(EmptyForm, edit, Ok, index)
+        //Future.successful(views.html.what_does_your_business_do(EmptyForm, BusinessActivities(Seq(AccountancyServices)), edit, index))
+        Future.successful(Redirect(controllers.tradingpremises.routes.SummaryController.get()))
+      }
   }
 
   private def buildView(form: Form2[_], edit: Boolean, status: Status, index: Int)(implicit authContext: AuthContext, request: Request[_]): Future[Result] = {
