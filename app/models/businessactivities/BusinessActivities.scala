@@ -3,6 +3,7 @@ package models.businessactivities
 case class BusinessActivities(
                                involvedInOther: Option[InvolvedInOther] = None,
                                businessFranchise: Option[BusinessFranchise] = None
+
                                ) {
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
     this.copy(businessFranchise = Some(p))

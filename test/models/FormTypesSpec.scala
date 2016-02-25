@@ -419,4 +419,16 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
   }
 
 
+  "For the Franchise Name" must {
+    "validate franchise name supplied" in {
+      franchiseNameType.validate("test test") must be(Success("test test"))
+    }
+
+    "fail validation if franchise name is longer than the permissible length" in {
+      franchiseNameType.validate("test" * 40) must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxFranchiseName))))
+      )
+    }
+  }
+
 }
