@@ -11,8 +11,7 @@
     @heading("summary.checkyouranswers.title", "summary.bankdetails")
     @if(model.isEmpty) {
         @fieldset("", jsHidden = false, id = "ttt") {
-
-        <span>@Messages("bankdetails.summary.nobank.account")</span> <br>
+            <span>@Messages("bankdetails.summary.nobank.account")</span> <br>
         }
         <br>
         <a href="@controllers.bankdetails.routes.BankAccountTypeController.get(model.length+1, false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
