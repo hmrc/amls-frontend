@@ -41,7 +41,7 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
     }
 
 
-    "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
+    "on get display the is your business a franchise page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(Some(BusinessFranchiseYes("test test"))))))
