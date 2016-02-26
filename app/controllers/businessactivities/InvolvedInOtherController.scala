@@ -4,8 +4,9 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import forms._
 import models.businessactivities.{BusinessActivities, _}
+import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -16,11 +17,15 @@ trait InvolvedInOtherController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(Some(data), _)) =>
-          Ok(views.html.involved_in_other_name(Form2[InvolvedInOther](data), edit))
+      for {
+        businessActivity <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
+        businessMatching <- dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key)
+
+      } yield businessActivity match {
+        case Some(BusinessActivities(Some(data), None)) =>
+            Ok(views.html.involved_in_other_name(Form2[InvolvedInOther](data), edit, businessMatching))
         case _ =>
-          Ok(views.html.involved_in_other_name(EmptyForm, edit))
+          Ok(views.html.involved_in_other_name(EmptyForm, edit, None))
       }
   }
 
@@ -28,7 +33,7 @@ trait InvolvedInOtherController extends BaseController {
     implicit authContext => implicit request => {
       Form2[InvolvedInOther](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.involved_in_other_name(f, edit)))
+          Future.successful(BadRequest(views.html.involved_in_other_name(f, edit, None)))
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)

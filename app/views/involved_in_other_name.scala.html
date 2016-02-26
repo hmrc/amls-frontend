@@ -1,7 +1,8 @@
 @import include.{forms => deprecated, _}
 @import forms2._
+@import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching)(implicit request: Request[_])
 
 @target = @{
 s"""${f("details").id}-fieldset"""
@@ -13,31 +14,48 @@ title = Messages("businessactivities.confirm-activities.title")
 
 @heading("businessactivities.confirm-activities.title", "summary.businessactivities")
 
-<div class="form-group">
-    <div class="panel-indent">
-        <span class="notice">@Messages("bankdetails.confirm-activities.subtitile")</span>
+    <div class="form-group">
+        <span><strong> @Messages("bankdetails.confirm-activities.subtitile")</strong> </span>
+        <div class="panel-indent">
+            @bmModel.activities.map {a=>
+            @a.businessActivities.map {line =>
+
+                @line match {
+                    case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
+                    case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
+                    case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
+                    case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
+                    case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
+                    case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
+                    case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
+                }
+            <br>
+            }
+        }
+        </div>
     </div>
-</div>
 
 
+    @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
-
-@form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
-
-<span class="form-field">
+        <span class="form-field"><strong>
             @Messages("businessactivities.confirm-activities.subtitle1")
+        </strong>
+
+        </span>
+        <span>
+            @Messages("businessactivities.confirm-activities.line1.text")
         </span>
 
 
-@inlineRadioGroup(f("involvedInOther")) {
-@legend("TODO", jsHidden = true)
-@radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
-@radio(f("businessFranchise"), "lbl.no", "false")
-@fieldset("TODO", jsHidden = true, id = target) {
-@input(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
-}
-}
-
-@submit(edit)
-}
+        @inlineRadioGroup(f("involvedInOther")) {
+            @legend("TODO", jsHidden = true)
+                @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("involvedInOther"), "lbl.no", "false")
+                @fieldset("TODO", jsHidden = true, id = target) {
+                    @input(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
+                }
+        }
+        @submit(edit)
+    }
 }
