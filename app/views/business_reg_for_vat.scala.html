@@ -20,7 +20,7 @@
             @radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
             @radio(f("registeredForVAT"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {
-                @input(f("franchiseName"), "aboutthebusiness.registeredforvat.lbl.vatNumber", bold = false)
+                @input(f("vrnNumber"), "aboutthebusiness.registeredforvat.lbl.vatNumber", bold = false)
             }
         }
 
