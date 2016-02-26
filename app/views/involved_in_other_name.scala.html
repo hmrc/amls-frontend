@@ -4,23 +4,37 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @target = @{
-s"""${f("vrnNumber").id}-fieldset"""
+s"""${f("details").id}-fieldset"""
 }
 
 @main(
-title = Messages("aboutthebusiness.registeredforvat.title")
-) {
+title = Messages("businessactivities.confirm-activities.title")
+)  {
 
-@heading("aboutthebusiness.registeredforvat.title", "summary.aboutbusiness")
+@heading("businessactivities.confirm-activities.title", "summary.businessactivities")
 
-@form(f, controllers.aboutthebusiness.routes.VATRegisteredController.post(edit)) {
+<div class="form-group">
+    <div class="panel-indent">
+        <span class="notice">@Messages("bankdetails.confirm-activities.subtitile")</span>
+    </div>
+</div>
 
-@inlineRadioGroup(f("registeredForVAT")) {
+
+
+
+@form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
+
+<span class="form-field">
+            @Messages("businessactivities.confirm-activities.subtitle1")
+        </span>
+
+
+@inlineRadioGroup(f("involvedInOther")) {
 @legend("TODO", jsHidden = true)
-@radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
-@radio(f("registeredForVAT"), "lbl.no", "false")
+@radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
+@radio(f("businessFranchise"), "lbl.no", "false")
 @fieldset("TODO", jsHidden = true, id = target) {
-@input(f("vrnNumber"), "aboutthebusiness.registeredforvat.lbl.vatNumber", bold = false)
+@input(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
 }
 }
 
