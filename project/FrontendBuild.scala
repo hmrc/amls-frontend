@@ -45,14 +45,15 @@ private object AppDependencies {
     "io.github.jto" %% "validation-form" % "1.1" excludeAll playJars
   )
 
-  trait TestDependencies {
-    lazy val scope: String = "test"
-    lazy val test: Seq[ModuleID] = ???
+  trait ScopeDependencies {
+    val scope: String
+    val dependencies: Seq[ModuleID]
   }
 
   object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
+    def apply() = new ScopeDependencies {
+      override val scope = "test"
+      override lazy val dependencies = Seq(
         "org.scalatest" %% "scalatest" % "2.2.5" % scope,
         "org.scalatestplus" %% "play" % "1.2.0" % scope,
         "org.pegdown" % "pegdown" % "1.4.2" % scope,
@@ -60,10 +61,24 @@ private object AppDependencies {
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "uk.gov.hmrc" %% "hmrctest" % "0.4.0" % scope
       )
-    }.test
+    }.dependencies
   }
 
-  def apply() = compile ++ Test()
+  object It {
+    def apply() = new ScopeDependencies {
+      override lazy val scope = "it"
+      override lazy val dependencies = Seq(
+        "org.scalatest" %% "scalatest" % "2.2.5" % scope,
+        "org.scalatestplus" %% "play" % "1.2.0" % scope,
+        "org.pegdown" % "pegdown" % "1.4.2" % scope,
+        "org.jsoup" % "jsoup" % "1.7.2" % scope,
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+        "uk.gov.hmrc" %% "hmrctest" % "0.4.0" % scope
+      )
+    }.dependencies
+  }
+
+  def apply() = compile ++ Test() ++It()
 }
 
 
