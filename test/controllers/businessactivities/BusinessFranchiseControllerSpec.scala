@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessFranchiseYes, BusinessActivities}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -79,8 +80,8 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      val document = Jsoup.parse(contentAsString(result))
-      // TODO
+      val document: Document  = Jsoup.parse(contentAsString(result))
+      document.select("span").html() must include("Invalid value")
     }
 
 
