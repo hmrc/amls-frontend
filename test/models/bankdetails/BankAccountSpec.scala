@@ -252,8 +252,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "accountName" -> Seq("My Account"),
         "isUK" -> Seq("false"),
-        "IBANNumber" -> Seq("1234567812345678123456781234567812345678"),
-        "isIBAN" -> Seq("true")
+        "IBANNumber" -> Seq("1234567812345678123456781234567812345678")
       )
 
       BankAccount.formWrite.writes(nonUKBankAccount) must be(urlFormEncoded)
