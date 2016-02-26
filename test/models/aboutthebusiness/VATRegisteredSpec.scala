@@ -6,7 +6,7 @@ import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class RegisteredForVATSpec extends PlaySpec with MockitoSugar {
+class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
 
