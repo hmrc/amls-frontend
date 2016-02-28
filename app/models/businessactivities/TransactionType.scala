@@ -77,9 +77,13 @@ object TransactionType {
       case TransactionRecordNo => Map("isRecorded" -> "false")
       case TransactionRecordYes(value) => {
          val data = getTupleFromModel(value)
-              Map("isRecorded" -> "true",
-                   "transactions" -> data._1,
-                   "name" -> data._2)
+        data._2 match {
+          case "" =>  Map("isRecorded" -> "true",
+            "transactions" -> data._1)
+          case _ =>   Map("isRecorded" -> "true",
+            "transactions" -> data._1,
+            "name" -> data._2)
+        }
       }
   }
 }
@@ -88,7 +92,7 @@ object TransactionRecord {
 
   implicit val jsonReads: Reads[TransactionRecord] =
     (__ \ "isRecorded").read[Boolean] flatMap {
-      case true => (__ \ "transactions").read[Set[String]].flatMap {x =>
+      case true => (__ \ "transactions").read[Set[String]].flatMap[Set[TransactionType]] {x =>
         x.map {
             case "01" => Reads(_ => JsSuccess(Paper))
             case "02" => Reads(_ => JsSuccess(DigitalSpreadsheet))
@@ -99,9 +103,9 @@ object TransactionRecord {
             Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
          ){
           (result, data) =>
-            data flatMap {u =>
-             result.map {q =>
-               q + u
+            data flatMap {m =>
+             result.map {n =>
+               n + m
              }
            }
         }
@@ -113,10 +117,15 @@ object TransactionRecord {
     case TransactionRecordNo => Json.obj("isRecorded" -> true)
     case TransactionRecordYes(name) => {
       val data = TransactionType.getTupleFromModel(name)
-            Json.obj("isRecorded" -> true,
-              "transactions" -> data._1,
-              "name" -> data._2)
-            }
+        data._2 match {
+          case "" =>  Json.obj("isRecorded" -> true,
+            "transactions" -> data._1)
+
+          case _ =>  Json.obj("isRecorded" -> true,
+            "transactions" -> data._1,
+            "name" -> data._2)
+        }
+      }
   }
 
 }
