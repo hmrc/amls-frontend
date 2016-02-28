@@ -133,6 +133,13 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
         Json.fromJson[TransactionRecord](Json.obj("isRecorded" -> true,"transactions" -> Seq("40"))) must
           be(JsError(((JsPath \ "isRecorded" \ "transactions")(0) \ "transactions") -> ValidationError("error.invalid")))
       }*/
+
+      "write valid data in using json write" in {
+        Json.toJson[TransactionRecord](TransactionRecordYes(Set(Paper, DigitalSoftware("test")))) must be (Json.obj("isRecorded" -> true,
+        "transactions" -> Seq("01", "03"),
+          "name" -> "test"
+        ))
+      }
     }
   }
 }

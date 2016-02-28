@@ -92,7 +92,7 @@ object TransactionRecord {
 
   implicit val jsonReads: Reads[TransactionRecord] =
     (__ \ "isRecorded").read[Boolean] flatMap {
-      case true => (__ \ "transactions").read[Set[String]].flatMap[Set[TransactionType]] {x =>
+      case true => (__ \ "transactions").read[Set[String]].flatMap {x =>
         x.map {
             case "01" => Reads(_ => JsSuccess(Paper))
             case "02" => Reads(_ => JsSuccess(DigitalSpreadsheet))
