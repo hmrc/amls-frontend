@@ -31,6 +31,7 @@ object FormTypes {
   val maxUKBankAccountNumberLength = 8
   val maxSortCodeLength = 6
   val maxSoftwareNameLength = 40
+  val maxFranchiseName = 140
 
   val indivNameType = notEmpty compose maxLength(maxNameTypeLength)
 
@@ -94,5 +95,7 @@ object FormTypes {
   val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern("^[0-9a-zA-Z_]+$".r)
 
   val softwareNameType = notEmpty compose maxLength (maxSoftwareNameLength)
+
+  val franchiseNameType = notEmpty compose maxLength(maxFranchiseName)
 
 }

@@ -18,7 +18,7 @@ object BusinessFranchise {
   import play.api.data.mapping.forms.Rules._
     (__ \ "businessFranchise").read[Boolean] flatMap {
       case true =>
-        (__ \ "franchiseName").read(descriptionType) fmap (BusinessFranchiseYes.apply)
+        (__ \ "franchiseName").read(franchiseNameType) fmap (BusinessFranchiseYes.apply)
       case false => Rule.fromMapping { _ => Success(BusinessFranchiseNo) }
     }
   }
@@ -26,7 +26,7 @@ object BusinessFranchise {
   implicit val formWrites: Write[BusinessFranchise, UrlFormEncoded] = Write {
     case BusinessFranchiseYes(value) =>
       Map("businessFranchise" -> Seq("true"),
-        "franchiseName" -> Seq(value)
+          "franchiseName" -> Seq(value)
       )
     case BusinessFranchiseNo => Map("businessFranchise" -> Seq("false"))
   }

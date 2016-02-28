@@ -2,7 +2,7 @@ package models.businessactivities
 
 case class BusinessActivities(
                                businessFranchise: Option[BusinessFranchise] = None,
-                               businessFranchise1: Option[BusinessFranchise] = None
+                               data: Option[String] = None
                                ) {
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
     this.copy(businessFranchise = Some(p))
@@ -17,14 +17,14 @@ object BusinessActivities {
 
   implicit val reads: Reads[BusinessActivities] = (
     __.read[Option[BusinessFranchise]] and
-    __.read[Option[BusinessFranchise]]
+    __.read[Option[String]]
     )(BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
   model =>
     Seq(
       Json.toJson(model.businessFranchise).asOpt[JsObject],
-      Json.toJson(model.businessFranchise).asOpt[JsObject]
+      Json.toJson(model.data).asOpt[JsObject]
     ).flatten.fold(Json.obj()){
      _ ++ _
     }

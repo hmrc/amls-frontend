@@ -55,7 +55,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[BusinessFranchise](Json.obj("businessFranchise" -> false)) must
-        be(JsSuccess(BusinessFranchise, JsPath \ "businessFranchise"))
+        be(JsSuccess(BusinessFranchiseNo, JsPath \ "businessFranchise"))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -63,25 +63,25 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("businessFranchise" -> true, "franchiseName" ->"test test")
 
       Json.fromJson[BusinessFranchise](json) must
-        be(JsSuccess(BusinessFranchiseYes("test test"), JsPath \ "BusinessFranchise" \ "franchiseName"))
+        be(JsSuccess(BusinessFranchiseYes("test test"), JsPath \ "businessFranchise" \ "franchiseName"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
 
-      val json = Json.obj("BusinessFranchise" -> true)
+      val json = Json.obj("businessFranchise" -> true)
 
       Json.fromJson[BusinessFranchise](json) must
-        be(JsError((JsPath \ "BusinessFranchise" \ "franchiseName") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "businessFranchise" \ "franchiseName") -> ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {
 
       Json.toJson(BusinessFranchiseNo) must
-        be(Json.obj("BusinessFranchise" -> false))
+        be(Json.obj("businessFranchise" -> false))
 
       Json.toJson(BusinessFranchiseYes("test test")) must
         be(Json.obj(
-          "BusinessFranchise" -> true,
+          "businessFranchise" -> true,
           "franchiseName" -> "test test"
         ))
     }
