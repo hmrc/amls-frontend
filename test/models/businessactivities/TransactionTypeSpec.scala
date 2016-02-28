@@ -22,7 +22,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
         "name" -> Seq("test")
       )
 
-      TransactionType.formRule.validate(model) must
+      TransactionRecord.formRule.validate(model) must
         be(Success(TransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))))
 
     }
@@ -34,7 +34,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
         "name" -> Seq("test")
       )
 
-      TransactionType.formRule.validate(model) must
+      TransactionRecord.formRule.validate(model) must
         be(Failure(List(( Path \ "isRecorded", Seq(ValidationError("error.required"))))))
 
     }
@@ -47,7 +47,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
         "name" -> Seq("test")
       )
 
-      TransactionType.formRule.validate(model) must
+      TransactionRecord.formRule.validate(model) must
         be(Failure(List(( Path \ "transactions", Seq(ValidationError("error.required"))))))
 
     }
@@ -55,7 +55,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
 
     "fail to validate on empty Map" in {
 
-      TransactionType.formRule.validate(Map.empty) must
+      TransactionRecord.formRule.validate(Map.empty) must
         be(Failure(Seq((Path \ "isRecorded") -> Seq(ValidationError("error.required")))))
 
     }
@@ -69,7 +69,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
       )
 
       val model = TransactionRecordYes(Set(DigitalSoftware("test"), Paper))
-     TransactionType.formWrites.writes(model) must be (map)
+     TransactionRecord.formWrites.writes(model) must be (map)
     }
 
     "validate form write for option No" in {
@@ -79,7 +79,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
       )
 
       val model = TransactionRecordNo
-      TransactionType.formWrites.writes(model) must be (map)
+      TransactionRecord.formWrites.writes(model) must be (map)
     }
 
     "validate form write for option Yes" in {
@@ -90,7 +90,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
       )
 
       val model = TransactionRecordYes(Set(DigitalSpreadsheet, Paper))
-      TransactionType.formWrites.writes(model) must be (map)
+      TransactionRecord.formWrites.writes(model) must be (map)
     }
 
 
@@ -101,7 +101,7 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
 
       val model = TransactionRecordNo
 
-      TransactionType.formWrites.writes(model) must be(map)
+      TransactionRecord.formWrites.writes(model) must be(map)
     }
 
     "JSON validation" must {

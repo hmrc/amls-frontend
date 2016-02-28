@@ -23,7 +23,7 @@ case object DigitalSpreadsheet extends TransactionType
 
 case class DigitalSoftware(name: String) extends TransactionType
 
-object TransactionType {
+object TransactionRecord {
 
   import utils.MappingUtils.Implicits._
 
@@ -36,59 +36,56 @@ object TransactionType {
             if (z.seq.isEmpty) {
               (Path \ "transactions") -> Seq(ValidationError("error.required"))
             } else {
-                z.map {
-                  case "01" => Rule[UrlFormEncoded, TransactionType](_ => Success(Paper))
-                  case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))
-                  case "03" =>
-                    (__ \ "name").read(softwareNameType) fmap DigitalSoftware.apply
-                }.foldLeft[Rule[UrlFormEncoded, Set[TransactionType]]](
-                  Rule[UrlFormEncoded, Set[TransactionType]](_ => Success(Set.empty))
-                ) {
-                  case (m, n) =>
-                    n flatMap { x =>
-                      m fmap {
-                        _ + x
-                      }
+              z.map {
+                case "01" => Rule[UrlFormEncoded, TransactionType](_ => Success(Paper))
+                case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))
+                case "03" =>
+                  (__ \ "name").read(softwareNameType) fmap DigitalSoftware.apply
+              }.foldLeft[Rule[UrlFormEncoded, Set[TransactionType]]](
+                Rule[UrlFormEncoded, Set[TransactionType]](_ => Success(Set.empty))
+              ) {
+                case (m, n) =>
+                  n flatMap { x =>
+                    m fmap {
+                      _ + x
                     }
-                } fmap TransactionRecordYes.apply
-              }
+                  }
+              } fmap TransactionRecordYes.apply
             }
+          }
         }
         case false => Rule.fromMapping { _ => Success(TransactionRecordNo) }
       }
-  }
+    }
 
   def getTupleFromModel(value: Set[TransactionType]) : (Seq[String], String) = {
-      val data = value.toSeq.map {
-          case Paper => ("01", "")
-          case DigitalSpreadsheet => ("02", "")
-          case DigitalSoftware(name) => ("03", name)
+    val data = value.toSeq.map {
+      case Paper => ("01", "")
+      case DigitalSpreadsheet => ("02", "")
+      case DigitalSoftware(name) => ("03", name)
 
-      }.foldLeft[(Seq[String], String)](
-          (Nil, "")
-      ) (
-        (result, txValue) =>
-          (result._1 :+ txValue._1, result._2.concat(txValue._2))
-      )
+    }.foldLeft[(Seq[String], String)](
+      (Nil, "")
+    ) (
+      (result, txValue) =>
+        (result._1 :+ txValue._1, result._2.concat(txValue._2))
+    )
     data
   }
 
   implicit def formWrites = Write[TransactionRecord, UrlFormEncoded] {
-      case TransactionRecordNo => Map("isRecorded" -> "false")
-      case TransactionRecordYes(value) => {
-         val data = getTupleFromModel(value)
-        data._2 match {
-          case "" =>  Map("isRecorded" -> "true",
-            "transactions" -> data._1)
-          case _ =>   Map("isRecorded" -> "true",
-            "transactions" -> data._1,
-            "name" -> data._2)
-        }
+    case TransactionRecordNo => Map("isRecorded" -> "false")
+    case TransactionRecordYes(value) => {
+      val data = getTupleFromModel(value)
+      data._2 match {
+        case "" =>  Map("isRecorded" -> "true",
+          "transactions" -> data._1)
+        case _ =>   Map("isRecorded" -> "true",
+          "transactions" -> data._1,
+          "name" -> data._2)
       }
+    }
   }
-}
-
-object TransactionRecord {
 
   implicit val jsonReads: Reads[TransactionRecord] =
     (__ \ "isRecorded").read[Boolean] flatMap {
@@ -116,7 +113,7 @@ object TransactionRecord {
   implicit val jsonWrite = Writes[TransactionRecord] {
     case TransactionRecordNo => Json.obj("isRecorded" -> true)
     case TransactionRecordYes(name) => {
-      val data = TransactionType.getTupleFromModel(name)
+      val data = getTupleFromModel(name)
         data._2 match {
           case "" =>  Json.obj("isRecorded" -> true,
             "transactions" -> data._1)

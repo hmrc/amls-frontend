@@ -44,6 +44,7 @@ lbl.date.example = For example, 31 3 2017
 
 lbl.uk = UK
 lbl.overseas = Overseas
+lbl.select.all = Select all that apply
 
 ## Login Page
 amls.Login.title= AMLS
@@ -299,3 +300,9 @@ bankdetails.summary.accounttype.lbl.03 = Another business''s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
 
+businessactivities.keep.customer.records.title = Do you keep records of all your transactions with customers?
+businessactivities.do.keep.records = How do you record transactions?
+businessactivities.transactiontype.lbl.01 = On paper
+businessactivities.transactiontype.lbl.02 = Digitally, on a spreadsheet
+businessactivities.transactiontype.lbl.03 = Digitally, on a software package designed for recording transactions
+businessactivities.name.software.pkg.lbl = Name of the software package
