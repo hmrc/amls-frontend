@@ -1,6 +1,5 @@
 package models.businessactivities
 
-import models.estateagentbusiness.Services
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
@@ -8,7 +7,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 
-class TransactionTypeSpec extends PlaySpec with MockitoSugar {
+class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
   "TransactionType" must {
 
@@ -57,6 +56,18 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
 
       TransactionRecord.formRule.validate(Map.empty) must
         be(Failure(Seq((Path \ "isRecorded") -> Seq(ValidationError("error.required")))))
+
+    }
+
+    "fail to validate  invalid data" in {
+
+      val model = Map(
+        "isRecorded" -> Seq("true"),
+        "transactions[]" -> Seq("01, 10")
+      )
+
+      TransactionRecord.formRule.validate(model) must
+        be(Failure(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid")))))
 
     }
 
@@ -129,10 +140,10 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
           be(JsError((JsPath \ "isRecorded" \ "transactions") -> ValidationError("error.path.missing")))
       }
 
-     /* "fail when on invalid data" in {
+      "fail when on invalid data" in {
         Json.fromJson[TransactionRecord](Json.obj("isRecorded" -> true,"transactions" -> Seq("40"))) must
-          be(JsError(((JsPath \ "isRecorded" \ "transactions")(0) \ "transactions") -> ValidationError("error.invalid")))
-      }*/
+          be(JsError(((JsPath \ "isRecorded" \ "transactions") \ "transactions") -> ValidationError("error.invalid")))
+      }
 
       "write valid data in using json write" in {
         Json.toJson[TransactionRecord](TransactionRecordYes(Set(Paper, DigitalSoftware("test")))) must be (Json.obj("isRecorded" -> true,
@@ -143,3 +154,5 @@ class TransactionTypeSpec extends PlaySpec with MockitoSugar {
     }
   }
 }
+
+

@@ -31,7 +31,7 @@ object TransactionRecord {
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
       (__ \ "isRecorded").read[Boolean].flatMap {
-        case true => {
+        case true =>
           (__ \ "transactions").read[Set[String]] flatMap { z =>
             if (z.seq.isEmpty) {
               (Path \ "transactions") -> Seq(ValidationError("error.required"))
@@ -41,19 +41,23 @@ object TransactionRecord {
                 case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))
                 case "03" =>
                   (__ \ "name").read(softwareNameType) fmap DigitalSoftware.apply
+                case _ =>
+                  Rule[UrlFormEncoded, TransactionType] { _ =>
+                    Failure(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid"))))
+                  }
               }.foldLeft[Rule[UrlFormEncoded, Set[TransactionType]]](
                 Rule[UrlFormEncoded, Set[TransactionType]](_ => Success(Set.empty))
               ) {
                 case (m, n) =>
-                  n flatMap { x =>
-                    m fmap {
-                      _ + x
+                    n flatMap { x =>
+                      m fmap {
+                        _ + x
+                      }
                     }
-                  }
               } fmap TransactionRecordYes.apply
             }
           }
-        }
+
         case false => Rule.fromMapping { _ => Success(TransactionRecordNo) }
       }
     }
@@ -75,7 +79,7 @@ object TransactionRecord {
 
   implicit def formWrites = Write[TransactionRecord, UrlFormEncoded] {
     case TransactionRecordNo => Map("isRecorded" -> "false")
-    case TransactionRecordYes(value) => {
+    case TransactionRecordYes(value) =>
       val data = getTupleFromModel(value)
       data._2 match {
         case "" =>  Map("isRecorded" -> "true",
@@ -84,18 +88,18 @@ object TransactionRecord {
           "transactions" -> data._1,
           "name" -> data._2)
       }
-    }
   }
 
   implicit val jsonReads: Reads[TransactionRecord] =
     (__ \ "isRecorded").read[Boolean] flatMap {
-      case true => (__ \ "transactions").read[Set[String]].flatMap {x =>
+      case true => (__ \ "transactions").read[Set[String]].flatMap {x:Set[String] =>
         x.map {
             case "01" => Reads(_ => JsSuccess(Paper))
             case "02" => Reads(_ => JsSuccess(DigitalSpreadsheet))
             case "03" =>
               (JsPath \ "name").read[String].map (DigitalSoftware.apply  _)
-
+            case _ =>
+              Reads(_ => JsError((JsPath \ "transactions") -> ValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TransactionType]]](
             Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
          ){
@@ -111,8 +115,8 @@ object TransactionRecord {
     }
 
   implicit val jsonWrite = Writes[TransactionRecord] {
-    case TransactionRecordNo => Json.obj("isRecorded" -> true)
-    case TransactionRecordYes(name) => {
+    case TransactionRecordNo => Json.obj("isRecorded" -> false)
+    case TransactionRecordYes(name) =>
       val data = getTupleFromModel(name)
         data._2 match {
           case "" =>  Json.obj("isRecorded" -> true,
@@ -122,7 +126,6 @@ object TransactionRecord {
             "transactions" -> data._1,
             "name" -> data._2)
         }
-      }
   }
-
 }
+
