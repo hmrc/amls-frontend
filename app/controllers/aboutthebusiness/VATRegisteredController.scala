@@ -37,7 +37,7 @@ trait VATRegisteredController extends BaseController {
               aboutTheBusiness.vatRegistered(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true =>  Redirect(routes.SummaryController.get())
             case false => Redirect(routes.ConfirmRegisteredOfficeController.get())
           }
       }
