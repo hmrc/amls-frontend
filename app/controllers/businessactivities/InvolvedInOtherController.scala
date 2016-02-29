@@ -25,7 +25,7 @@ trait InvolvedInOtherController extends BaseController {
         case Some(BusinessActivities(Some(data), None)) =>
             Ok(views.html.involved_in_other_name(Form2[InvolvedInOther](data), edit, businessMatching))
         case _ =>
-          Ok(views.html.involved_in_other_name(EmptyForm, edit, None))
+          Ok(views.html.involved_in_other_name(EmptyForm, edit, businessMatching))
       }
   }
 
