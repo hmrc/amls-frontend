@@ -12,11 +12,8 @@ import uk.gov.hmrc.play.http._
 import scala.concurrent.Future
 
 trait AmlsConnector extends ServicesConfig {
-
-  lazy val serviceURL = baseUrl("amls")
-
+  val serviceURL : String
   val login = "login"
-
   val http: HttpGet with HttpPost = WSHttp
 
   def submitLoginDetails(loginDetails: LoginDetails)(implicit user: AuthContext,  headerCarrier: HeaderCarrier) :Future[HttpResponse] = {
@@ -34,4 +31,6 @@ trait AmlsConnector extends ServicesConfig {
   }
 }
 
-object AmlsConnector extends AmlsConnector
+object AmlsConnector extends AmlsConnector {
+  override val serviceURL = baseUrl("amls")
+}
