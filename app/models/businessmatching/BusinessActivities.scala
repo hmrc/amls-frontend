@@ -17,7 +17,6 @@ case class BusinessActivities(businessActivities: Set[BusinessActivity]){
       case TrustAndCompanyServices => "06"
       case TelephonePaymentService => "07"
     }
-
   }
 }
 

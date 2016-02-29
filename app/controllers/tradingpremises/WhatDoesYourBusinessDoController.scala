@@ -7,53 +7,97 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import play.api.mvc.{Request, Result}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.RepeatingSection
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait WhatDoesYourBusinessDoController extends BaseController {
+trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController {
+
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request => {
-        //views.html.what_does_your_business_do(EmptyForm, BusinessActivities(Seq(AccountancyServices)), edit, index)
-        //buildView(EmptyForm, edit, Ok, index)
-        //Future.successful(views.html.what_does_your_business_do(EmptyForm, BusinessActivities(Seq(AccountancyServices)), edit, index))
-        Future.successful(Redirect(controllers.tradingpremises.routes.SummaryController.get()))
-      }
-  }
-
-  private def buildView(form: Form2[_], edit: Boolean, status: Status, index: Int)(implicit authContext: AuthContext, request: Request[_]): Future[Result] = {
-
-    dataCacheConnector.fetchAll map { x =>
-      (for {
-        allData <- x
-        businessMatchingData <- allData.getEntry[BusinessMatching](BusinessMatching.key)
-        tradingPremisesData <- allData.getEntry[TradingPremises](TradingPremises.key) orElse Some(TradingPremises())
-      } yield businessMatchingData match {
-        case BusinessMatching(Some(BusinessActivities(activityList))) if (activityList.size == 1) => {
-          dataCacheConnector.saveDataShortLivedCache(TradingPremises.key,
-            tradingPremisesData.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activityList))
-          ) map (_ => SeeOther(controllers.tradingpremises.routes.SummaryController.get.url))
-        }
-        case BusinessMatching(Some(businessActivities)) =>
-          Future.successful(status(views.html.what_does_your_business_do(form, businessActivities, edit, index)))
-      }) getOrElse Future.successful(NotFound)
-    } flatMap (identity)
-  }
-
-  def post(index: Int = 0, edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      Form2[WhatDoesYourBusinessDo](request.body) match {
-        case f: InvalidForm => buildView(f, edit, BadRequest, index)
-        case ValidForm(_, data) =>
-          for {
-            tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.whatDoesYourBusinessDoAtThisAddress(data))
-          } yield Redirect(controllers.tradingpremises.routes.SummaryController.get())
-      }
+  private def data
+  (index: Int, edit: Boolean)
+  (implicit
+   ac: AuthContext,
+   hc: HeaderCarrier
+//   ec: ExecutionContext
+  ): Future[Either[Result, (CacheMap, Set[BusinessActivity])]] =
+    dataCacheConnector.fetchAll map {
+      cache =>
+        type Tupe = (CacheMap, Set[BusinessActivity])
+        (for {
+          c <- cache
+          bm <- c.getEntry[BusinessMatching](BusinessMatching.key)
+//          tps <- c.getEntry[Seq[TradingPremises]](TradingPremises.mongoKey())
+          activities <- bm.activities flatMap {
+            _.businessActivities match {
+              case set if set.isEmpty => None
+              case set => Some(set)
+            }
+          }
+        } yield (c, activities))
+          .fold[Either[Result, Tupe]] {
+            Left(Redirect(routes.WhereAreTradingPremisesController.get(index, edit)))
+          } {
+            t => Right(t)
+          }
     }
+
+  def get(index: Int, edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      data(index, edit) flatMap {
+        case Right((c, activities)) =>
+          if (activities.size == 1) {
+            updateData[TradingPremises](c, index) {
+              case Some(TradingPremises(ytp, ya, Some(_))) =>
+                Some(TradingPremises(ytp, ya, Some(WhatDoesYourBusinessDo(activities))))
+              case _ =>
+                Some(TradingPremises(
+                  whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities))
+                ))
+            } map {
+              _ => Redirect(routes.SummaryController.get())
+            }
+          } else {
+            val ba = BusinessActivities(activities)
+            Future.successful {
+              getData[TradingPremises](c, index) match {
+                case Some(TradingPremises(_, _, Some(wdbd))) =>
+                  Ok(views.html.what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
+                case _ =>
+                  Ok(views.html.what_does_your_business_do(EmptyForm, ba, edit, index))
+              }
+            }
+          }
+        case Left(result) => Future.successful(result)
+        }
+      }
+
+  def post(index: Int, edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      data(index, edit) flatMap {
+        case Right((c, activities)) =>
+          Form2[WhatDoesYourBusinessDo](request.body) match {
+            case f: InvalidForm =>
+              val ba = BusinessActivities(activities)
+              Future.successful {
+                BadRequest(views.html.what_does_your_business_do(f, ba, edit, index))
+              }
+            case ValidForm(_, data) =>
+              updateData[TradingPremises](c, index) {
+                case Some(TradingPremises(ytp, ya, Some(_))) =>
+                  Some(TradingPremises(ytp, ya, Some(data)))
+                case _ =>
+                  Some(TradingPremises(None, None, Some(data)))
+              } map {
+                _ => Redirect(routes.SummaryController.get())
+              }
+          }
+        case Left(result) => Future.successful(result)
+      }
   }
 }
 

@@ -13,7 +13,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
         case Some(TradingPremises(Some(data), _, _)) =>
@@ -23,7 +23,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       }
   }
 
-  def post(index: Int = 0, edit: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[YourTradingPremises](request.body) match {
         case f: InvalidForm =>
