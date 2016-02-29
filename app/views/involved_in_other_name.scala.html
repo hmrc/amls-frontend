@@ -53,7 +53,7 @@ title = Messages("businessactivities.confirm-activities.title")
                 @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("involvedInOther"), "lbl.no", "false")
                 @fieldset("TODO", jsHidden = true, id = target) {
-                    @input(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
+                    @textarea(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
                 }
         }
         @submit(edit)
