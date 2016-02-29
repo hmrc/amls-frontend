@@ -1,5 +1,6 @@
 package controllers.businessactivities
 
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.bankdetails.BankDetails
 import models.businessactivities._
@@ -28,6 +29,11 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
   }
 
   "TransactionRecordController" must {
+
+    "use correct services" in new Fixture {
+      TransactionRecordController.authConnector must be(AMLSAuthConnector)
+      TransactionRecordController.dataCacheConnector must be(DataCacheConnector)
+    }
 
     "load the Customer Record Page" in new Fixture  {
 
@@ -67,9 +73,9 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
       when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)))))))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.BusinessFranchiseController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {

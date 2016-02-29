@@ -21,7 +21,7 @@
             <span class="form-label-bold">
                 @Messages("businessactivities.do.keep.records")
             </span>
-            <span class="form-label-bold">
+            <span class="form-hint">
                 @Messages("lbl.select.all")
             </span>
             @radioGroup(f("transactions")) {
@@ -34,6 +34,7 @@
                 }
             }
         }
+        <br>
         @submit(edit)
     }
 }

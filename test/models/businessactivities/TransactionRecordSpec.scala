@@ -26,6 +26,17 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
     }
 
+    "validate model with option No selected" in {
+
+      val model = Map(
+        "isRecorded" -> Seq("false")
+      )
+
+      TransactionRecord.formRule.validate(model) must
+        be(Success(TransactionRecordNo))
+
+    }
+
     "fail validation when field is recorded not selected" in {
 
       val model = Map(
@@ -125,6 +136,13 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
           be(JsSuccess(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)), JsPath \ "isRecorded" \ "transactions"))
       }
 
+      "successfully validate given values with option No" in {
+        val json =  Json.obj("isRecorded" -> false)
+
+        Json.fromJson[TransactionRecord](json) must
+          be(JsSuccess(TransactionRecordNo, JsPath \ "isRecorded"))
+      }
+
       "successfully validate given values with option Digital software" in {
         val json =  Json.obj("isRecorded" -> true,
           "transactions" -> Seq("03", "02"),
@@ -150,6 +168,10 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "transactions" -> Seq("01", "03"),
           "name" -> "test"
         ))
+      }
+
+      "write valid data in using json write with Option No" in {
+        Json.toJson[TransactionRecord](TransactionRecordNo) must be (Json.obj("isRecorded" -> false))
       }
     }
   }
