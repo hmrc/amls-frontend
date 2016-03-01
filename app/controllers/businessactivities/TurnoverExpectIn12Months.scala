@@ -17,8 +17,8 @@ trait TurnerOverExpectIn12MonthsController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, Some(data))) => Ok(views.html.turnover_expect_in_12_months(Form2[TurnerOverExpectIn12Months](data), edit))
-        case _ => Ok(views.html.turn_over_expect_in_12_months(EmptyForm, edit))
+        case Some(BusinessActivities(_, Some(data) ,_)) => Ok(views.html.turnover_expect_in_12_months(Form2[TurnerOverExpectIn12Months](data), edit))
+        case _ => Ok(views.html.turnover_expect_in_12_months(EmptyForm, edit))
       }
   }
 
@@ -30,7 +30,7 @@ trait TurnerOverExpectIn12MonthsController extends BaseController {
           for {
             businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
-              businessActivities.turnoverOverExpectIn12MOnths(data)
+              businessActivities.turnerOverExpectIn12Months(data)
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
