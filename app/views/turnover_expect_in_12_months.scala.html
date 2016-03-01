@@ -11,6 +11,9 @@
     @heading("businessactivities.business-turnover.title", "summary.businessactivities")
 
     @form(f, controllers.businessactivities.routes.TurnerOverExpectIn12MonthsController.post(edit)) {
+<span class="form-hint">
+            @Messages("businessactivities.business-turnover.line1.text")
+        </span>
 
         @radioGroup(f("turnoverOverExpectIn12MOnths")) {
             @legend("TODO", jsHidden = true)

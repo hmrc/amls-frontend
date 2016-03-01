@@ -291,9 +291,8 @@ businessactivities.confirm-activities.subtitle1 = Does your business carry out a
 businessactivities.confirm-activities.line1.text = Only list activities which relate to anti-money laundering supervision.
 
 
-
 businessactivities.business-turnover.title = How much turnover do you expect in the next 12 months?
-businessactivities.business-turnover.title = What is your role within the business?
+businessactivities.business-turnover.line1.text = We may consider your business a greater risk if you have a high turnover.
 businessactivities.business-turnover.lbl.01=£0 to £15,000
 businessactivities.business-turnover.lbl.02=£15,001 to £50,000
 businessactivities.business-turnover.lbl.03=£50,001 to £100,000
