@@ -25,7 +25,7 @@ trait AmlsConnector extends ServicesConfig {
 
   def subscribe(subscriptionRequest:SubscriptionRequest, safeId:String) (implicit user: AuthContext,  headerCarrier: HeaderCarrier) :Future[HttpResponse] = {
     val baseURI = "amls"
-    val postUrl = s"""$serviceURL/$baseURI/subscription/$safeId"""
+    val postUrl = s"""$serviceURL$baseURI/subscription/$safeId"""
     val jsonData = Json.toJson(subscriptionRequest)
     http.POST[JsValue, HttpResponse](postUrl, jsonData)
   }

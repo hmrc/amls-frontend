@@ -32,7 +32,7 @@ private object AppDependencies {
     // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % "3.0.0",
     "uk.gov.hmrc" %% "play-partials" % "4.0.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.0.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.5.0",
     "uk.gov.hmrc" %% "play-config" % "2.0.1",
     "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
     "uk.gov.hmrc" %% "http-caching-client" % "5.2.0",
@@ -73,7 +73,8 @@ private object AppDependencies {
         "org.pegdown" % "pegdown" % "1.4.2" % scope,
         "org.jsoup" % "jsoup" % "1.7.2" % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % scope
+        "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % scope,
+        "uk.gov.hmrc" %% "auth-test" % "2.1.0" % "test, it"
       )
     }.dependencies
   }
