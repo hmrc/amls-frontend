@@ -54,8 +54,8 @@ object AboutTheBusiness {
       }
   }
 
-  implicit def default(aboutYou: Option[AboutTheBusiness]): AboutTheBusiness =
-    aboutYou.getOrElse(AboutTheBusiness())
+  implicit def default(aboutTheBusiness: Option[AboutTheBusiness]): AboutTheBusiness =
+    aboutTheBusiness.getOrElse(AboutTheBusiness())
 }
 
 

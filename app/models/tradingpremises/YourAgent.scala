@@ -3,31 +3,51 @@ package models.tradingpremises
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
+import play.api.i18n.{Messages, Lang}
 import play.api.libs.json._
 
-case class YourAgent(agentsRegisteredName: AgentsRegisteredName,
+case class YourAgent(
+                    // TODO: should be a string
+                     agentsRegisteredName: AgentsRegisteredName,
                      taxType: TaxType,
                      businessStructure: BusinessStructure
                     )
 
 case class AgentsRegisteredName(value: String)
 
-sealed trait TaxType
+sealed trait TaxType {
+  def message(implicit lang: Lang): String =
+    this match {
+      case TaxTypeSelfAssesment =>
+        Messages("tradingpremises.youragent.taxtype.lbl.01")
+      case TaxTypeCorporationTax =>
+        Messages("tradingpremises.youragent.taxtype.lbl.02")
+    }
+}
 
 case object TaxTypeSelfAssesment extends TaxType
-
 case object TaxTypeCorporationTax extends TaxType
 
-sealed trait BusinessStructure
+sealed trait BusinessStructure {
+  def message(implicit lang: Lang): String =
+    this match {
+      case SoleProprietor =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.01")
+      case LimitedLiabilityPartnership =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.02")
+      case Partnership =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.03")
+      case IncorporatedBody =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.04")
+      case UnincorporatedBody =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.05")
+    }
+}
 
 case object SoleProprietor extends BusinessStructure
-
 case object LimitedLiabilityPartnership extends BusinessStructure
-
 case object Partnership extends BusinessStructure
-
 case object IncorporatedBody extends BusinessStructure
-
 case object UnincorporatedBody extends BusinessStructure
 
 object AgentsRegisteredName {
@@ -90,8 +110,8 @@ object YourAgent {
 
   val key = "your-agent"
 
-  import utils.MappingUtils.Implicits._
   import models.FormTypes._
+  import utils.MappingUtils.Implicits._
 
 
   implicit val formRule: Rule[UrlFormEncoded, YourAgent] = From[UrlFormEncoded] { __ =>
@@ -109,7 +129,6 @@ object YourAgent {
 
   implicit val taxTypeRule: Rule[UrlFormEncoded, TaxType] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    import models.FormTypes._
     (__ \ "taxType").read[String] flatMap {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
@@ -120,7 +139,6 @@ object YourAgent {
 
   implicit val agentsBusinessStructureRule: Rule[UrlFormEncoded, BusinessStructure] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    import models.FormTypes._
 
     (__ \ "agentsBusinessStructure").read[String] flatMap {
       case "01" => SoleProprietor
@@ -135,7 +153,6 @@ object YourAgent {
   implicit val formWrites: Write[YourAgent, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
-    import models.FormTypes._
     (__.write[AgentsRegisteredName] ~
       __.write[TaxType] ~
       __.write[BusinessStructure]) (unlift(YourAgent.unapply _))
@@ -168,9 +185,9 @@ object YourAgent {
   }
 
   implicit val jsonReads: Reads[YourAgent] = {
-    import play.api.libs.json._
-    import play.api.libs.functional.syntax._
     import AgentsRegisteredName._
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
 
     (__.read[AgentsRegisteredName] and
       __.read[TaxType] and
@@ -178,11 +195,15 @@ object YourAgent {
   }
 
   implicit val jsonWrite: Writes[YourAgent] = {
-    import play.api.libs.json._
     import play.api.libs.functional.syntax._
+    import play.api.libs.json._
     (__.write[AgentsRegisteredName] and
       __.write[TaxType] and
       __.write[BusinessStructure]) (unlift(YourAgent.unapply))
+  }
+
+  implicit def convert(data: YourAgent): Option[TradingPremises] = {
+    Some(TradingPremises(None, Some(data), None))
   }
 
 }
