@@ -8,16 +8,21 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
   val businessFranchise = BusinessFranchiseYes("test test")
   val transactionRecord = TransactionRecordYes(Set(Paper, DigitalSoftware("software")))
+  val involvedInOther = InvolvedInOtherYes("test")
 
   "BusinessActivities" must {
     val completeJson = Json.obj(
+      "involvedInOther" -> true,
+      "details" -> "test" ,
       "businessFranchise" -> true,
       "franchiseName" -> "test test",
       "isRecorded" -> true,
        "transactions" -> Seq("01")
     )
 
-    val completeModel = BusinessActivities(businessFranchise = Some(businessFranchise), None, Some(TransactionRecordYes(Set(Paper))))
+    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther),
+      businessFranchise = Some(businessFranchise),
+      Some(TransactionRecordYes(Set(Paper))))
 
     "Serialise as expected" in {
 
@@ -62,7 +67,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "Merged with BusinessFranchise" in {
        val result = initial.businessFranchise(businessFranchise)
-       result must be (BusinessActivities(Some(businessFranchise), None))
+       result must be (BusinessActivities(None,Some(businessFranchise) ))
 
     }
 
@@ -76,21 +81,26 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
   "BusinessActivities" must {
 
-    val initial = BusinessActivities(Some(businessFranchise), None, Some(transactionRecord))
+    val initial = BusinessActivities(Some(InvolvedInOtherNo), Some(businessFranchise), Some(transactionRecord))
 
     "Merged with BusinessFranchise" in{
        val newFranchiseName = BusinessFranchiseYes("test")
        val result = initial.businessFranchise(newFranchiseName)
-       result must be (BusinessActivities(Some(newFranchiseName), None, Some(transactionRecord)))
+       result must be (BusinessActivities(Some(InvolvedInOtherNo), Some(newFranchiseName), Some(transactionRecord)))
     }
 
     "Merged with TransactionRecord" in {
       val newRecords = TransactionRecordYes(Set(Paper))
       val result = initial.transactionRecord(newRecords)
-      result must be (BusinessActivities(Some(businessFranchise), None, Some(newRecords)))
+      result must be (BusinessActivities(Some(InvolvedInOtherNo), Some(businessFranchise), Some(newRecords)))
 
     }
 
+    "Merge InvolvedInOther" in{
+      val newInvolvedInOther= InvolvedInOtherYes("test")
+      val result = initial.involvedInOther(newInvolvedInOther)
+      result must be (BusinessActivities(Some(newInvolvedInOther), Some(businessFranchise), Some(transactionRecord)))
+    }
   }
 
 }

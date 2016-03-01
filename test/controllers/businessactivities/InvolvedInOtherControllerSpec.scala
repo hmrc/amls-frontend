@@ -2,61 +2,74 @@ package controllers.businessactivities
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessactivities.{BusinessFranchiseYes, BusinessActivities}
+import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
+import models.businessmatching.{BusinessActivities => activities, BusinessMatching}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.test.Helpers._
 import play.api.i18n.Messages
+import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 import scala.concurrent.Future
 
-class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures{
+class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new BusinessFranchiseController {
+     val controller = new InvolvedInOtherController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
   }
 
-  "BusinessFranchiseController" must {
+  "InvolvedInOtherController" must {
 
-    "use correct services" in new Fixture {
-      BusinessFranchiseController.authConnector must be(AMLSAuthConnector)
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
-    }
+    "on get display the is your involved in other page" in new Fixture {
+      val mockCacheMap = mock[CacheMap]
+      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+        .thenReturn(None)
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(None)
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    "on get display the is your business a franchise page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("businessactivities.businessfranchise.title"))
+      contentAsString(result) must include(Messages("businessactivities.confirm-activities.title"))
     }
 
 
-    "on get display the is your business a franchise page with pre populated data" in new Fixture {
+    "on get display the involved in other with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None,Some(BusinessFranchiseYes("test test"))))))
+      val mockCacheMap = mock[CacheMap]
+
+      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+        .thenReturn(Some(BusinessActivities(Some(InvolvedInOtherYes("test")))))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(None)
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include ("test test")
+      contentAsString(result) must include ("test")
 
     }
 
     "on post with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "businessFranchise" -> "true",
-        "franchiseName" -> "test test"
+        "involvedInOther" -> "true",
+        "details" -> "test"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
@@ -74,22 +87,21 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
     "on post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "businessFranchise" -> "test"
+        "involvedInOther" -> "test"
       )
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      val document: Document  = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include("Invalid value")
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#involvedInOther]").html() must include("Invalid value")
     }
-
 
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "businessFranchise" -> "true",
-        "franchiseName" -> "test"
+        "involvedInOther" -> "true",
+        "details" -> "test"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
@@ -102,7 +114,5 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
     }
-
   }
-
 }

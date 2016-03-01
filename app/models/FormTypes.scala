@@ -24,6 +24,7 @@ object FormTypes {
   val yearLength = 4
   val maxRedressOtherTypeLength = 255
   val maxLengthPremisesTradingName = 120
+  val maxOtherBusinessActivityTypeLength = 255
 
   val maxAccountName = 40
   val maxIBANLength = 34
@@ -97,5 +98,7 @@ object FormTypes {
   val softwareNameType = notEmpty compose maxLength (maxSoftwareNameLength)
 
   val franchiseNameType = notEmpty compose maxLength(maxFranchiseName)
+
+  val OtherBusinessActivityType = notEmpty compose maxLength(maxOtherBusinessActivityTypeLength)
 
 }

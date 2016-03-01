@@ -1,0 +1,26 @@
+@import forms.{Field, Form2}
+
+@(
+    field: Field,
+    labelText: String = "",
+    hintText: String = "",
+    bold: Boolean = true,
+    classes: Seq[String] = Seq.empty
+)(implicit lang: Lang)
+
+<div class="form-group @if(field.hasErrors) {form-field--error}" xmlns="http://www.w3.org/1999/html">
+    <label>
+        @if(labelText.nonEmpty) {
+            <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+        }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification">@field.error</span>
+        }
+        <textarea name="@field.name" cols="50" rows="5" id="@field.id" style="width:50%;text-align:left;white-space: normal;">
+        @field.value
+        </textarea>
+    </label>
+</div>
