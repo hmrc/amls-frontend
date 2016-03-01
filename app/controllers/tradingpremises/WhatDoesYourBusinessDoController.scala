@@ -87,7 +87,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
               }
             case ValidForm(_, data) =>
               updateData[TradingPremises](c, index) {
-                case Some(TradingPremises(ytp, ya, Some(_))) =>
+                case Some(TradingPremises(ytp, ya, _)) =>
                   Some(TradingPremises(ytp, ya, Some(data)))
                 case _ =>
                   Some(TradingPremises(None, None, Some(data)))
