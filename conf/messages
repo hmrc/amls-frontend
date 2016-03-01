@@ -194,6 +194,10 @@ tradingpremises.yourtradingpremises.startdate=Date you will start trading from t
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 
+tradingpremises.summary.addanother = Add another premises
+tradingpremises.summary.own = Own
+tradingpremises.summary.agents = Agent''s
+
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
 estateagentbusiness.whatyouneed.subheading = For this section you''ll need:
@@ -261,7 +265,7 @@ bankdetails.accounttype.title = What kind of bank account does your business use
 bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
 bankdetails.accounttype.lbl.03 = A business account belonging to another business
-bankdetails.accounttype.lbl.04 = The business doesn't use a bank account
+bankdetails.accounttype.lbl.04 = The business doesn''t use a bank account
 
 summary.businessactivities = Business activities
 

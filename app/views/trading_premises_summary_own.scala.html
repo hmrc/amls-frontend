@@ -1,7 +1,7 @@
 @import include._
 @import models.tradingpremises._
 
-@(model: TradingPremises)(implicit request: Request[_], lang: Lang)
+@(model: TradingPremises, index : Int)(implicit request: Request[_], lang: Lang)
 
 @main(
     title = Messages("summary.checkyouranswers.businesspremises.title")
@@ -15,7 +15,7 @@
         <table>
             <tr>
                 <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section1")</th>
-                <td><a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get()">@Messages("button.edit")</a></td>
+                <td><a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -48,7 +48,7 @@
     <table>
         <tr>
             <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.section2")</th>
-            <td><a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get()">@Messages("button.edit")</a></td>
+            <td><a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index)">@Messages("button.edit")</a></td>
         </tr>
         @ba.activities.map{ line =>
         <tr>
