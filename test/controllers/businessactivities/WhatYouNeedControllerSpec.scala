@@ -8,7 +8,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
-class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class WhatYouNeeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>

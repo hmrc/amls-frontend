@@ -406,6 +406,19 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   }
 
+
+  "OtherBusinessActivityType" must {
+
+    "fail to validate a string longer than 255" in {
+
+      OtherBusinessActivityType.validate("a" * 256) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", maxOtherBusinessActivityTypeLength))
+        )))
+    }
+  }
+
+
   "For the Franchise Name" must {
     "validate franchise name supplied" in {
       franchiseNameType.validate("test test") must be(Success("test test"))

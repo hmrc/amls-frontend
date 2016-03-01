@@ -13,6 +13,7 @@ trait RegisterServicesController  extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
+
       dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) map {
         case Some(BusinessMatching(Some(data))) =>
           Ok(views.html.what_you_need_to_register(Form2[BusinessActivities](data), edit))

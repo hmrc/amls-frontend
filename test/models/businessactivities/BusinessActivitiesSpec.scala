@@ -7,14 +7,17 @@ import play.api.libs.json.{Json}
 class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
   val businessFranchise = BusinessFranchiseYes("test test")
+  val involvedInOther = InvolvedInOtherYes("test")
 
   "BusinessActivities" must {
     val completeJson = Json.obj(
+      "involvedInOther" -> true,
+      "details" -> "test" ,
       "businessFranchise" -> true,
       "franchiseName" -> "test test"
     )
 
-    val completeModel = BusinessActivities(businessFranchise = Some(businessFranchise))
+    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther), businessFranchise = Some(businessFranchise))
 
     "Serialise as expected" in {
 
@@ -33,11 +36,12 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   "Partially complete BusinessActivities" must {
 
     val partialJson = Json.obj(
-      "businessFranchise" -> true,
-      "franchiseName" -> "test test"
+      "involvedInOther" -> true,
+      "details" -> "test"
+
     )
 
-    val partialModel = BusinessActivities(businessFranchise = Some(businessFranchise))
+    val partialModel = BusinessActivities(involvedInOther = Some(involvedInOther))
 
     "Serialise as expected" in {
 
@@ -59,21 +63,28 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "Merged with BusinessFranchise" in {
        val result = initial.businessFranchise(businessFranchise)
-       result must be (BusinessActivities(Some(businessFranchise), None))
+       result must be (BusinessActivities(None,Some(businessFranchise) ))
 
     }
+
+
   }
 
   "BusinessActivities" must {
 
-    val initial = BusinessActivities(Some(businessFranchise), None)
+    val initial = BusinessActivities(Some(InvolvedInOtherNo), Some(businessFranchise) )
 
-    "Merged with BusinessFranchise" in{
+    "Merge BusinessFranchise" in{
        val newFranchiseName = BusinessFranchiseYes("test")
        val result = initial.businessFranchise(newFranchiseName)
-       result must be (BusinessActivities(Some(newFranchiseName), None))
+       result must be (BusinessActivities(Some(InvolvedInOtherNo),Some(newFranchiseName)))
     }
 
+    "Merge InvolvedInOther" in{
+      val newInvolvedInOther= InvolvedInOtherYes("test")
+      val result = initial.involvedInOther(newInvolvedInOther)
+      result must be (BusinessActivities(Some(newInvolvedInOther), Some(businessFranchise)))
+    }
   }
 
 }
