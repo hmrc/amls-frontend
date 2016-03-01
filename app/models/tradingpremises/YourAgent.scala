@@ -3,31 +3,51 @@ package models.tradingpremises
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
+import play.api.i18n.{Messages, Lang}
 import play.api.libs.json._
 
-case class YourAgent(agentsRegisteredName: AgentsRegisteredName,
+case class YourAgent(
+                    // TODO: should be a string
+                     agentsRegisteredName: AgentsRegisteredName,
                      taxType: TaxType,
                      businessStructure: BusinessStructure
                     )
 
 case class AgentsRegisteredName(value: String)
 
-sealed trait TaxType
+sealed trait TaxType {
+  def message(implicit lang: Lang): String =
+    this match {
+      case TaxTypeSelfAssesment =>
+        Messages("tradingpremises.youragent.taxtype.lbl.01")
+      case TaxTypeCorporationTax =>
+        Messages("tradingpremises.youragent.taxtype.lbl.02")
+    }
+}
 
 case object TaxTypeSelfAssesment extends TaxType
-
 case object TaxTypeCorporationTax extends TaxType
 
-sealed trait BusinessStructure
+sealed trait BusinessStructure {
+  def message(implicit lang: Lang): String =
+    this match {
+      case SoleProprietor =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.01")
+      case LimitedLiabilityPartnership =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.02")
+      case Partnership =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.03")
+      case IncorporatedBody =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.04")
+      case UnincorporatedBody =>
+        Messages("tradingpremises.youragent.businessstructure.lbl.05")
+    }
+}
 
 case object SoleProprietor extends BusinessStructure
-
 case object LimitedLiabilityPartnership extends BusinessStructure
-
 case object Partnership extends BusinessStructure
-
 case object IncorporatedBody extends BusinessStructure
-
 case object UnincorporatedBody extends BusinessStructure
 
 object AgentsRegisteredName {

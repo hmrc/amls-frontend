@@ -6,13 +6,13 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Result
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.RepeatingSection
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController {
 
@@ -23,7 +23,6 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
   (implicit
    ac: AuthContext,
    hc: HeaderCarrier
-//   ec: ExecutionContext
   ): Future[Either[Result, (CacheMap, Set[BusinessActivity])]] =
     dataCacheConnector.fetchAll map {
       cache =>
@@ -31,7 +30,6 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
         (for {
           c <- cache
           bm <- c.getEntry[BusinessMatching](BusinessMatching.key)
-//          tps <- c.getEntry[Seq[TradingPremises]](TradingPremises.mongoKey())
           activities <- bm.activities flatMap {
             _.businessActivities match {
               case set if set.isEmpty => None
@@ -40,6 +38,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
           }
         } yield (c, activities))
           .fold[Either[Result, Tupe]] {
+            // TODO: Need to think about what we should do in case of this error
             Left(Redirect(routes.WhereAreTradingPremisesController.get(index, edit)))
           } {
             t => Right(t)
@@ -93,7 +92,10 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 case _ =>
                   Some(TradingPremises(None, None, Some(data)))
               } map {
-                _ => Redirect(routes.SummaryController.get())
+                _ => edit match {
+                  case true => Redirect(routes.SummaryController.getIndividual(index))
+                  case false => Redirect(routes.SummaryController.get())
+                }
               }
           }
         case Left(result) => Future.successful(result)

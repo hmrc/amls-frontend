@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises._
+import play.api.Logger
 import utils.RepeatingSection
 
 import scala.concurrent.Future
@@ -23,6 +24,8 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       }
   }
 
+  // TODO: Consider if this can be refactored
+  // scalastyle:off cyclomatic.complexity
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[YourTradingPremises](request.body) match {
@@ -31,17 +34,21 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
         case ValidForm(_, data) =>
           for {
             _ <- updateData[TradingPremises](index) {
-              case Some(TradingPremises(_, ya, wdbd)) => Some(TradingPremises(Some(data), ya, wdbd))
+              // This makes sure to save `None` for the agent section if
+              // the user selects that the premises is theirs.
+              case Some(TradingPremises(_, _, wdbd)) if data.isOwner =>
+                Some(TradingPremises(Some(data), None, wdbd))
+              case Some(TradingPremises(_, ya, wdbd)) =>
+                Some(TradingPremises(Some(data), ya, wdbd))
               case _ => data
             }
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false =>
-              if (data.isOwner) {
-                Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
-              } else {
-                Redirect(routes.YourAgentController.get(index, edit))
-              }
+          } yield (edit, data.isOwner) match {
+            case (true, true) =>
+              Redirect(routes.SummaryController.getIndividual(index))
+            case (false, true) =>
+              Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+            case (_, _) =>
+              Redirect(routes.YourAgentController.get(index, edit))
           }
       }
   }

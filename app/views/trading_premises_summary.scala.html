@@ -3,71 +3,60 @@
 
 @(model: Seq[TradingPremises])(implicit request: Request[_], lang: Lang)
 
-
 @main(
     title = Messages("summary.checkyouranswers.title")
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
-<div class="panel-indent">
-    <p>
-        @Messages("summary.linetext")
-    </p>
-    <p>
-        <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(model.length+1, false)"> @Messages("tradingpremises.summary.addanother") </a>
-    </p>
-</div>
 
-        @model.zipWithIndex.map { case (tp, y) =>
-            @tp.yourTradingPremises.map { ytp =>
-        <table>
+    <div class="form-group">
+        <div class="panel-indent">
+            <p>
+                @Messages("summary.linetext")
+            </p>
+            <p>
+                <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(model.length + 1, false)"> @Messages("tradingpremises.summary.addanother") </a>
+            </p>
+        </div>
+    </div>
+
+    @model.zipWithIndex.map { case (tp, y) =>
+        <table class="summary">
             <tr>
-                <th class="summary-title" colspan="2">@ytp.tradingName</th>
-                <td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get(y+1)">@Messages("button.edit")</a></td>
+                <th class="summary-title" colspan="2">
+                    @tp.yourTradingPremises.map { ytp =>
+                        @ytp.tradingName
+                    }
+                </th>
+                <td><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
-                <td>
-                    @ytp.tradingPremisesAddress.toLines.map{ line =>
-                    @line
-                    <br>}
+                <td width="40%">
+                    @tp.yourTradingPremises.map { ytp =>
+                        <ul class="no-padding">
+                            @ytp.tradingPremisesAddress.toLines.map { l =>
+                                <li>@l</li>
+                            }
+                        </ul>
+                    }
                 </td>
-                @tp.whatDoesYourBusinessDoAtThisAddress.map { ba=>
-                <td>
-                    @ba.activities.map{ line =>
-                    @line <br>}}
+                <td width="48%">
+                    @tp.whatDoesYourBusinessDoAtThisAddress.map { ba =>
+                        <ul class="no-padding">
+                            @ba.activities.map { a =>
+                                <li>@a.getMessage</li>
+                            }
+                        </ul>
+                    }
                 </td>
                 <td>
-                    <p>Own</p>
+                    @tp.yourAgent.fold(Html(Messages("tradingpremises.summary.own"))) { _ =>
+                        @Messages("tradingpremises.summary.agents")
+                    }
                 </td>
             </tr>
         </table>
-        }
-    @tp.yourAgent.map { agent=>
-    <table>
-        <tr>
-            <th class="summary-title" colspan="2">@agent.agentsRegisteredName.value</th>
-            <td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get(y+1)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            @tp.yourTradingPremises.map { ytp=>
-            <td>
-                @ytp.tradingPremisesAddress.toLines.map{ line =>
-                @line
-                <br>}
-            </td>
-            @tp.whatDoesYourBusinessDoAtThisAddress.map { ba=>
-            <td>
-                @ba.activities.map{ line =>
-                @line <br>}}
-            </td>
-            <td>
-                <p>Agent's</p>
-            </td>
-            }
-        </tr>
-    </table>
     }
 
-    }
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
 }

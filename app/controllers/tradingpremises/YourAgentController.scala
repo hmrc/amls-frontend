@@ -38,7 +38,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
             }
           } yield edit match {
             case true =>
-              Redirect(routes.SummaryController.get())
+              Redirect(routes.SummaryController.getIndividual(index))
             case false =>
               Redirect(routes.WhatDoesYourBusinessDoController.get(index))
           }
