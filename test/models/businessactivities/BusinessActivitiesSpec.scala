@@ -8,7 +8,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
   val businessFranchise = BusinessFranchiseYes("test test")
   val involvedInOther = InvolvedInOtherYes("test")
-  val  someTurnover = First
+  val  someTurnoverAmls = FirstTurnoverAmls
 
   "BusinessActivities" must {
     val completeJson = Json.obj(
@@ -19,7 +19,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "franchiseName" -> "test test"
     )
 
-    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther), businessFranchise = Some(businessFranchise), turnerOverExpectIn12Months = Some(First) )
+    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther), businessFranchise = Some(businessFranchise), turnerOverExpectIn12MonthsRelatedToAMLS = Some(FirstTurnoverAmls) )
 
     "Serialise as expected" in {
 
@@ -74,24 +74,24 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
   "BusinessActivities" must {
 
-    val initial = BusinessActivities(Some(involvedInOther),  Some(someTurnover), Some(businessFranchise) )
+    val initial = BusinessActivities(Some(involvedInOther),  Some(someTurnoverAmls), Some(businessFranchise) )
 
     "Merge BusinessFranchise" in{
        val newFranchiseName = BusinessFranchiseYes("test test")
        val result = initial.businessFranchise(newFranchiseName)
-       result must be (BusinessActivities(Some(involvedInOther),  Some(someTurnover), Some(businessFranchise)))
+       result must be (BusinessActivities(Some(involvedInOther),  Some(someTurnoverAmls), Some(businessFranchise)))
     }
 
     "Merge InvolvedInOther" in{
       val newInvolvedInOther= InvolvedInOtherYes("test")
       val result = initial.involvedInOther(newInvolvedInOther)
-      result must be ( BusinessActivities(Some(involvedInOther),  Some(someTurnover), Some(businessFranchise)))
+      result must be ( BusinessActivities(Some(involvedInOther),  Some(someTurnoverAmls), Some(businessFranchise)))
     }
 
-    "Merged with TurnoverExpectIn12Months" must {
-      "return TurnoverExpectIn12Months with correct turnover in the business set" in {
-        val newTurnover = First
-        val result = initial.turnerOverExpectIn12Months(newTurnover)
+    "Merged with TurnoverExpectIn12MonthsRelatedToAMLS" must {
+      "return TurnoverExpectIn12MonthsRelatedToAMLS with correct turnover in the business set" in {
+        val newTurnover = FirstTurnoverAmls
+        val result = initial.turnerOverExpectIn12MonthsRelatedToAMLS(newTurnover)
         result must be ( BusinessActivities(Some(involvedInOther),  Some(newTurnover), Some(businessFranchise)))
       }
     }
