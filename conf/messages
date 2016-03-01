@@ -176,8 +176,6 @@ tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
 
 
 tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
-tradingpremises.whatdoesyourbusinessdo.linetext = Select all that apply
-
 
 tradingpremises.yourtradingpremises.title=Trading premises - Where are your trading premises?
 tradingpremises.yourtradingpremises.heading=Where are your trading premises?
@@ -226,7 +224,6 @@ estateagentbusiness.service.lbl.06 = Asset management
 estateagentbusiness.service.lbl.07 = Land management
 estateagentbusiness.service.lbl.08 = Development company services
 estateagentbusiness.service.lbl.09 = Social housing provision
-estateagentbusiness.select.all = Select all that apply
 
 estateagentbusiness.redress.lbl = Redress scheme:
 estateagentbusiness.redress.lbl.01 = The Property Ombudsman Limited
@@ -240,7 +237,6 @@ estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.registerservices.title=Business Matching - What do you need to register?
 businessmatching.registerservices.heading=What do you need to register?
-businessmatching.registerservices.text=Select all that apply
 businessmatching.registerservices.servicename.lbl.01=Accountancy services
 businessmatching.registerservices.servicename.lbl.02=Bill payment services
 businessmatching.registerservices.servicename.lbl.03=Estate agent business
