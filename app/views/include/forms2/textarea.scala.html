@@ -8,7 +8,7 @@
     classes: Seq[String] = Seq.empty
 )(implicit lang: Lang)
 
-<div class="form-group @if(field.hasErrors) {form-field--error}">
+<div class="form-group @if(field.hasErrors) {form-field--error}" xmlns="http://www.w3.org/1999/html">
     <label>
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
@@ -19,8 +19,8 @@
         @if(field.hasErrors) {
             <span class="error-notification">@field.error</span>
         }
-        <input name="@field.name" class="form-control @classes.mkString(" ")" type="textarea" value="@field.value" id="@field.id"
-               @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
-        >
+        <textarea name="@field.name" cols="50" rows="5" id="@field.id" style="width:50%;text-align:left;white-space: normal;">
+        @field.value
+        </textarea>
     </label>
 </div>
