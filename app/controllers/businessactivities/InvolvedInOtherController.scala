@@ -25,7 +25,7 @@ trait InvolvedInOtherController extends BaseController {
           case Some(cacheData) => {
             val businessMatching = cacheData.getEntry[BusinessMatching](BusinessMatching.key)
             cacheData.getEntry[BusinessActivities](BusinessActivities.key) match {
-              case Some(BusinessActivities(Some(data),_, _)) =>
+              case Some(BusinessActivities(Some(data),_ ,_)) =>
                 Ok(views.html.involved_in_other_name(Form2[InvolvedInOther](data), edit, businessMatching))
               case _ =>
                 Ok(views.html.involved_in_other_name(EmptyForm, edit, businessMatching))
