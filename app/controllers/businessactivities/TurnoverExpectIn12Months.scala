@@ -4,7 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{TurnerOverExpectIn12Months, BusinessActivities}
+import models.businessactivities.{TurnerOverExpectIn12Months}
+import models.businessactivities.{BusinessActivities, _}
+
 
 import scala.concurrent.Future
 
@@ -15,7 +17,7 @@ trait TurnerOverExpectIn12MonthsController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, Some(data))) => Ok(views.html.turn_over_expect_in_12_months(Form2[TurnerOverExpectIn12Months](data), edit))
+        case Some(BusinessActivities(_, Some(data))) => Ok(views.html.turnover_expect_in_12_months(Form2[TurnerOverExpectIn12Months](data), edit))
         case _ => Ok(views.html.turn_over_expect_in_12_months(EmptyForm, edit))
       }
   }
@@ -23,16 +25,16 @@ trait TurnerOverExpectIn12MonthsController extends BaseController {
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[TurnerOverExpectIn12Months](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.turn_over_expect_in_months(f, edit)))
+        case f: InvalidForm => Future.successful(BadRequest(views.html.turnover_expect_in_12_months(f, edit)))
         case ValidForm(_, data) =>
           for {
-            aboutYou <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
+            businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
               businessActivities.turnoverOverExpectIn12MOnths(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.TurnerOverExpectIn12MonthsController.get())
+            case true => Redirect(routes.WhatYouNeedController.get())
+            case false => Redirect(routes.WhatYouNeedController.get())
           }
       }
     }
