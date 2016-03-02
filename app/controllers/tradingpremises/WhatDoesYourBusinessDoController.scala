@@ -51,7 +51,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
         case Right((c, activities)) =>
           if (activities.size == 1) {
             updateData[TradingPremises](c, index) {
-              case Some(TradingPremises(ytp, ya, Some(_))) =>
+              case Some(TradingPremises(ytp, ya, _)) =>
                 Some(TradingPremises(ytp, ya, Some(WhatDoesYourBusinessDo(activities))))
               case _ =>
                 Some(TradingPremises(
