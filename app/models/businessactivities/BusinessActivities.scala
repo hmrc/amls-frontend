@@ -2,14 +2,14 @@ package models.businessactivities
 
 case class BusinessActivities(
                                involvedInOther: Option[InvolvedInOther] = None,
-                               turnerOverExpectIn12MonthsRelatedToAMLS: Option[TurnerOverExpectIn12MonthsRelatedToAMLS] = None,
+                               expectedAMLSTurnover: Option[ExpectedAMLSTurnover] = None,
                                businessFranchise: Option[BusinessFranchise] = None
                                ) {
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
     this.copy(businessFranchise = Some(p))
 
-  def turnerOverExpectIn12MonthsRelatedToAMLS(p: TurnerOverExpectIn12MonthsRelatedToAMLS): BusinessActivities =
-    this.copy(turnerOverExpectIn12MonthsRelatedToAMLS = Some(p))
+  def expectedAMLSTurnover(p: ExpectedAMLSTurnover): BusinessActivities =
+    this.copy(expectedAMLSTurnover = Some(p))
 
 
   def involvedInOther(p: InvolvedInOther): BusinessActivities =
@@ -25,7 +25,7 @@ object BusinessActivities {
 
   implicit val reads: Reads[BusinessActivities] = (
     __.read[Option[InvolvedInOther]] and
-    __.read[Option[TurnerOverExpectIn12MonthsRelatedToAMLS]] and
+    __.read[Option[ExpectedAMLSTurnover]] and
     __.read[Option[BusinessFranchise]]
     )(BusinessActivities.apply _)
 
@@ -33,7 +33,7 @@ object BusinessActivities {
   model =>
     Seq(
       Json.toJson(model.involvedInOther).asOpt[JsObject],
-      Json.toJson(model.turnerOverExpectIn12MonthsRelatedToAMLS).asOpt[JsObject],
+      Json.toJson(model.expectedAMLSTurnover).asOpt[JsObject],
       Json.toJson(model.businessFranchise).asOpt[JsObject]
     ).flatten.fold(Json.obj()){
      _ ++ _

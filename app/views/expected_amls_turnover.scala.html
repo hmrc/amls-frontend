@@ -10,12 +10,12 @@
 
     @heading("businessactivities.turnover.title", "summary.businessactivities")
 
-    @form(f, controllers.businessactivities.routes.TurnerOverExpectIn12MonthsRelatedToAMLSController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 <span class="form-hint">
             @Messages("businessactivities.turnover.line1.text")
         </span>
 
-        @radioGroup(f("turnoverOverExpectIn12MOnthsRelatedToAMLS")) {
+        @radioGroup(f("expectedAMLSTurnoverController")) {
             @legend("TODO", jsHidden = true)
             @radio(f("turnoverOverExpectIn12MOnths"), "businessactivities.turnover.lbl.01", "01")
             @radio(f("turnoverOverExpectIn12MOnths"), "businessactivities.turnover.lbl.02", "02")

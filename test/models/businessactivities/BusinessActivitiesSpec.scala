@@ -8,18 +8,18 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
   val businessFranchise = BusinessFranchiseYes("test test")
   val involvedInOther = InvolvedInOtherYes("test")
-  val  someTurnoverAmls = FirstTurnoverAmls
+  val  someTurnoverAmls = ExpectedAMLSTurnover.First
 
   "BusinessActivities" must {
     val completeJson = Json.obj(
       "involvedInOther" -> true,
       "details" -> "test" ,
-      "turnoverOverExpectIn12MOnths" -> "01",
+      "expectedAMLSTurnover" -> "01",
       "businessFranchise" -> true,
       "franchiseName" -> "test test"
     )
 
-    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther), businessFranchise = Some(businessFranchise), turnerOverExpectIn12MonthsRelatedToAMLS = Some(FirstTurnoverAmls) )
+    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther), businessFranchise = Some(businessFranchise), expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First) )
 
     "Serialise as expected" in {
 
@@ -90,8 +90,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "Merged with TurnoverExpectIn12MonthsRelatedToAMLS" must {
       "return TurnoverExpectIn12MonthsRelatedToAMLS with correct turnover in the business set" in {
-        val newTurnover = FirstTurnoverAmls
-        val result = initial.turnerOverExpectIn12MonthsRelatedToAMLS(newTurnover)
+        val newTurnover = ExpectedAMLSTurnover.First
+        val result = initial.expectedAMLSTurnover(newTurnover)
         result must be ( BusinessActivities(Some(involvedInOther),  Some(newTurnover), Some(businessFranchise)))
       }
     }

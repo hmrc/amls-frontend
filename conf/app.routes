@@ -90,8 +90,8 @@ GET         /business-activities/confirm-activities        controllers.businessa
 POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
 
-GET         /business-activities/turnover           controllers.businessactivities.TurnerOverExpectIn12MonthsRelatedToAMLSController.get()
-POST        /business-activities/turnover          controllers.businessactivities.TurnerOverExpectIn12MonthsRelatedToAMLSController.post(edit: Boolean ?= false)
+GET         /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
 
 
 GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
