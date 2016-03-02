@@ -13,7 +13,7 @@
         <table class="summary">
             <tr>
                 <th class="summary-title">
-                    @Messages("tradingpremises.yourtradingpremises.heading")
+                    @Messages("summary.checkyouranswers.businesspremises.section1")
                 </th>
                 <td>
                     <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
@@ -65,41 +65,11 @@
         </table>
     }
 
-    @model.yourAgent.map { agent =>
-        <table class="summary">
-            <tr>
-                <th class="summary-title">
-                    @Messages("tradingpremises.yourtradingpremises.heading")
-                </th>
-                <td>
-                    <a href="@controllers.tradingpremises.routes.YourAgentController.get(index, true)">
-                        @Messages("button.edit")
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @agent.agentsRegisteredName.value
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @agent.taxType.message
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @agent.businessStructure.message
-                </td>
-            </tr>
-        </table>
-    }
-
     @model.whatDoesYourBusinessDoAtThisAddress.map { wdbd =>
         <table class="summary">
             <tr>
                 <th class="summary-title">
-                    @Messages("tradingpremises.yourtradingpremises.heading")
+                    @Messages("summary.checkyouranswers.businesspremises.section2")
                 </th>
                 <td>
                     <a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true)">
@@ -117,6 +87,36 @@
                 </td>
             </tr>
         </table>
+    }
+
+    @model.yourAgent.map { agent =>
+    <table class="summary">
+        <tr>
+            <th class="summary-title">
+                @Messages("summary.checkyouranswers.agentspremises.section3")
+            </th>
+            <td>
+                <a href="@controllers.tradingpremises.routes.YourAgentController.get(index, true)">
+                    @Messages("button.edit")
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @agent.agentsRegisteredName.value
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @agent.taxType.message
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @agent.businessStructure.message
+            </td>
+        </tr>
+    </table>
     }
 
     <a class="button" href="@controllers.tradingpremises.routes.SummaryController.get()">
