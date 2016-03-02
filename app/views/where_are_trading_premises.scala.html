@@ -40,12 +40,6 @@
             classes = Seq("postcode")
         )
 
-        @inlineRadioGroup(f("isOwner")) {
-            @legend("tradingpremises.yourtradingpremises.whose")
-            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
-            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
-        }
-
         @date(
             f = f,
             p = "startDate",
@@ -57,6 +51,12 @@
             @legend("tradingpremises.yourtradingpremises.isresidential")
             @radio(f("isResidential"), "lbl.yes", "true")
             @radio(f("isResidential"), "lbl.no", "false")
+        }
+
+        @inlineRadioGroup(f("isOwner")) {
+            @legend("tradingpremises.yourtradingpremises.whose")
+            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
+            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
         }
 
         @submit(edit)
