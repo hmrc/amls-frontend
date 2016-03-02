@@ -80,7 +80,7 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.ExpectedBusinessTurnoverController.get().url))
     }
 
 

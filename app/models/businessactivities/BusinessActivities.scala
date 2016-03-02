@@ -2,14 +2,14 @@ package models.businessactivities
 
 case class BusinessActivities(
                                involvedInOther: Option[InvolvedInOther] = None,
-                               turnerOverExpectIn12Months: Option[TurnerOverExpectIn12Months] = None,
+                               expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
                                businessFranchise: Option[BusinessFranchise] = None
                                ) {
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
     this.copy(businessFranchise = Some(p))
 
-  def turnerOverExpectIn12Months(p: TurnerOverExpectIn12Months): BusinessActivities =
-    this.copy(turnerOverExpectIn12Months = Some(p))
+  def expectedBusinessTurnover(p: ExpectedBusinessTurnover): BusinessActivities =
+    this.copy(expectedBusinessTurnover = Some(p))
 
 
   def involvedInOther(p: InvolvedInOther): BusinessActivities =
@@ -25,7 +25,7 @@ object BusinessActivities {
 
   implicit val reads: Reads[BusinessActivities] = (
     __.read[Option[InvolvedInOther]] and
-    __.read[Option[TurnerOverExpectIn12Months]] and
+    __.read[Option[ExpectedBusinessTurnover]] and
     __.read[Option[BusinessFranchise]]
     )(BusinessActivities.apply _)
 
@@ -33,7 +33,7 @@ object BusinessActivities {
   model =>
     Seq(
       Json.toJson(model.involvedInOther).asOpt[JsObject],
-      Json.toJson(model.turnerOverExpectIn12Months).asOpt[JsObject],
+      Json.toJson(model.expectedBusinessTurnover).asOpt[JsObject],
       Json.toJson(model.businessFranchise).asOpt[JsObject]
     ).flatten.fold(Json.obj()){
      _ ++ _

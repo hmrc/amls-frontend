@@ -1,5 +1,6 @@
 package models.businessactivities
 
+import controllers.businessactivities.ExpectedBusinessTurnoverController
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{Json}
@@ -8,18 +9,18 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
   val businessFranchise = BusinessFranchiseYes("test test")
   val involvedInOther = InvolvedInOtherYes("test")
-  val  someTurnover = First
+  val  someTurnover = ExpectedBusinessTurnover.First
 
   "BusinessActivities" must {
     val completeJson = Json.obj(
       "involvedInOther" -> true,
       "details" -> "test" ,
-      "turnoverOverExpectIn12MOnths" -> "01",
+      "expectedBusinessTurnover" -> "01",
       "businessFranchise" -> true,
       "franchiseName" -> "test test"
     )
 
-    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther), businessFranchise = Some(businessFranchise), turnerOverExpectIn12Months = Some(First) )
+    val completeModel = BusinessActivities(involvedInOther = Some(involvedInOther),expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First), businessFranchise = Some(businessFranchise) )
 
     "Serialise as expected" in {
 
@@ -90,8 +91,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "Merged with TurnoverExpectIn12Months" must {
       "return TurnoverExpectIn12Months with correct turnover in the business set" in {
-        val newTurnover = First
-        val result = initial.turnerOverExpectIn12Months(newTurnover)
+        val newTurnover = ExpectedBusinessTurnover.First
+        val result = initial.expectedBusinessTurnover(newTurnover)
         result must be ( BusinessActivities(Some(involvedInOther),  Some(newTurnover), Some(businessFranchise)))
       }
     }

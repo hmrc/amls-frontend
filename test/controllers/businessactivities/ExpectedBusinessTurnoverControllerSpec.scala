@@ -1,46 +1,48 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
-import models.aboutyou.{AboutYou, BeneficialShareholder, RoleWithinBusiness}
-import models.businessactivities.{TurnerOverExpectIn12Months, BusinessActivities, First}
+import models.businessactivities.{ExpectedBusinessTurnover, BusinessActivities}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
+
+
 import scala.concurrent.Future
 
-class TurnoverExpectIn12MonthsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new TurnerOverExpectIn12MonthsController {
+    val controller = new ExpectedBusinessTurnoverController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
   }
 
-  "TurnoverExpectIn12MonthsController" must {
+  "ExpectedBusinessTurnoverControllerSpec" must {
 
-    "on get display the Turnover Expect In 12Months page" in new Fixture {
+    "on get display the Expected Business Turnover page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TurnerOverExpectIn12Months](any())
+      when(controller.dataCacheConnector.fetchDataShortLivedCache[ExpectedBusinessTurnover](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include("How much turnover do you expect in the next 12 months?")
+      contentAsString(result) must include(Messages("businessactivities.business-turnover.title"))
     }
 
-    "on get display the Role Within Business page with pre populated data" in new Fixture {
+    "on get display the Expected Business Turnover page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, Some(First)))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, Some(ExpectedBusinessTurnover.First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -53,7 +55,7 @@ class TurnoverExpectIn12MonthsControllerSpec extends PlaySpec with OneServerPerS
     "on post with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "turnoverOverExpectIn12MOnths" -> "01"
+        "expectedBusinessTurnover" -> "01"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
@@ -70,7 +72,7 @@ class TurnoverExpectIn12MonthsControllerSpec extends PlaySpec with OneServerPerS
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "turnoverOverExpectIn12MOnths" -> "01"
+        "expectedBusinessTurnover" -> "01"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
