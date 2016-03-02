@@ -16,7 +16,14 @@ case class TransactionRecordYes(transactionType: Set[TransactionType]) extends T
 case object TransactionRecordNo extends TransactionRecord
 
 
-sealed trait TransactionType
+sealed trait TransactionType {
+  val value: String =
+    this match {
+      case Paper => "01"
+      case DigitalSpreadsheet => "02"
+      case DigitalSoftware(_) => "03"
+    }
+}
 
 case object Paper extends TransactionType
 
@@ -75,14 +82,15 @@ object TransactionRecord {
 
   implicit def formWrites = Write[TransactionRecord, UrlFormEncoded] {
     case TransactionRecordNo => Map("isRecorded" -> "false")
-    case TransactionRecordYes(value) =>
-      val data = getTupleFromModel(value)
-      data._2 match {
-        case "" =>  Map("isRecorded" -> "true",
-          "transactions" -> data._1)
-        case _ =>   Map("isRecorded" -> "true",
-          "transactions" -> data._1,
-          "name" -> data._2)
+    case TransactionRecordYes(transactions) =>
+      Map(
+        "isRecorded" -> Seq("true"),
+        "transactions" -> (transactions map { _.value }).toSeq
+      ) ++ transactions.foldLeft[UrlFormEncoded](Map.empty) {
+        case (m, DigitalSoftware(name)) =>
+          m ++ Map("name" -> Seq(name))
+        case (m, _) =>
+          m
       }
   }
 
