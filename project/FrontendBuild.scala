@@ -25,14 +25,15 @@ private object AppDependencies {
 
   val compile = Seq(
     ws,
+    "uk.gov.hmrc" %% "http-verbs" % "3.3.0",
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
 
     // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % "3.0.0",
-    "uk.gov.hmrc" %% "play-partials" % "4.0.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.5.0",
+    "uk.gov.hmrc" %% "play-partials" % "4.2.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.6.0",
     "uk.gov.hmrc" %% "play-config" % "2.0.1",
     "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
     "uk.gov.hmrc" %% "http-caching-client" % "5.2.0",
