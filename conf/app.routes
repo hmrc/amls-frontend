@@ -86,7 +86,7 @@ GET         /business-activities/index                  controllers.businessacti
 GET         /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.get()
 POST        /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
-GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get()
+GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
 
