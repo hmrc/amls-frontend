@@ -93,3 +93,6 @@ GET         /bank-details/account-details/:index        controllers.bankdetails.
 POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
+
+GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get()
+POST        /business-activities/records              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
