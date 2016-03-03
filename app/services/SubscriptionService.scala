@@ -1,0 +1,6 @@
+package services
+
+trait SubscriptionService {
+
+
+}

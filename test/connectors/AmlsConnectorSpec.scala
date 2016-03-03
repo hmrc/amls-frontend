@@ -21,7 +21,7 @@ class AmlsConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSuga
 
   val mockWSHttp = mock[MockHttp]
 
-  object TestAmlsConnector extends AmlsConnector {
+  object TestAmlsConnector extends DESConnector {
     override val http: HttpGet with HttpPost = mockWSHttp
   }
 
