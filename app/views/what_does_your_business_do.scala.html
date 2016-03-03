@@ -4,12 +4,12 @@
 @import models.tradingpremises._
 @import models.businessmatching._
 
-@(f:Form2[_], model : BusinessActivities, edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit lang: Lang, request: Request[_])
 @main(title = Messages("tradingpremises.whatdoesyourbusinessdo.title")) {
 
     @heading("tradingpremises.whatdoesyourbusinessdo.title", "summary.tradingpremises")
 
-    @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(edit)) {
+    @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(index, edit)) {
         @radioGroup(f("activities")) {
             @legend("lbl.select.all", jsHidden = false)
 

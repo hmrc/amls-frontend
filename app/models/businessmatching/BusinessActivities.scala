@@ -3,11 +3,12 @@ package models.businessmatching
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
+import play.api.i18n.{Messages, Lang}
 import play.api.libs.json._
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity]){
+
   def getValue(ba:BusinessActivity): String =
-  {
     ba match {
       case AccountancyServices => "01"
       case BillPaymentServices => "02"
@@ -17,11 +18,24 @@ case class BusinessActivities(businessActivities: Set[BusinessActivity]){
       case TrustAndCompanyServices => "06"
       case TelephonePaymentService => "07"
     }
+}
 
+sealed trait BusinessActivity {
+
+  def getMessage(implicit lang: Lang): String = {
+    val message = "businessmatching.registerservices.servicename.lbl."
+    this match {
+      case AccountancyServices => Messages(s"${message}01")
+      case BillPaymentServices => Messages(s"${message}02")
+      case EstateAgentBusinessService => Messages(s"${message}03")
+      case HighValueDealing => Messages(s"${message}04")
+      case MoneyServiceBusiness => Messages(s"${message}05")
+      case TrustAndCompanyServices => Messages(s"${message}06")
+      case TelephonePaymentService => Messages(s"${message}07")
+    }
   }
 }
 
-sealed trait BusinessActivity
 case object AccountancyServices extends BusinessActivity
 case object BillPaymentServices extends  BusinessActivity
 case object EstateAgentBusinessService extends BusinessActivity
@@ -96,9 +110,6 @@ object BusinessActivities {
     }
 
     implicit val formats = Json.format[BusinessActivities]
-
-
-
 }
 
 
