@@ -88,6 +88,8 @@ POST        /business-activities/franchise              controllers.businessacti
 GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
+GET         /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
 
 GET         /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
