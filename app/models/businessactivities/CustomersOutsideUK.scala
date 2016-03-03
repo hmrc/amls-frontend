@@ -1,11 +1,9 @@
 package models.businessactivities
 
-
 import models.FormTypes._
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
-
 
 sealed trait CustomersOutsideUK
 
