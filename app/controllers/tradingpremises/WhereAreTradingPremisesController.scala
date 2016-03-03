@@ -5,42 +5,50 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises._
-import org.joda.time.LocalDate
+import play.api.Logger
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-trait WhereAreTradingPremisesController extends BaseController {
+trait WhereAreTradingPremisesController extends RepeatingSection with BaseController {
 
-  def dataCacheConnector: DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key) map {
+      getData[TradingPremises](index) map {
         case Some(TradingPremises(Some(data), _, _)) =>
-          Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit))
+          Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
         case _ =>
-          Ok(views.html.where_are_trading_premises(EmptyForm, edit))
+          Ok(views.html.where_are_trading_premises(EmptyForm, edit, index))
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  // TODO: Consider if this can be refactored
+  // scalastyle:off cyclomatic.complexity
+  def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[YourTradingPremises](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.where_are_trading_premises(f, edit)))
+          Future.successful(BadRequest(views.html.where_are_trading_premises(f, edit, index)))
         case ValidForm(_, data) =>
           for {
-            tradingPremises <- dataCacheConnector.fetchDataShortLivedCache[TradingPremises](TradingPremises.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[TradingPremises](TradingPremises.key, tradingPremises.yourTradingPremises(data))
-//            TODO: Redirect to summary in edit mode
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false =>
-              if (data.isOwner) {
-                Redirect(routes.WhatDoesYourBusinessDoController.get(edit))
-              } else {
-                Redirect(routes.YourAgentController.get(edit))
-              }
+            _ <- updateData[TradingPremises](index) {
+              // This makes sure to save `None` for the agent section if
+              // the user selects that the premises is theirs.
+              case Some(TradingPremises(_, _, wdbd)) if data.isOwner =>
+                Some(TradingPremises(Some(data), None, wdbd))
+              case Some(TradingPremises(_, ya, wdbd)) =>
+                Some(TradingPremises(Some(data), ya, wdbd))
+              case _ => data
+            }
+          } yield (edit, data.isOwner) match {
+            case (true, true) =>
+              Redirect(routes.SummaryController.getIndividual(index))
+            case (false, true) =>
+              Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+            case (_, _) =>
+              Redirect(routes.YourAgentController.get(index, edit))
           }
       }
   }

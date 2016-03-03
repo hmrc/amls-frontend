@@ -1,0 +1,40 @@
+@import include.{forms => deprecated, _}
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@main(
+    title = Messages("businessactivities.keep.customer.records.title")
+) {
+
+    @heading("businessactivities.keep.customer.records.title", "summary.businessactivities")
+
+    @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
+
+        @inlineRadioGroup(f("isRedress")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isRecorded"), "lbl.yes", "true", target = s"#${f("transactions").id}-fieldset")
+            @radio(f("isRecorded"), "lbl.no", "false")
+        }
+
+        @fieldset("TODO", jsHidden = true, id = s"""${f("transactions").id}-fieldset""") {
+            <span class="form-label-bold">
+                @Messages("businessactivities.do.keep.records")
+            </span>
+            <span class="form-hint">
+                @Messages("lbl.select.all")
+            </span>
+            @radioGroup(f("transactions")) {
+                @legend("TODO", jsHidden = true)
+                @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.01", "01")
+                @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.02", "02")
+                @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.03", "03", target = s"#${f("name").id}-fieldset")
+                @fieldset("TODO", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
+                    @input(f("name"), "businessactivities.name.software.pkg.lbl", bold = false)
+                }
+            }
+        }
+        <br>
+        @submit(edit)
+    }
+}

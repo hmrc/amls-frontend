@@ -9,7 +9,7 @@
     @heading("estateagentbusiness.servicess.title", "summary.estateagentbusiness")
 
     @form(f, controllers.estateagentbusiness.routes.BusinessServicesController.post(edit)) {
-        <span>@Messages("estateagentbusiness.select.all")</span>
+        <span>@Messages("lbl.select.all")</span>
         @radioGroup(f("services")) {
             @legend("TODO", jsHidden = true)
             @checkbox(f("services"), "estateagentbusiness.service.lbl.01", "01")
