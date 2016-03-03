@@ -336,3 +336,6 @@ businessactivities.transactiontype.lbl.01 = On paper
 businessactivities.transactiontype.lbl.02 = Digitally, on a spreadsheet
 businessactivities.transactiontype.lbl.03 = Digitally, on a software package designed for recording transactions
 businessactivities.name.software.pkg.lbl = Name of the software package
+
+businessactivities.employees.title = How many employees does your business have?
+businessactivities.employees.line2.text = How many are directly involved in activities related to anti-money laundering supervision?
