@@ -1,15 +1,17 @@
 package models.bankdetails
 
+import typeclasses.MongoKey
+
 case class BankDetails (
                          bankAccountType: Option[BankAccountType] = None,
-                         bankAccountType1: Option[String] = None
+                         bankAccount: Option[BankAccount] = None
                         ){
 
   def bankAccountType(v: BankAccountType): BankDetails =
     this.copy(bankAccountType = Some(v))
 
-  def bankAccountType1(v: String): BankDetails =
-    this.copy(bankAccountType1 = Some(v))
+  def bankAccount(v: BankAccount): BankDetails =
+    this.copy(bankAccount = Some(v))
 
 }
 
@@ -19,16 +21,21 @@ object BankDetails {
   import play.api.libs.json._
 
   val key = "bank-details"
+
+  implicit val mongoKey = new MongoKey[BankDetails] {
+    override def apply(): String = "bank-details"
+  }
+
   implicit val reads: Reads[BankDetails] = (
       __.read[Option[BankAccountType]] and
-      __.read[Option[String]]
+      __.read[Option[BankAccount]]
     ) (BankDetails.apply _)
 
   implicit val writes: Writes[BankDetails] = Writes[BankDetails] {
     model =>
       Seq(
         Json.toJson(model.bankAccountType).asOpt[JsObject],
-        Json.toJson(model.bankAccountType1).asOpt[JsObject]
+        Json.toJson(model.bankAccount).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }

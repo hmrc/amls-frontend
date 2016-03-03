@@ -1,6 +1,7 @@
 @(
     legend: String,
-    jsHidden: Boolean = false
+    jsHidden: Boolean = false,
+    bold: Boolean = false
 )(implicit lang: Lang)
 
-<legend class="form-label-bold @if(jsHidden) {amls-js-hidden}">@Messages(legend)</legend>
+<legend class="form-label@if(bold){-bold} @if(jsHidden) {amls-js-hidden}">@Messages(legend)</legend>

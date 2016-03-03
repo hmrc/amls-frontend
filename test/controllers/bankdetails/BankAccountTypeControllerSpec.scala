@@ -1,17 +1,13 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import controllers.aboutyou.RoleWithinBusinessController
-import models.aboutyou.{BeneficialShareholder, AboutYou, RoleWithinBusiness}
-import models.bankdetails.{NoBankAccount, PersonalAccount, BankDetails, BankAccountType}
+import models.bankdetails.{PersonalAccount, BankDetails}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.data.mapping.{Failure, Path, Success}
 import play.api.i18n.Messages
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
@@ -43,13 +39,13 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
     "on get display kind of bank account page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(NoBankAccount), None)))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=04]").hasAttr("checked") must be(true)
+      document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
     "on post with valid data" in new Fixture {
@@ -66,7 +62,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BankAccountTypeController.get().url))
+      redirectLocation(result) must be(Some(routes.BankAccountController.get(0).url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
@@ -79,11 +75,11 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(NoBankAccount), None)))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
 
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {

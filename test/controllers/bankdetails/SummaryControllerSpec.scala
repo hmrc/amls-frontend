@@ -1,8 +1,9 @@
-package controllers.tradingpremises
+package controllers.bankdetails
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.tradingpremises._
+import models.bankdetails._
+import models.estateagentbusiness.EstateAgentBusiness
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -30,20 +31,20 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
       SummaryController.dataCache must be(DataCacheConnector)
     }
 
-    "load the trading premises summary page when section data is available" in new Fixture {
+    "load the summary page when section data is available" in new Fixture {
 
-      val model = TradingPremises(None, None)
+      val model = BankDetails(None, None)
 
-      when(controller.dataCache.fetchDataShortLivedCache[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      when(controller.dataCache.fetchDataShortLivedCache[Seq[BankDetails]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
     }
 
-    "redirect to main summary page when section data is unavailable" in new Fixture {
+    "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCache.fetchDataShortLivedCache[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)

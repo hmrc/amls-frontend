@@ -96,8 +96,16 @@ form .date .form-group input[type=text] {
 
 /* summary styles */
 .summary-title {
-    width : 90%;
+    width : 88%;
 }
+table.summary {
+    font-size: 16px;
+}
+table.summary ul li {
+    font-size: 16px;
+    margin-bottom: 0;
+}
+
 
 /* icons */
 .notice .icon {
@@ -115,6 +123,9 @@ form .date .form-group input[type=text] {
 .icon-information {
     display: inline-block;
 }
+
+
+
 .touchevents .date-of-birth {
     display:block;
 }

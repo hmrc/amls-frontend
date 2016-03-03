@@ -23,6 +23,7 @@ class AmlsConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSuga
 
   object TestAmlsConnector extends DESConnector {
     override val http: HttpGet with HttpPost = mockWSHttp
+    override val serviceURL: String = "URL Not important"
   }
 
   "AmlsConnector" must {
