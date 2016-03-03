@@ -27,4 +27,14 @@ class IdentifySuspiciousActivitySpec extends PlaySpec {
         (Path \ "hasWrittenGuidance") -> Seq(ValidationError("error.invalid", "Boolean")))))
     }
     }
+  "Form Writes" must {
+    "Write true into form" in {
+      IdentifySuspiciousActivity.formWrites.writes(IdentifySuspiciousActivity(true)) must be (Map("hasWrittenGuidance" -> Seq("true")))
+    }
+
+    "Write false into form" in {
+      IdentifySuspiciousActivity.formWrites.writes(IdentifySuspiciousActivity(false)) must be (Map("hasWrittenGuidance" -> Seq("false")))
+    }
+
+  }
   }
