@@ -65,21 +65,6 @@ object TransactionRecord {
       }
     }
 
-  def getTupleFromModel(value: Set[TransactionType]) : (Seq[String], String) = {
-    val data = value.toSeq.map {
-      case Paper => ("01", "")
-      case DigitalSpreadsheet => ("02", "")
-      case DigitalSoftware(name) => ("03", name)
-
-    }.foldLeft[(Seq[String], String)](
-      (Seq.empty, "")
-    ) (
-      (result, txValue) =>
-        (result._1 :+ txValue._1, result._2.concat(txValue._2))
-    )
-    data
-  }
-
   implicit def formWrites = Write[TransactionRecord, UrlFormEncoded] {
     case TransactionRecordNo => Map("isRecorded" -> "false")
     case TransactionRecordYes(transactions) =>
@@ -120,16 +105,18 @@ object TransactionRecord {
 
   implicit val jsonWrite = Writes[TransactionRecord] {
     case TransactionRecordNo => Json.obj("isRecorded" -> false)
-    case TransactionRecordYes(name) =>
-      val data = getTupleFromModel(name)
-        data._2 match {
-          case "" =>  Json.obj("isRecorded" -> true,
-            "transactions" -> data._1)
-
-          case _ =>  Json.obj("isRecorded" -> true,
-            "transactions" -> data._1,
-            "name" -> data._2)
-        }
+    case TransactionRecordYes(transactions) =>
+      Json.obj(
+        "isRecorded" -> true,
+        "transactions" -> (transactions map {
+          _.value
+        }).toSeq
+      ) ++ transactions.foldLeft[JsObject](Json.obj()) {
+        case (m, DigitalSoftware(name)) =>
+          m ++ Json.obj("name" -> name)
+        case (m, _) =>
+          m
+      }
   }
 }
 
