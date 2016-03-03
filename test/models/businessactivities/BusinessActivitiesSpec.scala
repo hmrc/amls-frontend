@@ -2,7 +2,7 @@ package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNull, Json}
 
 class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
@@ -38,7 +38,16 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "transactions" -> Seq("01", "03"),
       "name" -> DefaultSoftwareName,
       "isOutside" -> true,
-       "country_1" -> "GP"
+      "country_1" -> "GP",
+      "country_2" -> JsNull,
+      "country_3" -> JsNull,
+      "country_4" -> JsNull,
+      "country_5" -> JsNull,
+      "country_6" -> JsNull,
+      "country_7" -> JsNull,
+      "country_8" -> JsNull,
+      "country_9" -> JsNull,
+      "country_10" ->JsNull
     )
 
     val completeModel = BusinessActivities(involvedInOther = Some(DefaultInvolvedInOther),
@@ -106,6 +115,11 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       result must be (BusinessActivities(None, None, None, None, Some(NewTransactionRecord)))
     }
 
+    "Merged with CustomersOutsideUK" in {
+      val result = initial.customersOutsideUK(NewCustomersOutsideUK)
+      result must be (BusinessActivities(None, None, None, None, None, Some(NewCustomersOutsideUK)))
+    }
+
   }
 
   "BusinessActivities" must {
@@ -115,7 +129,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
                             expectedBusinessTurnover = Some(DefaultBusinessTurnover),
                                 expectedAMLSTurnover = Some(DefaultAMLSTurnover) ,
                                    businessFranchise = Some(DefaultBusinessFranchise),
-                                   transactionRecord = Some(DefaultTransactionRecord))
+                                   transactionRecord = Some(DefaultTransactionRecord),
+                                  customersOutsideUK = Some(DefaultCustomersOutsideUK))
 
 
     "involvedInOther" must {
@@ -125,7 +140,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           expectedBusinessTurnover = Some(DefaultBusinessTurnover),
           expectedAMLSTurnover = Some(DefaultAMLSTurnover),
           businessFranchise = Some(DefaultBusinessFranchise),
-          transactionRecord = Some(DefaultTransactionRecord)))
+          transactionRecord = Some(DefaultTransactionRecord),
+          customersOutsideUK = Some(DefaultCustomersOutsideUK)))
 
       }
     }
@@ -138,7 +154,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           expectedBusinessTurnover = Some(NewBusinessTurnover),
           expectedAMLSTurnover = Some(DefaultAMLSTurnover),
           businessFranchise = Some(DefaultBusinessFranchise),
-          transactionRecord = Some(DefaultTransactionRecord)))
+          transactionRecord = Some(DefaultTransactionRecord),
+          customersOutsideUK = Some(DefaultCustomersOutsideUK)))
       }
     }
 
@@ -151,7 +168,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           expectedBusinessTurnover = Some(DefaultBusinessTurnover),
           expectedAMLSTurnover = Some(NewAMLSTurnover),
           businessFranchise = Some(DefaultBusinessFranchise),
-          transactionRecord = Some(DefaultTransactionRecord)))
+          transactionRecord = Some(DefaultTransactionRecord),
+          customersOutsideUK = Some(DefaultCustomersOutsideUK)))
 
       }
     }
@@ -164,7 +182,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           expectedBusinessTurnover = Some(DefaultBusinessTurnover),
           expectedAMLSTurnover = Some(DefaultAMLSTurnover),
           businessFranchise = Some(NewBusinessFranchise),
-          transactionRecord = Some(DefaultTransactionRecord)))
+          transactionRecord = Some(DefaultTransactionRecord),
+          customersOutsideUK = Some(DefaultCustomersOutsideUK)))
       }
     }
 
@@ -175,8 +194,22 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           expectedBusinessTurnover = Some(DefaultBusinessTurnover),
           expectedAMLSTurnover = Some(DefaultAMLSTurnover),
           businessFranchise = Some(DefaultBusinessFranchise),
-          transactionRecord = Some(NewTransactionRecord)))
+          transactionRecord = Some(NewTransactionRecord),
+          customersOutsideUK = Some(DefaultCustomersOutsideUK)))
 
+      }
+    }
+
+    "CustomersOutsideUK" must {
+      "return BusinessActivities object with correct CustomersOutsideUK set" in {
+        val result = initial.customersOutsideUK(NewCustomersOutsideUK)
+        result must be (BusinessActivities(involvedInOther = Some(DefaultInvolvedInOther),
+          expectedBusinessTurnover = Some(DefaultBusinessTurnover),
+          expectedAMLSTurnover = Some(DefaultAMLSTurnover),
+          businessFranchise = Some(DefaultBusinessFranchise),
+          transactionRecord = Some(DefaultTransactionRecord),
+          customersOutsideUK = Some(NewCustomersOutsideUK)
+        ))
       }
     }
   }

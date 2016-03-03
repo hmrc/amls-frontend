@@ -34,7 +34,7 @@ trait ExpectedAMLSTurnoverController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.WhatYouNeedController.get())
+            case false => Redirect(routes.BusinessFranchiseController.get())
           }
       }
     }
