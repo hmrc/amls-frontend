@@ -1,5 +1,7 @@
 @import include._
 @import models.tradingpremises._
+@import forms2._
+@import utils._
 
 @(model: TradingPremises, index: Int)(implicit request: Request[_], lang: Lang)
 
@@ -45,11 +47,14 @@
                     }
                 </td>
             </tr>
+
             <tr>
                 <td colspan="2">
-                    @yta.startDate
+                    @Messages("tradingpremises.summary.tradingstartdate") @DateHelper.formatDate(yta.startDate)
+
                 </td>
             </tr>
+
             <tr>
                 <td colspan="2">
                     @yta.isResidential match {
