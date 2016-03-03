@@ -76,11 +76,14 @@
                 <th class="summary-title">
                     @Messages("summary.checkyouranswers.businesspremises.section2")
                 </th>
+                @if(wdbd.activities.size >1) {
                 <td>
                     <a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true)">
                         @Messages("button.edit")
                     </a>
                 </td>
+                }
+
             </tr>
             <tr>
                 <td colspan="2">
@@ -125,6 +128,6 @@
     }
 
     <a class="button" href="@controllers.tradingpremises.routes.SummaryController.get()">
-        @Messages("button.summary.acceptandcomplete")
+        @Messages("button.saveandreturn")
     </a>
 }
