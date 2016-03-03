@@ -164,7 +164,7 @@ tradingpremises.youragent.requiredinfo.heading=For each of your trading premises
 tradingpremises.youragent.registeredname = What is your agent''s registered business name?
 tradingpremises.youragent.registeredname.subtitle = It must be identical to the name on the incorporation certificate.
 tradingpremises.youragent.taxtype = What type of tax does your agent pay?
-tradingpremises.youragent.taxtype.lbl.01=Self-assesment
+tradingpremises.youragent.taxtype.lbl.01=Self-assessment
 tradingpremises.youragent.taxtype.lbl.02=Corporation tax
 
 tradingpremises.youragent.businessstructure=What is your agent''s business structure?
@@ -196,6 +196,7 @@ tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
 tradingpremises.summary.agents = Agent''s
+tradingpremises.summary.tradingstartdate = Trading start date of
 
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
