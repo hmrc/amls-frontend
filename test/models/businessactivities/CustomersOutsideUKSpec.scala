@@ -48,8 +48,11 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "successfully write model with formWrite" in {
 
       val model = CustomersOutsideUKYes(Countries("GP"))
-      CustomersOutsideUK.formWrites.writes(model) must be (Map("isRecorded" -> Seq("true"),
-        "country_1" -> Seq("GP")))
+      CustomersOutsideUK.formWrites.writes(model) must
+        contain allOf (
+        "isOutside" -> Seq("true"),
+        "country_1" -> Seq("GP")
+        )
 
     }
 
