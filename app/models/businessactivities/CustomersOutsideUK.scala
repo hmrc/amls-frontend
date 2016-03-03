@@ -75,15 +75,15 @@ object CustomersOutsideUK {
     (__ \ "isOutside").read[Boolean] flatMap {
       case true =>
         ((__ \ "country_1").read[String] and
-          (__ \ "country_2").read[Option[String]] and
-          (__ \ "country_3").read[Option[String]] and
-          (__ \ "country_4").read[Option[String]] and
-          (__ \ "country_5").read[Option[String]] and
-          (__ \ "country_6").read[Option[String]] and
-          (__ \ "country_7").read[Option[String]] and
-          (__ \ "country_8").read[Option[String]] and
-          (__ \ "country_9").read[Option[String]] and
-          (__ \ "country_10").read[Option[String]]) (Countries.apply _).fmap(CustomersOutsideUKYes.apply)
+          (__ \ "country_2").readNullable[String] and
+          (__ \ "country_3").readNullable[String] and
+          (__ \ "country_4").readNullable[String] and
+          (__ \ "country_5").readNullable[String] and
+          (__ \ "country_6").readNullable[String] and
+          (__ \ "country_7").readNullable[String] and
+          (__ \ "country_8").readNullable[String] and
+          (__ \ "country_9").readNullable[String] and
+          (__ \ "country_10").readNullable[String]) (Countries.apply _).fmap(CustomersOutsideUKYes.apply)
       case false => Reads(_ => JsSuccess(CustomersOutsideUKNo))
     }
   }
@@ -92,15 +92,15 @@ object CustomersOutsideUK {
     case CustomersOutsideUKYes(countries) => {
       Json.obj("isOutside" -> true,
               "country_1" -> countries.country_1,
-              "country_2" -> countries.country_1,
-              "country_3" -> countries.country_1,
-              "country_4" -> countries.country_1,
-              "country_5" -> countries.country_1,
-              "country_6" -> countries.country_1,
-              "country_7" -> countries.country_1,
-              "country_8" -> countries.country_1,
-              "country_9" -> countries.country_1,
-              "country_10" -> countries.country_1)
+              "country_2" -> countries.country_2,
+              "country_3" -> countries.country_3,
+              "country_4" -> countries.country_4,
+              "country_5" -> countries.country_5,
+              "country_6" -> countries.country_6,
+              "country_7" -> countries.country_7,
+              "country_8" -> countries.country_8,
+              "country_9" -> countries.country_9,
+              "country_10" -> countries.country_10)
     }
     case CustomersOutsideUKNo => Json.obj("isOutside" -> false)
   }
