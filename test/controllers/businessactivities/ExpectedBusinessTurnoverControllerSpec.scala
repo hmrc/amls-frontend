@@ -48,8 +48,7 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      // TODO
-//      document.select("input[value=01]").hasAttr("checked") must be(true)
+      document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
     "on post with valid data" in new Fixture {
@@ -66,7 +65,7 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
