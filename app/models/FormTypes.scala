@@ -100,5 +100,4 @@ object FormTypes {
   val franchiseNameType = notEmpty compose maxLength(maxFranchiseName)
 
   val OtherBusinessActivityType = notEmpty compose maxLength(maxOtherBusinessActivityTypeLength)
-
 }
