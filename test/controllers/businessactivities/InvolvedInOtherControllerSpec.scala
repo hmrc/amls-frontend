@@ -97,6 +97,20 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
       document.select("a[href=#involvedInOther]").html() must include("Invalid value")
     }
 
+    "on post with required field not filled" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "involvedInOther" -> "true"
+      )
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#details]").html() must include("This field is required")
+    }
+
+
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(

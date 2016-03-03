@@ -1,6 +1,8 @@
 package utils
 
 import org.scalatest.mock.MockitoSugar
+import play.api.data.mapping.forms.Rules
+import play.api.data.mapping.{Success, Rule}
 import uk.gov.hmrc.play.test.UnitSpec
 
 class StringHelperSpec extends UnitSpec with MockitoSugar  {
@@ -13,4 +15,5 @@ class StringHelperSpec extends UnitSpec with MockitoSugar  {
       StringHelper.isAllDigits("384898347854") shouldBe true
     }
   }
+
 }
