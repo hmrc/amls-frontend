@@ -44,6 +44,7 @@ lbl.date.example = For example, 31 3 2017
 
 lbl.uk = UK
 lbl.overseas = Overseas
+lbl.select.all = Select all that apply
 
 ## Login Page
 amls.Login.title= AMLS
@@ -175,8 +176,6 @@ tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
 
 
 tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
-tradingpremises.whatdoesyourbusinessdo.linetext = Select all that apply
-
 
 tradingpremises.yourtradingpremises.title=Trading premises - Where are your trading premises?
 tradingpremises.yourtradingpremises.heading=Where are your trading premises?
@@ -193,6 +192,10 @@ tradingpremises.yourtradingpremises.whose.another=Another business'' premises
 tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
+
+tradingpremises.summary.addanother = Add another premises
+tradingpremises.summary.own = Own
+tradingpremises.summary.agents = Agent''s
 
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
@@ -225,7 +228,6 @@ estateagentbusiness.service.lbl.06 = Asset management
 estateagentbusiness.service.lbl.07 = Land management
 estateagentbusiness.service.lbl.08 = Development company services
 estateagentbusiness.service.lbl.09 = Social housing provision
-estateagentbusiness.select.all = Select all that apply
 
 estateagentbusiness.redress.lbl = Redress scheme:
 estateagentbusiness.redress.lbl.01 = The Property Ombudsman Limited
@@ -239,7 +241,6 @@ estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.registerservices.title=Business Matching - What do you need to register?
 businessmatching.registerservices.heading=What do you need to register?
-businessmatching.registerservices.text=Select all that apply
 businessmatching.registerservices.servicename.lbl.01=Accountancy services
 businessmatching.registerservices.servicename.lbl.02=Bill payment services
 businessmatching.registerservices.servicename.lbl.03=Estate agent business
@@ -261,7 +262,7 @@ bankdetails.accounttype.title = What kind of bank account does your business use
 bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
 bankdetails.accounttype.lbl.03 = A business account belonging to another business
-bankdetails.accounttype.lbl.04 = The business doesn't use a bank account
+bankdetails.accounttype.lbl.04 = The business doesn''t use a bank account
 
 summary.businessactivities = Business activities
 
@@ -290,7 +291,6 @@ businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.subtitle1 = Does your business carry out any other activities?
 businessactivities.confirm-activities.line1.text = Only list activities which relate to anti-money laundering supervision.
 
-
 businessactivities.turnover.title = How much turnover do you expect in the next 12 months, from activities related to anti-money laundering supervision?
 businessactivities.turnover.line1.text = We may consider your business a greater risk if you have a high turnover.
 businessactivities.turnover.lbl.01=£0 to £14,999
@@ -301,7 +301,15 @@ businessactivities.turnover.lbl.05=£250,000 to £999,999
 businessactivities.turnover.lbl.06=£1 million to £10 million
 businessactivities.turnover.lbl.07=More than £10 million
 
-
+businessactivities.business-turnover.title = How much turnover do you expect in the next 12 months?
+businessactivities.business-turnover.line1.text = We may consider your business a greater risk if you have a high turnover.
+businessactivities.business-turnover.lbl.01=£0 to £14,999
+businessactivities.business-turnover.lbl.02=£15,000 to £49,999
+businessactivities.business-turnover.lbl.03=£50,000 to £99,999
+businessactivities.business-turnover.lbl.04=£100,000 to £249,999
+businessactivities.business-turnover.lbl.05=£250,000 to £999,999
+businessactivities.business-turnover.lbl.06=£1 million to £10 million
+businessactivities.business-turnover.lbl.07=More than £10 million
 
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname = Account name
@@ -321,3 +329,9 @@ bankdetails.summary.accounttype.lbl.03 = Another business''s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
 
+businessactivities.keep.customer.records.title = Do you keep records of all your transactions with customers?
+businessactivities.do.keep.records = How do you record transactions?
+businessactivities.transactiontype.lbl.01 = On paper
+businessactivities.transactiontype.lbl.02 = Digitally, on a spreadsheet
+businessactivities.transactiontype.lbl.03 = Digitally, on a software package designed for recording transactions
+businessactivities.name.software.pkg.lbl = Name of the software package
