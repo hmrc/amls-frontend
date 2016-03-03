@@ -281,8 +281,6 @@ businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor's registration.
 
-
-
 businessactivities.confirm-activities.title = Is your business involved in other activities?
 bankdetails.confirm-activities.subtitile =You''ve told us your business is involved in:
 bankdetails.confirm-activities.heading.subtitle.text = estateagentbusiness
@@ -290,6 +288,7 @@ businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.subtitle1 = Does your business carry out any other activities?
 businessactivities.confirm-activities.line1.text = Only list activities which relate to anti-money laundering supervision.
 
+businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname = Account name

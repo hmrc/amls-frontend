@@ -89,6 +89,8 @@ POST        /business-activities/franchise              controllers.businessacti
 GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get()
 POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
+GET         /business-activities/procedures             controllers.businessactivities.IdentifySuspiciousActivityController.get()
+POST        /business-activities/procedures             controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
 
 GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
