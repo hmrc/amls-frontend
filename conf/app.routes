@@ -85,7 +85,20 @@ GET         /business-activities/index                  controllers.businessacti
 GET         /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.get()
 POST        /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
+GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
+
+GET         /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
+
+GET         /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
+
+
 GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
+
+GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get()
+POST        /business-activities/records              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
