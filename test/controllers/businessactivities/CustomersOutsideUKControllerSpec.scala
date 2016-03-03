@@ -48,7 +48,7 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
     "pre-populate the Customer outside UK Page" in new Fixture  {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, Some(CustomersOutsideUKYes(Countries("GS")))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, Some(CustomersOutsideUKYes(Countries("GS")))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -69,7 +69,7 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, Some(CustomersOutsideUKYes(Countries("GS")))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, Some(CustomersOutsideUKYes(Countries("GS")))))))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
