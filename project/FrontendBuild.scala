@@ -30,6 +30,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
 
+
     // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % "3.0.0",
     "uk.gov.hmrc" %% "play-partials" % "4.2.0",

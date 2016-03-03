@@ -335,3 +335,6 @@ businessactivities.transactiontype.lbl.01 = On paper
 businessactivities.transactiontype.lbl.02 = Digitally, on a spreadsheet
 businessactivities.transactiontype.lbl.03 = Digitally, on a software package designed for recording transactions
 businessactivities.name.software.pkg.lbl = Name of the software package
+
+businessactivities.ncaRegistered.title = Has your business registered online with the National Crime Agency?
+businessactivities.ncaRegistered.subtitle = You need to be registered before you can report suspicious activity on the National Crime Agency website.
