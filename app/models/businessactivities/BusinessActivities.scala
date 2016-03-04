@@ -1,5 +1,8 @@
 package models.businessactivities
 
+import controllers.businessactivities.AccountantForAMLSRegulationsController
+import models.businessactivities.AccountantForAMLSRegulations
+
 case class BusinessActivities(
                                involvedInOther: Option[InvolvedInOther] = None,
                                expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
@@ -7,7 +10,8 @@ case class BusinessActivities(
                                businessFranchise: Option[BusinessFranchise] = None,
                                transactionRecord: Option[TransactionRecord] = None,
                                customersOutsideUK: Option[CustomersOutsideUK] = None,
-                               ncaRegistered: Option[NCARegistered] = None
+                               ncaRegistered: Option[NCARegistered] = None,
+                               accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None
                                ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
@@ -31,6 +35,9 @@ case class BusinessActivities(
   def ncaRegistered(p: NCARegistered): BusinessActivities =
     this.copy(ncaRegistered = Some(p))
 
+  def accountantForAMLSRegulations(p: AccountantForAMLSRegulations): BusinessActivities =
+    this.copy(accountantForAMLSRegulations = Some(p))
+
 }
 
 object BusinessActivities {
@@ -47,7 +54,8 @@ object BusinessActivities {
     __.read[Option[BusinessFranchise]] and
     __.read[Option[TransactionRecord]] and
     __.read[Option[CustomersOutsideUK]] and
-    __.read[Option[NCARegistered]]
+    __.read[Option[NCARegistered]] and
+    __.read[Option[AccountantForAMLSRegulations]]
     )(BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
@@ -59,7 +67,8 @@ object BusinessActivities {
       Json.toJson(model.businessFranchise).asOpt[JsObject],
       Json.toJson(model.transactionRecord).asOpt[JsObject],
       Json.toJson(model.customersOutsideUK).asOpt[JsObject],
-      Json.toJson(model.ncaRegistered).asOpt[JsObject]
+      Json.toJson(model.ncaRegistered).asOpt[JsObject],
+      Json.toJson(model.accountantForAMLSRegulations).asOpt[JsObject]
     ).flatten.fold(Json.obj()){
      _ ++ _
     }
