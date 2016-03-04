@@ -212,16 +212,23 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
   }
 
   "emailType" must {
+
     "successfully validate" in {
 
       emailType.validate("test@test.com") must
         be(Success("test@test.com"))
     }
 
+    "successfully validate 2" in {
+
+      emailType.validate("t@t") must
+        be(Success("t@t"))
+    }
+
     "fail to validate an empty string" in {
 
       emailType.validate("") must
-        be(Failure(Seq(
+        equal(Failure(Seq(
           Path -> Seq(ValidationError("error.required"))
         )))
     }
@@ -232,6 +239,17 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.maxLength", 100))
         )))
+    }
+
+    "fail to validate an email without a `@` in it" in {
+
+      emailType.validate("foo") must
+        be (a[Failure[_, _]])
+
+//       TODO: fix regex equalities
+//        be(Failure(Seq(
+//          Path -> Seq(ValidationError("error.pattern", "^.+@.+$".r))
+//        )))
     }
   }
 

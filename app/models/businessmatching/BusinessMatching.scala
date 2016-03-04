@@ -1,8 +1,16 @@
 package models.businessmatching
 
-case class BusinessMatching (activities: Option[BusinessActivities] = None) {
+import models.businesscustomer.ReviewDetails
+
+case class BusinessMatching(
+                             activities: Option[BusinessActivities] = None,
+                             reviewDetails: Option[ReviewDetails] = None
+                           ) {
   def activities(ba: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(ba))
+
+  def safeId(s: ReviewDetails): BusinessMatching =
+    this.copy(reviewDetails = Some(s))
 }
 
 object BusinessMatching {
@@ -12,24 +20,22 @@ object BusinessMatching {
 
   val key = "business-matching"
 
-  //  implicit val reads: Reads[BusinessMatching] = (
-  //      __.read[Option[BusinessActivities]] and
-  //    ) (BusinessMatching.apply _)
-
-  // TODO: Revert to the normal pattern when there are more properties added to the model
-  implicit val reads: Reads[BusinessMatching] =
-    __.read[Option[BusinessActivities]] map (BusinessMatching.apply)
+    implicit val reads: Reads[BusinessMatching] = (
+        __.read[Option[BusinessActivities]] and
+        __.read[Option[ReviewDetails]]
+      ) (BusinessMatching.apply _)
 
   implicit val writes: Writes[BusinessMatching] =
     Writes[BusinessMatching] {
       model =>
         Seq(
-          Json.toJson(model.activities).asOpt[JsObject]
+          Json.toJson(model.activities).asOpt[JsObject],
+          Json.toJson(model.reviewDetails).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
         }
     }
 
-  implicit def default(aboutYou: Option[BusinessMatching]): BusinessMatching =
-    aboutYou.getOrElse(BusinessMatching())
+  implicit def default(businessMatching: Option[BusinessMatching]): BusinessMatching =
+    businessMatching.getOrElse(BusinessMatching())
 }
