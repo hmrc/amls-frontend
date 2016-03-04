@@ -102,3 +102,6 @@ GET         /bank-details/summary                       controllers.bankdetails.
 
 GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get()
 POST        /business-activities/records              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
+
+GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get()
+POST        /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)

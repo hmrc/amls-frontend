@@ -2,9 +2,7 @@ package models
 
 import org.joda.time.LocalDate
 import play.api.data.mapping._
-import play.api.data.mapping.forms.{Rules, UrlFormEncoded}
-
-import scala.util.matching.Regex
+import play.api.data.mapping.forms.UrlFormEncoded
 
 object FormTypes {
 

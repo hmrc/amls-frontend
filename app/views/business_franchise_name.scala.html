@@ -21,12 +21,12 @@ title = Messages("businessactivities.businessfranchise.title")
         </span>
 
         @inlineRadioGroup(f("businessFranchise")) {
-        @legend("TODO", jsHidden = true)
-        @radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
-        @radio(f("businessFranchise"), "lbl.no", "false")
-        @fieldset("TODO", jsHidden = true, id = target) {
-        @input(f("franchiseName"), "businessactivities.businessfranchise.lbl.franchisename", bold = false)
-        }
+            @legend("TODO", jsHidden = true)
+            @radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("businessFranchise"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("franchiseName"), "businessactivities.businessfranchise.lbl.franchisename", bold = false)
+            }
      }
 
     @submit(edit)
