@@ -2,7 +2,6 @@ package controllers.businessactivities
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.bankdetails.BankDetails
 import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -16,23 +15,23 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
+class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new TransactionRecordController {
+    val controller = new CustomersOutsideUKController {
 
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override protected def authConnector: AuthConnector = self.authConnector
     }
   }
 
-  "TransactionRecordController" must {
+  "CustomersOutsideUKController" must {
 
     "use correct services" in new Fixture {
-      TransactionRecordController.authConnector must be(AMLSAuthConnector)
-      TransactionRecordController.dataCacheConnector must be(DataCacheConnector)
+      CustomersOutsideUKController.authConnector must be(AMLSAuthConnector)
+      CustomersOutsideUKController.dataCacheConnector must be(DataCacheConnector)
     }
 
     "load the Customer Record Page" in new Fixture  {
@@ -42,36 +41,35 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("businessactivities.keep.customer.records.title"))
-
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() must be (Messages("businessactivities.customer.outside.uk.title"))
     }
 
-    "pre-populate the Customer Record Page" in new Fixture  {
+    "pre-populate the Customer outside UK Page" in new Fixture  {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, Some(TransactionRecordYes(Set(Paper)))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, Some(CustomersOutsideUKYes(Countries("GS")))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
+      document.select("input[value=GS]").`val`() must be("GS")
 
     }
 
     "on post with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isRecorded" -> "true",
-        "transactions[0]" -> "01",
-        "transactions[1]" -> "02"
+        "isOutside" -> "true",
+        "country_1" -> "GS"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, Some(CustomersOutsideUKYes(Countries("GS")))))))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -81,16 +79,15 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isRecorded" -> "true",
-        "transactions[0]" -> "01",
-        "transactions[1]" -> "02"
+        "isOutside" -> "true",
+        "country_1" -> "GS"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None))))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -100,8 +97,7 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
     "on post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "transactions[0]" -> "01",
-        "transactions[1]" -> "02"
+        "isOutside" -> "true"
       )
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
@@ -114,7 +110,7 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isRecorded]").html() must include("This field is required")
+      document.select("a[href=#country_1]").html() must include("This field is required")
     }
   }
 

@@ -449,4 +449,22 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "CountryType" must {
+    "validate country name supplied" in {
+      countryType.validate("GP") must be(Success("GP"))
+    }
+
+    "fail validation if country is longer than the permissible length" in {
+      countryType.validate("test") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxCountryTypeLength))))
+      )
+    }
+
+    "fail validation if country containts numbers" in {
+      val test = "^[a-zA-Z_]+$".r
+      countryType.validate("12") mustBe a[Failure[_, _]]
+//        Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "^[a-zA-Z_]+$".r))))
+
+    }
+  }
 }

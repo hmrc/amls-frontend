@@ -164,7 +164,7 @@ tradingpremises.youragent.requiredinfo.heading=For each of your trading premises
 tradingpremises.youragent.registeredname = What is your agent''s registered business name?
 tradingpremises.youragent.registeredname.subtitle = It must be identical to the name on the incorporation certificate.
 tradingpremises.youragent.taxtype = What type of tax does your agent pay?
-tradingpremises.youragent.taxtype.lbl.01=Self-assesment
+tradingpremises.youragent.taxtype.lbl.01=Self-assessment
 tradingpremises.youragent.taxtype.lbl.02=Corporation tax
 
 tradingpremises.youragent.businessstructure=What is your agent''s business structure?
@@ -196,6 +196,7 @@ tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
 tradingpremises.summary.agents = Agent''s
+tradingpremises.summary.tradingstartdate = Trading start date of
 
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
@@ -282,8 +283,6 @@ businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor's registration.
 
-
-
 businessactivities.confirm-activities.title = Is your business involved in other activities?
 bankdetails.confirm-activities.subtitile =You''ve told us your business is involved in:
 bankdetails.confirm-activities.heading.subtitle.text = estateagentbusiness
@@ -291,6 +290,25 @@ businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.subtitle1 = Does your business carry out any other activities?
 businessactivities.confirm-activities.line1.text = Only list activities which relate to anti-money laundering supervision.
 
+businessactivities.turnover.title = How much turnover do you expect in the next 12 months, from activities related to anti-money laundering supervision?
+businessactivities.turnover.line1.text = We may consider your business a greater risk if you have a high turnover.
+businessactivities.turnover.lbl.01=£0 to £14,999
+businessactivities.turnover.lbl.02=£15,000 to £49,999
+businessactivities.turnover.lbl.03=£50,000 to £99,999
+businessactivities.turnover.lbl.04=£100,000 to £249,999
+businessactivities.turnover.lbl.05=£250,000 to £999,999
+businessactivities.turnover.lbl.06=£1 million to £10 million
+businessactivities.turnover.lbl.07=More than £10 million
+
+businessactivities.business-turnover.title = How much turnover do you expect in the next 12 months?
+businessactivities.business-turnover.line1.text = We may consider your business a greater risk if you have a high turnover.
+businessactivities.business-turnover.lbl.01=£0 to £14,999
+businessactivities.business-turnover.lbl.02=£15,000 to £49,999
+businessactivities.business-turnover.lbl.03=£50,000 to £99,999
+businessactivities.business-turnover.lbl.04=£100,000 to £249,999
+businessactivities.business-turnover.lbl.05=£250,000 to £999,999
+businessactivities.business-turnover.lbl.06=£1 million to £10 million
+businessactivities.business-turnover.lbl.07=More than £10 million
 
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname = Account name
@@ -316,3 +334,13 @@ businessactivities.transactiontype.lbl.01 = On paper
 businessactivities.transactiontype.lbl.02 = Digitally, on a spreadsheet
 businessactivities.transactiontype.lbl.03 = Digitally, on a software package designed for recording transactions
 businessactivities.name.software.pkg.lbl = Name of the software package
+
+businessactivities.ncaRegistered.title = Has your business registered online with the National Crime Agency?
+businessactivities.ncaRegistered.subtitle = You need to be registered before you can report suspicious activity on the National Crime Agency website.
+
+businessactivities.customer.outside.uk.title = Do you have customers who live outside of the UK?
+businessactivities.hight.value.customer.lbl = Where do your most high-value customers live?
+businessactivities.hight.value.customer.lbl.hint = ''High value customers'' are those who bring in the most revenue to your business.
+businessactivities.upto.10.countries = List up to 10 countries.
+
+businessactivities.accountantForAMLSRegulations.title = Does your business use an accountant for matters relating to money laundering regulations?
