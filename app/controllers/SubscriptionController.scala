@@ -1,34 +1,22 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
-import models.businessmatching.BusinessMatching
-import models.estateagentbusiness.EstateAgentBusiness
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.SubscriptionService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
 
 trait SubscriptionController extends BaseController {
 
-  private[controllers] def dataCache: DataCacheConnector
+  private[controllers] def subscriptionService: SubscriptionService
 
   def post() = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchAll flatMap { cacheMap =>
-        (for {
-          cache <- cacheMap
-          bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-          safeId <- bm.safeId
-          eab <- cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)
-        } yield {
-          ???
-        }).getOrElse(Future.successful(Ok("")))
+      subscriptionService.subscribe map {
+        response => Ok(response.body)
       }
   }
 }
 
 object SubscriptionController extends SubscriptionController {
-  override private[controllers] def dataCache: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector
+  override private[controllers] def subscriptionService: SubscriptionService = SubscriptionService
 }

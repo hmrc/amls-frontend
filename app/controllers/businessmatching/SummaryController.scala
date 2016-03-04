@@ -7,16 +7,18 @@ import forms.EmptyForm
 import models.businessmatching.BusinessMatching
 import models.estateagentbusiness.EstateAgentBusiness
 
+
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
-  def get = Authorised.async {
+  def get = Authorised {
     implicit authContext => implicit request =>
-      dataCache.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) map {
-        case Some(data) => Ok(views.html.unauthorised(request))
-        case _ => Redirect(routes.SummaryController.get())
-      }
+        NotImplemented
+//      dataCache.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) map {
+//        case Some(data) => Ok(views.html.unauthorised(request))
+//        case _ => Redirect(routes.SummaryController.get())
+//      }
   }
 }
 

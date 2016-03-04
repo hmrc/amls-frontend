@@ -1,31 +1,37 @@
-@import config.ApplicationConfig
 @import include.main
+@import include.{forms => deprecated}
+@import include.forms2._
+@import forms.EmptyForm
 
 @()(implicit request: Request[_])
 
 @main(
     title = Messages("summary.title")
 ) {
-<div id="main-pane" class="column-three-quarters">
-<p>
-    @Messages("summary.description")
-</p>
+    <div id="main-pane" class="column-three-quarters">
+    <p>
+        @Messages("summary.description")
+    </p>
 
-<table id="summary-table" class="summary-table">
-    <tr>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.businessactivities.routes.WhatYouNeedController.get()">@Messages("summary.businessactivities") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.businessmatching.routes.RegisterServicesController.get()">@Messages("summary.businessmatching") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.aboutthebusiness.routes.WhatYouNeedController.get()">@Messages("summary.aboutbusiness") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("summary.tradingpremises") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.estateagentbusiness.routes.WhatYouNeedController.get()">@Messages("summary.estateagentbusiness") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.bankdetails.routes.WhatYouNeedController.get()">@Messages("summary.bankdetails") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.responsiblepersons") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="@controllers.aboutyou.routes.RoleWithinBusinessController.get()">@Messages("summary.aboutyou") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.payment") </a> </span> </th></tr></thead>
-        <thead><tr><th class="section-name">
-            <span class="locked" title='@Messages("summary.declarationlocked.title")'>@Messages("summary.declarationlocked")</span>
-        </th></tr></thead>
-    </tr>
-</table>
-</div>
+    <table id="summary-table" class="summary-table">
+        <tr>
+            <thead><tr><th class="section-name"> <span> <a href="@controllers.businessactivities.routes.WhatYouNeedController.get()">@Messages("summary.businessactivities") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="@controllers.businessmatching.routes.RegisterServicesController.get()">@Messages("summary.businessmatching") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="@controllers.aboutthebusiness.routes.WhatYouNeedController.get()">@Messages("summary.aboutbusiness") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="@controllers.tradingpremises.routes.WhatYouNeedController.get()">@Messages("summary.tradingpremises") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="@controllers.estateagentbusiness.routes.WhatYouNeedController.get()">@Messages("summary.estateagentbusiness") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="@controllers.bankdetails.routes.WhatYouNeedController.get()">@Messages("summary.bankdetails") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.responsiblepersons") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="@controllers.aboutyou.routes.RoleWithinBusinessController.get()">@Messages("summary.aboutyou") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name"> <span> <a href="">@Messages("summary.payment") </a> </span> </th></tr></thead>
+            <thead><tr><th class="section-name">
+                <span class="locked" title='@Messages("summary.declarationlocked.title")'>@Messages("summary.declarationlocked")</span>
+            </th></tr></thead>
+        </tr>
+    </table>
+    </div>
+
+    @form(EmptyForm, controllers.routes.SubscriptionController.post()) {
+        @submit(false)
+    }
 }

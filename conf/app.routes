@@ -2,14 +2,12 @@
 
 GET         /assets/*file                               controllers.AssetsController.at(path="/public", file)
 
-GET         /                                           controllers.WelcomeController.get
-GET         /welcome                                    controllers.WelcomeController.get
+GET         /                                           controllers.LandingController.get()
+
+POST        /subscribe                                  controllers.SubscriptionController.post()
 
 GET         /unauthorised                               controllers.AmlsController.unauthorised
 GET         /summary                                    controllers.MainSummaryController.onPageLoad
-
-GET         /login                                      controllers.AmlsController.onPageLoad
-POST        /login                                      controllers.AmlsController.onSubmit
 
 GET         /about-you/your-details                    controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
 POST        /about-you/your-details                    controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)

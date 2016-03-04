@@ -50,7 +50,7 @@ object FormTypes {
 
   val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
 
-  val emailType = notEmpty compose maxLength(maxEMailLength)
+  val emailType = notEmpty compose maxLength(maxEMailLength) compose pattern("^.+@.+$".r)
 
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
