@@ -16,7 +16,7 @@ trait TransactionRecordController extends RepeatingSection with BaseController {
   def get(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_ , _, _, _, Some(data), _)) =>
+        case Some(BusinessActivities(_ , _, _, _, Some(data), _, _)) =>
           Ok(views.html.customer_transaction_records(Form2[TransactionRecord](data), edit))
         case _ =>
           Ok(views.html.customer_transaction_records(EmptyForm, edit))

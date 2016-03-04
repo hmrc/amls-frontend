@@ -105,3 +105,6 @@ POST        /business-activities/records              controllers.businessactivi
 
 GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get()
 POST        /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)
+
+GET         /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.get()
+POST        /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)

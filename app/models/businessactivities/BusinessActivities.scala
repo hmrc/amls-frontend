@@ -6,8 +6,10 @@ case class BusinessActivities(
                                expectedAMLSTurnover: Option[ExpectedAMLSTurnover] = None,
                                businessFranchise: Option[BusinessFranchise] = None,
                                transactionRecord: Option[TransactionRecord] = None,
-                               customersOutsideUK: Option[CustomersOutsideUK] = None
+                               customersOutsideUK: Option[CustomersOutsideUK] = None,
+                               ncaRegistered: Option[NCARegistered] = None
                                ) {
+
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
     this.copy(businessFranchise = Some(p))
 
@@ -25,6 +27,10 @@ case class BusinessActivities(
 
   def customersOutsideUK(p: CustomersOutsideUK): BusinessActivities =
     this.copy(customersOutsideUK = Some(p))
+
+  def ncaRegistered(p: NCARegistered): BusinessActivities =
+    this.copy(ncaRegistered = Some(p))
+
 }
 
 object BusinessActivities {
@@ -40,7 +46,8 @@ object BusinessActivities {
     __.read[Option[ExpectedAMLSTurnover]] and
     __.read[Option[BusinessFranchise]] and
     __.read[Option[TransactionRecord]] and
-    __.read[Option[CustomersOutsideUK]]
+    __.read[Option[CustomersOutsideUK]] and
+    __.read[Option[NCARegistered]]
     )(BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
@@ -51,7 +58,8 @@ object BusinessActivities {
       Json.toJson(model.expectedAMLSTurnover).asOpt[JsObject],
       Json.toJson(model.businessFranchise).asOpt[JsObject],
       Json.toJson(model.transactionRecord).asOpt[JsObject],
-      Json.toJson(model.customersOutsideUK).asOpt[JsObject]
+      Json.toJson(model.customersOutsideUK).asOpt[JsObject],
+      Json.toJson(model.ncaRegistered).asOpt[JsObject]
     ).flatten.fold(Json.obj()){
      _ ++ _
     }
