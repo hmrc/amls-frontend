@@ -46,6 +46,9 @@ lbl.uk = UK
 lbl.overseas = Overseas
 lbl.select.all = Select all that apply
 
+lbl.residential = Residential
+lbl.nonresidential = Non-Residential
+
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
