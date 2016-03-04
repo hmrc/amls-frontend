@@ -100,14 +100,14 @@ POST        /bank-details/account-details/:index        controllers.bankdetails.
 
 GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
 
-GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get(index:Int, edit: Boolean ?= false)
+GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get()
 POST        /business-activities/records              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
 
-GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get(index:Int, edit: Boolean ?= false)
+GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get()
 POST        /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
-GET         /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.get(index:Int, edit: Boolean ?= false)
+GET         /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.get()
 POST        /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.get(index:Int, edit: Boolean ?= false)
+GET         /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
