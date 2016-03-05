@@ -2,7 +2,6 @@ package controllers
 
 import config.AMLSAuthConnector
 import controllers.auth.AmlsRegime
-import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -17,6 +16,5 @@ trait MainSummaryController extends FrontendController  with Actions {
 }
 
 object MainSummaryController extends MainSummaryController {
-  val amlsService = AmlsService
   val authConnector = AMLSAuthConnector
 }

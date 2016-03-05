@@ -27,15 +27,6 @@ object BusinessCustomerSessionCache extends SessionCache with AppName with Servi
   override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
 }
 
-object AmlsSessionCache extends SessionCache with AppName with ServicesConfig{
-  override lazy val http = WSHttp
-  override lazy val defaultSource: String = getConfString("cachable.session-cache.amls-frontend.cache","amls-frontend")
-
-  override lazy val baseUri = baseUrl("cachable.session-cache")
-  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
-
-}
-
 object AMLSAuditConnector extends AuditConnector with RunMode {
   override lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(s"$env.auditing")
 }

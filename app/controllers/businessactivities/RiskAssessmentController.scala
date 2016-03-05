@@ -17,7 +17,7 @@ trait RiskAssessmentController extends RepeatingSection with BaseController {
   def get(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, _, Some(data))) =>
+        case Some(BusinessActivities(_, _, _, _, _, _, _, Some(data))) =>
           Ok(views.html.risk_assessment_policy(Form2[RiskAssessmentPolicy](data), edit))
         case _ =>
           Ok(views.html.risk_assessment_policy(EmptyForm, edit))

@@ -212,16 +212,23 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
   }
 
   "emailType" must {
+
     "successfully validate" in {
 
       emailType.validate("test@test.com") must
         be(Success("test@test.com"))
     }
 
+    "successfully validate 2" in {
+
+      emailType.validate("t@t") must
+        be(Success("t@t"))
+    }
+
     "fail to validate an empty string" in {
 
       emailType.validate("") must
-        be(Failure(Seq(
+        equal(Failure(Seq(
           Path -> Seq(ValidationError("error.required"))
         )))
     }
@@ -232,6 +239,17 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.maxLength", 100))
         )))
+    }
+
+    "fail to validate an email without a `@` in it" in {
+
+      emailType.validate("foo") must
+        be (a[Failure[_, _]])
+
+//       TODO: fix regex equalities
+//        be(Failure(Seq(
+//          Path -> Seq(ValidationError("error.pattern", "^.+@.+$".r))
+//        )))
     }
   }
 
@@ -431,4 +449,22 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "CountryType" must {
+    "validate country name supplied" in {
+      countryType.validate("GP") must be(Success("GP"))
+    }
+
+    "fail validation if country is longer than the permissible length" in {
+      countryType.validate("test") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxCountryTypeLength))))
+      )
+    }
+
+    "fail validation if country containts numbers" in {
+      val test = "^[a-zA-Z_]+$".r
+      countryType.validate("12") mustBe a[Failure[_, _]]
+//        Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "^[a-zA-Z_]+$".r))))
+
+    }
+  }
 }

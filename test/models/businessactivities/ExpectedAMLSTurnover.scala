@@ -7,7 +7,7 @@ import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with MockitoSugar {
+class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
 

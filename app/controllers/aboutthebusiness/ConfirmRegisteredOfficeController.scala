@@ -1,7 +1,7 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{BusinessCustomerSessionCacheConnector, DataCacheConnector}
+import connectors.{KeystoreConnector$, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{AboutTheBusiness, BusinessCustomerDetails, ConfirmRegisteredOffice}

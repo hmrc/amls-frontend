@@ -1,4 +1,5 @@
 package controllers.tradingpremises
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
