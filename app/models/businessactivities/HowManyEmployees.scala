@@ -26,8 +26,8 @@ object HowManyEmployees {
       import models.FormTypes._
       import play.api.data.mapping.forms.Rules._
       (
-        (__ \ "employeeCount").read(notEmpty) and
-          (__ \ "employeeCountAMLSSupervision").read(notEmpty)
+        (__ \ "employeeCount").read(employeeCountType) and
+          (__ \ "employeeCountAMLSSupervision").read(employeeCountType)
         ) (HowManyEmployees.apply _)
     }
 
