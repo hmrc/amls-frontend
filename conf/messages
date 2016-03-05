@@ -343,3 +343,5 @@ businessactivities.upto.10.countries = List up to 10 countries.
 
 businessactivities.riskassessment.policy.tile = Does your business have a formal risk assessment policy and procedure?
 businessactivities.paper.or.digital = Is it paper-based or digital?
+businessactivities.RiskAssessmentType.lbl.01 = Paper-based
+businessactivities.RiskAssessmentType.lbl.02 = Digital
