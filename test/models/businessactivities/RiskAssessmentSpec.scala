@@ -12,52 +12,80 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
     import play.api.data.mapping.forms.Rules._
 
-    val formalRiskAssessments: Set[RiskAssessment] = Set(PaperBased, Digital)
+    val formalRiskAssessments: Set[RiskAssessmentType] = Set(PaperBased, Digital)
+
+    "fail to validate on empty map" in {
+      RiskAssessmentPolicy.formReads.validate(Map.empty) must
+        be(Failure(Seq((Path \ "hasPolicy") -> Seq(ValidationError("error.required")))))
+    }
+
+    "successfully validate given an enum value" in {
+      RiskAssessmentPolicy.formReads.validate(Map("hasPolicy" -> Seq("false"))) must
+        be(Success(RiskAssessmentPolicyNo))
+    }
+
 
     "validate model with few check box selected" in {
 
       val model = Map(
+        "hasPolicy" -> Seq("true"),
         "riskassessments[]" -> Seq("01", "02")
       )
 
-      RiskAssessments.formReads.validate(model) must
-        be(Success(RiskAssessments(formalRiskAssessments)))
+      RiskAssessmentPolicy.formReads.validate(model) must
+        be(Success(RiskAssessmentPolicyYes(formalRiskAssessments)))
 
     }
 
-    "fail to validate on empty Map" in {
+    "fail to validate given `Yes` with no value" in {
 
-      RiskAssessments.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "riskassessments") -> Seq(ValidationError("error.required")))))
+      val model = Map(
+        "hasPolicy" -> Seq("true")
+      )
+
+      RiskAssessmentPolicy.formReads.validate(model) must
+        be(Failure(Seq(
+          (Path \ "riskassessments") -> Seq(ValidationError("error.required"))
+        )))
 
     }
 
     "fail to validate when given invalid data" in {
       val model = Map(
+        "hasPolicy" -> Seq("true"),
         "riskassessments[]" -> Seq("01", "99")
       )
 
-      RiskAssessments.formReads.validate(model) must
+      RiskAssessmentPolicy.formReads.validate(model) must
         be(Failure(Seq((Path \ "riskassessments" \ 1 \ "riskassessments", Seq(ValidationError("error.invalid"))))))
     }
 
-    "write correct data for services value" in {
 
-      RiskAssessments.formWrites.writes(RiskAssessments(Set(PaperBased,Digital))) must
-        be(Map("riskassessments" -> Seq("01", "02")))
+   "write correct data for risk assessment value" in {
 
-    }
+     val model = Map(
+       "hasPolicy" -> Seq("true"),
+       "riskassessments" -> Seq("01", "02")
+     )
 
-    "JSON validation" must {
+     RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Set(PaperBased,Digital))) must
+       be(model)
 
-      "successfully validate given values" in {
-        val json =  Json.obj("riskassessments" -> Seq("01","02"))
+   }
 
-        Json.fromJson[RiskAssessments](json) must
-          be(JsSuccess(RiskAssessments(formalRiskAssessments), JsPath \ "riskassessments"))
-      }
+     "JSON validation" must {
 
-    }
+       "successfully validate given values" in {
+         val json =  Json.obj(
+           "hasPolicy" -> Seq("true"),
+           "riskassessments" -> Seq("01","02"))
+
+         Json.fromJson[RiskAssessmentPolicy](json) must
+           be(JsSuccess(RiskAssessmentPolicyYes(formalRiskAssessments), JsPath \ "riskassessments"))
+       }
+
+     }
+
 
   }
 
