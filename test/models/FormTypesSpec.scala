@@ -431,4 +431,16 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "For the How many employees page" must {
+    "validate employee count field length supplied" in {
+      employeeCountType.validate("12345678912345") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxEmployeeLength)))))
+    }
+
+    "fail validation if employee count field is not supplied" in {
+      employeeCountType.validate("") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+    }
+  }
+
 }
