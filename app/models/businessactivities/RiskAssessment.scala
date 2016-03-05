@@ -86,7 +86,7 @@ object RiskAssessmentPolicy {
       case false => Reads(_ => JsSuccess(RiskAssessmentPolicyNo))
     }
 
-  implicit def jsonWrites = Writes[RiskAssessmentType] {
+  implicit def jsonWrites = Writes[RiskAssessmentPolicy] {
        case RiskAssessmentPolicyYes(data) =>
             Json.obj("hasPolicy" -> true,
             "riskassessments" -> data)
