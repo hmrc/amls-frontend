@@ -99,18 +99,14 @@ object RiskAssessmentPolicy {
       case false => Reads(_ => JsSuccess(RiskAssessmentPolicyNo))
     }*/
 
-  implicit def jsonReads
-  (implicit
-   p: Path => Reads[RiskAssessmentType]
-    ): Rule[UrlFormEncoded, RiskAssessmentPolicy] =
-    From[UrlFormEncoded] { __ =>
+  implicit def jsonReads:Reads[RiskAssessmentPolicy] =
       (__ \ "hasPolicy").read[Boolean] flatMap {
           case true =>
-             (__ \ "riskassessments").read(Set[RiskAssessmentType]) fmap RiskAssessmentPolicyYes.apply _
-         case false => Rule.fromMapping { _ => Success(RiskAssessmentPolicyNo) }
+             (__ \ "riskassessments").read[Set[RiskAssessmentType]].flatMap(RiskAssessmentPolicyYes.apply _)
+         case false => Reads(_ => JsSuccess(RiskAssessmentPolicyNo))
       }
 
-  }
+
 
 
 }
