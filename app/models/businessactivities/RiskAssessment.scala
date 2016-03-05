@@ -20,6 +20,7 @@ case object PaperBased extends RiskAssessmentType
 case object Digital extends RiskAssessmentType
 
 object RiskAssessmentType {
+
   import utils.MappingUtils.Implicits._
 
   implicit val riskAssessmentFormRead = Rule[String, RiskAssessmentType] {
@@ -77,36 +78,20 @@ object RiskAssessmentPolicy {
 
   }
 
- /* implicit val jsonReads: Reads[RiskAssessmentPolicy] =
+
+  implicit def jsonReads: Reads[RiskAssessmentPolicy] =
     (__ \ "hasPolicy").read[Boolean] flatMap {
-      case true => (__ \ "riskassessments").read[Set[String]].flatMap {x:Set[String] =>
-        x.map {
-            case "01" => Reads(_ => JsSuccess(PaperBased))
-            case "02" => Reads(_ => JsSuccess(Digital))
-            case _ =>
-              Reads(_ => JsError((JsPath \ "riskassessments") -> ValidationError("error.invalid")))
-          }.foldLeft[Reads[Set[RiskAssessmentType]]](
-            Reads[Set[RiskAssessmentType]](_ => JsSuccess(Set.empty))
-         ){
-          (result, data) =>
-            data flatMap {m =>
-             result.map {n =>
-               n + m
-             }
-           }
-        }
-      } map RiskAssessmentPolicyYes.apply
+      case true =>
+        (__ \ "riskassessments").read[Set[RiskAssessmentType]].flatMap(RiskAssessmentPolicyYes.apply _)
       case false => Reads(_ => JsSuccess(RiskAssessmentPolicyNo))
-    }*/
+    }
 
-  implicit def jsonReads:Reads[RiskAssessmentPolicy] =
-      (__ \ "hasPolicy").read[Boolean] flatMap {
-          case true =>
-             (__ \ "riskassessments").read[Set[RiskAssessmentType]].flatMap(RiskAssessmentPolicyYes.apply _)
-         case false => Reads(_ => JsSuccess(RiskAssessmentPolicyNo))
-      }
-
-
-
+  implicit def jsonWrites = Writes[RiskAssessmentType] {
+       case RiskAssessmentPolicyYes(data) =>
+            Json.obj("hasPolicy" -> true,
+            "riskassessments" -> data)
+        case RiskAssessmentPolicyNo =>
+            Json.obj("hasPolicy" -> false)
+  }
 
 }
