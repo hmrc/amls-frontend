@@ -42,10 +42,7 @@ trait IdentifySuspiciousActivityController extends BaseController {
           }
       }
   }
-
-
 }
-
 
 object IdentifySuspiciousActivityController extends IdentifySuspiciousActivityController {
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
