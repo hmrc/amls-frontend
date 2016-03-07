@@ -92,10 +92,9 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
            be(JsSuccess(RiskAssessmentPolicyNo, JsPath \ "hasPolicy"))
        }
 
-    /*   "fail when on invalid data" in {
-         Json.fromJson[RiskAssessmentPolicy](Json.obj("hasPolicy" -> true,"riskassessments" -> Seq("01","03"))) must
-           be(JsError(((JsPath \ "hasPolicy" \ "riskassessments[1]") \ "riskassessments") -> ValidationError("error.invalid")))
-       }*/
+       "fail when on invalid data" in {
+         Json.fromJson[RiskAssessmentPolicy](Json.obj("hasPolicy" -> true,"riskassessments" -> Seq("01","03"))) mustBe a[JsError]
+       }
 
        "write valid data in using json write" in {
          Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must be (Json.obj("hasPolicy" -> true,
