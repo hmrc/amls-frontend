@@ -45,19 +45,12 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
     "on get, display the identify suspicious activity page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, Some(IdentifySuspiciousActivity(true))))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))))))
       val result = controller.get()(request)
 
       status(result) must be(OK)
 
       val page = Jsoup.parse(contentAsString(result))
-
-      println("£££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££")
-      println(page.select("input"))
-      println("£££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££")
-      println(page.select("input[type=radio][name=hasWrittenGuidance]"))
-      println("£££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££")
-
 
       page.select("input[type=radio][name=hasWrittenGuidance][value=true][checked]").size must be (1)
       page.select("input[type=radio][name=hasWrittenGuidance][value=false]").size must be (1)
@@ -83,9 +76,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
       redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
     }
 
-
     "on post with invalid data" in new Fixture {
-
       val newRequest = request.withFormUrlEncodedBody(
         "hasWrittenGuidance" -> "grrrrr"
       )

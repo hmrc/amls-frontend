@@ -16,7 +16,7 @@ trait IdentifySuspiciousActivityController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_,_,Some(data))) =>
+        case Some(BusinessActivities(_, _, _, _, _, _, _, _, Some(data))) =>
           Ok(views.html.identify_suspicious_activity(Form2[IdentifySuspiciousActivity](data), edit))
         case _ =>
           Ok(views.html.identify_suspicious_activity(EmptyForm, edit))

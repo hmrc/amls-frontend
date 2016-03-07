@@ -16,7 +16,7 @@ trait NCARegisteredController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, _, Some(data),_)) =>
+        case Some(BusinessActivities(_, _, _, _, _, _, Some(data), _, _)) =>
           Ok(views.html.nca_registered(Form2[NCARegistered](data), edit))
         case _ =>
           Ok(views.html.nca_registered(EmptyForm, edit))

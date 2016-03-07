@@ -8,10 +8,11 @@ case class BusinessActivities(
                                expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
                                expectedAMLSTurnover: Option[ExpectedAMLSTurnover] = None,
                                businessFranchise: Option[BusinessFranchise] = None,
+                               transactionRecord: Option[TransactionRecord] = None,
                                customersOutsideUK: Option[CustomersOutsideUK] = None,
                                ncaRegistered: Option[NCARegistered] = None,
                                accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
-			       identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None
+                               identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None
                                ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
