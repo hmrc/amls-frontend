@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.businessactivities.{BusinessFranchise, AccountantForAMLSRegulations, BusinessActivities}
+import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
