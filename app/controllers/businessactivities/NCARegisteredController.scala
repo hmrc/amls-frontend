@@ -36,7 +36,7 @@ trait NCARegisteredController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.ExpectedBusinessTurnoverController.get())
+            case false => Redirect(routes.RiskAssessmentController.get())
           }
       }
     }

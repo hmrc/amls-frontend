@@ -40,7 +40,7 @@ trait RiskAssessmentController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.BusinessFranchiseController.get())
+            case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
           }
         }
       }
