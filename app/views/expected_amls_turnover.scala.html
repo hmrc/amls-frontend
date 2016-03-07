@@ -1,0 +1,31 @@
+@import include.{forms => deprecated, _}
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+
+@main(
+    title = Messages("businessactivities.turnover.title")
+) {
+
+    @heading("businessactivities.turnover.title", "summary.businessactivities")
+
+    @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
+        <span class="form-hint">
+            @Messages("businessactivities.turnover.line1.text")
+        </span>
+
+        @radioGroup(f("expectedAMLSTurnover")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.01", "01")
+            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.02", "02")
+            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.03", "03")
+            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.04", "04")
+            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.05", "05")
+            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.06", "06")
+            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.07", "07")
+
+        }
+        @submit(edit)
+    }
+}

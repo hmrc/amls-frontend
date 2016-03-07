@@ -8,19 +8,16 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.AmlsService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class MainSummaryControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   implicit val request = FakeRequest()
   val userId = s"user-${UUID.randomUUID}"
-  val mockAmlsService = mock[AmlsService]
   val mockAuthConnector = mock[AuthConnector]
 
   val mainSummaryController = new MainSummaryController {
     val authConnector = mockAuthConnector
-    val amlsService: AmlsService = mockAmlsService
   }
 
   "MainSummaryController" must {

@@ -13,17 +13,16 @@ trait RegisterServicesController  extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-
       dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) map {
-        case Some(BusinessMatching(Some(data))) =>
+        case Some(BusinessMatching(Some(data), _)) =>
           Ok(views.html.what_you_need_to_register(Form2[BusinessActivities](data), edit))
         case _ => Ok(views.html.what_you_need_to_register(EmptyForm, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    import play.api.data.mapping.forms.Rules._
-    implicit authContext => implicit request => {
+    implicit authContext => implicit request =>
+      import play.api.data.mapping.forms.Rules._
       Form2[BusinessActivities](request.body) match {
         case invalidForm : InvalidForm =>
           Future.successful(BadRequest(views.html.what_you_need_to_register(invalidForm, edit)))
@@ -31,18 +30,18 @@ trait RegisterServicesController  extends BaseController {
           for {
             businessMatching <- dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessMatching](BusinessMatching.key,
-              businessMatching.activities(data))
+              businessMatching.activities(data)
+            )
           } yield edit match {
-            case true =>
-              Redirect(routes.SummaryController.get())
-            case false => {
-              Redirect(routes.SummaryController.get())
-            }
+            case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+//            TODO
+//            case true =>
+//              Redirect(routes.SummaryController.get())
+//            case false =>
+//              Redirect(routes.SummaryController.get())
           }
       }
-    }
   }
-
 }
 
 object RegisterServicesController extends RegisterServicesController   {

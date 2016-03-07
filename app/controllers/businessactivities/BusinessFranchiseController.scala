@@ -15,7 +15,7 @@ trait BusinessFranchiseController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, Some(data), _)) =>
+        case Some(BusinessActivities(_, _, _, Some(data), _, _,_, _)) =>
           Ok(views.html.business_franchise_name(Form2[BusinessFranchise](data), edit))
         case _ =>
           Ok(views.html.business_franchise_name(EmptyForm, edit))

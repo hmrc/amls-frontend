@@ -25,14 +25,16 @@ private object AppDependencies {
 
   val compile = Seq(
     ws,
+    "uk.gov.hmrc" %% "http-verbs" % "3.3.0",
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
 
+
     // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % "3.0.0",
-    "uk.gov.hmrc" %% "play-partials" % "4.0.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.0.0",
+    "uk.gov.hmrc" %% "play-partials" % "4.2.0",
+    "uk.gov.hmrc" %% "play-authorised-frontend" % "4.6.0",
     "uk.gov.hmrc" %% "play-config" % "2.0.1",
     "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
     "uk.gov.hmrc" %% "http-caching-client" % "5.2.0",
@@ -45,25 +47,41 @@ private object AppDependencies {
     "io.github.jto" %% "validation-form" % "1.1" excludeAll playJars
   )
 
-  trait TestDependencies {
-    lazy val scope: String = "test"
-    lazy val test: Seq[ModuleID] = ???
+  trait ScopeDependencies {
+    val scope: String
+    val dependencies: Seq[ModuleID]
   }
 
   object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
+    def apply() = new ScopeDependencies {
+      override val scope = "test"
+      override lazy val dependencies = Seq(
         "org.scalatest" %% "scalatest" % "2.2.5" % scope,
         "org.scalatestplus" %% "play" % "1.2.0" % scope,
         "org.pegdown" % "pegdown" % "1.4.2" % scope,
         "org.jsoup" % "jsoup" % "1.7.2" % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "uk.gov.hmrc" %% "hmrctest" % "0.4.0" % scope
+        "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % scope
       )
-    }.test
+    }.dependencies
   }
 
-  def apply() = compile ++ Test()
+  object It {
+    def apply() = new ScopeDependencies {
+      override lazy val scope = "it"
+      override lazy val dependencies = Seq(
+        "org.scalatest" %% "scalatest" % "2.2.5" % scope,
+        "org.scalatestplus" %% "play" % "1.2.0" % scope,
+        "org.pegdown" % "pegdown" % "1.4.2" % scope,
+        "org.jsoup" % "jsoup" % "1.7.2" % scope,
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+        "uk.gov.hmrc" %% "hmrctest" % "1.4.0" % scope,
+        "uk.gov.hmrc" %% "auth-test" % "2.1.0" % "test, it"
+      )
+    }.dependencies
+  }
+
+  def apply() = compile ++ Test() ++It()
 }
 
 

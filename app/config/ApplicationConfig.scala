@@ -21,7 +21,12 @@ object ApplicationConfig extends ServicesConfig {
   lazy val betaFeedbackUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.authenticated")
   lazy val betaFeedbackUnauthenticatedUrl = (if (env == "Prod") "" else contactHost) + getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
-  lazy val reportAProblemUrl = contactHost + getConfigString(s"contact-frontend.report-a-problem-url")
+  lazy val reportAProblemUrl = contactHost + getConfigString("contact-frontend.report-a-problem-url")
 
   lazy val loginUrl = getConfigString("login.url")
+
+  lazy val amlsUrl = baseUrl("amls")
+  def subscriptionUrl(safeId: String) = s"$amlsUrl/amls/subscription/$safeId"
+
+  lazy val businessCustomerUrl = getConfigString("business-customer.url")
 }

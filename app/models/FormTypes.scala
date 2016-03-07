@@ -31,11 +31,14 @@ object FormTypes {
   val maxNonUKBankAccountNumberLength = 40
   val maxUKBankAccountNumberLength = 8
   val maxSortCodeLength = 6
+  val maxSoftwareNameLength = 40
   val maxFranchiseName = 140
+
+  val notEmptyStrip = Rule.zero[String] fmap { _.trim } compose notEmpty
 
   val indivNameType = notEmpty compose maxLength(maxNameTypeLength)
 
-  val descriptionType = notEmpty compose maxLength(maxDescriptionTypeLength)
+  val descriptionType = notEmptyStrip compose maxLength(maxDescriptionTypeLength)
 
   val prevMLRRegNoType = notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 
@@ -45,11 +48,11 @@ object FormTypes {
 
   val postcodeType = notEmpty compose maxLength(maxPostCodeTypeLength)
 
-  val countryType = notEmpty compose maxLength(maxCountryTypeLength)
+  val countryType = notEmpty compose maxLength(maxCountryTypeLength) compose pattern("^[a-zA-Z_]+$".r)
 
   val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
 
-  val emailType = notEmpty compose maxLength(maxEMailLength)
+  val emailType = notEmpty compose maxLength(maxEMailLength) compose pattern("^.+@.+$".r)
 
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
@@ -84,7 +87,7 @@ object FormTypes {
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
 
-  val accountNameType = notEmpty compose maxLength(maxAccountName)
+  val accountNameType = notEmptyStrip compose maxLength(maxAccountName)
 
   val sortCodeType = notEmpty compose maxLength(maxSortCodeLength) compose pattern("^[0-9]{6}".r)//compose pattern("\\d{2}-?\\d{2}-?\\d{2}".r)
 
@@ -94,8 +97,9 @@ object FormTypes {
 
   val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern("^[0-9a-zA-Z_]+$".r)
 
-  val franchiseNameType = notEmpty compose maxLength(maxFranchiseName)
+  val softwareNameType =  notEmptyStrip compose maxLength (maxSoftwareNameLength)
 
-  val OtherBusinessActivityType = notEmpty compose maxLength(maxOtherBusinessActivityTypeLength)
+  val franchiseNameType =  notEmptyStrip compose maxLength(maxFranchiseName)
 
+  val OtherBusinessActivityType = notEmptyStrip compose maxLength(maxOtherBusinessActivityTypeLength)
 }

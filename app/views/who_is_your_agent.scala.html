@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @main(
     title = Messages("tradingpremises.youragent.title")
@@ -11,7 +11,7 @@
 @heading("tradingpremises.youragent.heading", "summary.tradingpremises")
 
 
-@form(f, controllers.tradingpremises.routes.YourAgentController.post(edit)) {
+@form(f, controllers.tradingpremises.routes.YourAgentController.post(index, edit)) {
 
 
 <div class="form-field">
