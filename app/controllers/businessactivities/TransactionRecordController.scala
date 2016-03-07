@@ -10,7 +10,7 @@ import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-trait TransactionRecordController extends RepeatingSection with BaseController {
+trait TransactionRecordController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(edit : Boolean = false) = Authorised.async {

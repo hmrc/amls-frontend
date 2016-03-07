@@ -61,55 +61,50 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
     }
 
 
-   "write correct data for risk assessment value" in {
+    "write correct data for risk assessment value" in {
 
-     val model = Map(
-       "hasPolicy" -> Seq("true"),
-       "riskassessments" -> Seq("01", "02")
-     )
+      val model = Map(
+        "hasPolicy" -> Seq("true"),
+        "riskassessments" -> Seq("01", "02")
+      )
 
-     RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Set(PaperBased,Digital))) must
-       be(model)
+      RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must
+        be(model)
 
-   }
+    }
 
-     "JSON validation" must {
+    "JSON validation" must {
 
+      "successfully validate given values" in {
+        val json = Json.obj(
+          "hasPolicy" -> true,
+          "riskassessments" -> Seq("01", "02"))
 
-       "successfully validate given values" in {
-         val json =  Json.obj(
-           "hasPolicy" -> true,
-           "riskassessments" -> Seq("01","02"))
+        Json.fromJson[RiskAssessmentPolicy](json) must
+          be(JsSuccess(RiskAssessmentPolicyYes(formalRiskAssessments), JsPath \ "hasPolicy" \ "riskassessments"))
+      }
 
-         Json.fromJson[RiskAssessmentPolicy](json) must
-           be(JsSuccess(RiskAssessmentPolicyYes(formalRiskAssessments),  JsPath \ "hasPolicy" \ "riskassessments"))
-       }
+      "successfully validate given values with option No" in {
+        val json = Json.obj("hasPolicy" -> false)
 
-       "successfully validate given values with option No" in {
-         val json =  Json.obj("hasPolicy" -> false)
+        Json.fromJson[RiskAssessmentPolicy](json) must
+          be(JsSuccess(RiskAssessmentPolicyNo, JsPath \ "hasPolicy"))
+      }
 
-         Json.fromJson[RiskAssessmentPolicy](json) must
-           be(JsSuccess(RiskAssessmentPolicyNo, JsPath \ "hasPolicy"))
-       }
+      "fail when on invalid data" in {
+        Json.fromJson[RiskAssessmentPolicy](Json.obj("hasPolicy" -> true,"riskassessments" -> Seq("01","03"))) mustBe a[JsError]
+      }
 
-       "fail when on invalid data" in {
-         Json.fromJson[RiskAssessmentPolicy](Json.obj("hasPolicy" -> true,"riskassessments" -> Seq("01","03"))) mustBe a[JsError]
-       }
+      "write valid data in using json write" in {
+        Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must be(Json.obj("hasPolicy" -> true,
+          "riskassessments" -> Seq("01", "02")
+        ))
+      }
 
-       "write valid data in using json write" in {
-         Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must be (Json.obj("hasPolicy" -> true,
-           "riskassessments" -> Seq("01", "02")
-         ))
-       }
+      "write valid data in using json write with Option No" in {
+        Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicyNo) must be(Json.obj("hasPolicy" -> false))
+      }
 
-       "write valid data in using json write with Option No" in {
-         Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicyNo) must be (Json.obj("hasPolicy" -> false))
-       }
-
-
-     }
-
-
+    }
   }
-
 }

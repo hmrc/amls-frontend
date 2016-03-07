@@ -10,7 +10,7 @@ import utils.RepeatingSection
 import utils.RepeatingSection
 import scala.concurrent.Future
 
-trait RiskAssessmentController extends RepeatingSection with BaseController {
+trait RiskAssessmentController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 

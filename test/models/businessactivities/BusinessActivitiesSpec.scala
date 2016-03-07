@@ -108,42 +108,42 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "Merged with InvolvedInOther" in {
       val result = initial.involvedInOther(NewInvoledInOther)
-      result must be (BusinessActivities(Some(NewInvoledInOther), None, None, None, None, None , None, None, None))
+      result must be (BusinessActivities(Some(NewInvoledInOther)))
     }
 
     "Merged with ExcpectedBusinessTurnover" in {
       val result = initial.expectedBusinessTurnover(NewBusinessTurnover)
-      result must be (BusinessActivities(None, Some(NewBusinessTurnover), None, None, None, None , None, None, None))
+      result must be (BusinessActivities(None, Some(NewBusinessTurnover)))
     }
 
     "Merged with ExpectedAMLSTurnover" in {
       val result = initial.expectedAMLSTurnover(NewAMLSTurnover)
-      result must be (BusinessActivities(None, None, Some(NewAMLSTurnover), None, None, None, None, None, None))
+      result must be (BusinessActivities(None, None, Some(NewAMLSTurnover)))
     }
 
     "Merged with BusinessFranchise" in {
       val result = initial.businessFranchise(NewBusinessFranchise)
-      result must be (BusinessActivities(None, None, None, Some(NewBusinessFranchise), None, None, None, None, None))
+      result must be (BusinessActivities(None, None, None, Some(NewBusinessFranchise)))
     }
 
     "Merged with TransactionRecord" in {
       val result = initial.transactionRecord(NewTransactionRecord)
-      result must be (BusinessActivities(None, None, None, None, Some(NewTransactionRecord), None, None, None, None))
+      result must be (BusinessActivities(None, None, None, None, Some(NewTransactionRecord)))
     }
 
     "Merged with CustomersOutsideUK" in {
       val result = initial.customersOutsideUK(NewCustomersOutsideUK)
-      result must be (BusinessActivities(None, None, None, None, None, Some(NewCustomersOutsideUK), None, None, None))
+      result must be (BusinessActivities(None, None, None, None, None, Some(NewCustomersOutsideUK)))
     }
 
     "Merged with ncaRegistered" in {
       val result = initial.ncaRegistered(NewNCARegistered)
-      result must be (BusinessActivities(None, None, None, None, None, None, Some(NewNCARegistered), None, None))
+      result must be (BusinessActivities(None, None, None, None, None, None, Some(NewNCARegistered)))
     }
 
     "Merged with accountantForAMLSRegulations" in {
       val result = initial.accountantForAMLSRegulations(NewAccountantForAMLSRegulations)
-      result must be (BusinessActivities(None, None, None, None, None, None, None, Some(NewAccountantForAMLSRegulations), None))
+      result must be (BusinessActivities(None, None, None, None, None, None, None, Some(NewAccountantForAMLSRegulations)))
     }
 
 
