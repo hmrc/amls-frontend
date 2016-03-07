@@ -54,7 +54,7 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
         .thenReturn(Some(BusinessActivities(Some(InvolvedInOtherYes("test")))))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(None)
+        .thenReturn(Some(BusinessMatching()))
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))

@@ -13,13 +13,15 @@ import scala.concurrent.Future
 trait TransactionRecordController extends RepeatingSection with BaseController {
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit : Boolean = false) = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_ , _, _, _, Some(data), _,_, _)) =>
-          Ok(views.html.customer_transaction_records(Form2[TransactionRecord](data), edit))
-        case _ =>
-          Ok(views.html.customer_transaction_records(EmptyForm, edit))
+        response =>
+          val form = (for {
+            businessActivities <- response
+            transactionRecord <- businessActivities.transactionRecord
+          } yield Form2[TransactionRecord](transactionRecord)).getOrElse(EmptyForm)
+          Ok(views.html.customer_transaction_records(form, edit))
       }
   }
 

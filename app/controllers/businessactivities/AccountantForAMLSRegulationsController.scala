@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
+import models.businessactivities.{BusinessFranchise, AccountantForAMLSRegulations, BusinessActivities}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -16,10 +16,12 @@ trait AccountantForAMLSRegulationsController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, _,_, Some(data))) =>
-          Ok(views.html.accountant_for_amls_regulations(Form2[AccountantForAMLSRegulations](data), edit))
-        case _ =>
-          Ok(views.html.accountant_for_amls_regulations(EmptyForm, edit))
+        response =>
+          val form = (for {
+            businessActivities <- response
+            accountant <- businessActivities.accountantForAMLSRegulations
+          } yield Form2[AccountantForAMLSRegulations](accountant)).getOrElse(EmptyForm)
+          Ok(views.html.accountant_for_amls_regulations(form, edit))
       }
   }
 
