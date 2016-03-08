@@ -2,14 +2,12 @@
 
 GET         /assets/*file                               controllers.AssetsController.at(path="/public", file)
 
-GET         /                                           controllers.WelcomeController.get
-GET         /welcome                                    controllers.WelcomeController.get
+GET         /                                           controllers.LandingController.get()
+
+POST        /subscribe                                  controllers.SubscriptionController.post()
 
 GET         /unauthorised                               controllers.AmlsController.unauthorised
 GET         /summary                                    controllers.MainSummaryController.onPageLoad
-
-GET         /login                                      controllers.AmlsController.onPageLoad
-POST        /login                                      controllers.AmlsController.onSubmit
 
 GET         /about-you/your-details                    controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
 POST        /about-you/your-details                    controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)
@@ -40,41 +38,40 @@ GET         /business-details/summary                  controllers.aboutthebusin
 GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
 
 
-GET         /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.get(edit: Boolean ?= false)
-POST        /trading-premises/premises                 controllers.tradingpremises.WhereAreTradingPremisesController.post(edit: Boolean ?= false)
+GET         /trading-premises/premises/:index                       controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/premises/:index                       controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/agent                    controllers.tradingpremises.YourAgentController.get(edit: Boolean ?= false)
-POST        /trading-premises/agent                    controllers.tradingpremises.YourAgentController.post(edit: Boolean ?= false)
+GET         /trading-premises/agent/:index                          controllers.tradingpremises.YourAgentController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent/:index                          controllers.tradingpremises.YourAgentController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/summary                  controllers.tradingpremises.SummaryController.get()
-GET         /trading-premises/summary-own              controllers.tradingpremises.OwnSummaryController.get()
-GET         /trading-premises/summary-agent            controllers.tradingpremises.AgentSummaryController.get()
+GET         /trading-premises/what-does-your-business-do/:index     controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/what-does-your-business-do/:index     controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.get(edit: Boolean ?= false)
-POST        /trading-premises/what-does-your-business-do controllers.tradingpremises.WhatDoesYourBusinessDoController.post(edit: Boolean ?= false)
+GET         /trading-premises/summary                               controllers.tradingpremises.SummaryController.get()
+GET         /trading-premises/summary/:index                        controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
-GET         /estate-agents/index                       controllers.estateagentbusiness.WhatYouNeedController.get()
-GET         /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
-POST        /estate-agents/penalised                   controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
+GET         /estate-agents/index                        controllers.estateagentbusiness.WhatYouNeedController.get()
+GET         /estate-agents/penalised                    controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /estate-agents/penalised                    controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
-POST        /estate-agents/penalties                   controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
+GET         /estate-agents/penalties                    controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
+POST        /estate-agents/penalties                    controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/services                   controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
-POST        /estate-agents/services                   controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
+GET         /estate-agents/services                     controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
+POST        /estate-agents/services                     controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/redress-scheme             controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
-POST        /estate-agents/redress-scheme             controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
+GET         /estate-agents/redress-scheme               controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
+POST        /estate-agents/redress-scheme               controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/summary                     controllers.estateagentbusiness.SummaryController.get()
+GET         /estate-agents/summary                      controllers.estateagentbusiness.SummaryController.get()
 
 
-GET         /business-matching/activities              controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
-POST        /business-matching/activities              controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+GET         /business-matching/activities               controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /business-matching/activities               controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
-GET         /business-matching/summary                 controllers.businessmatching.SummaryController.get()
+GET         /business-matching/summary                  controllers.businessmatching.SummaryController.get()
 
-GET         /bank-details/index                        controllers.bankdetails.WhatYouNeedController.get()
+GET         /bank-details/index                         controllers.bankdetails.WhatYouNeedController.get()
 
 GET         /about-the-business/index                   controllers.aboutthebusiness.WhatYouNeedController.get()
 
@@ -86,11 +83,32 @@ GET         /business-activities/index                  controllers.businessacti
 GET         /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.get()
 POST        /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
-GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get()
+GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
+
+GET         /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
+
+GET         /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
 
 
 GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
+
+GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get()
+POST        /business-activities/records              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
+
+GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get()
+POST        /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)
+
+GET         /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.get()
+POST        /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
+
+GET         /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
+POST        /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
+
+GET         /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.get()
+POST        /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)

@@ -6,7 +6,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, Authority, ConfidenceLevel, OrgAccount}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.http.SessionKeys
 
 import scala.concurrent.Future
@@ -17,7 +17,7 @@ trait AuthorisedFixture extends MockitoSugar {
 
   val authority = Authority(
     "Test User",
-    Accounts(org = Some(OrgAccount("org/1234", Org("1234")))), None, None, ConfidenceLevel.L50
+    Accounts(org = Some(OrgAccount("org/1234", Org("1234")))), None, None, CredentialStrength.Strong ,ConfidenceLevel.L50
   )
 
   implicit val request = FakeRequest().withSession(

@@ -1,70 +1,62 @@
 @import include._
 @import models.tradingpremises._
 
-@(model: TradingPremises)(implicit request: Request[_], lang: Lang)
+@(model: Seq[TradingPremises])(implicit request: Request[_], lang: Lang)
 
 @main(
     title = Messages("summary.checkyouranswers.title")
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
-    <p>
-        @Messages("summary.linetext")
-    </p>
-        @model.yourTradingPremises.map { ytp=>
-        <table>
+
+    <div class="form-group">
+        <div class="panel-indent">
+            <p>
+                @Messages("summary.linetext")
+            </p>
+            <p>
+                <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(model.length + 1, false)"> @Messages("tradingpremises.summary.addanother") </a>
+            </p>
+        </div>
+    </div>
+
+    @model.zipWithIndex.map { case (tp, y) =>
+        <table class="summary">
             <tr>
-                <th class="summary-title">@Messages("summary.checkyouranswers.businesspremises.title")</th>
-                <td><a href="@controllers.tradingpremises.routes.OwnSummaryController.get()">@Messages("button.edit")</a></td>
+                <th class="summary-title" colspan="2">
+                    @tp.yourTradingPremises.map { ytp =>
+                        @ytp.tradingName
+                    }
+                </th>
+                <td><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
-                <td colspan="2">
-                    @ytp.tradingName
+                <td width="40%">
+                    @tp.yourTradingPremises.map { ytp =>
+                        <ul class="no-padding">
+                            @ytp.tradingPremisesAddress.toLines.map { l =>
+                                <li>@l</li>
+                            }
+                        </ul>
+                    }
                 </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @ytp.tradingPremisesAddress.toLines.map{ line =>
-                    @line
-                    <br>}
+                <td width="48%">
+                    @tp.whatDoesYourBusinessDoAtThisAddress.map { ba =>
+                        <ul class="no-padding">
+                            @ba.activities.map { a =>
+                                <li>@a.getMessage</li>
+                            }
+                        </ul>
+                    }
                 </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @{ytp.isOwner match { case true => "Own"
-                                            case _ => "Agent's"
-                    }}
+                <td>
+                    @tp.yourAgent.fold(Html(Messages("tradingpremises.summary.own"))) { _ =>
+                        @Messages("tradingpremises.summary.agents")
+                    }
                 </td>
             </tr>
         </table>
-        }
-    @model.yourAgent.map { agent=>
-    <table>
-        <tr>
-            <th class="summary-title">@Messages("summary.checkyouranswers.agentspremises.title")</th>
-            <td><a href="@controllers.tradingpremises.routes.AgentSummaryController.get()">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @agent.agentsRegisteredName.value
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @agent.businessStructure
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @{agent.taxType match {
-                case TaxTypeSelfAssesment => "Self Assessment"
-                case _ => "Corporation tax"
-                }}
-            </td>
-        </tr>
-    </table>
     }
-
 
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
 }

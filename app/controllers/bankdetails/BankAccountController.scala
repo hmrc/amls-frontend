@@ -26,12 +26,12 @@ trait BankAccountController extends RepeatingSection with BaseController {
 
   def post(index:Int = 0, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[BankAccount](request.body)(BankAccount.formRule) match {
+      Form2[BankAccount](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-            result <- updateData[BankDetails](index) {
+            _ <- updateData[BankDetails](index) {
               case Some(BankDetails(Some(x), _)) => Some(BankDetails(Some(x), Some(data)))
               case _ => data
             }

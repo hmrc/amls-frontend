@@ -1,8 +1,9 @@
 package utils
 
 import connectors.DataCacheConnector
-import play.api.libs.json
+import play.api.libs.json.Format
 import typeclasses.MongoKey
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -10,15 +11,57 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait RepeatingSection {
 
-  val dataCacheConnector: DataCacheConnector
+  def dataCacheConnector: DataCacheConnector
+
+  def getData[T]
+  (cache: CacheMap, index: Int)
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Option[T] =
+    getData[T](cache) match {
+      case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
+      case _ => None
+    }
+
+  def getData[T]
+  (cache: CacheMap)
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Seq[T] =
+    cache.getEntry[Seq[T]](key())
+      .fold(Seq.empty[T]) {
+        identity
+      }
+
+  def updateData[T]
+  (cache: CacheMap, index: Int)
+  (fn: Option[T] => Option[T])
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Future[_] = {
+    val data = getData[T](cache)
+    putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
+  }
 
   def getData[T]
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
-   formats: json.Format[T],
+   formats: Format[T],
    key: MongoKey[T],
-   ec :ExecutionContext
+   ec: ExecutionContext
   ): Future[Seq[T]] = {
     dataCacheConnector.fetchDataShortLivedCache[Seq[T]](key()) map {
       _.fold(Seq.empty[T]) {
@@ -32,12 +75,12 @@ trait RepeatingSection {
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
-   formats: json.Format[T],
+   formats: Format[T],
    key: MongoKey[T],
-   ec :ExecutionContext
+   ec: ExecutionContext
   ): Future[Option[T]] = {
     getData[T] map {
-      case accounts if index > 0 && index <= accounts.length + 1 => accounts lift (index - 1)
+      case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
       case _ => None
     }
   }
@@ -48,25 +91,25 @@ trait RepeatingSection {
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
-   formats: json.Format[T],
+   formats: Format[T],
    key: MongoKey[T],
-   ec :ExecutionContext
+   ec: ExecutionContext
   ): Future[_] =
     getData[T] map {
-      accounts => {
-        putData(accounts.patch(index - 1, fn(accounts.lift(index - 1)).toSeq, 1))
+      data => {
+        putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
       }
     }
 
   protected def putData[T]
-  (accounts: Seq[T])
+  (data: Seq[T])
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
-   formats: json.Format[T],
+   formats: Format[T],
    key: MongoKey[T],
-   ec :ExecutionContext
+   ec: ExecutionContext
   ): Future[_] =
-    dataCacheConnector.saveDataShortLivedCache[Seq[T]](key(), accounts)
+    dataCacheConnector.saveDataShortLivedCache[Seq[T]](key(), data)
 }
 
