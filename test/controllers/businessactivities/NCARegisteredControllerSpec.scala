@@ -109,7 +109,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessactivities.routes.RiskAssessmentController.get().url))
       }
 
     }
@@ -142,7 +142,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessactivities.routes.RiskAssessmentController.get().url))
     }
   }
 

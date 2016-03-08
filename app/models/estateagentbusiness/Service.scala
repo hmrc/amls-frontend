@@ -3,7 +3,6 @@ package models.estateagentbusiness
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
-import play.api.i18n.Messages
 import play.api.libs.json._
 
 case class Services(services: Set[Service])

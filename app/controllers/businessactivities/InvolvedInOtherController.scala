@@ -17,22 +17,20 @@ trait InvolvedInOtherController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
+      dataCacheConnector.fetchAll map {
+        optionalCache =>
+          (for {
+            cache <- optionalCache
+            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          } yield {
 
-      for {
-          allData <- dataCacheConnector.fetchAll
-        } yield {
-          allData match {
-          case Some(cacheData) => {
-            val businessMatching = cacheData.getEntry[BusinessMatching](BusinessMatching.key)
-            cacheData.getEntry[BusinessActivities](BusinessActivities.key) match {
-              case Some(BusinessActivities(Some(data), _, _, _,_, _, _, _, _)) =>
-                Ok(views.html.involved_in_other_name(Form2[InvolvedInOther](data), edit, businessMatching))
-              case _ =>
-                Ok(views.html.involved_in_other_name(EmptyForm, edit, businessMatching))
-            }
-          }
-          case _ =>  Ok(views.html.involved_in_other_name(EmptyForm, edit, None))
-        }
+            val x = for {
+              businessActivties <- cache.getEntry[BusinessActivities](BusinessActivities.key)
+              involvedInOther <- businessActivties.involvedInOther
+            } yield Ok(views.html.involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching))
+
+            x getOrElse Ok(views.html.involved_in_other_name(EmptyForm, edit, businessMatching))
+          }) getOrElse Ok(views.html.involved_in_other_name(EmptyForm, edit, None))
       }
   }
 

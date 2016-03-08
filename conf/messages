@@ -46,6 +46,9 @@ lbl.uk = UK
 lbl.overseas = Overseas
 lbl.select.all = Select all that apply
 
+lbl.residential = Residential
+lbl.nonresidential = Non-Residential
+
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
@@ -283,9 +286,9 @@ businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor's registration.
 
-businessactivities.confirm-activities.title = Is your business involved in other activities?
+businessactivities.confirm-activities.title = Does your business carry out any other activities?
 bankdetails.confirm-activities.subtitile =You''ve told us your business is involved in:
-bankdetails.confirm-activities.heading.subtitle.text = estateagentbusiness
+bankdeails.confirm-activities.heading.subtitle.text = estateagentbusiness
 businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.subtitle1 = Does your business carry out any other activities?
 businessactivities.confirm-activities.line1.text = Only list activities which relate to anti-money laundering supervision.
@@ -344,5 +347,8 @@ businessactivities.customer.outside.uk.title = Do you have customers who live ou
 businessactivities.hight.value.customer.lbl = Where do your most high-value customers live?
 businessactivities.hight.value.customer.lbl.hint = ''High value customers'' are those who bring in the most revenue to your business.
 businessactivities.upto.10.countries = List up to 10 countries.
-
-businessactivities.accountantForAMLSRegulations.title = Does your business use an accountant for matters relating to money laundering regulations?
+businessactivities.accountantForAMLSRegulations.title = Does your business use an accountant for matters relating to money laundering regulations?businessactivities.upto.10.countries = List up to 10 countries.
+businessactivities.riskassessment.policy.tile = Does your business have a formal risk assessment policy and procedure?
+businessactivities.paper.or.digital = Is it paper-based or digital?
+businessactivities.RiskAssessmentType.lbl.01 = Paper-based
+businessactivities.RiskAssessmentType.lbl.02 = Digital

@@ -16,10 +16,12 @@ trait IdentifySuspiciousActivityController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, _, _, _, Some(data))) =>
-          Ok(views.html.identify_suspicious_activity(Form2[IdentifySuspiciousActivity](data), edit))
-        case _ =>
-          Ok(views.html.identify_suspicious_activity(EmptyForm, edit))
+        response =>
+          val form = (for {
+            businessActivities <- response
+            identifySuspiciousActivity <- businessActivities.identifySuspiciousActivity
+          } yield Form2[IdentifySuspiciousActivity](identifySuspiciousActivity)).getOrElse(EmptyForm)
+          Ok(views.html.identify_suspicious_activity(form, edit))
       }
   }
 

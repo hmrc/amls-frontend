@@ -17,6 +17,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val DefaultCustomersOutsideUK = CustomersOutsideUKYes(Countries("GP"))
   val DefaultNCARegistered      = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
+  val DefaultRiskAssessments    = RiskAssessmentPolicyYes(Set(PaperBased))
 
 
   val NewFranchiseName          = "NEW FRANCHISE NAME"
@@ -29,6 +30,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val NewCustomersOutsideUK     = CustomersOutsideUKNo
   val NewNCARegistered          = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
+  val NewRiskAssessment         = RiskAssessmentPolicyNo
 
   "BusinessActivities" must {
 
@@ -54,7 +56,9 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "country_9" -> JsNull,
       "country_10" ->JsNull,
       "ncaRegistered" -> true,
-      "accountantForAMLSRegulations" -> true
+      "accountantForAMLSRegulations" -> true,
+      "hasPolicy" -> true,
+      "riskassessments" -> Seq("01")
     )
 
     val completeModel = BusinessActivities(involvedInOther = Some(DefaultInvolvedInOther),
@@ -64,7 +68,10 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
                                            transactionRecord = Some(DefaultTransactionRecord),
                                            customersOutsideUK = Some(DefaultCustomersOutsideUK),
                                            ncaRegistered = Some(DefaultNCARegistered),
-                                           accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations))
+                                           accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+                                           riskAssessmentPolicy = Some(DefaultRiskAssessments)
+                                          )
+
 
     "Serialise as expected" in {
       Json.toJson(completeModel) must be(completeJson)
@@ -101,22 +108,22 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "Merged with InvolvedInOther" in {
       val result = initial.involvedInOther(NewInvoledInOther)
-      result must be (BusinessActivities(Some(NewInvoledInOther), None, None, None, None))
+      result must be (BusinessActivities(Some(NewInvoledInOther)))
     }
 
     "Merged with ExcpectedBusinessTurnover" in {
       val result = initial.expectedBusinessTurnover(NewBusinessTurnover)
-      result must be (BusinessActivities(None, Some(NewBusinessTurnover), None, None, None))
+      result must be (BusinessActivities(None, Some(NewBusinessTurnover)))
     }
 
     "Merged with ExpectedAMLSTurnover" in {
       val result = initial.expectedAMLSTurnover(NewAMLSTurnover)
-      result must be (BusinessActivities(None, None, Some(NewAMLSTurnover), None, None))
+      result must be (BusinessActivities(None, None, Some(NewAMLSTurnover)))
     }
 
     "Merged with BusinessFranchise" in {
       val result = initial.businessFranchise(NewBusinessFranchise)
-      result must be (BusinessActivities(None, None, None, Some(NewBusinessFranchise), None))
+      result must be (BusinessActivities(None, None, None, Some(NewBusinessFranchise)))
     }
 
     "Merged with TransactionRecord" in {
@@ -140,6 +147,11 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     }
 
 
+    "Merged with RiskAssesment" in {
+      val result = initial.riskAssessmentspolicy(NewRiskAssessment)
+      result must be (BusinessActivities(riskAssessmentPolicy = Some(NewRiskAssessment)))
+    }
+
   }
 
   "BusinessActivities" must {
@@ -152,9 +164,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
                                    transactionRecord = Some(DefaultTransactionRecord),
                                   customersOutsideUK = Some(DefaultCustomersOutsideUK),
                                        ncaRegistered = Some(DefaultNCARegistered),
-                        accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations))
-
-
+                        accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+                                       riskAssessmentPolicy = Some(DefaultRiskAssessments))
 
 
     "involvedInOther" must {
@@ -167,7 +178,10 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(DefaultTransactionRecord),
           customersOutsideUK = Some(DefaultCustomersOutsideUK),
           ncaRegistered = Some(DefaultNCARegistered),
-          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)
+        ))
+
       }
     }
 
@@ -182,7 +196,9 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(DefaultTransactionRecord),
           customersOutsideUK = Some(DefaultCustomersOutsideUK),
           ncaRegistered = Some(DefaultNCARegistered),
-          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)
+        ))
       }
     }
 
@@ -198,7 +214,9 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(DefaultTransactionRecord),
           customersOutsideUK = Some(DefaultCustomersOutsideUK),
           ncaRegistered = Some(DefaultNCARegistered),
-          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)
+        ))
 
       }
     }
@@ -214,7 +232,9 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(DefaultTransactionRecord),
           customersOutsideUK = Some(DefaultCustomersOutsideUK),
           ncaRegistered = Some(DefaultNCARegistered),
-          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)
+        ))
       }
     }
 
@@ -228,7 +248,9 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(NewTransactionRecord),
           customersOutsideUK = Some(DefaultCustomersOutsideUK),
           ncaRegistered = Some(DefaultNCARegistered),
-          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)
+        ))
 
       }
     }
@@ -243,7 +265,9 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(DefaultTransactionRecord),
           customersOutsideUK = Some(NewCustomersOutsideUK),
           ncaRegistered = Some(DefaultNCARegistered),
-          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)
+        ))
       }
     }
 
@@ -257,7 +281,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(DefaultTransactionRecord),
           customersOutsideUK = Some(DefaultCustomersOutsideUK),
           ncaRegistered = Some(NewNCARegistered),
-          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)))
 
       }
     }
@@ -272,8 +297,27 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           transactionRecord = Some(DefaultTransactionRecord),
           customersOutsideUK = Some(DefaultCustomersOutsideUK),
           ncaRegistered = Some(DefaultNCARegistered),
-          accountantForAMLSRegulations = Some(NewAccountantForAMLSRegulations)))
+          accountantForAMLSRegulations = Some(NewAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(DefaultRiskAssessments)
+        ))
 
+      }
+    }
+
+
+    "RiskAssessment" must {
+      "return BusinessActivities object with correct riskAssessmentPolicy set" in {
+        val result = initial.riskAssessmentspolicy(NewRiskAssessment)
+        result must be (BusinessActivities(involvedInOther = Some(DefaultInvolvedInOther),
+          expectedBusinessTurnover = Some(DefaultBusinessTurnover),
+          expectedAMLSTurnover = Some(DefaultAMLSTurnover),
+          businessFranchise = Some(DefaultBusinessFranchise),
+          transactionRecord = Some(DefaultTransactionRecord),
+          customersOutsideUK = Some(DefaultCustomersOutsideUK),
+          ncaRegistered = Some(DefaultNCARegistered),
+          accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+          riskAssessmentPolicy = Some(NewRiskAssessment)
+        ))
       }
     }
 

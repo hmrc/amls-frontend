@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.estateagentbusiness.{RedressScheme, Residential, EstateAgentBusiness, Service}
+import models.estateagentbusiness._
 
 import scala.concurrent.Future
 
@@ -15,10 +15,12 @@ trait ResidentialRedressSchemeController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
-        case Some(EstateAgentBusiness(_,Some(data), _, _)) =>
-          Ok(views.html.registered_with_redress_scheme(Form2[RedressScheme](data), edit))
-        case _ =>
-          Ok(views.html.registered_with_redress_scheme(EmptyForm, edit))
+        response =>
+          val form = (for {
+            estateAgentBusiness <- response
+            redressScheme <- estateAgentBusiness.redressScheme
+          } yield Form2[RedressScheme](redressScheme)).getOrElse(EmptyForm)
+          Ok(views.html.registered_with_redress_scheme(form, edit))
       }
   }
 

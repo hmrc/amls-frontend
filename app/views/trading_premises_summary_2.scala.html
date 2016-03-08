@@ -35,15 +35,16 @@
                     </ul>
                 </td>
             </tr>
+
             <tr>
                 <td colspan="2">
-                    @yta.isOwner match {
-                        case true => {
-                            @Messages("tradingpremises.yourtradingpremises.whose.my")
-                        }
-                        case false => {
-                            @Messages("tradingpremises.yourtradingpremises.whose.another")
-                        }
+                    @yta.isResidential match {
+                    case true => {
+                    @Messages("lbl.residential")
+                    }
+                    case false => {
+                    @Messages("lbl.nonresidential")
+                    }
                     }
                 </td>
             </tr>
@@ -55,18 +56,6 @@
                 </td>
             </tr>
 
-            <tr>
-                <td colspan="2">
-                    @yta.isResidential match {
-                        case true => {
-                            @Messages("lbl.yes")
-                        }
-                        case false => {
-                            @Messages("lbl.no")
-                        }
-                    }
-                </td>
-            </tr>
         </table>
     }
 
@@ -76,13 +65,11 @@
                 <th class="summary-title">
                     @Messages("summary.checkyouranswers.businesspremises.section2")
                 </th>
-                @if(wdbd.activities.size >1) {
                 <td>
                     <a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true)">
                         @Messages("button.edit")
                     </a>
                 </td>
-                }
 
             </tr>
             <tr>
