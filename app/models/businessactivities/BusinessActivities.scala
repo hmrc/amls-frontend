@@ -12,6 +12,7 @@ case class BusinessActivities(
                                customersOutsideUK: Option[CustomersOutsideUK] = None,
                                ncaRegistered: Option[NCARegistered] = None,
                                accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
+                               identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None,
                                riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None
                                ) {
 
@@ -27,6 +28,9 @@ case class BusinessActivities(
   def involvedInOther(p: InvolvedInOther): BusinessActivities =
     this.copy(involvedInOther = Some(p))
 
+  def identifySuspiciousActivity(p: IdentifySuspiciousActivity): BusinessActivities =
+    this.copy(identifySuspiciousActivity = Some(p))
+  
   def transactionRecord(p: TransactionRecord): BusinessActivities =
     this.copy(transactionRecord = Some(p))
 
@@ -60,6 +64,7 @@ object BusinessActivities {
     __.read[Option[CustomersOutsideUK]] and
     __.read[Option[NCARegistered]] and
     __.read[Option[AccountantForAMLSRegulations]] and
+    __.read[Option[IdentifySuspiciousActivity]] and
     __.read[Option[RiskAssessmentPolicy]]
     )(BusinessActivities.apply _)
 
@@ -74,6 +79,7 @@ object BusinessActivities {
       Json.toJson(model.customersOutsideUK).asOpt[JsObject],
       Json.toJson(model.ncaRegistered).asOpt[JsObject],
       Json.toJson(model.accountantForAMLSRegulations).asOpt[JsObject],
+      Json.toJson(model.identifySuspiciousActivity).asOpt[JsObject],
       Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject]
     ).flatten.fold(Json.obj()){
      _ ++ _

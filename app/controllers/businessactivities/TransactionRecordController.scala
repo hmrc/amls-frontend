@@ -38,8 +38,8 @@ trait TransactionRecordController extends BaseController {
               businessActivity.transactionRecord(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.BusinessFranchiseController.get())
+            case true => Redirect(routes.IdentifySuspiciousActivityController.get())
+            case false => Redirect(routes.IdentifySuspiciousActivityController.get())
           }
         }
       }

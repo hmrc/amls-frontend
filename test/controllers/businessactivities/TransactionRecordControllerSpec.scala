@@ -75,7 +75,7 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BusinessFranchiseController.get().url))
+      redirectLocation(result) must be(Some(routes.IdentifySuspiciousActivityController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
@@ -94,7 +94,7 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.IdentifySuspiciousActivityController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
