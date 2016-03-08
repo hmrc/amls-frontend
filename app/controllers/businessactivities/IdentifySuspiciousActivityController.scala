@@ -3,13 +3,13 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
+import forms._
+import models.businessactivities.{BusinessActivities, _}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait AccountantForAMLSRegulationsController extends BaseController {
+trait IdentifySuspiciousActivityController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
@@ -19,33 +19,34 @@ trait AccountantForAMLSRegulationsController extends BaseController {
         response =>
           val form = (for {
             businessActivities <- response
-            accountant <- businessActivities.accountantForAMLSRegulations
-          } yield Form2[AccountantForAMLSRegulations](accountant)).getOrElse(EmptyForm)
-          Ok(views.html.accountant_for_amls_regulations(form, edit))
+            identifySuspiciousActivity <- businessActivities.identifySuspiciousActivity
+          } yield Form2[IdentifySuspiciousActivity](identifySuspiciousActivity)).getOrElse(EmptyForm)
+          Ok(views.html.identify_suspicious_activity(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      Form2[AccountantForAMLSRegulations](request.body) match {
+  def post(edit : Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      Form2[IdentifySuspiciousActivity](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.accountant_for_amls_regulations(f, edit)))
+          Future.successful(BadRequest(views.html.identify_suspicious_activity(f, edit)))
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
-              businessActivities.accountantForAMLSRegulations(data)
+              businessActivities.identifySuspiciousActivity(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.WhatYouNeedController.get())
+              //todo : Implement the correct redirects when relevant pages are available
+            case true => Redirect(routes.NCARegisteredController.get())
+            case false => Redirect(routes.NCARegisteredController.get())
+
           }
       }
-    }
   }
 }
 
-object AccountantForAMLSRegulationsController extends AccountantForAMLSRegulationsController {
+object IdentifySuspiciousActivityController extends IdentifySuspiciousActivityController {
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

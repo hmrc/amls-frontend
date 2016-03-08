@@ -14,14 +14,16 @@ trait TransactionRecordController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, Some(data), _, _, _, _, _)) =>
-          Ok(views.html.customer_transaction_records(Form2[TransactionRecord](data), edit))
-        case _ =>
-          Ok(views.html.customer_transaction_records(EmptyForm, edit))
+        response =>
+          val form = (for {
+            businessActivities <- response
+            transactionRecord <- businessActivities.transactionRecord
+          } yield Form2[TransactionRecord](transactionRecord)).getOrElse(EmptyForm)
+          Ok(views.html.customer_transaction_records(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[TransactionRecord](request.body) match {
         case f: InvalidForm =>
@@ -34,8 +36,8 @@ trait TransactionRecordController extends BaseController {
               businessActivity.transactionRecord(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.BusinessFranchiseController.get())
+            case true => Redirect(routes.IdentifySuspiciousActivityController.get())
+            case false => Redirect(routes.IdentifySuspiciousActivityController.get())
           }
         }
       }

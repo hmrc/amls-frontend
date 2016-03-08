@@ -13,18 +13,18 @@ trait RiskAssessmentController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
+    implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, _, _, _, Some(data), _)) =>
-          Ok(views.html.risk_assessment_policy(Form2[RiskAssessmentPolicy](data), edit))
-        case _ =>
-          Ok(views.html.risk_assessment_policy(EmptyForm, edit))
+        response =>
+          val form = (for {
+            businessActivities <- response
+            riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
+          } yield Form2[RiskAssessmentPolicy](riskAssessmentPolicy)).getOrElse(EmptyForm)
+          Ok(views.html.risk_assessment_policy(form, edit))
       }
   }
 
-
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(edit : Boolean = false) = Authorised.async {
     import play.api.data.mapping.forms.Rules._
     implicit authContext => implicit request =>
       Form2[RiskAssessmentPolicy](request.body) match {

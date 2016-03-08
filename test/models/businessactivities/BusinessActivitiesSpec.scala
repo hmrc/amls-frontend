@@ -149,7 +149,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "Merged with RiskAssesment" in {
       val result = initial.riskAssessmentspolicy(NewRiskAssessment)
-      result must be (BusinessActivities(None, None, None, None, None, None, None, None, Some(NewRiskAssessment)))
+      result must be (BusinessActivities(riskAssessmentPolicy = Some(NewRiskAssessment)))
     }
 
   }

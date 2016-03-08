@@ -48,7 +48,7 @@ class RiskAssessmentControllerSpec extends PlaySpec with MockitoSugar with OneSe
     "pre-populate the Risk assessment Page" in new Fixture  {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, None, None, None, Some(RiskAssessmentPolicyYes(Set(PaperBased)))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy =  Some(RiskAssessmentPolicyYes(Set(PaperBased)))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -70,7 +70,7 @@ class RiskAssessmentControllerSpec extends PlaySpec with MockitoSugar with OneSe
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, None, None, None, Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))))))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -89,7 +89,7 @@ class RiskAssessmentControllerSpec extends PlaySpec with MockitoSugar with OneSe
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, None, None, None, Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital)))))))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

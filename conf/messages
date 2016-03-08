@@ -46,6 +46,9 @@ lbl.uk = UK
 lbl.overseas = Overseas
 lbl.select.all = Select all that apply
 
+lbl.residential = Residential
+lbl.nonresidential = Non-Residential
+
 ## Login Page
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
@@ -289,6 +292,8 @@ bankdeails.confirm-activities.heading.subtitle.text = estateagentbusiness
 businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.subtitle1 = Does your business carry out any other activities?
 businessactivities.confirm-activities.line1.text = Only list activities which relate to anti-money laundering supervision.
+
+businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 
 businessactivities.turnover.title = How much turnover do you expect in the next 12 months, from activities related to anti-money laundering supervision?
 businessactivities.turnover.line1.text = We may consider your business a greater risk if you have a high turnover.
