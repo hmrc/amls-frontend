@@ -109,3 +109,6 @@ POST        /business-activities/crime-agency              controllers.businessa
 
 GET         /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
+
+GET         /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.get()
+POST        /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)

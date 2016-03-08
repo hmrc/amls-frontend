@@ -16,7 +16,7 @@ trait AccountantForAMLSRegulationsController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, _,_, Some(data))) =>
+        case Some(BusinessActivities(_, _, _, _, _, _,_, Some(data), _)) =>
           Ok(views.html.accountant_for_amls_regulations(Form2[AccountantForAMLSRegulations](data), edit))
         case _ =>
           Ok(views.html.accountant_for_amls_regulations(EmptyForm, edit))
