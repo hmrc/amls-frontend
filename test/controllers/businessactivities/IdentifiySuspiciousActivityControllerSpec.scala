@@ -73,7 +73,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -103,7 +103,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be("URL for check your answers page")
+      redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
     }
   }
 }

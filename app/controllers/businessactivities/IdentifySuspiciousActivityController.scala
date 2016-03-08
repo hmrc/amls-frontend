@@ -36,8 +36,8 @@ trait IdentifySuspiciousActivityController extends BaseController {
             )
           } yield edit match {
               //todo : Implement the correct redirects when relevant pages are available
-            case true => Status(418)  // I'm a teapot - will be "Summary"
-            case false => Status(418)  // I'm a teapot - will be "Have you registered with NCA"
+            case true => Redirect(routes.NCARegisteredController.get())
+            case false => Redirect(routes.NCARegisteredController.get())
 
           }
       }
