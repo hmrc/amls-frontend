@@ -36,8 +36,8 @@ trait HowManyEmployeesController extends BaseController {
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
               businessActivities.employees(data))
           } yield edit match {
-            case true => NotImplemented
-            case false => Redirect(routes.HowManyEmployeesController.get())
+            case true => Redirect(routes.CustomersOutsideUKController.get())
+            case false => Redirect(routes.CustomersOutsideUKController.get())
           }
       }
     }

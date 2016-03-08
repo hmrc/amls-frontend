@@ -44,7 +44,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "on get display the how many employees page with pre populated data" in new Fixture {
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, Some(HowManyEmployees("163", "17"))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, None, None, None, Some(HowManyEmployees("163", "17"))))))
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include("163")
@@ -67,7 +67,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.HowManyEmployeesController.get().url))
+      redirectLocation(result) must be(Some(routes.CustomersOutsideUKController.get().url))
     }
 
     "on post without data" in new Fixture {
@@ -77,7 +77,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
       )
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      val document: Document  = Jsoup.parse(contentAsString(result))
+      val document: Document = Jsoup.parse(contentAsString(result))
       document.select("span").html() must include("This field is required")
     }
 
@@ -88,7 +88,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
       )
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      val document: Document  = Jsoup.parse(contentAsString(result))
+      val document: Document = Jsoup.parse(contentAsString(result))
       document.select("span").html() must include("Maximum length is 11")
     }
 
@@ -107,12 +107,12 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val resultTrue = controller.post(true)(newRequest)
-      status(resultTrue) must be(NOT_IMPLEMENTED)
-      //redirectLocation(resultTrue) must be(Some(routes.HowManyEmployeesController.get()))
+      //status(resultTrue) must be(NOT_IMPLEMENTED)
+      redirectLocation(resultTrue) must be(Some(routes.CustomersOutsideUKController.get().url))
 
       val resultFalse = controller.post(false)(newRequest)
-      status(resultFalse) must be(SEE_OTHER)
-      redirectLocation(resultFalse) must be(Some(routes.HowManyEmployeesController.get().url))
+      //status(resultFalse) must be(SEE_OTHER)
+      redirectLocation(resultFalse) must be(Some(routes.CustomersOutsideUKController.get().url))
     }
   }
 }
