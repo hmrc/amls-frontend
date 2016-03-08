@@ -4,47 +4,48 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, CustomersOutsideUK}
-import utils.RepeatingSection
+import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy}
 
 import scala.concurrent.Future
 
-trait CustomersOutsideUKController extends RepeatingSection with BaseController {
+trait RiskAssessmentController extends BaseController {
+
   val dataCacheConnector: DataCacheConnector
 
-
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, Some(data), _, _, _, _)) =>
-          Ok(views.html.customers_outside_uk(Form2[CustomersOutsideUK](data), edit))
+        case Some(BusinessActivities(_, _, _, _, _, _, _, _, Some(data), _)) =>
+          Ok(views.html.risk_assessment_policy(Form2[RiskAssessmentPolicy](data), edit))
         case _ =>
-          Ok(views.html.customers_outside_uk(EmptyForm, edit))
+          Ok(views.html.risk_assessment_policy(EmptyForm, edit))
       }
   }
 
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[CustomersOutsideUK](request.body) match {
+      Form2[RiskAssessmentPolicy](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.customers_outside_uk(f, edit)))
+          Future.successful(BadRequest(views.html.risk_assessment_policy(f, edit)))
         case ValidForm(_, data) => {
           for {
             businessActivity <-
             dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
-              businessActivity.customersOutsideUK(data)
+              businessActivity.riskAssessmentspolicy(data)
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.BusinessFranchiseController.get())
+            case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
           }
         }
       }
   }
 }
 
-object CustomersOutsideUKController extends CustomersOutsideUKController {
+object RiskAssessmentController extends RiskAssessmentController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

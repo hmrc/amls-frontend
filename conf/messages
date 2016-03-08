@@ -342,8 +342,16 @@ businessactivities.customer.outside.uk.title = Do you have customers who live ou
 businessactivities.hight.value.customer.lbl = Where do your most high-value customers live?
 businessactivities.hight.value.customer.lbl.hint = ''High value customers'' are those who bring in the most revenue to your business.
 businessactivities.upto.10.countries = List up to 10 countries.
+<<<<<<< HEAD
 
 businessactivities.accountantForAMLSRegulations.title = Does your business use an accountant for matters relating to money laundering regulations?
 
 businessactivities.employees.title = How many employees does your business have?
 businessactivities.employees.line2.text = How many are directly involved in activities related to anti-money laundering supervision?
+=======
+businessactivities.accountantForAMLSRegulations.title = Does your business use an accountant for matters relating to money laundering regulations?businessactivities.upto.10.countries = List up to 10 countries.
+businessactivities.riskassessment.policy.tile = Does your business have a formal risk assessment policy and procedure?
+businessactivities.paper.or.digital = Is it paper-based or digital?
+businessactivities.RiskAssessmentType.lbl.01 = Paper-based
+businessactivities.RiskAssessmentType.lbl.02 = Digital
+>>>>>>> master

@@ -16,7 +16,7 @@ trait NCARegisteredController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, _, _, Some(data), _, _)) =>
+        case Some(BusinessActivities(_, _, _, _, _, _, Some(data),_, _, _)) =>
           Ok(views.html.nca_registered(Form2[NCARegistered](data), edit))
         case _ =>
           Ok(views.html.nca_registered(EmptyForm, edit))
@@ -36,7 +36,7 @@ trait NCARegisteredController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.ExpectedBusinessTurnoverController.get())
+            case false => Redirect(routes.RiskAssessmentController.get())
           }
       }
     }

@@ -9,6 +9,7 @@ case class BusinessActivities(
                                customersOutsideUK: Option[CustomersOutsideUK] = None,
                                ncaRegistered: Option[NCARegistered] = None,
                                accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
+                               riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
                                howManyEmployees: Option[HowManyEmployees] = None
                              ) {
 
@@ -36,6 +37,9 @@ case class BusinessActivities(
   def accountantForAMLSRegulations(p: AccountantForAMLSRegulations): BusinessActivities =
     this.copy(accountantForAMLSRegulations = Some(p))
 
+  def riskAssessmentspolicy(p: RiskAssessmentPolicy) : BusinessActivities =
+    this.copy(riskAssessmentPolicy = Some(p))
+
   def employees(p: HowManyEmployees): BusinessActivities =
     this.copy(howManyEmployees = Some(p))
 
@@ -57,6 +61,7 @@ object BusinessActivities {
       __.read[Option[CustomersOutsideUK]] and
       __.read[Option[NCARegistered]] and
       __.read[Option[AccountantForAMLSRegulations]] and
+      __.read[Option[RiskAssessmentPolicy]] and
       __.read[Option[HowManyEmployees]]
     ) (BusinessActivities.apply _)
 
@@ -71,6 +76,7 @@ object BusinessActivities {
         Json.toJson(model.customersOutsideUK).asOpt[JsObject],
         Json.toJson(model.ncaRegistered).asOpt[JsObject],
         Json.toJson(model.accountantForAMLSRegulations).asOpt[JsObject],
+        Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _

@@ -5,17 +5,16 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, TransactionRecord}
-import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-trait TransactionRecordController extends RepeatingSection with BaseController {
+trait TransactionRecordController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, _, _, _, Some(data), _, _, _, _)) =>
+        case Some(BusinessActivities(_, _, _, _, Some(data), _, _, _, _, _)) =>
           Ok(views.html.customer_transaction_records(Form2[TransactionRecord](data), edit))
         case _ =>
           Ok(views.html.customer_transaction_records(EmptyForm, edit))

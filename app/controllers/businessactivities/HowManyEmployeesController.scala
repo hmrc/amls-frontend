@@ -17,7 +17,7 @@ trait HowManyEmployeesController extends BaseController {
     implicit authContext =>
       implicit request => {
         dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-          case Some(BusinessActivities(_, _, _, _, _, _, _, _, Some(data))) =>
+          case Some(BusinessActivities(_, _, _, _, _, _, _, _, _, Some(data))) =>
             Ok(views.html.business_employees(Form2[HowManyEmployees](data), edit))
           case _ =>
             Ok(views.html.business_employees(EmptyForm, edit))

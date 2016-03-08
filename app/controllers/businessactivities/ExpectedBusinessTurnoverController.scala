@@ -6,7 +6,6 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities._
 
-
 import scala.concurrent.Future
 
 trait ExpectedBusinessTurnoverController extends BaseController {
@@ -16,7 +15,7 @@ trait ExpectedBusinessTurnoverController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, Some(data), _, _, _, _, _, _, _)) => Ok(views.html.expected_business_turnover(Form2[ExpectedBusinessTurnover](data), edit))
+        case Some(BusinessActivities(_, Some(data), _, _, _, _, _, _, _, _)) => Ok(views.html.expected_business_turnover(Form2[ExpectedBusinessTurnover](data), edit))
         case _ => Ok(views.html.expected_business_turnover(EmptyForm, edit))
       }
   }
