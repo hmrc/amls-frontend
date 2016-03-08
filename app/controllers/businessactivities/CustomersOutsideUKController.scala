@@ -3,8 +3,8 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.businessactivities.{CustomersOutsideUK, BusinessActivities}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessactivities.{BusinessActivities, CustomersOutsideUK}
 import utils.RepeatingSection
 
 import scala.concurrent.Future
@@ -24,7 +24,7 @@ trait CustomersOutsideUKController extends RepeatingSection with BaseController 
       }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[CustomersOutsideUK](request.body) match {
         case f: InvalidForm =>
@@ -46,6 +46,6 @@ trait CustomersOutsideUKController extends RepeatingSection with BaseController 
 }
 
 object CustomersOutsideUKController extends CustomersOutsideUKController {
-    override val authConnector = AMLSAuthConnector
-    override val dataCacheConnector = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
+  override val dataCacheConnector = DataCacheConnector
 }

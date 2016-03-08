@@ -36,8 +36,8 @@ trait BusinessFranchiseController extends BaseController {
               businessActivities.businessFranchise(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.WhatYouNeedController.get())
+            case true => Redirect(routes.HowManyEmployeesController.get())
+            case false => Redirect(routes.HowManyEmployeesController.get())
           }
       }
     }

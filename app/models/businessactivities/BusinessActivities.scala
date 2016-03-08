@@ -1,8 +1,5 @@
 package models.businessactivities
 
-import controllers.businessactivities.AccountantForAMLSRegulationsController
-import models.businessactivities.AccountantForAMLSRegulations
-
 case class BusinessActivities(
                                involvedInOther: Option[InvolvedInOther] = None,
                                expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
@@ -13,8 +10,9 @@ case class BusinessActivities(
                                ncaRegistered: Option[NCARegistered] = None,
                                accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
                                identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None,
-                               riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None
-                               ) {
+                               riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
+                               howManyEmployees: Option[HowManyEmployees] = None
+                             ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
     this.copy(businessFranchise = Some(p))
@@ -30,7 +28,7 @@ case class BusinessActivities(
 
   def identifySuspiciousActivity(p: IdentifySuspiciousActivity): BusinessActivities =
     this.copy(identifySuspiciousActivity = Some(p))
-  
+
   def transactionRecord(p: TransactionRecord): BusinessActivities =
     this.copy(transactionRecord = Some(p))
 
@@ -43,8 +41,11 @@ case class BusinessActivities(
   def accountantForAMLSRegulations(p: AccountantForAMLSRegulations): BusinessActivities =
     this.copy(accountantForAMLSRegulations = Some(p))
 
-  def riskAssessmentspolicy(p: RiskAssessmentPolicy) : BusinessActivities =
+  def riskAssessmentspolicy(p: RiskAssessmentPolicy): BusinessActivities =
     this.copy(riskAssessmentPolicy = Some(p))
+
+  def employees(p: HowManyEmployees): BusinessActivities =
+    this.copy(howManyEmployees = Some(p))
 
 }
 
@@ -57,33 +58,35 @@ object BusinessActivities {
 
   implicit val reads: Reads[BusinessActivities] = (
     __.read[Option[InvolvedInOther]] and
-    __.read[Option[ExpectedBusinessTurnover]] and
-    __.read[Option[ExpectedAMLSTurnover]] and
-    __.read[Option[BusinessFranchise]] and
-    __.read[Option[TransactionRecord]] and
-    __.read[Option[CustomersOutsideUK]] and
-    __.read[Option[NCARegistered]] and
-    __.read[Option[AccountantForAMLSRegulations]] and
-    __.read[Option[IdentifySuspiciousActivity]] and
-    __.read[Option[RiskAssessmentPolicy]]
-    )(BusinessActivities.apply _)
+      __.read[Option[ExpectedBusinessTurnover]] and
+      __.read[Option[ExpectedAMLSTurnover]] and
+      __.read[Option[BusinessFranchise]] and
+      __.read[Option[TransactionRecord]] and
+      __.read[Option[CustomersOutsideUK]] and
+      __.read[Option[NCARegistered]] and
+      __.read[Option[AccountantForAMLSRegulations]] and
+      __.read[Option[IdentifySuspiciousActivity]] and
+      __.read[Option[RiskAssessmentPolicy]] and
+      __.read[Option[HowManyEmployees]]
+    ) (BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
-  model =>
-    Seq(
-      Json.toJson(model.involvedInOther).asOpt[JsObject],
-      Json.toJson(model.expectedBusinessTurnover).asOpt[JsObject],
-      Json.toJson(model.expectedAMLSTurnover).asOpt[JsObject],
-      Json.toJson(model.businessFranchise).asOpt[JsObject],
-      Json.toJson(model.transactionRecord).asOpt[JsObject],
-      Json.toJson(model.customersOutsideUK).asOpt[JsObject],
-      Json.toJson(model.ncaRegistered).asOpt[JsObject],
-      Json.toJson(model.accountantForAMLSRegulations).asOpt[JsObject],
-      Json.toJson(model.identifySuspiciousActivity).asOpt[JsObject],
-      Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject]
-    ).flatten.fold(Json.obj()){
-     _ ++ _
-    }
+    model =>
+      Seq(
+        Json.toJson(model.involvedInOther).asOpt[JsObject],
+        Json.toJson(model.expectedBusinessTurnover).asOpt[JsObject],
+        Json.toJson(model.expectedAMLSTurnover).asOpt[JsObject],
+        Json.toJson(model.businessFranchise).asOpt[JsObject],
+        Json.toJson(model.transactionRecord).asOpt[JsObject],
+        Json.toJson(model.customersOutsideUK).asOpt[JsObject],
+        Json.toJson(model.ncaRegistered).asOpt[JsObject],
+        Json.toJson(model.accountantForAMLSRegulations).asOpt[JsObject],
+        Json.toJson(model.identifySuspiciousActivity).asOpt[JsObject],
+        Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
+        Json.toJson(model.howManyEmployees).asOpt[JsObject]
+      ).flatten.fold(Json.obj()) {
+        _ ++ _
+      }
   }
 
   implicit def default(businessActivities: Option[BusinessActivities]): BusinessActivities =

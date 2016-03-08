@@ -3,8 +3,8 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.businessactivities.{NCARegistered, BusinessActivities}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessactivities.{BusinessActivities, NCARegistered}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future

@@ -3,10 +3,8 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.bankdetails.{BankAccountType, BankDetails}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, TransactionRecord}
-import utils.RepeatingSection
 
 import scala.concurrent.Future
 
@@ -47,6 +45,6 @@ trait TransactionRecordController extends BaseController {
 }
 
 object TransactionRecordController extends TransactionRecordController {
-    override val authConnector = AMLSAuthConnector
-    override val dataCacheConnector = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
+  override val dataCacheConnector = DataCacheConnector
 }

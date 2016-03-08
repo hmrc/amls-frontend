@@ -6,7 +6,6 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities._
 
-
 import scala.concurrent.Future
 
 trait ExpectedBusinessTurnoverController extends BaseController {

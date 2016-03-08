@@ -3,11 +3,9 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.bankdetails.{BankAccountType, BankDetails}
-import models.businessactivities.{RiskAssessmentPolicy, BusinessActivities}
-import utils.RepeatingSection
-import utils.RepeatingSection
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy}
+
 import scala.concurrent.Future
 
 trait RiskAssessmentController extends BaseController {

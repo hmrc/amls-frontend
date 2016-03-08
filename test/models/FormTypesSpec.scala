@@ -244,12 +244,12 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate an email without a `@` in it" in {
 
       emailType.validate("foo") must
-        be (a[Failure[_, _]])
+        be(a[Failure[_, _]])
 
-//       TODO: fix regex equalities
-//        be(Failure(Seq(
-//          Path -> Seq(ValidationError("error.pattern", "^.+@.+$".r))
-//        )))
+      //       TODO: fix regex equalities
+      //        be(Failure(Seq(
+      //          Path -> Seq(ValidationError("error.pattern", "^.+@.+$".r))
+      //        )))
     }
   }
 
@@ -463,8 +463,22 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail validation if country containts numbers" in {
       val test = "^[a-zA-Z_]+$".r
       countryType.validate("12") mustBe a[Failure[_, _]]
-//        Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "^[a-zA-Z_]+$".r))))
+      //        Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "^[a-zA-Z_]+$".r))))
 
     }
   }
+
+  "For the How many employees page" must {
+    "validate employee count field length supplied" in {
+      employeeCountType.validate("12345678912345") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxEmployeeLength)))))
+    }
+
+    "fail validation if employee count field is not supplied" in {
+      employeeCountType.validate("") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+    }
+  }
+
+
 }
