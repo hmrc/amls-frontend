@@ -44,7 +44,8 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "on get display the how many employees page with pre populated data" in new Fixture {
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, None, None, None, None, None, None, None, Some(HowManyEmployees("163", "17"))))))
+        (any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessActivities(None, None, None, None, None, None, None, None, None, None, Some(HowManyEmployees("163", "17"))))))
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include("163")
