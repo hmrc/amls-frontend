@@ -15,10 +15,12 @@ trait BusinessServicesController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
-        case Some(EstateAgentBusiness(Some(data), _, _, _)) =>
-          Ok(views.html.business_servicess_EAB(Form2[Services](data), edit))
-        case _ =>
-          Ok(views.html.business_servicess_EAB(EmptyForm, edit))
+        response =>
+          val form = (for {
+            estateAgentBusiness <- response
+            accountant <- estateAgentBusiness.services
+          } yield Form2[Services](accountant)).getOrElse(EmptyForm)
+          Ok(views.html.business_servicess_EAB(form, edit))
       }
   }
 

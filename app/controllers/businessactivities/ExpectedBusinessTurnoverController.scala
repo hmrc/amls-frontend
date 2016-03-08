@@ -16,8 +16,12 @@ trait ExpectedBusinessTurnoverController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
-        case Some(BusinessActivities(_, Some(data), _, _,_ ,_, _, _, _)) => Ok(views.html.expected_business_turnover(Form2[ExpectedBusinessTurnover](data), edit))
-        case _ => Ok(views.html.expected_business_turnover(EmptyForm, edit))
+        response =>
+          val form = (for {
+            businessActivities <- response
+            expectedTurnover <- businessActivities.expectedBusinessTurnover
+          } yield Form2[ExpectedBusinessTurnover](expectedTurnover)).getOrElse(EmptyForm)
+          Ok(views.html.expected_business_turnover(form, edit))
       }
   }
 

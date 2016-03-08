@@ -13,12 +13,15 @@ trait PenalisedUnderEstateAgentsActController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+    implicit authContext => implicit request =>
       dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
-        case Some(EstateAgentBusiness(_, _, _, Some(data))) => Ok(views.html.penalised_under_estate_agents_act(Form2[PenalisedUnderEstateAgentsAct](data), edit))
-        case _ => Ok(views.html.penalised_under_estate_agents_act(EmptyForm, edit))
+        response =>
+          val form = (for {
+            estateAgentBusiness <- response
+            estateAgentsAct <- estateAgentBusiness.penalisedUnderEstateAgentsAct
+          } yield Form2[PenalisedUnderEstateAgentsAct](estateAgentsAct)).getOrElse(EmptyForm)
+          Ok(views.html.penalised_under_estate_agents_act(form, edit))
       }
-    }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
