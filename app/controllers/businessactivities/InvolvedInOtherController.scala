@@ -31,7 +31,6 @@ trait InvolvedInOtherController extends BaseController {
 
             x getOrElse Ok(views.html.involved_in_other_name(EmptyForm, edit, businessMatching))
           }) getOrElse Ok(views.html.involved_in_other_name(EmptyForm, edit, None))
-
       }
   }
 

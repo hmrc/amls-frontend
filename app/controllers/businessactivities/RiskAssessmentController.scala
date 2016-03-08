@@ -5,12 +5,13 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
 import models.bankdetails.{BankAccountType, BankDetails}
-import models.businessactivities.{BusinessActivities, TransactionRecord}
+import models.businessactivities.{RiskAssessmentPolicy, BusinessActivities}
 import utils.RepeatingSection
-
+import utils.RepeatingSection
 import scala.concurrent.Future
 
-trait TransactionRecordController extends BaseController {
+trait RiskAssessmentController extends BaseController {
+
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -19,34 +20,35 @@ trait TransactionRecordController extends BaseController {
         response =>
           val form = (for {
             businessActivities <- response
-            transactionRecord <- businessActivities.transactionRecord
-          } yield Form2[TransactionRecord](transactionRecord)).getOrElse(EmptyForm)
-          Ok(views.html.customer_transaction_records(form, edit))
+            riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
+          } yield Form2[RiskAssessmentPolicy](riskAssessmentPolicy)).getOrElse(EmptyForm)
+          Ok(views.html.risk_assessment_policy(form, edit))
       }
   }
 
   def post(edit : Boolean = false) = Authorised.async {
+    import play.api.data.mapping.forms.Rules._
     implicit authContext => implicit request =>
-      Form2[TransactionRecord](request.body) match {
+      Form2[RiskAssessmentPolicy](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.customer_transaction_records(f, edit)))
+          Future.successful(BadRequest(views.html.risk_assessment_policy(f, edit)))
         case ValidForm(_, data) => {
           for {
             businessActivity <-
             dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
-              businessActivity.transactionRecord(data)
+              businessActivity.riskAssessmentspolicy(data)
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.BusinessFranchiseController.get())
+            case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
           }
         }
       }
   }
 }
 
-object TransactionRecordController extends TransactionRecordController {
-    override val authConnector = AMLSAuthConnector
-    override val dataCacheConnector = DataCacheConnector
+object RiskAssessmentController extends RiskAssessmentController {
+  override val authConnector = AMLSAuthConnector
+  override val dataCacheConnector = DataCacheConnector
 }
