@@ -1,0 +1,28 @@
+@import forms.Form2
+@import include.{main, heading, registered_office}
+@import include.forms2._
+@import utils.CommonHelper._
+@import models.aboutthebusiness._
+
+@(f: Form2[_])(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("")
+) {
+
+    @heading("businessmatching.businessType.title", "summary.businessmatching")
+
+    @form(f, controllers.businessmatching.routes.BusinessTypeController.post()) {
+
+        @radioGroup(f("businessType")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("businessType"), "businessmatching.businessType.lbl.01", "01")
+            @radio(f("businessType"), "businessmatching.businessType.lbl.02", "02")
+            @radio(f("businessType"), "businessmatching.businessType.lbl.03", "03")
+            @radio(f("businessType"), "businessmatching.businessType.lbl.04", "04")
+            @radio(f("businessType"), "businessmatching.businessType.lbl.05", "05")
+        }
+
+        @submit(false)
+    }
+}
