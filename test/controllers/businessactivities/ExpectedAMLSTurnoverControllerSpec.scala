@@ -47,7 +47,7 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneServerPerSuite
     "on get display the Role Within Business page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, None, Some(First), None, None))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(expectedAMLSTurnover = Some(First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)

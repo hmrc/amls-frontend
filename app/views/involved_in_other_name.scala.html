@@ -15,11 +15,11 @@ title = Messages("businessactivities.confirm-activities.title")
 @heading("businessactivities.confirm-activities.title", "summary.businessactivities")
 
     <div class="form-group">
-        @bmModel.activities.map {a=>
-            @a.businessActivities.map {line =>
-            <span><strong> @Messages("bankdetails.confirm-activities.subtitile")</strong> </span>
-            <div class="panel-indent">
-                    @line match {
+        <p>@Messages("bankdetails.confirm-activities.subtitile")</p>
+        @bmModel.activities.map { a=>
+        <div class="panel-indent panel-border-wide">
+        @a.businessActivities.map {line =>
+             @line match {
                         case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
                         case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
                         case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
@@ -29,8 +29,8 @@ title = Messages("businessactivities.confirm-activities.title")
                         case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
                     }
                 <br>
-            </div>
             }
+        </div>
         }
     </div>
 

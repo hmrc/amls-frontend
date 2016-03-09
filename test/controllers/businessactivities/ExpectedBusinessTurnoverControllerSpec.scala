@@ -42,7 +42,7 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
     "on get display the Expected Business Turnover page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None, Some(ExpectedBusinessTurnover.First)))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)

@@ -192,3 +192,7 @@ table.summary ul li {
 .no-margin {
     margin-left: 0
 }
+
+.panel-border-wide {
+    border-left-width: 10px;
+}

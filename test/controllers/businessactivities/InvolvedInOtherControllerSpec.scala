@@ -51,7 +51,7 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
       val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(BusinessActivities(Some(InvolvedInOtherYes("test")))))
+        .thenReturn(Some(BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching()))
