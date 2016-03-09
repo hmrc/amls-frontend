@@ -44,7 +44,7 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
 
     "on get display the is your business a franchise page with pre populated data" in new Fixture {
       when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(None,None, None, Some(BusinessFranchiseYes("test test")), None))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(businessFranchise = Some(BusinessFranchiseYes("test test"))))))
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include ("test test")
