@@ -3,7 +3,6 @@ package controllers.bankdetails
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.bankdetails._
-import models.estateagentbusiness.EstateAgentBusiness
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -34,20 +33,19 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     "load the summary page when section data is available" in new Fixture {
 
       val model = BankDetails(None, None)
-
       when(controller.dataCache.fetchDataShortLivedCache[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
-
       val result = controller.get()(request)
+
       status(result) must be(OK)
     }
 
-    "redirect to the main summary page when section data is unavailable" in new Fixture {
+    "redirect to the main amls summary page when section data is unavailable" in new Fixture {
 
       when(controller.dataCache.fetchDataShortLivedCache[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
-
       val result = controller.get()(request)
+      redirectLocation(result) must be(Some("/anti-money-laundering/summary"))
       status(result) must be(SEE_OTHER)
     }
   }
