@@ -1,10 +1,10 @@
 package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
-import connectors.{KeystoreConnector$, DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, BusinessCustomerDetails, ConfirmRegisteredOffice}
+import models.aboutthebusiness.{AboutTheBusiness, ConfirmRegisteredOffice}
 
 import scala.concurrent.Future
 

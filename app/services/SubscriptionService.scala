@@ -30,7 +30,12 @@ trait SubscriptionService extends DataCacheService {
         } map {
           reviewDetails =>
             val request = SubscriptionRequest(
-              acknowledgmentReference = None,
+              businessType =
+                for {
+                  businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                  reviewDetails <- businessMatching.reviewDetails
+                  businessType <- reviewDetails.businessType
+                } yield businessType,
               eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
               aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
               tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
