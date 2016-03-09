@@ -8,7 +8,6 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
@@ -30,7 +29,6 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     }
   }
 
-
   "SummaryController" must {
 
     "load the summary page when the model is present" in new Fixture {
@@ -42,20 +40,33 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
       status(result) must be(OK)
     }
 
-    "load the pre page when the model is not present" in new Fixture {
 
+    "redirect to the main amls summary page when section data is unavailable" in new Fixture {
+
+      when(summaryController.dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+      val result = summaryController.get()(request)
+      redirectLocation(result) must be(Some("/anti-money-laundering/summary"))
+      status(result) must be(SEE_OTHER)
+    }
+
+    "for an individual display the trading premises summary page for individual" in new Fixture {
+
+      val model = TradingPremises()
+      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+      val result = summaryController.getIndividual(1)(request)
+      status(result) must be(OK)
+    }
+
+
+    "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
       when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
-
-      val result: Future[Result] = summaryController.get()(request)
-
-      println(contentAsString(result))
-
-
+      val result = summaryController.getIndividual(any())(request)
+      redirectLocation(result) must be(Some("/anti-money-laundering/trading-premises/summary"))
       status(result) must be(SEE_OTHER)
-
     }
 
   }
-
 }
