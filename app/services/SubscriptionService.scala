@@ -36,7 +36,7 @@ trait SubscriptionService extends DataCacheService {
                   reviewDetails <- businessMatching.reviewDetails
                   businessType <- reviewDetails.businessType
                 } yield businessType,
-              eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)
+              eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
               aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
               tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
               bankDetailsSection = cache.getEntry[Seq[BankDetails]](BankDetails.key)
