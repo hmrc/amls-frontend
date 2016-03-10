@@ -66,6 +66,9 @@ POST        /estate-agents/redress-scheme               controllers.estateagentb
 GET         /estate-agents/summary                      controllers.estateagentbusiness.SummaryController.get()
 
 
+GET         /business-matching/business-type            controllers.businessmatching.BusinessTypeController.get()
+POST        /business-matching/business-type            controllers.businessmatching.BusinessTypeController.post()
+
 GET         /business-matching/activities               controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
 POST        /business-matching/activities               controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 

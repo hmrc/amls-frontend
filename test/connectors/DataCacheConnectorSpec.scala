@@ -6,7 +6,7 @@ import builders.AuthBuilder
 import config.AmlsShortLivedCache
 import org.mockito.Matchers
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.Json
@@ -16,7 +16,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.Future
 
 
-class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with IntegrationPatience {
 
   val mockShortLivedCache = mock[ShortLivedCache]
   val userId = s"user-${UUID.randomUUID}"
