@@ -9,7 +9,7 @@ case class BusinessMatching(
   def activities(ba: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(ba))
 
-  def safeId(s: ReviewDetails): BusinessMatching =
+  def reviewDetails(s: ReviewDetails): BusinessMatching =
     this.copy(reviewDetails = Some(s))
 }
 

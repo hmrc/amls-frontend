@@ -38,7 +38,7 @@ trait CustomersOutsideUKController extends RepeatingSection with BaseController 
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.BusinessFranchiseController.get())
+            case false => Redirect(routes.TransactionRecordController.get())
           }
         }
       }
