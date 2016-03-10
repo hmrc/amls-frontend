@@ -18,12 +18,8 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
 
   val dataCacheConnector: DataCacheConnector
 
-  private def data
-  (index: Int, edit: Boolean)
-  (implicit
-   ac: AuthContext,
-   hc: HeaderCarrier
-  ): Future[Either[Result, (CacheMap, Set[BusinessActivity])]] =
+  private def data(index: Int, edit: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier)
+  : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
     dataCacheConnector.fetchAll map {
       cache =>
         type Tupe = (CacheMap, Set[BusinessActivity])
@@ -38,12 +34,13 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
           }
         } yield (c, activities))
           .fold[Either[Result, Tupe]] {
-            // TODO: Need to think about what we should do in case of this error
-            Left(Redirect(routes.WhereAreTradingPremisesController.get(index, edit)))
-          } {
-            t => Right(t)
-          }
+          // TODO: Need to think about what we should do in case of this error
+          Left(Redirect(routes.WhereAreTradingPremisesController.get(index, edit)))
+        } {
+          t => Right(t)
+        }
     }
+  }
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -72,8 +69,8 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             }
           }
         case Left(result) => Future.successful(result)
-        }
       }
+  }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
