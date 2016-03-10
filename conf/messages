@@ -53,13 +53,6 @@ lbl.nonresidential = Non-Residential
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
-# Sections
-
-aboutyou.sectiontitle = About you
-aboutthebusiness.sectiontitle = About the business
-estateagentbusiness.sectiontitle = Estate agent business
-businessactivities.sectiontitle = Business Activities
-
 # Individual pages
 
 summary.title = Your AMLS registration
