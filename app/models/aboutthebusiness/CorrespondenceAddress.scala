@@ -51,7 +51,6 @@ case class NonUKCorrespondenceAddress(
                                      ) extends CorrespondenceAddress
 
 object CorrespondenceAddress {
-
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] =
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
@@ -110,26 +109,23 @@ object CorrespondenceAddress {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
-    (__ \ "isUK").read[Boolean] flatMap {
-      case true => (
-          (__ \ "yourName").read[String] and
-          (__ \ "businessName").read[String] and
-          (__ \ "correspondenceAddressLine1").read[String] and
-          (__ \ "correspondenceAddressLine2").read[String] and
-          (__ \ "correspondenceAddressLine3").readNullable[String] and
-          (__ \ "correspondenceAddressLine4").readNullable[String] and
-          (__ \ "correspondencePostCode").read[String]
-        )(UKCorrespondenceAddress.apply _)
-      case false => (
-          (__ \ "yourName").read[String] and
-          (__ \ "businessName").read[String] and
-          (__ \ "correspondenceAddressLine1").read[String] and
-          (__ \ "correspondenceAddressLine2").read[String] and
-          (__ \ "correspondenceAddressLine3").readNullable[String] and
-          (__ \ "correspondenceAddressLine4").readNullable[String] and
-          (__ \ "correspondenceCountry").read[String]
-        )(NonUKCorrespondenceAddress.apply _)
-    }
+    (__ \ "correspondencePostCode").read[String] andKeep (
+      ((__ \ "yourName").read[String] and
+        (__ \ "businessName").read[String] and
+        (__ \ "correspondenceAddressLine1").read[String] and
+        (__ \ "correspondenceAddressLine2").read[String] and
+        (__ \ "correspondenceAddressLine3").readNullable[String] and
+        (__ \ "correspondenceAddressLine4").readNullable[String] and
+        (__ \ "correspondencePostCode").read[String])(UKCorrespondenceAddress.apply _) map identity[CorrespondenceAddress]
+      ) orElse (
+      ((__ \ "yourName").read[String] and
+        (__ \ "businessName").read[String] and
+        (__ \ "correspondenceAddressLine1").read[String] and
+        (__ \ "correspondenceAddressLine2").read[String] and
+        (__ \ "correspondenceAddressLine3").readNullable[String] and
+        (__ \ "correspondenceAddressLine4").readNullable[String] and
+        (__ \ "correspondenceCountry").read[String])(NonUKCorrespondenceAddress.apply _)
+      )
   }
 
   implicit val jsonWrites: Writes[CorrespondenceAddress] = {
@@ -155,7 +151,7 @@ object CorrespondenceAddress {
           (__ \ "correspondenceAddressLine2").write[String] and
           (__ \ "correspondenceAddressLine3").writeNullable[String] and
           (__ \ "correspondenceAddressLine4").writeNullable[String] and
-          (__ \ "correspondencePostCode").write[String]
+          (__ \ "correspondenceCountry").write[String]
         )(unlift(NonUKCorrespondenceAddress.unapply)).writes(a)
     }
   }
