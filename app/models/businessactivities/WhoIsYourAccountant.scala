@@ -15,7 +15,6 @@ case class WhoIsYourAccountant(name: String,
 
 object WhoIsYourAccountant {
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   val key = "who-is-your-accountant"
