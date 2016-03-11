@@ -120,3 +120,6 @@ POST        /business-activities/risk-assessment         controllers.businessact
 
 GET         /business-activities/employees              controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
 POST        /business-activities/employees              controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
+
+GET         /business-activities/who-is-your-accountant controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
+POST        /business-activities/who-is-your-accountant controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
