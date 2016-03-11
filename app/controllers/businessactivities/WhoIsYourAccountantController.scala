@@ -41,10 +41,8 @@ trait WhoIsYourAccountantController extends BaseController {
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
               businessActivity.whoIsYourAccountant(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
-          }
+          } yield Redirect(routes.WhatYouNeedController.get())
+
         }
       }
   }
