@@ -22,15 +22,16 @@
                 }
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                @model.involvedInOther.map {
-                    case InvolvedInOtherNo => { @Messages("lbl.na") }
-                    case InvolvedInOtherYes(v) => { @v }
-                }
-            </td>
-        </tr>
-
+        @model.involvedInOther.map {
+            case InvolvedInOtherNo => { @Messages("lbl.na") }
+            case InvolvedInOtherYes(v) => {
+            <tr>
+                <td colspan="2">
+                    @v
+                </td>
+            </tr>
+            }
+        }
     </table>
     @model.expectedBusinessTurnover.map { turnover =>
         <table>
@@ -63,12 +64,12 @@
                 <td colspan="2">
                     @turnover match {
                         case ExpectedAMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
-                        case ExpectedAMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.01") }
-                        case ExpectedAMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.01") }
-                        case ExpectedAMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.01") }
-                        case ExpectedAMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.01") }
-                        case ExpectedAMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.01") }
-                        case ExpectedAMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case ExpectedAMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
+                        case ExpectedAMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
+                        case ExpectedAMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
+                        case ExpectedAMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
+                        case ExpectedAMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
+                        case ExpectedAMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
                     }
                 </td>
             </tr>
@@ -87,14 +88,17 @@
                 }
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                @model.businessFranchise.map {
-                    case BusinessFranchiseNo => { @Messages("lbl.na") }
-                    case BusinessFranchiseYes(v) => { @v }
-                }
-            </td>
-        </tr>
+        @model.businessFranchise.map {
+            case BusinessFranchiseNo => { }
+            case BusinessFranchiseYes(name) => {
+                <tr>
+                    <td colspan="2">
+                        @name
+                    </td>
+                </tr>
+            }
+        }
+
     </table>
     @model.howManyEmployees.map { employees =>
         <table>
@@ -162,6 +166,7 @@
                                     case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
                                     case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"):@software}
                                 }
+                                <br>
                             }
                         }
                     }
@@ -207,10 +212,10 @@
         </tr>
         <tr>
             <td colspan="2">
-            @model.riskAssessmentPolicy.map {
-                case RiskAssessmentPolicyNo => { @Messages("lbl.no") }
-                case RiskAssessmentPolicyYes(v) => { @Messages("lbl.yes") }
-            }
+                @model.riskAssessmentPolicy.map {
+                    case RiskAssessmentPolicyNo => { @Messages("lbl.no") }
+                    case RiskAssessmentPolicyYes(v) => { @Messages("lbl.yes") }
+                }
             </td>
         </tr>
         <tr>
@@ -223,7 +228,24 @@
                                 case PaperBased => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
                                 case Digital => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
                             }
+                            <br>
                         }
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("businessactivities.accountantForAMLSRegulations.title")</th>
+            <td colspan="2"><a href="@controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.accountantForAMLSRegulations.map {x=>
+                    @x.accountantForAMLSRegulations match {
+                        case true =>  { @Messages("lbl.yes") }
+                        case false =>  { @Messages("lbl.no") }
                     }
                 }
             </td>
