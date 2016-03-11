@@ -37,8 +37,8 @@ trait AccountantForAMLSRegulationsController extends BaseController {
               businessActivities.accountantForAMLSRegulations(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.WhatYouNeedController.get())
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.SummaryController.get())
           }
       }
     }

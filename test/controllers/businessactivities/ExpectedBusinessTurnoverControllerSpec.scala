@@ -82,7 +82,7 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
     }
 
 

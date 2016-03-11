@@ -362,3 +362,4 @@ businessactivities.employees.line2.text = How many are directly involved in acti
 businessactivities.summary.anticipated.turnover = Anticipated total business turnover for the next 12 months
 businessactivities.summary.anticipated.mlr.turnover = Anticipated MLR activity turnover for the next 12 months
 businessactivities.summary.employees = Employees
+businessactivities.summary.directly.involved.text = directly involved in MLR activities

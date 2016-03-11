@@ -21,9 +21,10 @@ sealed trait CustomersOutsideUK {
         values.country_9.getOrElse(""),
         values.country_10.getOrElse("")
       )
-    case CustomersOutsideUKNo => Seq("No")
+    case CustomersOutsideUKNo => Seq.empty
   }
 }
+
 
 case object CustomersOutsideUKNo extends  CustomersOutsideUK
 

@@ -94,7 +94,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
       }
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
@@ -108,7 +108,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
       }
 
     }
@@ -126,7 +126,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
     }
 
     "successfully redirect to the page on selection of Option 'No' when edit mode is off" in new Fixture {
@@ -141,7 +141,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
     }
   }
 

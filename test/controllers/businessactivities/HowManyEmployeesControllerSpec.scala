@@ -109,7 +109,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       val resultTrue = controller.post(true)(newRequest)
       //status(resultTrue) must be(NOT_IMPLEMENTED)
-      redirectLocation(resultTrue) must be(Some(routes.CustomersOutsideUKController.get().url))
+      redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
 
       val resultFalse = controller.post(false)(newRequest)
       //status(resultFalse) must be(SEE_OTHER)
