@@ -39,10 +39,10 @@ object AccountantsAddress extends AccountantsAddress {
           ) (UkAccountantsAddress.apply _)
       case false =>
         (
-          (__ \ "addressLineNonUK1").read(addressType) and
-            (__ \ "addressLineNonUK2").read(addressType) and
-            (__ \ "addressLineNonUK3").read(optionR(addressType)) and
-            (__ \ "addressLineNonUK4").read(optionR(addressType)) and
+          (__ \ "addressLine1").read(addressType) and
+            (__ \ "addressLine2").read(addressType) and
+            (__ \ "addressLine3").read(optionR(addressType)) and
+            (__ \ "addressLine4").read(optionR(addressType)) and
             (__ \ "country").read(countryType)
           ) (NonUkAccountantsAddress.apply _)
     }

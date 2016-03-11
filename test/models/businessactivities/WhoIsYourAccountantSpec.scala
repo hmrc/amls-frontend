@@ -29,10 +29,6 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
   "WhoIsYourAccountant" must {
 
-    "Successfully validate a valid form" in  {
-      val form = Map ("")
-    }
-
 
     "successfully complete a round robin json conversion" in {
       WhoIsYourAccountant.formats.reads(

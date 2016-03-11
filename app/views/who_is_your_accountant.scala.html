@@ -24,46 +24,32 @@ labelText = "businessactivities.whoisyouraccountant.tradingName"
 
 @inlineRadioGroup(f("isUK")) {
 @legend("TODO", jsHidden = true)
-@radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-@radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
+@radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}-field")
+@radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}-field")
 }
 
-@fieldset(
-legend = "TODO",
-panel = false,
-jsHidden = true,
-id = s"${f("postCode").id}-fieldset") {
-<legend class="form-label-bold">
-    @Messages("businessactivities.whoisyouraccountant.address")
-</legend>
-@input(f("addressLine1"))
-@input(f("addressLine2"))
-@input(f("addressLine3"))
-@input(f("addressLine4"))
-    @input(
-        field = f("postCode"),
-        labelText = "businessactivities.whoisyouraccountant.postCode",
-        classes = Seq("postcode")
-    )
-}
-
-@fieldset(
-legend = "TODO",
-panel = false,
-jsHidden = true,
-id = s"${f("country").id}-fieldset") {
-<legend class="form-label-bold">
-    @Messages("businessactivities.whoisyouraccountant.address")
-</legend>
-@input(f("addressLine1"))
-@input(f("addressLine2"))
-@input(f("addressLine3"))
-@input(f("addressLine4"))
-    @input(
-        field = f("country"),
-        labelText = "businessactivities.whoisyouraccountant.country"
-    )
-}
+<fieldset>
+    <legend class="form-label-bold">
+        @Messages("businessactivities.whoisyouraccountant.address")
+    </legend>
+    @input(f("addressLine1"))
+    @input(f("addressLine2"))
+    @input(f("addressLine3"))
+    @input(f("addressLine4"))
+    @fieldset(id=s"${f("postCode").id}-field", legend="POSTCODE", jsHidden=true, panel=false){
+        @input(
+            field = f("postCode"),
+            labelText = "businessactivities.whoisyouraccountant.postCode",
+            classes = Seq("postcode")
+        )
+    }
+    @fieldset(id=s"${f("country").id}-field", legend="COuntry", jsHidden=true, panel=false){
+        @input(
+            field = f("country"),
+            labelText = "businessactivities.whoisyouraccountant.country"
+        )
+    }
+</fieldset>
 
 <p class="form-label-bold">@Messages("businessactivities.whoisyouraccountant.taxMessage")</p>
 

@@ -24,15 +24,14 @@ trait WhoIsYourAccountantController extends BaseController {
           val form = (for {
             businessActivities <- response
             whoIsYourAccountant <- businessActivities.whoIsYourAccountant
-          } yield Form2(defaultValues)).getOrElse(Form2(defaultValues))
+          } yield Form2(whoIsYourAccountant)).getOrElse(Form2(defaultValues))
           Ok(views.html.who_is_your_accountant(form, edit))
       }
   }
 
   def post(edit : Boolean = false) = Authorised.async {
-    import play.api.data.mapping.forms.Rules._
     implicit authContext => implicit request =>
-      Form2(request.body) match {
+      Form2[WhoIsYourAccountant](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.who_is_your_accountant(f, edit)))
         case ValidForm(_, data) => {
@@ -40,7 +39,7 @@ trait WhoIsYourAccountantController extends BaseController {
             businessActivity <-
             dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
-              businessActivity//.whoIsYourAccountant(data)
+              businessActivity.whoIsYourAccountant(data)
             )
           } yield edit match {
             case true => Redirect(routes.WhatYouNeedController.get())
@@ -49,7 +48,6 @@ trait WhoIsYourAccountantController extends BaseController {
         }
       }
   }
-
 }
 
 object WhoIsYourAccountantController extends WhoIsYourAccountantController {
