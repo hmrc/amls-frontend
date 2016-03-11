@@ -8,61 +8,76 @@
 title = Messages("businessactivities.whoisyouraccountant.title")
 ) {
 
-@heading("businessactivities.whoisyouraccountant.heading")
+@heading("businessactivities.whoisyouraccountant.heading", "summary.businessactivities")
 
-@form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(index, edit)) {
+@form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
 
 @input(
 field = f("name"),
-labelText = "businessactivities.whoisyouraccountant.name",
+labelText = "businessactivities.whoisyouraccountant.name"
 )
 
 @input(
 field = f("tradingName"),
-labelText = "businessactivities.whoisyouraccountant.tradingName",
+labelText = "businessactivities.whoisyouraccountant.tradingName"
 )
 
 @inlineRadioGroup(f("isUK")) {
 @legend("TODO", jsHidden = true)
-@radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}")
-@radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}")
+@radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
+@radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
 }
 
 @fieldset(
-    legend = "TODO",
-    panel = false,
-) {
-<fieldset class="">
-    <legend class="form-label-bold">
-        @Messages("businessactivities.whoisyouraccountant.address")
-    </legend>
-    @input(f("addressLine1"))
-    @input(f("addressLine2"))
-    @input(f("addressLine3"))
-    @input(f("addressLine4"))
-</fieldset>
+legend = "TODO",
+panel = false,
+jsHidden = true,
+id = s"${f("postCode").id}-fieldset") {
+<legend class="form-label-bold">
+    @Messages("businessactivities.whoisyouraccountant.address")
+</legend>
+@input(f("addressLine1"))
+@input(f("addressLine2"))
+@input(f("addressLine3"))
+@input(f("addressLine4"))
+    @input(
+        field = f("postCode"),
+        labelText = "businessactivities.whoisyouraccountant.postCode",
+        classes = Seq("postcode")
+    )
 }
 
-@input(
-field = f("postCode"),
+@fieldset(
+legend = "TODO",
+panel = false,
 jsHidden = true,
-labelText = "businessactivities.whoisyouraccountant.postCode",
-classes = Seq("postcode"),
-id = s"""${f("postCode").id}"""
-)
+id = s"${f("country").id}-fieldset") {
+<legend class="form-label-bold">
+    @Messages("businessactivities.whoisyouraccountant.address")
+</legend>
+@input(f("addressLine1"))
+@input(f("addressLine2"))
+@input(f("addressLine3"))
+@input(f("addressLine4"))
+    @input(
+        field = f("country"),
+        labelText = "businessactivities.whoisyouraccountant.country"
+    )
 }
 
-@input(
-field = f("country"),
-jsHidden = true,
-labelText = "aboutthebusiness.correspondenceaddress.country",
-id = s"""${f("country").id}"""
-)
+<p class="form-label-bold">@Messages("businessactivities.whoisyouraccountant.taxMessage")</p>
+
+@inlineRadioGroup(f("alsoDealsWithTax")) {
+    @legend("TODO", jsHidden = true)
+    @radio(f("alsoDealsWithTax"), "lbl.yes", "true", target = s"#${f("accountantsReferenceNumber").id}-fieldset")
+    @radio(f("alsoDealsWithTax"), "lbl.no", "false")
+    @fieldset("TODO", jsHidden = true, id = s"${f("accountantsReferenceNumber").id}-fieldset") {
+        @input(f("accountantsReferenceNumber"), "businessactivities.whoisyouraccountant.reference.details", bold = false)
+    }
 }
 
 
 @submit(edit)
-
 }
 
 }
