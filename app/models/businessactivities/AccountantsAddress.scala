@@ -1,5 +1,8 @@
 package models.businessactivities
 
+import models.FormTypes._
+import play.api.data.mapping.{From, Rule}
+import play.api.data.mapping.forms._
 import play.api.libs.json.{Writes, Reads}
 
 sealed trait AccountantsAddress
@@ -22,6 +25,28 @@ case class NonUkAccountantsAddress(
 
 
 object AccountantsAddress extends AccountantsAddress {
+
+  implicit val formRule: Rule[UrlFormEncoded, AccountantsAddress] = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    (__ \ "isUK").read[Boolean] flatMap {
+      case true =>
+        (
+          (__ \ "addressLine1").read(addressType) and
+            (__ \ "addressLine2").read(addressType) and
+            (__ \ "addressLine3").read(optionR(addressType)) and
+            (__ \ "addressLine4").read(optionR(addressType)) and
+            (__ \ "postCode").read(postcodeType)
+          ) (UkAccountantsAddress.apply _)
+      case false =>
+        (
+          (__ \ "addressLineNonUK1").read(addressType) and
+            (__ \ "addressLineNonUK2").read(addressType) and
+            (__ \ "addressLineNonUK3").read(optionR(addressType)) and
+            (__ \ "addressLineNonUK4").read(optionR(addressType)) and
+            (__ \ "country").read(countryType)
+          ) (NonUkAccountantsAddress.apply _)
+    }
+  }
 
   implicit val jsonReads: Reads[AccountantsAddress] = {
     import play.api.libs.functional.syntax._
