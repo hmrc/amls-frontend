@@ -21,24 +21,4 @@ object WhoIsYourAccountant {
   val key = "who-is-your-accountant"
 
   implicit val formats = Json.format[WhoIsYourAccountant]
-
-//  implicit val reads: Reads[WhoIsYourAccountant] = (
-//      __.read[String] and
-//      __.read[Option[String]] and
-//      __.read[AccountantsAddress] and
-//      __.read[Boolean]
-//    ) (WhoIsYourAccountant.apply _)
-//
-//  implicit val writes: Writes[WhoIsYourAccountant] = Writes[WhoIsYourAccountant] {
-//    model =>
-//      Seq(
-//        Json.toJson(model.name).as[JsObject],
-//        Json.toJson(model.tradingName).asOpt[JsObject],
-//        Json.toJson(model.address).as[JsObject],
-//        Json.toJson(model.alsoDealsWithTax).as[JsObject]
-//      ).flatten.fold(Json.obj()) {
-//        _ ++ _
-//      }
-//  }
-
 }
