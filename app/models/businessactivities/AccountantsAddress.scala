@@ -27,22 +27,19 @@ object AccountantsAddress extends AccountantsAddress {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
-    (__ \ "isUK").read[Boolean] flatMap {
-      case true => (
-        (__ \ "addressLine1").read[String] and
-          (__ \ "addressLine2").read[String] and
-          (__ \ "addressLine3").readNullable[String] and
-          (__ \ "addressLine4").readNullable[String] and
-          (__ \ "postCode").read[String]
-        ) (UkAccountantsAddress.apply _)
-      case false => (
-        (__ \ "addressLine1").read[String] and
-          (__ \ "addressLine2").read[String] and
-          (__ \ "addressLine3").readNullable[String] and
-          (__ \ "addressLine4").readNullable[String] and
-          (__ \ "country").read[String]
-        ) (NonUkAccountantsAddress.apply _)
-    }
+    (__ \ "accountantsAddressPostCode").read[String] andKeep (
+        ((__ \ "accountantsAddressLine1").read[String] and
+        (__ \ "accountantsAddressLine2").read[String] and
+        (__ \ "accountantsAddressLine3").readNullable[String] and
+        (__ \ "accountantsAddressLine4").readNullable[String] and
+        (__ \ "accountantsAddressPostCode").read[String])  (UkAccountantsAddress.apply _) map identity[AccountantsAddress]
+      ) orElse
+        ( (__ \ "accountantsAddressLine1").read[String] and
+          (__ \ "accountantsAddressLine2").read[String] and
+          (__ \ "accountantsAddressLine3").readNullable[String] and
+          (__ \ "accountantsAddressLine4").readNullable[String] and
+          (__ \ "accountantsAddressCountry").read[String]) (NonUkAccountantsAddress.apply _)
+
   }
 
   implicit val jsonWrites: Writes[AccountantsAddress] = {
@@ -52,19 +49,19 @@ object AccountantsAddress extends AccountantsAddress {
     Writes[AccountantsAddress] {
       case a: UkAccountantsAddress =>
         (
-            (__ \ "addressLine1").write[String] and
-            (__ \ "addressLine2").write[String] and
-            (__ \ "addressLine3").writeNullable[String] and
-            (__ \ "addressLine4").writeNullable[String] and
-            (__ \ "postCode").write[String]
+            (__ \ "accountantsAddressLine1").write[String] and
+            (__ \ "accountantsAddressLine2").write[String] and
+            (__ \ "accountantsAddressLine3").writeNullable[String] and
+            (__ \ "accountantsAddressLine4").writeNullable[String] and
+            (__ \ "accountantsAddressPostCode").write[String]
           ) (unlift(UkAccountantsAddress.unapply)).writes(a)
       case a: NonUkAccountantsAddress =>
         (
-            (__ \ "addressLine1").write[String] and
-            (__ \ "addressLine2").write[String] and
-            (__ \ "addressLine3").writeNullable[String] and
-            (__ \ "addressLine4").writeNullable[String] and
-            (__ \ "country").write[String]
+            (__ \ "accountantsAddressLine1").write[String] and
+            (__ \ "accountantsAddressLine2").write[String] and
+            (__ \ "accountantsAddressLine3").writeNullable[String] and
+            (__ \ "accountantsAddressLine4").writeNullable[String] and
+            (__ \ "accountantsAddressCountry").write[String]
           ) (unlift(NonUkAccountantsAddress.unapply)).writes(a)
     }
   }

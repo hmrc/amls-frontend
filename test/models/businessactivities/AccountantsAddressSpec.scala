@@ -1,7 +1,7 @@
 package models.businessactivities
 
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 
 class AccountantsAddressSpec extends PlaySpec {
 
@@ -32,27 +32,36 @@ class AccountantsAddressSpec extends PlaySpec {
     DefaultCountry)
 
   val DefaultUKJson = Json.obj(
-    "isUK"         -> true,
-    "addressLine1" -> DefaultAddressLine1,
-    "addressLine2" -> DefaultAddressLine2,
-    "addressLine3" -> DefaultAddressLine3,
-    "addressLine4" -> DefaultAddressLine4,
-    "postCode" -> DefaultPostcode
+    "accountantsAddressLine1" -> DefaultAddressLine1,
+    "accountantsAddressLine2" -> DefaultAddressLine2,
+    "accountantsAddressLine3" -> DefaultAddressLine3,
+    "accountantsAddressLine4" -> DefaultAddressLine4,
+    "accountantsAddressPostCode" -> DefaultPostcode
   )
 
   val DefaultNonUKJson = Json.obj(
-    "isUK"         -> false,
-    "addressLine1" -> DefaultAddressLine1,
-    "addressLine2" -> DefaultAddressLine2,
-    "addressLine3" -> DefaultAddressLine3,
-    "addressLine4" -> DefaultAddressLine4,
-    "country" -> DefaultCountry
+    "accountantsAddressLine1" -> DefaultAddressLine1,
+    "accountantsAddressLine2" -> DefaultAddressLine2,
+    "accountantsAddressLine3" -> DefaultAddressLine3,
+    "accountantsAddressLine4" -> DefaultAddressLine4,
+    "accountantsAddressCountry" -> DefaultCountry
   )
 
   "AccountantsAddress" must {
 
     "JSON validation" must {
 
+      "Round trip a UK Address correctly" in {
+        AccountantsAddress.jsonReads.reads(
+          AccountantsAddress.jsonWrites.writes(DefaultUKAddress)
+        ) must be (JsSuccess(DefaultUKAddress))
+      }
+
+      "Round trip a Non UK Address correctly" in {
+        AccountantsAddress.jsonReads.reads(
+          AccountantsAddress.jsonWrites.writes(DefaultNonUKAddress)
+        ) must be (JsSuccess(DefaultNonUKAddress))
+      }
 
       "Serialise UK address as expected" in {
         Json.toJson(DefaultUKAddress) must be(DefaultUKJson)
@@ -69,9 +78,6 @@ class AccountantsAddressSpec extends PlaySpec {
       "Deserialise non-UK address as expected" in {
         DefaultNonUKJson.as[AccountantsAddress] must be(DefaultNonUKAddress)
       }
-
     }
-
   }
-
 }
