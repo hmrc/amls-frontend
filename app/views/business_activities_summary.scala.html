@@ -1,0 +1,215 @@
+@import include._
+@import models.businessactivities._
+
+@(model: BusinessActivities)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.businessactivities")
+
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("businessactivities.confirm-activities.title")</th>
+            <td colspan="2"><a href="@controllers.businessactivities.routes.InvolvedInOtherController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.involvedInOther.map {
+                    case InvolvedInOtherNo => { @Messages("lbl.no") }
+                    case InvolvedInOtherYes(v) => { @Messages("lbl.yes") }
+                }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.involvedInOther.map {
+                    case InvolvedInOtherNo => { @Messages("lbl.na") }
+                    case InvolvedInOtherYes(v) => { @v }
+                }
+            </td>
+        </tr>
+
+    </table>
+    @model.expectedBusinessTurnover.map { turnover =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("businessactivities.summary.anticipated.turnover")</th>
+                <td><a href="@controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @turnover match {
+                        case First => { @Messages("businessactivities.turnover.lbl.01") }
+                        case Second => { @Messages("businessactivities.turnover.lbl.02") }
+                        case Third => { @Messages("businessactivities.turnover.lbl.03") }
+                        case Fourth => { @Messages("businessactivities.turnover.lbl.04") }
+                        case Fifth => { @Messages("businessactivities.turnover.lbl.05") }
+                        case Sixth => { @Messages("businessactivities.turnover.lbl.06") }
+                        case Seventh => { @Messages("businessactivities.turnover.lbl.07") }
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+    @model.expectedAMLSTurnover.map { turnover =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("businessactivities.summary.anticipated.mlr.turnover")</th>
+                <td><a href="@controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @turnover match {
+                        case First => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case Second => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case Third => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case Fourth => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case Fifth => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case Sixth => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case Seventh => { @Messages("businessactivities.business-turnover.lbl.01") }
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("businessactivities.businessfranchise.title")</th>
+            <td colspan="2"><a href="@controllers.businessactivities.routes.BusinessFranchiseController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.businessFranchise.map {
+                    case BusinessFranchiseNo => { @Messages("lbl.no") }
+                    case BusinessFranchiseYes(v) => { @Messages("lbl.yes") }
+                }
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.businessFranchise.map {
+                    case BusinessFranchiseNo => { @Messages("lbl.na") }
+                    case BusinessFranchiseYes(v) => { @v }
+                }
+            </td>
+        </tr>
+    </table>
+    @model.howManyEmployees.map { employees =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("businessactivities.summary.employees")</th>
+                <td colspan="2"><a href="@controllers.businessactivities.routes.HowManyEmployeesController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    employees.employeeCount
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    employees.employeeCountAMLSSupervision
+                </td>
+            </tr>
+        </table>
+    }
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("businessactivities.customer.outside.uk.title")</th>
+            <td colspan="2"><a href="@controllers.businessactivities.routes.CustomersOutsideUKController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.customersOutsideUK.map {
+                    case CustomersOutsideUKNo => { @Messages("lbl.no") }
+                    case CustomersOutsideUKYes(v) => { @Messages("lbl.yes") }
+                }
+            </td>
+        </tr>
+        @model.customersOutsideUK.map { ca =>
+            <tr>
+                <td colspan="2">
+                    @ca.toLines.map { line =>
+                        @line<br/>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("businessactivities.keep.customer.records.title")</th>
+                <td colspan="2"><a href="@controllers.businessactivities.routes.TransactionRecordController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @model.transactionRecord.map {
+                case TransactionRecordYes(value) =>
+                    @value.transactionType.map { line =>
+                    <tr>
+                        <td colspan="2">
+                            @line match {
+                                case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
+                                case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
+                                case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"):@software}
+                            }
+                        </td>
+                    </tr>
+                    }
+                case TransactionRecordNo => "No"
+            }
+        </table>
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("businessactivities.identify-suspicious-activity.title")</th>
+            <td colspan="2"><a href="@controllers.businessactivities.routes.IdentifySuspiciousActivityController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.identifySuspiciousActivity.map {x=>
+                    @x.hasWrittenGuidance match {
+                        case true =>  { @Messages("lbl.yes") }
+                        case false =>  { @Messages("lbl.no") }
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("businessactivities.ncaRegistered.title")</th>
+            <td colspan="2"><a href="@controllers.businessactivities.routes.NCARegisteredController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.ncaRegistered.map {x=>
+                    @x.ncaRegistered match {
+                        case true =>  { @Messages("lbl.yes") }
+                        case false =>  { @Messages("lbl.no") }
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+    <table>
+            <tr>
+                <th class="summary-title">@Messages("businessactivities.ncaRegistered.title")</th>
+                <td colspan="2"><a href="@controllers.businessactivities.routes.NCARegisteredController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @model.riskAssessmentPolicy.map {
+                case RiskAssessmentPolicyYes(value) =>
+                    @value.riskassessments.map { line =>
+                    <tr>
+                        <td colspan="2">
+                            @line match {
+                                case Paper => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
+                                case Digital => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
+                            }
+                        </td>
+                    </tr>
+                }
+                case RiskAssessmentPolicyNo => "No"
+            }
+        </table>
+    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
+}
