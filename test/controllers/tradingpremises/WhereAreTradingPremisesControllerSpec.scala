@@ -65,11 +65,12 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
       when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      val result = controller.get(0)(request)
+      val RecordId = 1
+
+      val result = controller.get(RecordId)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("tradingpremises.yourtradingpremises.title"))
 
-      println(contentAsString(result))
       val document = Jsoup.parse(contentAsString(result))
       for (field <- fields)
         document.select(s"input[id=${field}]").`val`() must not be ("")
