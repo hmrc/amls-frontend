@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
 import models.businessmatching.{BusinessMatching, BusinessActivities}
 import scala.concurrent.Future
+import views.html.businessmatching._
 
 trait RegisterServicesController  extends BaseController {
 
@@ -13,10 +14,11 @@ trait RegisterServicesController  extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) map {
+      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
         case Some(BusinessMatching(Some(data), _)) =>
-          Ok(views.html.what_you_need_to_register(Form2[BusinessActivities](data), edit))
-        case _ => Ok(views.html.what_you_need_to_register(EmptyForm, edit))
+          Ok(register_services(Form2[BusinessActivities](data), edit))
+        case _ =>
+          Ok(register_services(EmptyForm, edit))
       }
   }
 
@@ -25,11 +27,11 @@ trait RegisterServicesController  extends BaseController {
       import play.api.data.mapping.forms.Rules._
       Form2[BusinessActivities](request.body) match {
         case invalidForm : InvalidForm =>
-          Future.successful(BadRequest(views.html.what_you_need_to_register(invalidForm, edit)))
+          Future.successful(BadRequest(register_services(invalidForm, edit)))
         case ValidForm(_, data) =>
           for {
-            businessMatching <- dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[BusinessMatching](BusinessMatching.key,
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
               businessMatching.activities(data)
             )
           } yield edit match {

@@ -7,6 +7,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises._
 import play.api.Logger
 import utils.RepeatingSection
+import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
@@ -18,9 +19,9 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
         case Some(TradingPremises(Some(data), _, _)) =>
-          Ok(views.html.where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
+          Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
         case _ =>
-          Ok(views.html.where_are_trading_premises(EmptyForm, edit, index))
+          Ok(where_are_trading_premises(EmptyForm, edit, index))
       }
   }
 
@@ -30,7 +31,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
     implicit authContext => implicit request =>
       Form2[YourTradingPremises](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.where_are_trading_premises(f, edit, index)))
+          Future.successful(BadRequest(where_are_trading_premises(f, edit, index)))
         case ValidForm(_, data) =>
           for {
             _ <- updateData[TradingPremises](index) {

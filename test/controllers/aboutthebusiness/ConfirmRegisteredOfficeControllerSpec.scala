@@ -8,6 +8,7 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 
@@ -39,7 +40,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
       "load register Office" in new Fixture {
 
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -50,7 +51,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
         val registeredAddress = ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
 
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -67,7 +68,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
@@ -80,7 +81,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
@@ -92,7 +93,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
         val newRequest = request.withFormUrlEncodedBody(
         )
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)
@@ -105,7 +106,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
         val newRequest = request.withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())(any(),any(),any()))
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
 
         val result = controller.post()(newRequest)

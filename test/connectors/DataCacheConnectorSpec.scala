@@ -1,93 +1,99 @@
 package connectors
 
-import java.util.UUID
-
-import builders.AuthBuilder
 import config.AmlsShortLivedCache
-import org.mockito.Matchers
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.play.frontend.auth.{LoggedInUser, AuthContext}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
+class DataCacheConnectorSpec
+  extends PlaySpec
+    with OneServerPerSuite
+    with MockitoSugar
+    with ScalaFutures
+    with IntegrationPatience {
 
-class DataCacheConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures with IntegrationPatience {
-
-  val mockShortLivedCache = mock[ShortLivedCache]
-  val userId = s"user-${UUID.randomUUID}"
-
-  object TestModel {
-    implicit val formats = Json.format[TestModel]
+  case class Model(value: String)
+  object Model {
+    implicit val format = Json.format[Model]
   }
 
-  case class TestModel(name: String)
+  trait Fixture {
 
-  val dummyModel: TestModel = TestModel("sample")
-  val returnedCacheMap: CacheMap = CacheMap("data", Map("formId" -> Json.toJson(dummyModel)))
-  val sourceId = "AMLS"
+    implicit val headerCarrier = HeaderCarrier()
+    implicit val authContext = mock[AuthContext]
+    implicit val user = mock[LoggedInUser]
+    val oid = "user_oid"
+    val key = "key"
 
-  object TestDataCacheConnector extends DataCacheConnector {
-    override val shortLivedCache: ShortLivedCache = mockShortLivedCache
+    when(authContext.user) thenReturn user
+    when(user.oid) thenReturn oid
+  }
+
+  val emptyCache = CacheMap("", Map.empty)
+
+  object DataCacheConnector extends DataCacheConnector {
+    override val shortLivedCache: ShortLivedCache = mock[ShortLivedCache]
   }
 
   "DataCacheConnector" must {
+
     "use the correct session cache for Amls" in {
-      DataCacheConnector.shortLivedCache mustBe AmlsShortLivedCache
+      connectors.DataCacheConnector.shortLivedCache mustBe AmlsShortLivedCache
     }
 
-    "save form data to save4later" in {
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      when(mockShortLivedCache.cache(Matchers.any(), Matchers.any(),
-        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(returnedCacheMap))
-      val result = TestDataCacheConnector.saveDataShortLivedCache(sourceId, "formId", dummyModel)
-      whenReady(result) { dtl =>
-        dtl mustBe Some(dummyModel)
+    "save data to save4later" in new Fixture {
+
+      val model = Model("data")
+
+      when {
+        DataCacheConnector.shortLivedCache.cache(eqTo(oid), eqTo(key), eqTo(model))(any(), any())
+      } thenReturn Future.successful(emptyCache)
+
+      val result = DataCacheConnector.save(key, model)
+
+      whenReady(result) {
+        result =>
+          result must be (emptyCache)
       }
     }
 
-    "save form data to save4later with cacheId and value" in {
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      when(mockShortLivedCache.cache(Matchers.any(), Matchers.any(),
-        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(returnedCacheMap))
-      val result = TestDataCacheConnector.saveDataShortLivedCache("formId", dummyModel)
-      whenReady(result) { dtl =>
-        dtl mustBe Some(dummyModel)
+    "fetch saved data from save4later" in new Fixture {
+
+      val model = Model("data")
+
+      when {
+        DataCacheConnector.shortLivedCache.fetchAndGetEntry[Model](eqTo(oid), eqTo(key))(any(), any())
+      } thenReturn Future.successful(Some(model))
+
+      val result = DataCacheConnector.fetch[Model](key)
+
+      whenReady (result) {
+        result =>
+          result must be (Some(model))
       }
     }
 
-    "fetch saved data from save4later" in {
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      when(mockShortLivedCache.fetchAndGetEntry[TestModel](Matchers.any(),
-        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(dummyModel)))
-      val result = TestDataCacheConnector.fetchDataShortLivedCache[TestModel](sourceId,"formId")
-      whenReady(result) { dtl =>
-        dtl mustBe Some(dummyModel)
-      }
-    }
+    "fetch all data from save4later" in new Fixture {
 
-    "fetch saved data from save4later with cacheId" in {
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      implicit val user = AuthBuilder.createUserAuthContext(userId, "name")
-      when(mockShortLivedCache.fetchAndGetEntry[TestModel](Matchers.any(),
-        Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(dummyModel)))
-      val result = TestDataCacheConnector.fetchDataShortLivedCache[TestModel]("formId")
-      whenReady(result) { dtl =>
-        dtl mustBe Some(dummyModel)
-      }
-    }
+      val model = Model("data")
 
-    "fetch all data from save4later" in {
-      implicit val hc: HeaderCarrier = HeaderCarrier()
-      when(mockShortLivedCache.fetch(Matchers.any())(Matchers.any())).thenReturn(Future.successful(Some(returnedCacheMap)))
-      val result = TestDataCacheConnector.fetchAll(sourceId)
-      whenReady(result) { dtl =>
-        dtl contains ("formId")
+      when {
+        DataCacheConnector.shortLivedCache.fetch(eqTo(oid))(any())
+      } thenReturn Future.successful(Some(emptyCache))
+
+      val result = DataCacheConnector.fetchAll
+
+      whenReady(result) {
+        result =>
+          result must be (Some(emptyCache))
       }
     }
   }

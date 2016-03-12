@@ -7,6 +7,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises.{TradingPremises, YourAgent}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.RepeatingSection
+import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
@@ -19,8 +20,9 @@ trait YourAgentController extends RepeatingSection with BaseController {
       implicit request =>
         getData[TradingPremises](index) map {
           case Some(TradingPremises(_, Some(data), _)) =>
-            Ok(views.html.who_is_your_agent(Form2[YourAgent](data), edit, index))
-          case _ => Ok(views.html.who_is_your_agent(EmptyForm, edit, index))
+            Ok(who_is_your_agent(Form2[YourAgent](data), edit, index))
+          case _ =>
+            Ok(who_is_your_agent(EmptyForm, edit, index))
         }
   }
 
@@ -29,7 +31,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
       implicit request => {
       Form2[YourAgent](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.who_is_your_agent(f, edit, index)))
+          Future.successful(BadRequest(who_is_your_agent(f, edit, index)))
         case ValidForm(_, data) =>
           for {
             _ <- updateData[TradingPremises](index) {

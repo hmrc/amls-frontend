@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.estateagentbusiness.{Services, Residential, EstateAgentBusiness}
+import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
@@ -14,13 +15,13 @@ trait BusinessServicesController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
+      dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
         response =>
           val form = (for {
             estateAgentBusiness <- response
             accountant <- estateAgentBusiness.services
           } yield Form2[Services](accountant)).getOrElse(EmptyForm)
-          Ok(views.html.business_servicess_EAB(form, edit))
+          Ok(business_servicess(form, edit))
       }
   }
 
@@ -29,11 +30,11 @@ trait BusinessServicesController extends BaseController {
     implicit authContext => implicit request =>
       Form2[Services](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.business_servicess_EAB(f, edit)))
+          Future.successful(BadRequest(business_servicess(f, edit)))
         case ValidForm(_, data) =>
           for {
-            estateAgentBusiness <- dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key,
+            estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key)
+            _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
               estateAgentBusiness.services(data))
           } yield edit match {
             case true =>

@@ -1,5 +1,0 @@
-@(name: String)(implicit form: Form[_], lang: Lang)
-
-@form(name).errors.map { error =>
-    <span class="error-notification">@Messages(error.message)</span>
-}

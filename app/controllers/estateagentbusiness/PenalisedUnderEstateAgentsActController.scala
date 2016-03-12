@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.estateagentbusiness.{EstateAgentBusiness, PenalisedUnderEstateAgentsAct}
+import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
@@ -14,23 +15,24 @@ trait PenalisedUnderEstateAgentsActController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key) map {
+      dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key) map {
         response =>
           val form = (for {
             estateAgentBusiness <- response
             estateAgentsAct <- estateAgentBusiness.penalisedUnderEstateAgentsAct
           } yield Form2[PenalisedUnderEstateAgentsAct](estateAgentsAct)).getOrElse(EmptyForm)
-          Ok(views.html.penalised_under_estate_agents_act(form, edit))
+          Ok(penalised_under_estate_agents_act(form, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[PenalisedUnderEstateAgentsAct](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.penalised_under_estate_agents_act(f, edit)))
+        case f: InvalidForm =>
+          Future.successful(BadRequest(penalised_under_estate_agents_act(f, edit)))
         case ValidForm(_, data) =>
-          for {estateAgentBusiness <- dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](EstateAgentBusiness.key)
-               _ <- dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](
+          for {estateAgentBusiness <- dataCacheConnector.fetch[EstateAgentBusiness](EstateAgentBusiness.key)
+               _ <- dataCacheConnector.save[EstateAgentBusiness](
                  EstateAgentBusiness.key,
                  estateAgentBusiness.penalisedUnderEstateAgentsAct(data))
           } yield edit match {

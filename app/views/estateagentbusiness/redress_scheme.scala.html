@@ -1,0 +1,40 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@main(
+    title = Messages("estateagentbusiness.registered.redress.title")
+) {
+
+    @heading("estateagentbusiness.registered.redress.title", "summary.estateagentbusiness")
+
+    @form(f, controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.post(edit)) {
+
+        <span>
+            @Messages("estateagentbusiness.registered.redress.text")
+        </span>
+        @inlineRadioGroup(f("isRedress")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isRedress"), "lbl.yes", "true", target = s"#${f("propertyRedress").id}-fieldset")
+            @radio(f("isRedress"), "lbl.no", "false")
+        }
+
+        @fieldset("TODO", jsHidden = true, id = s"""${f("propertyRedress").id}-fieldset""") {
+            <span class="form-label-bold">
+                @Messages("estateagentbusiness.which.redress.scheme.lbl")
+            </span>
+            @radioGroup(f("propertyRedressScheme")) {
+                @legend("TODO", jsHidden = true)
+                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.01", "01")
+                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.02", "02")
+                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.03", "03")
+                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.04", "04", target = s"#${f("other").id}-fieldset")
+                @fieldset("TODO", jsHidden = true, id = s"""${f("other").id}-fieldset""") {
+                    @input(f("other"), "lbl.pleasespecify", bold = false)
+                }
+            }
+        }
+        @submit(edit)
+    }
+}

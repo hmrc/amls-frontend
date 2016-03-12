@@ -5,22 +5,22 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, CustomersOutsideUK}
-import utils.RepeatingSection
+import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait CustomersOutsideUKController extends RepeatingSection with BaseController {
+trait CustomersOutsideUKController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
           val form = (for {
             businessActivities <- response
             customers <- businessActivities.customersOutsideUK
           } yield Form2[CustomersOutsideUK](customers)).getOrElse(EmptyForm)
-          Ok(views.html.customers_outside_uk(form, edit))
+          Ok(customers_outside_uk(form, edit))
       }
   }
 
@@ -28,12 +28,12 @@ trait CustomersOutsideUKController extends RepeatingSection with BaseController 
     implicit authContext => implicit request =>
       Form2[CustomersOutsideUK](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.customers_outside_uk(f, edit)))
+          Future.successful(BadRequest(customers_outside_uk(f, edit)))
         case ValidForm(_, data) => {
           for {
             businessActivity <-
-            dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
+            dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivity.customersOutsideUK(data)
             )
           } yield edit match {
