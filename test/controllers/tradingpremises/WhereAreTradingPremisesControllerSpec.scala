@@ -126,14 +126,14 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourAgentController.get(0).url))
     }
 
-    "post in EDIT Mode and is OWNER redirect to Summary Controller" in new Fixture {
+    "post with edit mode with valid data and is OWNER then redirect to Summary Controller" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
         "postcode" -> "NE98 1ZZ",
-        "isOwner" -> "false",
+        "isOwner" -> "true",
         "startDate.day" -> "01",
         "startDate.month" -> "02",
         "startDate.year" -> "2010",
@@ -149,7 +149,6 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
       val RecordId = 1
 
       val result = controller.post(RecordId, true)(newRequest)
-      println(contentAsString(result))
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(
         Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId).url))
