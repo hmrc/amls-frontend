@@ -16,7 +16,7 @@ trait CustomersOutsideUKController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[CustomersOutsideUK] = (for {
             businessActivities <- response
             customers <- businessActivities.customersOutsideUK
           } yield Form2[CustomersOutsideUK](customers)).getOrElse(EmptyForm)

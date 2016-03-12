@@ -24,13 +24,11 @@ trait InvolvedInOtherController extends BaseController {
             cache <- optionalCache
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           } yield {
-
-            val x = for {
+            (for {
               businessActivties <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               involvedInOther <- businessActivties.involvedInOther
-            } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching))
-
-            x getOrElse Ok(involved_in_other_name(EmptyForm, edit, businessMatching))
+            } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching)))
+              .getOrElse (Ok(involved_in_other_name(EmptyForm, edit, businessMatching)))
           }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
       }
   }

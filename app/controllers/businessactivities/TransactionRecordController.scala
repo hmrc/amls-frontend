@@ -16,7 +16,7 @@ trait TransactionRecordController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[TransactionRecord] = (for {
             businessActivities <- response
             transactionRecord <- businessActivities.transactionRecord
           } yield Form2[TransactionRecord](transactionRecord)).getOrElse(EmptyForm)

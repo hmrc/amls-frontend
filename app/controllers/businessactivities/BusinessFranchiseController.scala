@@ -17,7 +17,7 @@ trait BusinessFranchiseController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[BusinessFranchise] = (for {
             businessActivities <- response
             businessFranchise <- businessActivities.businessFranchise
           } yield Form2[BusinessFranchise](businessFranchise)).getOrElse(EmptyForm)

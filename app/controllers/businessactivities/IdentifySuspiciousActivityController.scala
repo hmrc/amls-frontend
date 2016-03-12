@@ -18,7 +18,7 @@ trait IdentifySuspiciousActivityController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[IdentifySuspiciousActivity] = (for {
             businessActivities <- response
             identifySuspiciousActivity <- businessActivities.identifySuspiciousActivity
           } yield Form2[IdentifySuspiciousActivity](identifySuspiciousActivity)).getOrElse(EmptyForm)

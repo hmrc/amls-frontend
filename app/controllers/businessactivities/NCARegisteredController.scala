@@ -18,7 +18,7 @@ trait NCARegisteredController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[NCARegistered] = (for {
             businessActivities <- response
             ncaRegistered <- businessActivities.ncaRegistered
           } yield Form2[NCARegistered](ncaRegistered)).getOrElse(EmptyForm)

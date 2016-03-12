@@ -17,7 +17,7 @@ trait RiskAssessmentController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[RiskAssessmentPolicy] = (for {
             businessActivities <- response
             riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
           } yield Form2[RiskAssessmentPolicy](riskAssessmentPolicy)).getOrElse(EmptyForm)

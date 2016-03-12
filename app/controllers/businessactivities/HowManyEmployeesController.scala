@@ -19,7 +19,7 @@ trait HowManyEmployeesController extends BaseController {
       implicit request => {
         dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
           response =>
-            val form = (for {
+            val form: Form2[HowManyEmployees] = (for {
               businessActivities <- response
               employees <- businessActivities.howManyEmployees
             } yield Form2[HowManyEmployees](employees)).getOrElse(EmptyForm)

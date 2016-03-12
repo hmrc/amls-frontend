@@ -19,7 +19,7 @@ trait ExpectedAMLSTurnoverController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[ExpectedAMLSTurnover] = (for {
             businessActivities <- response
             expectedTurnover <- businessActivities.expectedAMLSTurnover
           } yield Form2[ExpectedAMLSTurnover](expectedTurnover)).getOrElse(EmptyForm)

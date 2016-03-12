@@ -18,7 +18,7 @@ trait AccountantForAMLSRegulationsController extends BaseController {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[AccountantForAMLSRegulations] = (for {
             businessActivities <- response
             accountant <- businessActivities.accountantForAMLSRegulations
           } yield Form2[AccountantForAMLSRegulations](accountant)).getOrElse(EmptyForm)
