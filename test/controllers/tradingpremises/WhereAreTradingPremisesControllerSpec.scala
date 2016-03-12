@@ -146,11 +146,13 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
       when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = controller.post(any())(newRequest)
+      val RecordId = 1
+
+      val result = controller.post(RecordId, true)(newRequest)
       println(contentAsString(result))
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(
-        Some(controllers.tradingpremises.routes.SummaryController.getIndividual(0).url))
+        Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId).url))
     }
   }
 

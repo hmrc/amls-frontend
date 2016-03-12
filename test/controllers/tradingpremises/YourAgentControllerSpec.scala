@@ -100,6 +100,8 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       val RecordId = 1
       val result = controller.post(RecordId)(validRequest)
       status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(RecordId).url))
+
     }
 
 
@@ -125,6 +127,8 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       val RecordId = 1
       val result = controller.post(RecordId, true)(validRequest)
       status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId).url))
+
     }
 
   }
