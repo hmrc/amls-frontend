@@ -104,8 +104,6 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     }
 
-
-
     "for a Valid Request with edit true must redirect to Summary Controller" in new Fixture {
 
       val validRequest = request.withFormUrlEncodedBody(

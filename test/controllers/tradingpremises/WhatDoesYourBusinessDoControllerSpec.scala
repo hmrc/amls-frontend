@@ -2,6 +2,7 @@ package controllers.tradingpremises
 
 import java.util.UUID
 
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
@@ -36,9 +37,14 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
 
   val fieldElements = Array("report-name", "report-email", "report-action", "report-error")
 
-  "WhatDoesYourBusinessDoController get" must {
+  "WhatDoesYourBusinessDoController" must {
 
-    "check if the form is empty and then load what does your business do with empty fields" in new Fixture {
+    "use correct services" in new Fixture {
+      WhatDoesYourBusinessDoController.authConnector must be(AMLSAuthConnector)
+      WhatDoesYourBusinessDoController.dataCacheConnector must be(DataCacheConnector)
+    }
+
+    "load what does your business do with empty fields" in new Fixture {
 
       val tradingPremises = TradingPremises()
       val mockCacheMap = mock[CacheMap]
@@ -71,7 +77,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       document.select(s"input[id=activities-01]").hasAttr("checked") must be(false)
     }
 
-    "check if the the form is not-empty and then load what does your business do with fields populated" in new Fixture {
+    "load what does your business do with fields populated if the the form is not-empty" in new Fixture {
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
       val tradingPremises = TradingPremises(None, None, Some(wdbd))
@@ -158,7 +164,6 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       val RecordId = 1
       val result = whatDoesYourBusinessDoController.post(RecordId)(invalidRequest)
       status(result) must be(BAD_REQUEST)
-      //      headers(result).foreach( x => println(s" Key: ${x._1} Value : ${x._2}"))
     }
 
 
@@ -253,10 +258,10 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
 
       val RecordId = 1
       val result = whatDoesYourBusinessDoController.post(RecordId, true)(newRequest)
-
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(s"/anti-money-laundering/trading-premises/summary/${RecordId}"))
     }
+    
   }
 
 }
