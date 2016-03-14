@@ -79,15 +79,20 @@ GET         /about-the-business/index                   controllers.aboutthebusi
 GET         /bank-details/accounts/:index               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
 
+GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
+POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
+
+GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
+
 GET         /business-activities/index                  controllers.businessactivities.WhatYouNeedController.get()
 
-GET         /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.get()
+GET         /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
 POST        /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
 GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
-GET         /business-activities/procedures             controllers.businessactivities.IdentifySuspiciousActivityController.get()
+GET         /business-activities/procedures             controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
 POST        /business-activities/procedures             controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
 
 GET         /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
@@ -96,24 +101,19 @@ POST        /business-activities/turnover           controllers.businessactiviti
 GET         /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /business-activities/business-turnover          controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
 
-GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
-POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
-
-GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
-
-GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get()
+GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
 POST        /business-activities/records              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
 
-GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get()
+GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get(edit: Boolean ?= false)
 POST        /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
-GET         /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.get()
+GET         /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.get(edit: Boolean ?= false)
 POST        /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
 
 GET         /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
 
-GET         /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.get()
+GET         /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
 POST        /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)
 
 GET         /business-activities/employees              controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
@@ -121,3 +121,6 @@ POST        /business-activities/employees              controllers.businessacti
 
 GET         /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+
+GET         /business-activities/check-your-answers                       controllers.businessactivities.SummaryController.get()
+

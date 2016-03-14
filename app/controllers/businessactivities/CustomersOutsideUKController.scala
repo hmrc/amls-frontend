@@ -37,7 +37,7 @@ trait CustomersOutsideUKController extends BaseController {
               businessActivity.customersOutsideUK(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
+            case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.TransactionRecordController.get())
           }
         }

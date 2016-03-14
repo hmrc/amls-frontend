@@ -5,7 +5,26 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 
-sealed trait CustomersOutsideUK
+sealed trait CustomersOutsideUK {
+
+  def toLines: Seq[String] = this match {
+    case CustomersOutsideUKYes(values) =>
+      Seq(
+        values.country_1,
+        values.country_2.getOrElse(""),
+        values.country_3.getOrElse(""),
+        values.country_4.getOrElse(""),
+        values.country_5.getOrElse(""),
+        values.country_6.getOrElse(""),
+        values.country_7.getOrElse(""),
+        values.country_8.getOrElse(""),
+        values.country_9.getOrElse(""),
+        values.country_10.getOrElse("")
+      )
+    case CustomersOutsideUKNo => Seq.empty
+  }
+}
+
 
 case object CustomersOutsideUKNo extends  CustomersOutsideUK
 

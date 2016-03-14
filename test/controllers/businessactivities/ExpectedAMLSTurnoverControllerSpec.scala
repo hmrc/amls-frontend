@@ -89,7 +89,7 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneServerPerSuite
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
     }
 
 

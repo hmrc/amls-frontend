@@ -37,7 +37,7 @@ trait ExpectedBusinessTurnoverController extends BaseController {
               businessActivities.expectedBusinessTurnover(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
+            case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.ExpectedAMLSTurnoverController.get())
           }
       }

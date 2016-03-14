@@ -5,7 +5,26 @@ import play.api.data.mapping.{From, Rule}
 import play.api.data.mapping.forms._
 import play.api.libs.json.{Writes, Reads}
 
-sealed trait AccountantsAddress
+sealed trait AccountantsAddress {
+  def toLines: Seq[String] = this match {
+    case a: UkAccountantsAddress =>
+      Seq(
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.postCode)
+      ).flatten
+    case a: NonUkAccountantsAddress =>
+      Seq(
+        Some(a.addressLine1),
+        Some(a.addressLine2),
+        a.addressLine3,
+        a.addressLine4,
+        Some(a.country)
+      ).flatten
+  }
+}
 
 case class UkAccountantsAddress(
                                  addressLine1: String,

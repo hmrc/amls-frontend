@@ -39,7 +39,7 @@ trait RiskAssessmentController extends BaseController {
               businessActivity.riskAssessmentspolicy(data)
             )
           } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
+            case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
           }
         }

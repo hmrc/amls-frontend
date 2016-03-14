@@ -41,7 +41,7 @@ trait WhoIsYourAccountantController extends BaseController {
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivity.whoIsYourAccountant(data)
             )
-          } yield Redirect(routes.WhatYouNeedController.get())
+          } yield Redirect(routes.SummaryController.get())
 
         }
       }
