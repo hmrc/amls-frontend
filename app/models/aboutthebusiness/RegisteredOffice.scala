@@ -97,7 +97,7 @@ object RegisteredOffice {
     (
       (__ \ "postCode").read[String] andKeep
         (
-          (__ \ "addressLine1").read[String] and
+            (__ \ "addressLine1").read[String] and
             (__ \ "addressLine2").read[String] and
             (__ \ "addressLine3").readNullable[String] and
             (__ \ "addressLine4").readNullable[String] and
@@ -105,7 +105,7 @@ object RegisteredOffice {
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
-        (__ \ "addressLineNonUK1").read[String] and
+          (__ \ "addressLineNonUK1").read[String] and
           (__ \ "addressLineNonUK2").read[String] and
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
@@ -115,14 +115,14 @@ object RegisteredOffice {
 
   implicit val jsonWrites = Writes[RegisteredOffice] {
     case m: RegisteredOfficeUK =>
-      Json.obj("isUK" -> true,
+      Json.obj(
         "addressLine1" -> m.addressLine1,
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
         "postCode" -> m.postCode)
     case m: RegisteredOfficeNonUK =>
-      Json.obj("isUK" -> false,
+      Json.obj(
         "addressLineNonUK1" -> m.addressLine1,
         "addressLineNonUK2" -> m.addressLine2,
         "addressLineNonUK3" -> m.addressLine3,

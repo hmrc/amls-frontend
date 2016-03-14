@@ -1,0 +1,69 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@main(
+title = Messages("businessactivities.whoisyouraccountant.title")
+) {
+
+@heading("businessactivities.whoisyouraccountant.heading", "summary.businessactivities")
+
+@form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
+
+@input(
+field = f("name"),
+labelText = "businessactivities.whoisyouraccountant.name"
+)
+
+@input(
+field = f("tradingName"),
+labelText = "businessactivities.whoisyouraccountant.tradingName"
+)
+
+@inlineRadioGroup(f("isUK")) {
+@legend("TODO", jsHidden = true)
+@radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}-field")
+@radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}-field")
+}
+
+<fieldset>
+    <legend class="form-label-bold">
+        @Messages("businessactivities.whoisyouraccountant.address")
+    </legend>
+    @input(f("addressLine1"))
+    @input(f("addressLine2"))
+    @input(f("addressLine3"))
+    @input(f("addressLine4"))
+    @fieldset(id=s"${f("postCode").id}-field", legend="POSTCODE", jsHidden=true, panel=false){
+        @input(
+            field = f("postCode"),
+            labelText = "businessactivities.whoisyouraccountant.postCode",
+            classes = Seq("postcode")
+        )
+    }
+    @fieldset(id=s"${f("country").id}-field", legend="COuntry", jsHidden=true, panel=false){
+        @input(
+            field = f("country"),
+            labelText = "businessactivities.whoisyouraccountant.country"
+        )
+    }
+</fieldset>
+
+<p class="form-label-bold">@Messages("businessactivities.whoisyouraccountant.taxMessage")</p>
+
+@inlineRadioGroup(f("alsoDealsWithTax")) {
+    @legend("TODO", jsHidden = true)
+    @radio(f("alsoDealsWithTax"), "lbl.yes", "true", target = s"#${f("accountantsReferenceNumber").id}-fieldset")
+    @radio(f("alsoDealsWithTax"), "lbl.no", "false")
+    @fieldset("TODO", jsHidden = true, id = s"${f("accountantsReferenceNumber").id}-fieldset") {
+        @input(f("accountantsReferenceNumber"), "businessactivities.whoisyouraccountant.reference.details", bold = false)
+    }
+}
+
+
+@submit(edit)
+}
+
+}

@@ -18,7 +18,6 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "prevMLRRegNo" -> "12345678",
       "registeredForVAT" -> true,
       "vrnNumber" -> "123456789",
-      "isUK" -> true,
       "addressLine1" -> "38B",
       "addressLine2" -> "Longbenton",
       "addressLine3" -> JsNull,

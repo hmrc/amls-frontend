@@ -112,14 +112,41 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
 
       Json.toJson(data) must
-        be( Json.obj("isUK" -> true,
+        be( Json.obj(
           "addressLine1" -> "38B",
           "addressLine2" -> "Longbenton",
           "addressLine3" -> "line 1",
           "addressLine4" -> JsNull,
           "postCode" -> "NE7 7DX")
         )
+    }
 
+    val uKRegisteredOffice = RegisteredOfficeUK(
+      "Test Address 1",
+      "Test Address 2",
+      Some("Test Address 3"),
+      Some("Test Address 4"),
+      "P05TC0DE"
+    )
+
+    val nonUKRegisteredOffice = RegisteredOfficeNonUK(
+      "Test Address 1",
+      "Test Address 2",
+      Some("Test Address 3"),
+      Some("Test Address 4"),
+      "Country"
+    )
+
+    "Round trip a UK Address correctly through serialisation" in {
+      RegisteredOffice.jsonReads.reads(
+        RegisteredOffice.jsonWrites.writes(uKRegisteredOffice)
+      ) must be (JsSuccess(uKRegisteredOffice))
+    }
+
+    "Round trip a Non UK Address correctly through serialisation" in {
+      RegisteredOffice.jsonReads.reads(
+        RegisteredOffice.jsonWrites.writes(nonUKRegisteredOffice)
+      ) must be (JsSuccess(nonUKRegisteredOffice))
     }
   }
 }

@@ -49,5 +49,4 @@ object ContactingYouForm {
           (__ \ "letterToThisAddress").read[Boolean]
         )(ContactingYouForm.apply _)
     }
-
 }
