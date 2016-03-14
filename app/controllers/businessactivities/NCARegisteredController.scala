@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, NCARegistered}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessactivities._
 
 import scala.concurrent.Future
 
@@ -15,13 +16,13 @@ trait NCARegisteredController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[NCARegistered] = (for {
             businessActivities <- response
             ncaRegistered <- businessActivities.ncaRegistered
           } yield Form2[NCARegistered](ncaRegistered)).getOrElse(EmptyForm)
-          Ok(views.html.nca_registered(form, edit))
+          Ok(nca_registered(form, edit))
       }
   }
 
@@ -29,11 +30,11 @@ trait NCARegisteredController extends BaseController {
     implicit authContext => implicit request => {
       Form2[NCARegistered](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.nca_registered(f, edit)))
+          Future.successful(BadRequest(nca_registered(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivities.ncaRegistered(data)
             )
           } yield edit match {

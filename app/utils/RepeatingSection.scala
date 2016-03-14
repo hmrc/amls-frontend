@@ -63,7 +63,7 @@ trait RepeatingSection {
    key: MongoKey[T],
    ec: ExecutionContext
   ): Future[Seq[T]] = {
-    dataCacheConnector.fetchDataShortLivedCache[Seq[T]](key()) map {
+    dataCacheConnector.fetch[Seq[T]](key()) map {
       _.fold(Seq.empty[T]) {
         identity
       }
@@ -110,6 +110,6 @@ trait RepeatingSection {
    key: MongoKey[T],
    ec: ExecutionContext
   ): Future[_] =
-    dataCacheConnector.saveDataShortLivedCache[Seq[T]](key(), data)
+    dataCacheConnector.save[Seq[T]](key(), data)
 }
 

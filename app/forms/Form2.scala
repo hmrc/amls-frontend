@@ -47,7 +47,7 @@ case class InvalidForm(
   }
 }
 
-case object EmptyForm extends Form2[Nothing] {
+object EmptyForm extends Form2[Nothing] {
   override val data: UrlFormEncoded = Map.empty
   override def apply(path: Path): Field = InvalidField(path, Seq.empty, Seq.empty)
   override def errors(path: Path): Seq[mapping.ValidationError] = Seq.empty

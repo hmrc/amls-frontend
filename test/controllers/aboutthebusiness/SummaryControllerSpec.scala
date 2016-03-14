@@ -34,7 +34,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
       val model = AboutTheBusiness(None, None, None, None)
 
-      when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
+      when(controller.dataCache.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -43,7 +43,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
+      when(controller.dataCache.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)

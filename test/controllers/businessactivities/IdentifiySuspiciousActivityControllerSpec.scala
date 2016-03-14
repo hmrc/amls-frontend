@@ -35,7 +35,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
     }
 
     "on get, display the Identify suspicious activity page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -44,7 +44,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
 
     "on get, display the identify suspicious activity page with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))))))
       val result = controller.get()(request)
 
@@ -65,11 +65,11 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
         "hasWrittenGuidance" -> "true"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(???))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -95,11 +95,11 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
         "hasWrittenGuidance" -> "true"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+       (any(), any(), any())).thenReturn(Future.successful(???))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

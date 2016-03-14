@@ -11,6 +11,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -26,6 +27,8 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "RegisterServicesController" must {
 
     val activityData1:Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
@@ -39,7 +42,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
 
     "on get display who is your agent page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -49,7 +52,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "on get() display the who is your agent page with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching1)))
 
       val result = controller.get()(request)
@@ -71,11 +74,11 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "businessActivities" -> "02",
         "businessActivities" -> "03")
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -91,11 +94,11 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "businessActivities" -> "11")
 
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -114,11 +117,11 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "businessActivities" -> "02",
         "businessActivities" -> "03")
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(businessMatchingWithData)))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -132,11 +135,11 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessMatching](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

@@ -12,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import play.api.i18n.Messages
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import scala.concurrent.Future
 
@@ -26,6 +27,8 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "BusinessFranchiseController" must {
 
     "use correct services" in new Fixture {
@@ -34,7 +37,7 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
     }
 
     "on get display the is your business a franchise page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -43,7 +46,7 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
 
 
     "on get display the is your business a franchise page with pre populated data" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(businessFranchise = Some(BusinessFranchiseYes("test test"))))))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -56,11 +59,11 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
         "franchiseName" -> "test test"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -87,11 +90,11 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
         "franchiseName" -> "test"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

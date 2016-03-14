@@ -14,8 +14,8 @@ trait SummaryController extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchDataShortLivedCache[Seq[BankDetails]](BankDetails.key) map {
-        case Some(data) => Ok(views.html.bank_details_summary(data))
+      dataCache.fetch[Seq[BankDetails]](BankDetails.key) map {
+        case Some(data) => Ok(views.html.bankdetails.summary(data))
         case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }
   }

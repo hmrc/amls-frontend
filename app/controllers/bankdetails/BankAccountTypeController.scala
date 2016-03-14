@@ -17,9 +17,9 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
     implicit authContext => implicit request =>
       getData[BankDetails](index) map {
         case Some(BankDetails(Some(data), _)) =>
-          Ok(views.html.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
+          Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
         case _ => {
-          Ok(views.html.bank_account_types(EmptyForm, edit, index))
+          Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index))
         }
       }
   }
@@ -28,7 +28,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
     implicit authContext => implicit request => {
       Form2[Option[BankAccountType]](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.bank_account_types(f, edit, index)))
+          Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index)))
         case ValidForm(_, data) => {
           for {
               result <- updateData[BankDetails](index) {

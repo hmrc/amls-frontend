@@ -11,12 +11,14 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 
 class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -26,6 +28,8 @@ class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneServerPerS
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "ResidentialRedressSchemeController" must {
 
     "use correct services" in new Fixture {
@@ -34,7 +38,7 @@ class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneServerPerS
     }
 
     "on get load Residential Redress Scheme page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -44,7 +48,7 @@ class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneServerPerS
 
   "on get load redress scheme page with pre populated data" in new Fixture {
 
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, Some(Other("test")),None, None))))
 
     val result = controller.get()(request)
@@ -61,11 +65,11 @@ class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneServerPerS
       "other" -> "test"
     )
 
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-    when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+    when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
@@ -93,11 +97,11 @@ class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneServerPerS
        "propertyRedressScheme" -> "01"
      )
 
-     when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
        (any(), any(), any())).thenReturn(Future.successful(None))
 
-     when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+     when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)
