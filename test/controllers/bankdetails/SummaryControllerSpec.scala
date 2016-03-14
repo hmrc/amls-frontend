@@ -33,7 +33,8 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     "load the summary page when section data is available" in new Fixture {
 
       val model = BankDetails(None, None)
-      when(controller.dataCache.fetchDataShortLivedCache[Seq[BankDetails]](any())
+
+      when(controller.dataCache.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
       val result = controller.get()(request)
 
@@ -42,7 +43,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetchDataShortLivedCache[Seq[BankDetails]](any())
+      when(controller.dataCache.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       redirectLocation(result) must be(Some("/anti-money-laundering/summary"))

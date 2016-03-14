@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
 import models.aboutthebusiness.{UKCorrespondenceAddress, CorrespondenceAddress, AboutTheBusiness}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
@@ -16,11 +17,11 @@ trait CorrespondenceAddressController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
+      dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
         case Some(AboutTheBusiness(_, _, _, _, Some(data))) =>
-          Ok(views.html.business_correspondence_address(Form2[CorrespondenceAddress](data), edit))
+          Ok(correspondence_address(Form2[CorrespondenceAddress](data), edit))
         case _ =>
-          Ok(views.html.business_correspondence_address(Form2[CorrespondenceAddress](initialiseWithUK), edit))
+          Ok(correspondence_address(Form2[CorrespondenceAddress](initialiseWithUK), edit))
       }
   }
 
@@ -28,11 +29,11 @@ trait CorrespondenceAddressController extends BaseController {
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddress](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.business_correspondence_address(f, edit)))
+          Future.successful(BadRequest(correspondence_address(f, edit)))
         case ValidForm(_, data) =>
           for {
-            aboutTheBusiness <- dataConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
+            aboutTheBusiness <- dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
+            _ <- dataConnector.save[AboutTheBusiness](AboutTheBusiness.key,
               aboutTheBusiness.correspondenceAddress(data)
             )
           } yield Redirect(routes.SummaryController.get())

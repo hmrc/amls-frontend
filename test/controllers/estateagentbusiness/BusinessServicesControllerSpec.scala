@@ -11,11 +11,13 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -25,6 +27,8 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "BusinessServicesController" must {
 
     "use correct services" in new Fixture {
@@ -33,7 +37,7 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "on get display Business services page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -47,11 +51,11 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "services" -> "08"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -59,7 +63,7 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "load the page with data when the user revisits at a later time" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(Some(Services(Set(Auction, Residential))), None, None, None))))
 
       val result = controller.get()(request)
@@ -76,11 +80,11 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "services" -> "0299999"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -95,11 +99,11 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -117,11 +121,11 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "services[2]" -> "03"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -136,11 +140,11 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "services[2]" -> "03"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -154,11 +158,11 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "services[1]" -> "08"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)

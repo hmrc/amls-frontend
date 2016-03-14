@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness._
+import views.html.aboutthebusiness._
 
 trait ContactingYouController extends BaseController {
 
@@ -14,12 +15,12 @@ trait ContactingYouController extends BaseController {
     implicit authContext => implicit request =>
       for {
         aboutTheBusiness <-
-        dataCache.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
+        dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
         case Some(AboutTheBusiness(_, _, Some(details), Some(registeredOffice), _)) =>
-          Ok(views.html.contacting_you(Form2[ContactingYou](details), registeredOffice, edit))
+          Ok(contacting_you(Form2[ContactingYou](details), registeredOffice, edit))
         case Some(AboutTheBusiness(_, _, None, Some(registeredOffice), _)) =>
-          Ok(views.html.contacting_you(EmptyForm, registeredOffice, edit))
+          Ok(contacting_you(EmptyForm, registeredOffice, edit))
         case _ =>
           // TODO: Make sure this redirects to the right place
           Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
@@ -32,17 +33,17 @@ trait ContactingYouController extends BaseController {
         case f: InvalidForm =>
           for {
             aboutTheBusiness <-
-            dataCache.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
+            dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
           } yield aboutTheBusiness match {
             case Some(AboutTheBusiness(_, _, _, Some(registeredOffice), _)) =>
-              BadRequest(views.html.contacting_you(f, registeredOffice, edit))
+              BadRequest(contacting_you(f, registeredOffice, edit))
             case _ =>
               Redirect(routes.ContactingYouController.get(edit))
           }
         case ValidForm(_, data) =>
           for {
-            aboutTheBusiness <- dataCache.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataCache.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
+            aboutTheBusiness <- dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
+            _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key,
               aboutTheBusiness.contactingYou(data).correspondenceAddress(None)
             )
           } yield data.letterToThisAddress match {

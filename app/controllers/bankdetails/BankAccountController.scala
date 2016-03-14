@@ -18,9 +18,9 @@ trait BankAccountController extends RepeatingSection with BaseController {
     implicit authContext => implicit request =>
       getData[BankDetails](index) map {
         case Some(BankDetails(_, Some(data))) =>
-          Ok(views.html.bank_account_details(Form2[BankAccount](data), edit, index))
+          Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
         case _ =>
-          Ok(views.html.bank_account_details(EmptyForm, edit, index))
+          Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
       }
   }
 
@@ -28,7 +28,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
     implicit authContext => implicit request => {
       Form2[BankAccount](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.bank_account_details(f, edit, index)))
+          Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
           for {
             _ <- updateData[BankDetails](index) {

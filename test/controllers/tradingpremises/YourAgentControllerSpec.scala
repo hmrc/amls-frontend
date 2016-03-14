@@ -34,7 +34,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on get display the blank trading premises your agent page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -54,7 +54,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val yourAgent = YourAgent(agentsRegisteredName, taxType, businessStructure)
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
         TradingPremises(None, Some(yourAgent), None)))))
 
@@ -93,7 +93,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val yourAgent = YourAgent(agentsRegisteredName, taxType, businessStructure)
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
         TradingPremises(None, Some(yourAgent), None)))))
 
@@ -118,7 +118,7 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val yourAgent = YourAgent(agentsRegisteredName, taxType, businessStructure)
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
         TradingPremises(None, Some(yourAgent), None)))))
 

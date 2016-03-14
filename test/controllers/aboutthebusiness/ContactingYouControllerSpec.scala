@@ -12,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -32,6 +33,8 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "BusinessHasEmailController" must {
 
     "Get" must {
@@ -40,7 +43,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
 
         val aboutTheBusinessWithAddress = AboutTheBusiness(registeredOffice = Some(ukAddress))
 
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithAddress)))
 
         val result = controller.get()(request)
@@ -50,7 +53,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       "load the page with the pre populated data" in new Fixture {
 
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
         val result = controller.get()(request)
@@ -70,11 +73,11 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
           "letterToThisAddress" -> "true"
         )
 
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCache.saveDataShortLivedCache[AboutTheBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
+        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -88,11 +91,11 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
           "phoneNumber" -> "1234567890"
         )
 
-        when(controller.dataCache.fetchDataShortLivedCache[AboutTheBusiness](any())
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
 
-        when(controller.dataCache.saveDataShortLivedCache[AboutTheBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
+        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

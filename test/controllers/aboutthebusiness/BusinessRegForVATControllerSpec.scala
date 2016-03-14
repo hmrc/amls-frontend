@@ -9,12 +9,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 
 class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -24,10 +26,12 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "BusinessRegisteredForVATController" must {
 
     "on get display the registered for VAT page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -37,7 +41,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
 
   "on get display the registered for VAT page with pre populated data" in new Fixture {
 
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+    when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("")), Some(VATRegisteredYes("123456789"))))))
 
     val result = controller.get()(request)
@@ -55,11 +59,11 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
       "vrnNumber" -> "123456789"
     )
 
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+    when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-    when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+    when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)

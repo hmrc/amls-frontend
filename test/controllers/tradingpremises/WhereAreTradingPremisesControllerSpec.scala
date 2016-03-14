@@ -13,6 +13,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -31,6 +32,8 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   val fields = Array[String]("tradingName", "addressLine1", "addressLine2", "postcode")
 
   "WhereAreTradingPremisesController" must {
@@ -42,7 +45,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
 
     "load an empty page Where are Trading Premises without data" in new Fixture {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+      when(mockDataCacheConnector.fetch[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get(any())(request)
       status(result) must be(OK)
@@ -62,7 +65,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
       val tradingPremises = TradingPremises(Some(ytp), None, None)
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
       val RecordId = 1
@@ -91,11 +94,11 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         "isResidential" -> "true"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(any())(newRequest)
       status(result) must be(SEE_OTHER)
@@ -116,11 +119,11 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         "isResidential" -> "true"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(any())(newRequest)
       status(result) must be(SEE_OTHER)
@@ -141,11 +144,11 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
         "isResidential" -> "true"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[TradingPremises](any())
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val RecordId = 1
 

@@ -9,6 +9,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -24,13 +25,15 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "AboutYouController" must {
 
     "Get" must {
 
       "load Your Name page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[YourDetails](any())
+        when(controller.dataCacheConnector.fetch[YourDetails](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -42,7 +45,7 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
         val yourDetails = YourDetails("foo", None, "bar")
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
+        when(controller.dataCacheConnector.fetch[AboutYou](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(AboutYou(Some(yourDetails), None))))
 
         val result = controller.get()(request)
@@ -64,11 +67,11 @@ class YourDetailsControllerSpec extends PlaySpec with OneServerPerSuite with Moc
           "lastName" -> "bar"
         )
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutYou](any())
+        when(controller.dataCacheConnector.fetch[AboutYou](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[AboutYou](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[AboutYou](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)

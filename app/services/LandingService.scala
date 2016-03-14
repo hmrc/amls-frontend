@@ -44,7 +44,7 @@ trait LandingService {
    ac: AuthContext
   ): Future[_] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
-    cacheConnector.saveDataShortLivedCache[BusinessMatching](BusinessMatching.key, bm)
+    cacheConnector.save[BusinessMatching](BusinessMatching.key, bm)
   }
 }
 

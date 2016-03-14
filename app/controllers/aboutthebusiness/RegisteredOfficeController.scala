@@ -7,6 +7,7 @@ import forms._
 import models.aboutthebusiness.{RegisteredOfficeUK, AboutTheBusiness, RegisteredOffice}
 
 import scala.concurrent.Future
+import views.html.aboutthebusiness._
 
 trait RegisteredOfficeController extends BaseController  {
 
@@ -16,11 +17,11 @@ trait RegisteredOfficeController extends BaseController  {
 
   def get(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key) map {
+      dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
         case Some(AboutTheBusiness(_ , _, _, Some(data), _)) =>
-          Ok(views.html.registered_office_or_main_place(Form2[RegisteredOffice](data), edit))
+          Ok(registered_office(Form2[RegisteredOffice](data), edit))
         case _ =>
-          Ok(views.html.registered_office_or_main_place(Form2[RegisteredOffice](preSelectUK), edit))
+          Ok(registered_office(Form2[RegisteredOffice](preSelectUK), edit))
       }
   }
 
@@ -28,12 +29,12 @@ trait RegisteredOfficeController extends BaseController  {
     implicit authContext => implicit request =>
       Form2[RegisteredOffice](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.registered_office_or_main_place(f, edit)))
+          Future.successful(BadRequest(registered_office(f, edit)))
         case ValidForm(_, data) => {
           for {
             aboutTheBusiness <-
-              dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key,
+              dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
+            _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
               aboutTheBusiness.registeredOffice(data)
             )
           } yield edit match {

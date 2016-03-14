@@ -29,6 +29,8 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "InvolvedInOtherController" must {
 
     "on get display the is your involved in other page" in new Fixture {
@@ -72,11 +74,11 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
         "details" -> "test"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -118,11 +120,11 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
         "details" -> "test"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

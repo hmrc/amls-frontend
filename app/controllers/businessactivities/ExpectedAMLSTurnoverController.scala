@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{ExpectedAMLSTurnover}
 import models.businessactivities.{BusinessActivities, _}
+import views.html.businessactivities._
 
 
 import scala.concurrent.Future
@@ -16,24 +17,24 @@ trait ExpectedAMLSTurnoverController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[ExpectedAMLSTurnover] = (for {
             businessActivities <- response
             expectedTurnover <- businessActivities.expectedAMLSTurnover
           } yield Form2[ExpectedAMLSTurnover](expectedTurnover)).getOrElse(EmptyForm)
-          Ok(views.html.expected_amls_turnover(form, edit))
+          Ok(expected_amls_turnover(form, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[ExpectedAMLSTurnover](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.expected_amls_turnover(f, edit)))
+        case f: InvalidForm => Future.successful(BadRequest(expected_amls_turnover(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivities.expectedAMLSTurnover(data)
             )
           } yield edit match {

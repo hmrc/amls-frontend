@@ -34,7 +34,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     "load the summary page when the model is present" in new Fixture {
 
       val model = TradingPremises()
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
       val result = summaryController.get()(request)
       status(result) must be(OK)
@@ -43,7 +43,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
 
-      when(summaryController.dataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(summaryController.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = summaryController.get()(request)
       redirectLocation(result) must be(Some("/anti-money-laundering/summary"))
@@ -53,7 +53,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     "for an individual display the trading premises summary page for individual" in new Fixture {
 
       val model = TradingPremises()
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
       val result = summaryController.getIndividual(1)(request)
       status(result) must be(OK)
@@ -61,7 +61,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
 
     "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = summaryController.getIndividual(any())(request)
       redirectLocation(result) must be(Some("/anti-money-laundering/trading-premises/summary"))

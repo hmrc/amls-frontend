@@ -35,6 +35,8 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   val fieldElements = Array("report-name", "report-email", "report-action", "report-error")
 
   "WhatDoesYourBusinessDoController" must {
@@ -53,11 +55,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.saveDataShortLivedCache[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(Some(businessActivities))
@@ -89,11 +91,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.saveDataShortLivedCache[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(Some(businessActivities))
@@ -122,11 +124,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.saveDataShortLivedCache[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val RecordId = 1
       val result = whatDoesYourBusinessDoController.get(RecordId)(request)
@@ -146,11 +148,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.saveDataShortLivedCache[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
@@ -176,11 +178,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.saveDataShortLivedCache[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
@@ -206,11 +208,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.saveDataShortLivedCache[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
@@ -240,11 +242,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockDataCacheConnector.fetchDataShortLivedCache[Seq[TradingPremises]](any())
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.saveDataShortLivedCache[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 

@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessactivities._
 
 import scala.concurrent.Future
 
@@ -15,13 +16,13 @@ trait AccountantForAMLSRegulationsController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[AccountantForAMLSRegulations] = (for {
             businessActivities <- response
             accountant <- businessActivities.accountantForAMLSRegulations
           } yield Form2[AccountantForAMLSRegulations](accountant)).getOrElse(EmptyForm)
-          Ok(views.html.accountant_for_amls_regulations(form, edit))
+          Ok(accountant_for_amls_regulations(form, edit))
       }
   }
 
@@ -29,11 +30,11 @@ trait AccountantForAMLSRegulationsController extends BaseController {
     implicit authContext => implicit request => {
       Form2[AccountantForAMLSRegulations](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.accountant_for_amls_regulations(f, edit)))
+          Future.successful(BadRequest(accountant_for_amls_regulations(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivities.accountantForAMLSRegulations(data)
             )
           } yield edit match {
