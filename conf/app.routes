@@ -121,4 +121,8 @@ POST        /business-activities/risk-assessment         controllers.businessact
 GET         /business-activities/employees              controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
 POST        /business-activities/employees              controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
 
+GET         /business-activities/accountant-details controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
+POST        /business-activities/accountant-details controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+
 GET         /business-activities/check-your-answers                       controllers.businessactivities.SummaryController.get()
+

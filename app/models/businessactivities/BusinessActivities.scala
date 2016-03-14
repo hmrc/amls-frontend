@@ -11,7 +11,8 @@ case class BusinessActivities(
                                accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
                                identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None,
                                riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
-                               howManyEmployees: Option[HowManyEmployees] = None
+                               howManyEmployees: Option[HowManyEmployees] = None,
+                               whoIsYourAccountant: Option[WhoIsYourAccountant] = None
                              ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
@@ -47,6 +48,9 @@ case class BusinessActivities(
   def employees(p: HowManyEmployees): BusinessActivities =
     this.copy(howManyEmployees = Some(p))
 
+  def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
+    this.copy(whoIsYourAccountant = Some(p))
+
 }
 
 object BusinessActivities {
@@ -67,7 +71,8 @@ object BusinessActivities {
       __.read[Option[AccountantForAMLSRegulations]] and
       __.read[Option[IdentifySuspiciousActivity]] and
       __.read[Option[RiskAssessmentPolicy]] and
-      __.read[Option[HowManyEmployees]]
+      __.read[Option[HowManyEmployees]] and
+      __.read[Option[WhoIsYourAccountant]]
     ) (BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
@@ -83,7 +88,8 @@ object BusinessActivities {
         Json.toJson(model.accountantForAMLSRegulations).asOpt[JsObject],
         Json.toJson(model.identifySuspiciousActivity).asOpt[JsObject],
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
-        Json.toJson(model.howManyEmployees).asOpt[JsObject]
+        Json.toJson(model.howManyEmployees).asOpt[JsObject],
+        Json.toJson(model.whoIsYourAccountant).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }

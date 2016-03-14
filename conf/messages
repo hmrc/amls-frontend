@@ -348,7 +348,7 @@ businessactivities.hight.value.customer.lbl = Where do your most high-value cust
 businessactivities.hight.value.customer.lbl.hint = ''High value customers'' are those who bring in the most revenue to your business.
 businessactivities.upto.10.countries = List up to 10 countries.
 
-businessactivities.accountantForAMLSRegulations.title = Does your business use an accountant for matters relating to money laundering regulations?
+businessactivities.accountantForAMLSRegulations.title = Does your business use an external accountant or financial advisor?
 
 businessactivities.riskassessment.policy.tile = Does your business have a formal risk assessment policy and procedure?
 businessactivities.paper.or.digital = Is it paper-based or digital?
@@ -357,5 +357,17 @@ businessactivities.RiskAssessmentType.lbl.02 = Digital
 
 businessactivities.employees.title = How many employees does your business have?
 businessactivities.employees.line2.text = How many are directly involved in activities related to anti-money laundering supervision?
+
+businessactivities.whoisyouraccountant.title = Who is your accountant?
+businessactivities.whoisyouraccountant.heading = Who is your accountant?
+businessactivities.whoisyouraccountant.name = Name
+businessactivities.whoisyouraccountant.tradingName = Trading name (if different)
+businessactivities.whoisyouraccountant.address = Address
+businessactivities.whoisyouraccountant.ukAddress = This is a UK address
+businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas address
+businessactivities.whoisyouraccountant.country = Country
+businessactivities.whoisyouraccountant.postCode = Postcode
+businessactivities.whoisyouraccountant.taxMessage = Does this accountant also deal with HMRC on behalf of your business, for tax-related matters?
+businessactivities.whoisyouraccountant.reference.details = Your accountant''s HMRC Agent Reference Number
 
 businessactivities.summary.directly.involved.text = directly involved in MLR activities

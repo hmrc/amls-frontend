@@ -36,7 +36,7 @@
     @model.expectedBusinessTurnover.map { turnover =>
         <table>
             <tr>
-                <th class="summary-title">@Messages("businessactivities.turnover.title")</th>
+                <th class="summary-title">@Messages("businessactivities.business-turnover.title")</th>
                 <td><a href="@controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -57,7 +57,7 @@
     @model.expectedAMLSTurnover.map { turnover =>
         <table>
             <tr>
-                <th class="summary-title">@Messages("businessactivities.business-turnover.title")</th>
+                <th class="summary-title">@Messages("businessactivities.turnover.title")</th>
                 <td><a href="@controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -256,16 +256,30 @@
             case true => {
             <table>
                 <tr>
-                    <th class="summary-title">@Messages("businessactivities.accountantForAMLSRegulations.title")</th>
+                    <th class="summary-title">@Messages("businessactivities.whoisyouraccountant.title")</th>
                     <td colspan="2"><a
-                            href="@controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true)">@Messages("button.edit")</a>
+                            href="@controllers.businessactivities.routes.WhoIsYourAccountantController.get(true)">@Messages("button.edit")</a>
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="2">
-                       
-                    </td>
-                </tr>
+                @model.whoIsYourAccountant.map {accountant=>
+                    <tr>
+                        <td colspan="2">
+                            @accountant.name
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @accountant.tradingName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @accountant.address.toLines.map {dtls=>
+                                @dtls <br>
+                            }
+                        </td>
+                    </tr>
+                }
             </table>
             }
             case false =>{}

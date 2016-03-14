@@ -36,9 +36,9 @@ trait AccountantForAMLSRegulationsController extends BaseController {
             _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
               businessActivities.accountantForAMLSRegulations(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SummaryController.get())
+          } yield (edit, data.accountantForAMLSRegulations) match {
+            case (false, true) => Redirect(routes.WhoIsYourAccountantController.get())
+            case _ => Redirect(routes.SummaryController.get())
           }
       }
     }
