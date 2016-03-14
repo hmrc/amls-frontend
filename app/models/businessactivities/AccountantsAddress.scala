@@ -24,7 +24,7 @@ case class NonUkAccountantsAddress(
                                   ) extends AccountantsAddress
 
 
-object AccountantsAddress extends AccountantsAddress {
+object AccountantsAddress {
 
   implicit val formRule: Rule[UrlFormEncoded, AccountantsAddress] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._

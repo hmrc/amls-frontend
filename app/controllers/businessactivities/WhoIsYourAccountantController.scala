@@ -19,7 +19,7 @@ trait WhoIsYourAccountantController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
           val form = (for {
             businessActivities <- response
@@ -37,8 +37,8 @@ trait WhoIsYourAccountantController extends BaseController {
         case ValidForm(_, data) => {
           for {
             businessActivity <-
-            dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
+            dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivity.whoIsYourAccountant(data)
             )
           } yield Redirect(routes.WhatYouNeedController.get())

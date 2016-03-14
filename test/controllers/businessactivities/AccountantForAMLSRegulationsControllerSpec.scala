@@ -111,7 +111,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhatYouNeedController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
       }
 
     }
