@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.businessmatching.{BusinessType, BusinessMatching}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching._
 
 import scala.concurrent.Future
 
@@ -15,7 +16,7 @@ trait BusinessTypeController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) map {
+      dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
         option =>
           // TODO Add conditional logic here
 //          val redirect = for {
@@ -24,7 +25,7 @@ trait BusinessTypeController extends BaseController {
 //            businessType <- reviewDetails.businessType
 //          } yield Redirect(controllers.routes.MainSummaryController.onPageLoad())
 //          redirect getOrElse Ok(views.html.business_type(EmptyForm))
-          Ok(views.html.business_type(EmptyForm))
+          Ok(business_type(EmptyForm))
       }
   }
 
@@ -32,9 +33,9 @@ trait BusinessTypeController extends BaseController {
     implicit authContext => implicit request =>
       Form2[BusinessType](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.business_type(f)))
+          Future.successful(BadRequest(business_type(f)))
         case ValidForm(_, data) =>
-          dataCache.fetchDataShortLivedCache[BusinessMatching](BusinessMatching.key) flatMap {
+          dataCache.fetch[BusinessMatching](BusinessMatching.key) flatMap {
             bm =>
               // TODO: Put some stuff in a service
               val updatedDetails = for {
@@ -51,7 +52,7 @@ trait BusinessTypeController extends BaseController {
               }
              updatedDetails map {
                details =>
-                 dataCache.saveDataShortLivedCache[BusinessMatching](BusinessMatching.key, updatedDetails) map {
+                 dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
                    _ =>
                      Redirect(controllers.routes.MainSummaryController.onPageLoad())
                  }

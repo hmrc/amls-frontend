@@ -11,6 +11,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
@@ -28,6 +29,8 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "TransactionRecordController" must {
 
     "use correct services" in new Fixture {
@@ -37,7 +40,7 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
 
     "load the Customer Record Page" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -48,7 +51,7 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
 
     "pre-populate the Customer Record Page" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(transactionRecord = Some(TransactionRecordYes(Set(Paper)))))))
 
       val result = controller.get()(request)
@@ -67,11 +70,11 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
         "transactions[1]" -> "02"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(transactionRecord = Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)))))))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -86,11 +89,11 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
         "transactions[1]" -> "02"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(transactionRecord = Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet)))))))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -104,11 +107,11 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
         "transactions[1]" -> "02"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

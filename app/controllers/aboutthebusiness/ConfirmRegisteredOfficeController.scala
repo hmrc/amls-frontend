@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{AboutTheBusiness, ConfirmRegisteredOffice}
+import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
@@ -16,10 +17,10 @@ trait ConfirmRegisteredOfficeController extends BaseController {
     implicit authContext => implicit request =>
       for {
         registeredOffice <-
-        dataCache.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
+          dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield registeredOffice match {
         case Some(AboutTheBusiness(_, _, _, Some(data), _)) =>
-          Ok(views.html.confirm_registered_office_or_main_place(EmptyForm, data))
+          Ok(confirm_registered_office_or_main_place(EmptyForm, data))
         case _ =>
           Redirect(routes.RegisteredOfficeController.get())
       }
@@ -31,10 +32,10 @@ trait ConfirmRegisteredOfficeController extends BaseController {
         case f: InvalidForm =>
           for {
             aboutTheBusiness <-
-            dataCache.fetchDataShortLivedCache[AboutTheBusiness](AboutTheBusiness.key)
+            dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
           } yield aboutTheBusiness match {
             case Some(AboutTheBusiness(_, _, _, Some(registeredOffice), _)) =>
-              BadRequest(views.html.confirm_registered_office_or_main_place(f, registeredOffice))
+              BadRequest(confirm_registered_office_or_main_place(f, registeredOffice))
             case _ =>
               Redirect(routes.RegisteredOfficeController.get(edit))
           }

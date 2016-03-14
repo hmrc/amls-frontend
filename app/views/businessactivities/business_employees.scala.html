@@ -1,0 +1,31 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+s"""${f("franchiseName").id}-fieldset"""
+}
+
+@main(
+title = Messages("businessactivities.employees.title")
+)  {
+
+        @heading("businessactivities.employees.title", "summary.businessactivities")
+
+
+        @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
+
+        @input(f("employeeCount"), "", bold = false)
+
+        <span class="form-field">
+            @Messages("businessactivities.employees.line2.text")
+        </span>
+
+        @input(f("employeeCountAMLSSupervision"), "", bold = false)
+
+        @submit(edit)
+
+        }
+
+   }

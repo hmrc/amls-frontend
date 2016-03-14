@@ -83,10 +83,10 @@ object TransactionRecord {
     (__ \ "isRecorded").read[Boolean] flatMap {
       case true => (__ \ "transactions").read[Set[String]].flatMap {x:Set[String] =>
         x.map {
-            case "01" => Reads(_ => JsSuccess(Paper))
-            case "02" => Reads(_ => JsSuccess(DigitalSpreadsheet))
+            case "01" => Reads(_ => JsSuccess(Paper)) map identity[TransactionType]
+            case "02" => Reads(_ => JsSuccess(DigitalSpreadsheet)) map identity[TransactionType]
             case "03" =>
-              (JsPath \ "name").read[String].map (DigitalSoftware.apply  _)
+              (JsPath \ "name").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
             case _ =>
               Reads(_ => JsError((JsPath \ "transactions") -> ValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TransactionType]]](

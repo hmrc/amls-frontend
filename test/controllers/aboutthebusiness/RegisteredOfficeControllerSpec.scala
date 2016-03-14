@@ -9,6 +9,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 
@@ -26,6 +27,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "RegisteredOfficeController" must {
 
     "use correct services" in new Fixture {
@@ -37,7 +40,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "load the where is your registered office or main place of business place page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -52,7 +55,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())(any(), any(), any())).
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).
         thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, Some(ukAddress), None))))
 
       val result = controller.get()(request)
@@ -62,8 +65,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "successfully submit form and navigate to target page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache(any())(any(), any(), any())).thenReturn(Future.successful(None))
-      when (controller.dataCacheConnector.saveDataShortLivedCache(any(), any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch(any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true",
@@ -79,8 +82,8 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
 
     "fail form submission on validation error" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache(any())(any(), any(), any())).thenReturn(Future.successful(None))
-      when (controller.dataCacheConnector.saveDataShortLivedCache(any(), any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch(any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true",

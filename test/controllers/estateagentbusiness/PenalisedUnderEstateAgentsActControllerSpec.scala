@@ -11,6 +11,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -26,10 +27,12 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "PenalisedUnderEstateAgentsActController" must {
 
     "load the blank page when the user visits the first time" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -37,7 +40,7 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
     }
 
     "load the page with data when the user revisits at a later time" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None, None,
         Some(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before"))))))
 
@@ -57,11 +60,11 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
         "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)

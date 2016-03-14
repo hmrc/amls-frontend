@@ -9,6 +9,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -24,11 +25,13 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "BankAccountTypeController" must {
 
     "on get display kind of bank account page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -38,7 +41,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
 
     "on get display kind of bank account page with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
 
       val result = controller.get(1)(request)
@@ -54,11 +57,11 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
         "bankAccountType" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -71,11 +74,11 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
         "bankAccountType" -> "04"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
+      when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -88,11 +91,11 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneServerPerSuite wit
         "bankAccountType" -> "10"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[Seq[BankDetails]](any())
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[Seq[BankDetails]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

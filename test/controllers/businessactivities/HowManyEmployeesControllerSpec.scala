@@ -12,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
@@ -27,6 +28,8 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "HowManyEmployeesController" must {
 
     "use correct services" in new Fixture {
@@ -35,7 +38,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "on get display the how many employees page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -43,7 +46,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
     }
 
     "on get display the how many employees page with pre populated data" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessActivities(howManyEmployees = Some(HowManyEmployees("163", "17"))))))
       val result = controller.get()(request)
@@ -60,11 +63,11 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "employeeCountAMLSSupervision" -> "123"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -101,11 +104,11 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
         "employeeCountAMLSSupervision" -> "12345"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val resultTrue = controller.post(true)(newRequest)
       //status(resultTrue) must be(NOT_IMPLEMENTED)

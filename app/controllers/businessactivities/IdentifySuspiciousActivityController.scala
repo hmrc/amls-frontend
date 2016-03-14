@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms._
 import models.businessactivities.{BusinessActivities, _}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessactivities._
 
 import scala.concurrent.Future
 
@@ -15,13 +16,13 @@ trait IdentifySuspiciousActivityController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
+      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form = (for {
+          val form: Form2[IdentifySuspiciousActivity] = (for {
             businessActivities <- response
             identifySuspiciousActivity <- businessActivities.identifySuspiciousActivity
           } yield Form2[IdentifySuspiciousActivity](identifySuspiciousActivity)).getOrElse(EmptyForm)
-          Ok(views.html.identify_suspicious_activity(form, edit))
+          Ok(identify_suspicious_activity(form, edit))
       }
   }
 
@@ -29,11 +30,11 @@ trait IdentifySuspiciousActivityController extends BaseController {
     implicit authContext => implicit request =>
       Form2[IdentifySuspiciousActivity](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.identify_suspicious_activity(f, edit)))
+          Future.successful(BadRequest(identify_suspicious_activity(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivities <- dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.saveDataShortLivedCache[BusinessActivities](BusinessActivities.key,
+            businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivities.identifySuspiciousActivity(data)
             )
           } yield edit match {

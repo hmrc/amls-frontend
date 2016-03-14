@@ -12,7 +12,7 @@ trait SummaryController extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetchDataShortLivedCache[BusinessActivities](BusinessActivities.key) map {
+      dataCache.fetch[BusinessActivities](BusinessActivities.key) map {
         case Some(data) => Ok(views.html.business_activities_summary(data))
         case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
       }

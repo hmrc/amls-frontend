@@ -27,6 +27,8 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "NCARegisteredController" must {
 
     "use correct services" in new Fixture {
@@ -38,7 +40,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       "load the NCA Registered page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -53,7 +55,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
         val ncaRegistered = Some(NCARegistered(true))
         val activities = BusinessActivities(ncaRegistered = ncaRegistered)
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -69,7 +71,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
         val ncaRegistered = Some(NCARegistered(false))
         val activities = BusinessActivities(ncaRegistered = ncaRegistered)
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -87,11 +89,11 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
 
         val newRequest = request.withFormUrlEncodedBody("ncaRegistered" -> "true")
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -101,11 +103,11 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
       "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("ncaRegistered" -> "true")
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -119,11 +121,11 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
       val newRequest = request.withFormUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -134,11 +136,11 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
       val newRequest = request.withFormUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -149,7 +151,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
   "on post invalid data show error" in new Fixture {
 
     val newRequest = request.withFormUrlEncodedBody()
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+    when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
     val result = controller.post()(newRequest)
@@ -162,7 +164,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
     val newRequest = request.withFormUrlEncodedBody(
       "ncaRegistered" -> ""
     )
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+    when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
     val result = controller.post()(newRequest)

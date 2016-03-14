@@ -11,6 +11,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -26,6 +27,8 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "AccountantForAMLSRegulationsController" must {
 
     "use correct services" in new Fixture {
@@ -37,7 +40,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
       "load the Accountant For AMLSRegulations page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -52,7 +55,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
         val accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true))
         val activities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -68,7 +71,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
         val accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(false))
         val activities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -86,11 +89,11 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
         val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -100,15 +103,15 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
       "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
-        when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantController.get().url))
       }
 
     }
@@ -118,11 +121,11 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
       val newRequest = request.withFormUrlEncodedBody(
         "accountantForAMLSRegulations" -> "false"
       )
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -133,11 +136,11 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
       val newRequest = request.withFormUrlEncodedBody(
         "accountantForAMLSRegulations" -> "false"
       )
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -148,7 +151,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
   "on post invalid data show error" in new Fixture {
 
     val newRequest = request.withFormUrlEncodedBody()
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+    when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
     val result = controller.post()(newRequest)
@@ -161,7 +164,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
     val newRequest = request.withFormUrlEncodedBody(
       "WhatYouNeedController" -> ""
     )
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())(any(), any(), any()))
+    when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
     val result = controller.post()(newRequest)

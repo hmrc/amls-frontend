@@ -10,6 +10,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 
@@ -27,11 +28,13 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "ExpectedBusinessTurnoverControllerSpec" must {
 
     "on get display the Expected Business Turnover page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[ExpectedBusinessTurnover](any())
+      when(controller.dataCacheConnector.fetch[ExpectedBusinessTurnover](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -41,7 +44,7 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
 
     "on get display the Expected Business Turnover page with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)))))
 
       val result = controller.get()(request)
@@ -57,11 +60,11 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
         "expectedBusinessTurnover" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -74,11 +77,11 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneServerPerS
         "expectedBusinessTurnover" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.saveDataShortLivedCache[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

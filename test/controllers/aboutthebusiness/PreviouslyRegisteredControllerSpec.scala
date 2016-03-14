@@ -10,6 +10,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -25,10 +26,12 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
     }
   }
 
+  val emptyCache = CacheMap("", Map.empty)
+
   "BusinessRegisteredWithHMRCBeforeController" must {
 
     "on get display the previously registered with HMRC page" in new Fixture {
-      when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -38,7 +41,7 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
 
   "on get display the previously registered with HMRC with pre populated data" in new Fixture {
 
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+    when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("12345678"))))))
 
     val result = controller.get()(request)
@@ -56,11 +59,11 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
       "prevMLRRegNo" -> "12345678"
     )
 
-    when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+    when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-    when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+    when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)

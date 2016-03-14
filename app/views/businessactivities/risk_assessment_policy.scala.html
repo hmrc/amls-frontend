@@ -1,0 +1,36 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@main(
+    title = Messages("businessactivities.riskassessment.policy.tile")
+) {
+
+    @heading("businessactivities.riskassessment.policy.tile", "summary.businessactivities")
+
+    @form(f, controllers.businessactivities.routes.RiskAssessmentController.post(edit)) {
+
+        @inlineRadioGroup(f("isRedress")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("hasPolicy"), "lbl.yes", "true", target = s"#${f("riskassessments").id}-fieldset")
+            @radio(f("hasPolicy"), "lbl.no", "false")
+        }
+
+        @fieldset("TODO", jsHidden = true, id = s"""${f("riskassessments").id}-fieldset""") {
+            <span class="form-label-bold">
+                @Messages("businessactivities.paper.or.digital")
+            </span>
+            <span class="form-hint">
+                @Messages("lbl.select.all")
+            </span>
+            @radioGroup(f("riskassessments")) {
+                @legend("TODO", jsHidden = true)
+                @checkbox(f("riskassessments"), "businessactivities.RiskAssessmentType.lbl.01", "01")
+                @checkbox(f("riskassessments"), "businessactivities.RiskAssessmentType.lbl.02", "02")
+            }
+        }
+        <br>
+        @submit(edit)
+    }
+}

@@ -17,6 +17,7 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with Moc
       override val authConnector = self.authConnector
     }
   }
+
   "WhatYouNeedController" must {
 
       "use correct services" in new Fixture {

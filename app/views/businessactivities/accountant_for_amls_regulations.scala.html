@@ -1,0 +1,22 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+
+@main(
+title = Messages("businessactivities.accountantForAMLSRegulations.title")
+) {
+
+@heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
+
+@form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
+
+    @inlineRadioGroup(f("AccountantForAMLSRegulations")) {
+        @radio(f("accountantForAMLSRegulations"), "lbl.yes", "true")
+        @radio(f("accountantForAMLSRegulations"), "lbl.no", "false")
+    }
+    @submit(edit)
+
+    }
+}

@@ -2,6 +2,7 @@ package connectors
 
 import config.AmlsShortLivedCache
 import play.api.libs.json
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -13,33 +14,29 @@ trait DataCacheConnector {
 
   def shortLivedCache: ShortLivedCache
 
-  def fetchDataShortLivedCache[T](key: String, cacheId: String)(implicit hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
-    shortLivedCache.fetchAndGetEntry[T](key, cacheId)
-  }
+  def fetch[T]
+  (cacheId: String)
+  (implicit
+   authContext: AuthContext,
+   hc: HeaderCarrier,
+   formats: json.Format[T]
+  ): Future[Option[T]] =
+    shortLivedCache.fetchAndGetEntry[T](authContext.user.oid, cacheId)
 
-  def fetchDataShortLivedCache[T](cacheId: String)(implicit user: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
-    shortLivedCache.fetchAndGetEntry[T](user.user.oid, cacheId)
-  }
+  def save[T]
+  (cacheId: String, data: T)
+  (implicit
+   authContext: AuthContext,
+   hc: HeaderCarrier,
+   write: Writes[T]
+  ): Future[CacheMap] =
+    shortLivedCache.cache(authContext.user.oid, cacheId, data)
 
-  def saveDataShortLivedCache[T](key: String, cacheId: String, data: T)(implicit hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
-    shortLivedCache.cache(key, cacheId, data) flatMap {
-      data => Future.successful(data.getEntry[T](cacheId))
-    }
-  }
-
-  def saveDataShortLivedCache[T](cacheId: String, data: T)(implicit user: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
-    shortLivedCache.cache(user.user.oid, cacheId, data) flatMap {
-      data => Future.successful(data.getEntry[T](cacheId))
-    }
-  }
-
-  def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] = {
+  def fetchAll
+  (implicit hc: HeaderCarrier,
+   authContext: AuthContext
+  ): Future[Option[CacheMap]] =
     shortLivedCache.fetch(authContext.user.oid)
-  }
-
-  def fetchAll(key: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
-    shortLivedCache.fetch(key)
-  }
 }
 
 object DataCacheConnector extends DataCacheConnector {
