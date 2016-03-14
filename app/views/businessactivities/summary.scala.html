@@ -23,7 +23,7 @@
             </td>
         </tr>
         @model.involvedInOther.map {
-            case InvolvedInOtherNo => { @Messages("lbl.na") }
+            case InvolvedInOtherNo => { }
             case InvolvedInOtherYes(v) => {
             <tr>
                 <td colspan="2">
@@ -131,14 +131,19 @@
                 }
             </td>
         </tr>
-        @model.customersOutsideUK.map { ca =>
-            <tr>
-                <td colspan="2">
-                    @ca.toLines.filter(_.length > 1).map {country=>
-                        @country<br>
-                    }
-                </td>
-            </tr>
+        @model.customersOutsideUK.map {
+            case CustomersOutsideUKNo => { }
+            case CustomersOutsideUKYes(v) => {
+                @model.customersOutsideUK.map { ca =>
+                    <tr>
+                        <td colspan="2">
+                            @ca.toLines.filter(_.length > 1).map {country=>
+                                @country<br>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
         }
     </table>
 
