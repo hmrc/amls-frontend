@@ -155,23 +155,25 @@
                     }
                 </td>
             </tr>
-            <tr>
-                <td colspan="2">
+
                     @model.transactionRecord.map {
                         case TransactionRecordNo => { }
                         case TransactionRecordYes(v) => {
-                            @v.map { x=>
-                                @x match {
-                                    case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
-                                    case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
-                                    case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"):@software}
+                        <tr>
+                            <td colspan="2">
+                                @v.map { x=>
+                                    @x match {
+                                        case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
+                                        case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
+                                        case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"):@software}
+                                    }
+                                    <br>
                                 }
-                                <br>
-                            }
+                            </td>
+                        </tr>
                         }
                     }
-                </td>
-            </tr>
+
         </table>
     <table>
         <tr>
@@ -218,22 +220,22 @@
                 }
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                @model.riskAssessmentPolicy.map {
-                    case RiskAssessmentPolicyNo => { }
-                    case RiskAssessmentPolicyYes(v) => {
-                        @v.map { x=>
-                            @x match {
-                                case PaperBased => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
-                                case Digital => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
-                            }
-                            <br>
+        @model.riskAssessmentPolicy.map {
+            case RiskAssessmentPolicyNo => { }
+            case RiskAssessmentPolicyYes(v) => {
+            <tr>
+                <td colspan="2">
+                    @v.map { x=>
+                        @x match {
+                            case PaperBased => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
+                            case Digital => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
                         }
+                        <br>
                     }
-                }
-            </td>
-        </tr>
+                </td>
+            </tr>
+            }
+        }
     </table>
     <table>
         <tr>
@@ -274,8 +276,8 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            @accountant.address.toLines.map {dtls=>
-                                @dtls <br>
+                            @accountant.address.toLines.map {line=>
+                                @line <br>
                             }
                         </td>
                     </tr>
