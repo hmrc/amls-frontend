@@ -44,7 +44,8 @@ trait YourAgentController extends RepeatingSection with BaseController {
                 Redirect(routes.WhatDoesYourBusinessDoController.get(index))
             }
         }
-    }
+      }
+  }
 }
 
 object YourAgentController extends YourAgentController {
