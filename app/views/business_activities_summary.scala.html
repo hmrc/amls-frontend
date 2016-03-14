@@ -36,7 +36,7 @@
     @model.expectedBusinessTurnover.map { turnover =>
         <table>
             <tr>
-                <th class="summary-title">@Messages("businessactivities.summary.anticipated.turnover")</th>
+                <th class="summary-title">@Messages("businessactivities.turnover.title")</th>
                 <td><a href="@controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -57,7 +57,7 @@
     @model.expectedAMLSTurnover.map { turnover =>
         <table>
             <tr>
-                <th class="summary-title">@Messages("businessactivities.summary.anticipated.mlr.turnover")</th>
+                <th class="summary-title">@Messages("businessactivities.business-turnover.title")</th>
                 <td><a href="@controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -103,7 +103,7 @@
     @model.howManyEmployees.map { employees =>
         <table>
             <tr>
-                <th class="summary-title">@Messages("businessactivities.summary.employees")</th>
+                <th class="summary-title">@Messages("businessactivities.employees.title")</th>
                 <td colspan="2"><a href="@controllers.businessactivities.routes.HowManyEmployeesController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -251,5 +251,27 @@
             </td>
         </tr>
     </table>
-    <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
+    @model.accountantForAMLSRegulations.map {x=>
+        @x.accountantForAMLSRegulations match {
+            case true => {
+            <table>
+                <tr>
+                    <th class="summary-title">@Messages("businessactivities.accountantForAMLSRegulations.title")</th>
+                    <td colspan="2"><a
+                            href="@controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true)">@Messages("button.edit")</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                       
+                    </td>
+                </tr>
+            </table>
+            }
+            case false =>{}
+
+        }
+    }
+
+<a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">@Messages("button.summary.acceptandcomplete")</a>
 }

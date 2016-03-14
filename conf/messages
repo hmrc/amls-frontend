@@ -358,8 +358,4 @@ businessactivities.RiskAssessmentType.lbl.02 = Digital
 businessactivities.employees.title = How many employees does your business have?
 businessactivities.employees.line2.text = How many are directly involved in activities related to anti-money laundering supervision?
 
-
-businessactivities.summary.anticipated.turnover = Anticipated total business turnover for the next 12 months
-businessactivities.summary.anticipated.mlr.turnover = Anticipated MLR activity turnover for the next 12 months
-businessactivities.summary.employees = Employees
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
