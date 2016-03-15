@@ -25,4 +25,4 @@ class AmlsControllerSpec extends PlaySpec with OneServerPerSuite {
           contentAsString(result) must include(Messages("unauthorised.title"))
         }
     }
-  }
+}
