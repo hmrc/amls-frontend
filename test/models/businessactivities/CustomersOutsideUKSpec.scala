@@ -10,6 +10,14 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
   "CustomersOutsideUK" must {
 
+    "validate toLines for UK address" in {
+      CustomersOutsideUKYes(Countries("GP")).toLines must be (Seq("GP"))
+    }
+
+    "validate toLines for Non UK address" in {
+      CustomersOutsideUKNo.toLines mustBe Seq.empty
+    }
+
     "successfully validate the form Rule with option No" in {
       CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("false"))) must
         be(Success(CustomersOutsideUKNo))
@@ -17,8 +25,9 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
     "successfully validate the form Rule with option Yes" in {
       CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"),
-      "country_1" -> Seq("GS"))) must
-        be(Success(CustomersOutsideUKYes(Countries("GS"))))
+      "country_1" -> Seq("GS"),
+        "country_2" -> Seq("AR"))) must
+        be(Success(CustomersOutsideUKYes(Countries("GS", Some("AR")))))
     }
 
     "validate mandatory field when isOutside is not selected" in {
@@ -53,8 +62,14 @@ class CustomersOutsideUKSpec extends PlaySpec {
         "isOutside" -> Seq("true"),
         "country_1" -> Seq("GP")
         )
-
     }
+
+    "successfully write model with formWrite and option No" in {
+
+      val model = CustomersOutsideUKNo
+      CustomersOutsideUK.formWrites.writes(model) mustBe Map("isOutside" -> Seq("false"))
+    }
+
 
     "JSON validation" must {
       "successfully validate givcen values" in {
@@ -72,7 +87,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
           be(JsSuccess(CustomersOutsideUKNo, JsPath \ "isOutside"))
       }
 
-      "write valid data in using json write" in {
+      "write valid data using json write" in {
         Json.toJson[CustomersOutsideUK](CustomersOutsideUKYes(Countries("GS"))) must be (Json.obj("isOutside" -> true,
           "country_1" -> "GS",
           "country_2" -> JsNull,
@@ -85,6 +100,10 @@ class CustomersOutsideUKSpec extends PlaySpec {
           "country_9" -> JsNull,
           "country_10" ->JsNull
         ))
+      }
+
+      "write valid data using json write with option No" in {
+        Json.toJson[CustomersOutsideUK](CustomersOutsideUKNo) must be (Json.obj("isOutside" -> false))
       }
     }
   }
