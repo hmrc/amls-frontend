@@ -24,6 +24,11 @@ object DoesAccountantAlsoDealWithTax {
     }
   }
 
+  implicit val formWrites: Write[DoesAccountantAlsoDealWithTax, UrlFormEncoded] = Write {
+    case AccountantDoesAlsoDealWithTax(refNo) => Map("alsoDealsWithTax" -> Seq("true"), "accountantsReferenceNumber" -> Seq(refNo))
+    case AccountantDoesNotAlsoDealWithTax => Map("alsoDealsWithTax" -> Seq("false"))
+  }
+
   implicit val jsonReads: Reads[DoesAccountantAlsoDealWithTax] =
     (__ \ "doesAccountantAlsoDealWithTax").read[Boolean] flatMap {
       case true => (__ \ "accountantsReference").read[String] map AccountantDoesAlsoDealWithTax.apply
@@ -82,12 +87,7 @@ object WhoIsYourAccountant {
           "addressLine4" -> address.addressLine4.toSeq,
           "country" -> Seq(address.country)
         )
-      }) ++ (data.alsoDealsWithTax match {
-        case tax : AccountantDoesAlsoDealWithTax => Map(
-          "alsoDealsWithTax" -> Seq("false"),
-          "accountantsReferenceNumber" -> Seq(tax.accountantsRef))
-        case AccountantDoesNotAlsoDealWithTax => Map("alsoDealsWithTax" -> Seq("false"))
-      })
+      }) ++ DoesAccountantAlsoDealWithTax.formWrites.writes(data.alsoDealsWithTax)
     }
 
   implicit val formRule: Rule[UrlFormEncoded, WhoIsYourAccountant] =
