@@ -16,3 +16,8 @@ To stop the Services
 To start the app locally, kill the service AMLS_FRONTEND and then start using the command below
 
  sbt "run 9222"
+
+To update Service Manager, do as below
+
+ sudo pip install servicemanager --upgrade
+ 
