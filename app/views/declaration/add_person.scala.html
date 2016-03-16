@@ -1,0 +1,55 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@target = @{
+    s"""${f("other").id}-fieldset"""
+}
+
+@main(
+    title = Messages("declaration.addperson.title")
+) {
+
+    @heading("declaration.addperson.title", "submit.registration")
+
+    @form(f, controllers.aboutyou.routes.YourDetailsController.post(edit)) {
+
+        @input(
+            field = f("firstName"),
+            labelText = Messages("declaration.addperson.firstname")
+        )
+
+        @input(
+            field = f("middleName"),
+            labelText = Messages("declaration.addperson.middlename")
+        )
+
+        @input(
+            field = f("lastName"),
+            labelText = Messages("declaration.addperson.lastname")
+        )
+
+        <span class="form-field">
+            <strong>@Messages("declaration.addperson.whatsyourrole")</strong>
+        </span>
+
+        @radioGroup(f("roleWithinBusiness")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.01", "01")
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.02", "02")
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.03", "03")
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.04", "04")
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.05", "05")
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
+            @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("other"), "lbl.pleasespecify", bold = false)
+            }
+
+    }
+    @submit(edit)
+  }
+}
