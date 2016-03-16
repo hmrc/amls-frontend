@@ -57,6 +57,16 @@ class CustomersOutsideUKSpec extends PlaySpec {
         )))
     }
 
+    "validate mandatory field for min length when isOutside is  selected as Yes and country with invalid data" in {
+      val json = Map("isOutside" -> Seq("true"),
+        "country_1" -> Seq("A"))
+
+      CustomersOutsideUK.formRule.validate(json) must
+        be(Failure(Seq(
+          (Path \ "country_1") -> Seq(ValidationError("error.minLength", 2))
+        )))
+    }
+
     "validate mandatory country field" in {
       CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"))) must
         be(Failure(Seq(
@@ -73,6 +83,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
         "country_1" -> Seq("GP")
         )
     }
+
 
     "successfully write model with formWrite and option No" in {
 
