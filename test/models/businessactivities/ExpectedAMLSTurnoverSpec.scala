@@ -35,9 +35,6 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
         be(Success(ExpectedAMLSTurnover.Seventh))
     }
 
-
-    }
-
     "write correct data from enum value" in {
 
       ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.First) must
@@ -61,6 +58,13 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
       ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.Seventh) must
         be(Map("expectedAMLSTurnover" -> Seq("07")))
     }
+
+
+    "throw error on invalid data" in {
+      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("20"))) must
+        be(Failure(Seq((Path \ "expectedAMLSTurnover", Seq(ValidationError("error.invalid"))))))
+    }
+  }
 
   "JSON validation" must {
 
@@ -88,7 +92,6 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
         be(JsSuccess(ExpectedAMLSTurnover.Seventh, JsPath \ "expectedAMLSTurnover"))
     }
 
-
     "write the correct value" in {
 
       Json.toJson(ExpectedAMLSTurnover.First) must
@@ -111,8 +114,11 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
       Json.toJson(ExpectedAMLSTurnover.Seventh) must
         be(Json.obj("expectedAMLSTurnover" -> "07"))
+    }
 
-
+    "throw error for invalid data" in {
+      Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "20")) must
+        be(JsError(JsPath \ "expectedAMLSTurnover", ValidationError("error.invalid")))
     }
   }
 }

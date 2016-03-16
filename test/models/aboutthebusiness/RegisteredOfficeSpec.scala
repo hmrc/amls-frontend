@@ -9,34 +9,48 @@ import play.api.libs.json.{JsPath, JsSuccess, JsNull, Json}
 
 class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
-  "RegisteredOfficeOrMainPlaceOfBusiness" must {
+  "RegisteredOffice" must {
 
     "validate the given UK address" in {
-      val model = Map(
+      val ukModel = Map(
         "isUK" -> Seq("true"),
         "addressLine1" -> Seq("38B"),
-        "addressLine2" -> Seq("Longbenton"),
-        "addressLine3" -> Seq(""),
-        "addressLine4" -> Seq(""),
+        "addressLine2" -> Seq("building"),
+        "addressLine3" -> Seq("street"),
+        "addressLine4" -> Seq("Longbenton"),
         "postCode" -> Seq("NE7 7DX")
       )
 
-      RegisteredOffice.formRule.validate(model) must
-        be(Success(RegisteredOfficeUK("38B", "Longbenton", None, None, "NE7 7DX")))
+      RegisteredOffice.formRule.validate(ukModel) must
+        be(Success(RegisteredOfficeUK("38B", "building", Some("street"), Some("Longbenton"), "NE7 7DX")))
     }
 
     "validate the given non UK address" in {
-      val model = Map(
+      val nonUKModel = Map(
         "isUK" -> Seq("false"),
         "addressLineNonUK1" -> Seq("38B"),
-        "addressLineNonUK2" -> Seq("Longbenton"),
-        "addressLineNonUK3" -> Seq(""),
-        "addressLineNonUK4" -> Seq(""),
-        "country" -> Seq("UK")
+        "addressLineNonUK2" -> Seq("building"),
+        "addressLineNonUK3" -> Seq("street"),
+        "addressLineNonUK4" -> Seq("Area"),
+        "country" -> Seq("MN")
       )
 
-      RegisteredOffice.formRule.validate(model) must
-        be(Success(RegisteredOfficeNonUK("38B", "Longbenton", None, None, "UK")))
+      RegisteredOffice.formRule.validate(nonUKModel) must
+        be(Success(RegisteredOfficeNonUK("38B", "building", Some("street"), Some("Area"), "MN")))
+    }
+
+    "validate toLines for UK address" in {
+      RegisteredOfficeUK("38B", "some street", None, None, "NE7 7ST").toLines must be (Seq("38B",
+        "some street",
+        "NE7 7ST"))
+
+    }
+
+    "validate toLines for Non UK address" in {
+      RegisteredOfficeNonUK("38B", "some street", None, None, "AR").toLines must be (Seq("38B",
+        "some street",
+        "AR"))
+
     }
 
     "fail to validation for not filling mandatory field" in {
@@ -75,29 +89,44 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         "isUK" -> Seq("true"),
         "addressLine1" -> Seq("38B"),
         "addressLine2" -> Seq("a"*36),
-        "addressLine3" -> Seq(""),
-        "addressLine4" -> Seq(""),
+        "addressLine3" -> Seq("a"*36),
+        "addressLine4" -> Seq("a"*36),
         "postCode" -> Seq("UK"*12)
       )
 
       RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "addressLine2") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
+          (Path \ "addressLine3") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
+          (Path \ "addressLine4") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
           (Path \ "postCode") -> Seq(ValidationError("error.maxLength", FormTypes.maxPostCodeTypeLength))
         )))
     }
 
-    "write correct data to the model " in {
+    "write correct UK address to the model" in {
 
-      val data = RegisteredOfficeUK("38B", "Longbenton", None, None, "NE7 7DX")
+      val data = RegisteredOfficeUK("38B", "Some building", Some("street"), Some("Longbenton"), "NE7 7DX")
 
-      RegisteredOffice.formWrites.writes(data) must be
-      Map("addressLine1" -> "38B",
-        "addressLine2" -> "Longbenton",
-        "addressLine3" -> "",
-        "addressLine4" -> "",
-        "postCode" -> "NE7 &DX")
+      RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("true"),
+                                                          "addressLine1" -> Seq("38B"),
+                                                          "addressLine2" -> Seq("Some building"),
+                                                          "addressLine3" -> Seq("street"),
+                                                          "addressLine4" -> Seq("Longbenton"),
+                                                          "postCode" -> Seq("NE7 7DX"))
     }
+
+    "write correct Non UK address to the model" in {
+
+      val data = RegisteredOfficeNonUK("38B", "Some Street", None, None, "MN")
+
+      RegisteredOffice.formWrites.writes(data) mustBe  Map("isUK" -> Seq("false"),
+                                                            "addressLineNonUK1" -> Seq("38B"),
+                                                            "addressLineNonUK2" -> Seq("Some Street"),
+                                                            "addressLineNonUK3" -> Seq(""),
+                                                            "addressLineNonUK4" -> Seq(""),
+                                                            "country" -> Seq("MN"))
+    }
+
 
     "json read the given non UK address" in {
 

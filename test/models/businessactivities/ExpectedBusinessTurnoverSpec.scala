@@ -12,7 +12,6 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
   "Form Validation" must {
 
     "successfully validate given an enum value" in {
-
       ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("01"))) must
         be(Success(ExpectedBusinessTurnover.First))
 
@@ -35,7 +34,9 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
         be(Success(ExpectedBusinessTurnover.Seventh))
     }
 
-
+    "throw error on invalid data" in {
+      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("20"))) must
+        be(Failure(Seq((Path \ "expectedBusinessTurnover", Seq(ValidationError("error.invalid"))))))
     }
 
     "write correct data from enum value" in {
@@ -61,6 +62,7 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
       ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.Seventh) must
         be(Map("expectedBusinessTurnover" -> Seq("07")))
     }
+  }
 
   "JSON validation" must {
 
@@ -90,7 +92,6 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
 
 
     "write the correct value" in {
-
       Json.toJson(ExpectedBusinessTurnover.First) must
         be(Json.obj("expectedBusinessTurnover" -> "01"))
 
@@ -111,8 +112,11 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
 
       Json.toJson(ExpectedBusinessTurnover.Seventh) must
         be(Json.obj("expectedBusinessTurnover" -> "07"))
+    }
 
-
+    "throw error for invalid data" in {
+      Json.fromJson[ExpectedBusinessTurnover](Json.obj("expectedBusinessTurnover" -> "20")) must
+        be(JsError(JsPath \ "expectedBusinessTurnover", ValidationError("error.invalid")))
     }
   }
 }

@@ -1,6 +1,5 @@
 package models.businessactivities
 
-import models.businessactivities.AccountantForAMLSRegulations
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.Success
 import play.api.libs.json.{JsPath, JsSuccess, Json}
