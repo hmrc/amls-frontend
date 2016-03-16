@@ -26,8 +26,18 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "successfully validate the form Rule with option Yes" in {
       CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"),
       "country_1" -> Seq("GS"),
-        "country_2" -> Seq("AR"))) must
-        be(Success(CustomersOutsideUKYes(Countries("GS", Some("AR")))))
+        "country_2" -> Seq("AR"),
+        "country_3" -> Seq("AB"),
+        "country_4" -> Seq("AC"),
+        "country_5" -> Seq("AD"),
+        "country_6" -> Seq("AE"),
+        "country_7" -> Seq("AF"),
+        "country_8" -> Seq("AG"),
+        "country_9" -> Seq("AH"),
+        "country_10" -> Seq("AI")
+      )) must
+        be(Success(CustomersOutsideUKYes(Countries("GS", Some("AR"), Some("AB"), Some("AC"),
+          Some("AD"), Some("AE"), Some("AF"), Some("AG"), Some("AH"),Some("AI")))))
     }
 
     "validate mandatory field when isOutside is not selected" in {
@@ -69,7 +79,6 @@ class CustomersOutsideUKSpec extends PlaySpec {
       val model = CustomersOutsideUKNo
       CustomersOutsideUK.formWrites.writes(model) mustBe Map("isOutside" -> Seq("false"))
     }
-
 
     "JSON validation" must {
       "successfully validate givcen values" in {
