@@ -237,11 +237,11 @@ estateagentbusiness.registered.redress.text = A redress scheme is an independent
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.businessType.title = Select your business type
-businessmatching.businessType.lbl.01 = Sole Proprietor
-businessmatching.businessType.lbl.02 = Limited Liability Partnership
+businessmatching.businessType.lbl.01 = Limited Liability Partnership
+businessmatching.businessType.lbl.02 = Sole Proprietor
 businessmatching.businessType.lbl.03 = Partnership
-businessmatching.businessType.lbl.04 = Corporate Body
-businessmatching.businessType.lbl.05 = Unincorporated Body
+businessmatching.businessType.lbl.04 = Limited Partnership or Limited Liability Partnership
+businessmatching.businessType.lbl.05 = Unincorporated Association or Trust
 
 businessmatching.registerservices.title=Business Matching - What do you need to register?
 businessmatching.registerservices.heading=What do you need to register?
