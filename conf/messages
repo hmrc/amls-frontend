@@ -371,3 +371,20 @@ businessactivities.whoisyouraccountant.taxMessage = Does this accountant also de
 businessactivities.whoisyouraccountant.reference.details = Your accountant''s HMRC Agent Reference Number
 
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
+
+submit.registration = Submit registration
+
+declaration.addperson.title = What is your name?
+declaration.addperson.firstname = First name
+declaration.addperson.middlename = Middle name (optional)
+declaration.addperson.lastname = Last name
+declaration.addperson.whatsyourrole = What's your role within the business?
+
+declaration.addperson.lbl.01=Beneficial shareholder
+declaration.addperson.lbl.02=Director
+declaration.addperson.lbl.03=External accountant
+declaration.addperson.lbl.04=Internal accountant
+declaration.addperson.lbl.05=Nominated officer
+declaration.addperson.lbl.06=Partner
+declaration.addperson.lbl.07=Sole proprietor
+declaration.addperson.lbl.08=Other
