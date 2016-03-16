@@ -4,6 +4,7 @@ import models.FormTypes._
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json.{Reads, JsSuccess, Writes, Json, __}
+import play.api.libs.functional.syntax._
 
 sealed trait DoesAccountantAlsoDealWithTax
 
@@ -44,14 +45,14 @@ object DoesAccountantAlsoDealWithTax {
   }
 }
 
-case class WhoIsYourAccountant(name: String,
-                               tradingName: Option[String],
+case class WhoIsYourAccountant(accountantsName: String,
+                               accountantsTradingName: Option[String],
                                address: AccountantsAddress,
                                alsoDealsWithTax: DoesAccountantAlsoDealWithTax) {
 
 
-  def name(newName: String) : WhoIsYourAccountant = this.copy(name = newName)
-  def tradingName(newTradingName: String) : WhoIsYourAccountant = this.copy(tradingName = Some(newTradingName))
+  def name(newName: String) : WhoIsYourAccountant = this.copy(accountantsName = newName)
+  def tradingName(newTradingName: String) : WhoIsYourAccountant = this.copy(accountantsTradingName = Some(newTradingName))
   def address(newAddress: AccountantsAddress) : WhoIsYourAccountant = this.copy(address = newAddress)
   def alsoDealsWithTax(newAlsoDealsWithTax: DoesAccountantAlsoDealWithTax) : WhoIsYourAccountant = this.copy(alsoDealsWithTax = newAlsoDealsWithTax)
 }
@@ -62,14 +63,26 @@ object WhoIsYourAccountant {
 
   val key = "who-is-your-accountant"
 
-  implicit val formats = Json.format[WhoIsYourAccountant]
+  implicit val jsonWrites : Writes[WhoIsYourAccountant] = Writes[WhoIsYourAccountant] { data:WhoIsYourAccountant =>
+    Json.obj("accountantsName" -> data.accountantsName,
+             "accountantsTradingName" -> data.accountantsTradingName) ++
+      Json.toJson(data.address).as[JsObject] ++
+      Json.toJson(data.alsoDealsWithTax).as[JsObject]
+  }
+
+  implicit val jsonReads : Reads[WhoIsYourAccountant] = (
+    ((__ \ "accountantsName").read[String] and
+     (__ \ "accountantsTradingName").read[Option[String]] and
+     (__).read[AccountantsAddress] and
+     (__).read[DoesAccountantAlsoDealWithTax])(WhoIsYourAccountant.apply _)
+    )
 
   implicit val formWrites = Write[WhoIsYourAccountant, UrlFormEncoded] {
     data: WhoIsYourAccountant =>
 
       Map(
-        "name" -> Seq(data.name),
-        "tradingName" -> data.tradingName.toSeq
+        "name" -> Seq(data.accountantsName),
+        "tradingName" -> data.accountantsTradingName.toSeq
       ) ++ (data.address match {
         case address: UkAccountantsAddress => Map(
           "isUK" -> Seq("true"),

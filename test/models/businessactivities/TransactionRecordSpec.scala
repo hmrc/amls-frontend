@@ -146,10 +146,10 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       "successfully validate given values with option Digital software" in {
         val json =  Json.obj("isRecorded" -> true,
           "transactions" -> Seq("03", "02"),
-        "name" -> "test")
+        "digitalSoftwareName" -> "test")
 
         Json.fromJson[TransactionRecord](json) must
-          be(JsSuccess(TransactionRecordYes(Set(DigitalSoftware("test"), DigitalSpreadsheet)), JsPath \ "isRecorded" \ "transactions" \ "name"))
+          be(JsSuccess(TransactionRecordYes(Set(DigitalSoftware("test"), DigitalSpreadsheet)), JsPath \ "isRecorded" \ "transactions" \ "digitalSoftwareName"))
       }
 
       "fail when on path is missing" in {
@@ -164,9 +164,9 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       }
 
       "write valid data in using json write" in {
-        Json.toJson[TransactionRecord](TransactionRecordYes(Set(Paper, DigitalSoftware("test")))) must be (Json.obj("isRecorded" -> true,
+        Json.toJson[TransactionRecord](TransactionRecordYes(Set(Paper, DigitalSoftware("test657")))) must be (Json.obj("isRecorded" -> true,
         "transactions" -> Seq("01", "03"),
-          "name" -> "test"
+          "digitalSoftwareName" -> "test657"
         ))
       }
 

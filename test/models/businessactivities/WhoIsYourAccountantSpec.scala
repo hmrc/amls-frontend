@@ -31,8 +31,8 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
   "WhoIsYourAccountant" must {
 
     "successfully complete a round trip json conversion" in {
-      WhoIsYourAccountant.formats.reads(
-        WhoIsYourAccountant.formats.writes(DefaultWhoIsYourAccountant)
+      WhoIsYourAccountant.jsonReads.reads(
+        WhoIsYourAccountant.jsonWrites.writes(DefaultWhoIsYourAccountant)
       ) shouldBe JsSuccess(DefaultWhoIsYourAccountant)
     }
 
