@@ -6,7 +6,7 @@ import play.api.data.mapping.{From, Rule, To, Write}
 case class AddPerson(firstName: String,
                      middleName: Option[String],
                      lastName: String,
-                     roleWithinTheBusiness: RoleWithinBusiness
+                     roleWithinBusiness: RoleWithinBusiness
                     )
 
 object AddPerson {
