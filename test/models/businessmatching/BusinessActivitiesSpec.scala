@@ -14,10 +14,17 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "validate model with few check box selected" in {
 
-      val model = Map("businessActivities[]" -> Seq("03","01"))
-      val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices))
+      val model = Map("businessActivities[]" -> Seq("03", "01", "02"))
+      val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, BillPaymentServices))
 
       BusinessActivities.formReads.validate(model) must be(Success(ba))
+
+      val model1 = Map("businessActivities[]" -> Seq("04", "05", "06"))
+      val ba1 = BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))
+
+      BusinessActivities.formReads.validate(model1) must be(Success(ba1))
+
+      BusinessActivities.formReads.validate(Map("businessActivities[]" -> Seq("07"))) must be(Success(BusinessActivities(Set(TelephonePaymentService))))
 
     }
 
@@ -51,15 +58,39 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
         be(Map("businessActivities" -> Seq("03","02", "05")))
     }
 
-    "write correct data for businessActivities value when residential option is selected" in {
+    "write correct data for businessActivities value on checkbox selected" in {
 
       BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices))) must
         be(Map("businessActivities" -> Seq("01")))
     }
 
+    "write correct data for businessActivities value when 3 checkbox selected" in {
+
+      BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
+        be(Map("businessActivities" -> Seq("07", "06", "04")))
+    }
+
     "get the value for each activity type" in {
-      val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices))
+      val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, HighValueDealing,
+        MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
       ba.getValue(EstateAgentBusinessService) must be ("03")
+      ba.getValue(AccountancyServices) must be ("01")
+      ba.getValue(HighValueDealing) must be ("04")
+      ba.getValue(MoneyServiceBusiness) must be ("05")
+      ba.getValue(TrustAndCompanyServices) must be ("06")
+      ba.getValue(TelephonePaymentService) must be ("07")
+
+    }
+
+    "get the message for each activity type" in {
+      AccountancyServices.getMessage must be ("businessmatching.registerservices.servicename.lbl.01")
+      BillPaymentServices.getMessage must be ("businessmatching.registerservices.servicename.lbl.02")
+      EstateAgentBusinessService.getMessage must be ("businessmatching.registerservices.servicename.lbl.03")
+      HighValueDealing.getMessage must be ("businessmatching.registerservices.servicename.lbl.04")
+      MoneyServiceBusiness.getMessage must be ("businessmatching.registerservices.servicename.lbl.05")
+      TrustAndCompanyServices.getMessage must be ("businessmatching.registerservices.servicename.lbl.06")
+      TelephonePaymentService.getMessage must be ("businessmatching.registerservices.servicename.lbl.07")
+
     }
 
     "JSON validation" must {
@@ -69,6 +100,13 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
         Json.fromJson[BusinessActivities](json) must
           be(JsSuccess(BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)), JsPath \ "businessActivities"))
+
+        Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01","02", "03"))) must
+          be(JsSuccess(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)), JsPath \ "businessActivities"))
+
+        Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"))) must
+          be(JsSuccess(BusinessActivities(Set(HighValueDealing)), JsPath \ "businessActivities"))
+
       }
 
       "fail when on invalid data" in {
@@ -78,14 +116,19 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     }
 
     "validate json write" in {
-      Json.toJson(BusinessActivities(Set(HighValueDealing))) must
-        be(Json.obj("businessActivities" -> Seq("04")))
+      Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService))) must
+        be(Json.obj("businessActivities" -> Seq("04", "03")))
     }
 
     "successfully validate json write" in {
       val json = Json.obj("businessActivities" -> Seq("02","07", "01"))
       Json.toJson(BusinessActivities(Set(BillPaymentServices, TelephonePaymentService, AccountancyServices))) must be(json)
 
+    }
+
+    "throw error for invalid data" in {
+      Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq(JsString("20")))) must
+        be(JsError((JsPath \ "businessActivities")(0) \"businessActivities" , ValidationError("error.invalid")))
     }
   }
 }

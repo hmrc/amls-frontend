@@ -1,30 +1,29 @@
 package models.businessactivities
 
 import models.FormTypes._
-import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.libs.json._
+import play.api.data.mapping.{Success, From, Rule, Write}
+import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait CustomersOutsideUK {
 
   def toLines: Seq[String] = this match {
     case CustomersOutsideUKYes(values) =>
-      Seq(
-        values.country_1,
-        values.country_2.getOrElse(""),
-        values.country_3.getOrElse(""),
-        values.country_4.getOrElse(""),
-        values.country_5.getOrElse(""),
-        values.country_6.getOrElse(""),
-        values.country_7.getOrElse(""),
-        values.country_8.getOrElse(""),
-        values.country_9.getOrElse(""),
-        values.country_10.getOrElse("")
-      )
+        Seq(
+          Some(values.country_1),
+          values.country_2,
+          values.country_3,
+          values.country_4,
+          values.country_5,
+          values.country_6,
+          values.country_7,
+          values.country_8,
+          values.country_9,
+          values.country_10
+        ).flatten
     case CustomersOutsideUKNo => Seq.empty
   }
 }
-
 
 case object CustomersOutsideUKNo extends  CustomersOutsideUK
 
@@ -73,15 +72,15 @@ object CustomersOutsideUK {
     case CustomersOutsideUKYes(countries) => {
       Map("isOutside" -> Seq("true"),
         "country_1" -> Seq(countries.country_1),
-        "country_2" -> Seq(countries.country_2.getOrElse("")),
-        "country_3" -> Seq(countries.country_3.getOrElse("")),
-        "country_4" -> Seq(countries.country_4.getOrElse("")),
-        "country_5" -> Seq(countries.country_5.getOrElse("")),
-        "country_6" -> Seq(countries.country_6.getOrElse("")),
-        "country_7" -> Seq(countries.country_7.getOrElse("")),
-        "country_8" -> Seq(countries.country_8.getOrElse("")),
-        "country_9" -> Seq(countries.country_9.getOrElse("")),
-        "country_10" -> Seq(countries.country_10.getOrElse(""))
+        "country_2" -> countries.country_2.toSeq,
+        "country_3" -> countries.country_3.toSeq,
+        "country_4" -> countries.country_4.toSeq,
+        "country_5" -> countries.country_5.toSeq,
+        "country_6" -> countries.country_6.toSeq,
+        "country_7" -> countries.country_7.toSeq,
+        "country_8" -> countries.country_8.toSeq,
+        "country_9" -> countries.country_9.toSeq,
+        "country_10" -> countries.country_10.toSeq
       )
     }
     case CustomersOutsideUKNo => Map("isOutside" ->  Seq("false"))
