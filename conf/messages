@@ -182,10 +182,10 @@ tradingpremises.yourtradingpremises.tradingname=Trading name
 tradingpremises.yourtradingpremises.address=Address
 tradingpremises.yourtradingpremises.postcode=Postcode
 tradingpremises.yourtradingpremises.country=Country
-tradingpremises.yourtradingpremises.whose=Whose premises are these?
+tradingpremises.yourtradingpremises.whose=Who uses these premises?
 tradingpremises.yourtradingpremises.whose.my=My business
 tradingpremises.yourtradingpremises.whose.another=Another business, acting as an agent for my business
-tradingpremises.yourtradingpremises.startdate=Date you will start trading from these premises
+tradingpremises.yourtradingpremises.startdate=When will you start trading from these premises?
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 
