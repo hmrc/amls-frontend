@@ -1,6 +1,5 @@
 package models.declaration
 
-import models.aboutyou.RoleWithinBusiness
 import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, To, Write}
 

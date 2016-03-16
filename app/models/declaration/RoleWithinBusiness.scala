@@ -8,12 +8,19 @@ import play.api.libs.json._
 sealed trait RoleWithinBusiness
 
 case object BeneficialShareholder extends RoleWithinBusiness
+
 case object Director extends RoleWithinBusiness
+
 case object ExternalAccountant extends RoleWithinBusiness
+
 case object InternalAccountant extends RoleWithinBusiness
+
 case object NominatedOfficer extends RoleWithinBusiness
+
 case object Partner extends RoleWithinBusiness
+
 case object SoleProprietor extends RoleWithinBusiness
+
 case class Other(value: String) extends RoleWithinBusiness
 
 object RoleWithinBusiness {
@@ -22,8 +29,8 @@ object RoleWithinBusiness {
 
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusiness] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
-      import play.api.data.mapping.forms.Rules._
       import models.FormTypes._
+      import play.api.data.mapping.forms.Rules._
       (readerURLFormEncoded \ "roleWithinBusiness").read[String] flatMap {
         case "01" => BeneficialShareholder
         case "02" => Director
