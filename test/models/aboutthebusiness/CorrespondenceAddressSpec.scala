@@ -1,6 +1,9 @@
 package models.aboutthebusiness
 
+import models.FormTypes
 import org.scalatestplus.play.PlaySpec
+import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class CorrespondenceAddressSpec extends PlaySpec {
@@ -12,7 +15,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "NE1 7YX"
-  val DefaultCountry = "Default Country"
+  val DefaultCountry = "MN"
 
   val NewYourName     = "New Your Name"
   val NewBusinessName = "New Business Name"
@@ -21,7 +24,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
   val NewPostcode = "CR6 5HG"
-  val NewCountry = "New Country"
+  val NewCountry = "AB"
 
   val DefaultUKAddress = UKCorrespondenceAddress(DefaultYourName,
     DefaultBusinessName,
@@ -38,6 +41,29 @@ class CorrespondenceAddressSpec extends PlaySpec {
     DefaultAddressLine3,
     DefaultAddressLine4,
     DefaultCountry)
+
+  val DefaultUKModel = Map(
+    "isUK" -> Seq("true"),
+    "yourName" -> Seq(DefaultYourName),
+    "businessName" -> Seq(DefaultBusinessName),
+    "addressLine1" -> Seq(DefaultAddressLine1),
+    "addressLine2" -> Seq(DefaultAddressLine2),
+    "addressLine3" -> Seq("Default Line 3"),
+    "addressLine4" -> Seq("Default Line 4"),
+    "postCode" -> Seq(DefaultPostcode)
+  )
+
+  val DefaultNonUKModel = Map(
+    "isUK" -> Seq("false"),
+    "yourName" -> Seq(DefaultYourName),
+    "businessName" -> Seq(DefaultBusinessName),
+    "addressLineNonUK1" -> Seq(DefaultAddressLine1),
+    "addressLineNonUK2" -> Seq(DefaultAddressLine2),
+    "addressLineNonUK3" -> Seq("Default Line 3"),
+    "addressLineNonUK4" -> Seq("Default Line 4"),
+    "country" -> Seq(DefaultCountry)
+  )
+
 
   val DefaultUKJson = Json.obj(
     "yourName"     -> DefaultYourName,
@@ -60,6 +86,69 @@ class CorrespondenceAddressSpec extends PlaySpec {
   )
 
   "CorrespondenceAddress" must {
+
+    "validate toLines for UK address" in {
+      DefaultUKAddress.toLines must be (Seq("Default Your Name",
+                                            "Default Business Name",
+                                            "Default Line 1",
+                                            "Default Line 2",
+                                            "Default Line 3",
+                                            "Default Line 4",
+                                            "NE1 7YX"))
+
+    }
+
+    "validate toLines for Non UK address" in {
+      DefaultNonUKAddress.toLines must be (Seq("Default Your Name",
+        "Default Business Name",
+        "Default Line 1",
+        "Default Line 2",
+        "Default Line 3",
+        "Default Line 4",
+        "MN"))
+
+    }
+
+    "Form validation" must {
+      "Read UK Address" in {
+        CorrespondenceAddress.formRule.validate(DefaultUKModel) must be (Success(DefaultUKAddress))
+      }
+
+      "throw error when mandatory fields are missing" in {
+        CorrespondenceAddress.formRule.validate(Map.empty) must be(
+          Failure(Seq(
+            (Path \ "isUK") -> Seq(ValidationError("error.required"))
+          )))
+      }
+
+      "throw error when there is an invalid data" in {
+        val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
+        CorrespondenceAddress.formRule.validate(model) must be(
+          Failure(Seq(
+            (Path \ "isUK") -> Seq(ValidationError("error.invalid", "Boolean"))
+          )))
+      }
+
+      "throw error when length of country exceeds max length" in {
+       val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
+        CorrespondenceAddress.formRule.validate(model) must be(
+          Failure(Seq(
+            (Path \ "country") -> Seq(ValidationError("error.maxLength", FormTypes.maxCountryTypeLength))
+          )))
+      }
+
+      "Read Non UK Address" in {
+        CorrespondenceAddress.formRule.validate(DefaultNonUKModel) must be (Success(DefaultNonUKAddress))
+      }
+
+      "write correct UK Address" in {
+        CorrespondenceAddress.formWrites.writes(DefaultUKAddress) must be (DefaultUKModel)
+      }
+
+      "write correct Non UK Address" in {
+        CorrespondenceAddress.formWrites.writes(DefaultNonUKAddress) must be (DefaultNonUKModel)
+      }
+    }
 
     "JSON validation" must {
 
