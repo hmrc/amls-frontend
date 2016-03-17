@@ -25,9 +25,7 @@
         )
 
         <fieldset>
-            <legend class="form-label-bold">
-                @Messages("tradingpremises.yourtradingpremises.address")
-            </legend>
+            @legend("tradingpremises.yourtradingpremises.address", false, true)
             @input(f("addressLine1"))
             @input(f("addressLine2"))
             @input(f("addressLine3"))
@@ -48,13 +46,13 @@
         )
 
         @inlineRadioGroup(f("isResidential")) {
-            @legend("tradingpremises.yourtradingpremises.isresidential")
+            @legend("tradingpremises.yourtradingpremises.isresidential", false, true)
             @radio(f("isResidential"), "lbl.yes", "true")
             @radio(f("isResidential"), "lbl.no", "false")
         }
 
-        @inlineRadioGroup(f("isOwner")) {
-            @legend("tradingpremises.yourtradingpremises.whose")
+        @radioGroup(f("isOwner")) {
+            @legend("tradingpremises.yourtradingpremises.whose",false, true)
             @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
             @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
         }
