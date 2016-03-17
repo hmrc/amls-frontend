@@ -3,6 +3,7 @@ package services
 import connectors.{DataCacheConnector, KeystoreConnector}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -42,7 +43,7 @@ trait LandingService {
    hc: HeaderCarrier,
    ec: ExecutionContext,
    ac: AuthContext
-  ): Future[_] = {
+  ): Future[CacheMap] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
     cacheConnector.save[BusinessMatching](BusinessMatching.key, bm)
   }
