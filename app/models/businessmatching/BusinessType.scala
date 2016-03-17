@@ -28,8 +28,8 @@ object BusinessType {
   implicit val formR: Rule[UrlFormEncoded, BusinessType] =
     From[UrlFormEncoded] { __ =>
       (__ \ "businessType").read[String] flatMap {
-        case "01" => Rule(_ => Success(SoleProprietor))
-        case "02" => Rule(_ => Success(LLP))
+        case "01" => Rule(_ => Success(LLP))
+        case "02" => Rule(_ => Success(SoleProprietor))
         case "03" => Rule(_ => Success(Partnership))
         case "04" => Rule(_ => Success(CorporateBody))
         case "05" => Rule(_ => Success(UnincorporatedBody))
@@ -42,9 +42,9 @@ object BusinessType {
 
   implicit val formW: Write[BusinessType, UrlFormEncoded] =
     Write[BusinessType, UrlFormEncoded] {
-      case SoleProprietor =>
-        Map("businessType" -> Seq("01"))
       case LLP =>
+        Map("businessType" -> Seq("01"))
+      case SoleProprietor =>
         Map("businessType" -> Seq("02"))
       case Partnership =>
         Map("businessType" -> Seq("03"))

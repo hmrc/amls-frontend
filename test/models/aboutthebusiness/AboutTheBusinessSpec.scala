@@ -12,6 +12,14 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
   val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "Longbenton", None, None, "NE7 7DX")
 
+  val uKCorrespondenceAddress = UKCorrespondenceAddress("Name",
+    "Business Name",
+    "address 1",
+    "address 2",
+    Some("address 3"),
+    Some("address 4"),
+    "NE77 0QQ")
+
   "AboutTheBusiness" must {
     val completeJson = Json.obj(
       "previouslyRegistered" -> true,
@@ -85,6 +93,13 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
         val result = initial.registeredOffice(regOfficeOrMainPlaceUK)
         result must be (AboutTheBusiness(None, None, None, Some(regOfficeOrMainPlaceUK)))
+      }
+    }
+
+    "Merged with UKCorrespondenceAddress" must {
+      "return AboutTheBusiness with correct UKCorrespondenceAddress" in {
+        val result = initial.correspondenceAddress(uKCorrespondenceAddress)
+        result must be (AboutTheBusiness(None, None, None, None, Some(uKCorrespondenceAddress)))
       }
     }
   }

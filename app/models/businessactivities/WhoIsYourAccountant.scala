@@ -15,8 +15,6 @@ case class AccountantDoesAlsoDealWithTax(accountantsRef: String) extends DoesAcc
 object DoesAccountantAlsoDealWithTax {
   import play.api.data.mapping.forms.Rules._
 
-  val accountantRefNoType = notEmpty compose maxLength(11) compose minLength(11)
-
   implicit val formRule: Rule[UrlFormEncoded, DoesAccountantAlsoDealWithTax] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     (__ \ "alsoDealsWithTax").read[Boolean] flatMap {

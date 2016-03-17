@@ -60,6 +60,15 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         status(result) must be(OK)
         contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.title"))
       }
+
+      "load the page with no data" in new Fixture {
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+        val result = controller.get()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.ConfirmRegisteredOfficeController.get().url)
+      }
+
     }
 
     "Post" must {
@@ -100,6 +109,45 @@ class ContactingYouControllerSpec extends PlaySpec with OneServerPerSuite with M
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
+
+
+      "on post of incomplete data with no response from data cache" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "phoneNumber" -> "1234567890"
+        )
+
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.ContactingYouController.get().url)
+      }
+
+      "load the page with valid data and letterToThisAddress set to false" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "phoneNumber" -> "1234567890",
+          "email" -> "test@test.com",
+          "website" -> "website",
+          "letterToThisAddress" -> "false"
+        )
+
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
+
+        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.CorrespondenceAddressController.get().url)
+      }
+
     }
   }
 
