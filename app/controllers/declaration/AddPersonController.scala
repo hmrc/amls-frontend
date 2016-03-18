@@ -4,7 +4,6 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutyou.YourDetails
 import models.declaration.AddPerson
 import views.html.declaration.add_person
 
@@ -27,13 +26,12 @@ trait AddPersonController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[YourDetails](request.body) match {
+      Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(add_person(f, edit)))
         case ValidForm(_, data) =>
           for {
-            addPerson <- dataCacheConnector.fetch[AddPerson](AddPerson.key)
-            _ <- dataCacheConnector.save[AddPerson](AddPerson.key, addPerson.get)
+            _ <- dataCacheConnector.save[AddPerson](AddPerson.key, data)
           } yield Redirect(routes.AddPersonController.get(edit))
       }
     }
