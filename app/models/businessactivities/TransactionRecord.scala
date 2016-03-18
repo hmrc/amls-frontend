@@ -86,7 +86,7 @@ object TransactionRecord {
             case "01" => Reads(_ => JsSuccess(Paper)) map identity[TransactionType]
             case "02" => Reads(_ => JsSuccess(DigitalSpreadsheet)) map identity[TransactionType]
             case "03" =>
-              (JsPath \ "name").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
+              (JsPath \ "digitalSoftwareName").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
             case _ =>
               Reads(_ => JsError((JsPath \ "transactions") -> ValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TransactionType]]](
@@ -113,7 +113,7 @@ object TransactionRecord {
         }).toSeq
       ) ++ transactions.foldLeft[JsObject](Json.obj()) {
         case (m, DigitalSoftware(name)) =>
-          m ++ Json.obj("name" -> name)
+          m ++ Json.obj("digitalSoftwareName" -> name)
         case (m, _) =>
           m
       }

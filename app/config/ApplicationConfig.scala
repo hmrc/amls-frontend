@@ -7,7 +7,6 @@ import play.api.Play.current
 
 object ApplicationConfig extends ServicesConfig {
 
-
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
 
   lazy val contactHost = baseUrl("contact-frontend")
@@ -29,4 +28,6 @@ object ApplicationConfig extends ServicesConfig {
   def subscriptionUrl(safeId: String) = s"$amlsUrl/amls/subscription/$safeId"
 
   lazy val businessCustomerUrl = getConfigString("business-customer.url")
+
+  lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
 }

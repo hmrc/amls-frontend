@@ -18,10 +18,11 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val DefaultNCARegistered      = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
   val DefaultRiskAssessments    = RiskAssessmentPolicyYes(Set(PaperBased))
+  val DefaultWhoIsYourAccountant = WhoIsYourAccountant("Accountant's name", Some("Accountant's trading name"),
+                                                          UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE" ),
+                                                        AccountantDoesAlsoDealWithTax("11Character"))
   val DefaultIdentifySuspiciousActivity  = IdentifySuspiciousActivity(true)
-  val DefaultWhoIsYourAccountant = WhoIsYourAccountant("name", Some("tradingName"),
-                                                    UkAccountantsAddress("99E", "Building", Some("street"), Some("road"), "NE27 0QQ"),
-                                                    AccountantDoesNotAlsoDealWithTax)
+
 
 
   val NewFranchiseName          = "NEW FRANCHISE NAME"
@@ -52,7 +53,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "franchiseName" -> DefaultFranchiseName,
       "isRecorded" -> true,
       "transactions" -> Seq("01", "03"),
-      "name" -> DefaultSoftwareName,
+      "digitalSoftwareName" -> DefaultSoftwareName,
       "isOutside" -> true,
       "country_1" -> "GP",
       "country_2" -> JsNull,
@@ -67,7 +68,16 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "ncaRegistered" -> true,
       "accountantForAMLSRegulations" -> true,
       "hasPolicy" -> true,
-      "riskassessments" -> Seq("01")
+      "riskassessments" -> Seq("01"),
+      "accountantsName" -> "Accountant's name",
+      "accountantsTradingName" -> "Accountant's trading name",
+      "accountantsAddressLine1" -> "address1",
+      "accountantsAddressLine2" -> "address2",
+      "accountantsAddressLine3" -> "address3",
+      "accountantsAddressLine4" -> "address4",
+      "accountantsAddressPostCode" -> "POSTCODE",
+      "doesAccountantAlsoDealWithTax" -> true,
+      "accountantsReference" -> "11Character"
     )
 
     val completeModel = BusinessActivities(involvedInOther = Some(DefaultInvolvedInOther),
@@ -78,7 +88,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
                                            customersOutsideUK = Some(DefaultCustomersOutsideUK),
                                            ncaRegistered = Some(DefaultNCARegistered),
                                            accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
-                                           riskAssessmentPolicy = Some(DefaultRiskAssessments)
+                                           riskAssessmentPolicy = Some(DefaultRiskAssessments),
+                                            whoIsYourAccountant = Some(DefaultWhoIsYourAccountant)
                                           )
 
 

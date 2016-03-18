@@ -2,6 +2,7 @@ package config
 
 import com.typesafe.config.Config
 import play.api.Play
+import play.api.mvc.Call
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
@@ -14,6 +15,7 @@ import uk.gov.hmrc.play.http.HttpGet
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 import uk.gov.hmrc.play.http.ws.{WSGet, WSPut, WSPost, WSDelete}
 import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
+import uk.gov.hmrc.whitelist.AkamaiWhitelistFilter
 
 object AMLSControllerConfig extends ControllerConfig {
   override def controllerConfigs: Config = Play.current.configuration.underlying.getConfig("controllers")
@@ -75,3 +77,8 @@ object AmlsShortLivedCache extends ShortLivedCache {
   override lazy val shortLiveCache = AmlsShortLivedHttpCaching
 }
 
+object WhitelistFilter extends AkamaiWhitelistFilter {
+  override def whitelist: Seq[String] = ApplicationConfig.whitelist
+  // TODO redirect to shutter page when it is configured
+  override def destination: Call = Call("GET", "https://www.gov.uk")
+}
