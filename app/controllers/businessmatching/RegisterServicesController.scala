@@ -15,7 +15,7 @@ trait RegisterServicesController  extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-        case Some(BusinessMatching(Some(data), _)) =>
+        case Some(BusinessMatching(Some(data), _, _)) =>
           Ok(register_services(Form2[BusinessActivities](data), edit))
         case _ =>
           Ok(register_services(EmptyForm, edit))
