@@ -4,7 +4,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 
 class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
@@ -177,6 +177,13 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
 
       Json.fromJson[RoleWithinBusiness](json) must
         be(JsSuccess(Other("any other value"), JsPath \ "roleWithinBusiness" \ "roleWithinBusinessOther"))
+    }
+
+    "Read the json and return error if an invalid value is found" in {
+      val json = Json.obj(
+        "roleWithinBusiness" -> "09"
+      )
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath \ "roleWithinBusiness") -> ValidationError("error.invalid")))
     }
 
 
