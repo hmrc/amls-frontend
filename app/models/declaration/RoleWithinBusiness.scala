@@ -40,7 +40,7 @@ object RoleWithinBusiness {
         case "06" => Partner
         case "07" => SoleProprietor
         case "08" =>
-          (readerURLFormEncoded \ "roleWithinBusinessOther").read(descriptionType) fmap Other.apply
+          (readerURLFormEncoded \ "roleWithinBusinessOther").read(roleWithinBusinessOtherType) fmap Other.apply
         case _ =>
           (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
       }

@@ -390,7 +390,7 @@ declaration.addperson.lbl.06=Partner
 declaration.addperson.lbl.07=Sole proprietor
 declaration.addperson.lbl.08=Other
 
-declaration.declaration.title = Declaration
+declaration.declaration.title = Declaration - submit declaration
 declaration.declaration.fullname = You have told us that you are
 declaration.declaration.declare = I declare that:
 declaration.declaration.correctinformation = all the information I have given in this application is correct
