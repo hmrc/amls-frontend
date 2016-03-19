@@ -34,14 +34,8 @@ trait RegisterServicesController  extends BaseController {
             _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
               businessMatching.activities(data)
             )
-          } yield edit match {
-            case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
-//            TODO
-//            case true =>
-//              Redirect(routes.SummaryController.get())
-//            case false =>
-//              Redirect(routes.SummaryController.get())
-          }
+          } yield Redirect(routes.SummaryController.get())
+
       }
   }
 }

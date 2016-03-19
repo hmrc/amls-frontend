@@ -75,6 +75,8 @@ POST        /business-matching/type-of-business            controllers.businessm
 GET         /business-matching/activities               controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
 POST        /business-matching/activities               controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
+GET         /business-matching/check-your-answers      controllers.businessmatching.SummaryController.get()
+
 GET         /bank-details/index                         controllers.bankdetails.WhatYouNeedController.get()
 
 GET         /about-the-business/index                   controllers.aboutthebusiness.WhatYouNeedController.get()
@@ -125,5 +127,5 @@ POST        /business-activities/employees              controllers.businessacti
 GET         /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 
-GET         /business-activities/check-your-answers                       controllers.businessactivities.SummaryController.get()
+GET         /business-activities/check-your-answers      controllers.businessactivities.SummaryController.get()
 
