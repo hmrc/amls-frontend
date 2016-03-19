@@ -5,13 +5,14 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{TypeOfBusiness, BusinessMatching}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.type_of_business
 
 import scala.concurrent.Future
 
 trait TypeOfBusinessController extends BaseController {
 
-  def dataCacheConnector: DataCacheConnector
+  private[controllers] def dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -46,6 +47,6 @@ trait TypeOfBusinessController extends BaseController {
 }
 
 object TypeOfBusinessController extends TypeOfBusinessController {
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
+  override private[controllers] def dataCacheConnector: DataCacheConnector = DataCacheConnector
+  override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
