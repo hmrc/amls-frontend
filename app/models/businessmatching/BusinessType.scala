@@ -8,9 +8,9 @@ sealed trait BusinessType {
   override def toString: String =
     this match {
       case SoleProprietor => "SOP"
-      case LLP => "LP"
+      case LimitedCompany => "LTD"
       case Partnership => "OBP"
-      case CorporateBody => "LTD"
+      case LPrLLP => "LP"
       case UnincorporatedBody => "UIB"
     }
 }
@@ -20,35 +20,35 @@ object BusinessType {
   import play.api.data.mapping.forms.Rules._
 
   case object SoleProprietor extends BusinessType
-  case object LLP extends BusinessType
+  case object LimitedCompany extends BusinessType
   case object Partnership extends BusinessType
-  case object CorporateBody extends BusinessType
+  case object LPrLLP extends BusinessType
   case object UnincorporatedBody extends BusinessType
 
   implicit val formR: Rule[UrlFormEncoded, BusinessType] =
     From[UrlFormEncoded] { __ =>
       (__ \ "businessType").read[String] flatMap {
-        case "01" => Rule(_ => Success(LLP))
+        case "01" => Rule(_ => Success(LimitedCompany))
         case "02" => Rule(_ => Success(SoleProprietor))
         case "03" => Rule(_ => Success(Partnership))
-        case "04" => Rule(_ => Success(CorporateBody))
+        case "04" => Rule(_ => Success(LPrLLP))
         case "05" => Rule(_ => Success(UnincorporatedBody))
         case _ =>
           Rule { _ =>
-            Failure(Seq(Path -> Seq(ValidationError("error.invalid"))))
+            Failure(Seq(Path \ "businessType" -> Seq(ValidationError("error.invalid"))))
           }
       }
     }
 
   implicit val formW: Write[BusinessType, UrlFormEncoded] =
     Write[BusinessType, UrlFormEncoded] {
-      case LLP =>
+      case LimitedCompany =>
         Map("businessType" -> Seq("01"))
       case SoleProprietor =>
         Map("businessType" -> Seq("02"))
       case Partnership =>
         Map("businessType" -> Seq("03"))
-      case CorporateBody =>
+      case LPrLLP =>
         Map("businessType" -> Seq("04"))
       case UnincorporatedBody =>
         Map("businessType" -> Seq("05"))
