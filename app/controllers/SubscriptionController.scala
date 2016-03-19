@@ -1,6 +1,7 @@
 package controllers
 
 import config.AMLSAuthConnector
+import play.api.libs.json.Json
 import services.SubscriptionService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -11,7 +12,7 @@ trait SubscriptionController extends BaseController {
   def post() = Authorised.async {
     implicit authContext => implicit request =>
       subscriptionService.subscribe map {
-        response => Ok(response.body)
+        response => Ok(Json.toJson(response))
       }
   }
 }

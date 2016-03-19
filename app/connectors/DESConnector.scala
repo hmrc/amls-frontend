@@ -1,7 +1,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.{SubscriptionRequest, LoginDetails}
+import models.{SubscriptionResponse, SubscriptionResponse$, SubscriptionRequest, LoginDetails}
 import play.api.libs.json.{JsValue, Json, Reads}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -20,8 +20,8 @@ trait DESConnector {
   (implicit
    user: AuthContext,
    headerCarrier: HeaderCarrier
-  ): Future[HttpResponse] =
-    http.POST[SubscriptionRequest, HttpResponse](ApplicationConfig.subscriptionUrl(safeId), subscriptionRequest)
+  ): Future[SubscriptionResponse] =
+    http.POST[SubscriptionRequest, SubscriptionResponse](ApplicationConfig.subscriptionUrl(safeId), subscriptionRequest)
 }
 
 object DESConnector extends DESConnector {
