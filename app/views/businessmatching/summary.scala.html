@@ -43,36 +43,34 @@
                         </tr>
                     </table>
                 }
-                case _=> {
-                @model.activities.map { activity =>
-                    <table>
-                        <tr>
-                            <th class="summary-title">@Messages("businessmatching.registerservices.heading")</th>
-                            <td><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
-                        </tr>
-                        @activity.businessActivities.map { line =>
-                        <tr>
-                            <td colspan="2">
-                                @line match {
-                                case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
-                                case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
-                                case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
-                                case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
-                                case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
-                                case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
-                                case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
-                                }
-                            </td>
-                        </tr>
-                        }
-                    </table>
+                case _ => {}
 
-                }
             }
         }
     }
 
-
+    @model.activities.map { activity =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("businessmatching.registerservices.heading")</th>
+                <td><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @activity.businessActivities.map { line =>
+            <tr>
+                <td colspan="2">
+                    @line match {
+                        case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
+                        case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
+                        case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
+                        case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
+                        case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
+                        case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
+                        case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
+                    }
+                </td>
+            </tr>
+            }
+        </table>
     }
 
     <a class="button" href="@controllers.routes.MainSummaryController.onPageLoad()">Accept and complete section</a>
