@@ -14,18 +14,25 @@ trait BusinessTypeController extends BaseController {
 
   private[controllers] def dataCache: DataCacheConnector
 
+  val CORPORATE_BODY = "Corporate Body"
+  val UNINCORPORATED_BODY = "Unincorporated Body"
+  val LLP = "LLP"
+  val PARTNERSHIP = "Partnership"
+
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
         option =>
-          // TODO Add conditional logic here
-//          val redirect = for {
-//            businessMatching <- option
-//            reviewDetails <- businessMatching.reviewDetails
-//            businessType <- reviewDetails.businessType
-//          } yield Redirect(controllers.routes.MainSummaryController.onPageLoad())
-//          redirect getOrElse Ok(views.html.business_type(EmptyForm))
-          Ok(business_type(EmptyForm))
+          val redirect = for {
+            businessMatching <- option
+            reviewDetails <- businessMatching.reviewDetails
+            businessType <- reviewDetails.businessType
+          } yield businessType match {
+            case UNINCORPORATED_BODY => Redirect(routes.TypeOfBusinessController.get())
+            case LLP |CORPORATE_BODY => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+            case _ => Redirect(routes.RegisterServicesController.get())
+          }
+          redirect getOrElse Ok(business_type(EmptyForm))
       }
   }
 
@@ -37,7 +44,6 @@ trait BusinessTypeController extends BaseController {
         case ValidForm(_, data) =>
           dataCache.fetch[BusinessMatching](BusinessMatching.key) flatMap {
             bm =>
-              // TODO: Put some stuff in a service
               val updatedDetails = for {
                 businessMatching <- bm
                 reviewDetails <- businessMatching.reviewDetails

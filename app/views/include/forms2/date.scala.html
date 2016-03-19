@@ -11,7 +11,7 @@
 @field = @{ f(p) }
 
 <fieldset class="form-group date @if(field.hasErrors) {form-field--error}" id="@field.id">
-    @legend(labelText)
+    @legend(labelText, false, true)
     @if(hintText.nonEmpty) {
         <span class="form-hint">@Messages(hintText)</span>
     }

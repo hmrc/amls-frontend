@@ -38,6 +38,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-config" % "2.0.1",
     "uk.gov.hmrc" %% "play-json-logger" % "2.1.0",
     "uk.gov.hmrc" %% "http-caching-client" % "5.2.0",
+    "uk.gov.hmrc" %% "play-whitelist-filter" % "1.0.1",
 
     "com.kenshoo" %% "metrics-play" % "2.3.0_0.1.9",
     "com.codahale.metrics" % "metrics-graphite" % "3.0.2",

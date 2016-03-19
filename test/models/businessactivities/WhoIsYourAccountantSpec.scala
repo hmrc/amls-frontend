@@ -1,13 +1,14 @@
 package models.businessactivities
 
 import org.scalatest.{MustMatchers, Matchers, WordSpec}
+import play.api.data.mapping.Success
 import play.api.libs.json.{JsPath, Json, JsSuccess}
 
 class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
   val DefaultName = "Default Name"
   val DefaultTradingName = Some("Default Trading Name")
-  val DefaultDealsWithTaxYes = AccountantDoesAlsoDealWithTax("Accountant reference")
+  val DefaultDealsWithTaxYes = AccountantDoesAlsoDealWithTax("11Character")
 
   val DefaultAddressLine1 = "Default Line 1"
   val DefaultAddressLine2 = "Default Line 2"
@@ -29,11 +30,36 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
 
   "WhoIsYourAccountant" must {
 
-
-    "successfully complete a round robin json conversion" in {
-      WhoIsYourAccountant.formats.reads(
-        WhoIsYourAccountant.formats.writes(DefaultWhoIsYourAccountant)
+    "successfully complete a round trip json conversion" in {
+      WhoIsYourAccountant.jsonReads.reads(
+        WhoIsYourAccountant.jsonWrites.writes(DefaultWhoIsYourAccountant)
       ) shouldBe JsSuccess(DefaultWhoIsYourAccountant)
+    }
+
+    "Successfully complete a round trip to a Url Encoded form" when {
+      "The accountant deals with tax matters" in {
+        WhoIsYourAccountant.formRule.validate(
+          WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
+                                                  DefaultTradingName,
+                                                  DefaultUKAddress,
+                                                  AccountantDoesAlsoDealWithTax("11Character")))
+        ) should be (Success(WhoIsYourAccountant(DefaultName,
+                      DefaultTradingName,
+                      DefaultUKAddress,
+                      AccountantDoesAlsoDealWithTax("11Character"))))
+      }
+
+      "The accountant does not deal with tax matters" in {
+        WhoIsYourAccountant.formRule.validate(
+          WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
+            DefaultTradingName,
+            DefaultUKAddress,
+            AccountantDoesNotAlsoDealWithTax))
+        ) should be (Success(WhoIsYourAccountant(DefaultName,
+                            DefaultTradingName,
+                            DefaultUKAddress,
+                            AccountantDoesNotAlsoDealWithTax)))
+      }
     }
   }
 
@@ -41,7 +67,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
     "Serialise yes to json correctly" in {
         val expected = Json.obj(
           "doesAccountantAlsoDealWithTax" -> true,
-          "accountantsReference" -> "Accountant reference"
+          "accountantsReference" -> "11Character"
         )
         DoesAccountantAlsoDealWithTax.jsonWrites.writes(DefaultDealsWithTaxYes) should be (expected)
     }
@@ -83,6 +109,30 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
       DoesAccountantAlsoDealWithTax.jsonReads.reads (
         DoesAccountantAlsoDealWithTax.jsonWrites.writes(AccountantDoesNotAlsoDealWithTax)
       ) should be (JsSuccess(AccountantDoesNotAlsoDealWithTax, JsPath \ "doesAccountantAlsoDealWithTax"))
+    }
+
+    "Write to a form correctly" when {
+      "the accountant deals with tax matters" in {
+        val expected = Map("alsoDealsWithTax" -> Seq("true"), "accountantsReferenceNumber" -> Seq("RefNo"))
+        DoesAccountantAlsoDealWithTax.formWrites.writes(AccountantDoesAlsoDealWithTax("RefNo")) should be (expected)
+      }
+
+      "the accountant does not deal with tax matters" in {
+        val expected = Map("alsoDealsWithTax" -> Seq("false"))
+        DoesAccountantAlsoDealWithTax.formWrites.writes(AccountantDoesNotAlsoDealWithTax) should be (expected)
+      }
+    }
+
+    "Read from a form correctly" when {
+      "the accountant deals with tax matters" in {
+        val form = Map("alsoDealsWithTax" -> Seq("true"), "accountantsReferenceNumber" -> Seq("01234567891"))
+        DoesAccountantAlsoDealWithTax.formRule.validate(form) should be (Success(AccountantDoesAlsoDealWithTax("01234567891")))
+      }
+
+      "the accountant does not deal with tax matters" in {
+        val form = Map("alsoDealsWithTax" -> Seq("false"))
+        DoesAccountantAlsoDealWithTax.formRule.validate(form) should be (Success(AccountantDoesNotAlsoDealWithTax))
+      }
     }
   }
 
