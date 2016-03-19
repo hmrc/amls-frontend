@@ -4,10 +4,11 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsSuccess, Json}
 
 class AddPersonSpec extends PlaySpec with MockitoSugar {
 
-  "When the user posts the input it" must {
+  "Form Rules and Writes" must {
 
     "successfully validate given all fields" in {
       val urlFormEncoded = Map(
@@ -29,7 +30,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
     }
 
 
-    "fail to validate when fields are missing" in {
+    "fail validation when fields are missing" in {
 
       AddPerson.formRule.validate(Map.empty) must
         be(Failure(Seq(
@@ -92,8 +93,36 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
           (Path \ "lastName") -> Seq(ValidationError("error.maxLength", 35))
         )))
     }
-
-
   }
+
+  "JSON" must {
+
+    "Read the json and return the AddPerson domain object successfully" in {
+
+      val json = Json.obj(
+        "firstName" -> "John",
+        "middleName" -> "Envy",
+        "lastName" -> "Doe",
+        "roleWithinBusiness" -> "02"
+      )
+
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", Director)))
+    }
+
+    "Write the json successfully from the AddPerson domain object created" in {
+
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", Director)
+
+      val json = Json.obj(
+        "firstName" -> "John",
+        "middleName" -> "Envy",
+        "lastName" -> "Doe",
+        "roleWithinBusiness" -> "02"
+      )
+
+      AddPerson.jsonWrites.writes(addPerson) must be(json)
+    }
+  }
+
 
 }

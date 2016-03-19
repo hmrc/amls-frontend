@@ -40,7 +40,7 @@ object RoleWithinBusiness {
         case "06" => Partner
         case "07" => SoleProprietor
         case "08" =>
-          (readerURLFormEncoded \ "other").read(descriptionType) fmap Other.apply
+          (readerURLFormEncoded \ "roleWithinBusinessOther").read(descriptionType) fmap Other.apply
         case _ =>
           (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
       }
@@ -55,11 +55,13 @@ object RoleWithinBusiness {
     case Partner => "roleWithinBusiness" -> "06"
     case SoleProprietor => "roleWithinBusiness" -> "07"
     case Other(value) => Map("roleWithinBusiness" -> "08",
-      "other" -> value)
+      "roleWithinBusinessOther" -> value)
   }
 
-  implicit val jsonReads = {
-    import play.api.libs.json.Reads.StringReads
+  implicit val jsonReads: Reads[RoleWithinBusiness] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
     (__ \ "roleWithinBusiness").read[String].flatMap[RoleWithinBusiness] {
       case "01" => BeneficialShareholder
       case "02" => Director
