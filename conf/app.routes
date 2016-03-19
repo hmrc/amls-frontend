@@ -69,13 +69,16 @@ GET         /estate-agents/summary                      controllers.estateagentb
 GET         /business-matching/business-type            controllers.businessmatching.BusinessTypeController.get()
 POST        /business-matching/business-type            controllers.businessmatching.BusinessTypeController.post()
 
-GET         /business-matching/type-of-business            controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
-POST        /business-matching/type-of-business            controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
+GET         /business-matching/type-of-business         controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
+POST        /business-matching/type-of-business         controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
 
 GET         /business-matching/activities               controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
 POST        /business-matching/activities               controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
-GET         /business-matching/check-your-answers      controllers.businessmatching.SummaryController.get()
+GET         /business-matching/registration-number      controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
+POST        /business-matching/registration-number      controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
+
+GET         /business-matching/check-your-answers       controllers.businessmatching.SummaryController.get()
 
 GET         /bank-details/index                         controllers.bankdetails.WhatYouNeedController.get()
 

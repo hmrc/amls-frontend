@@ -11,15 +11,17 @@ import scala.concurrent.Future
 
 trait TypeOfBusinessController extends BaseController {
 
-  def dataCache: DataCacheConnector
+  def dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-        dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
-        case Some(BusinessMatching(_, _, Some(data))) =>
-          Ok(type_of_business(Form2[TypeOfBusiness](data), edit))
-        case _ =>
-          Ok(type_of_business(EmptyForm, edit))
+      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+        response =>
+          val form: Form2[TypeOfBusiness] = (for {
+            businessMatching <- response
+            business <- businessMatching.typeOfBusiness
+          } yield Form2[TypeOfBusiness](business)).getOrElse(EmptyForm)
+          Ok(type_of_business(form, edit))
       }
   }
 
@@ -30,17 +32,20 @@ trait TypeOfBusinessController extends BaseController {
           Future.successful(BadRequest(type_of_business(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessMatching <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
-            _ <- dataCache.save[BusinessMatching](BusinessMatching.key,
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
               businessMatching.typeOfBusiness(data)
             )
-          } yield Redirect(routes.RegisterServicesController.get())
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.RegisterServicesController.get())
+          }
       }
     }
   }
 }
 
 object TypeOfBusinessController extends TypeOfBusinessController {
-  override val dataCache = DataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }
