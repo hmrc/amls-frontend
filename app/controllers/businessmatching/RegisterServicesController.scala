@@ -20,7 +20,7 @@ trait RegisterServicesController  extends BaseController {
             businessMatching <- response
             businessActivities <- businessMatching.activities
           } yield Form2[BusinessActivities](businessActivities)).getOrElse(EmptyForm)
-          Ok(type_of_business(form, edit))
+          Ok(register_services(form, edit))
       }
   }
 

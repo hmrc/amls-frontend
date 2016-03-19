@@ -51,7 +51,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.routes.MainSummaryController.onPageLoad().url))
+      redirectLocation(result) must be (Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
     "display Registration Number page for LLP" in new Fixture {
@@ -64,7 +64,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.routes.MainSummaryController.onPageLoad().url))
+      redirectLocation(result) must be (Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
     "display Type of Business Page" in new Fixture {
