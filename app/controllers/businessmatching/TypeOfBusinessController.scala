@@ -7,6 +7,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{AboutTheBusiness, ConfirmRegisteredOffice}
 import models.businessmatching.{TypeOfBusiness, BusinessMatching}
 import views.html.aboutthebusiness._
+import views.html.businessmatching.type_of_business
 
 import scala.concurrent.Future
 
@@ -18,9 +19,9 @@ trait TypeOfBusinessController extends BaseController {
     implicit authContext => implicit request =>
         dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
         case Some(BusinessMatching(_, _, Some(data))) =>
-          Ok(vat_registered(Form2[TypeOfBusiness](data), edit))
+          Ok(type_of_business(Form2[TypeOfBusiness](data), edit))
         case _ =>
-          Ok(vat_registered(EmptyForm, edit))
+          Ok(type_of_business(EmptyForm, edit))
       }
   }
 
@@ -28,14 +29,14 @@ trait TypeOfBusinessController extends BaseController {
     implicit authContext => implicit request => {
       Form2[TypeOfBusiness](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(vat_registered(f, edit)))
+          Future.successful(BadRequest(type_of_business(f, edit)))
         case ValidForm(_, data) =>
           for {
             businessMatching <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
             _ <- dataCache.save[BusinessMatching](BusinessMatching.key,
               businessMatching.typeOfBusiness(data)
             )
-          } yield Redirect(routes.TypeOfBusinessController.get())
+          } yield Redirect(routes.RegisterServicesController.get())
       }
     }
   }

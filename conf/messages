@@ -252,6 +252,11 @@ businessmatching.registerservices.servicename.lbl.05=Money service business
 businessmatching.registerservices.servicename.lbl.06=Trust and company services
 businessmatching.registerservices.servicename.lbl.07=Telephone, digital and IT payment services
 
+businessmatching.typeofbusiness.title = What''s your type of business?
+businessmatching.typeofbusiness.lbl.hint = For example: association, charity, trust
+
+
+
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
 bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn''t the place to pay registration fees.
