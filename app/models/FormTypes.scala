@@ -35,11 +35,8 @@ object FormTypes {
   val maxFranchiseName = 140
   val maxEmployeeLength = 11
   val minAccountantRefNoTypeLength = 11
-<<<<<<< HEAD
   val maxRoleWithinBusinessOtherType = 255
-=======
   val maxTypeOfBusinessLength = 40
->>>>>>> master
 
 
   val notEmptyStrip = Rule.zero[String] fmap { _.trim } compose notEmpty
