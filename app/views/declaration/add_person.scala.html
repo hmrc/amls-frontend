@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_])(implicit request: Request[_], lang: Lang)
 
 @target = @{
     s"""${f("other").id}-fieldset"""
@@ -14,7 +14,7 @@
 
     @heading("declaration.addperson.title", "submit.registration")
 
-    @form(f, controllers.declaration.routes.AddPersonController.post(edit)) {
+    @form(f, controllers.declaration.routes.AddPersonController.post()) {
 
         @input(
             field = f("firstName"),
@@ -31,9 +31,7 @@
             labelText = Messages("declaration.addperson.lastname")
         )
 
-        <span class="form-field">
-           <strong>@Messages("declaration.addperson.whatsyourrole")</strong>
-        </span>
+        <span class="form-label-bold">@Messages("declaration.addperson.whatsyourrole")</span>
 
         @radioGroup(f("roleWithinBusiness")) {
             @legend("TODO", jsHidden = true)
@@ -50,6 +48,6 @@
             }
 
     }
-    @submit(edit)
+    @submit()
   }
 }

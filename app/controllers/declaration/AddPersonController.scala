@@ -13,26 +13,26 @@ trait AddPersonController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get() = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[AddPerson](AddPerson.key) map {
         case Some(addPerson) =>
-          Ok(add_person(Form2[AddPerson](addPerson), edit))
+          Ok(add_person(Form2[AddPerson](addPerson)))
         case _ =>
-          Ok(add_person(EmptyForm, edit))
+          Ok(add_person(EmptyForm))
       }
   }
 
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post() = Authorised.async {
     implicit authContext => implicit request => {
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(add_person(f, edit)))
+          Future.successful(BadRequest(add_person(f)))
         case ValidForm(_, data) =>
           for {
             _ <- dataCacheConnector.save[AddPerson](AddPerson.key, data)
-          } yield Redirect(routes.AddPersonController.get(edit))
+          } yield Redirect(routes.AddPersonController.get())
       }
     }
   }
