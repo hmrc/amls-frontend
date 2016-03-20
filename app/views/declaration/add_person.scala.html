@@ -31,10 +31,8 @@
             labelText = Messages("declaration.addperson.lastname")
         )
 
-        <span class="form-label-bold">@Messages("declaration.addperson.whatsyourrole")</span>
-
         @radioGroup(f("roleWithinBusiness")) {
-            @legend("TODO", jsHidden = true)
+            @legend("declaration.addperson.whatsyourrole", jsHidden = false, bold = true)
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.01", "01")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.02", "02")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.03", "03")
