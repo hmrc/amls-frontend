@@ -127,3 +127,6 @@ POST        /business-activities/accountant-details     controllers.businessacti
 
 GET         /business-activities/check-your-answers                       controllers.businessactivities.SummaryController.get()
 
+GET         /declaration/add-person                     controllers.declaration.AddPersonController.get()
+POST        /declaration/add-person                     controllers.declaration.AddPersonController.post()
+
