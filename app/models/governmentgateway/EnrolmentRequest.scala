@@ -13,10 +13,10 @@ object EnrolmentRequest {
     Writes[EnrolmentRequest] {
       request =>
         Json.obj(
-          "portalIdentifier" -> "Default",
+          "portalId" -> "Default",
           "serviceName" -> "HMRC-MLR-ORG",
           "friendlyName" -> "AMLS Enrolment",
-          "knownFact" -> Seq(
+          "knownFacts" -> Seq(
             request.mlrRefNo,
             "",
             "",

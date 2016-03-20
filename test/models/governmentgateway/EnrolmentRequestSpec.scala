@@ -11,10 +11,10 @@ class EnrolmentRequestSpec extends PlaySpec {
 
       val model = EnrolmentRequest("foo", "bar")
       val json = Json.obj(
-          "portalIdentifier" -> "Default",
+          "portalId" -> "Default",
           "serviceName" -> "HMRC-MLR-ORG",
           "friendlyName" -> "AMLS Enrolment",
-          "knownFact" -> Seq(
+          "knownFacts" -> Seq(
             "foo",
             "",
             "",

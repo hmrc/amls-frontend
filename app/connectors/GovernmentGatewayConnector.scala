@@ -17,5 +17,5 @@ trait GovernmentGatewayConnector {
 
 object GovernmentGatewayConnector extends GovernmentGatewayConnector {
   override val http: HttpPost = WSHttp
-  override val enrolUrl: String = ApplicationConfig.ggUrl
+  override val enrolUrl: String = ApplicationConfig.enrolUrl
 }
