@@ -377,7 +377,7 @@ businessactivities.summary.directly.involved.text = directly involved in MLR act
 
 submit.registration = Submit registration
 
-declaration.addperson.title = What's your name?
+declaration.addperson.title = What''s your name?
 declaration.addperson.firstname = First name
 declaration.addperson.middlename = Middle name (optional)
 declaration.addperson.lastname = Last name
