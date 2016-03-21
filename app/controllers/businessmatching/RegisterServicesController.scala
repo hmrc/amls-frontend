@@ -15,10 +15,12 @@ trait RegisterServicesController  extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-        case Some(BusinessMatching(Some(data), _, _)) =>
-          Ok(register_services(Form2[BusinessActivities](data), edit))
-        case _ =>
-          Ok(register_services(EmptyForm, edit))
+        response =>
+          val form: Form2[BusinessActivities] = (for {
+            businessMatching <- response
+            businessActivities <- businessMatching.activities
+          } yield Form2[BusinessActivities](businessActivities)).getOrElse(EmptyForm)
+          Ok(register_services(form, edit))
       }
   }
 
@@ -34,14 +36,8 @@ trait RegisterServicesController  extends BaseController {
             _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
               businessMatching.activities(data)
             )
-          } yield edit match {
-            case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
-//            TODO
-//            case true =>
-//              Redirect(routes.SummaryController.get())
-//            case false =>
-//              Redirect(routes.SummaryController.get())
-          }
+          } yield Redirect(routes.SummaryController.get())
+
       }
   }
 }

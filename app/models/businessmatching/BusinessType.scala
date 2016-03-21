@@ -19,6 +19,11 @@ object BusinessType {
 
   import play.api.data.mapping.forms.Rules._
 
+  val CORPORATE_BODY = "Corporate Body"
+  val UNINCORPORATED_BODY = "Unincorporated Body"
+  val LLP = "LLP"
+  val PARTNERSHIP = "Partnership"
+
   case object SoleProprietor extends BusinessType
   case object LimitedCompany extends BusinessType
   case object Partnership extends BusinessType
