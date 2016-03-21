@@ -19,9 +19,9 @@ object AddPerson {
     import models.FormTypes._
     import play.api.data.mapping.forms.Rules._
     (
-      (__ \ "firstName").read(indivNameType) and
-        (__ \ "middleName").read(optionR(indivNameType)) and
-        (__ \ "lastName").read(indivNameType) and
+      (__ \ "firstName").read(declarationNameType) and
+        (__ \ "middleName").read(optionR(declarationNameType)) and
+        (__ \ "lastName").read(declarationNameType) and
         __.read[RoleWithinBusiness]
       ) (AddPerson.apply _)
   }

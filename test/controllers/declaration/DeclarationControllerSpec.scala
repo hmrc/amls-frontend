@@ -50,8 +50,9 @@ class DeclarationControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (addPerson.firstName)
-      contentAsString(result) must include (addPerson.lastName)
+      contentAsString(result) must include(addPerson.firstName)
+      contentAsString(result) must include(addPerson.middleName mkString)
+      contentAsString(result) must include(addPerson.lastName)
     }
 
 
