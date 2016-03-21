@@ -261,6 +261,9 @@ businessmatching.typeofbusiness.title =Business matching - What''s your type of 
 businessmatching.typeofbusiness.heading = What''s your type of business?
 businessmatching.typeofbusiness.lbl.hint = For example: association, charity, trust
 
+businessmatching.summary.icon.title = You will be registering the following business for anti-money laundering supervision:
+businessmatching.summary.business.address.lbl = Your business details
+
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
 bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn''t the place to pay registration fees.

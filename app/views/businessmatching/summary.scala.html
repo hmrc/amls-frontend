@@ -10,7 +10,26 @@
 
     @heading("summary.checkyouranswers.title", "summary.businessmatching")
 
+    <div class="form-group">
+        <div class="panel-indent">
+            <span class="icon-information"></span>
+            <span class="notice">@Messages("businessmatching.summary.icon.title")</span>
+        </div>
+    </div>
     @model.reviewDetails.map { review =>
+        <table>
+            <tr>
+                <th  colspan="2" class="summary-title">@Messages("businessmatching.summary.business.address.lbl")</th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @review.businessAddress.toLines.map { line =>
+                        <li>@line</li>
+                    }
+                </td>
+            </tr>
+        </table>
+
         @review.businessType.map { m =>
             @m match {
                 case BusinessType.LLP | BusinessType.CORPORATE_BODY => {
