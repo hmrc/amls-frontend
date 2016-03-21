@@ -32,7 +32,7 @@ trait AddPersonController extends BaseController {
         case ValidForm(_, data) =>
           for {
             _ <- dataCacheConnector.save[AddPerson](AddPerson.key, data)
-          } yield Redirect(routes.AddPersonController.get())
+          } yield Redirect(routes.DeclarationController.get())
       }
     }
   }

@@ -48,7 +48,6 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
       val result = addPersonController.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("declaration.addperson.title"))
     }
 
     "on get display the persons page with blank fields" in new Fixture {

@@ -17,7 +17,7 @@ trait DeclarationController extends BaseController {
           val name = s"${addPerson.firstName} ${addPerson.middleName mkString} ${addPerson.lastName}"
           Ok(declare(name))
         case _ =>
-          BadRequest(declare(""))
+          Redirect(routes.AddPersonController.get())
       }
   }
 
