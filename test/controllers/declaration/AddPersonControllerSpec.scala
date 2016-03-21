@@ -83,7 +83,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       document.select("input[name=roleWithinBusiness][checked]").`val` must be("02")
     }
 
-    "must pass on post with all the mandators parameters supplied" in new Fixture {
+    "must pass on post with all the mandatory parameters supplied" in new Fixture {
 
       val requestWithParams = request.withFormUrlEncodedBody(
         "firstName" -> "John",
