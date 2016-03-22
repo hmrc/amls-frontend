@@ -77,6 +77,10 @@ div.grid-layout {
 .progress-section .heading-small, .progress-submit .heading-small {
   margin-top : 0;
 }
+.right.complete {
+  background-color : #00823B;
+  color : white;
+}
 
 
 /* postcode */

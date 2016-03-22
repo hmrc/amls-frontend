@@ -28,6 +28,14 @@ case class AboutTheBusiness(
 
   def correspondenceAddress(v: Option[CorrespondenceAddress]): AboutTheBusiness =
     this.copy(correspondenceAddress = v)
+
+  def isComplete: Boolean =
+    this match {
+      case AboutTheBusiness(
+        Some(_), Some(_), Some(_), Some(x), _
+      ) => true
+      case _ => false
+    }
 }
 
 object AboutTheBusiness {
@@ -35,9 +43,9 @@ object AboutTheBusiness {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "aboutthebusiness"
     val incomplete = Section(messageKey, false, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
-    cache.getEntry[IsComplete](key).fold(incomplete) {
-      isComplete =>
-        if (isComplete.isComplete) {
+    cache.getEntry[AboutTheBusiness](key).fold(incomplete) {
+      model =>
+        if (model.isComplete) {
           Section(messageKey, true, controllers.aboutthebusiness.routes.SummaryController.get())
         } else {
           incomplete

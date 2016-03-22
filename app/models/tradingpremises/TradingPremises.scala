@@ -13,7 +13,6 @@ case class TradingPremises(
   def yourAgent(v: YourAgent): TradingPremises =
     this.copy(yourAgent = Some(v))
 
-
   def yourTradingPremises(v: YourTradingPremises): TradingPremises =
     this.copy(yourTradingPremises = Some(v))
 
@@ -29,9 +28,9 @@ object TradingPremises {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tradingpremises"
     val incomplete = Section(messageKey, false, controllers.tradingpremises.routes.WhatYouNeedController.get())
-    cache.getEntry[IsComplete](key).fold(incomplete) {
-      isComplete =>
-        if (isComplete.isComplete) {
+    cache.getEntry[Seq[TradingPremises]](key).fold(incomplete) {
+      premises =>
+        if (premises.nonEmpty) {
           Section(messageKey, true, controllers.tradingpremises.routes.SummaryController.get())
         } else {
           incomplete

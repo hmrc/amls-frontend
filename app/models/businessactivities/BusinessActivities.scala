@@ -53,29 +53,29 @@ case class BusinessActivities(
 
   def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
     this.copy(whoIsYourAccountant = Some(p))
-}
 
-object BusinessActivities {
-
-  private def isComplete(model: BusinessActivities): Boolean =
-    model match {
+  def isComplete: Boolean =
+    this match {
       case BusinessActivities(
-        Some(_), Some(_), Some(_), Some(_), Some(_), Some(_),
-        Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)
+      Some(_), Some(_), Some(_), Some(_), Some(_), Some(_),
+      Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)
       ) => true
       case BusinessActivities(
-        Some(_), Some(_), Some(_), Some(_), Some(_), Some(_),
-        Some(_), Some(x), Some(_), Some(_), Some(_), _
+      Some(_), Some(_), Some(_), Some(_), Some(_), Some(_),
+      Some(_), Some(x), Some(_), Some(_), Some(_), _
       ) if !x.accountantForAMLSRegulations => true
       case _ => false
     }
+}
+
+object BusinessActivities {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessactivities"
     val incomplete = Section(messageKey, false, controllers.businessactivities.routes.WhatYouNeedController.get())
     cache.getEntry[BusinessActivities](key).fold(incomplete) {
       model =>
-        if (isComplete(model)) {
+        if (model.isComplete) {
           Section(messageKey, true, controllers.businessactivities.routes.SummaryController.get())
         } else {
           incomplete

@@ -21,23 +21,22 @@ case class EstateAgentBusiness(
   def penalisedUnderEstateAgentsAct(p: PenalisedUnderEstateAgentsAct): EstateAgentBusiness =
     this.copy(penalisedUnderEstateAgentsAct = Some(p))
 
-}
-
-object EstateAgentBusiness {
-
-  private def isComplete(model: EstateAgentBusiness): Boolean =
-    model match {
+  def isComplete: Boolean =
+    this match {
       case EstateAgentBusiness(Some(x), _, Some(_), Some(_)) if !x.services.contains(Residential) => true
       case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_)) => true
       case _ => false
     }
+}
+
+object EstateAgentBusiness {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "eab"
     val incomplete = Section(messageKey, false, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
     cache.getEntry[EstateAgentBusiness](key).fold(incomplete) {
-      eab =>
-        if (isComplete(eab)) {
+      model =>
+        if (model.isComplete) {
           Section(messageKey, true, controllers.estateagentbusiness.routes.SummaryController.get())
         } else {
           incomplete
