@@ -21,12 +21,18 @@ case class BusinessMatching(
 
 object BusinessMatching {
 
+  private def isComplete(model: BusinessMatching): Boolean =
+    model match {
+      case BusinessMatching(Some(_), _, Some(_)) => true
+      case _ => false
+    }
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessmatching"
     val incomplete = Section(messageKey, false, controllers.businessmatching.routes.RegisterServicesController.get())
-    cache.getEntry[IsComplete](key).fold(incomplete) {
-      isComplete =>
-        if (isComplete.isComplete) {
+    cache.getEntry[BusinessMatching](key).fold(incomplete) {
+      model =>
+        if (isComplete(model)) {
           // TODO Add summary page url
           Section(messageKey, true, controllers.routes.RegistrationProgressController.get())
         } else {

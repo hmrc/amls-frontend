@@ -35,6 +35,12 @@ div.grid-layout {
 
 
 /* Registration Progress */
+.progress-submit {
+  background-color : #f8f8f8;
+  margin-left : 30px;
+  padding : 15px;
+  border-bottom : #dee0e2 solid 3px;
+}
 .progress-section {
   display : table;
   background-color : #f8f8f8;
@@ -46,7 +52,7 @@ div.grid-layout {
 .progress-section > .left, .progress-section > .right {
   box-sizing : border-box;
   display : table-cell;
-  padding : 10px;
+  padding : 15px;
 }
 .progress-section > .left {
   border-bottom : #dee0e2 solid 3px;
@@ -68,7 +74,7 @@ div.grid-layout {
 .time-to-complete {
   width : 66%;
 }
-.progress-section .heading-small {
+.progress-section .heading-small, .progress-submit .heading-small {
   margin-top : 0;
 }
 

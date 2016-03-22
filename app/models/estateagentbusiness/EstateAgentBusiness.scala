@@ -25,12 +25,19 @@ case class EstateAgentBusiness(
 
 object EstateAgentBusiness {
 
+  private def isComplete(model: EstateAgentBusiness): Boolean =
+    model match {
+      case EstateAgentBusiness(Some(x), _, Some(_), Some(_)) if !x.services.contains(Residential) => true
+      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_)) => true
+      case _ => false
+    }
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "eab"
     val incomplete = Section(messageKey, false, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
-    cache.getEntry[IsComplete](key).fold(incomplete) {
-      isComplete =>
-        if (isComplete.isComplete) {
+    cache.getEntry[EstateAgentBusiness](key).fold(incomplete) {
+      eab =>
+        if (isComplete(eab)) {
           Section(messageKey, true, controllers.estateagentbusiness.routes.SummaryController.get())
         } else {
           incomplete

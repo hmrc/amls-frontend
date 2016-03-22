@@ -29,7 +29,7 @@ trait BusinessTypeController extends BaseController {
             businessType <- reviewDetails.businessType
           } yield businessType match {
             case UNINCORPORATED_BODY => Redirect(routes.TypeOfBusinessController.get())
-            case LLP |CORPORATE_BODY => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+            case LLP | CORPORATE_BODY => Redirect(controllers.routes.RegistrationProgressController.get())
             case _ => Redirect(routes.RegisterServicesController.get())
           }
           redirect getOrElse Ok(business_type(EmptyForm))
