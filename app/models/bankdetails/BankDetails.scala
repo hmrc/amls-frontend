@@ -1,6 +1,8 @@
 package models.bankdetails
 
+import models.registrationprogress.{IsComplete, Section}
 import typeclasses.MongoKey
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BankDetails (
                          bankAccountType: Option[BankAccountType] = None,
@@ -19,6 +21,19 @@ object BankDetails {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "bankdetails"
+    val incomplete = Section(messageKey, false, controllers.bankdetails.routes.WhatYouNeedController.get())
+    cache.getEntry[IsComplete](key).fold(incomplete) {
+      isComplete =>
+        if (isComplete.isComplete) {
+          Section(messageKey, true, controllers.bankdetails.routes.SummaryController.get())
+        } else {
+          incomplete
+        }
+    }
+  }
 
   val key = "bank-details"
 

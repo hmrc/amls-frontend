@@ -34,6 +34,45 @@ div.grid-layout {
 }
 
 
+/* Registration Progress */
+.progress-section {
+  display : table;
+  background-color : #f8f8f8;
+  width : 100%;
+}
+.progress-section + .progress-section {
+  margin-top : 12px;
+}
+.progress-section > .left, .progress-section > .right {
+  box-sizing : border-box;
+  display : table-cell;
+  padding : 10px;
+}
+.progress-section > .left {
+  border-bottom : #dee0e2 solid 3px;
+}
+.progress-section p {
+  margin : 0;
+  padding-bottom : 10px;
+}
+.progress-section > .right {
+  padding-top : 10px;
+  background-color : #dee0e2;
+  color : #6F777B;
+  width : 33%;
+}
+.progress-section:hover > .right {
+  background-color : #00823B;
+  color : white;
+}
+.time-to-complete {
+  width : 66%;
+}
+.progress-section .heading-small {
+  margin-top : 0;
+}
+
+
 /* postcode */
 /* TODO, determine if there's a class in Assets Frontend for this */
 form input[type=text].form-control.postcode {

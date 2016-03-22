@@ -22,7 +22,7 @@ trait BusinessTypeController extends BaseController {
             businessMatching <- option
             reviewDetails <- businessMatching.reviewDetails
             businessType <- reviewDetails.businessType
-          } yield Redirect(controllers.routes.MainSummaryController.onPageLoad())
+          } yield Redirect(controllers.routes.RegistrationProgressController.get())
           redirect getOrElse Ok(business_type(EmptyForm))
       }
   }
@@ -51,10 +51,10 @@ trait BusinessTypeController extends BaseController {
                details =>
                  dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
                    _ =>
-                     Redirect(controllers.routes.MainSummaryController.onPageLoad())
+                     Redirect(controllers.routes.RegistrationProgressController.get())
                  }
              } getOrElse Future.successful {
-               Redirect(controllers.routes.MainSummaryController.onPageLoad())
+               Redirect(controllers.routes.RegistrationProgressController.get())
              }
           }
       }

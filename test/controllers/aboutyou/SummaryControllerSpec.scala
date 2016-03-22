@@ -37,7 +37,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be (Some(controllers.routes.MainSummaryController.onPageLoad().url))
+        redirectLocation(result) must be (Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
       "load summary page with pre populated data" in new Fixture {

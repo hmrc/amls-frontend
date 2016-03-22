@@ -1,5 +1,8 @@
 package models.aboutthebusiness
 
+import models.registrationprogress.{IsComplete, Section}
+import uk.gov.hmrc.http.cache.client.CacheMap
+
 case class AboutTheBusiness(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
                              vatRegistered: Option[VATRegistered] = None,
@@ -28,6 +31,19 @@ case class AboutTheBusiness(
 }
 
 object AboutTheBusiness {
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "aboutthebusiness"
+    val incomplete = Section(messageKey, false, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
+    cache.getEntry[IsComplete](key).fold(incomplete) {
+      isComplete =>
+        if (isComplete.isComplete) {
+          Section(messageKey, true, controllers.aboutthebusiness.routes.SummaryController.get())
+        } else {
+          incomplete
+        }
+    }
+  }
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._

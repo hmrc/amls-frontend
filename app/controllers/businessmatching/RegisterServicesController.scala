@@ -35,7 +35,7 @@ trait RegisterServicesController  extends BaseController {
               businessMatching.activities(data)
             )
           } yield edit match {
-            case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+            case _ => Redirect(controllers.routes.RegistrationProgressController.get())
 //            TODO
 //            case true =>
 //              Redirect(routes.SummaryController.get())

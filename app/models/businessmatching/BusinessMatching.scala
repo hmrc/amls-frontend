@@ -1,6 +1,8 @@
 package models.businessmatching
 
 import models.businesscustomer.ReviewDetails
+import models.registrationprogress.{IsComplete, Section}
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessMatching(
                              activities: Option[BusinessActivities] = None,
@@ -14,6 +16,21 @@ case class BusinessMatching(
 }
 
 object BusinessMatching {
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "businessmatching"
+    val incomplete = Section(messageKey, false, controllers.businessmatching.routes.RegisterServicesController.get())
+    cache.getEntry[IsComplete](key).fold(incomplete) {
+      isComplete =>
+        if (isComplete.isComplete) {
+          // TODO Add summary page url
+          Section(messageKey, true, controllers.routes.RegistrationProgressController.get())
+        } else {
+          incomplete
+        }
+    }
+  }
+
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._

@@ -7,7 +7,9 @@ GET         /                                           controllers.LandingContr
 POST        /subscribe                                  controllers.SubscriptionController.post()
 
 GET         /unauthorised                               controllers.AmlsController.unauthorised
-GET         /summary                                    controllers.MainSummaryController.onPageLoad
+
+#GET         /summary                                    controllers.MainSummaryController.onPageLoad
+GET         /registration-progress                      controllers.RegistrationProgressController.get()
 
 GET         /about-you/your-details                    controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
 POST        /about-you/your-details                    controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)

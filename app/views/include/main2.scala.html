@@ -73,19 +73,7 @@
             <div class="amls-service-info">
                 @betaBanner
             </div>
-            <div class="grid-layout">
-                <div class="grid-layout__column grid-layout__column--2-3">
-                    @mainContent
-                    @getHelpForm
-                </div>
-                <div class="grid-layout__column grid-layout__column--1-3">
-                    @if(sidebar == HtmlFormat.empty) {
-                        &nbsp;
-                    } else {
-                        @sidebar
-                    }
-                </div>
-            </div>
+            @mainContent
         </div>
     </main>
 }

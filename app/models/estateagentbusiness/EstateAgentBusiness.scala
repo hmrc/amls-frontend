@@ -1,5 +1,8 @@
 package models.estateagentbusiness
 
+import models.registrationprogress.{IsComplete, Section}
+import uk.gov.hmrc.http.cache.client.CacheMap
+
 case class EstateAgentBusiness(
                                 services: Option[Services] = None,
                                 redressScheme: Option[RedressScheme] = None,
@@ -21,6 +24,19 @@ case class EstateAgentBusiness(
 }
 
 object EstateAgentBusiness {
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "eab"
+    val incomplete = Section(messageKey, false, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
+    cache.getEntry[IsComplete](key).fold(incomplete) {
+      isComplete =>
+        if (isComplete.isComplete) {
+          Section(messageKey, true, controllers.estateagentbusiness.routes.SummaryController.get())
+        } else {
+          incomplete
+        }
+    }
+  }
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._

@@ -1,6 +1,8 @@
 package models.tradingpremises
 
+import models.registrationprogress.{IsComplete, Section}
 import typeclasses.MongoKey
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class TradingPremises(
                             yourTradingPremises: Option[YourTradingPremises] = None,
@@ -23,6 +25,19 @@ object TradingPremises {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "tradingpremises"
+    val incomplete = Section(messageKey, false, controllers.tradingpremises.routes.WhatYouNeedController.get())
+    cache.getEntry[IsComplete](key).fold(incomplete) {
+      isComplete =>
+        if (isComplete.isComplete) {
+          Section(messageKey, true, controllers.tradingpremises.routes.SummaryController.get())
+        } else {
+          incomplete
+        }
+    }
+  }
 
   val key = "trading-premises"
 
