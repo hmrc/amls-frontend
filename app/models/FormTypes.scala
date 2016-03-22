@@ -112,6 +112,8 @@ object FormTypes {
 
   val accountantRefNoType = notEmpty compose maxLength(minAccountantRefNoTypeLength) compose minLength(minAccountantRefNoTypeLength)
 
+  val declarationNameType = notEmptyStrip compose maxLength(maxNameTypeLength)
+
   val roleWithinBusinessOtherType = notEmptyStrip compose maxLength(maxRoleWithinBusinessOtherType)
 
   val typeOfBusinessType = notEmptyStrip compose maxLength(maxTypeOfBusinessLength)

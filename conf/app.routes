@@ -135,3 +135,6 @@ GET         /business-activities/check-your-answers      controllers.businessact
 GET         /declaration/add-person                     controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                     controllers.declaration.AddPersonController.post()
 
+GET         /declaration/declaration                    controllers.declaration.DeclarationController.get()
+
+
