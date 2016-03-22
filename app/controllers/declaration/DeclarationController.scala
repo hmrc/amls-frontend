@@ -4,7 +4,6 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.declaration.AddPerson
-import views.html.declaration.declare
 
 trait DeclarationController extends BaseController {
 
@@ -15,7 +14,7 @@ trait DeclarationController extends BaseController {
       dataCacheConnector.fetch[AddPerson](AddPerson.key) map {
         case Some(addPerson) =>
           val name = s"${addPerson.firstName} ${addPerson.middleName mkString} ${addPerson.lastName}"
-          Ok(declare(name))
+          Ok(views.html.declaration.declare(name))
         case _ =>
           Redirect(routes.AddPersonController.get())
       }
