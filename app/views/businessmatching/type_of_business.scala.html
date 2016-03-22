@@ -1,0 +1,22 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+@import models.aboutthebusiness._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("businessmatching.typeofbusiness.title")
+) {
+
+    @heading("businessmatching.typeofbusiness.title", "summary.businessmatching")
+
+    @form(f, controllers.businessmatching.routes.TypeOfBusinessController.post()) {
+        @input(
+            field = f("typeOfBusiness"),
+            hintText = Messages("businessmatching.typeofbusiness.lbl.hint")
+        )
+
+            @submit(false)
+        }
+}

@@ -1,12 +1,9 @@
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessactivities.{InvolvedInOtherYes, BusinessActivities, BusinessFranchiseYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -35,10 +32,6 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
     val emptyCache = CacheMap("", Map.empty)
 
-    "use correct services" in new Fixture {
-      BusinessTypeController.dataCache must be(DataCacheConnector)
-    }
-
     "display business Types Page" in new Fixture {
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(None))
@@ -48,9 +41,9 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
       document.title() must be (Messages("businessmatching.businessType.title"))
     }
 
-    "display main Summary Page" in new Fixture {
+    "display Registration Number page for CORPORATE_BODY" in new Fixture {
 
-     val reviewDtls = ReviewDetails("BusinessName", Some("SOP"),
+     val reviewDtls = ReviewDetails("BusinessName", Some(controller.CORPORATE_BODY),
        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
@@ -59,6 +52,67 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be (Some(controllers.routes.RegistrationProgressController.get().url))
+    }
+
+    "display Registration Number page for LLP" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(controller.LLP),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+
+      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+
+      val result = controller.get()(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be (Some(controllers.routes.MainSummaryController.onPageLoad().url))
+    }
+
+    "display Type of Business Page" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(controller.UNINCORPORATED_BODY),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+
+      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+
+      val result = controller.get()(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be (Some(routes.TypeOfBusinessController.get().url))
+    }
+
+    "display Register Services Page" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(controller.PARTNERSHIP),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+
+      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+
+      val result = controller.get()(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be (Some(routes.RegisterServicesController.get().url))
+    }
+
+
+    "post with updated business matching data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "businessType" -> "01"
+      )
+
+      val reviewDtls = ReviewDetails("BusinessName", Some("SOP"),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+
+      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+
+      when(controller.dataCache.save[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.routes.MainSummaryController.onPageLoad().url))
+
     }
 
     "post with valid data" in new Fixture {
