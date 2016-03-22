@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.BusinessType._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
 
@@ -13,11 +14,6 @@ import scala.concurrent.Future
 trait BusinessTypeController extends BaseController {
 
   private[controllers] def dataCache: DataCacheConnector
-
-  val CORPORATE_BODY = "Corporate Body"
-  val UNINCORPORATED_BODY = "Unincorporated Body"
-  val LLP = "LLP"
-  val PARTNERSHIP = "Partnership"
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -29,7 +25,7 @@ trait BusinessTypeController extends BaseController {
             businessType <- reviewDetails.businessType
           } yield businessType match {
             case UNINCORPORATED_BODY => Redirect(routes.TypeOfBusinessController.get())
-            case LLP | CORPORATE_BODY => Redirect(controllers.routes.RegistrationProgressController.get())
+            case LLP |CORPORATE_BODY => Redirect(routes.CompanyRegistrationNumberController.get())
             case _ => Redirect(routes.RegisterServicesController.get())
           }
           redirect getOrElse Ok(business_type(EmptyForm))

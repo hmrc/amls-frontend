@@ -27,6 +27,7 @@ button.back = Back
 button.edit = Edit
 button.continue=Continue
 button.returntosummary = Return to Summary
+button.confirmandsubmit = Confirm and submit
 
 lbl.other = Other
 lbl.yes = Yes
@@ -105,7 +106,7 @@ summary.aboutyou = About you
 summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
-summary.businessmatching=Business Matching
+summary.businessmatching=Business matching
 
 summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises
@@ -289,8 +290,16 @@ businessmatching.registerservices.servicename.lbl.05=Money service business
 businessmatching.registerservices.servicename.lbl.06=Trust and company services
 businessmatching.registerservices.servicename.lbl.07=Telephone, digital and IT payment services
 
-businessmatching.typeofbusiness.title = What''s your type of business?
+businessmatching.registrationnumber.title=Business matching - What''s your company registration number?
+businessmatching.registrationnumber.heading=What''s your company registration number?
+businessmatching.registrationnumber.example=For example: A1234567.
+
+businessmatching.typeofbusiness.title =Business matching - What''s your type of business?
+businessmatching.typeofbusiness.heading = What''s your type of business?
 businessmatching.typeofbusiness.lbl.hint = For example: association, charity, trust
+
+businessmatching.summary.icon.title = You will be registering the following business for anti-money laundering supervision:
+businessmatching.summary.business.address.lbl = Your business details
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
@@ -410,3 +419,30 @@ businessactivities.whoisyouraccountant.taxMessage = Does this accountant also de
 businessactivities.whoisyouraccountant.reference.details = Your accountant''s HMRC Agent Reference Number
 
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
+
+submit.registration = Submit registration
+
+declaration.addperson.title = What''s your name?
+declaration.addperson.firstname = First name
+declaration.addperson.middlename = Middle name (optional)
+declaration.addperson.lastname = Last name
+declaration.addperson.whatsyourrole = What's your role within the business?
+
+declaration.addperson.lbl.01=Beneficial shareholder
+declaration.addperson.lbl.02=Director
+declaration.addperson.lbl.03=External accountant
+declaration.addperson.lbl.04=Internal accountant
+declaration.addperson.lbl.05=Nominated officer
+declaration.addperson.lbl.06=Partner
+declaration.addperson.lbl.07=Sole proprietor
+declaration.addperson.lbl.08=Other
+
+declaration.declaration.title = Declaration - submit declaration
+declaration.declaration.fullname = You have told us that you are
+declaration.declaration.declare = I declare that:
+declaration.declaration.correctinformation = all the information I have given in this application is correct
+declaration.declaration.tellhmrc = I understand that the business must tell HMRC about any change to any of the information on this form
+declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
+declaration.declaration.confirm = I confirm that I have read and understood the
+declaration.declaration.guidance = guidance
+

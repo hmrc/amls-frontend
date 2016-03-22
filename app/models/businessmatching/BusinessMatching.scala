@@ -7,7 +7,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class BusinessMatching(
                              activities: Option[BusinessActivities] = None,
                              reviewDetails: Option[ReviewDetails] = None,
-                             typeOfBusiness: Option[TypeOfBusiness] = None
+                             typeOfBusiness: Option[TypeOfBusiness] = None,
+                             companyRegistrationNumber: Option[CompanyRegistrationNumber] = None
                            ) {
   def activities(ba: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(ba))
@@ -23,6 +24,10 @@ case class BusinessMatching(
       case BusinessMatching(Some(_), _, Some(_)) => true
       case _ => false
     }
+
+  def companyRegistrationNumber(crn: CompanyRegistrationNumber): BusinessMatching =
+    this.copy(companyRegistrationNumber = Some(crn))
+
 }
 
 object BusinessMatching {
@@ -50,7 +55,8 @@ object BusinessMatching {
     implicit val reads: Reads[BusinessMatching] = (
         __.read[Option[BusinessActivities]] and
         __.read[Option[ReviewDetails]] and
-        __.read[Option[TypeOfBusiness]]
+        __.read[Option[TypeOfBusiness]] and
+        __.read[Option[CompanyRegistrationNumber]]
       ) (BusinessMatching.apply _)
 
   implicit val writes: Writes[BusinessMatching] =
@@ -59,7 +65,8 @@ object BusinessMatching {
         Seq(
           Json.toJson(model.activities).asOpt[JsObject],
           Json.toJson(model.reviewDetails).asOpt[JsObject],
-          Json.toJson(model.typeOfBusiness).asOpt[JsObject]
+          Json.toJson(model.typeOfBusiness).asOpt[JsObject],
+          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
         }

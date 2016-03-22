@@ -59,9 +59,8 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-
       private val checkbox = document.select("input[id=businessActivities-01]")
-      document.select("input[id=businessActivities-01]").attr("checked") must be("checked")
+      checkbox.attr("checked") must be("checked")
     }
 
     "on post with valid data" in new Fixture {
@@ -82,7 +81,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -125,7 +124,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get()().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
 

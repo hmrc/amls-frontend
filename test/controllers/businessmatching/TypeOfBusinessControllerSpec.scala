@@ -23,7 +23,7 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with 
     self =>
 
     val controller = new TypeOfBusinessController {
-      override val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
     }
   }
@@ -34,7 +34,7 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with 
 
     "display business Types Page" in new Fixture {
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
@@ -43,8 +43,8 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with 
 
     "display main Summary Page" in new Fixture {
 
-      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(None, None, Some(TypeOfBusiness("test"))))))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessMatching(typeOfBusiness = Some(TypeOfBusiness("test"))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -59,15 +59,32 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with 
         "typeOfBusiness" -> "text"
       )
 
-      when(controller.dataCache.fetch[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[BusinessMatching](any(), any())
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.RegisterServicesController.get().url))
+    }
+
+    "post with valid data in edit mode" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "typeOfBusiness" -> "text"
+      )
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
     }
 
@@ -77,10 +94,10 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with 
         "typeOfBusiness" -> "11"*40
       )
 
-      when(controller.dataCache.fetch[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[BusinessMatching](any(), any())
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -93,10 +110,10 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with 
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      when(controller.dataCache.fetch[BusinessMatching](any())
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[BusinessMatching](any(), any())
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
