@@ -18,7 +18,7 @@
     </div>
     <div class="right @if(completed) {complete}">
         @if(completed) {
-            completed
+            <img src="@routes.AssetsController.at("icon-tick-white.png")" alt="completed"/>
         } else {
             <div class="time-to-complete">
                 <span class="heading-large">@Messages(s"progress.${name}.time")</span>

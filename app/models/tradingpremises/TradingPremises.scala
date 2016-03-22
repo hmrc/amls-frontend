@@ -18,6 +18,13 @@ case class TradingPremises(
 
   def whatDoesYourBusinessDoAtThisAddress(v: WhatDoesYourBusinessDo): TradingPremises =
     this.copy(whatDoesYourBusinessDoAtThisAddress = Some(v))
+
+  def isComplete: Boolean =
+    this match {
+      case TradingPremises(Some(x), _, Some(_)) if x.isOwner => true
+      case TradingPremises(Some(_), Some(_), Some(_)) => true
+      case _ => false
+    }
 }
 
 object TradingPremises {
@@ -30,7 +37,7 @@ object TradingPremises {
     val incomplete = Section(messageKey, false, controllers.tradingpremises.routes.WhatYouNeedController.get())
     cache.getEntry[Seq[TradingPremises]](key).fold(incomplete) {
       premises =>
-        if (premises.nonEmpty) {
+        if (premises.nonEmpty && (premises forall { _.isComplete })) {
           Section(messageKey, true, controllers.tradingpremises.routes.SummaryController.get())
         } else {
           incomplete

@@ -15,6 +15,11 @@ case class BankDetails (
   def bankAccount(v: BankAccount): BankDetails =
     this.copy(bankAccount = Some(v))
 
+  def isComplete: Boolean =
+    this match {
+      case BankDetails(Some(_), Some(_)) => true
+      case _ => false
+    }
 }
 
 object BankDetails {
@@ -25,13 +30,11 @@ object BankDetails {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "bankdetails"
     val incomplete = Section(messageKey, false, controllers.bankdetails.routes.WhatYouNeedController.get())
-    cache.getEntry[IsComplete](key).fold(incomplete) {
-      isComplete =>
-        if (isComplete.isComplete) {
-          Section(messageKey, true, controllers.bankdetails.routes.SummaryController.get())
-        } else {
-          incomplete
-        }
+    val complete = Section(messageKey, true, controllers.bankdetails.routes.SummaryController.get())
+    cache.getEntry[Seq[BankDetails]](key).fold(incomplete) {
+      case model if model.isEmpty => complete
+      case model if model forall { _.isComplete } => complete
+      case _ => incomplete
     }
   }
 
