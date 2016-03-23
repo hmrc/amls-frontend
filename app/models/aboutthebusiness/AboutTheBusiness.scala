@@ -32,7 +32,7 @@ case class AboutTheBusiness(
   def isComplete: Boolean =
     this match {
       case AboutTheBusiness(
-        Some(_), Some(_), Some(_), Some(x), _
+        Some(_), Some(_), Some(_), Some(_), _
       ) => true
       case _ => false
     }
@@ -42,14 +42,14 @@ object AboutTheBusiness {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "aboutthebusiness"
-    val incomplete = Section(messageKey, Started, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
-    cache.getEntry[AboutTheBusiness](key).fold(incomplete) {
-      model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, controllers.aboutthebusiness.routes.SummaryController.get())
-        } else {
-          incomplete
-        }
+    val notStarted = Section(messageKey, NotStarted, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
+    cache.getEntry[AboutTheBusiness](key).fold(notStarted) {
+      case model if model.isComplete =>
+        Section(messageKey, Completed, controllers.aboutthebusiness.routes.SummaryController.get())
+      case AboutTheBusiness(None, None, None, _, None) =>
+        notStarted
+      case _ =>
+        Section(messageKey, Started, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
     }
   }
 

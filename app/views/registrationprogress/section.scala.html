@@ -8,14 +8,20 @@
         case NotStarted => {
             <div class="left">
                 <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
-                <a href="@call.url">
-                    @Messages("progress.start")
-                </a>
+                <p>
+                    @Messages(s"progress.$name.description")
+                </p>
+                <!--<a href="@call.url">-->
+                    <!--@Messages("progress.start")-->
+                <!--</a>-->
             </div>
             <div class="right not-started">
                 <div class="time-to-complete">
                     <span class="heading-large">@Messages(s"progress.${name}.time")</span>
                     <p class="font-xsmall">@Messages("progress.minutes")</p>
+                </div>
+                <div class="chevron-container">
+                    <a href="@call.url"><span class="chevron">&nbsp;</span></a>
                 </div>
             </div>
         }

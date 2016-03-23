@@ -50,6 +50,7 @@ div.grid-layout {
   margin-top : 12px;
 }
 .progress-section > .left, .progress-section > .right {
+  vertical-align : top;
   box-sizing : border-box;
   display : table-cell;
   padding : 15px;
@@ -62,7 +63,7 @@ div.grid-layout {
   padding-bottom : 10px;
 }
 .progress-section > .right {
-  padding-top : 10px;
+  padding : 20px 15px;
   background-color : #dee0e2;
   color : #6F777B;
   width : 33%;
@@ -71,15 +72,35 @@ div.grid-layout {
   background-color : #00823B;
   color : white;
 }
-.time-to-complete {
-  width : 66%;
-}
 .progress-section .heading-small, .progress-submit .heading-small {
   margin-top : 0;
 }
 .right.started {
   background-color : #FFBF47;
   color : white;
+}
+.time-to-complete {
+  display : table-cell;
+  width : 66%;
+}
+.chevron-container {
+  display : table-cell;
+  vertical-align : middle;
+  padding-right : 15px;
+}
+.chevron {
+  display : inline-block;
+  height : 2.5em;
+  width : 2.5em;
+  border-bottom : solid 0.4em #6F777B;
+  border-right : solid 0.4em #6F777B;
+  transform : rotate(-45deg);
+}
+.progress-section:hover .chevron {
+  border-color : white;
+}
+.chevron-container > a:focus {
+  background : none;
 }
 
 
