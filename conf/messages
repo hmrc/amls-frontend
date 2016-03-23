@@ -17,8 +17,15 @@ err.required = Please enter an item
 err.invalid = Please enter a valid item
 err.notrequired = No item should be entered
 err.invalidLength = invalid length
-err.summary = There are errors in your form submission
+err.summary = There is a problem
 err.pleasespecify = Please specify
+
+# Custom error messages
+error.required.businessmatching.register.service = Select at least one activity that you need to register.
+error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
+error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
+error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
+error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary

@@ -39,13 +39,19 @@ object FormTypes {
   val maxTypeOfBusinessLength = 40
 
 
+  def notEmptyWithMessage(message:String) = validateWith[String](message) { !_.isEmpty }
+
+  def maxLengthWithMessage(l: Int, message:String) = validateWith[String](message, l) { _.size <= l }
+
+  def validateText(regex: scala.util.matching.Regex, message:String) =  validateWith[String](message, regex) { regex.unapplySeq(_: String).isDefined }
+
   val notEmptyStrip = Rule.zero[String] fmap { _.trim } compose notEmpty
 
   val indivNameType = notEmpty compose maxLength(maxNameTypeLength)
 
   val descriptionType = notEmptyStrip compose maxLength(maxDescriptionTypeLength)
 
-  val prevMLRRegNoType = notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
+  //val prevMLRRegNoType = notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 
   val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
 

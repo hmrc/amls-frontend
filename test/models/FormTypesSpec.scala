@@ -59,7 +59,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-  "prevMLRRegNoType" must {
+/*  "prevMLRRegNoType" must {
 
     "successfully validate" in {
 
@@ -85,7 +85,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
           Path -> Seq(ValidationError("error.maxLength", FormTypes.maxPrevMLRRegNoLength))
         )))
     }
-  }
+  }*/
 
   "validateAddressType" must {
 

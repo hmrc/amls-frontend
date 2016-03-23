@@ -16,10 +16,12 @@ trait PreviouslyRegisteredController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(Some(data), _, _, _, _)) =>
-          Ok(previously_registered(Form2[PreviouslyRegistered](data), edit))
-        case _ =>
-          Ok(previously_registered(EmptyForm, edit))
+        response =>
+          val form: Form2[PreviouslyRegistered] = (for {
+            aboutTheBusiness <- response
+            prevRegistered <- aboutTheBusiness.previouslyRegistered
+          } yield Form2[PreviouslyRegistered](prevRegistered)).getOrElse(EmptyForm)
+          Ok(previously_registered(form, edit))
       }
   }
 
