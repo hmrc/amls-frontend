@@ -67,7 +67,7 @@ div.grid-layout {
   color : #6F777B;
   width : 33%;
 }
-.progress-section:hover > .right {
+.progress-section:hover > .right.not-started, .right.complete {
   background-color : #00823B;
   color : white;
 }
@@ -77,8 +77,8 @@ div.grid-layout {
 .progress-section .heading-small, .progress-submit .heading-small {
   margin-top : 0;
 }
-.right.complete {
-  background-color : #00823B;
+.right.started {
+  background-color : #FFBF47;
   color : white;
 }
 

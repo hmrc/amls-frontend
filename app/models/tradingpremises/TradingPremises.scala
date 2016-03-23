@@ -1,6 +1,6 @@
 package models.tradingpremises
 
-import models.registrationprogress.{IsComplete, Section}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -34,13 +34,17 @@ object TradingPremises {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tradingpremises"
-    val incomplete = Section(messageKey, false, controllers.tradingpremises.routes.WhatYouNeedController.get())
-    cache.getEntry[Seq[TradingPremises]](key).fold(incomplete) {
+    val notStarted = Section(messageKey, NotStarted, controllers.tradingpremises.routes.WhatYouNeedController.get(1))
+    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
       premises =>
         if (premises.nonEmpty && (premises forall { _.isComplete })) {
-          Section(messageKey, true, controllers.tradingpremises.routes.SummaryController.get())
+          Section(messageKey, Completed, controllers.tradingpremises.routes.SummaryController.get())
         } else {
-          incomplete
+          val index = premises.indexWhere {
+            case model if !model.isComplete => true
+            case _ => false
+          }
+          Section(messageKey, Started, controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
         }
     }
   }

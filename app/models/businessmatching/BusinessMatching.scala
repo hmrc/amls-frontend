@@ -1,7 +1,7 @@
 package models.businessmatching
 
 import models.businesscustomer.ReviewDetails
-import models.registrationprogress.{IsComplete, Section}
+import models.registrationprogress.{Completed, NotStarted, Section}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessMatching(
@@ -19,33 +19,34 @@ case class BusinessMatching(
   def typeOfBusiness(b: TypeOfBusiness): BusinessMatching =
     this.copy(typeOfBusiness = Some(b))
 
-  def isComplete: Boolean =
-    this match {
-      case BusinessMatching(Some(_), _, Some(_)) => true
-      case _ => false
-    }
-
   def companyRegistrationNumber(crn: CompanyRegistrationNumber): BusinessMatching =
     this.copy(companyRegistrationNumber = Some(crn))
 
+  def isComplete: Boolean =
+    this match {
+      case BusinessMatching(Some(_), Some(x), _, _)
+        if x.businessType.fold(false) {
+          y => (y == BusinessType.CORPORATE_BODY) || (y == BusinessType.UNINCORPORATED_BODY)
+        } => true
+      case _ => false
+    }
 }
 
 object BusinessMatching {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessmatching"
-    val incomplete = Section(messageKey, false, controllers.businessmatching.routes.RegisterServicesController.get())
+    val incomplete = Section(messageKey, NotStarted, controllers.businessmatching.routes.RegisterServicesController.get())
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
       model =>
         if (model.isComplete) {
           // TODO Add summary page url
-          Section(messageKey, true, controllers.routes.RegistrationProgressController.get())
+          Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
         } else {
           incomplete
         }
     }
   }
-
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._

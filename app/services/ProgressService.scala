@@ -6,7 +6,7 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => _, _}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.registrationprogress.{IsComplete, Section}
+import models.registrationprogress.{NotStarted, Section}
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -18,9 +18,6 @@ trait ProgressService {
 
   private[services] def cacheConnector: DataCacheConnector
 
-  private def isComplete(key: String)(implicit cache: CacheMap): Boolean =
-    cache.getEntry[IsComplete](key).fold(false) { _.isComplete }
-
   private def dependentSections(implicit cache: CacheMap): Seq[Section] =
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -29,18 +26,18 @@ trait ProgressService {
       (m, n) => n match {
         case AccountancyServices =>
           // TODO
-          m :+ Section("asp", false, controllers.routes.RegistrationProgressController.get())
+          m :+ Section("asp", NotStarted, controllers.routes.RegistrationProgressController.get())
         case EstateAgentBusinessService =>
           m :+ EstateAgentBusiness.section
         case HighValueDealing =>
           // TODO
-          m :+ Section("hvd", false, controllers.routes.RegistrationProgressController.get())
+          m :+ Section("hvd", NotStarted, controllers.routes.RegistrationProgressController.get())
         case MoneyServiceBusiness =>
           // TODO
-          m :+ Section("msb", false, controllers.routes.RegistrationProgressController.get())
+          m :+ Section("msb", NotStarted, controllers.routes.RegistrationProgressController.get())
         case TrustAndCompanyServices =>
           // TODO
-          m :+ Section("tcsp", false, controllers.routes.RegistrationProgressController.get())
+          m :+ Section("tcsp", NotStarted, controllers.routes.RegistrationProgressController.get())
         case _ => m
       }
         // TODO Error instead of empty map

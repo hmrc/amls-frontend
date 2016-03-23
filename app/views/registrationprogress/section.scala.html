@@ -1,29 +1,47 @@
-@import models.registrationprogress.Section
+@import models.registrationprogress._
 
-@(name: String, completed: Boolean, call: Call)(implicit request: Request[_], lang: Lang)
+@(name: String, status: Status, call: Call)(implicit request: Request[_], lang: Lang)
 
 <div class="progress-section">
-    <div class="left">
-        <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
-        @if(!completed) {
-            <p>@Messages(s"progress.${name}.description")</p>
-        }
-        <a href="@call.url">
-            @if(completed) {
-                @Messages("progress.edit")
-            } else {
-                @Messages("progress.start")
-            }
-        </a>
-    </div>
-    <div class="right @if(completed) {complete}">
-        @if(completed) {
-            <img src="@routes.AssetsController.at("icon-tick-white.png")" alt="completed"/>
-        } else {
-            <div class="time-to-complete">
-                <span class="heading-large">@Messages(s"progress.${name}.time")</span>
-                <p class="font-xsmall">@Messages("progress.minutes")</p>
+    @status match {
+
+        case NotStarted => {
+            <div class="left">
+                <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
+                <a href="@call.url">
+                    @Messages("progress.start")
+                </a>
+            </div>
+            <div class="right not-started">
+                <div class="time-to-complete">
+                    <span class="heading-large">@Messages(s"progress.${name}.time")</span>
+                    <p class="font-xsmall">@Messages("progress.minutes")</p>
+                </div>
             </div>
         }
-    </div>
+
+        case Started => {
+            <div class="left">
+                <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
+                <a href="@call.url">
+                    @Messages("progress.continue")
+                </a>
+            </div>
+            <div class="right not-started">
+                &nbsp;
+            </div>
+        }
+
+        case Completed => {
+            <div class="left">
+                <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
+                <a href="@call.url">
+                    @Messages("progress.edit")
+                </a>
+            </div>
+            <div class="right complete">
+                <img src="@routes.AssetsController.at("icon-tick-white.png")" alt="completed"/>
+            </div>
+        }
+    }
 </div>

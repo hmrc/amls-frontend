@@ -1,6 +1,6 @@
 package models.aboutthebusiness
 
-import models.registrationprogress.{IsComplete, Section}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class AboutTheBusiness(
@@ -42,11 +42,11 @@ object AboutTheBusiness {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "aboutthebusiness"
-    val incomplete = Section(messageKey, false, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
+    val incomplete = Section(messageKey, Started, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
     cache.getEntry[AboutTheBusiness](key).fold(incomplete) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, true, controllers.aboutthebusiness.routes.SummaryController.get())
+          Section(messageKey, Completed, controllers.aboutthebusiness.routes.SummaryController.get())
         } else {
           incomplete
         }

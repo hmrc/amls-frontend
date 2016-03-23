@@ -4,6 +4,6 @@ import play.api.mvc.Call
 
 case class Section(
                   name: String,
-                  complete: Boolean,
+                  status: Status,
                   call: Call
                   )

@@ -57,7 +57,8 @@ unauthorised.title = Unauthorised
 # Progress page
 progress.title = Registration progress
 progress.lede = Complete all the sections below to register. Once you start the application, you have 28 days to finish it.
-progress.edit = Edit this section
+progress.edit = Edit
+progress.continue = Continue
 progress.start = Start this section
 progress.minutes = minutes to complete
 progress.businessmatching.name = Business matching

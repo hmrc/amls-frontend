@@ -1,6 +1,6 @@
 package models.bankdetails
 
-import models.registrationprogress.{IsComplete, Section}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -29,12 +29,17 @@ object BankDetails {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "bankdetails"
-    val incomplete = Section(messageKey, false, controllers.bankdetails.routes.WhatYouNeedController.get())
-    val complete = Section(messageKey, true, controllers.bankdetails.routes.SummaryController.get())
-    cache.getEntry[Seq[BankDetails]](key).fold(incomplete) {
+    val notStarted = Section(messageKey, NotStarted, controllers.bankdetails.routes.WhatYouNeedController.get(1))
+    val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
+    cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
       case model if model.isEmpty => complete
       case model if model forall { _.isComplete } => complete
-      case _ => incomplete
+      case model =>
+        val index = model.indexWhere {
+          case model if !model.isComplete => true
+          case _ => false
+        }
+        Section(messageKey, Started, controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
     }
   }
 

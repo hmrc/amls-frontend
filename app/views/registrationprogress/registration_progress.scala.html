@@ -22,8 +22,8 @@
 
         @* Main section *@
         <div class="grid-layout__column grid-layout__column--2-3">
-            @sections.map { case Section(name, complete, call) =>
-                @section(name, complete, call)
+            @sections.map { case Section(name, status, call) =>
+                @section(name, status, call)
             }
         </div>
 
@@ -31,9 +31,16 @@
         <div class="grid-layout__column grid-layout__column--1-3">
             <div class="progress-submit">
                 <h3 class="heading-small">Submit registration</h3>
-                <p>You can't finish the registration until you've completed all the sections.</p>
-                <a class="button @if(declarationAvailable) {disabled}" href="#">Submit registration</a>
+                <p>
+                    @if(declarationAvailable) {
+                        All sections complete: you can now submit the registration.
+                    } else {
+                        You can't finish the registration until you've completed all the sections.
+                    }
+                </p>
+                <a class="button @if(!declarationAvailable) {disabled}" href="#">Submit registration</a>
             </div>
         </div>
+
     </div>
 }
