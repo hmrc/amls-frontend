@@ -1,10 +1,8 @@
 package models.businessactivities
 
-import models.aboutyou.Other
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
-import play.api.i18n.{Messages, Lang}
 import play.api.libs.json._
 
 sealed trait ExpectedAMLSTurnover
@@ -18,7 +16,6 @@ object ExpectedAMLSTurnover {
   case object Fifth extends ExpectedAMLSTurnover
   case object Sixth extends ExpectedAMLSTurnover
   case object Seventh extends ExpectedAMLSTurnover
-
 
 
   import utils.MappingUtils.Implicits._

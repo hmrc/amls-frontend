@@ -38,7 +38,7 @@
                         You can't finish the registration until you've completed all the sections.
                     }
                 </p>
-                <a class="button @if(!declarationAvailable) {disabled}" href="#">Submit registration</a>
+                <a class="button @if(!declarationAvailable) {disabled}" href="@controllers.declaration.routes.AddPersonController.get()">Submit registration</a>
             </div>
         </div>
 
