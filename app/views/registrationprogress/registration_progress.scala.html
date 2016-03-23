@@ -30,15 +30,17 @@
         @* Sidebar *@
         <div class="grid-layout__column grid-layout__column--1-3">
             <div class="progress-submit">
-                <h3 class="heading-small">Submit registration</h3>
+                <h3 class="heading-small">@Messages("progress.submit")</h3>
                 <p>
                     @if(declarationAvailable) {
-                        All sections complete: you can now submit the registration.
+                        @Messages("progress.declarationavailable")
                     } else {
-                        You can't finish the registration until you've completed all the sections.
+                        @Messages("progress.declarationunavailable")
                     }
                 </p>
-                <a class="button @if(!declarationAvailable) {disabled}" href="@controllers.declaration.routes.AddPersonController.get()">Submit registration</a>
+                <form method="get" action="@controllers.declaration.routes.AddPersonController.get.url">
+                    <input type="submit" value="@Messages("progress.submit")" @if(!declarationAvailable) {disabled} class="button"></input>
+                </form>
             </div>
         </div>
 
