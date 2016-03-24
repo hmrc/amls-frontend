@@ -14,7 +14,7 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       dataCache.fetch[BusinessMatching](BusinessMatching.key) map {
         case Some(data) => Ok(summary(data))
-        case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 }

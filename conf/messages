@@ -54,6 +54,47 @@ lbl.nonresidential = Non-Residential
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
+# Progress page
+progress.title = Registration progress
+progress.lede = Complete all the sections below to register. Once you start the application, you have 28 days to finish it.
+progress.edit = Edit
+progress.continue = Continue
+progress.start = Start this section
+progress.minutes = minutes to complete
+progress.submit = Submit registration
+progress.declarationavailable = All sections complete: you can now submit the registration.
+progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
+progress.businessmatching.name = Business matching
+progress.businessmatching.description = Administrative information about your business.
+progress.businessmatching.time = 5
+progress.aboutthebusiness.name = About the business
+progress.aboutthebusiness.description = Administrative information about your business.
+progress.aboutthebusiness.time = 5
+progress.businessactivities.name = Business activities
+progress.businessactivities.description = Information about how your business operates, and your anti-money laundering procedures.
+progress.businessactivities.time = 8
+progress.bankdetails.name = Bank details
+progress.bankdetails.description = The bank accounts your business uses. These include personal accounts or accounts belonging to other businesses.
+progress.bankdetails.time = 5
+progress.tradingpremises.name = Trading premises
+progress.tradingpremises.description = Which premises your business trades from, and details of any other businesses that trade on your behalf.
+progress.tradingpremises.time = 8
+progress.asp.name = Accountancy service provider
+progress.asp.description = Registration information specifically for accountancy service providers.
+progress.asp.time = 5
+progress.eab.name = Estate agent business
+progress.eab.description = Registration information specifically for estate agent businesses.
+progress.eab.time = 5
+progress.hvd.name = High value dealer
+progress.hvd.description = Registration information specifically for high value dealers.
+progress.hvd.time = 8
+progress.msb.name = Money service business
+progress.msb.description = Registration information specifically for money service businesses.
+progress.msb.time = 6
+progress.tcsp.name = Trust or company service provider
+progress.tcsp.description = Registration information specifically for trust or company service providers.
+progress.tcsp.time = 8
+
 # Individual pages
 
 summary.title = Your AMLS registration

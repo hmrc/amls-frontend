@@ -18,7 +18,7 @@ trait LandingController extends BaseController {
       landingService.hasSavedForm flatMap {
         case true =>
           // If we have a saved form, skip business matching.
-          Future.successful(Redirect(controllers.routes.MainSummaryController.onPageLoad()))
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         case false =>
           landingService.reviewDetails flatMap {
             case Some(reviewDetails) =>

@@ -1,5 +1,8 @@
 package models.estateagentbusiness
 
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import uk.gov.hmrc.http.cache.client.CacheMap
+
 case class EstateAgentBusiness(
                                 services: Option[Services] = None,
                                 redressScheme: Option[RedressScheme] = None,
@@ -18,9 +21,28 @@ case class EstateAgentBusiness(
   def penalisedUnderEstateAgentsAct(p: PenalisedUnderEstateAgentsAct): EstateAgentBusiness =
     this.copy(penalisedUnderEstateAgentsAct = Some(p))
 
+  def isComplete: Boolean =
+    this match {
+      case EstateAgentBusiness(Some(x), _, Some(_), Some(_)) if !x.services.contains(Residential) => true
+      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_)) => true
+      case _ => false
+    }
 }
 
 object EstateAgentBusiness {
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "eab"
+    val notStarted = Section(messageKey, NotStarted, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
+    cache.getEntry[EstateAgentBusiness](key).fold(notStarted) {
+      model =>
+        if (model.isComplete) {
+          Section(messageKey, Completed, controllers.estateagentbusiness.routes.SummaryController.get())
+        } else {
+          Section(messageKey, Started, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
+        }
+    }
+  }
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._

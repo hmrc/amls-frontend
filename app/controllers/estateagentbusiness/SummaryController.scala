@@ -16,7 +16,7 @@ trait SummaryController extends BaseController {
         case Some(data) =>
           Ok(summary(data))
         case _ =>
-          Redirect(controllers.routes.MainSummaryController.onPageLoad())
+          Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 }

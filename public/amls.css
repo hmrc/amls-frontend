@@ -34,6 +34,76 @@ div.grid-layout {
 }
 
 
+/* Registration Progress */
+.progress-submit {
+  background-color : #f8f8f8;
+  margin-left : 30px;
+  padding : 15px;
+  border-bottom : #dee0e2 solid 3px;
+}
+.progress-section {
+  display : table;
+  background-color : #f8f8f8;
+  width : 100%;
+}
+.progress-section + .progress-section {
+  margin-top : 12px;
+}
+.progress-section > .left, .progress-section > .right {
+  vertical-align : top;
+  box-sizing : border-box;
+  display : table-cell;
+  padding : 15px;
+}
+.progress-section > .left {
+  border-bottom : #dee0e2 solid 3px;
+}
+.progress-section p {
+  margin : 0;
+  padding-bottom : 10px;
+}
+.progress-section > .right {
+  padding : 20px 15px;
+  background-color : #dee0e2;
+  color : #6F777B;
+  width : 33%;
+}
+.progress-section:hover > .right.not-started, .right.complete {
+  background-color : #00823B;
+  color : white;
+}
+.progress-section .heading-small, .progress-submit .heading-small {
+  margin-top : 0;
+}
+.right.started {
+  background-color : #FFBF47;
+  color : white;
+}
+.time-to-complete {
+  display : table-cell;
+  width : 66%;
+}
+.chevron-container {
+  display : table-cell;
+  vertical-align : middle;
+  padding-right : 15px;
+}
+.chevron {
+  display : inline-block;
+  height : 2.5em;
+  width : 2.5em;
+  border-bottom : solid 0.4em #6F777B;
+  border-right : solid 0.4em #6F777B;
+  transform : rotate(-45deg);
+}
+.progress-section:hover .chevron {
+  border-color : white;
+}
+.chevron-container > a:focus {
+  background : none;
+}
+
+
 /* postcode */
 /* TODO, determine if there's a class in Assets Frontend for this */
 form input[type=text].form-control.postcode {

@@ -15,7 +15,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
     implicit val formRule: Rule[UrlFormEncoded, Foobar] = From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
       (
-        (__ \ "s").read[String] and
+        (__ \ "services").read[String] and
           (__ \ "f").read[String]
         )(Foobar.apply _)
     }
@@ -24,7 +24,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
       import play.api.data.mapping.forms.Writes._
       import play.api.libs.functional.syntax.unlift
       (
-        (__ \ "s").write[String] and
+        (__ \ "services").write[String] and
           (__ \ "f").write[String]
         )(unlift(Foobar.unapply _))
     }
@@ -32,7 +32,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
     val model = Foobar("foo", "bar")
 
     val data = Map(
-      "s" -> Seq("foo"),
+      "services" -> Seq("foo"),
       "f" -> Seq("bar")
     )
   }
@@ -54,7 +54,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
     "return an InvalidForm when invalid UrlFormEncoded data is passed" in new Fixture {
 
       val errors = Seq(
-        (Path \ "s") -> Seq(ValidationError("error.required")),
+        (Path \ "services") -> Seq(ValidationError("error.required")),
         (Path \ "f") -> Seq(ValidationError("error.required"))
       )
 
@@ -64,8 +64,8 @@ class Form2Spec extends PlaySpec with MockitoSugar {
 
     "return data for a field when given a path" in new Fixture {
 
-      Form2[Foobar](model).apply(Path \ "s") must
-        be(ValidField(Path \ "s", Seq("foo")))
+      Form2[Foobar](model).apply(Path \ "services") must
+        be(ValidField(Path \ "services", Seq("foo")))
     }
   }
 
@@ -77,7 +77,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
         ValidationError("error.required")
       )
 
-      Form2[Foobar](Map.empty[String, Seq[String]]).errors(Path \ "s") must
+      Form2[Foobar](Map.empty[String, Seq[String]]).errors(Path \ "services") must
         be(errors)
     }
   }
