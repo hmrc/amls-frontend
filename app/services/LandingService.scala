@@ -49,7 +49,6 @@ trait LandingService {
     cacheConnector.save[BusinessMatching](BusinessMatching.key, bm)
     val atb = AboutTheBusiness(registeredOffice = Some(reviewDetails.businessAddress))
     cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, atb)
-
   }
 }
 

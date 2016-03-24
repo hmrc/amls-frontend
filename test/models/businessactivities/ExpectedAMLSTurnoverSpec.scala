@@ -1,6 +1,5 @@
 package models.businessactivities
 
-import models.aboutyou.InternalAccountant
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}

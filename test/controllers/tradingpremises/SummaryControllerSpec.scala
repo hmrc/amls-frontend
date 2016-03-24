@@ -46,7 +46,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
       when(summaryController.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = summaryController.get()(request)
-      redirectLocation(result) must be(Some("/anti-money-laundering/summary"))
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       status(result) must be(SEE_OTHER)
     }
 

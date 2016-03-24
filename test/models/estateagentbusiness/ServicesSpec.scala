@@ -65,7 +65,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
       }
 
       "fail when on path is missing" in {
-        Json.fromJson[Services](Json.obj("service" -> Seq("01"))) must
+        Json.fromJson[Services](Json.obj("services" -> Seq("01"))) must
           be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
       }
 

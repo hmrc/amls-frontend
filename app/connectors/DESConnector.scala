@@ -3,7 +3,6 @@ package connectors
 import config.{ApplicationConfig, WSHttp}
 import models.SubscriptionRequest
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import uk.gov.hmrc.play.http._
 
@@ -11,17 +10,18 @@ import scala.concurrent.Future
 
 trait DESConnector {
 
-  protected def http: HttpPost
+  private[connectors] def http: HttpPost
+  private[connectors] def url: String
 
   def subscribe
   (subscriptionRequest: SubscriptionRequest, safeId:String)
   (implicit
-   user: AuthContext,
    headerCarrier: HeaderCarrier
   ): Future[HttpResponse] =
-    http.POST[SubscriptionRequest, HttpResponse](ApplicationConfig.subscriptionUrl(safeId), subscriptionRequest)
+    http.POST[SubscriptionRequest, HttpResponse](s"$url/$safeId", subscriptionRequest)
 }
 
 object DESConnector extends DESConnector {
-  override val http = WSHttp
+  override private[connectors] val http = WSHttp
+  override private[connectors] val url = ApplicationConfig.subscriptionUrl
 }

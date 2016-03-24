@@ -29,7 +29,7 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
 
     "load the what you need page" in new Fixture {
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("tradingpremises.whatyouneed.title"))
     }
