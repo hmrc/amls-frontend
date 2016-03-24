@@ -30,12 +30,15 @@ error.required.yourname = Enter your name.
 error.required.name.of.business = Enter the name of the business.
 
 # Custom error messages
-error.required.businessmatching.register.service = Select at least one activity that you need to register.
+error.required.bm.register.service = Select at least one activity that you need to register.
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
 error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
 error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
 error.required.atb.uk.or.overseas = Select one option: is this a UK address or an overseas address?
+
+error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
+error.required.ba.enter.text = Enter information about what other anti-money laundering activities your business carries out
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary

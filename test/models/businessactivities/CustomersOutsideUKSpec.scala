@@ -1,5 +1,6 @@
 package models.businessactivities
 
+import models.FormTypes
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
@@ -53,17 +54,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.maxLength", 2))
-        )))
-    }
-
-    "validate mandatory field for min length when isOutside is  selected as Yes and country with invalid data" in {
-      val json = Map("isOutside" -> Seq("true"),
-        "country_1" -> Seq("A"))
-
-      CustomersOutsideUK.formRule.validate(json) must
-        be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.minLength", 2))
+          (Path \ "country_1") -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
         )))
     }
 

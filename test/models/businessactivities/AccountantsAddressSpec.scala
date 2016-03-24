@@ -111,7 +111,7 @@ class AccountantsAddressSpec extends PlaySpec {
         val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
         AccountantsAddress.formRule.validate(model) must be(
           Failure(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.maxLength", FormTypes.maxCountryTypeLength))
+            (Path \ "country") -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
           )))
       }
 

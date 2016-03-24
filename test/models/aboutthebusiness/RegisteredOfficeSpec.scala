@@ -58,7 +58,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
       RegisteredOffice.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
+          (Path \ "isUK") -> Seq(ValidationError("error.required.atb.confirm.office"))
         )))
     }
 

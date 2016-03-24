@@ -71,7 +71,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       addressType.validate("") must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.required.address.line"))
         )))
     }
 
@@ -79,7 +79,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       addressType.validate("a" * 36) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength))
+          Path -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength))
         )))
     }
   }
@@ -96,7 +96,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       postcodeType.validate("") must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.required.postcode"))
         )))
     }
 
@@ -104,7 +104,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       postcodeType.validate("a" * 11) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxPostCodeTypeLength))
+          Path -> Seq(ValidationError("error.invalid.postcode", FormTypes.maxPostCodeTypeLength))
         )))
     }
   }
@@ -121,7 +121,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       countryType.validate("") must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.required.country"))
         )))
     }
 
@@ -129,7 +129,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       countryType.validate("a" * 3) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxCountryTypeLength))
+          Path -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
         )))
     }
   }
@@ -422,7 +422,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail validation if country is longer than the permissible length" in {
       countryType.validate("test") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxCountryTypeLength))))
+        Failure(Seq(Path -> Seq(ValidationError("error.invalid.country", countryRegex))))
       )
     }
 

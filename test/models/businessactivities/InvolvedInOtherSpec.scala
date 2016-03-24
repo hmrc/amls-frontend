@@ -6,7 +6,7 @@ import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class InvolvedInOtherActivitiesSpec extends PlaySpec with MockitoSugar {
+class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
     "successfully validate given an enum value" in {
@@ -27,12 +27,22 @@ class InvolvedInOtherActivitiesSpec extends PlaySpec with MockitoSugar {
     "fail to validate given an `Yes` with no value" in {
 
       val data = Map(
-        "involvedInOther" -> Seq("true")
+        "involvedInOther" -> Seq("true"),
+        "details" -> Seq("")
       )
 
       InvolvedInOther.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.required"))
+          (Path \ "details") -> Seq(ValidationError("error.required.ba.enter.text"))
+        )))
+    }
+
+
+    "fail to validate mandatory field" in {
+
+      InvolvedInOther.formRule.validate(Map.empty) must
+        be(Failure(Seq(
+          (Path \ "involvedInOther") -> Seq(ValidationError("error.required.ba.involved.in.other"))
         )))
     }
 

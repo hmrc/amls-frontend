@@ -116,9 +116,9 @@ class CorrespondenceAddressSpec extends PlaySpec {
 
       "throw error when mandatory fields are missing" in {
         CorrespondenceAddress.formRule.validate(Map.empty) must be
-          (Failure(Seq(
+          Failure(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
-          )))
+          ))
       }
 
 

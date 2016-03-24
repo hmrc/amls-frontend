@@ -1,8 +1,6 @@
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.aboutthebusiness.ConfirmRegisteredOfficeController
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -30,11 +28,6 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
   val emptyCache = CacheMap("", Map.empty)
 
   "AccountantForAMLSRegulationsController" must {
-
-    "use correct services" in new Fixture {
-      ConfirmRegisteredOfficeController.authConnector must be(AMLSAuthConnector)
-      ConfirmRegisteredOfficeController.dataCache must be(DataCacheConnector)
-    }
 
     "Get Option:" must {
 
@@ -146,31 +139,31 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
     }
+
+
+    "on post invalid data show error" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody()
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("This field is required"))
+
+    }
+
+    "on post with invalid data show error" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody(
+        "WhatYouNeedController" -> ""
+      )
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("err.summary"))
+
+    }
   }
-
-  "on post invalid data show error" in new Fixture {
-
-    val newRequest = request.withFormUrlEncodedBody()
-    when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
-    val result = controller.post()(newRequest)
-    status(result) must be(BAD_REQUEST)
-    contentAsString(result) must include(Messages("This field is required"))
-
-  }
-
-  "on post with invalid data show error" in new Fixture {
-    val newRequest = request.withFormUrlEncodedBody(
-      "WhatYouNeedController" -> ""
-    )
-    when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
-    val result = controller.post()(newRequest)
-    status(result) must be(BAD_REQUEST)
-    contentAsString(result) must include("There are errors in your form submission")
-
-  }
-
 }

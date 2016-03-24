@@ -68,7 +68,7 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) and
             (__ \ "country").read(countryType)
           )(RegisteredOfficeNonUK.apply _)
-      case _ =>(Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
+      case _ =>(Path \ "isUK") -> Seq(ValidationError("error.required.atb.confirm.office"))
     }
   }
 

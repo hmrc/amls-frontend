@@ -30,7 +30,6 @@ object FormTypes {
   val maxIBANLength = 34
   val maxNonUKBankAccountNumberLength = 40
   val maxUKBankAccountNumberLength = 8
-  val maxSortCodeLength = 6
   val maxSoftwareNameLength = 40
   val maxFranchiseName = 140
   val maxEmployeeLength = 11
@@ -45,11 +44,11 @@ object FormTypes {
 
   def customRegex(regex: scala.util.matching.Regex, message:String) =  validateWith[String](message, regex) { regex.unapplySeq(_: String).isDefined }
 
-  val notEmptyStrip = Rule.zero[String] fmap { _.trim } compose notEmpty
+  val notEmptyStrip = Rule.zero[String] fmap { _.trim }
 
   val indivNameType = notEmpty compose maxLength(maxNameTypeLength)
 
-  val descriptionType = notEmptyStrip compose maxLength(maxDescriptionTypeLength)
+  val descriptionType = notEmptyStrip compose notEmpty compose maxLength(maxDescriptionTypeLength)
 
   val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
 
@@ -102,10 +101,10 @@ object FormTypes {
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
 
-  val accountNameType = notEmptyStrip compose maxLength(maxAccountName)
+  val accountNameType = notEmptyStrip compose notEmpty compose maxLength(maxAccountName)
 
   val sortCodeRegex = "^[0-9]{6}".r
-  val sortCodeType = notEmpty compose maxLength(maxSortCodeLength) compose pattern(sortCodeRegex)
+  val sortCodeType = notEmpty compose pattern(sortCodeRegex)
 
   val ukBankAccountNumberRegex = "^[0-9]{8}$".r
   val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength) compose pattern(ukBankAccountNumberRegex)
@@ -114,19 +113,19 @@ object FormTypes {
 
   val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern("^[0-9a-zA-Z_]+$".r)
 
-  val softwareNameType =  notEmptyStrip compose maxLength (maxSoftwareNameLength)
+  val softwareNameType =  notEmptyStrip compose notEmpty compose maxLength (maxSoftwareNameLength)
 
-  val franchiseNameType =  notEmptyStrip compose maxLength(maxFranchiseName)
+  val franchiseNameType =  notEmptyStrip compose notEmpty compose maxLength(maxFranchiseName)
 
-  val OtherBusinessActivityType = notEmptyStrip compose maxLength(maxOtherBusinessActivityTypeLength)
+  val OtherBusinessActivityType = notEmptyStrip compose customNotEmpty("error.required.ba.enter.text") compose maxLength(maxOtherBusinessActivityTypeLength)
 
-  val employeeCountType = notEmptyStrip compose maxLength(maxEmployeeLength) compose pattern("^[0-9]+$".r)
+  val employeeCountType = notEmptyStrip compose notEmpty compose maxLength(maxEmployeeLength) compose pattern("^[0-9]+$".r)
 
   val accountantRefNoType = notEmpty compose maxLength(minAccountantRefNoTypeLength) compose minLength(minAccountantRefNoTypeLength)
 
-  val declarationNameType = notEmptyStrip compose maxLength(maxNameTypeLength)
+  val declarationNameType = notEmptyStrip compose notEmpty compose maxLength(maxNameTypeLength)
 
-  val roleWithinBusinessOtherType = notEmptyStrip compose maxLength(maxRoleWithinBusinessOtherType)
+  val roleWithinBusinessOtherType = notEmptyStrip compose notEmpty compose maxLength(maxRoleWithinBusinessOtherType)
 
-  val typeOfBusinessType = notEmptyStrip compose maxLength(maxTypeOfBusinessLength)
+  val typeOfBusinessType = notEmptyStrip compose notEmpty compose maxLength(maxTypeOfBusinessLength)
 }

@@ -105,7 +105,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
         "postCode"->"NE7 7DS")
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("There are errors in your form submission")
+      contentAsString(result) must include(Messages("err.summary"))
 
     }
   }
