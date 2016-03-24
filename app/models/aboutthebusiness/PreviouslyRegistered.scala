@@ -20,8 +20,8 @@ object PreviouslyRegistered {
     import play.api.data.mapping.forms.Rules._
     (__ \ "previouslyRegistered").read[Option[Boolean]] flatMap {
       case Some(true) =>
-        (__ \ "prevMLRRegNo").read(notEmptyWithMessage("error.required.atb.mlr.number")
-          compose validateText("^([0-9]{8}|[0-9]{15})$".r, "error.invalid.atb.mlr.number")) fmap PreviouslyRegisteredYes.apply
+        (__ \ "prevMLRRegNo").read(customNotEmpty("error.required.atb.mlr.number")
+          compose customRegex("^([0-9]{8}|[0-9]{15})$".r, "error.invalid.atb.mlr.number")) fmap PreviouslyRegisteredYes.apply
       case Some(false) => Rule.fromMapping { _ => Success(PreviouslyRegisteredNo) }
       case _ => (Path \ "previouslyRegistered") -> Seq(ValidationError("error.required.atb.previously.registered"))
     }

@@ -54,34 +54,27 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     }
 
-    "fail to validation for not filling mandatory field" in {
-      val data = Map(
-        "isUK" -> Seq("false"),
-        "addressLineNonUK2" -> Seq("Longbenton"),
-        "addressLineNonUK3" -> Seq(""),
-        "addressLineNonUK4" -> Seq(""),
-        "postCode" -> Seq("UK")
-      )
+    "fail to validation for missing mandatory field" in {
 
-      RegisteredOffice.formRule.validate(data) must
+      RegisteredOffice.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required")),
-          (Path \ "country") -> Seq(ValidationError("error.required"))
+          (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
         )))
     }
 
-    "fail to validation for not filling mandatory isUKOrOverseas field" in {
+    "fail to validation for not filling mandatory field" in {
       val data = Map(
-        "addressLineNonUK2" -> Seq(""),
-        "addressLineNonUK3" -> Seq(""),
-        "addressLineNonUK4" -> Seq(""),
-        "country" -> Seq("")
+        "isUK" -> Seq("true"),
+        "addressLine1" -> Seq(""),
+        "addressLine2" -> Seq(""),
+        "postCode" -> Seq("")
       )
 
       RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "isUK") -> Seq(ValidationError("error.required"))
-
+          (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
+          (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
+          (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
         )))
     }
 
@@ -97,10 +90,10 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
       RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "addressLine2") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
-          (Path \ "addressLine3") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
-          (Path \ "addressLine4") -> Seq(ValidationError("error.maxLength", FormTypes.maxAddressLength)),
-          (Path \ "postCode") -> Seq(ValidationError("error.maxLength", FormTypes.maxPostCodeTypeLength))
+          (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength)),
+          (Path \ "addressLine3") -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength)),
+          (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength)),
+          (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode", FormTypes.maxPostCodeTypeLength))
         )))
     }
 

@@ -39,11 +39,11 @@ object FormTypes {
   val maxTypeOfBusinessLength = 40
 
 
-  def notEmptyWithMessage(message:String) = validateWith[String](message) { !_.isEmpty }
+  def customNotEmpty(message:String) = validateWith[String](message) { !_.isEmpty }
 
-  def maxLengthWithMessage(l: Int, message:String) = validateWith[String](message, l) { _.size <= l }
+  def customMaxLength(l: Int, message:String) = validateWith[String](message, l) { _.size <= l }
 
-  def validateText(regex: scala.util.matching.Regex, message:String) =  validateWith[String](message, regex) { regex.unapplySeq(_: String).isDefined }
+  def customRegex(regex: scala.util.matching.Regex, message:String) =  validateWith[String](message, regex) { regex.unapplySeq(_: String).isDefined }
 
   val notEmptyStrip = Rule.zero[String] fmap { _.trim } compose notEmpty
 
@@ -51,19 +51,23 @@ object FormTypes {
 
   val descriptionType = notEmptyStrip compose maxLength(maxDescriptionTypeLength)
 
-  //val prevMLRRegNoType = notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
-
   val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
 
-  val addressType = notEmpty compose maxLength(maxAddressLength)
+  val validateAddress = customMaxLength(maxAddressLength, "error.max.length.address.line")
 
-  val postcodeType = notEmpty compose maxLength(maxPostCodeTypeLength)
+  val addressType = customNotEmpty("error.required.address.line") compose validateAddress
 
-  val countryType = notEmpty compose minLength(maxCountryTypeLength) compose maxLength(maxCountryTypeLength) compose pattern("^[a-zA-Z_]+$".r)
+  val postcodeType = customNotEmpty("error.required.postcode")  compose customMaxLength(maxPostCodeTypeLength, "error.invalid.postcode")
+
+  val countryRegex = "^[a-zA-Z_]{2}+$".r
+
+  val countryType = customNotEmpty("error.required.country") compose customRegex(countryRegex, "error.invalid.country")
 
   val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
 
-  val emailType = notEmpty compose maxLength(maxEMailLength) compose pattern("^.+@.+$".r)
+  val emailRegex = "^.+@.+$".r
+
+  val emailType = notEmpty compose maxLength(maxEMailLength) compose pattern(emailRegex)
 
   val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
 
@@ -100,9 +104,11 @@ object FormTypes {
 
   val accountNameType = notEmptyStrip compose maxLength(maxAccountName)
 
-  val sortCodeType = notEmpty compose maxLength(maxSortCodeLength) compose pattern("^[0-9]{6}".r)//compose pattern("\\d{2}-?\\d{2}-?\\d{2}".r)
+  val sortCodeRegex = "^[0-9]{6}".r
+  val sortCodeType = notEmpty compose maxLength(maxSortCodeLength) compose pattern(sortCodeRegex)
 
-  val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength) compose pattern("^[0-9]{8}$".r)
+  val ukBankAccountNumberRegex = "^[0-9]{8}$".r
+  val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength) compose pattern(ukBankAccountNumberRegex)
 
   val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength) compose pattern("^[0-9a-zA-Z_]+$".r)
 

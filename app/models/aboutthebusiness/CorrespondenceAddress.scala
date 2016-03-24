@@ -1,7 +1,8 @@
 package models.aboutthebusiness
 
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, Write}
+import play.api.data.mapping.{Path, From, Rule, Write}
+import play.api.data.validation.ValidationError
 import play.api.libs.json.{Reads, Writes}
 
 sealed trait CorrespondenceAddress {
@@ -55,28 +56,30 @@ object CorrespondenceAddress {
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
       import models.FormTypes._
+      import utils.MappingUtils.Implicits._
 
-      val nameType = notEmpty compose maxLength(140)
+      val nameType = maxLength(140)
 
-      (__ \ "isUK").read[Boolean] flatMap {
-        case true => (
-            (__ \ "yourName").read(nameType) ~
-            (__ \ "businessName").read(nameType) ~
-            (__ \ "addressLine1").read(addressType) ~
-            (__ \ "addressLine2").read(addressType) ~
-            (__ \ "addressLine3").read(optionR(addressType)) ~
-            (__ \ "addressLine4").read(optionR(addressType)) ~
+      (__ \ "isUK").read[Option[Boolean]] flatMap {
+        case Some(true) => (
+            (__ \ "yourName").read(customNotEmpty("error.required.yourname") compose nameType) ~
+            (__ \ "businessName").read(customNotEmpty("error.required.name.of.business") compose nameType) ~
+            (__ \ "addressLine1").read(customNotEmpty("error.required.address.line1") compose validateAddress) ~
+            (__ \ "addressLine2").read(customNotEmpty("error.required.address.line2") compose validateAddress) ~
+            (__ \ "addressLine3").read(optionR(validateAddress)) ~
+            (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "postCode").read(postcodeType)
           )(UKCorrespondenceAddress.apply _)
-        case false => (
-            (__ \ "yourName").read(nameType) ~
-            (__ \ "businessName").read(nameType) ~
-            (__ \ "addressLineNonUK1").read(addressType) ~
-            (__ \ "addressLineNonUK2").read(addressType) ~
-            (__ \ "addressLineNonUK3").read(optionR(addressType)) ~
-            (__ \ "addressLineNonUK4").read(optionR(addressType)) ~
+        case Some(false) => (
+            (__ \ "yourName").read(customNotEmpty("error.required.yourname") compose nameType) ~
+            (__ \ "businessName").read(customNotEmpty("error.required.name.of.business") compose nameType) ~
+            (__ \ "addressLineNonUK1").read(customNotEmpty("error.required.address.line1") compose validateAddress) ~
+            (__ \ "addressLineNonUK2").read(customNotEmpty("error.required.address.line2") compose validateAddress) ~
+            (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
+            (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
             (__ \ "country").read(countryType)
           )(NonUKCorrespondenceAddress.apply _)
+        case _ => (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
       }
     }
 
@@ -117,7 +120,7 @@ object CorrespondenceAddress {
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
         (__ \ "correspondencePostCode").read[String])(UKCorrespondenceAddress.apply _) map identity[CorrespondenceAddress]
-      ) orElse (
+      ) orElse
       ((__ \ "yourName").read[String] and
         (__ \ "businessName").read[String] and
         (__ \ "correspondenceAddressLine1").read[String] and
@@ -125,7 +128,7 @@ object CorrespondenceAddress {
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
         (__ \ "correspondenceCountry").read[String])(NonUKCorrespondenceAddress.apply _)
-      )
+
   }
 
   implicit val jsonWrites: Writes[CorrespondenceAddress] = {

@@ -19,6 +19,15 @@ err.notrequired = No item should be entered
 err.invalidLength = invalid length
 err.summary = There is a problem
 err.pleasespecify = Please specify
+error.required.address.line1 = Enter the first line of the address.
+error.required.address.line2 = Enter the second line of the address.
+error.required.postcode = Enter a postcode.
+error.invalid.postcode = Enter valid postcode.
+error.required.country = Enter a country.
+error.invalid.country = Enter valid country.
+error.max.length.address.line = Need Message for this
+error.required.yourname = Enter your name.
+error.required.name.of.business = Enter the name of the business.
 
 # Custom error messages
 error.required.businessmatching.register.service = Select at least one activity that you need to register.
@@ -26,6 +35,7 @@ error.required.atb.previously.registered = Select yes or no to the question: is 
 error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
 error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
+error.required.atb.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary

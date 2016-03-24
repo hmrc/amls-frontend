@@ -115,11 +115,12 @@ class CorrespondenceAddressSpec extends PlaySpec {
       }
 
       "throw error when mandatory fields are missing" in {
-        CorrespondenceAddress.formRule.validate(Map.empty) must be(
-          Failure(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required"))
+        CorrespondenceAddress.formRule.validate(Map.empty) must be
+          (Failure(Seq(
+            (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
           )))
       }
+
 
       "throw error when there is an invalid data" in {
         val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
@@ -133,9 +134,46 @@ class CorrespondenceAddressSpec extends PlaySpec {
        val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
         CorrespondenceAddress.formRule.validate(model) must be(
           Failure(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.maxLength", FormTypes.maxCountryTypeLength))
+            (Path \ "country") -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
           )))
       }
+
+      "fail to validation for not filling mandatory field" in {
+        val data = Map(
+          "isUK" -> Seq("true"),
+          "yourName"     -> Seq(DefaultYourName),
+          "businessName" -> Seq(DefaultBusinessName),
+          "addressLine1" -> Seq(""),
+          "addressLine2" -> Seq(""),
+          "postCode" -> Seq("")
+        )
+
+        CorrespondenceAddress.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
+            (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
+            (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
+          )))
+      }
+
+      "fail to validation for not filling non UK mandatory field" in {
+        val data = Map(
+          "isUK" -> Seq("false"),
+          "yourName"     -> Seq(DefaultYourName),
+          "businessName" -> Seq(DefaultBusinessName),
+          "addressLineNonUK1" -> Seq(""),
+          "addressLineNonUK2" -> Seq(""),
+          "country" -> Seq("")
+        )
+
+        CorrespondenceAddress.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
+            (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
+            (Path \ "country") -> Seq(ValidationError("error.required.country"))
+          )))
+      }
+
 
       "Read Non UK Address" in {
         CorrespondenceAddress.formRule.validate(DefaultNonUKModel) must be (Success(DefaultNonUKAddress))

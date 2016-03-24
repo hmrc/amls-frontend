@@ -59,34 +59,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-/*  "prevMLRRegNoType" must {
-
-    "successfully validate" in {
-
-      prevMLRRegNoType.validate("12345678") must
-        be(Success("12345678"))
-
-      prevMLRRegNoType.validate("123456789012345") must
-        be(Success("123456789012345"))
-    }
-
-    "fail to validate an empty string" in {
-
-      prevMLRRegNoType.validate("") must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
-        )))
-    }
-
-    "fail to validate a string longer than 15" in {
-
-      prevMLRRegNoType.validate("1" * 16) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxPrevMLRRegNoLength))
-        )))
-    }
-  }*/
-
   "validateAddressType" must {
 
     "successfully validate" in {
@@ -243,13 +215,9 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail to validate an email without a `@` in it" in {
 
-      emailType.validate("foo") must
-        be(a[Failure[_, _]])
-
-      //       TODO: fix regex equalities
-      //        be(Failure(Seq(
-      //          Path -> Seq(ValidationError("error.pattern", "^.+@.+$".r))
-      //        )))
+      emailType.validate("foo") must be(Failure(Seq(
+                Path -> Seq(ValidationError("error.pattern", emailRegex))
+              )))
     }
   }
 
@@ -367,23 +335,21 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       sortCodeType.validate("654321") must be(Success("654321"))
     }
 
-    /*
-        "fail validation when more than 6 digits are supplied without - " in {
-          sortCodeType.validate("87654321") must be(
-          Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}")))))
-        }
+    "fail validation when more than 6 digits are supplied without - " in {
+      sortCodeType.validate("87654321") must be(
+      Failure(Seq(Path -> Seq(ValidationError("error.pattern", sortCodeRegex)))))
+    }
 
-        "fail when 8 non digits are supplied with - " in {
-          sortCodeType.validate("ab-cd-ef") must be(
-            Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}")))))
-        }
+    "fail when 8 non digits are supplied with - " in {
+      sortCodeType.validate("ab-cd-ef") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.pattern", sortCodeRegex)))))
+    }
 
-        "fail validation for sort code with any other pattern" in {
-          sortCodeType.validate("8712341241431243124124654321") must be(
-            Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "\\d{2}-?\\d{2}-?\\d{2}"))))
-          )
-        }
-        */
+    "fail validation for sort code with any other pattern" in {
+      sortCodeType.validate("8712341241431243124124654321") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.pattern", sortCodeRegex))))
+      )
+    }
   }
 
 
@@ -393,10 +359,10 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       ukBankAccountNumberType.validate("87654321") must be(Success("87654321"))
     }
 
-    /*"fail validation when anything other than 8 characters are supplied" in {
+    "fail validation when anything other than 8 characters are supplied" in {
       ukBankAccountNumberType.validate("123456") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.pattern", "[0-9]{8}$")))))
-    }*/
+        Failure(Seq(Path -> Seq(ValidationError("error.pattern", ukBankAccountNumberRegex)))))
+    }
 
     ukBankAccountNumberType.validate("1234567890") must be(
       Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxUKBankAccountNumberLength)))))
@@ -461,9 +427,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
 
     "fail validation if country containts numbers" in {
-      val test = "^[a-zA-Z_]+$".r
-      countryType.validate("12") mustBe a[Failure[_, _]]
-      //        Failure(Seq((Path) -> Seq(ValidationError("error.pattern", "^[a-zA-Z_]+$".r))))
+      countryType.validate("12") mustBe Failure(Seq(Path -> Seq(ValidationError("error.invalid.country", countryRegex))))
 
     }
   }
