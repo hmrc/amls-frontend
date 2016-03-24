@@ -63,8 +63,8 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
       when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
-      val result = summaryController.getIndividual(any())(request)
-      redirectLocation(result) must be(Some("/anti-money-laundering/trading-premises/summary"))
+      val result = summaryController.getIndividual(1)(request)
+      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       status(result) must be(SEE_OTHER)
     }
 
