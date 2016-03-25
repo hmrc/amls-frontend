@@ -14,8 +14,8 @@ GET         /registration-progress                      controllers.Registration
 GET         /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
-GET         /business-details/index                    controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/index                    controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
+GET         /business-details/previously-registered                    controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/previously-registered                    controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
 GET         /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)

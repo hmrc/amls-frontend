@@ -67,7 +67,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(Some(businessMatchingActivities))))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val RecordId = 1
       val result = whatDoesYourBusinessDoController.get(RecordId)(request)
@@ -102,7 +102,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(Some(businessMatchingActivities))))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val recordId = 1
       val result = whatDoesYourBusinessDoController.get(recordId)(request)
@@ -156,7 +156,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(Some(businessMatchingActivities))))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val invalidRequest = request.withFormUrlEncodedBody(
         "activities" -> ""
@@ -186,7 +186,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(Some(businessMatchingActivities))))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
 
@@ -215,7 +215,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(Some(businessMatchingActivities))))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "activities[0]" -> "01",
@@ -249,7 +249,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(Some(businessMatchingActivities))))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "activities[0]" -> "01",

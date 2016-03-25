@@ -24,9 +24,9 @@ trait BusinessTypeController extends BaseController {
             reviewDetails <- businessMatching.reviewDetails
             businessType <- reviewDetails.businessType
           } yield businessType match {
-            case UNINCORPORATED_BODY =>
+            case UnincorporatedBody =>
               Redirect(routes.TypeOfBusinessController.get())
-            case LLP | CORPORATE_BODY =>
+            case LPrLLP | LimitedCompany =>
               Redirect(routes.CompanyRegistrationNumberController.get())
             case _ =>
               Redirect(routes.RegisterServicesController.get())
@@ -50,7 +50,7 @@ trait BusinessTypeController extends BaseController {
                 businessMatching.copy(
                   reviewDetails = Some(
                     reviewDetails.copy(
-                      businessType = Some(data.toString)
+                      businessType = Some(data)
                     )
                   )
                 )
@@ -59,10 +59,10 @@ trait BusinessTypeController extends BaseController {
                details =>
                  dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
                    _ =>
-                     Redirect(controllers.routes.RegistrationProgressController.get())
+                     Redirect(routes.RegisterServicesController.get())
                  }
              } getOrElse Future.successful {
-               Redirect(controllers.routes.RegistrationProgressController.get())
+               Redirect(routes.RegisterServicesController.get())
              }
           }
       }

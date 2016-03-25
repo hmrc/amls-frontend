@@ -49,7 +49,6 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
           postcode = None,
           country = ""
         ),
-        sapNumber = "",
         safeId = ""
       )
 

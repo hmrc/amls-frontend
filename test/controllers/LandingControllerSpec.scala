@@ -41,7 +41,6 @@ class LandingControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
           val details = Some(ReviewDetails(businessName = "Test",
                                            businessType = None,
                                            businessAddress = Address("Line 1", "Line 2", None, None, None, "Country"),
-                                           sapNumber = "",
                                            safeId = ""))
 
           when(controller.landingService.hasSavedForm(any(), any(), any())) thenReturn Future.successful(false)

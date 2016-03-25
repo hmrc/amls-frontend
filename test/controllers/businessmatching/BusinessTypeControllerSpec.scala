@@ -43,11 +43,11 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
     "display Registration Number page for CORPORATE_BODY" in new Fixture {
 
-     val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.CORPORATE_BODY),
-       Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+     val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+       Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -56,11 +56,11 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
     "display Registration Number page for LLP" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -69,11 +69,11 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
     "display Type of Business Page" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UNINCORPORATED_BODY),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -82,15 +82,15 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
     "display Register Services Page" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.PARTNERSHIP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(routes.RegisterServicesController.get().url))
+      redirectLocation(result) must be (Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
 
@@ -100,18 +100,18 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
         "businessType" -> "01"
       )
 
-      val reviewDtls = ReviewDetails("BusinessName", Some("SOP"),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(None,Some(reviewDtls)))))
+        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       when(controller.dataCache.save[BusinessMatching](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      redirectLocation(result) must be(Some(routes.RegisterServicesController.get().url))
 
     }
 
@@ -129,7 +129,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      redirectLocation(result) must be(Some(routes.RegisterServicesController.get().url))
 
     }
 
