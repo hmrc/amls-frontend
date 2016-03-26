@@ -28,7 +28,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
         val jsonBusinessMatching = Json.obj("businessActivities" -> Seq("05", "06", "07"),
           "businessName" -> "BusinessName",
-          "businessType" -> "SOP",
+          "businessType" -> "Sole Trader",
           "businessAddress" -> Json.obj("line_1" -> "line1",
             "line_2" -> "line2",
             "line_3" -> "line3",
@@ -53,7 +53,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
         val jsonBusinessMatching = Json.obj("businessActivities" -> Seq("05", "06", "07"),
           "businessName" -> "BusinessName",
-          "businessType" -> "SOP",
+          "businessType" -> "Sole Trader",
           "businessAddress" -> Json.obj("line_1" -> "line1",
             "line_2" -> "line2",
             "line_3" -> "line3",

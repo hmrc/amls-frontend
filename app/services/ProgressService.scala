@@ -53,14 +53,6 @@ trait ProgressService {
       optionCache =>
         optionCache map {
           implicit cache =>
-            val entity = for {
-              bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              rd <- bm.reviewDetails
-              le <- rd.businessType
-            } yield bm
-            println()
-            println(entity)
-            println()
             Seq(
               BusinessMatching.section,
               AboutTheBusiness.section,

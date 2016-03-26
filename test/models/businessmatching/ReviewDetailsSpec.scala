@@ -58,5 +58,22 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
 
       Json.fromJson[ReviewDetails](json) mustEqual JsSuccess(model)
     }
+
+    "validate correctly with a `None` business type" in {
+
+      val model = suite.model.copy(businessType = None)
+
+      val json = Json.obj(
+        "businessName" -> "Name",
+        "businessAddress" -> Json.obj(
+          "line_1" -> "1 Test Street",
+          "line_2" -> "Test Town",
+          "country" -> "GB"
+        ),
+        "safeId" -> "safeId"
+      )
+
+      Json.fromJson[ReviewDetails](json) mustEqual JsSuccess(model)
+    }
   }
 }

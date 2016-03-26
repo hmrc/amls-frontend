@@ -55,15 +55,23 @@ trait BusinessTypeController extends BaseController {
                   )
                 )
               }
-             updatedDetails map {
-               details =>
-                 dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
-                   _ =>
-                     Redirect(routes.RegisterServicesController.get())
-                 }
-             } getOrElse Future.successful {
-               Redirect(routes.RegisterServicesController.get())
-             }
+              updatedDetails map {
+                details =>
+                  dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
+                    _ =>
+                      data match {
+                        case UnincorporatedBody =>
+                          Redirect(routes.TypeOfBusinessController.get())
+                        case LPrLLP | LimitedCompany =>
+                          Redirect(routes.CompanyRegistrationNumberController.get())
+                        case _ =>
+                          Redirect(routes.RegisterServicesController.get())
+                      }
+                  }
+              } getOrElse Future.successful {
+                // TODO error and logging
+                Redirect(routes.RegisterServicesController.get())
+              }
           }
       }
   }

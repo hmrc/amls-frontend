@@ -31,13 +31,7 @@ trait LandingService {
    hc: HeaderCarrier,
    ec: ExecutionContext
   ): Future[Option[ReviewDetails]] =
-    keyStore.optionalReviewDetails map {
-      x =>
-        println()
-        println(x)
-        println()
-        x
-    }
+    keyStore.optionalReviewDetails
 
   /* TODO: Consider if there's a good way to stop
    * this from just overwriting whatever is in Business Matching,

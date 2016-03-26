@@ -23,7 +23,6 @@ trait LandingController extends BaseController {
           landingService.reviewDetails flatMap {
             case Some(reviewDetails) =>
               landingService.updateReviewDetails(reviewDetails) map {
-                // TODO: Make this redirect into OUR business matching flow when it exists
                 _ =>
                   Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
               }

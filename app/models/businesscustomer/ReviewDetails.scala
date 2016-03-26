@@ -26,7 +26,7 @@ object ReviewDetails {
     (
       (__ \ "businessName").read[String] and
       (
-        (__ \ "businessType").read[Option[String]] map {
+        (__ \ "businessType").readNullable[String] map {
           case Some("Sole Trader") => Some(SoleProprietor)
           case Some("Corporate Body") => Some(LimitedCompany)
           case Some("Partnership") => Some(Partnership)

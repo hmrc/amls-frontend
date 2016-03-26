@@ -2,7 +2,7 @@ package models.businessmatching
 
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessType.{LimitedCompany, UnincorporatedBody}
-import models.registrationprogress.{Completed, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessMatching(
@@ -40,14 +40,14 @@ object BusinessMatching {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessmatching"
     val incomplete =
-      Section(messageKey, Started, controllers.businessmatching.routes.RegisterServicesController.get())
+      Section(messageKey, NotStarted, controllers.businessmatching.routes.RegisterServicesController.get())
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
       model =>
         if (model.isComplete) {
           // TODO Add summary page url
           Section(messageKey, Completed, controllers.businessmatching.routes.SummaryController.get())
         } else {
-          incomplete
+          Section(messageKey, Started, controllers.businessmatching.routes.RegisterServicesController.get())
         }
     }
   }
