@@ -20,11 +20,13 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   val safeId = "SAFEID"
 
   val request = SubscriptionRequest(
-    businessType = None,
+    businessMatchingSection = None,
     eabSection = None,
-    aboutTheBusinessSection = None,
     tradingPremisesSection = None,
-    bankDetailsSection = None
+    aboutTheBusinessSection = None,
+    bankDetailsSection = None,
+    aboutYouSection = None,
+    businessActivitiesSection = None
   )
 
   implicit val hc = HeaderCarrier()
