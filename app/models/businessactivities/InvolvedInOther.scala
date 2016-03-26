@@ -1,8 +1,8 @@
 package models.businessactivities
 
 import play.api.data.mapping._
+import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait InvolvedInOther
@@ -15,6 +15,11 @@ object InvolvedInOther {
 
   import models.FormTypes._
   import utils.MappingUtils.Implicits._
+
+  val OtherBusinessActivityType = notEmptyStrip compose
+                                  customNotEmpty("error.required.ba.enter.text") compose
+                                  maxLength(maxOtherBusinessActivityTypeLength) //TODO need message for max length
+
 
   implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._

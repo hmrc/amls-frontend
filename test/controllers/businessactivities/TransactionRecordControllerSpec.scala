@@ -117,7 +117,7 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isRecorded]").html() must include("This field is required")
+      document.select("a[href=#isRecorded]").html() must include(Messages("error.required.ba.select.transaction.record"))
     }
   }
 

@@ -67,7 +67,7 @@ object TaxType {
   import utils.MappingUtils.Implicits._
 
   implicit val jsonReadsTaxType = {
-    (__ \ "taxType").read[String].flatMap[TaxType] {
+    (__ \ "taxType").read[String] flatMap[TaxType] {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
       case _ => ValidationError("error.invalid")
@@ -86,7 +86,7 @@ object BusinessStructure {
   import utils.MappingUtils.Implicits._
 
   implicit val jsonReadsBusinessStructure = {
-    (__ \ "agentsBusinessStructure").read[String].flatMap[BusinessStructure] {
+    (__ \ "agentsBusinessStructure").read[String] flatMap[BusinessStructure] {
       case "01" => SoleProprietor
       case "02" => LimitedLiabilityPartnership
       case "03" => Partnership

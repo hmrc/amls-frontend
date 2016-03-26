@@ -30,7 +30,7 @@ object FormTypes {
   val maxIBANLength = 34
   val maxNonUKBankAccountNumberLength = 40
   val maxUKBankAccountNumberLength = 8
-  val maxSoftwareNameLength = 40
+
   val maxFranchiseName = 140
   val maxEmployeeLength = 11
   val minAccountantRefNoTypeLength = 11
@@ -113,13 +113,7 @@ object FormTypes {
 
   val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern("^[0-9a-zA-Z_]+$".r)
 
-  val softwareNameType =  notEmptyStrip compose notEmpty compose maxLength (maxSoftwareNameLength)
 
-  val franchiseNameType =  notEmptyStrip compose notEmpty compose maxLength(maxFranchiseName)
-
-  val OtherBusinessActivityType = notEmptyStrip compose customNotEmpty("error.required.ba.enter.text") compose maxLength(maxOtherBusinessActivityTypeLength)
-
-  val employeeCountType = notEmptyStrip compose notEmpty compose maxLength(maxEmployeeLength) compose pattern("^[0-9]+$".r)
 
   val accountantRefNoType = notEmpty compose maxLength(minAccountantRefNoTypeLength) compose minLength(minAccountantRefNoTypeLength)
 

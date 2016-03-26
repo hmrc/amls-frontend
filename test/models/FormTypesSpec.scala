@@ -390,31 +390,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   }
 
-
-  "OtherBusinessActivityType" must {
-
-    "fail to validate a string longer than 255" in {
-
-      OtherBusinessActivityType.validate("a" * 256) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", maxOtherBusinessActivityTypeLength))
-        )))
-    }
-  }
-
-
-  "For the Franchise Name" must {
-    "validate franchise name supplied" in {
-      franchiseNameType.validate("test test") must be(Success("test test"))
-    }
-
-    "fail validation if franchise name is longer than the permissible length" in {
-      franchiseNameType.validate("test" * 40) must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxFranchiseName))))
-      )
-    }
-  }
-
   "CountryType" must {
     "validate country name supplied" in {
       countryType.validate("GP") must be(Success("GP"))
@@ -429,18 +404,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail validation if country containts numbers" in {
       countryType.validate("12") mustBe Failure(Seq(Path -> Seq(ValidationError("error.invalid.country", countryRegex))))
 
-    }
-  }
-
-  "For the How many employees page" must {
-    "validate employee count field length supplied" in {
-      employeeCountType.validate("12345678912345") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxEmployeeLength)))))
-    }
-
-    "fail validation if employee count field is not supplied" in {
-      employeeCountType.validate("") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
     }
   }
 

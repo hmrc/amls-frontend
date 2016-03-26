@@ -44,7 +44,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "validate mandatory field when isOutside is not selected" in {
       CustomersOutsideUK.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "isOutside") -> Seq(ValidationError("error.required"))
+          (Path \ "isOutside") -> Seq(ValidationError("error.required.ba.select.country"))
         )))
     }
 
@@ -59,9 +59,9 @@ class CustomersOutsideUKSpec extends PlaySpec {
     }
 
     "validate mandatory country field" in {
-      CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"))) must
+      CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"),"country_1" -> Seq(""))) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.required"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
         )))
     }
 

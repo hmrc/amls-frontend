@@ -1,8 +1,9 @@
 package models.businessactivities
 
+
 import models.FormTypes._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{Success, From, Rule, Write}
+import play.api.data.mapping._
 import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait CustomersOutsideUK {
@@ -45,18 +46,20 @@ case class Countries (
 object CustomersOutsideUK {
 
   implicit val formRule: Rule[UrlFormEncoded, CustomersOutsideUK] = From[UrlFormEncoded] { __ =>
+    import utils.MappingUtils.Implicits._
 
     import play.api.data.mapping.forms.Rules._
-    (__ \ "isOutside").read[Boolean] flatMap {
-      case true =>
+    (__ \ "isOutside").read[Option[Boolean]] flatMap {
+      case Some(true) =>
        __.read[Countries].fmap(CustomersOutsideUKYes.apply)
-      case false => Rule.fromMapping { _ => Success(CustomersOutsideUKNo) }
+      case Some(false) => Rule.fromMapping { _ => Success(CustomersOutsideUKNo) }
+      case _ => Path \ "isOutside" -> Seq(ValidationError("error.required.ba.select.country"))
     }
   }
 
   implicit val formRuleCountry: Rule[UrlFormEncoded, Countries] = From[UrlFormEncoded] { __ =>
    import play.api.data.mapping.forms.Rules._
-        ((__ \ "country_1").read(countryType) and
+        ((__ \ "country_1").read(customNotEmpty("error.required.ba.country.name") compose customRegex(countryRegex, "error.invalid.country")) and
           (__ \ "country_2").read(optionR(countryType)) and
           (__ \ "country_3").read(optionR(countryType)) and
           (__ \ "country_4").read(optionR(countryType)) and

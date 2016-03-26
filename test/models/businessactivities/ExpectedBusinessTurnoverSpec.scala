@@ -1,6 +1,5 @@
 package models.businessactivities
 
-import models.aboutyou.InternalAccountant
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -36,7 +35,7 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "throw error on invalid data" in {
       ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("20"))) must
-        be(Failure(Seq((Path \ "expectedBusinessTurnover", Seq(ValidationError("error.invalid"))))))
+        be(Failure(Seq((Path \ "expectedBusinessTurnover", Seq(ValidationError("error.required.ba.business.turnover"))))))
     }
 
     "write correct data from enum value" in {

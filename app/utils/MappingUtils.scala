@@ -10,8 +10,8 @@ import play.api.data.mapping.GenericRules
 import scala.collection.TraversableLike
 
 object TraversableValidators {
-  def minLength[T <: Traversable[_]](expectedLength : Int) : RuleLike[T, T] = {
-    GenericRules.validateWith[T]("error.required")(t => t.size >= expectedLength)}
+  def minLength[T <: Traversable[_]](msg : String) : RuleLike[T, T] = {
+    GenericRules.validateWith[T](msg)(t => t.nonEmpty)}
 }
 
 trait MappingUtils {

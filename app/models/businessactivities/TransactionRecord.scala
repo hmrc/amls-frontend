@@ -35,11 +35,16 @@ object TransactionRecord {
 
   import utils.MappingUtils.Implicits._
 
+  val maxSoftwareNameLength = 40
+  val softwareNameType =  notEmptyStrip compose
+                          customNotEmpty("error.required.ba.software.package.name") compose
+                          customMaxLength(maxSoftwareNameLength, "error.max.length.ba.software.package.name")
+
   implicit val formRule: Rule[UrlFormEncoded, TransactionRecord] =
     From[UrlFormEncoded] { __ =>
-      (__ \ "isRecorded").read[Boolean].flatMap {
-        case true =>
-          (__ \ "transactions").read(minLength[Set[String]](1)) flatMap { z =>
+      (__ \ "isRecorded").read[Option[Boolean]].flatMap {
+        case Some(true) =>
+          (__ \ "transactions").read(minLength[Set[String]]("error.required.ba.atleast.one.transaction.record")) flatMap { z =>
             z.map {
               case "01" => Rule[UrlFormEncoded, TransactionType](_ => Success(Paper))
               case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))
@@ -61,7 +66,8 @@ object TransactionRecord {
             } fmap TransactionRecordYes.apply
           }
 
-        case false => Rule.fromMapping { _ => Success(TransactionRecordNo) }
+        case Some(false) => Rule.fromMapping { _ => Success(TransactionRecordNo) }
+        case _ => Path \ "isRecorded" -> Seq(ValidationError("error.required.ba.select.transaction.record"))
       }
     }
 

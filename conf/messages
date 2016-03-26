@@ -25,9 +25,11 @@ error.required.postcode = Enter a postcode.
 error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
-error.max.length.address.line = Need Message for this
 error.required.yourname = Enter your name.
 error.required.name.of.business = Enter the name of the business.
+#TODO
+error.max.length.address.line = Need Message for this
+
 
 # Custom error messages
 error.required.bm.register.service = Select at least one activity that you need to register.
@@ -39,6 +41,27 @@ error.required.atb.uk.or.overseas = Select one option: is this a UK address or a
 
 error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
 error.required.ba.enter.text = Enter information about what other anti-money laundering activities your business carries out
+error.required.ba.business.turnover = Select how much turnover you expect in the next 12 months.
+error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
+error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
+error.required.ba.franchise.name = Enter your franchisor’s name.
+#TODO need message for this
+error.max.length.ba.franchise.name = Enter valid franchisor’s name.It must be 140 characters long
+
+error.required.ba.employee.count1 = Enter a number. If you are a sole proprietor with no employees, enter 1.
+error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punctuation or other characters.
+#TODO need message for this
+error.max.length.ba.employee.count = It must be 11 characters long
+error.required.ba.employee.count2 = Enter a number.
+error.required.ba.select.country  = Select yes or no to the question: do you have customers who live outside of the UK?
+error.required.ba.country.name = Enter at least one country.
+
+error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
+error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
+error.required.ba.software.package.name = Enter the name of the software package.
+error.max.length.ba.software.package.name = It must be 40 characters long
+error.required.ba.option.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
+
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary
