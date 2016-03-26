@@ -74,7 +74,6 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
 
       status(result) must be(OK)
 
-
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select(s"input[id=activities-01]").hasAttr("checked") must be(false)
     }
@@ -105,8 +104,8 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(Some(businessMatchingActivities))))
 
-      val RecordId = 1
-      val result = whatDoesYourBusinessDoController.get(RecordId)(request)
+      val recordId = 1
+      val result = whatDoesYourBusinessDoController.get(recordId)(request)
 
       status(result) must be(OK)
 
@@ -130,9 +129,9 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val RecordId = 1
-      val result = whatDoesYourBusinessDoController.get(RecordId)(request)
-      redirectLocation(result) must be(Some(s"/anti-money-laundering/trading-premises/premises/${RecordId}"))
+      val recordId = 1
+      val result = whatDoesYourBusinessDoController.get(recordId)(request)
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(recordId).url))
 
       status(result) must be(SEE_OTHER)
     }
@@ -227,7 +226,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
       val RecordId = 1
       val result = whatDoesYourBusinessDoController.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(s"/anti-money-laundering/trading-premises/summary"))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
 
@@ -258,12 +257,10 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneServerPerSui
         "activities[2]" -> "03"
       )
 
-      val RecordId = 1
-      val result = whatDoesYourBusinessDoController.post(RecordId, true)(newRequest)
+      val recordId = 1
+      val result = whatDoesYourBusinessDoController.post(recordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(s"/anti-money-laundering/trading-premises/summary/${RecordId}"))
+      redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId).url))
     }
-    
   }
-
 }

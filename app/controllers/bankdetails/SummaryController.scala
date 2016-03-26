@@ -16,7 +16,7 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       dataCache.fetch[Seq[BankDetails]](BankDetails.key) map {
         case Some(data) => Ok(views.html.bankdetails.summary(data))
-        case _ => Redirect(controllers.routes.MainSummaryController.onPageLoad())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 }

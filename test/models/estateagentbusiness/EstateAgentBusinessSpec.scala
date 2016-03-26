@@ -1,8 +1,13 @@
 package models.estateagentbusiness
 
+import models.registrationprogress.{NotStarted, Section, Started}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.CacheMap
+import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => eqTo, _}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
 
@@ -121,6 +126,67 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
         val result = initial.penalisedUnderEstateAgentsAct(newPenalisedEAAct)
         result must be (EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(professionalBody), Some(newPenalisedEAAct)))
       }
+    }
+  }
+
+  val completeModel = EstateAgentBusiness(
+    services = Some(Services(Set(Residential))),
+    redressScheme = Some(ThePropertyOmbudsman),
+    professionalBody = Some(ProfessionalBodyNo),
+    penalisedUnderEstateAgentsAct = Some(PenalisedUnderEstateAgentsActNo)
+  )
+
+  val incompleteModel = EstateAgentBusiness(
+    services = None,
+    redressScheme = None,
+    professionalBody = None,
+    penalisedUnderEstateAgentsAct = None
+  )
+
+  "isComplete" must {
+
+    "return true when all internal properties are `Some`" in {
+      completeModel.isComplete mustEqual true
+    }
+
+    "return true when there is no redress scheme and no Residential service" in {
+      val model = EstateAgentBusiness(
+        services = Some(Services(Set.empty)),
+        redressScheme = None,
+        professionalBody = Some(ProfessionalBodyNo),
+        penalisedUnderEstateAgentsAct = Some(PenalisedUnderEstateAgentsActNo)
+      )
+
+      model.isComplete mustEqual true
+    }
+
+    "return false when properties are `None`" in {
+      incompleteModel.isComplete mustEqual false
+    }
+  }
+
+  "section" must {
+
+    "return `NotStarted` section when there is no section in s4l" in {
+      implicit val cache = CacheMap("", Map.empty)
+      EstateAgentBusiness.section mustBe Section("eab", NotStarted, controllers.estateagentbusiness.routes.WhatYouNeedController.get)
+    }
+
+    "return `Started` section when there is a section which isn't completed" in {
+      implicit val cache = mock[CacheMap]
+      implicit val ac = mock[AuthContext]
+      when {
+        cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
+      } thenReturn Some(incompleteModel)
+      EstateAgentBusiness.section mustBe Section("eab", Started, controllers.estateagentbusiness.routes.WhatYouNeedController.get)
+    }
+
+    "return `Completed` section when there is a section which is completed" in {
+      implicit val cache = mock[CacheMap]
+      implicit val ac = mock[AuthContext]
+      when {
+        cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
+      } thenReturn Some(completeModel)
     }
   }
 }

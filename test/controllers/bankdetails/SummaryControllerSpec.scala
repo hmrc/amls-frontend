@@ -42,11 +42,10 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     }
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
-
       when(controller.dataCache.fetch[Seq[BankDetails]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
-      redirectLocation(result) must be(Some("/anti-money-laundering/summary"))
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       status(result) must be(SEE_OTHER)
     }
   }

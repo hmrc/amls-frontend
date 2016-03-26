@@ -1,6 +1,8 @@
 package models.tradingpremises
 
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class TradingPremises(
                             yourTradingPremises: Option[YourTradingPremises] = None,
@@ -11,18 +13,41 @@ case class TradingPremises(
   def yourAgent(v: YourAgent): TradingPremises =
     this.copy(yourAgent = Some(v))
 
-
   def yourTradingPremises(v: YourTradingPremises): TradingPremises =
     this.copy(yourTradingPremises = Some(v))
 
   def whatDoesYourBusinessDoAtThisAddress(v: WhatDoesYourBusinessDo): TradingPremises =
     this.copy(whatDoesYourBusinessDoAtThisAddress = Some(v))
+
+  def isComplete: Boolean =
+    this match {
+      case TradingPremises(Some(x), _, Some(_)) if x.isOwner => true
+      case TradingPremises(Some(_), Some(_), Some(_)) => true
+      case _ => false
+    }
 }
 
 object TradingPremises {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "tradingpremises"
+    val notStarted = Section(messageKey, NotStarted, controllers.tradingpremises.routes.WhatYouNeedController.get(1))
+    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
+      premises =>
+        if (premises.nonEmpty && (premises forall { _.isComplete })) {
+          Section(messageKey, Completed, controllers.tradingpremises.routes.SummaryController.get())
+        } else {
+          val index = premises.indexWhere {
+            case model if !model.isComplete => true
+            case _ => false
+          }
+          Section(messageKey, Started, controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
+        }
+    }
+  }
 
   val key = "trading-premises"
 

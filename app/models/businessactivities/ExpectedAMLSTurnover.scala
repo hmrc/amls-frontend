@@ -18,7 +18,6 @@ object ExpectedAMLSTurnover {
   case object Seventh extends ExpectedAMLSTurnover
 
 
-
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ExpectedAMLSTurnover] = From[UrlFormEncoded] { __ =>

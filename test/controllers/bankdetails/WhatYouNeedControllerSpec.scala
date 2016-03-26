@@ -22,14 +22,14 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with Moc
   "WhatYouNeedController" must {
 
     "on get display the what you need page" in new Fixture {
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("bankdetails.whatyouneed.title"))
     }
 
     "on click of continue button, page to be redirectd to " in new Fixture{
 
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("button.continue"))
     }

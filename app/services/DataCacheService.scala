@@ -11,7 +11,7 @@ private[services] trait DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
 
-  protected def getCache
+  def getCache
   (implicit
    ec: ExecutionContext,
    hc: HeaderCarrier,
