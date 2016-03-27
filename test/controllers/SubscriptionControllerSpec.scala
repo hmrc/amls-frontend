@@ -1,5 +1,6 @@
 package controllers
 
+import models.SubscriptionResponse
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.JsString
 import play.api.test.Helpers._
@@ -22,16 +23,28 @@ class SubscriptionControllerSpec extends PlaySpec with OneServerPerSuite {
     }
   }
 
+  val response = SubscriptionResponse(
+    etmpFormBundleNumber = "",
+    amlsRefNo = "",
+    registrationFee = 0,
+    fpFee = None,
+    premiseFee = 0,
+    totalFees = 0,
+    paymentReference = ""
+  )
+
   "SubscriptionController" must {
 
     "post must return the response from the service correctly" in new Fixture {
-      val responseBody = Some(JsString("RESPONSE BODY"))
-      when(controller.subscriptionService.subscribe(any(), any(), any())) thenReturn Future.successful(HttpResponse(OK, responseBody))
+
+      when {
+        controller.subscriptionService.subscribe(any(), any(), any())
+      } thenReturn Future.successful(response)
+
       val result = controller.post()(request)
-      status(result) must be(OK)
-      contentAsString(result) mustBe "\"RESPONSE BODY\""
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
     }
-
   }
-
 }
