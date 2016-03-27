@@ -17,7 +17,7 @@ object NCARegistered {
     import play.api.data.mapping.forms.Rules._
     (__ \ "ncaRegistered").read[Option[Boolean]] flatMap {
       case Some(x) => NCARegistered(x)
-      case _ => Path \ "ncaRegistered" -> Seq(ValidationError("error.required.ba.option.nca"))
+      case _ => Path \ "ncaRegistered" -> Seq(ValidationError("error.required.ba.select.nca"))
     }
   }
 

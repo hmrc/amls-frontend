@@ -50,7 +50,8 @@ object FormTypes {
 
   val descriptionType = notEmptyStrip compose notEmpty compose maxLength(maxDescriptionTypeLength)
 
-  val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
+  val vrnTypeRegex = "^[0-9]{9}$".r
+  val vrnType = customNotEmpty("error.required.vat.number") compose customRegex(vrnTypeRegex, "error.invalid.vat.number")
 
   val validateAddress = customMaxLength(maxAddressLength, "error.max.length.address.line")
 

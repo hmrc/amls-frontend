@@ -26,6 +26,8 @@ error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
 error.required.yourname = Enter your name.
+error.required.vat.number = Enter a VAT registration number.
+error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers
 error.required.name.of.business = Enter the name of the business.
 #TODO
 error.max.length.address.line = Need Message for this
@@ -38,6 +40,7 @@ error.required.atb.mlr.number = Enter the Money Laundering Regulation registrati
 error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
 error.required.atb.uk.or.overseas = Select one option: is this a UK address or an overseas address?
+error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
 
 error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
 error.required.ba.enter.text = Enter information about what other anti-money laundering activities your business carries out
@@ -60,8 +63,13 @@ error.required.ba.select.transaction.record = Select yes or no to the question: 
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
 error.required.ba.software.package.name = Enter the name of the software package.
 error.max.length.ba.software.package.name = It must be 40 characters long
-error.required.ba.option.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
+error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
+error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a formal risk assessment policy and procedure?
+error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
+error.required.ba.business.use.accountant = Select yes or no to the question: does your business use an accountant for matters relating to money laundering regulations?
 
+
+error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary

@@ -19,7 +19,7 @@ class NCARegisteredSpec extends PlaySpec {
 
     "fail validation for empty data" in {
       val result = NCARegistered.formRule.validate(Map.empty)
-      result mustBe Failure(Seq((Path \ "ncaRegistered", Seq(ValidationError("error.required.ba.option.nca")))))
+      result mustBe Failure(Seq((Path \ "ncaRegistered", Seq(ValidationError("error.required.ba.select.nca")))))
     }
 
     "successfully validate given a false value" in {

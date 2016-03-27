@@ -15,7 +15,7 @@ case class WhatDoesYourBusinessDo(activities : Set[BusinessActivity])
 object WhatDoesYourBusinessDo {
   implicit val formRule : Rule[UrlFormEncoded, WhatDoesYourBusinessDo] = From[UrlFormEncoded] { __ =>
     (__ \ "activities")
-      .read(minLength[Set[BusinessActivity]](""))
+      .read(minLength[Set[BusinessActivity]]("error.required.tp.activity.your.business.do"))
       .fmap(WhatDoesYourBusinessDo.apply _)
   }
 

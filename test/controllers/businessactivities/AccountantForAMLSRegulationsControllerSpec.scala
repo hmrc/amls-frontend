@@ -149,7 +149,7 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneServer
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("This field is required"))
+      contentAsString(result) must include(Messages("error.required.ba.business.use.accountant"))
 
     }
 

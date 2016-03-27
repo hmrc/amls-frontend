@@ -4,7 +4,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
 
@@ -30,22 +30,30 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
         result mustBe Success(CompanyRegistrationNumber("AB78JC12"))
       }
 
+      "validate with a failure on missing mandatory field" in {
+        val result = CompanyRegistrationNumber.formReads.validate(Map("companyRegistrationNumber" -> Seq("")))
+        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.required"))))
+      }
+
       "validate with a failure given a value with length greater than 8" in {
         val data = Map("companyRegistrationNumber" -> Seq("1234567890"))
         val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.maxLength", 8))))
+        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.pattern",
+          CompanyRegistrationNumber.registrationNumberRegex))))
       }
 
       "validate with a failure given a value with length less than 8" in {
         val data = Map("companyRegistrationNumber" -> Seq("1290"))
         val result = CompanyRegistrationNumber.formReads.validate(data)
-        result must be (a[Failure[_, _]])
+        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.pattern",
+          CompanyRegistrationNumber.registrationNumberRegex))))
       }
 
       "validate with a failure given a value containing non-alphanumeric characters" in {
         val data = Map("companyRegistrationNumber" -> Seq("1234567!"))
         val result = CompanyRegistrationNumber.formReads.validate(data)
-        result must be (a[Failure[_, _]])
+        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.pattern",
+          CompanyRegistrationNumber.registrationNumberRegex))))
       }
 
       "write correct data from correct value" in {
@@ -84,17 +92,20 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
 
       "fail to validate when given data with length greater than 8" in {
         val model = Map("companyRegistrationNumber" -> Seq("1234567890"))
-        CompanyRegistrationNumber.formReads.validate(model) must be (a[Failure[_, _]])
+        CompanyRegistrationNumber.formReads.validate(model) mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.pattern",
+          CompanyRegistrationNumber.registrationNumberRegex))))
       }
 
       "fail to validate when given data with length less than 8" in {
         val model = Map("companyRegistrationNumber" -> Seq("123"))
-        CompanyRegistrationNumber.formReads.validate(model) must be (a[Failure[_, _]])
+        CompanyRegistrationNumber.formReads.validate(model) mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.pattern",
+          CompanyRegistrationNumber.registrationNumberRegex))))
       }
 
       "fail to validate when given data with non-alphanumeric characters" in {
         val model = Map("companyRegistrationNumber" -> Seq("1234567!"))
-        CompanyRegistrationNumber.formReads.validate(model) must be (a[Failure[_, _]])
+        CompanyRegistrationNumber.formReads.validate(model) mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.pattern",
+          CompanyRegistrationNumber.registrationNumberRegex))))
       }
     }
   }

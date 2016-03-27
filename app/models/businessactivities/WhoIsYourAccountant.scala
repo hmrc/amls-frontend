@@ -19,7 +19,7 @@ object DoesAccountantAlsoDealWithTax {
     import play.api.data.mapping.forms.Rules._
     (__ \ "alsoDealsWithTax").read[Boolean] flatMap {
       case false => Rule.fromMapping {_ => Success(AccountantDoesNotAlsoDealWithTax)}
-      case true => ((__ \ "accountantsReferenceNumber").read(accountantRefNoType)) fmap AccountantDoesAlsoDealWithTax.apply
+      case true => (__ \ "accountantsReferenceNumber").read(accountantRefNoType) fmap AccountantDoesAlsoDealWithTax.apply
     }
   }
 

@@ -149,7 +149,7 @@ class NCARegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.ba.option.nca"))
+      contentAsString(result) must include(Messages("error.required.ba.select.nca"))
 
     }
 
