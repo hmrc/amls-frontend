@@ -1,0 +1,56 @@
+@import include.main
+@import models.confirmation._
+
+@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
+
+@sidebar = {
+    <div class="bevel-container">
+        <h3 class="heading-small">@Messages("confirmation.sidebar.title")</h3>
+        <p>@Messages("confirmation.sidebar.lede")</p>
+        <p>@Messages("confirmation.sidebar.code", mlrRegNo)</p>
+        <p>@Messages("confirmation.sidebar.time")</p>
+    </div>
+}
+
+@main(
+    title = "Confirmation",
+    sidebar = sidebar
+) {
+
+    <div class="confirmation">
+        <h1 class="heading-large">@Messages("confirmation.lede")</h1>
+        <p class="heading-small">@Messages("confirmation.code", mlrRegNo)</p>
+    </div>
+
+    <div class="panel-wide form-group">
+        <div>@Messages("confirmation.fee")</div>
+        <span class="heading-xlarge">@total</span>
+    </div>
+
+    <p>
+        @Messages("confirmation.breakdown")
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th width="15%">@Messages("confirmation.quantity")</th>
+                <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
+                <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
+            </tr>
+        </thead>
+        <tbody>
+            @breakdown.map {
+                case BreakdownRow(label, quantity, perItem, total) => {
+                    <tr>
+                        <td>@Messages(label)</td>
+                        <td>@quantity</td>
+                        <td class="numeric">@perItem</td>
+                        <td class="numeric">@total</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
