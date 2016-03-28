@@ -1,7 +1,7 @@
 package models.businessmatching
 
 import models.businesscustomer.ReviewDetails
-import models.businessmatching.BusinessType.{LimitedCompany, UnincorporatedBody}
+import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -29,7 +29,7 @@ case class BusinessMatching(
       case BusinessMatching(Some(x), Some(_), Some(_), _)
         if x.businessType.fold(false) { _ == UnincorporatedBody } => true
       case BusinessMatching(Some(x), Some(_), _, Some(_))
-        if x.businessType.fold(false) { _ == LimitedCompany } => true
+        if x.businessType.fold(false) { y => y == LimitedCompany || y == LPrLLP } => true
       case BusinessMatching(Some(_), Some(_), None, None) => true
       case _ => false
     }
