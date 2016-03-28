@@ -25,7 +25,7 @@ object ApplicationConfig extends ServicesConfig {
   lazy val loginUrl = getConfigString("login.url")
 
   lazy val amlsUrl = baseUrl("amls")
-  def subscriptionUrl(safeId: String) = s"$amlsUrl/amls/subscription/$safeId"
+  lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
 
   lazy val businessCustomerUrl = getConfigString("business-customer.url")
 

@@ -480,5 +480,37 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "For the Declaration Add Persons 'name' fields" must {
+
+    "fail validation if blank value is supplied for the name" in {
+      declarationNameType.validate(" ") must be(Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+    }
+
+    "pass validation if name supplied is 255 characters" in {
+      declarationNameType.validate("1" * maxNameTypeLength) must be(Success("1" * maxNameTypeLength))
+    }
+
+    "validate other value length supplied" in {
+      declarationNameType.validate("1" * (maxNameTypeLength + 1)) must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxNameTypeLength)))))
+    }
+  }
+
+  "For the Declaration Add Persons page, business activity 'other' field" must {
+
+    "pass validation if value length supplied is 255 characters" in {
+      roleWithinBusinessOtherType.validate("1" * 255) must be(Success("1" * 255))
+    }
+
+    "validate other value length supplied" in {
+      roleWithinBusinessOtherType.validate("1" * 256) must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxRoleWithinBusinessOtherType)))))
+    }
+
+    "fail validation if business type field is not selected" in {
+      roleWithinBusinessOtherType.validate("") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+    }
+  }
 
 }

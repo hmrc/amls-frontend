@@ -1,0 +1,94 @@
+@import include._
+@import models.businessmatching._
+
+@(model: BusinessMatching)(implicit request: Request[_])
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.businessmatching")
+
+    <div class="form-group">
+        <span class="icon-information"></span>
+        <span class="notice">@Messages("businessmatching.summary.icon.title")</span>
+    </div>
+
+    @model.reviewDetails.map { review =>
+        <table>
+            <tr>
+                <th  colspan="2" class="summary-title">@Messages("businessmatching.summary.business.address.lbl")</th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @review.businessAddress.toLines.map { line =>
+                        @line<br>
+                    }
+                </td>
+            </tr>
+        </table>
+
+        @review.businessType.map { m =>
+            @m match {
+                case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
+                    <table>
+                        <tr>
+                            <th class="summary-title">@Messages("businessmatching.registrationnumber.heading")</th>
+                            <td><a href="@controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true)">@Messages("button.edit")</a></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                @model.companyRegistrationNumber.map {number =>
+                                    @number.companyRegistrationNumber
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                }
+                case BusinessType.UnincorporatedBody => {
+                    <table>
+                        <tr>
+                            <th class="summary-title">@Messages("businessmatching.typeofbusiness.heading")</th>
+                            <td><a href="@controllers.businessmatching.routes.TypeOfBusinessController.get(true)">@Messages("button.edit")</a></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                @model.typeOfBusiness.map {business =>
+                                    @business.typeOfBusiness
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                }
+                case _ => {}
+
+            }
+        }
+    }
+
+    @model.activities.map { activity =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("businessmatching.registerservices.heading")</th>
+                <td><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @activity.businessActivities.map { line =>
+            <tr>
+                <td colspan="2">
+                    @line match {
+                        case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
+                        case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
+                        case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
+                        case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
+                        case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
+                        case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
+                        case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
+                    }
+                </td>
+            </tr>
+            }
+        </table>
+    }
+
+    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">Accept and complete section</a>
+}

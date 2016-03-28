@@ -1,0 +1,18 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+@import models.aboutthebusiness._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@main(title = Messages("businessmatching.registrationnumber.title")) {
+
+    @heading("businessmatching.registrationnumber.heading", "summary.businessmatching")
+
+    @form(f, controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit)) {
+
+        @input(f("companyRegistrationNumber"), hintText = "businessmatching.registrationnumber.example", bold = false)
+
+        @submit(edit)
+    }
+}

@@ -1,6 +1,7 @@
 package models.aboutthebusiness
 
 import models.FormTypes
+import models.businesscustomer.Address
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
@@ -176,6 +177,18 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       RegisteredOffice.jsonReads.reads(
         RegisteredOffice.jsonWrites.writes(nonUKRegisteredOffice)
       ) must be (JsSuccess(nonUKRegisteredOffice))
+    }
+
+    "covert Business Customer Address to RegisteredOfficeUK" in {
+      val address = Address("addr1", "addr2", Some("line3"), Some("line4"), Some("NE2 6GH"), "GB")
+
+      RegisteredOffice.convert(address) must be(RegisteredOfficeUK("addr1","addr2",Some("line3"),Some("line4"),"NE2 6GH"))
+    }
+
+    "covert Business Customer Address to RegisteredOfficeNonUK" in {
+      val address = Address("addr1", "addr2", Some("line3"), Some("line4"),None, "HP")
+
+      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1","addr2",Some("line3"),Some("line4"),"HP"))
     }
   }
 }

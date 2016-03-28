@@ -1,6 +1,7 @@
 package models.aboutthebusiness
 
 import models.FormTypes._
+import models.businesscustomer.Address
 import play.api.data.mapping.forms._
 import play.api.data.mapping._
 import play.api.libs.json.{Writes, Reads, Json}
@@ -128,5 +129,20 @@ object RegisteredOffice {
         "addressLineNonUK3" -> m.addressLine3,
         "addressLineNonUK4" -> m.addressLine4,
         "country" -> m.country)
+  }
+
+  implicit def convert(address: Address): RegisteredOffice = {
+    address.postcode match {
+      case Some(data) => RegisteredOfficeUK (address.line_1,
+        address.line_2,
+        address.line_3,
+        address.line_4,
+        data)
+      case None => RegisteredOfficeNonUK (address.line_1,
+        address.line_2,
+        address.line_3,
+        address.line_4,
+        address.country)
+    }
   }
 }

@@ -1,6 +1,5 @@
 package models.estateagentbusiness
 
-import models.aboutyou.RoleWithinBusiness
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}

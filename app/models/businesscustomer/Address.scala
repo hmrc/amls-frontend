@@ -9,7 +9,18 @@ case class Address(
                   line_4: Option[String],
                   postcode: Option[String],
                   country: String
-                  )
+                  ) {
+  def toLines: Seq[String] = {
+      Seq(
+        Some(line_1),
+        Some(line_2),
+        line_3,
+        line_4,
+        postcode,
+        Some(country)
+      ).flatten
+  }
+}
 
 object Address {
   implicit val format = Json.format[Address]

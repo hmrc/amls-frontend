@@ -1,15 +1,13 @@
 package services
 
-import connectors.{GovernmentGatewayConnector, DataCacheConnector, DESConnector}
-import models.governmentgateway.EnrolmentRequest
-import models.{SubscriptionResponse, SubscriptionRequest}
+import connectors.{DataCacheConnector, DESConnector}
+import models.SubscriptionRequest
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
 import models.businessmatching.BusinessMatching
 import models.estateagentbusiness.EstateAgentBusiness
 import models.tradingpremises.TradingPremises
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.{GovernmentGateway, AuthContext}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{NotFoundException, HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -72,6 +70,30 @@ trait SubscriptionService extends DataCacheService {
       )
     } yield subscription
   }
+
+  def getSubscription
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[(String, Currency, Seq[BreakdownRow])] =
+    cacheConnector.fetchAll flatMap {
+      option =>
+        (for {
+          cache <- option
+          subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+        } yield {
+          val mlrRegNo = subscription.amlsRefNo
+          val total = subscription.totalFees
+          val rows = Seq(
+            BreakdownRow(Submission.message, Submission.quantity, Submission.feePer, subscription.registrationFee),
+            BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee)
+          )
+          Future.successful((mlrRegNo, Currency.fromBD(total), rows))
+          // TODO
+        }) getOrElse Future.failed(new Exception("TODO"))
+    }
 }
 
 object SubscriptionService extends SubscriptionService {

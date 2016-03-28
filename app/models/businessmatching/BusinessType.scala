@@ -3,17 +3,9 @@ package models.businessmatching
 import models.businessmatching.BusinessType._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
+import play.api.libs.json._
 
-sealed trait BusinessType {
-  override def toString: String =
-    this match {
-      case SoleProprietor => "SOP"
-      case LimitedCompany => "LTD"
-      case Partnership => "OBP"
-      case LPrLLP => "LP"
-      case UnincorporatedBody => "UIB"
-    }
-}
+sealed trait BusinessType
 
 object BusinessType {
 
@@ -53,4 +45,22 @@ object BusinessType {
       case UnincorporatedBody =>
         Map("businessType" -> Seq("05"))
     }
+
+  implicit val writes = Writes[BusinessType] {
+    case LimitedCompany => JsString("Corporate Body")
+    case SoleProprietor => JsString("Sole Trader")
+    case Partnership => JsString("Partnership")
+    case LPrLLP => JsString("LLP")
+    case UnincorporatedBody => JsString("Unincorporated Body")
+  }
+
+  implicit val reads = Reads[BusinessType] {
+    case JsString("Corporate Body") => JsSuccess(LimitedCompany)
+    case JsString("Sole Trader") => JsSuccess(SoleProprietor)
+    case JsString("Partnership") => JsSuccess(Partnership)
+    case JsString("LLP") => JsSuccess(LPrLLP)
+    case JsString("Unincorporated Body") => JsSuccess(UnincorporatedBody)
+    case _ =>
+      JsError(JsPath -> ValidationError("error.invalid"))
+  }
 }

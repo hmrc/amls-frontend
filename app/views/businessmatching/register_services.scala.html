@@ -8,27 +8,27 @@
     title = Messages("businessmatching.registerservices.title")
 ) {
 
-@heading("businessmatching.registerservices.heading", "summary.businessmatching")
+    @heading("businessmatching.registerservices.heading", "summary.businessmatching")
 
-@form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
+    @form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
 
-<div class="form-field">
-    <span class="form-field">@Messages("lbl.select.all")</span>
-</div>
+    <div class="form-field">
+        <span class="form-field">@Messages("lbl.select.all")</span>
+    </div>
 
-@radioGroup(f("businessActivities")) {
-@legend("TODO", jsHidden = true)
-@checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.01", "01")
-@checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.02", "02")
-@checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.03", "03")
-@checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.04", "04")
-@checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.05", "05")
-@checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.06", "06")
-@checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.07", "07")
-}
+        @radioGroup(f("businessActivities")) {
+            @legend("lbl.select.all", jsHidden = true)
+            @checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.01", "01")
+            @checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.02", "02")
+            @checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.03", "03")
+            @checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.04", "04")
+            @checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.05", "05")
+            @checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.06", "06")
+            @checkbox(f("businessActivities"), "businessmatching.registerservices.servicename.lbl.07", "07")
+        }
 
-@submit(edit)
+    @submit(edit)
 
-}
+    }
 
 }

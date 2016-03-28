@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.BusinessType._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching._
 
@@ -13,11 +14,6 @@ import scala.concurrent.Future
 trait BusinessTypeController extends BaseController {
 
   private[controllers] def dataCache: DataCacheConnector
-
-  val CORPORATE_BODY = "Corporate Body"
-  val UNINCORPORATED_BODY = "Unincorporated Body"
-  val LLP = "LLP"
-  val PARTNERSHIP = "Partnership"
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -28,9 +24,12 @@ trait BusinessTypeController extends BaseController {
             reviewDetails <- businessMatching.reviewDetails
             businessType <- reviewDetails.businessType
           } yield businessType match {
-            case UNINCORPORATED_BODY => Redirect(routes.TypeOfBusinessController.get())
-            case LLP |CORPORATE_BODY => Redirect(controllers.routes.MainSummaryController.onPageLoad())
-            case _ => Redirect(routes.RegisterServicesController.get())
+            case UnincorporatedBody =>
+              Redirect(routes.TypeOfBusinessController.get())
+            case LPrLLP | LimitedCompany =>
+              Redirect(routes.CompanyRegistrationNumberController.get())
+            case _ =>
+              Redirect(routes.RegisterServicesController.get())
           }
           redirect getOrElse Ok(business_type(EmptyForm))
       }
@@ -51,20 +50,28 @@ trait BusinessTypeController extends BaseController {
                 businessMatching.copy(
                   reviewDetails = Some(
                     reviewDetails.copy(
-                      businessType = Some(data.toString)
+                      businessType = Some(data)
                     )
                   )
                 )
               }
-             updatedDetails map {
-               details =>
-                 dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
-                   _ =>
-                     Redirect(controllers.routes.MainSummaryController.onPageLoad())
-                 }
-             } getOrElse Future.successful {
-               Redirect(controllers.routes.MainSummaryController.onPageLoad())
-             }
+              updatedDetails map {
+                details =>
+                  dataCache.save[BusinessMatching](BusinessMatching.key, updatedDetails) map {
+                    _ =>
+                      data match {
+                        case UnincorporatedBody =>
+                          Redirect(routes.TypeOfBusinessController.get())
+                        case LPrLLP | LimitedCompany =>
+                          Redirect(routes.CompanyRegistrationNumberController.get())
+                        case _ =>
+                          Redirect(routes.RegisterServicesController.get())
+                      }
+                  }
+              } getOrElse Future.successful {
+                // TODO error and logging
+                Redirect(routes.RegisterServicesController.get())
+              }
           }
       }
   }

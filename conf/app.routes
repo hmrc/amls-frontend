@@ -7,19 +7,15 @@ GET         /                                           controllers.LandingContr
 POST        /subscribe                                  controllers.SubscriptionController.post()
 
 GET         /unauthorised                               controllers.AmlsController.unauthorised
-GET         /summary                                    controllers.MainSummaryController.onPageLoad
 
-GET         /about-you/your-details                    controllers.aboutyou.YourDetailsController.get(edit: Boolean ?= false)
-POST        /about-you/your-details                    controllers.aboutyou.YourDetailsController.post(edit: Boolean ?= false)
-GET         /about-you/role-within-business            controllers.aboutyou.RoleWithinBusinessController.get(edit: Boolean ?= false)
-POST        /about-you/role-within-business            controllers.aboutyou.RoleWithinBusinessController.post(edit: Boolean ?= false)
-GET         /about-you/summary                         controllers.aboutyou.SummaryController.get()
+GET         /registration-progress                      controllers.RegistrationProgressController.get()
+
 
 GET         /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
-GET         /business-details/index                    controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/index                    controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
+GET         /business-details/previously-registered                    controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/previously-registered                    controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
 GET         /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
@@ -33,10 +29,13 @@ POST        /business-details/new-registered-office    controllers.aboutthebusin
 GET         /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
 POST        /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
 
+GET         /business-details/index                   controllers.aboutthebusiness.WhatYouNeedController.get()
+
+
 GET         /business-details/summary                  controllers.aboutthebusiness.SummaryController.get()
 
-GET         /trading-premises/index                    controllers.tradingpremises.WhatYouNeedController.get()
 
+GET         /trading-premises/index/:index                    controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
 GET         /trading-premises/premises/:index                       controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                       controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
@@ -49,6 +48,7 @@ POST        /trading-premises/what-does-your-business-do/:index     controllers.
 
 GET         /trading-premises/summary                               controllers.tradingpremises.SummaryController.get()
 GET         /trading-premises/summary/:index                        controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+
 
 GET         /estate-agents/index                        controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised                    controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
@@ -69,15 +69,19 @@ GET         /estate-agents/summary                      controllers.estateagentb
 GET         /business-matching/business-type            controllers.businessmatching.BusinessTypeController.get()
 POST        /business-matching/business-type            controllers.businessmatching.BusinessTypeController.post()
 
-GET         /business-matching/type-of-business            controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
-POST        /business-matching/type-of-business            controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
+GET         /business-matching/type-of-business         controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
+POST        /business-matching/type-of-business         controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
 
 GET         /business-matching/activities               controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
 POST        /business-matching/activities               controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
-GET         /bank-details/index                         controllers.bankdetails.WhatYouNeedController.get()
+GET         /business-matching/registration-number      controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
+POST        /business-matching/registration-number      controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
 
-GET         /about-the-business/index                   controllers.aboutthebusiness.WhatYouNeedController.get()
+GET         /business-matching/check-your-answers       controllers.businessmatching.SummaryController.get()
+
+
+GET         /bank-details/index/:index                         controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
 GET         /bank-details/accounts/:index               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
@@ -86,6 +90,7 @@ GET         /bank-details/account-details/:index        controllers.bankdetails.
 POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
+
 
 GET         /business-activities/index                  controllers.businessactivities.WhatYouNeedController.get()
 
@@ -125,5 +130,14 @@ POST        /business-activities/employees              controllers.businessacti
 GET         /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 
-GET         /business-activities/check-your-answers                       controllers.businessactivities.SummaryController.get()
+GET         /business-activities/check-your-answers      controllers.businessactivities.SummaryController.get()
+
+
+GET         /declaration/add-person                     controllers.declaration.AddPersonController.get()
+POST        /declaration/add-person                     controllers.declaration.AddPersonController.post()
+
+GET         /declaration/declaration                    controllers.declaration.DeclarationController.get()
+
+GET         /confirmation                               controllers.ConfirmationController.get()
+
 

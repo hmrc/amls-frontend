@@ -1,6 +1,7 @@
 package services
 
 import connectors.{DataCacheConnector, KeystoreConnector}
+import models.aboutthebusiness.AboutTheBusiness
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -45,7 +46,10 @@ trait LandingService {
    ac: AuthContext
   ): Future[CacheMap] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
-    cacheConnector.save[BusinessMatching](BusinessMatching.key, bm)
+    val atb = AboutTheBusiness(registeredOffice = Some(reviewDetails.businessAddress))
+    cacheConnector.save[BusinessMatching](BusinessMatching.key, bm) flatMap {
+      _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, atb)
+    }
   }
 }
 

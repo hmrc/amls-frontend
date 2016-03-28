@@ -3,25 +3,25 @@
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
 
 @(
-title: String,
-mainClass: Option[String] = None,
-mainDataAttributes: Option[Html] = None,
-bodyClasses: Option[String] = None,
-sidebar: Html = HtmlFormat.empty,
-contentHeader: Html = HtmlFormat.empty,
-scriptElem: Option[Html] = None,
-linkElement : Option[Html] = None,
-nameBusiness : Option[String] = None,
-userLoggedIn : Boolean = true
+    title: String,
+    mainClass: Option[String] = None,
+    mainDataAttributes: Option[Html] = None,
+    bodyClasses: Option[String] = None,
+    sidebar: Html = HtmlFormat.empty,
+    contentHeader: Html = HtmlFormat.empty,
+    scriptElem: Option[Html] = None,
+    linkElement : Option[Html] = None,
+    nameBusiness : Option[String] = None,
+    userLoggedIn : Boolean = true
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
 @styles = {
-<link href="@routes.AssetsController.at("amls.css")" rel="stylesheet" type="text/css"/>
-@linkElement
+    <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet" type="text/css"/>
+    @linkElement
 }
 
 @scripts = {
-<script src="@routes.AssetsController.at("amls.js")"></script>
+    <script src="@routes.AssetsController.at("amls.js")"></script>
     @scriptElem
 }
 
@@ -79,7 +79,11 @@ userLoggedIn : Boolean = true
                     @getHelpForm
                 </div>
                 <div class="grid-layout__column grid-layout__column--1-3">
-                    &nbsp;
+                    @if(sidebar == HtmlFormat.empty) {
+                        &nbsp;
+                    } else {
+                        @sidebar
+                    }
                 </div>
             </div>
         </div>
