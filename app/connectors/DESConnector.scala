@@ -1,8 +1,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.{SubscriptionResponse, SubscriptionResponse$, SubscriptionRequest, LoginDetails}
-import play.api.libs.json.{JsValue, Json, Reads}
+import models.{SubscriptionResponse, SubscriptionRequest}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http._
 

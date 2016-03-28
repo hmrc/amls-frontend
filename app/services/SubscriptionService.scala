@@ -1,14 +1,18 @@
 package services
 
-import connectors.{DataCacheConnector, DESConnector}
-import models.SubscriptionRequest
+import connectors.{DESConnector, DataCacheConnector}
+import models.{SubscriptionRequest, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
-import models.businessmatching.BusinessMatching
+import models.businessactivities.BusinessActivities
+import models.businessmatching.{BusinessMatching, BusinessType}
+import models.confirmation.{BreakdownRow, Currency}
+import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.tradingpremises.TradingPremises
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{NotFoundException, HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse, NotFoundException}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -17,6 +21,17 @@ trait SubscriptionService extends DataCacheService {
   private[services] def cacheConnector: DataCacheConnector
   private[services] def desConnector: DESConnector
   private[services] def ggService: GovernmentGatewayService
+
+  private object Submission {
+    val message = "confirmation.submission"
+    val quantity = 1
+    val feePer = 100
+  }
+
+  private object Premises {
+    val message = "confirmation.tradingpremises"
+    val feePer = 110
+  }
 
   private def safeId(cache: CacheMap): Future[String] = {
     (for {
@@ -31,7 +46,7 @@ trait SubscriptionService extends DataCacheService {
     }
   }
 
-  private def businessType(cache: CacheMap): Option[String] =
+  private def businessType(cache: CacheMap): Option[BusinessType] =
     for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       rd <- bm.reviewDetails
@@ -45,11 +60,13 @@ trait SubscriptionService extends DataCacheService {
    hc: HeaderCarrier
   ): Future[SubscriptionResponse] = {
     val request = SubscriptionRequest(
-      businessType = businessType(cache),
+      businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
-      aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
       tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
-      bankDetailsSection = cache.getEntry[Seq[BankDetails]](BankDetails.key)
+      aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
+      bankDetailsSection = cache.getEntry[Seq[BankDetails]](BankDetails.key),
+      aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
+      businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key)
     )
     desConnector.subscribe(request, safeId)
   }

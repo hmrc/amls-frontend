@@ -62,7 +62,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
     } thenReturn safeId
     when {
       reviewDetails.businessType
-    } thenReturn Some(businessType.toString)
+    } thenReturn Some(businessType)
 
     val businessMatching = mock[BusinessMatching]
 
@@ -98,7 +98,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
       } thenReturn Future.successful(Some(cache))
 
       when {
-        SubscriptionService.desConnector.subscribe(any(), eqTo(safeId))(any(), any())
+        SubscriptionService.desConnector.subscribe(any(), eqTo(safeId))(any())
       } thenReturn Future.successful(subscriptionResponse)
 
       when {
