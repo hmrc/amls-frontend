@@ -1,5 +1,6 @@
 package models.businessmatching
 
+import models.Country
 import models.businesscustomer.ReviewDetails
 import models.businesscustomer.Address
 import org.scalatest.mock.MockitoSugar
@@ -15,7 +16,7 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     businessName = "Name",
     businessType = Some(BusinessType.SoleProprietor),
     businessAddress = Address(
-      "1 Test Street", "Test Town", None, None, None, "GB"
+      "1 Test Street", "Test Town", None, None, None, Country("United Kingdom", "GB")
     ),
     safeId = "safeId"
   )

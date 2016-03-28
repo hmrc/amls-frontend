@@ -18,12 +18,6 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
         result mustBe Success(CompanyRegistrationNumber("12345678"))
       }
 
-      "successfully validate given a correct lower case alphanumeric value" in {
-        val data = Map("companyRegistrationNumber" -> Seq("ab765bhd"))
-        val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Success(CompanyRegistrationNumber("ab765bhd"))
-      }
-
       "successfully validate given a correct upper case alphanumeric value" in {
         val data = Map("companyRegistrationNumber" -> Seq("AB78JC12"))
         val result = CompanyRegistrationNumber.formReads.validate(data)
@@ -33,7 +27,7 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
       "validate with a failure given a value with length greater than 8" in {
         val data = Map("companyRegistrationNumber" -> Seq("1234567890"))
         val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.maxLength", 8))))
+        result mustBe a[Failure[_, _]]
       }
 
       "validate with a failure given a value with length less than 8" in {
@@ -74,12 +68,6 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
         val model = Map("companyRegistrationNumber" -> Seq("ABCDEFGH"))
         CompanyRegistrationNumber.formReads.validate(model) must
           be(Success(CompanyRegistrationNumber("ABCDEFGH")))
-      }
-
-      "validate model with valid lower case registration number" in {
-        val model = Map("companyRegistrationNumber" -> Seq("abcdefgh"))
-        CompanyRegistrationNumber.formReads.validate(model) must
-          be(Success(CompanyRegistrationNumber("abcdefgh")))
       }
 
       "fail to validate when given data with length greater than 8" in {

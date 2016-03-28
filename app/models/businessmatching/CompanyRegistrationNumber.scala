@@ -10,8 +10,7 @@ case class CompanyRegistrationNumber(companyRegistrationNumber: String)
 
 object CompanyRegistrationNumber {
 
-  val registrationNumberLength = 8
-  val registrationType = notEmpty compose maxLength(registrationNumberLength) compose pattern("^[A-Za-z0-9]{8}$".r)
+  val registrationType = notEmpty compose pattern("^[A-Z0-9]{8}$".r)
 
   implicit val formats = Json.format[CompanyRegistrationNumber]
 
@@ -23,5 +22,4 @@ object CompanyRegistrationNumber {
   implicit val formWrites: Write[CompanyRegistrationNumber, UrlFormEncoded] = Write {
     case CompanyRegistrationNumber(registered) => Map("companyRegistrationNumber" -> Seq(registered))
   }
-
 }
