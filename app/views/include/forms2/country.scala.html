@@ -1,0 +1,29 @@
+@import forms.{Field, Form2}
+
+@(
+    field: Field,
+    labelText: String = "",
+    hintText: String = "",
+    bold: Boolean = true,
+    classes: Seq[String] = Seq.empty
+)(implicit lang: Lang)
+
+<div class="form-group @if(field.hasErrors) {form-field--error}">
+    <label>
+        @if(labelText.nonEmpty) {
+            <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+        }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification">@field.error</span>
+        }
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")">
+            <option value=""></option>
+            @models.countries.map { case Country(name, code) =>
+                <option value="@code" @if(field.value.contains(code)) {selected} >@name</option>
+            }
+        </select>
+    </label>
+</div>

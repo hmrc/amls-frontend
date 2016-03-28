@@ -135,13 +135,13 @@
             case CustomersOutsideUKNo => { }
             case CustomersOutsideUKYes(v) => {
                 @model.customersOutsideUK.map { ca =>
-                    <tr>
-                        <td colspan="2">
-                            @ca.toLines.filter(_.length > 1).map {country=>
-                                @country<br>
-                            }
-                        </td>
-                    </tr>
+                    @ca.toLines.filter(_.length > 1).map {country=>
+                        <tr>
+                            <td colspan="2">
+                                @country
+                            </td>
+                        </tr>
+                    }
                 }
             }
         }

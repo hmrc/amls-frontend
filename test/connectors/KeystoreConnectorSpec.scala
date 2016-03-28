@@ -1,5 +1,6 @@
 package connectors
 
+import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -47,7 +48,7 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
           line_3 = None,
           line_4 = None,
           postcode = None,
-          country = ""
+          country = Country("United Kingdom", "GB")
         ),
         safeId = ""
       )

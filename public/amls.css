@@ -138,6 +138,14 @@ form input[type=text].form-control.postcode {
     width : 20%;
 }
 
+/* select box for countries */
+select {
+  border : 2px solid #6f777b;
+  margin : 0;
+  padding : 4px;
+  width : 50%;
+}
+
 
 /* form errors */
 .amls-error-summary {
