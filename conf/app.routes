@@ -138,4 +138,6 @@ POST        /declaration/add-person                     controllers.declaration.
 
 GET         /declaration/declaration                    controllers.declaration.DeclarationController.get()
 
+GET         /confirmation                               controllers.ConfirmationController.get()
+
 
