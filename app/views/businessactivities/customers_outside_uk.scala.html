@@ -22,21 +22,19 @@
                 <span class="form-hint">
                     @Messages("businessactivities.hight.value.customer.lbl.hint")
                 </span>
-                <span>
+                <p>
                     @Messages("businessactivities.upto.10.countries")
-                </span>
-                <br>
-                <br>
-                @input(f("country_1"), "", bold = false)
-                @input(f("country_2"), "", bold = false)
-                @input(f("country_3"), "", bold = false)
-                @input(f("country_4"), "", bold = false)
-                @input(f("country_5"), "", bold = false)
-                @input(f("country_6"), "", bold = false)
-                @input(f("country_7"), "", bold = false)
-                @input(f("country_8"), "", bold = false)
-                @input(f("country_9"), "", bold = false)
-                @input(f("country_10"), "", bold = false)
+                </p>
+                @country(f("country_1"))
+                @country(f("country_2"))
+                @country(f("country_3"))
+                @country(f("country_4"))
+                @country(f("country_5"))
+                @country(f("country_6"))
+                @country(f("country_7"))
+                @country(f("country_8"))
+                @country(f("country_9"))
+                @country(f("country_10"))
             }
         }
         @submit(edit)

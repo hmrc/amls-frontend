@@ -1,8 +1,9 @@
 package controllers.businessmatching
 
 import connectors.DataCacheConnector
+import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -44,7 +45,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
     "display Registration Number page for CORPORATE_BODY" in new Fixture {
 
      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-       Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
+       Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -57,7 +58,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
     "display Registration Number page for LLP" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -70,7 +71,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
     "display Type of Business Page" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -83,7 +84,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
     "display Register Services Page" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -101,7 +102,7 @@ class BusinessTypeControllerSpec extends PlaySpec with OneServerPerSuite with Mo
       )
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
 
       when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))

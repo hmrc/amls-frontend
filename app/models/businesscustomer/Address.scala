@@ -1,5 +1,6 @@
 package models.businesscustomer
 
+import models.Country
 import play.api.libs.json.Json
 
 case class Address(
@@ -8,7 +9,7 @@ case class Address(
                   line_3: Option[String],
                   line_4: Option[String],
                   postcode: Option[String],
-                  country: String
+                  country: Country
                   ) {
   def toLines: Seq[String] = {
       Seq(
@@ -17,7 +18,7 @@ case class Address(
         line_3,
         line_4,
         postcode,
-        Some(country)
+        Some(country.toString)
       ).flatten
   }
 }

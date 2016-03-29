@@ -1,5 +1,6 @@
 package models.businessactivities
 
+import models.Country
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsNull, Json}
@@ -14,7 +15,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val DefaultInvolvedInOther   = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
   val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
   val DefaultTransactionRecord = TransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
-  val DefaultCustomersOutsideUK = CustomersOutsideUKYes(Countries("GP"))
+  val DefaultCustomersOutsideUK = CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB")))
   val DefaultNCARegistered      = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
   val DefaultRiskAssessments    = RiskAssessmentPolicyYes(Set(PaperBased))
@@ -55,7 +56,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "transactions" -> Seq("01", "03"),
       "digitalSoftwareName" -> DefaultSoftwareName,
       "isOutside" -> true,
-      "country_1" -> "GP",
+      "country_1" -> "GB",
       "country_2" -> JsNull,
       "country_3" -> JsNull,
       "country_4" -> JsNull,
