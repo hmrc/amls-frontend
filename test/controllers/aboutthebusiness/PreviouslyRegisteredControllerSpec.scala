@@ -1,6 +1,7 @@
 package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
+import models.Country
 import models.aboutthebusiness._
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
@@ -61,13 +62,13 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.CORPORATE_BODY),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
       val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(reviewDtls))))
+        .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
 
@@ -86,12 +87,12 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", None,
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
       val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(reviewDtls))))
+        .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
 
@@ -110,12 +111,12 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", None,
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"),Country("United Kingdom", "GB")), "ghghg")
 
       val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(reviewDtls))))
+        .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(None)
 
@@ -133,13 +134,13 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
         "previouslyRegistered" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.CORPORATE_BODY),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), "GB"), "ghghg", "XE0001234567890")
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
       val mockCacheMap = mock[CacheMap]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(reviewDtls))))
+        .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
 

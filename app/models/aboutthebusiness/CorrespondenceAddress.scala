@@ -1,5 +1,6 @@
 package models.aboutthebusiness
 
+import models.Country
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{Path, From, Rule, Write}
 import play.api.data.validation.ValidationError
@@ -26,7 +27,7 @@ sealed trait CorrespondenceAddress {
         Some(a.addressLineNonUK2),
         a.addressLineNonUK3,
         a.addressLineNonUK4,
-        Some(a.country)
+        Some(a.country.toString)
       ).flatten
   }
 }
@@ -48,7 +49,7 @@ case class NonUKCorrespondenceAddress(
                                      addressLineNonUK2: String,
                                      addressLineNonUK3: Option[String],
                                      addressLineNonUK4: Option[String],
-                                     country: String
+                                     country: Country
                                      ) extends CorrespondenceAddress
 
 object CorrespondenceAddress {
@@ -77,7 +78,7 @@ object CorrespondenceAddress {
             (__ \ "addressLineNonUK2").read(customNotEmpty("error.required.address.line2") compose validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
-            (__ \ "country").read(countryType)
+              (__ \ "country").read[Country]
           )(NonUKCorrespondenceAddress.apply _)
         case _ => (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
       }
@@ -104,7 +105,7 @@ object CorrespondenceAddress {
         "addressLineNonUK2" -> Seq(a.addressLineNonUK2),
         "addressLineNonUK3" -> a.addressLineNonUK3.toSeq,
         "addressLineNonUK4" -> a.addressLineNonUK4.toSeq,
-        "country" -> Seq(a.country)
+        "country" -> Seq(a.country.code)
       )
   }
 
@@ -120,15 +121,15 @@ object CorrespondenceAddress {
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
         (__ \ "correspondencePostCode").read[String])(UKCorrespondenceAddress.apply _) map identity[CorrespondenceAddress]
-      ) orElse
+      ) orElse (
       ((__ \ "yourName").read[String] and
         (__ \ "businessName").read[String] and
         (__ \ "correspondenceAddressLine1").read[String] and
         (__ \ "correspondenceAddressLine2").read[String] and
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
-        (__ \ "correspondenceCountry").read[String])(NonUKCorrespondenceAddress.apply _)
-
+        (__ \ "correspondenceCountry").read[Country])(NonUKCorrespondenceAddress.apply _)
+      )
   }
 
   implicit val jsonWrites: Writes[CorrespondenceAddress] = {
@@ -154,7 +155,7 @@ object CorrespondenceAddress {
           (__ \ "correspondenceAddressLine2").write[String] and
           (__ \ "correspondenceAddressLine3").writeNullable[String] and
           (__ \ "correspondenceAddressLine4").writeNullable[String] and
-          (__ \ "correspondenceCountry").write[String]
+          (__ \ "correspondenceCountry").write[Country]
         )(unlift(NonUKCorrespondenceAddress.unapply)).writes(a)
     }
   }

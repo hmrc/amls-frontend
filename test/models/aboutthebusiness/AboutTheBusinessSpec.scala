@@ -1,5 +1,6 @@
 package models.aboutthebusiness
 
+import models.Country
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsNull, Json}
@@ -129,7 +130,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
       "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
         "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
-          val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, "UK")
+          val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, Country("United Kingdom", "GB"))
           val result = initial.registeredOffice(newregOffice)
           result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, Some(newregOffice)))
         }
@@ -160,7 +161,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
         "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
           "return AboutTheBusiness with correct registered office detailes" in {
-            val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, "UK")
+            val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, Country("United Kingdom", "GB"))
             val result = initial.registeredOffice(newregOffice)
             result must be(AboutTheBusiness(None, Some(regForVAT), None, Some(newregOffice)))
           }

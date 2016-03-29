@@ -2,7 +2,7 @@ package connectors
 
 import config.AmlsShortLivedCache
 import play.api.libs.json
-import play.api.libs.json.Writes
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -28,7 +28,7 @@ trait DataCacheConnector {
   (implicit
    authContext: AuthContext,
    hc: HeaderCarrier,
-   write: Writes[T]
+   format: Format[T]
   ): Future[CacheMap] =
     shortLivedCache.cache(authContext.user.oid, cacheId, data)
 

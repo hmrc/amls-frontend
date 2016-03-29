@@ -1,6 +1,7 @@
 package services
 
 import connectors.{DataCacheConnector, KeystoreConnector}
+import models.Country
 import models.aboutthebusiness.AboutTheBusiness
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
@@ -71,9 +72,8 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         line_3 = None,
         line_4 = None,
         postcode = None,
-        country = ""
+        country = Country("United Kingdom", "GB")
       ),
-      sapNumber = "",
       safeId = ""
     )
 

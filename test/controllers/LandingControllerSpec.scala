@@ -1,6 +1,7 @@
 package controllers
 
 import config.ApplicationConfig
+import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -40,8 +41,7 @@ class LandingControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
           val details = Some(ReviewDetails(businessName = "Test",
                                            businessType = None,
-                                           businessAddress = Address("Line 1", "Line 2", None, None, None, "Country"),
-                                           sapNumber = "",
+                                           businessAddress = Address("Line 1", "Line 2", None, None, None, Country("United Kingdom", "GB")),
                                            safeId = ""))
 
           when(controller.landingService.hasSavedForm(any(), any(), any())) thenReturn Future.successful(false)

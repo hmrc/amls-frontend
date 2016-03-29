@@ -1,8 +1,9 @@
 package models.businessactivities
 
+import models.Country
 import models.FormTypes
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsNull, JsPath, JsSuccess, Json}
 
@@ -12,7 +13,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
   "CustomersOutsideUK" must {
 
     "validate toLines for UK address" in {
-      CustomersOutsideUKYes(Countries("GP")).toLines must be (Seq("GP"))
+      CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB"))).toLines must be (Seq("United Kingdom"))
     }
 
     "validate toLines for Non UK address" in {
@@ -25,20 +26,36 @@ class CustomersOutsideUKSpec extends PlaySpec {
     }
 
     "successfully validate the form Rule with option Yes" in {
-      CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"),
-      "country_1" -> Seq("GS"),
-        "country_2" -> Seq("AR"),
-        "country_3" -> Seq("AB"),
-        "country_4" -> Seq("AC"),
-        "country_5" -> Seq("AD"),
-        "country_6" -> Seq("AE"),
-        "country_7" -> Seq("AF"),
-        "country_8" -> Seq("AG"),
-        "country_9" -> Seq("AH"),
-        "country_10" -> Seq("AI")
-      )) must
-        be(Success(CustomersOutsideUKYes(Countries("GS", Some("AR"), Some("AB"), Some("AC"),
-          Some("AD"), Some("AE"), Some("AF"), Some("AG"), Some("AH"),Some("AI")))))
+      CustomersOutsideUK.formRule.validate(
+        Map(
+          "isOutside" -> Seq("true"),
+          "country_1" -> Seq("AL"),
+          "country_2" -> Seq("DZ"),
+          "country_3" -> Seq("AS"),
+          "country_4" -> Seq("AD"),
+          "country_5" -> Seq("AO"),
+          "country_6" -> Seq("AI"),
+          "country_7" -> Seq("AQ"),
+          "country_8" -> Seq("AG"),
+          "country_9" -> Seq("AR"),
+          "country_10" -> Seq("AM")
+        )
+      ) mustBe {
+        Success(CustomersOutsideUKYes(
+          Countries(
+            Country("Albania", "AL"),
+            Some(Country("Algeria", "DZ")),
+            Some(Country("American Samoa", "AS")),
+            Some(Country("Andorra", "AD")),
+            Some(Country("Angola", "AO")),
+            Some(Country("Anguilla", "AI")),
+            Some(Country("Antarctica", "AQ")),
+            Some(Country("Antigua and Barbuda", "AG")),
+            Some(Country("Argentina", "AR")),
+            Some(Country("Armenia", "AM"))
+          )
+        ))
+      }
     }
 
     "validate mandatory field when isOutside is not selected" in {
@@ -54,7 +71,17 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
+          (Path \ "country_1") -> Seq(ValidationError("error.invalid.country"))
+        )))
+    }
+
+    "validate mandatory field for min length when isOutside is  selected as Yes and country with invalid data" in {
+      val json = Map("isOutside" -> Seq("true"),
+        "country_1" -> Seq("A"))
+
+      CustomersOutsideUK.formRule.validate(json) must
+        be(Failure(Seq(
+          (Path \ "country_1") -> Seq(ValidationError("error.invalid.country"))
         )))
     }
 
@@ -67,12 +94,12 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
     "successfully write model with formWrite" in {
 
-      val model = CustomersOutsideUKYes(Countries("GP", Some("AB")))
+      val model = CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB"))))
       CustomersOutsideUK.formWrites.writes(model) must
         contain allOf (
         "isOutside" -> Seq("true"),
-        "country_1" -> Seq("GP"),
-        "country_2" -> Seq("AB")
+        "country_1" -> Seq("GB"),
+        "country_2" -> Seq("GB")
         )
     }
 
@@ -86,10 +113,10 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "JSON validation" must {
       "successfully validate givcen values" in {
         val json =  Json.obj("isOutside" -> true,
-          "country_1" -> "GP")
+          "country_1" -> "GB")
 
         Json.fromJson[CustomersOutsideUK](json) must
-          be(JsSuccess(CustomersOutsideUKYes(Countries("GP")), JsPath \ "isOutside"))
+          be(JsSuccess(CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB"))), JsPath \ "isOutside"))
       }
 
       "successfully validate given values with option No" in {
@@ -100,8 +127,8 @@ class CustomersOutsideUKSpec extends PlaySpec {
       }
 
       "write valid data using json write" in {
-        Json.toJson[CustomersOutsideUK](CustomersOutsideUKYes(Countries("GS"))) must be (Json.obj("isOutside" -> true,
-          "country_1" -> "GS",
+        Json.toJson[CustomersOutsideUK](CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB")))) must be (Json.obj("isOutside" -> true,
+          "country_1" -> "GB",
           "country_2" -> JsNull,
           "country_3" -> JsNull,
           "country_4" -> JsNull,

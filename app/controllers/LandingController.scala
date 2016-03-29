@@ -23,7 +23,6 @@ trait LandingController extends BaseController {
           landingService.reviewDetails flatMap {
             case Some(reviewDetails) =>
               landingService.updateReviewDetails(reviewDetails) map {
-                // TODO: Make this redirect into OUR business matching flow when it exists
                 _ =>
                   Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
               }
@@ -35,6 +34,6 @@ trait LandingController extends BaseController {
 }
 
 object LandingController extends LandingController {
-  override private[controllers] def landingService: LandingService = LandingService
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
+  override private[controllers] val landingService = LandingService
+  override protected val authConnector = AMLSAuthConnector
 }

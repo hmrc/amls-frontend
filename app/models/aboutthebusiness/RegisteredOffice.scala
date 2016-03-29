@@ -1,5 +1,6 @@
 package models.aboutthebusiness
 
+import models.Country
 import models.FormTypes._
 import models.businesscustomer.Address
 import play.api.data.mapping.forms._
@@ -24,7 +25,7 @@ sealed trait RegisteredOffice {
         Some(a.addressLine2),
         a.addressLine3,
         a.addressLine4,
-        Some(a.country)
+        Some(a.country.toString)
       ).flatten
   }
 }
@@ -42,7 +43,7 @@ case class RegisteredOfficeNonUK(
                                   addressLine2: String,
                                   addressLine3: Option[String] = None,
                                   addressLine4: Option[String] = None,
-                                  country: String
+                                  country: Country
                                 ) extends RegisteredOffice
 
 object RegisteredOffice {
@@ -66,7 +67,7 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK2").read(customNotEmpty("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) and
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) and
-            (__ \ "country").read(countryType)
+            (__ \ "country").read[Country]
           )(RegisteredOfficeNonUK.apply _)
       case _ =>(Path \ "isUK") -> Seq(ValidationError("error.required.atb.confirm.office"))
     }
@@ -89,7 +90,7 @@ object RegisteredOffice {
         "addressLineNonUK2" -> f.addressLine2,
         "addressLineNonUK3" -> Seq(f.addressLine3.getOrElse("")),
         "addressLineNonUK4" -> Seq(f.addressLine4.getOrElse("")),
-        "country" -> f.country
+        "country" -> f.country.code
       )
   }
 
@@ -112,7 +113,7 @@ object RegisteredOffice {
           (__ \ "addressLineNonUK2").read[String] and
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
-          (__ \ "country").read[String]
+          (__ \ "country").read[Country]
         ) (RegisteredOfficeNonUK.apply _)
   }
 
@@ -130,7 +131,7 @@ object RegisteredOffice {
         "addressLineNonUK2" -> m.addressLine2,
         "addressLineNonUK3" -> m.addressLine3,
         "addressLineNonUK4" -> m.addressLine4,
-        "country" -> m.country)
+        "country" -> m.country.code)
   }
 
   implicit def convert(address: Address): RegisteredOffice = {

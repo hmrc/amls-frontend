@@ -2,6 +2,7 @@ package controllers.businessactivities
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.Country
 import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -51,13 +52,13 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
     "pre-populate the Customer outside UK Page" in new Fixture  {
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(customersOutsideUK = Some(CustomersOutsideUKYes(Countries("GS")))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(customersOutsideUK = Some(CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB"))))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=GS]").`val`() must be("GS")
+      document.select("select[name=country_1] > option[value=GB]").hasAttr("selected") must be(true)
 
     }
 

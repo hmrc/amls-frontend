@@ -39,7 +39,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     val businessActivities1 = BusinessActivities(activityData1)
     val businessActivities2 = BusinessActivities(activityData2)
 
-    val businessMatching1 = BusinessMatching(Some(businessActivities1))
+    val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
 
     "on get display who is your agent page" in new Fixture {
@@ -67,7 +67,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     "on post with valid data" in new Fixture {
 
       val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
-      val businessMatchingWithData = BusinessMatching(Some(businessActivitiesWithData))
+      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
       val newRequest = request.withFormUrlEncodedBody(
         "businessActivities" -> "01",
@@ -88,7 +88,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     "on post with invalid data" in new Fixture {
 
       val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
-      val businessMatchingWithData = BusinessMatching(Some(businessActivitiesWithData))
+      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
       val newRequest = request.withFormUrlEncodedBody(
         "businessActivities" -> "11")
@@ -109,7 +109,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
     "on post with valid data in edit mode" in new Fixture {
 
       val businessActivitiesWithData = BusinessActivities(businessActivities = activityData2)
-      val businessMatchingWithData = BusinessMatching(Some(businessActivitiesWithData))
+      val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
 
       val newRequest = request.withFormUrlEncodedBody(

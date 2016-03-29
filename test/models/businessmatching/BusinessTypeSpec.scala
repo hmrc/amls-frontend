@@ -48,14 +48,6 @@ class BusinessTypeSpec extends PlaySpec with MockitoSugar {
 
     }
 
-    "businessType toString" in {
-      SoleProprietor.toString must be("SOP")
-      LimitedCompany.toString must be("LTD")
-      Partnership.toString must be("OBP")
-      LPrLLP.toString must be("LP")
-      UnincorporatedBody.toString must be("UIB")
-    }
-
     "throw error on invalid data" in {
       BusinessType.formR.validate(Map("businessType" -> Seq("20"))) must
         be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.invalid"))))))

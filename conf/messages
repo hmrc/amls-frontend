@@ -146,6 +146,21 @@ progress.tcsp.name = Trust or company service provider
 progress.tcsp.description = Registration information specifically for trust or company service providers.
 progress.tcsp.time = 8
 
+# Confirmation page
+confirmation.lede = You have submitted the registration. Now pay the registration fee.
+confirmation.code = Confirmation code: {0}
+confirmation.fee = Your registration fee:
+confirmation.breakdown = How your registration fee has been calculated:
+confirmation.sidebar.title = Confirmation code
+confirmation.sidebar.lede = You have registered for anti-money laundering supervision, pending payment.
+confirmation.sidebar.code = Your confirmation code is: {0}
+confirmation.sidebar.time = You have 30 days to pay the registration fee.
+confirmation.quantity = Quantity
+confirmation.feeperitem = Fee per item
+confirmation.totalfee = Total fee
+confirmation.submission = Application submission
+confirmation.tradingpremises = Trading Premises
+
 # Individual pages
 
 summary.title = Your AMLS registration

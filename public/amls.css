@@ -103,11 +103,47 @@ div.grid-layout {
   background : none;
 }
 
+/* Confirmation */
+.confirmation {
+  margin : 40px 0;
+  padding : 40px 20px 20px 20px;
+  background-color : #28A197;
+  color : white;
+  text-align : center;
+}
+.confirmation > h1 {
+  margin : 0;
+}
+.panel-wide {
+  border-left : solid 10px #bfc1c3;
+  padding : 15px;
+}
+.bevel-container {
+  margin : 40px 0 0 40px;
+  padding : 15px;
+  border-bottom : #dee0e2 solid 3px;
+  background-color : #f8f8f8;
+}
+.bevel-container > heading-small {
+  margin : 0;
+}
+td.numeric, th.numeric {
+  text-align : right;
+}
+
 
 /* postcode */
 /* TODO, determine if there's a class in Assets Frontend for this */
 form input[type=text].form-control.postcode {
     width : 20%;
+}
+
+/* select box for countries */
+select {
+  border : 2px solid #6f777b;
+  margin : 0;
+  padding : 4px;
+  width : 50%;
 }
 
 

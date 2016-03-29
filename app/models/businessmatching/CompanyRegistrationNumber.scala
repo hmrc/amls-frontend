@@ -11,7 +11,7 @@ case class CompanyRegistrationNumber(companyRegistrationNumber: String)
 object CompanyRegistrationNumber {
 
   val registrationNumberLength = 8
-  val registrationNumberRegex = "^[A-Za-z0-9]{8}$".r
+  val registrationNumberRegex = "^[A-Z0-9]{8}$".r
   val registrationType = notEmpty compose pattern(registrationNumberRegex)
 
   implicit val formats = Json.format[CompanyRegistrationNumber]

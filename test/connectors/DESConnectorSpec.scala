@@ -1,6 +1,6 @@
 package connectors
 
-import models.SubscriptionRequest
+import models.{SubscriptionRequest, SubscriptionResponse}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
@@ -20,27 +20,37 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   val safeId = "SAFEID"
 
   val request = SubscriptionRequest(
-    businessType = None,
+    businessMatchingSection = None,
     eabSection = None,
-    aboutTheBusinessSection = None,
     tradingPremisesSection = None,
-    bankDetailsSection = None
+    aboutTheBusinessSection = None,
+    bankDetailsSection = None,
+    aboutYouSection = None,
+    businessActivitiesSection = None
+  )
+
+  val response = SubscriptionResponse(
+    etmpFormBundleNumber = "",
+    amlsRefNo = "",
+    registrationFee = 0,
+    fpFee = None,
+    premiseFee = 0,
+    totalFees = 0,
+    paymentReference = ""
   )
 
   implicit val hc = HeaderCarrier()
 
-  //scalastyle:off magic.number
   "subscribe" must {
 
     "successfully subscribe" in {
 
       when {
-        DESConnector.http.POST[SubscriptionRequest, HttpResponse](eqTo(s"${DESConnector.url}/$safeId"), eqTo(request), any())(any(), any(), any())
-      } thenReturn Future.successful(HttpResponse(200, None))
+        DESConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/$safeId"), eqTo(request), any())(any(), any(), any())
+      } thenReturn Future.successful(response)
 
       whenReady (DESConnector.subscribe(request, safeId)) {
-        result =>
-          result.status mustBe 200
+        _ mustBe response
       }
     }
   }

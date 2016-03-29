@@ -1,8 +1,8 @@
 package models.aboutthebusiness
 
-import models.FormTypes
+import models.{Country, FormTypes}
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
@@ -15,7 +15,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "NE1 7YX"
-  val DefaultCountry = "MN"
+  val DefaultCountry = Country("United Kingdom", "GB")
 
   val NewYourName     = "New Your Name"
   val NewBusinessName = "New Business Name"
@@ -61,7 +61,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
     "addressLineNonUK2" -> Seq(DefaultAddressLine2),
     "addressLineNonUK3" -> Seq("Default Line 3"),
     "addressLineNonUK4" -> Seq("Default Line 4"),
-    "country" -> Seq(DefaultCountry)
+    "country" -> Seq(DefaultCountry.code)
   )
 
 
@@ -105,8 +105,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
-        "MN"))
-
+        "United Kingdom"))
     }
 
     "Form validation" must {
@@ -120,7 +119,6 @@ class CorrespondenceAddressSpec extends PlaySpec {
             (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
           ))
       }
-
 
       "throw error when there is an invalid data" in {
         val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
