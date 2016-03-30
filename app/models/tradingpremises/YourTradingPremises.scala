@@ -2,8 +2,9 @@ package models.tradingpremises
 
 import org.joda.time.LocalDate
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, To, Write}
+import play.api.data.mapping._
 import play.api.libs.json.{Reads, Writes}
+import utils.MappingUtils.Implicits._
 
 case class YourTradingPremises(
                                 tradingName: String,
@@ -46,9 +47,9 @@ object YourTradingPremises {
       (
         (__ \ "tradingName").read(premisesTradingNameType) ~
           __.read[Address] ~
-          (__ \ "isOwner").read[Boolean] ~
+          (__ \ "isOwner").read[Boolean].withMessage("error.required.tp.your.business.or.other") ~
           (__ \ "startDate").read(localDateRule) ~
-          (__ \ "isResidential").read[Boolean]
+          (__ \ "isResidential").read[Boolean].withMessage("error.required.tp.residential.address")
         ) (YourTradingPremises.apply _)
     }
 

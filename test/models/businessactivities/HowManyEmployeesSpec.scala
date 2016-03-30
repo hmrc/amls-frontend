@@ -47,7 +47,7 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneServerPerS
 
       HowManyEmployees.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count", HowManyEmployees.employeeCountRegex))
+          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count"))
         )))
     }
 
@@ -58,7 +58,7 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneServerPerS
 
       HowManyEmployees.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.max.length.ba.employee.count", HowManyEmployees.maxEmployeeCount))
+          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.max.length.ba.employee.count"))
         )))
     }
   }

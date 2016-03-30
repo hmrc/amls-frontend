@@ -47,7 +47,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
 
       BusinessFranchise.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "franchiseName") -> Seq(ValidationError("error.max.length.ba.franchise.name", FormTypes.maxFranchiseName))
+          (Path \ "franchiseName") -> Seq(ValidationError("error.max.length.ba.franchise.name"))
         )))
     }
 

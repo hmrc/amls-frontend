@@ -116,7 +116,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
       "throw error when mandatory fields are missing" in {
         CorrespondenceAddress.formRule.validate(Map.empty) must be
           Failure(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
+            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           ))
       }
 
@@ -124,7 +124,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
         val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
         CorrespondenceAddress.formRule.validate(model) must be(
           Failure(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.invalid", "Boolean"))
+            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           )))
       }
 
@@ -132,7 +132,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
        val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
         CorrespondenceAddress.formRule.validate(model) must be(
           Failure(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
+            (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
           )))
       }
 

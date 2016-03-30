@@ -33,10 +33,22 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
 
       InvolvedInOther.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.required.ba.enter.text"))
+          (Path \ "details") -> Seq(ValidationError("error.required.ba.involved.in.other.text"))
         )))
     }
 
+    "fail to validate given an `Yes` with max value" in {
+
+      val data = Map(
+        "involvedInOther" -> Seq("true"),
+        "details" -> Seq("ghgfdfdfh"*50)
+      )
+
+      InvolvedInOther.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "details") -> Seq(ValidationError("error.invalid.ba.involved.in.other.text"))
+        )))
+    }
 
     "fail to validate mandatory field" in {
 

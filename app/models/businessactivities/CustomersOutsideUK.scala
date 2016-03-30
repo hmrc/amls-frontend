@@ -46,21 +46,21 @@ case class Countries (
 
 object CustomersOutsideUK {
 
+
   implicit val formRule: Rule[UrlFormEncoded, CustomersOutsideUK] = From[UrlFormEncoded] { __ =>
     import utils.MappingUtils.Implicits._
-
     import play.api.data.mapping.forms.Rules._
-    (__ \ "isOutside").read[Option[Boolean]] flatMap {
-      case Some(true) =>
+    (__ \ "isOutside").read[Boolean].withMessage("error.required.ba.select.country") flatMap {
+      case true =>
        __.read[Countries].fmap(CustomersOutsideUKYes.apply)
-      case Some(false) => Rule.fromMapping { _ => Success(CustomersOutsideUKNo) }
-      case _ => Path \ "isOutside" -> Seq(ValidationError("error.required.ba.select.country"))
+      case false => Rule.fromMapping { _ => Success(CustomersOutsideUKNo) }
     }
   }
 
   implicit val formRuleCountry: Rule[UrlFormEncoded, Countries] = From[UrlFormEncoded] { __ =>
+    import utils.MappingUtils.Implicits._
    import play.api.data.mapping.forms.Rules._
-        ((__ \ "country_1").read[Country] and
+        ((__ \ "country_1").read[Country].withMessage("error.required.ba.country.name") and
           (__ \ "country_2").read[Option[Country]] and
           (__ \ "country_3").read[Option[Country]] and
           (__ \ "country_4").read[Option[Country]] and

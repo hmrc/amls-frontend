@@ -15,10 +15,7 @@ object NCARegistered {
 
   implicit val formRule: Rule[UrlFormEncoded, NCARegistered] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "ncaRegistered").read[Option[Boolean]] flatMap {
-      case Some(x) => NCARegistered(x)
-      case _ => Path \ "ncaRegistered" -> Seq(ValidationError("error.required.ba.select.nca"))
-    }
+    (__ \ "ncaRegistered").read[Boolean].withMessage("error.required.ba.select.nca") fmap NCARegistered.apply
   }
 
   implicit val formWrites: Write[NCARegistered, UrlFormEncoded] = Write {

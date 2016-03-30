@@ -5,7 +5,6 @@ import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
 import play.api.libs.json.{JsError, JsSuccess, Reads}
-import play.api.data.mapping.GenericRules
 
 import scala.collection.TraversableLike
 
@@ -46,6 +45,18 @@ trait MappingUtils {
 
     implicit def toReadsFailure[A](f: ValidationError): Reads[A] =
       Reads { _ => JsError(f) }
+
+    implicit class RichRule[I, O](rule: Rule[I, O]) {
+      def withMessage(message: String*): Rule[I, O] =
+        Rule { d =>
+          rule.validate(d).fail.map {
+            _.map {
+              case (p, errs) =>
+                p -> (message map { m => ValidationError(m) })
+            }
+          }
+        }
+    }
   }
 
   object JsConstraints {
@@ -55,6 +66,8 @@ trait MappingUtils {
     def nonEmpty[M](implicit reads: Reads[M], p: M => TraversableLike[_, M]) =
       filter[M](ValidationError("error.required"))(_.isEmpty)
   }
+
+
 }
 
 object MappingUtils extends MappingUtils

@@ -18,11 +18,10 @@ object VATRegistered {
 
   implicit val formRule: Rule[UrlFormEncoded, VATRegistered] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "registeredForVAT").read[Option[Boolean]] flatMap {
-      case Some(true) =>
+    (__ \ "registeredForVAT").read[Boolean].withMessage("error.required.atb.registered.for.vat") flatMap {
+      case true =>
         (__ \ "vrnNumber").read(vrnType) fmap VATRegisteredYes.apply
-      case Some(false) => Rule.fromMapping { _ => Success(VATRegisteredNo) }
-      case _ => (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
+      case false => Rule.fromMapping { _ => Success(VATRegisteredNo) }
     }
   }
 

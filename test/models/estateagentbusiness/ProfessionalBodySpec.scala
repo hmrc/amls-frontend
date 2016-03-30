@@ -28,15 +28,37 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
         be(Success(ProfessionalBodyYes("details")))
     }
 
+    "fail to validate missing mandatory value" in {
+
+      ProfessionalBody.formRule.validate(Map.empty) must
+        be(Failure(Seq(
+          (Path \ "penalised") -> Seq(ValidationError("error.required.eab.penalised.by.professional.body"))
+        )))
+    }
+
     "fail to validate given an `Yes` with no value" in {
 
       val data = Map(
-        "penalised" -> Seq("true")
+        "penalised" -> Seq("true"),
+        "professionalBody" -> Seq("")
       )
 
       ProfessionalBody.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "professionalBody") -> Seq(ValidationError("error.required"))
+          (Path \ "professionalBody") -> Seq(ValidationError("error.required.eab.info.about.penalty "))
+        )))
+    }
+
+    "fail to validate given an `Yes` with max value" in {
+
+      val data = Map(
+        "penalised" -> Seq("true"),
+        "professionalBody" -> Seq("zzxczxczx"*50)
+      )
+
+      ProfessionalBody.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.eab.professional.body.penalty"))
         )))
     }
 

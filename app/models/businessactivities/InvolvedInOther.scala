@@ -17,17 +17,16 @@ object InvolvedInOther {
   import utils.MappingUtils.Implicits._
 
   val OtherBusinessActivityType = notEmptyStrip compose
-                                  customNotEmpty("error.required.ba.enter.text") compose
-                                  maxLength(maxOtherBusinessActivityTypeLength) //TODO need message for max length
+                                  notEmpty.withMessage("error.required.ba.involved.in.other.text") compose
+                                  maxLength(maxOtherBusinessActivityTypeLength).withMessage("error.invalid.ba.involved.in.other.text")
 
 
   implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "involvedInOther").read[Option[Boolean]] flatMap {
-      case Some(true) =>
+    (__ \ "involvedInOther").read[Boolean].withMessage("error.required.ba.involved.in.other") flatMap {
+      case true =>
         (__ \ "details").read(OtherBusinessActivityType) fmap InvolvedInOtherYes.apply
-      case Some(false) => Rule.fromMapping { _ => Success(InvolvedInOtherNo) }
-      case _ => (Path \ "involvedInOther") -> Seq(ValidationError("error.required.ba.involved.in.other"))
+      case false => Rule.fromMapping { _ => Success(InvolvedInOtherNo) }
     }
   }
 

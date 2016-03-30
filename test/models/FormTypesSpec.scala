@@ -59,31 +59,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-  "validateAddressType" must {
-
-    "successfully validate" in {
-
-      addressType.validate("177A") must
-        be(Success("177A"))
-    }
-
-    "fail to validate an empty string" in {
-
-      addressType.validate("") must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required.address.line"))
-        )))
-    }
-
-    "fail to validate a string longer than 35" in {
-
-      addressType.validate("a" * 36) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength))
-        )))
-    }
-  }
-
   "validPostCodeType" must {
 
     "successfully validate" in {
@@ -104,32 +79,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       postcodeType.validate("a" * 11) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.invalid.postcode", FormTypes.maxPostCodeTypeLength))
-        )))
-    }
-  }
-
-  "validCountryType" must {
-
-    "successfully validate" in {
-
-      countryType.validate("IN") must
-        be(Success("IN"))
-    }
-
-    "fail to validate an empty string" in {
-
-      countryType.validate("") must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required.country"))
-        )))
-    }
-
-    "fail to validate a string longer than 3" in {
-
-      countryType.validate("a" * 3) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
+          Path -> Seq(ValidationError("error.invalid.postcode"))
         )))
     }
   }
@@ -146,7 +96,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       vrnType.validate("") must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.required.vat.number"))
         )))
     }
 
@@ -154,7 +104,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       vrnType.validate("1" * 10) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 9))
+          Path -> Seq(ValidationError("error.invalid.vat.number"))
         )))
     }
   }
@@ -231,7 +181,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate a string longer than 120" in {
       premisesTradingNameType.validate("a" * 121) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 120))
+          Path -> Seq(ValidationError("error.invalid.tp.trading.name"))
         )))
     }
   }
@@ -287,31 +237,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "successfully serialise" in {
       localDateWrite.writes(model) must be(data)
-    }
-  }
-
-  "redressOtherType" must {
-
-    "successfully validate" in {
-
-      redressOtherType.validate("foobar") must
-        be(Success("foobar"))
-    }
-
-    "fail to validate an empty string" in {
-
-      redressOtherType.validate("") must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
-        )))
-    }
-
-    "fail to validate a string longer than 255" in {
-
-      redressOtherType.validate("a" * 256) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxRedressOtherTypeLength))
-        )))
     }
   }
 
@@ -388,23 +313,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxNonUKBankAccountNumberLength)))))
     }
 
-  }
-
-  "CountryType" must {
-    "validate country name supplied" in {
-      countryType.validate("GP") must be(Success("GP"))
-    }
-
-    "fail validation if country is longer than the permissible length" in {
-      countryType.validate("test") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.invalid.country", countryRegex))))
-      )
-    }
-
-    "fail validation if country containts numbers" in {
-      countryType.validate("12") mustBe Failure(Seq(Path -> Seq(ValidationError("error.invalid.country", countryRegex))))
-
-    }
   }
 
   "For the Declaration Add Persons 'name' fields" must {

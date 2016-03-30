@@ -68,12 +68,12 @@ object WhoIsYourAccountant {
       Json.toJson(data.alsoDealsWithTax).as[JsObject]
   }
 
-  implicit val jsonReads : Reads[WhoIsYourAccountant] = (
+  implicit val jsonReads : Reads[WhoIsYourAccountant] =
     ((__ \ "accountantsName").read[String] and
      (__ \ "accountantsTradingName").read[Option[String]] and
-     (__).read[AccountantsAddress] and
-     (__).read[DoesAccountantAlsoDealWithTax])(WhoIsYourAccountant.apply _)
-    )
+     __.read[AccountantsAddress] and
+     __.read[DoesAccountantAlsoDealWithTax])(WhoIsYourAccountant.apply _)
+
 
   implicit val formWrites = Write[WhoIsYourAccountant, UrlFormEncoded] {
     data: WhoIsYourAccountant =>
@@ -96,7 +96,7 @@ object WhoIsYourAccountant {
           "addressLine2" -> Seq(address.addressLine2),
           "addressLine3" -> address.addressLine3.toSeq,
           "addressLine4" -> address.addressLine4.toSeq,
-          "country" -> Seq(address.country)
+          "country" -> Seq(address.country.toString)
         )
       }) ++ DoesAccountantAlsoDealWithTax.formWrites.writes(data.alsoDealsWithTax)
     }

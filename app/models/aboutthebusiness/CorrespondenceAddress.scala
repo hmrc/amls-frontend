@@ -61,26 +61,25 @@ object CorrespondenceAddress {
 
       val nameType = maxLength(140)
 
-      (__ \ "isUK").read[Option[Boolean]] flatMap {
-        case Some(true) => (
-            (__ \ "yourName").read(customNotEmpty("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(customNotEmpty("error.required.name.of.business") compose nameType) ~
-            (__ \ "addressLine1").read(customNotEmpty("error.required.address.line1") compose validateAddress) ~
-            (__ \ "addressLine2").read(customNotEmpty("error.required.address.line2") compose validateAddress) ~
+      (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
+        case true => (
+            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose nameType) ~
+            (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
             (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "postCode").read(postcodeType)
           )(UKCorrespondenceAddress.apply _)
-        case Some(false) => (
-            (__ \ "yourName").read(customNotEmpty("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(customNotEmpty("error.required.name.of.business") compose nameType) ~
-            (__ \ "addressLineNonUK1").read(customNotEmpty("error.required.address.line1") compose validateAddress) ~
-            (__ \ "addressLineNonUK2").read(customNotEmpty("error.required.address.line2") compose validateAddress) ~
+        case false => (
+            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose nameType) ~
+            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
+            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
               (__ \ "country").read[Country]
           )(NonUKCorrespondenceAddress.apply _)
-        case _ => (Path \ "isUK") -> Seq(ValidationError("error.required.atb.uk.or.overseas"))
       }
     }
 
@@ -121,7 +120,7 @@ object CorrespondenceAddress {
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
         (__ \ "correspondencePostCode").read[String])(UKCorrespondenceAddress.apply _) map identity[CorrespondenceAddress]
-      ) orElse (
+      ) orElse
       ((__ \ "yourName").read[String] and
         (__ \ "businessName").read[String] and
         (__ \ "correspondenceAddressLine1").read[String] and
@@ -129,7 +128,7 @@ object CorrespondenceAddress {
         (__ \ "correspondenceAddressLine3").readNullable[String] and
         (__ \ "correspondenceAddressLine4").readNullable[String] and
         (__ \ "correspondenceCountry").read[Country])(NonUKCorrespondenceAddress.apply _)
-      )
+
   }
 
   implicit val jsonWrites: Writes[CorrespondenceAddress] = {

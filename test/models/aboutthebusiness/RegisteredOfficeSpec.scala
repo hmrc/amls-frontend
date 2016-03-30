@@ -58,7 +58,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
       RegisteredOffice.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "isUK") -> Seq(ValidationError("error.required.atb.confirm.office"))
+          (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
         )))
     }
 
@@ -90,10 +90,10 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
       RegisteredOffice.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength)),
-          (Path \ "addressLine3") -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength)),
-          (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line", FormTypes.maxAddressLength)),
-          (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode", FormTypes.maxPostCodeTypeLength))
+          (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line")),
+          (Path \ "addressLine3") -> Seq(ValidationError("error.max.length.address.line")),
+          (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line")),
+          (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
         )))
     }
 

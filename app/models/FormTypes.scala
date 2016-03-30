@@ -7,22 +7,19 @@ import play.api.data.mapping.forms.UrlFormEncoded
 object FormTypes {
 
   import play.api.data.mapping.forms.Rules._
+  import utils.MappingUtils.Implicits._
 
   val maxNameTypeLength = 35
   val maxDescriptionTypeLength = 140
   val maxAddressLength = 35
   val maxPostCodeTypeLength = 10
-  val maxCountryTypeLength = 2
-  val maxPrevMLRRegNoLength = 15
   val maxVRNTypeLength = 9
   val maxPhoneNumberLength = 30
   val maxEMailLength = 100
-  val maxPenalisedTypeLength = 255
-  val maxAgentNameLength = 140
   val minLengthDayOrMonth = 1
   val maxLengthDayOrMonth = 2
   val yearLength = 4
-  val maxRedressOtherTypeLength = 255
+
   val maxLengthPremisesTradingName = 120
   val maxOtherBusinessActivityTypeLength = 255
 
@@ -30,19 +27,11 @@ object FormTypes {
   val maxIBANLength = 34
   val maxNonUKBankAccountNumberLength = 40
   val maxUKBankAccountNumberLength = 8
-
-  val maxFranchiseName = 140
+  val maxSortCodeLength = 6
   val maxEmployeeLength = 11
   val minAccountantRefNoTypeLength = 11
   val maxRoleWithinBusinessOtherType = 255
   val maxTypeOfBusinessLength = 40
-
-
-  def customNotEmpty(message:String) = validateWith[String](message) { !_.isEmpty }
-
-  def customMaxLength(l: Int, message:String) = validateWith[String](message, l) { _.size <= l }
-
-  def customRegex(regex: scala.util.matching.Regex, message:String) =  validateWith[String](message, regex) { regex.unapplySeq(_: String).isDefined }
 
   val notEmptyStrip = Rule.zero[String] fmap { _.trim }
 
@@ -51,17 +40,11 @@ object FormTypes {
   val descriptionType = notEmptyStrip compose notEmpty compose maxLength(maxDescriptionTypeLength)
 
   val vrnTypeRegex = "^[0-9]{9}$".r
-  val vrnType = customNotEmpty("error.required.vat.number") compose customRegex(vrnTypeRegex, "error.invalid.vat.number")
+  val vrnType = notEmpty.withMessage("error.required.vat.number") compose pattern(vrnTypeRegex).withMessage("error.invalid.vat.number")
 
-  val validateAddress = customMaxLength(maxAddressLength, "error.max.length.address.line")
+  val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line")
 
-  val addressType = customNotEmpty("error.required.address.line") compose validateAddress
-
-  val postcodeType = customNotEmpty("error.required.postcode")  compose customMaxLength(maxPostCodeTypeLength, "error.invalid.postcode")
-
-  val countryRegex = "^[a-zA-Z_]{2}+$".r
-
-  val countryType = customNotEmpty("error.required.country") compose customRegex(countryRegex, "error.invalid.country")
+  val postcodeType = notEmpty.withMessage("error.required.postcode")  compose maxLength(maxPostCodeTypeLength).withMessage("error.invalid.postcode")
 
   val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
 
@@ -69,19 +52,17 @@ object FormTypes {
 
   val emailType = notEmpty compose maxLength(maxEMailLength) compose pattern(emailRegex)
 
-  val penalisedType = notEmpty compose maxLength(maxPenalisedTypeLength)
+  val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
+  val dayType = notEmpty.withMessage("error.required.tp.date") compose pattern(dayRegex).withMessage("error.invalid.tp.date")
 
-  val agentNameType = notEmpty compose maxLength(maxAgentNameLength)
+  val monthRegex = "(0?[1-9]|1[012])".r
+  val monthType =  notEmpty.withMessage("error.required.tp.month") compose pattern(monthRegex).withMessage("error.invalid.tp.date")
 
-  val dayType = notEmpty compose minLength(minLengthDayOrMonth) compose maxLength(maxLengthDayOrMonth) compose pattern("(0?[1-9]|[12][0-9]|3[01])".r)
+  val yearRegex = "((19|20)\\d\\d)".r
+  val yearType =  notEmpty.withMessage("error.required.tp.year") compose pattern(yearRegex).withMessage("error.invalid.tp.date")
 
-  val monthType = notEmpty compose minLength(minLengthDayOrMonth) compose maxLength(maxLengthDayOrMonth) compose pattern("(0?[1-9]|1[012])".r)
-
-  val yearType = notEmpty compose minLength(yearLength) compose maxLength(yearLength) compose pattern("((19|20)\\d\\d)".r)
-
-  val redressOtherType = notEmpty compose maxLength(maxRedressOtherTypeLength)
-
-  val premisesTradingNameType = maxLength(maxLengthPremisesTradingName)
+  val premisesTradingNameType = notEmpty.withMessage("error.required.tp.trading.name") compose
+    maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name")
 
   val localDateRule: Rule[UrlFormEncoded, LocalDate] =
     From[UrlFormEncoded] { __ =>
@@ -113,8 +94,6 @@ object FormTypes {
   val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength) compose pattern("^[0-9a-zA-Z_]+$".r)
 
   val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern("^[0-9a-zA-Z_]+$".r)
-
-
 
   val accountantRefNoType = notEmpty compose maxLength(minAccountantRefNoTypeLength) compose minLength(minAccountantRefNoTypeLength)
 

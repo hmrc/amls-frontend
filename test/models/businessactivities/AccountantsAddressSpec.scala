@@ -1,6 +1,6 @@
 package models.businessactivities
 
-import models.FormTypes
+import models.{Country, FormTypes}
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Success, Failure, Path}
 import play.api.data.validation.ValidationError
@@ -13,14 +13,13 @@ class AccountantsAddressSpec extends PlaySpec {
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "NE1 7YX"
-  val DefaultCountry = "GP"
+  val DefaultCountry = Country("United Kingdom", "GB")
 
   val NewAddressLine1 = "New Line 1"
   val NewAddressLine2 = "New Line 2"
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
   val NewPostcode = "CR6 5HG"
-  val NewCountry = "MN"
 
   val DefaultUKAddress = UkAccountantsAddress(DefaultAddressLine1,
     DefaultAddressLine2,
@@ -47,7 +46,7 @@ class AccountantsAddressSpec extends PlaySpec {
     "accountantsAddressLine2" -> DefaultAddressLine2,
     "accountantsAddressLine3" -> DefaultAddressLine3,
     "accountantsAddressLine4" -> DefaultAddressLine4,
-    "accountantsAddressCountry" -> DefaultCountry
+    "accountantsAddressCountry" -> DefaultCountry.code
   )
 
   val DefaultUKModel = Map(
@@ -65,7 +64,7 @@ class AccountantsAddressSpec extends PlaySpec {
     "addressLine2" -> Seq(DefaultAddressLine2),
     "addressLine3" -> Seq("Default Line 3"),
     "addressLine4" -> Seq("Default Line 4"),
-    "country" -> Seq(DefaultCountry)
+    "country" -> Seq(DefaultCountry.code)
   )
 
 
@@ -84,7 +83,7 @@ class AccountantsAddressSpec extends PlaySpec {
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
-        "GP"))
+        "United Kingdom"))
     }
 
     "Form validation" must {
@@ -95,7 +94,7 @@ class AccountantsAddressSpec extends PlaySpec {
       "throw error when mandatory fields are missing" in {
         AccountantsAddress.formRule.validate(Map.empty) must be(
           Failure(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required"))
+            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           )))
       }
 
@@ -103,7 +102,7 @@ class AccountantsAddressSpec extends PlaySpec {
         val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
         AccountantsAddress.formRule.validate(model) must be(
           Failure(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.invalid", "Boolean"))
+            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           )))
       }
 
@@ -111,7 +110,7 @@ class AccountantsAddressSpec extends PlaySpec {
         val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
         AccountantsAddress.formRule.validate(model) must be(
           Failure(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.invalid.country", FormTypes.countryRegex))
+            (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
           )))
       }
 

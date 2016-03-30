@@ -4,6 +4,7 @@ import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
+import utils.TraversableValidators._
 
 case class Services(services: Set[Service])
 
@@ -92,13 +93,7 @@ object Services {
    p: Path => RuleLike[UrlFormEncoded, Set[Service]]
   ): Rule[UrlFormEncoded, Services] =
     From[UrlFormEncoded] { __ =>
-      val data = (__ \ "services").read[Set[Service]]
-      data flatMap(f =>
-        if(f.seq.isEmpty){
-          (Path \ "services") -> Seq(ValidationError("error.required"))
-        } else {
-          data fmap Services.apply
-        })
+       (__ \ "services").read(minLength[Set[Service]]("error.required.eab.business.services")) fmap Services.apply
   }
 
   implicit def formWrites

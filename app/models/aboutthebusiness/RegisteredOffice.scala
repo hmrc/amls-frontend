@@ -52,24 +52,23 @@ object RegisteredOffice {
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "isUK").read[Option[Boolean]] flatMap {
-      case Some(true) =>
+    (__ \ "isUK").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") flatMap {
+      case true =>
         (
-          (__ \ "addressLine1").read(customNotEmpty("error.required.address.line1") compose validateAddress) and
-            (__ \ "addressLine2").read(customNotEmpty("error.required.address.line2") compose validateAddress) and
+          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLine3").read(optionR(validateAddress)) and
             (__ \ "addressLine4").read(optionR(validateAddress)) and
             (__ \ "postCode").read(postcodeType)
           ) (RegisteredOfficeUK.apply _)
-      case Some(false) =>
+      case false =>
         (
-          (__ \ "addressLineNonUK1").read(customNotEmpty("error.required.address.line1") compose  validateAddress) and
-            (__ \ "addressLineNonUK2").read(customNotEmpty("error.required.address.line2") compose validateAddress) and
+          (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose  validateAddress) and
+            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) and
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) and
             (__ \ "country").read[Country]
           )(RegisteredOfficeNonUK.apply _)
-      case _ =>(Path \ "isUK") -> Seq(ValidationError("error.required.atb.confirm.office"))
     }
   }
 

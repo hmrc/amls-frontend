@@ -29,21 +29,25 @@ error.required.yourname = Enter your name.
 error.required.vat.number = Enter a VAT registration number.
 error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers
 error.required.name.of.business = Enter the name of the business.
+error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 #TODO
 error.max.length.address.line = Need Message for this
 
-
 # Custom error messages
 error.required.bm.register.service = Select at least one activity that you need to register.
+
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
 error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
 error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
-error.required.atb.uk.or.overseas = Select one option: is this a UK address or an overseas address?
+error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
 error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
 
 error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
-error.required.ba.enter.text = Enter information about what other anti-money laundering activities your business carries out
+error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
+#TODO
+error.invalid.ba.involved.in.other.text = Need Message
+
 error.required.ba.business.turnover = Select how much turnover you expect in the next 12 months.
 error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
 error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
@@ -67,9 +71,45 @@ error.required.ba.select.nca = Select yes or no to the question: has your busine
 error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a formal risk assessment policy and procedure?
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
 error.required.ba.business.use.accountant = Select yes or no to the question: does your business use an accountant for matters relating to money laundering regulations?
-
+error.required.ba.suspicious.activity = Need Message for suspicious.activity
 
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
+error.required.tp.trading.name = Enter a trading name.
+#TODO
+error.invalid.tp.trading.name = Message needed
+error.expected.jodadate.format = Need Message
+
+error.required.tp.date = Enter a date.
+error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
+error.required.tp.month = Enter a month.
+error.invalid.tp.month = Enter a valid month. It must be a number between 1 and 12.
+error.required.tp.year = Enter a year.
+error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
+error.required.tp.residential.address =  Need Message
+error.required.tp.your.business.or.other = Select one option: who uses these premises, your business or another business acting as an agent for your business?
+
+error.required.tp.registered.business.name = Enter your agent’s registered business name.
+#TODO
+error.invalid.tp.registered.business.name = Message Needed
+
+error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
+error.required.tp.select.business.structure = Select your agent’s business structure.
+
+error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
+error.required.eab.which.redress.scheme = Select which redress scheme.
+error.required.eab.redress.scheme.name = Enter the name of the redress scheme
+#TODO
+error.invalid.eab.redress.scheme.name = Need message for max length
+
+error.required.eab.business.services = Select at least one service that your business provides.
+error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
+error.required.eab.info.about.penalty = Enter some information about the penalty received.
+#TODO
+error.invalid.eab.info.about.penalty = Need message for max length
+
+error.required.eab.penalised.by.professional.body = Select yes or no the question: has the business, or anyone in the business, ever been penalised by a professional body?
+#TODO
+error.invalid.eab.professional.body.penalty = = Need message for max length
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary

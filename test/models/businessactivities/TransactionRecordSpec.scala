@@ -68,7 +68,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "name" -> Seq("test"*20)
       )
       TransactionRecord.formRule.validate(model) must
-        be(Failure(List(( Path \ "name", Seq(ValidationError("error.max.length.ba.software.package.name", TransactionRecord.maxSoftwareNameLength))))))
+        be(Failure(List(( Path \ "name", Seq(ValidationError("error.max.length.ba.software.package.name"))))))
     }
 
     "fail validation when none of the check boxes selected" in {

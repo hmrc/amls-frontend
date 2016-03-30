@@ -82,6 +82,8 @@ class PenalisedUnderEstateAgentsActControllerSpec extends PlaySpec with OneServe
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[name=penalisedUnderEstateAgentsActDetails]").`val` must be("Do not remember why penalised before")
+      document.select("a[href=#penalisedUnderEstateAgentsAct]").html() must include(Messages("error.required.eab.penalised.under.act"))
+
     }
   }
 

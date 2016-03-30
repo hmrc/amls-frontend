@@ -24,16 +24,16 @@ object ExpectedBusinessTurnover {
   implicit val formRule: Rule[UrlFormEncoded, ExpectedBusinessTurnover] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "expectedBusinessTurnover").read[Option[String]] flatMap {
-      case Some("01") => First
-      case Some("02") => Second
-      case Some("03") => Third
-      case Some("04")=> Fourth
-      case Some("05") => Fifth
-      case Some("06") => Sixth
-      case Some("07") => Seventh
+    (__ \ "expectedBusinessTurnover").read[String].withMessage("error.required.ba.business.turnover") flatMap {
+      case "01" => First
+      case "02" => Second
+      case "03" => Third
+      case "04" => Fourth
+      case "05" => Fifth
+      case "06" => Sixth
+      case "07" => Seventh
       case _ =>
-        (Path \ "expectedBusinessTurnover") -> Seq(ValidationError("error.required.ba.business.turnover"))
+        (Path \ "expectedBusinessTurnover") -> Seq(ValidationError("error.invalid"))
     }
   }
 

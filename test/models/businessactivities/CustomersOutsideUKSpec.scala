@@ -71,7 +71,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.invalid.country"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
         )))
     }
 
@@ -81,7 +81,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.invalid.country"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
         )))
     }
 

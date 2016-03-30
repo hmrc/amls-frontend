@@ -29,7 +29,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "fail to validate on empty Map" in {
 
       Services.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required")))))
+        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required.eab.business.services")))))
 
     }
 
