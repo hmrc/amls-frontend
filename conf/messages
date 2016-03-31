@@ -480,3 +480,8 @@ responsiblepeople.whatyouneed.line_7 = passport number
 responsiblepeople.whatyouneed.line_8 = national insurance number
 responsiblepeople.whatyouneed.line_9 = VAT number and Self Assessment number
 responsiblepeople.whatyouneed.line_10 = details of relevant experience and training
+
+responsiblepeople.addperson.title = What''s the name of this responsible person?
+responsiblepeople.addperson.firstname = First name
+responsiblepeople.addperson.middlename = Middle name (optional)
+responsiblepeople.addperson.lastname = Last name
