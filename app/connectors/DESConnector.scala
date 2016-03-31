@@ -1,7 +1,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.{SubscriptionRequest, SubscriptionResponse}
+import models.{SubscriptionResponse, SubscriptionRequest}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http._
 
