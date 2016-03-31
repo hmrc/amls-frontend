@@ -1,0 +1,31 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+    s"""${f("corporationTaxReference").id}-fieldset"""
+}
+
+@main(
+title = Messages("aboutthebusiness.registeredforcorporationtax.title")
+) {
+    @heading("aboutthebusiness.registeredforcorporationtax.title", "summary.aboutbusiness")
+
+    @form(f, controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.post(edit)) {
+
+        @inlineRadioGroup(f("registeredForCorporationTax")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("registeredForCorporationTax"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("registeredForCorporationTax"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("corporationTaxReference"),
+                        "aboutthebusiness.registeredforcorporationtax.taxReference",
+                        hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+                        bold = false)
+            }
+        }
+
+        @submit(edit)
+    }
+}

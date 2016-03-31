@@ -37,7 +37,7 @@ object FormTypes {
   val minAccountantRefNoTypeLength = 11
   val maxRoleWithinBusinessOtherType = 255
   val maxTypeOfBusinessLength = 40
-
+  val maxCorporationTaxTypeLength = 10
 
   val notEmptyStrip = Rule.zero[String] fmap { _.trim } compose notEmpty
 
@@ -48,6 +48,8 @@ object FormTypes {
   val prevMLRRegNoType = notEmpty compose maxLength(maxPrevMLRRegNoLength) compose pattern("^([0-9]{8}|[0-9]{15})$".r)
 
   val vrnType = notEmpty compose maxLength(maxVRNTypeLength) compose pattern("^[0-9]{9}$".r)
+
+  val corporationTaxType = notEmpty compose maxLength(maxCorporationTaxTypeLength) compose pattern("^[0-9]{10}$".r)
 
   val addressType = notEmpty compose maxLength(maxAddressLength)
 

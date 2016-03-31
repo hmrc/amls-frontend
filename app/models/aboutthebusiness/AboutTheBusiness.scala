@@ -6,6 +6,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class AboutTheBusiness(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
                              vatRegistered: Option[VATRegistered] = None,
+                             corporationTaxRegistered: Option[CorporationTaxRegistered] = None,
                              contactingYou: Option[ContactingYou] = None,
                              registeredOffice: Option[RegisteredOffice] = None,
                              correspondenceAddress: Option[CorrespondenceAddress] = None
@@ -16,6 +17,9 @@ case class AboutTheBusiness(
 
   def vatRegistered(v: VATRegistered): AboutTheBusiness =
     this.copy(vatRegistered = Some(v))
+
+  def corporationTaxRegistered(c: CorporationTaxRegistered): AboutTheBusiness =
+    this.copy(corporationTaxRegistered = Some(c))
 
   def registeredOffice(v: RegisteredOffice): AboutTheBusiness =
     this.copy(registeredOffice = Some(v))
@@ -32,7 +36,7 @@ case class AboutTheBusiness(
   def isComplete: Boolean =
     this match {
       case AboutTheBusiness(
-        Some(_), Some(_), Some(_), Some(_), _
+        Some(_), Some(_), Some(_), Some(_), Some(_), _
       ) => true
       case _ => false
     }
@@ -46,7 +50,7 @@ object AboutTheBusiness {
     cache.getEntry[AboutTheBusiness](key).fold(notStarted) {
       case model if model.isComplete =>
         Section(messageKey, Completed, controllers.aboutthebusiness.routes.SummaryController.get())
-      case AboutTheBusiness(None, None, None, _, None) =>
+      case AboutTheBusiness(None, None, None, None, _, None) =>
         notStarted
       case _ =>
         Section(messageKey, Started, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
@@ -60,6 +64,7 @@ object AboutTheBusiness {
   implicit val reads: Reads[AboutTheBusiness] = (
     __.read[Option[PreviouslyRegistered]] and
       __.read[Option[VATRegistered]] and
+      __.read[Option[CorporationTaxRegistered]] and
       __.read[Option[ContactingYou]] and
       __.read[Option[RegisteredOffice]] and
       __.read[Option[CorrespondenceAddress]]
@@ -70,6 +75,7 @@ object AboutTheBusiness {
       Seq(
         Json.toJson(model.previouslyRegistered).asOpt[JsObject],
         Json.toJson(model.vatRegistered).asOpt[JsObject],
+        Json.toJson(model.corporationTaxRegistered).asOpt[JsObject],
         Json.toJson(model.contactingYou).asOpt[JsObject],
         Json.toJson(model.registeredOffice).asOpt[JsObject],
         Json.toJson(model.correspondenceAddress).asOpt[JsObject]

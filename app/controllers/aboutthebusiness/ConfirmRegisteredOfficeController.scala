@@ -19,7 +19,7 @@ trait ConfirmRegisteredOfficeController extends BaseController {
         registeredOffice <-
           dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield registeredOffice match {
-        case Some(AboutTheBusiness(_, _, _, Some(data), _)) =>
+        case Some(AboutTheBusiness(_, _, _, _, Some(data), _)) =>
           Ok(confirm_registered_office_or_main_place(EmptyForm, data))
         case _ =>
           Redirect(routes.RegisteredOfficeController.get())
@@ -34,7 +34,7 @@ trait ConfirmRegisteredOfficeController extends BaseController {
             aboutTheBusiness <-
             dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
           } yield aboutTheBusiness match {
-            case Some(AboutTheBusiness(_, _, _, Some(registeredOffice), _)) =>
+            case Some(AboutTheBusiness(_, _, _, _, Some(registeredOffice), _)) =>
               BadRequest(confirm_registered_office_or_main_place(f, registeredOffice))
             case _ =>
               Redirect(routes.RegisteredOfficeController.get(edit))

@@ -18,7 +18,7 @@ trait CorrespondenceAddressController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_, _, _, _, Some(data))) =>
+        case Some(AboutTheBusiness(_, _, _, _, _, Some(data))) =>
           Ok(correspondence_address(Form2[CorrespondenceAddress](data), edit))
         case _ =>
           Ok(correspondence_address(Form2[CorrespondenceAddress](initialiseWithUK), edit))

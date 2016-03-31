@@ -71,6 +71,21 @@
 
     <table>
         <tr>
+            <th class="summary-title">@Messages("aboutthebusiness.registeredforcorporationtax.title")</th>
+            <td colspan="2"><a href="@controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.corporationTaxRegistered.map {
+                case CorporationTaxRegisteredNo => { @Messages("lbl.na") }
+                case CorporationTaxRegisteredYes(v) => { @v }
+                }
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
             <th class="summary-title">@Messages("aboutthebusiness.registeredformlr.title")</th>
             <td colspan="2"><a href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true)">@Messages("button.edit")</a></td>
         </tr>
