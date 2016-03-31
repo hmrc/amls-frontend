@@ -53,9 +53,11 @@ $(function () {
                 }
             });
 
-            $('input[name="' + $self.prop('name') + '"][value!="' + $self.val() + '"]').change(function () {
-                hide();
-            });
+            if ($self.prop('type') != "checkbox") {
+                $('input[name="' + $self.prop('name') + '"][value!="' + $self.val() + '"]').change(function () {
+                    hide();
+                });
+            }
 
             if ($self.prop('checked') === true) {
                 $target.show();

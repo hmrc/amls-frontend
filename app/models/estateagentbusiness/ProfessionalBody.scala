@@ -16,7 +16,7 @@ object ProfessionalBody {
   import utils.MappingUtils.Implicits._
 
   val maxPenalisedTypeLength = 255
-  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty ") compose
+  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") compose
     maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.professional.body.penalty")
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>

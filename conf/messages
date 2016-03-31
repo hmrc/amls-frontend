@@ -109,7 +109,7 @@ error.invalid.eab.info.about.penalty = Need message for max length
 
 error.required.eab.penalised.by.professional.body = Select yes or no the question: has the business, or anyone in the business, ever been penalised by a professional body?
 #TODO
-error.invalid.eab.professional.body.penalty = = Need message for max length
+error.invalid.eab.professional.body.penalty = Need message for max length
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary
