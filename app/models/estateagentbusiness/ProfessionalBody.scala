@@ -17,7 +17,7 @@ object ProfessionalBody {
 
   val maxPenalisedTypeLength = 255
   val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") compose
-    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.professional.body.penalty")
+    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._

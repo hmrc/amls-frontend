@@ -58,7 +58,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
 
       ProfessionalBody.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.eab.professional.body.penalty"))
+          (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.eab.info.about.penalty"))
         )))
     }
 

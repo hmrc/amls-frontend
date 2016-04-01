@@ -19,10 +19,6 @@ object FormTypes {
   val minLengthDayOrMonth = 1
   val maxLengthDayOrMonth = 2
   val yearLength = 4
-
-  val maxLengthPremisesTradingName = 120
-  val maxOtherBusinessActivityTypeLength = 255
-
   val maxAccountName = 40
   val maxIBANLength = 34
   val maxNonUKBankAccountNumberLength = 40
@@ -61,8 +57,7 @@ object FormTypes {
   val yearRegex = "((19|20)\\d\\d)".r
   val yearType =  notEmpty.withMessage("error.required.tp.year") compose pattern(yearRegex).withMessage("error.invalid.tp.date")
 
-  val premisesTradingNameType = notEmpty.withMessage("error.required.tp.trading.name") compose
-    maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name")
+
 
   val localDateRule: Rule[UrlFormEncoded, LocalDate] =
     From[UrlFormEncoded] { __ =>

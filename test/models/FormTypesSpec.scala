@@ -171,21 +171,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
-  "premisesTradingNameType" must {
-
-    "successfully validate" in {
-      premisesTradingNameType.validate("asdf") must
-        be(Success("asdf"))
-    }
-
-    "fail to validate a string longer than 120" in {
-      premisesTradingNameType.validate("a" * 121) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.invalid.tp.trading.name"))
-        )))
-    }
-  }
-
   "localDateRule" must {
 
     import org.joda.time.LocalDate

@@ -16,6 +16,7 @@ object InvolvedInOther {
   import models.FormTypes._
   import utils.MappingUtils.Implicits._
 
+  val maxOtherBusinessActivityTypeLength = 255
   val OtherBusinessActivityType = notEmptyStrip compose
                                   notEmpty.withMessage("error.required.ba.involved.in.other.text") compose
                                   maxLength(maxOtherBusinessActivityTypeLength).withMessage("error.invalid.ba.involved.in.other.text")
