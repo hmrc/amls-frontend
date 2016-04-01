@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_])(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @target = @{
     s"""${f("other").id}-fieldset"""
@@ -14,7 +14,7 @@
 
     @heading("responsiblepeople.addperson.title", "summary.responsiblepeople")
 
-    @form(f, controllers.responsiblepeople.routes.AddPersonController.post()) {
+    @form(f, controllers.responsiblepeople.routes.AddPersonController.post(index, edit)) {
 
         @input(
             field = f("firstName"),

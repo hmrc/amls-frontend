@@ -3,30 +3,31 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.AddPerson
+import forms.{EmptyForm, Form2, InvalidForm}
+import models.responsiblepeople.{AddPerson, ResponsiblePeople}
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-trait AddPersonController extends BaseController {
+trait AddPersonController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get() = Authorised.async {
+  def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[AddPerson](AddPerson.key) map {
-        case Some(addPerson) =>
-          Ok(views.html.responsiblepeople.add_person(Form2[AddPerson](addPerson)))
+      getData[ResponsiblePeople](index) map {
+        case Some(ResponsiblePeople(Some(data))) =>
+          Ok(views.html.responsiblepeople.add_person(Form2[AddPerson](data), edit, index))
         case _ =>
-          Ok(views.html.responsiblepeople.add_person(EmptyForm))
+          Ok(views.html.responsiblepeople.add_person(EmptyForm, edit, index))
       }
   }
 
-  def post() = Authorised.async {
+  def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.responsiblepeople.add_person(f)))
+          Future.successful(BadRequest(views.html.responsiblepeople.add_person(f, edit, index)))
       }
     }
   }

@@ -132,10 +132,6 @@ POST        /business-activities/accountant-details     controllers.businessacti
 
 GET         /business-activities/check-your-answers      controllers.businessactivities.SummaryController.get()
 
-GET         /responsible-people/your-name                controllers.responsiblepeople.AddPersonController.get()
-POST        /responsible-people/your-name                controllers.responsiblepeople.AddPersonController.post()
-
-
 GET         /declaration/add-person                     controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                     controllers.declaration.AddPersonController.post()
 
@@ -143,4 +139,7 @@ GET         /declaration/declaration                    controllers.declaration.
 
 GET         /confirmation                               controllers.ConfirmationController.get()
 
-GET         /responsible-people/index                  controllers.responsiblepeople.WhatYouNeedController.get()
+GET         /responsible-people/index                   controllers.responsiblepeople.WhatYouNeedController.get()
+
+GET         /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)

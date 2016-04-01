@@ -79,6 +79,52 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       document.select("input[name=lastName]").`val` must be("Doe")
     }
 
+    "must pass on post with all the mandatory parameters supplied" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "firstName" -> "John",
+        "lastName" -> "Doe"
+      )
+
+      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = addPersonController.post()(requestWithParams)
+      status(result) must be(SEE_OTHER)
+    }
+
+    "must fail on post if first name not supplied" in new Fixture {
+
+      val firstNameMissingInRequest = request.withFormUrlEncodedBody(
+        "lastName" -> "Doe"
+      )
+
+      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = addPersonController.post()(firstNameMissingInRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#firstName]").html() must include("This field is required")
+    }
+
+    "must fail on post if last name not supplied" in new Fixture {
+
+      val lastNameMissingInRequest = request.withFormUrlEncodedBody(
+        "firstName" -> "John"
+      )
+
+      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = addPersonController.post()(lastNameMissingInRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#lastName]").html() must include("This field is required")
+    }
+
   }
 
 }
