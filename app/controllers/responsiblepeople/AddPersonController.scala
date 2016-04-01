@@ -3,7 +3,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{AddPerson, ResponsiblePeople}
 import utils.RepeatingSection
 
@@ -28,6 +28,14 @@ trait AddPersonController extends RepeatingSection with BaseController {
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.responsiblepeople.add_person(f, edit, index)))
+        case ValidForm(_, data) =>
+          for {
+          _ <- updateData[ResponsiblePeople](index) {
+            case _ => Some(ResponsiblePeople(Some(data)))
+          }
+        } yield {
+            Redirect(routes.AddPersonController.get(index, edit))
+        }
       }
     }
   }
