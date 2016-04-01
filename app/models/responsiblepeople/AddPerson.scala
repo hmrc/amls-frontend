@@ -46,7 +46,6 @@ object AddPerson {
 
   }
 
-
   implicit val jsonWrites: Writes[AddPerson] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Writes._
