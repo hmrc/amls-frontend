@@ -480,3 +480,6 @@ responsiblepeople.whatyouneed.line_7 = passport number
 responsiblepeople.whatyouneed.line_8 = national insurance number
 responsiblepeople.whatyouneed.line_9 = VAT number and Self Assessment number
 responsiblepeople.whatyouneed.line_10 = details of relevant experience and training
+
+responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
+responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number

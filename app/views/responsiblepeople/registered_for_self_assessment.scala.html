@@ -1,0 +1,30 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+s"""${f("utrNumber").id}-fieldset"""
+}
+
+@main(
+title = Messages("responsiblepeople.registeredforselfassessment.title")
+)  {
+
+@heading("responsiblepeople.registeredforselfassessment.title", "summary.responsiblepeople")
+
+
+    @form(f, controllers.responsiblepeople.routes.WhatYouNeedController.get()) {
+
+        @inlineRadioGroup(f("selfAssessment")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("selfAssessment"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("selfAssessment"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("utrNumber"), "responsiblepeople.registeredforselfassessment.lbl.utrnumber", bold = false)
+            }
+        }
+
+    @submit(edit)
+    }
+}
