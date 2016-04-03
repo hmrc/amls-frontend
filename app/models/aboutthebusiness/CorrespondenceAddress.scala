@@ -59,12 +59,13 @@ object CorrespondenceAddress {
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
 
-      val nameType = maxLength(140)
+      val nameType = maxLength(140).withMessage("error.invalid.yourname")
+      val businessNameType =  maxLength(120).withMessage("error.invalid.name.of.business")
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
             (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose businessNameType) ~
             (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
             (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
@@ -73,7 +74,7 @@ object CorrespondenceAddress {
           )(UKCorrespondenceAddress.apply _)
         case false => (
             (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose businessNameType) ~
             (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
