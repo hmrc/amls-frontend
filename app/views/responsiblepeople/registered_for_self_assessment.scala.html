@@ -14,7 +14,7 @@ title = Messages("responsiblepeople.registeredforselfassessment.title")
 @heading("responsiblepeople.registeredforselfassessment.title", "summary.responsiblepeople")
 
 
-    @form(f, controllers.responsiblepeople.routes.WhatYouNeedController.get()) {
+    @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(edit)) {
 
         @inlineRadioGroup(f("saRegistered")) {
             @legend("TODO", jsHidden = true)
