@@ -1,10 +1,11 @@
 package services
 
 import connectors.GovernmentGatewayConnector
-import models.governmentgateway.{EnrolmentResponse, EnrolmentRequest}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import models.governmentgateway.{EnrolmentRequest, EnrolmentResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import play.api.http.Status.OK
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait GovernmentGatewayService {
 
@@ -13,12 +14,14 @@ trait GovernmentGatewayService {
   def enrol
   (mlrRefNo: String, safeId: String)
   (implicit
-   hc : HeaderCarrier
-  ): Future[EnrolmentResponse] =
-    ggConnector.enrol(EnrolmentRequest(
-      mlrRefNo = mlrRefNo,
-      safeId = safeId
-    ))
+   hc: HeaderCarrier,
+   ec: ExecutionContext
+  ): Future[HttpResponse] =
+    Future.successful(HttpResponse(OK))
+//    ggConnector.enrol(EnrolmentRequest(
+//      mlrRefNo = mlrRefNo,
+//      safeId = safeId
+//    ))
 }
 
 object GovernmentGatewayService extends GovernmentGatewayService {

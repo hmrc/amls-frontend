@@ -17,7 +17,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -35,12 +36,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
-    val enrolmentResponse = EnrolmentResponse(
-      serviceName = "",
-      state = "",
-      friendlyName = "",
-      identifiersForDisplay = Seq.empty
-    )
+    val enrolmentResponse = HttpResponse(OK)
 
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",
@@ -102,7 +98,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
       } thenReturn Future.successful(subscriptionResponse)
 
       when {
-        SubscriptionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId))(any())
+        SubscriptionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId))(any(), any())
       } thenReturn Future.successful(enrolmentResponse)
 
       whenReady (SubscriptionService.subscribe) {
