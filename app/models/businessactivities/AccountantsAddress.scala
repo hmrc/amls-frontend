@@ -61,7 +61,7 @@ object AccountantsAddress {
       case false =>
         (
           (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLine3").read(optionR(validateAddress)) and
             (__ \ "addressLine4").read(optionR(validateAddress)) and
             (__ \ "country").read[Country]
