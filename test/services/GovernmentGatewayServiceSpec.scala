@@ -18,7 +18,7 @@ class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with Scala
     override private[services] val ggConnector = mock[GovernmentGatewayConnector]
   }
 
-  "GovernmentGatewayService" must {
+  "GovernmentGatewayService" ignore {
 
     implicit val hc = HeaderCarrier()
 
