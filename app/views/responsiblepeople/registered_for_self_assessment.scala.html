@@ -16,10 +16,10 @@ title = Messages("responsiblepeople.registeredforselfassessment.title")
 
     @form(f, controllers.responsiblepeople.routes.WhatYouNeedController.get()) {
 
-        @inlineRadioGroup(f("selfAssessment")) {
+        @inlineRadioGroup(f("saRegistered")) {
             @legend("TODO", jsHidden = true)
-            @radio(f("selfAssessment"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("selfAssessment"), "lbl.no", "false")
+            @radio(f("saRegistered"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("saRegistered"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {
                 @input(f("utrNumber"), "responsiblepeople.registeredforselfassessment.lbl.utrnumber", bold = false)
             }

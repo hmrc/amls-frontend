@@ -187,6 +187,31 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "utrType" must {
+
+    "successfully validate" in {
+
+      utrType.validate("1234567890") must
+        be(Success("1234567890"))
+    }
+
+    "fail to validate an empty string" in {
+
+      utrType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate a string longer than 10" in {
+
+      utrType.validate("1" * 11) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.maxLength", 10))
+        )))
+    }
+  }
+
   "phoneNumberType" must {
     "successfully validate" in {
 
