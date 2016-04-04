@@ -1,7 +1,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.{SubscriptionRequest, SubscriptionResponse}
+import models.{SubscriptionResponse, SubscriptionRequest}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http._
 
@@ -16,8 +16,10 @@ trait DESConnector {
   (subscriptionRequest: SubscriptionRequest, safeId:String)
   (implicit
    headerCarrier: HeaderCarrier
-  ): Future[SubscriptionResponse] =
-    http.POST[SubscriptionRequest, SubscriptionResponse](s"$url/$safeId", subscriptionRequest)
+  ): Future[SubscriptionResponse] = {
+    val postUrl = s"$url/$safeId"
+    http.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest)
+  }
 }
 
 object DESConnector extends DESConnector {

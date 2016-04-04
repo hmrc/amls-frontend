@@ -140,4 +140,4 @@ GET         /declaration/declaration                    controllers.declaration.
 
 GET         /confirmation                               controllers.ConfirmationController.get()
 
-
+GET         /responsible-people/index                  controllers.responsiblepeople.WhatYouNeedController.get()

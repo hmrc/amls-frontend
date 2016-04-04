@@ -30,4 +30,9 @@ object ApplicationConfig extends ServicesConfig {
   lazy val businessCustomerUrl = getConfigString("business-customer.url")
 
   lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
+
+  lazy val ggUrl = baseUrl("government-gateway")
+  lazy val enrolUrl = s"$ggUrl/enrol"
+
+  lazy val responsiblePeopleToggle = getConfBool("feature-toggle.responsible-people", false)
 }
