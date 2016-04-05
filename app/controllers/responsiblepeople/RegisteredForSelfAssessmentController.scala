@@ -11,7 +11,7 @@ import scala.concurrent.Future
 
 trait RegisteredForSelfAssessmentController extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+  def dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -25,7 +25,6 @@ trait RegisteredForSelfAssessmentController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-    {
       Form2[SaRegistered](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(registered_for_self_assessment(f, edit)))
@@ -40,12 +39,11 @@ trait RegisteredForSelfAssessmentController extends BaseController {
             case false => Redirect(routes.WhatYouNeedController.get())//Todo
           }
       }
-    }
   }
 }
 
 object RegisteredForSelfAssessmentController extends RegisteredForSelfAssessmentController{
   override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
+  override def dataCacheConnector = DataCacheConnector
 }
 
