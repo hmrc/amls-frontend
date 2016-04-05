@@ -2,7 +2,8 @@ package models.responsiblepeople
 
 import typeclasses.MongoKey
 
-case class ResponsiblePeople(addPerson: Option[AddPerson] = None) {
+case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
+                             saRegistered: Option[SaRegistered] = None ) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
