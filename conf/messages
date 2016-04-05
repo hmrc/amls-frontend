@@ -78,8 +78,7 @@ error.required.ba.suspicious.activity = Need Message for suspicious.activity
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can''t enter more than 120 characters for the trading name.
-#TODO
-error.expected.jodadate.format = Need Message
+error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
 
 error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
