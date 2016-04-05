@@ -6,6 +6,9 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
+
+  def saRegistered(sa: SaRegistered): ResponsiblePeople =
+    this.copy(saRegistered = Some(sa))
 }
 
 object ResponsiblePeople {

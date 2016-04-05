@@ -58,7 +58,6 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
 
     }
 
-    // ignored until the National crime agency page is ready to redirect to
     "on post with valid data" ignore new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -85,7 +84,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerP
       status(result) must be(BAD_REQUEST)
 
       val document: Document  = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include("Invalid value")
+      document.select("span").html() must include(Messages("error.required.ba.suspicious.activity"))
     }
 
     //ignored until summary page is available to redirect to

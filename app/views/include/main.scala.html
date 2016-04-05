@@ -34,12 +34,16 @@
     <meta name="format-detection" content="telephone=no" />
 }
 
+@navLinks = {
+    <li><a href="@appConfig.logoutUrl">Sign out</a></li>
+}
+
 @insideHeader = {
     @uiLayouts.header_nav(
         navTitle = Some(Messages("amls.title")),
         navTitleLink = None,
         showBetaLink = false,
-        navLinks = None
+        navLinks = Some(navLinks)
     )
 }
 

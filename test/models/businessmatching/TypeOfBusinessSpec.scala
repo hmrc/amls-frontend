@@ -21,7 +21,8 @@ class TypeOfBusinessSpec extends PlaySpec {
 
     "throw error when input exceeds max length" in {
       val formInput = Map("typeOfBusiness" -> Seq("sometext"*10))
-      TypeOfBusiness.formRead.validate(formInput) must be(Failure(Seq((Path \ "typeOfBusiness", Seq(ValidationError("error.maxLength", FormTypes.maxTypeOfBusinessLength))))))
+      TypeOfBusiness.formRead.validate(formInput) must be(Failure(Seq((Path \ "typeOfBusiness", Seq(ValidationError("error.maxLength",
+        FormTypes.maxTypeOfBusinessLength))))))
     }
 
     "validate form write" in {

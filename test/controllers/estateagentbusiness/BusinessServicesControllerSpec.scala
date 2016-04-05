@@ -107,9 +107,8 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("This field is required")
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#services]").html() must include("This field is required")
+      document.select("a[href=#services]").html() must include(Messages("error.required.eab.business.services"))
     }
 
 

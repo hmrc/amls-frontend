@@ -139,7 +139,14 @@ GET         /declaration/declaration                    controllers.declaration.
 
 GET         /confirmation                               controllers.ConfirmationController.get()
 
+<<<<<<< HEAD
 GET         /responsible-people/index                   controllers.responsiblepeople.WhatYouNeedController.get()
 
 GET         /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
+=======
+GET         /responsible-people/index                  controllers.responsiblepeople.WhatYouNeedController.get()
+
+GET         /responsible-people/self-assessment              controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(edit: Boolean ?= false)
+POST        /responsible-people/self-assessment              controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(edit: Boolean ?= false)
+>>>>>>> master
