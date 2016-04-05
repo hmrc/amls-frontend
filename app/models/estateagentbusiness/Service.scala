@@ -100,7 +100,7 @@ object Services {
   (implicit
    w: Write[Service, String]
   ) = Write[Services, UrlFormEncoded] { data =>
-    Map("services" -> data.services.toSeq.map(w.writes))
+    Map("services[]" -> data.services.toSeq.map(w.writes))
   }
 
   implicit val formats = Json.format[Services]

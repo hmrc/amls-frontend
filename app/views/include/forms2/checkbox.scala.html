@@ -9,7 +9,7 @@
     <input
             id="@{f.id}-@value"
             type="checkbox"
-            name="@{f.name}[]"
+            name="@{f.name}"
             value="@value"
             @if(f.value.contains(value)) {checked="checked"}
             @if(target.nonEmpty) {data-toggle="@target"}

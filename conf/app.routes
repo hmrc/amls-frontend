@@ -146,3 +146,5 @@ POST        /responsible-people/your-name/:index            controllers.responsi
 
 GET         /responsible-people/self-assessment             controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(edit: Boolean ?= false)
 POST        /responsible-people/self-assessment             controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(edit: Boolean ?= false)
+
+GET         /responsible-people/summary                     controllers.responsiblepeople.SummaryController.get()
