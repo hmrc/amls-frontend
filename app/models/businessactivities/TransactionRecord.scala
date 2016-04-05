@@ -44,7 +44,7 @@ object TransactionRecord {
     From[UrlFormEncoded] { __ =>
       (__ \ "isRecorded").read[Boolean].withMessage("error.required.ba.select.transaction.record") flatMap {
         case true =>
-          (__ \ "transactions").read(minLength[Set[String]]("error.required.ba.atleast.one.transaction.record")) flatMap { z =>
+          (__ \ "transactions").read(minLength[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { z =>
             z.map {
               case "01" => Rule[UrlFormEncoded, TransactionType](_ => Success(Paper))
               case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))

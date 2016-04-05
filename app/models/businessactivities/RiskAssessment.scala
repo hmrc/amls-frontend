@@ -60,7 +60,8 @@ object RiskAssessmentPolicy {
     From[UrlFormEncoded] { __ =>
       (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
           case true =>
-             (__ \ "riskassessments").read(minLength[Set[RiskAssessmentType]]("error.required.ba.risk.assessment.format")) fmap RiskAssessmentPolicyYes.apply
+             (__ \ "riskassessments").
+               read(minLength[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) fmap RiskAssessmentPolicyYes.apply
          case false => Rule.fromMapping { _ => Success(RiskAssessmentPolicyNo) }
       }
 

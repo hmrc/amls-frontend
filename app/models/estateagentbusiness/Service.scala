@@ -93,7 +93,7 @@ object Services {
    p: Path => RuleLike[UrlFormEncoded, Set[Service]]
   ): Rule[UrlFormEncoded, Services] =
     From[UrlFormEncoded] { __ =>
-       (__ \ "services").read(minLength[Set[Service]]("error.required.eab.business.services")) fmap Services.apply
+       (__ \ "services").read(minLength[Set[Service]](1).withMessage("error.required.eab.business.services")) fmap Services.apply
   }
 
   implicit def formWrites

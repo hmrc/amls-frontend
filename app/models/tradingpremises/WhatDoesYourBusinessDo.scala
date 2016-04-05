@@ -13,9 +13,12 @@ import play.api.libs.json.{Json, Reads}
 case class WhatDoesYourBusinessDo(activities : Set[BusinessActivity])
 
 object WhatDoesYourBusinessDo {
+
+  import utils.MappingUtils.Implicits._
+
   implicit val formRule : Rule[UrlFormEncoded, WhatDoesYourBusinessDo] = From[UrlFormEncoded] { __ =>
     (__ \ "activities")
-      .read(minLength[Set[BusinessActivity]]("error.required.tp.activity.your.business.do"))
+      .read(minLength[Set[BusinessActivity]](1).withMessage("error.required.tp.activity.your.business.do"))
       .fmap(WhatDoesYourBusinessDo.apply _)
   }
 
