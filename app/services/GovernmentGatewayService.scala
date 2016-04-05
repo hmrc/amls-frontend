@@ -17,11 +17,10 @@ trait GovernmentGatewayService {
    hc: HeaderCarrier,
    ec: ExecutionContext
   ): Future[HttpResponse] =
-    Future.successful(HttpResponse(OK))
-//    ggConnector.enrol(EnrolmentRequest(
-//      mlrRefNo = mlrRefNo,
-//      safeId = safeId
-//    ))
+    ggConnector.enrol(EnrolmentRequest(
+      mlrRefNo = mlrRefNo,
+      safeId = safeId
+    ))
 }
 
 object GovernmentGatewayService extends GovernmentGatewayService {
