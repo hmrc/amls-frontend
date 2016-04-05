@@ -70,7 +70,7 @@ object TransactionRecord {
     case TransactionRecordYes(transactions) =>
       Map(
         "isRecorded" -> Seq("true"),
-        "transactions" -> (transactions map { _.value }).toSeq
+        "transactions[]" -> (transactions map { _.value }).toSeq
       ) ++ transactions.foldLeft[UrlFormEncoded](Map.empty) {
         case (m, DigitalSoftware(name)) =>
           m ++ Map("name" -> Seq(name))

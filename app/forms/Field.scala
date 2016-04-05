@@ -14,7 +14,7 @@ sealed trait Field {
     PM.asKey(path)
 
   val id: String =
-    name.replaceAll("\\.", "-")
+    name.replaceAll("\\.", "-").replaceAll("[]", "")
 
   def hasErrors: Boolean =
     errors.nonEmpty

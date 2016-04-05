@@ -26,9 +26,9 @@
             </span>
             @radioGroup(f("transactions")) {
                 @legend("TODO", jsHidden = true)
-                @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.01", "01")
-                @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.02", "02")
-                @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.03", "03", target = s"#${f("name").id}-fieldset")
+                @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.01", "01")
+                @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.02", "02")
+                @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.03", "03", target = s"#${f("name").id}-fieldset")
                 @fieldset("TODO", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
                     @input(f("name"), "businessactivities.name.software.pkg.lbl", bold = false)
                 }
