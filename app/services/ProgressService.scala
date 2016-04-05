@@ -7,6 +7,7 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => _, _}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.registrationprogress.{NotStarted, Section}
+import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -58,7 +59,8 @@ trait ProgressService {
               AboutTheBusiness.section,
               BusinessActivities.section,
               BankDetails.section,
-              TradingPremises.section
+              TradingPremises.section,
+              ResponsiblePeople.section
             ) ++ dependentSections
         } getOrElse Seq.empty
     }

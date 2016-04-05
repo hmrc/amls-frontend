@@ -1,0 +1,15 @@
+@import include._
+@import models.responsiblepeople._
+
+@(model: ResponsiblePeople)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
+    @model.services.map { a =>
+        <table>
+
+    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+}

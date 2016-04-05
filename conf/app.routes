@@ -143,3 +143,6 @@ GET         /responsible-people/index                   controllers.responsiblep
 
 GET         /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
+
+
+GET         /responsible-people/summary                  controllers.responsiblepeople.SummaryController.get()

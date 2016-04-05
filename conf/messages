@@ -94,6 +94,12 @@ progress.msb.time = 6
 progress.tcsp.name = Trust or company service provider
 progress.tcsp.description = Registration information specifically for trust or company service providers.
 progress.tcsp.time = 8
+progress.responsiblepeople.name = Business matching
+progress.responsiblepeople.description = Administrative information about your business.
+progress.responsiblepeople.time = 5
+progress.declarationavailable = All sections complete: you can now submit the registration.
+progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
+
 
 # Confirmation page
 confirmation.lede = You have submitted the registration. Now pay the registration fee.

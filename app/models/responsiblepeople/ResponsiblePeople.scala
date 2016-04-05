@@ -1,14 +1,38 @@
 package models.responsiblepeople
 
 import typeclasses.MongoKey
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class ResponsiblePeople(addPerson: Option[AddPerson] = None) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
+
+  def isComplete: Boolean =
+    this match {
+      case ResponsiblePeople(Some(_), Some(_), Some(_)) => true
+      case _ => false
+    }
+
 }
 
+
+
 object ResponsiblePeople {
+
+  def section(implicit cache: CacheMap): Section = {
+    val messageKey = "responsiblepeople"
+    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get())
+    cache.getEntry[ResponsiblePeople](key).fold(notStarted) {
+      model =>
+        if (model.isComplete) {
+          Section(messageKey, Completed, controllers.responsiblepeople.routes.SummaryController.get())
+        } else {
+          Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get())
+        }
+    }
+  }
 
   import play.api.libs.json._
 
