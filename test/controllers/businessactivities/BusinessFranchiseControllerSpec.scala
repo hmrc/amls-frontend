@@ -80,7 +80,7 @@ class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite wi
       status(result) must be(BAD_REQUEST)
 
       val document: Document  = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include("Invalid value")
+      document.select("span").html() must include(Messages("error.required.ba.is.your.franchise"))
     }
 
 

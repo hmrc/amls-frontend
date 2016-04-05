@@ -1,5 +1,6 @@
 package models.businessactivities
 
+import models.FormTypes
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -27,12 +28,26 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
     "fail to validate given an `Yes` with no value" in {
 
       val data = Map(
-        "businessFranchise" -> Seq("true")
+        "businessFranchise" -> Seq("true"),
+        "franchiseName" -> Seq("")
       )
 
       BusinessFranchise.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "franchiseName") -> Seq(ValidationError("error.required"))
+          (Path \ "franchiseName") -> Seq(ValidationError("error.required.ba.franchise.name"))
+        )))
+    }
+
+    "fail to validate given an `Yes` with max value" in {
+
+      val data = Map(
+        "businessFranchise" -> Seq("true"),
+        "franchiseName" -> Seq("test test"*50)
+      )
+
+      BusinessFranchise.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "franchiseName") -> Seq(ValidationError("error.max.length.ba.franchise.name"))
         )))
     }
 

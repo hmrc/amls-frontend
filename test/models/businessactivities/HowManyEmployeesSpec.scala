@@ -2,7 +2,7 @@ package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import play.api.data.mapping.Success
+import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -20,13 +20,46 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneServerPerS
         be(Success(HowManyEmployees("123456789", "12345678")))
     }
 
-
     "write the model fields to url encoded response" in {
 
       HowManyEmployees.formWrites.writes(HowManyEmployees("123456789", "12345678")) must
         be(Map("employeeCount" -> Seq("123456789"),
           "employeeCountAMLSSupervision" -> Seq("12345678")))
 
+    }
+
+    "fail when mandatory fields not filled" in {
+
+      val data = Map("employeeCount" -> Seq(""),
+        "employeeCountAMLSSupervision" -> Seq(""))
+
+      HowManyEmployees.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "employeeCount") -> Seq(ValidationError("error.required.ba.employee.count1")),
+          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.required.ba.employee.count2"))
+        )))
+    }
+
+    "fail to validate given invalid data" in {
+
+      val data = Map("employeeCount" -> Seq("124545"),
+        "employeeCountAMLSSupervision" -> Seq("ghjgj"))
+
+      HowManyEmployees.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count"))
+        )))
+    }
+
+    "fail to validate given max value" in {
+
+      val data = Map("employeeCount" -> Seq("12454"),
+        "employeeCountAMLSSupervision" -> Seq("111111111111"))
+
+      HowManyEmployees.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.max.length.ba.employee.count"))
+        )))
     }
   }
 

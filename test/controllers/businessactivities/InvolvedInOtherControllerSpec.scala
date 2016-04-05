@@ -1,6 +1,5 @@
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => activities, BusinessMatching}
@@ -96,20 +95,21 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#involvedInOther]").html() must include("Invalid value")
+      document.select("a[href=#involvedInOther]").html() must include(Messages("error.required.ba.involved.in.other"))
     }
 
     "on post with required field not filled" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "involvedInOther" -> "true"
+        "involvedInOther" -> "true",
+          "details" -> ""
       )
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#details]").html() must include("This field is required")
+      document.select("a[href=#details]").html() must include(Messages("error.required.ba.involved.in.other.text"))
     }
 
 

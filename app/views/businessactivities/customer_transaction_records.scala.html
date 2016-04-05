@@ -11,21 +11,15 @@
 
     @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
 
-        @inlineRadioGroup(f("isRedress")) {
+        @inlineRadioGroup(f("isRecorded")) {
             @legend("TODO", jsHidden = true)
             @radio(f("isRecorded"), "lbl.yes", "true", target = s"#${f("transactions").id}-fieldset")
             @radio(f("isRecorded"), "lbl.no", "false")
         }
 
         @fieldset("TODO", jsHidden = true, id = s"""${f("transactions").id}-fieldset""") {
-            <span class="form-label-bold">
-                @Messages("businessactivities.do.keep.records")
-            </span>
-            <span class="form-hint">
-                @Messages("lbl.select.all")
-            </span>
+            @legend("businessactivities.do.keep.records", false ,bold = true, "lbl.select.all")
             @radioGroup(f("transactions")) {
-                @legend("TODO", jsHidden = true)
                 @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.01", "01")
                 @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.02", "02")
                 @checkbox(f("transactions"), "businessactivities.transactiontype.lbl.03", "03", target = s"#${f("name").id}-fieldset")

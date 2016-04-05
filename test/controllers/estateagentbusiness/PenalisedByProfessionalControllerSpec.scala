@@ -44,7 +44,7 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
       status(result) must be(OK)
       contentAsString(result) must include(Messages("estateagentbusiness.penalisedbyprofessional.title"))
     }
-  }
+
 
   "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
 
@@ -85,7 +85,7 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
     status(result) must be(BAD_REQUEST)
 
     val document = Jsoup.parse(contentAsString(result))
-    // TODO
+
   }
 
    "on post with valid data in edit mode" in new Fixture {
@@ -105,6 +105,7 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
      status(result) must be(SEE_OTHER)
      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
    }
+  }
 }
 
 
