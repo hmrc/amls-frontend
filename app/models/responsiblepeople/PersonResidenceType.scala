@@ -1,0 +1,56 @@
+/*
+package models.responsiblepeople
+
+import models.Country
+import play.api.data.mapping._
+import play.api.data.mapping.forms._
+import play.api.libs.json.{Reads, Writes}
+
+
+case class PersonResidenceType (
+                               isUKResidence : ResidenceType,
+                               countryOfBirth: Country,
+                               nationality: String
+                              )
+object PersonResidenceType {
+
+  implicit val formRule: Rule[UrlFormEncoded, PersonResidenceType] = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    (
+      __.read[ResidenceType] and
+      (__ \ "countryOfBirth").read[Country] and
+      (__ \ "nationality").read[String]
+      )(PersonResidenceType.apply _)
+  }
+
+  implicit val formWrites: Writes[PersonResidenceType] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+        __.write[ResidenceType] and
+        (__ \ "countryOfBirth").write[Country] and
+        (__ \ "nationality").write[String]
+      ) (unlift(PersonResidenceType.unapply))
+  }
+
+  implicit val jsonRead: Reads[PersonResidenceType] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      __.read[ResidenceType] and
+        (__ \ "countryOfBirth").read[Country] and
+        (__ \ "nationality").read[String]
+      ) (PersonResidenceType.apply _)
+  }
+
+  implicit val jsonWrite: Writes[PersonResidenceType] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      __.write[ResidenceType] and
+        (__ \ "isOwner").write[Country] and
+        (__ \ "isResidential").write[String]
+      ) (unlift(PersonResidenceType.unapply))
+  }
+}
+*/

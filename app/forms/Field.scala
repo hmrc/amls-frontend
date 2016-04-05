@@ -28,10 +28,13 @@ case class ValidField(
                        value: Seq[String]
                      ) extends Field {
   override val errors = Seq.empty
+  println("ValidField==============================="+path+"========================"+value)
 }
 
 case class InvalidField(
                          path: Path,
                          value: Seq[String],
                          errors: Seq[ValidationError]
-                       ) extends Field
+                       ) extends Field {
+  println("InvalidField==============================="+path+"============value==="+value+"================error============="+errors)
+}
