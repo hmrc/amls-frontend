@@ -23,6 +23,7 @@ object ApplicationConfig extends ServicesConfig {
   lazy val reportAProblemUrl = contactHost + getConfigString("contact-frontend.report-a-problem-url")
 
   lazy val loginUrl = getConfigString("login.url")
+  lazy val logoutUrl = getConfigString("logout.url")
 
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
