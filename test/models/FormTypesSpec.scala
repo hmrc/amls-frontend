@@ -109,6 +109,8 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+
+
   "phoneNumberType" must {
     "successfully validate" in {
 
