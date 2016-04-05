@@ -98,7 +98,7 @@ object BusinessActivities {
         val data = (__ \ "businessActivities").read[Set[BusinessActivity]]
         data flatMap(f =>
           if(f.seq.isEmpty) {
-            (Path \ "businessActivities") -> Seq(ValidationError("error.required"))
+            (Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service"))
           } else {
             data fmap BusinessActivities.apply
           })

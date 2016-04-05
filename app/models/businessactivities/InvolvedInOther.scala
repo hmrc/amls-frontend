@@ -1,6 +1,7 @@
 package models.businessactivities
 
 import play.api.data.mapping._
+import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 
@@ -13,10 +14,17 @@ case object InvolvedInOtherNo extends InvolvedInOther
 object InvolvedInOther {
 
   import models.FormTypes._
+  import utils.MappingUtils.Implicits._
+
+  val maxOtherBusinessActivityTypeLength = 255
+  val OtherBusinessActivityType = notEmptyStrip compose
+                                  notEmpty.withMessage("error.required.ba.involved.in.other.text") compose
+                                  maxLength(maxOtherBusinessActivityTypeLength).withMessage("error.invalid.ba.involved.in.other.text")
+
 
   implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "involvedInOther").read[Boolean] flatMap {
+    (__ \ "involvedInOther").read[Boolean].withMessage("error.required.ba.involved.in.other") flatMap {
       case true =>
         (__ \ "details").read(OtherBusinessActivityType) fmap InvolvedInOtherYes.apply
       case false => Rule.fromMapping { _ => Success(InvolvedInOtherNo) }

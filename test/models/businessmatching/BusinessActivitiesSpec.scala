@@ -40,7 +40,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     "fail to validate on empty Map" in {
 
       BusinessActivities.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required")))))
+        be(Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service")))))
     }
 
     "fail to validate when given invalid data" in {

@@ -10,7 +10,11 @@ case class CompanyRegistrationNumber(companyRegistrationNumber: String)
 
 object CompanyRegistrationNumber {
 
-  val registrationType = notEmpty compose pattern("^[A-Z0-9]{8}$".r)
+  import utils.MappingUtils.Implicits._
+
+  val registrationNumberRegex = "^[A-Z0-9]{8}$".r
+  val registrationType = notEmpty.withMessage("error.required.bm.registration.number") compose
+    pattern(registrationNumberRegex).withMessage("error.invalid.bm.registration.number")
 
   implicit val formats = Json.format[CompanyRegistrationNumber]
 

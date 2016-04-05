@@ -23,7 +23,7 @@ object ExpectedAMLSTurnover {
   implicit val formRule: Rule[UrlFormEncoded, ExpectedAMLSTurnover] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "expectedAMLSTurnover").read[String] flatMap {
+    (__ \ "expectedAMLSTurnover").read[String].withMessage("error.required.ba.turnover.from.mlr") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third

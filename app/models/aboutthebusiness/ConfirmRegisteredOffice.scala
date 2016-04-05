@@ -9,11 +9,12 @@ case class ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness: Boolean)
 object ConfirmRegisteredOffice {
 
   implicit val formats = Json.format[ConfirmRegisteredOffice]
+  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ConfirmRegisteredOffice] =
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
-      (__ \ "isRegOfficeOrMainPlaceOfBusiness").read[Boolean] fmap (ConfirmRegisteredOffice.apply)
+      (__ \ "isRegOfficeOrMainPlaceOfBusiness").read[Boolean].withMessage("error.required.atb.confirm.office") fmap ConfirmRegisteredOffice.apply
     }
 
   implicit val formWrites: Write[ConfirmRegisteredOffice, UrlFormEncoded] =
