@@ -1,6 +1,7 @@
 package models.businessactivities
 
 import models.Country
+import models.FormTypes
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
@@ -60,7 +61,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "validate mandatory field when isOutside is not selected" in {
       CustomersOutsideUK.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "isOutside") -> Seq(ValidationError("error.required"))
+          (Path \ "isOutside") -> Seq(ValidationError("error.required.ba.select.country"))
         )))
     }
 
@@ -70,7 +71,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.invalid"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
         )))
     }
 
@@ -80,14 +81,14 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.invalid"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
         )))
     }
 
     "validate mandatory country field" in {
-      CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"))) must
+      CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"),"country_1" -> Seq(""))) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.required"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
         )))
     }
 

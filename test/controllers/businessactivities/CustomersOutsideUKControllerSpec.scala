@@ -101,7 +101,8 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
     "on post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isOutside" -> "true"
+        "isOutside" -> "true",
+        "country_1" -> ""
       )
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -114,7 +115,7 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#country_1]").html() must include("This field is required")
+      document.select("a[href=#country_1]").html() must include(Messages("error.required.ba.country.name"))
     }
   }
 

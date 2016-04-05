@@ -9,9 +9,9 @@ import play.api.libs.json._
 class YourAgentSpec extends PlaySpec with MockitoSugar {
 
 
-  val yourAgent1 = YourAgent(AgentsRegisteredName("STUDENT"), TaxTypeSelfAssesment, SoleProprietor)
-  val yourAgent2 = YourAgent(AgentsRegisteredName("XYZ"), TaxTypeSelfAssesment, LimitedLiabilityPartnership)
-  val yourAgent3 = YourAgent(AgentsRegisteredName("CTU"), TaxTypeCorporationTax, UnincorporatedBody)
+  val yourAgent1 = YourAgent("STUDENT", TaxTypeSelfAssesment, SoleProprietor)
+  val yourAgent2 = YourAgent("XYZ", TaxTypeSelfAssesment, LimitedLiabilityPartnership)
+  val yourAgent3 = YourAgent("CTU", TaxTypeCorporationTax, UnincorporatedBody)
 
   val inputData1 = Map("agentsRegisteredName" -> Seq("STUDENT"),
                        "taxType" -> Seq("01"),
@@ -57,9 +57,6 @@ class YourAgentSpec extends PlaySpec with MockitoSugar {
       val tt = Json.obj("taxType" -> "01")
       val bs = Json.obj("agentsBusinessStructure"-> "01")
 
-      val jVal1 =  Json.fromJson[AgentsRegisteredName](rn)
-      jVal1 must be(JsSuccess(AgentsRegisteredName("STUDENT"), JsPath \ "agentsRegisteredName"))
-
       val jVal2 =  Json.fromJson[TaxType](tt)
       jVal2 must be(JsSuccess(TaxTypeSelfAssesment, JsPath \ "taxType"))
 
@@ -69,7 +66,7 @@ class YourAgentSpec extends PlaySpec with MockitoSugar {
     }
   }
 
-  "successfully convert object to json " in {
+  "successfully convert object to json" in {
     val agentJObj = Json.obj("agentsRegisteredName" -> "STUDENT", "taxType" -> "01", "agentsBusinessStructure"-> "01")
     Json.toJson[YourAgent](yourAgent1) must be(agentJObj)
   }

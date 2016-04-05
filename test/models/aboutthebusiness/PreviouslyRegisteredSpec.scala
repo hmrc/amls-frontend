@@ -10,7 +10,6 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
 
-
     "successfully validate given an enum value" in {
 
       PreviouslyRegistered.formRule.validate(Map("previouslyRegistered" -> Seq("false"))) must
@@ -26,6 +25,14 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
       PreviouslyRegistered.formRule.validate(data) must
         be(Success(PreviouslyRegisteredYes("12345678")))
+    }
+
+    "fail when mandatory fields are missing" in {
+
+      PreviouslyRegistered.formRule.validate(Map.empty) must
+        be(Failure(Seq(
+          (Path \ "previouslyRegistered") -> Seq(ValidationError("error.required.atb.previously.registered"))
+        )))
     }
 
     "fail to validate given an `Yes` with no value" in {
@@ -90,6 +97,4 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         ))
     }
   }
-
-
 }
