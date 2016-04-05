@@ -1,4 +1,3 @@
-/*
 package models.responsiblepeople
 
 import models.Country
@@ -53,4 +52,3 @@ object PersonResidenceType {
       ) (unlift(PersonResidenceType.unapply))
   }
 }
-*/

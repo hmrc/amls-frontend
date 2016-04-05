@@ -1,4 +1,3 @@
-/*
 package models.responsiblepeople
 
 import play.api.data.mapping._
@@ -73,4 +72,3 @@ object PassportType {
   }
 }
 
-*/
