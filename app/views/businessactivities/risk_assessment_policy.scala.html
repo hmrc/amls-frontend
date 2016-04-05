@@ -20,8 +20,8 @@
         @fieldset("TODO", jsHidden = true, id = s"""${f("riskassessments").id}-fieldset""") {
             @radioGroup(f("riskassessments")) {
                 @legend("businessactivities.paper.or.digital", true ,bold = true, "lbl.select.all")
-                @checkbox(f("riskassessments"), "businessactivities.RiskAssessmentType.lbl.01", "01")
-                @checkbox(f("riskassessments"), "businessactivities.RiskAssessmentType.lbl.02", "02")
+                @checkbox(f("riskassessments[]"), "businessactivities.RiskAssessmentType.lbl.01", "01")
+                @checkbox(f("riskassessments[]"), "businessactivities.RiskAssessmentType.lbl.02", "02")
             }
         }
         <br>
