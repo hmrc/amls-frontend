@@ -4,7 +4,7 @@ import java.util.UUID
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.AddPerson
+import models.responsiblepeople.{AddPerson, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -21,6 +21,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
+  val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -42,19 +43,19 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on get display the persons page" in new Fixture {
 
-      when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+      when(addPersonController.dataCacheConnector.fetch[ResponsiblePeople](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = addPersonController.get()(request)
+      val result = addPersonController.get(RecordId)(request)
       status(result) must be(OK)
     }
 
     "on get display the persons page with blank fields" in new Fixture {
 
-      when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+      when(addPersonController.dataCacheConnector.fetch[ResponsiblePeople](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = addPersonController.get()(request)
+      val result = addPersonController.get(RecordId)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
@@ -66,11 +67,12 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
     "on get display the persons page with fields populated" in new Fixture {
 
       val addPerson = AddPerson("John", Some("Envy"), "Doe")
+      val responsiblePeople = ResponsiblePeople(Some(addPerson))
 
-      when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      when(addPersonController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      val result = addPersonController.get()(request)
+      val result = addPersonController.get(RecordId)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
@@ -86,10 +88,13 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "lastName" -> "Doe"
       )
 
+      when(addPersonController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = addPersonController.post()(requestWithParams)
+      val result = addPersonController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
     }
 
@@ -102,7 +107,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = addPersonController.post()(firstNameMissingInRequest)
+      val result = addPersonController.post(RecordId)(firstNameMissingInRequest)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
@@ -118,7 +123,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = addPersonController.post()(lastNameMissingInRequest)
+      val result = addPersonController.post(RecordId)(lastNameMissingInRequest)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))

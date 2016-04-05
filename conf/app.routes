@@ -144,5 +144,7 @@ GET         /responsible-people/index                   controllers.responsiblep
 GET         /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/your-name/:index        controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
 
-
 GET         /responsible-people/summary                  controllers.responsiblepeople.SummaryController.get()
+
+GET         /responsible-people/self-assessment              controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(edit: Boolean ?= false)
+POST        /responsible-people/self-assessment              controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(edit: Boolean ?= false)

@@ -86,7 +86,9 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
       val newRequest = request.withFormUrlEncodedBody(
         "isRecorded" -> "true",
         "transactions[0]" -> "01",
-        "transactions[1]" -> "02"
+        "transactions[1]" -> "02",
+        "transactions[2]" -> "03",
+        "name" -> "test"
       )
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -117,7 +119,30 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isRecorded]").html() must include("This field is required")
+      document.select("a[href=#isRecorded]").html() must include(Messages("error.required.ba.select.transaction.record"))
+    }
+
+    "on post with invalid data1" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isRecorded" -> "true",
+        "transactions[0]" -> "01",
+        "transactions[1]" -> "02",
+        "transactions[2]" -> "03",
+        "name" -> ""
+      )
+
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#name]").html() must include(Messages("error.required.ba.software.package.name"))
     }
   }
 

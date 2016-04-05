@@ -11,9 +11,7 @@ case class AddPerson(firstName: String,
 object AddPerson {
 
   import play.api.libs.json._
-
-  val key = "responsible-add-person"
-
+  
   implicit val formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
     import models.FormTypes._
     import play.api.data.mapping.forms.Rules._

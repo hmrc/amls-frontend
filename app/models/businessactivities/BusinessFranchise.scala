@@ -1,7 +1,9 @@
 package models.businessactivities
 
 import play.api.data.mapping._
+import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait BusinessFranchise
@@ -13,12 +15,17 @@ case object BusinessFranchiseNo extends BusinessFranchise
 object BusinessFranchise {
 
   import models.FormTypes._
+  import utils.MappingUtils.Implicits._
+
+  val maxFranchiseName = 140
+  val franchiseNameType =  notEmptyStrip compose notEmpty.withMessage("error.required.ba.franchise.name") compose
+    maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name")
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessFranchise] = From[UrlFormEncoded] { __ =>
   import play.api.data.mapping.forms.Rules._
-    (__ \ "businessFranchise").read[Boolean] flatMap {
+    (__ \ "businessFranchise").read[Boolean].withMessage("error.required.ba.is.your.franchise") flatMap {
       case true =>
-        (__ \ "franchiseName").read(franchiseNameType) fmap (BusinessFranchiseYes.apply)
+        (__ \ "franchiseName").read(franchiseNameType) fmap BusinessFranchiseYes.apply
       case false => Rule.fromMapping { _ => Success(BusinessFranchiseNo) }
     }
   }
@@ -33,7 +40,7 @@ object BusinessFranchise {
 
   implicit val jsonReads: Reads[BusinessFranchise] =
     (__ \ "businessFranchise").read[Boolean] flatMap {
-      case true => (__ \ "franchiseName").read[String] map (BusinessFranchiseYes.apply _)
+      case true => (__ \ "franchiseName").read[String] map BusinessFranchiseYes.apply
       case false => Reads(_ => JsSuccess(BusinessFranchiseNo))
     }
 
@@ -46,5 +53,4 @@ object BusinessFranchise {
   }
 
 }
-
 

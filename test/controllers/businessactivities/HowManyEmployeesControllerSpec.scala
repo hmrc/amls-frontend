@@ -82,7 +82,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include("This field is required")
+      document.select("span").html() must include(Messages("error.required.ba.employee.count1"))
     }
 
 
@@ -93,7 +93,7 @@ class HowManyEmployeesControllerSpec extends PlaySpec with OneServerPerSuite wit
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include("Maximum length is 11")
+      document.select("span").html() must include(Messages("error.max.length.ba.employee.count"))
     }
 
 
