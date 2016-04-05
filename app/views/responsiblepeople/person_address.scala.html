@@ -26,7 +26,7 @@
         ) {
             <fieldset class="">
                 <legend class="form-label-bold">
-                    @Messages("aboutthebusiness.correspondenceaddress.address")
+                    @Messages("responsiblepeople.wherepersonlives.address")
                 </legend>
                 @input(f("addressLine1"))
                 @input(f("addressLine2"))
@@ -35,7 +35,7 @@
             </fieldset>
             @input(
                 field = f("postCode"),
-                labelText = "aboutthebusiness.correspondenceaddress.postCode",
+                labelText = "responsiblepeople.wherepersonlives.postCode",
                 classes = Seq("postcode")
             )
         }
@@ -48,7 +48,7 @@
         ) {
             <fieldset class="">
                 <legend class="form-label-bold">
-                    @Messages("aboutthebusiness.correspondenceaddress.address")
+                    @Messages("responsiblepeople.wherepersonlives.address")
                 </legend>
                 @input(f("addressLineNonUK1"))
                 @input(f("addressLineNonUK2"))
@@ -57,10 +57,17 @@
             </fieldset>
             @country(
                 field = f("country"),
-                labelText = "aboutthebusiness.correspondenceaddress.country"
+                labelText = "responsiblepeople.wherepersonlives.country"
             )
         }
 
+        @radioGroup(f("addressHistory")) {
+            @legend("responsiblepeople.wherepersonlives.address_history", jsHidden = true)
+            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.5_months_history", "First")
+            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.11_months_history", "Second")
+            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.3_years_history", "Third")
+            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.more_years_history", "Fourth")
+        }
         @submit(edit)
     }
 }
