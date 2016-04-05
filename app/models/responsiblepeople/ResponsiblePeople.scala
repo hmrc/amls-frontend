@@ -10,14 +10,14 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
 
-  def isComplete: Boolean =
-    this match {
-      case ResponsiblePeople(Some(_)) => true
-      case _ => false
-    }
-
   def saRegistered(sa: SaRegistered): ResponsiblePeople =
     this.copy(saRegistered = Some(sa))
+
+  def isComplete: Boolean =
+    this match {
+      case ResponsiblePeople(_, _) => true
+      case _ => false
+    }
 
 }
 
