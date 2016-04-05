@@ -8,6 +8,42 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class AddPersonSpec extends PlaySpec with MockitoSugar {
 
+  "Validate definitions" must {
+
+    "successfully validate the first name" in {
+      AddPerson.firstNameType.validate("John") must be(Success("John"))
+    }
+
+    "fail validation if the first name is not provided" in {
+      AddPerson.firstNameType.validate("") must be(Failure(Seq(Path -> Seq(ValidationError("error.required.firstname")))))
+    }
+
+    "fail validation if the first name is more than 35 characters" in {
+      AddPerson.firstNameType.validate("JohnJohnJohnJohnJohnJohnJohnJohnJohnJohn") must
+        be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.firstname")))))
+    }
+
+
+    "fail validation if the middle name is more than 35 characters" in {
+      AddPerson.middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
+        be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
+    }
+
+    "successfully validate the last name" in {
+      AddPerson.lastNameType.validate("Doe") must be(Success("Doe"))
+    }
+
+    "fail validation if the last name is not provided" in {
+      AddPerson.lastNameType.validate("") must be(Failure(Seq(Path -> Seq(ValidationError("error.required.lastname")))))
+    }
+
+    "fail validation if the last name is more than 35 characters" in {
+      AddPerson.lastNameType.validate("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe") must
+        be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.lastname")))))
+    }
+
+  }
+
   "Form Rules and Writes" must {
 
     "successfully validate given all fields" in {
@@ -70,8 +106,8 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
 
       AddPerson.formRule.validate(urlFormEncoded) must
         be(Failure(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.maxLength", 35)),
-          (Path \ "lastName") -> Seq(ValidationError("error.maxLength", 35))
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
         )))
     }
   }
