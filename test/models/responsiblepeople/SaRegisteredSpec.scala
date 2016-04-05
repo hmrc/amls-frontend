@@ -9,6 +9,32 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 class SaRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
+
+    "utrType" must {
+
+      "successfully validate" in {
+
+        SaRegistered.utrType.validate("1234567890") must
+          be(Success("1234567890"))
+      }
+
+      "fail to validate an empty string" in {
+
+        SaRegistered.utrType.validate("") must
+          be(Failure(Seq(
+            Path -> Seq(ValidationError("error.required.utr.number"))
+          )))
+      }
+
+      "fail to validate a string longer than 10" in {
+
+        SaRegistered.utrType.validate("1" * 11) must
+          be(Failure(Seq(
+            Path -> Seq(ValidationError("error.invalid.length.utr.number"))
+          )))
+      }
+    }
+
     "successfully validate given an enum value" in {
       SaRegistered.formRule.validate(Map("saRegistered" -> Seq("false"))) must
         be(Success(SaRegisteredNo))

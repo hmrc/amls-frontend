@@ -3,6 +3,8 @@ package models.responsiblepeople
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
+import play.api.data.mapping.forms.Rules._
+import utils.MappingUtils.Implicits._
 
 sealed trait SaRegistered
 
@@ -12,7 +14,8 @@ case object SaRegisteredNo extends SaRegistered
 
 object SaRegistered {
 
-  import models.FormTypes._
+  val utrTypeRegex = "^[0-9]{10}$".r
+  val utrType = notEmpty.withMessage("error.required.utr.number") compose pattern(utrTypeRegex).withMessage("error.invalid.length.utr.number")
 
   implicit val formRule: Rule[UrlFormEncoded, SaRegistered] = From[UrlFormEncoded] { __ =>
   import play.api.data.mapping.forms.Rules._

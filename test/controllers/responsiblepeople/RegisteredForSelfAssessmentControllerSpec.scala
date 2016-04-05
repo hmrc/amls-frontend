@@ -17,7 +17,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class l extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>

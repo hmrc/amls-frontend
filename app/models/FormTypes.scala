@@ -14,7 +14,6 @@ object FormTypes {
   val maxAddressLength = 35
   val maxPostCodeTypeLength = 10
   val maxVRNTypeLength = 9
-  val maxUTRTypeLength = 10
   val maxPhoneNumberLength = 30
   val maxEMailLength = 100
   val minLengthDayOrMonth = 1
@@ -42,13 +41,6 @@ object FormTypes {
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line")
 
   val postcodeType = notEmpty.withMessage("error.required.postcode")  compose maxLength(maxPostCodeTypeLength).withMessage("error.invalid.postcode")
-  val utrType = notEmpty compose maxLength(maxUTRTypeLength) compose pattern("^[0-9]{10}$".r)
-
-  val addressType = notEmpty compose maxLength(maxAddressLength)
-
-  val postcodeType = notEmpty compose maxLength(maxPostCodeTypeLength)
-
-  val countryType = notEmpty compose minLength(maxCountryTypeLength) compose maxLength(maxCountryTypeLength) compose pattern("^[a-zA-Z_]+$".r)
 
   val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
 
