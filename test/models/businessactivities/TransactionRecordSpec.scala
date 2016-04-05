@@ -104,7 +104,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
       val map = Map(
         "isRecorded" -> Seq("true"),
-        "transactions" -> Seq("03","01"),
+        "transactions[]" -> Seq("03","01"),
         "name" -> Seq("test")
       )
 
@@ -125,7 +125,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
       val map = Map(
         "isRecorded" -> Seq("true"),
-        "transactions" -> Seq("02","01")
+        "transactions[]" -> Seq("02","01")
       )
 
       val model = TransactionRecordYes(Set(DigitalSpreadsheet, Paper))
