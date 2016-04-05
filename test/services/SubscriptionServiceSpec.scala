@@ -106,5 +106,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
           result must equal (subscriptionResponse)
       }
     }
+
+    "successfully return "
   }
 }

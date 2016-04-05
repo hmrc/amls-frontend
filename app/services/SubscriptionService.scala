@@ -81,6 +81,7 @@ trait SubscriptionService extends DataCacheService {
       cache <- getCache
       safeId <- safeId(cache)
       subscription <- subscribe(cache, safeId)
+      _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
       _ <- ggService.enrol(
         safeId = safeId,
         mlrRefNo = subscription.amlsRefNo
