@@ -35,8 +35,8 @@ trait RegisteredForSelfAssessmentController extends BaseController {
               resPeople.saRegistered(data)
             )
           } yield edit match {
-            case true =>  Redirect(routes.WhatYouNeedController.get())//Todo
-            case false => Redirect(routes.WhatYouNeedController.get())//Todo
+            case true =>  Redirect(routes.WhatYouNeedController.get(1))//Todo
+            case false => Redirect(routes.WhatYouNeedController.get(1))//Todo
           }
       }
   }

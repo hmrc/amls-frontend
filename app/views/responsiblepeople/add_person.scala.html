@@ -31,6 +31,12 @@
             labelText = Messages("responsiblepeople.addperson.lastname")
         )
 
+        @inlineRadioGroup(f("isKnownByOtherNames")) {
+            @legend("responsiblepeople.addperson.isknownbyothernames", false, true)
+            @radio(f("isKnownByOtherNames"), "lbl.yes", "true")
+            @radio(f("isKnownByOtherNames"), "lbl.no", "false")
+        }
+
     @submit()
   }
 }

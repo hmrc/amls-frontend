@@ -3,11 +3,13 @@ package models.responsiblepeople
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, To, Write}
+import play.api.libs.json.{Writes => _, _}
 import utils.MappingUtils.Implicits._
 
 case class AddPerson(firstName: String,
                      middleName: Option[String],
-                     lastName: String
+                     lastName: String,
+                     isKnownByOtherNames: Boolean
                     )
 
 object AddPerson {
@@ -30,7 +32,8 @@ object AddPerson {
     (
       (__ \ "firstName").read(firstNameType) and
         (__ \ "middleName").read(optionR(middleNameType)) and
-        (__ \ "lastName").read(lastNameType)
+        (__ \ "lastName").read(lastNameType) and
+        (__ \ "isKnownByOtherNames").read[Boolean].withMessage("error.required.rp.isknownbyothernames")
       ) (AddPerson.apply _)
   }
 
@@ -40,7 +43,8 @@ object AddPerson {
     (
       (__ \ "firstName").write[String] and
         (__ \ "middleName").write[Option[String]] and
-        (__ \ "lastName").write[String]
+        (__ \ "lastName").write[String] and
+        (__ \ "isKnownByOtherNames").write[Boolean]
       ) (unlift(AddPerson.unapply))
   }
 
@@ -51,7 +55,8 @@ object AddPerson {
     (
       (__ \ "firstName").read[String] and
         (__ \ "middleName").read[Option[String]] and
-        (__ \ "lastName").read[String]
+        (__ \ "lastName").read[String] and
+        (__ \ "isKnownByOtherNames").read[Boolean]
       ) (AddPerson.apply _)
 
   }
@@ -63,7 +68,8 @@ object AddPerson {
     (
       (__ \ "firstName").write[String] and
         (__ \ "middleName").write[Option[String]] and
-        (__ \ "lastName").write[String]
+        (__ \ "lastName").write[String] and
+        (__ \ "isKnownByOtherNames").write[Boolean]
       ) (unlift(AddPerson.unapply))
   }
 
