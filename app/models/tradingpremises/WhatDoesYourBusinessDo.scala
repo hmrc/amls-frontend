@@ -23,7 +23,7 @@ object WhatDoesYourBusinessDo {
   }
 
   implicit val formWrite = Write[WhatDoesYourBusinessDo, UrlFormEncoded] { data =>
-    Map("activities" -> data.activities.toSeq.map(BusinessActivity.activityFormWrite.writes))
+    Map("activities[]" -> data.activities.toSeq.map(BusinessActivity.activityFormWrite.writes))
   }
 
   implicit val format = Json.format[WhatDoesYourBusinessDo]

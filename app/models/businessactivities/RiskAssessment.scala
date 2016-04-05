@@ -73,7 +73,7 @@ object RiskAssessmentPolicy {
     ) = Write[RiskAssessmentPolicy, UrlFormEncoded] {
         case RiskAssessmentPolicyYes(data) =>
             Map("hasPolicy" -> Seq("true"),
-            "riskassessments" -> data.toSeq.map(w.writes))
+            "riskassessments[]" -> data.toSeq.map(w.writes))
         case RiskAssessmentPolicyNo =>
             Map("hasPolicy" -> Seq("false"))
 
