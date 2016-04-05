@@ -14,7 +14,7 @@ sealed trait Field {
     PM.asKey(path)
 
   val id: String =
-    name.replaceAll("\\.", "-")
+    name.replaceAll("\\.", "-").replaceAll("\\[]", "")
 
   def hasErrors: Boolean =
     errors.nonEmpty
@@ -28,13 +28,10 @@ case class ValidField(
                        value: Seq[String]
                      ) extends Field {
   override val errors = Seq.empty
-  println("ValidField==============================="+path+"========================"+value)
 }
 
 case class InvalidField(
                          path: Path,
                          value: Seq[String],
                          errors: Seq[ValidationError]
-                       ) extends Field {
-  println("InvalidField==============================="+path+"============value==="+value+"================error============="+errors)
-}
+                       ) extends Field

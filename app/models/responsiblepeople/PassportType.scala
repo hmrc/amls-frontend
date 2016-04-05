@@ -9,7 +9,6 @@ sealed trait PassportType
 
 case class UKPassport(passportNumberUk: String) extends PassportType
 case class NonUKPassport(passportNumberNonUk: String) extends PassportType
-
 case object NoPassport extends PassportType
 
 object PassportType {
@@ -21,7 +20,7 @@ object PassportType {
     import models.FormTypes._
     (__ \ "passportType").read[String] flatMap {
       case "01" =>
-        (__ \ "passportNumberUk").read(descriptionType) fmap UKPassport.apply
+        (__ \ "passportNumberUk").read(ukPassportType) fmap UKPassport.apply
       case "02" =>
         (__ \ "passportNumberNonUk").read(descriptionType) fmap NonUKPassport.apply
       case "03" => NoPassport

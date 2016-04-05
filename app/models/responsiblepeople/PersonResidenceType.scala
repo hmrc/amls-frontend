@@ -5,12 +5,12 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms._
 import play.api.libs.json.{Reads, Writes}
 
-
 case class PersonResidenceType (
                                isUKResidence : ResidenceType,
                                countryOfBirth: Country,
                                nationality: String
                               )
+
 object PersonResidenceType {
 
   implicit val formRule: Rule[UrlFormEncoded, PersonResidenceType] = From[UrlFormEncoded] { __ =>
@@ -22,11 +22,11 @@ object PersonResidenceType {
       )(PersonResidenceType.apply _)
   }
 
-  implicit val formWrites: Writes[PersonResidenceType] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
+  implicit val formWrites: Write[PersonResidenceType, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Writes._
+    import play.api.libs.functional.syntax.unlift
     (
-        __.write[ResidenceType] and
+      __.write[ResidenceType] and
         (__ \ "countryOfBirth").write[Country] and
         (__ \ "nationality").write[String]
       ) (unlift(PersonResidenceType.unapply))
@@ -47,8 +47,8 @@ object PersonResidenceType {
     import play.api.libs.json._
     (
       __.write[ResidenceType] and
-        (__ \ "isOwner").write[Country] and
-        (__ \ "isResidential").write[String]
+        (__ \ "countryOfBirth").write[Country] and
+        (__ \ "nationality").write[String]
       ) (unlift(PersonResidenceType.unapply))
   }
 }
