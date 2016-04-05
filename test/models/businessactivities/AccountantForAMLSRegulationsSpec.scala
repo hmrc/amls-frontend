@@ -1,7 +1,8 @@
 package models.businessactivities
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.Success
+import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -19,6 +20,13 @@ class AccountantForAMLSRegulationsSpec extends PlaySpec {
       val data = Map("accountantForAMLSRegulations" -> Seq("false"))
       val result = AccountantForAMLSRegulations.formRule.validate(data)
       result mustBe Success(AccountantForAMLSRegulations(false))
+    }
+
+    "fail validation when mandatory field is missing" in {
+      val result = AccountantForAMLSRegulations.formRule.validate(Map.empty)
+      result mustBe Failure(Seq(
+        (Path \ "accountantForAMLSRegulations") -> Seq(ValidationError("error.required.ba.business.use.accountant"))
+      ))
     }
 
     "write correct data from true value" in {

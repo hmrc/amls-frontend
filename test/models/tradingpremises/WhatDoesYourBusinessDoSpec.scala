@@ -23,7 +23,8 @@ class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
     "no items have been selected" must {
       "reject with a required message" in {
         val formData = Map("activities[]" -> Seq())
-        WhatDoesYourBusinessDo.formRule.validate(formData) must be (Failure(List((Path \ "activities") -> List(ValidationError("error.required")))))
+        WhatDoesYourBusinessDo.formRule.validate(formData) must be
+        Failure(List((Path \ "activities") -> List(ValidationError("error.required.tp.activity.your.business.do"))))
       }
     }
   }

@@ -1,6 +1,5 @@
 package models.businessmatching
 
-import models.businessmatching.BusinessType._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.libs.json._

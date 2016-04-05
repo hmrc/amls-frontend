@@ -116,7 +116,7 @@ class RiskAssessmentControllerSpec extends PlaySpec with MockitoSugar with OneSe
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#hasPolicy]").html() must include("This field is required")
+      document.select("a[href=#hasPolicy]").html() must include(Messages("error.required.ba.option.risk.assessment"))
     }
   }
 
