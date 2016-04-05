@@ -9,7 +9,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
   val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
     true, new LocalDate(1990, 2, 24), true)
 
-  val yourAgent = YourAgent(AgentsRegisteredName("STUDENT"), TaxTypeSelfAssesment, SoleProprietor)
+  val yourAgent = YourAgent("STUDENT", TaxTypeSelfAssesment, SoleProprietor)
 
   val wdbd = WhatDoesYourBusinessDo(
     Set(

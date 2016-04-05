@@ -17,8 +17,93 @@ err.required = Please enter an item
 err.invalid = Please enter a valid item
 err.notrequired = No item should be entered
 err.invalidLength = invalid length
-err.summary = There are errors in your form submission
+err.summary = There is a problem
 err.pleasespecify = Please specify
+
+error.required.address.line1 = Enter the first line of the address.
+error.required.address.line2 = Enter the second line of the address.
+error.max.length.address.line = You can''t enter more than 35 characters.
+error.required.postcode = Enter a postcode.
+error.invalid.postcode = Enter valid postcode.
+error.required.country = Enter a country.
+error.invalid.country = Enter valid country.
+
+error.required.yourname = Enter your name.
+error.invalid.yourname = You can''t enter more than 140 characters for your name.
+error.required.vat.number = Enter a VAT registration number.
+error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers
+error.required.name.of.business = Enter the name of the business.
+error.invalid.name.of.business = You can''t enter more than 120 characters for the name of the business.
+error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
+
+
+# Custom error messages
+error.required.bm.register.service = Select at least one activity that you need to register.
+error.required.bm.registration.number = Enter the company registration number.
+error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
+
+error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
+error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
+error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
+error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
+error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
+error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
+
+error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
+error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
+error.invalid.ba.involved.in.other.text = You can''t enter more than 255 characters
+error.required.ba.business.turnover = Select how much turnover you expect in the next 12 months.
+error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
+error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
+error.required.ba.franchise.name = Enter your franchisor’s name.
+error.max.length.ba.franchise.name = You can''t enter more than 140 characters for the franchisor’s name.
+
+error.required.ba.employee.count1 = Enter a number. If you are a sole proprietor with no employees, enter 1.
+error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punctuation or other characters.
+error.max.length.ba.employee.count = You can''t enter a number larger than 99999999999
+error.required.ba.employee.count2 = Enter a number.
+error.required.ba.select.country  = Select yes or no to the question: do you have customers who live outside of the UK?
+error.required.ba.country.name = Enter at least one country.
+error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
+error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
+error.required.ba.software.package.name = Enter the name of the software package.
+error.max.length.ba.software.package.name = You can''t enter more than 40 characters for the names of the software packages.
+error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
+error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a formal risk assessment policy and procedure?
+error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
+error.required.ba.business.use.accountant = Select yes or no to the question: does your business use an accountant for matters relating to money laundering regulations?
+#TODO
+error.required.ba.suspicious.activity = Need Message for suspicious.activity
+
+error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
+error.required.tp.trading.name = Enter a trading name.
+error.invalid.tp.trading.name = You can''t enter more than 120 characters for the trading name.
+#TODO
+error.expected.jodadate.format = Need Message
+
+error.required.tp.date = Enter a date.
+error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
+error.required.tp.month = Enter a month.
+error.invalid.tp.month = Enter a valid month. It must be a number between 1 and 12.
+error.required.tp.year = Enter a year.
+error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
+error.required.tp.residential.address = Select yes or no to the question: is this a residential address?
+error.required.tp.your.business.or.other = Select one option: who uses these premises, your business or another business acting as an agent for your business?
+error.required.tp.registered.business.name = Enter your agent’s registered business name.
+error.invalid.tp.registered.business.name = You can''t enter more than 140 characters for your agent’s registered business name.
+error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
+error.required.tp.select.business.structure = Select your agent’s business structure.
+
+error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
+error.required.eab.which.redress.scheme = Select which redress scheme.
+error.required.eab.redress.scheme.name = Enter the name of the redress scheme
+error.invalid.eab.redress.scheme.name = You can''t enter more than 255 characters for the name of the redress scheme.
+
+error.required.eab.business.services = Select at least one service that your business provides.
+error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
+error.required.eab.info.about.penalty = Enter some information about the penalty received.
+error.invalid.eab.info.about.penalty = You can''t enter more than 255 characters for information about the penalty received.
+error.required.eab.penalised.by.professional.body = Select yes or no the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary
@@ -63,7 +148,7 @@ progress.start = Start this section
 progress.minutes = minutes to complete
 progress.submit = Submit registration
 progress.declarationavailable = All sections complete: you can now submit the registration.
-progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
+progress.declarationunavailable = You can''t finish the registration until you''ve completed all the sections.
 progress.businessmatching.name = Business matching
 progress.businessmatching.description = Administrative information about your business.
 progress.businessmatching.time = 5
@@ -344,10 +429,10 @@ businessactivities.whatyouneed.line_1 = the anticipated turnover for the next 12
 businessactivities.whatyouneed.line_2 = how many employees you have
 businessactivities.whatyouneed.line_3 = where your most high-value customers live
 businessactivities.whatyouneed.possiblerequiredinfo.heading = Depending on your circumstances, you may also need to know:
-businessactivities.whatyouneed.line_4 = your franchisor's name
+businessactivities.whatyouneed.line_4 = your franchisor''s name
 businessactivities.whatyouneed.line_5 = how you record transactions
-businessactivities.whatyouneed.line_6 = your accountant's name and address
-businessactivities.whatyouneed.line_7 = your accountant's HMRC Agent Reference Number
+businessactivities.whatyouneed.line_6 = your accountant''s name and address
+businessactivities.whatyouneed.line_7 = your accountant''s HMRC Agent Reference Number
 
 businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
@@ -445,7 +530,7 @@ declaration.addperson.title = What''s your name?
 declaration.addperson.firstname = First name
 declaration.addperson.middlename = Middle name (optional)
 declaration.addperson.lastname = Last name
-declaration.addperson.whatsyourrole = What's your role within the business?
+declaration.addperson.whatsyourrole = What''s your role within the business?
 
 declaration.addperson.lbl.01=Beneficial shareholder
 declaration.addperson.lbl.02=Director

@@ -5,10 +5,10 @@ import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
 
-class ConfirmRegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with MockitoSugar {
-  "RegOfficeOrMainPlaceOfBusiness " must {
+class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
+  "RegOfficeOrMainPlaceOfBusiness" must {
 
-    "validate the given model " in {
+    "validate the given model" in {
       val data = Map(
         "isRegOfficeOrMainPlaceOfBusiness" -> Seq("true")
       )
@@ -31,7 +31,7 @@ class ConfirmRegisteredOfficeOrMainPlaceOfBusinessSpec extends PlaySpec with Moc
 
       ConfirmRegisteredOffice.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required"))
+          (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required.atb.confirm.office"))
         )))
     }
 

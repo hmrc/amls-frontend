@@ -4,6 +4,7 @@ import models.Country
 import models.FormTypes._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{From, Rule, Success, Write}
+import play.api.data.mapping._
 import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait CustomersOutsideUK {
@@ -45,10 +46,11 @@ case class Countries (
 
 object CustomersOutsideUK {
 
-  implicit val formRule: Rule[UrlFormEncoded, CustomersOutsideUK] = From[UrlFormEncoded] { __ =>
 
+  implicit val formRule: Rule[UrlFormEncoded, CustomersOutsideUK] = From[UrlFormEncoded] { __ =>
+    import utils.MappingUtils.Implicits._
     import play.api.data.mapping.forms.Rules._
-    (__ \ "isOutside").read[Boolean] flatMap {
+    (__ \ "isOutside").read[Boolean].withMessage("error.required.ba.select.country") flatMap {
       case true =>
        __.read[Countries].fmap(CustomersOutsideUKYes.apply)
       case false => Rule.fromMapping { _ => Success(CustomersOutsideUKNo) }
@@ -56,8 +58,9 @@ object CustomersOutsideUK {
   }
 
   implicit val formRuleCountry: Rule[UrlFormEncoded, Countries] = From[UrlFormEncoded] { __ =>
+    import utils.MappingUtils.Implicits._
    import play.api.data.mapping.forms.Rules._
-        ((__ \ "country_1").read[Country] and
+        ((__ \ "country_1").read[Country].withMessage("error.required.ba.country.name") and
           (__ \ "country_2").read[Option[Country]] and
           (__ \ "country_3").read[Option[Country]] and
           (__ \ "country_4").read[Option[Country]] and

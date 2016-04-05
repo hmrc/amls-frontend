@@ -8,6 +8,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -15,7 +16,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 
-class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class VATRegisteredControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -37,7 +38,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
       status(result) must be(OK)
       contentAsString(result) must include("Is this business registered for VAT?")
     }
-  }
+
 
   "on get display the registered for VAT page with pre populated data" in new Fixture {
 
@@ -48,8 +49,7 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
     status(result) must be(OK)
 
     val document = Jsoup.parse(contentAsString(result))
-    // TODO
-    //      document.select("input[value=01]").hasAttr("checked") must be(true)
+    document.select("input[value=true]").hasAttr("checked") must be(true)
   }
 
   "on post with valid data" in new Fixture {
@@ -79,30 +79,28 @@ class BusinessRegisteredForVATControllerSpec extends PlaySpec with OneServerPerS
     val result = controller.post()(newRequest)
     status(result) must be(BAD_REQUEST)
 
-    val document = Jsoup.parse(contentAsString(result))
-    // TODO
-    //      document.select("input[name=other]").`val` must be("foo")
+    contentAsString(result) must include(Messages("error.required.atb.registered.for.vat"))
   }
 
-  // to be valid after summary edit page is ready
-  /* "on post with valid data in edit mode" in new Fixture {
+   "on post with valid data in edit mode" in new Fixture {
 
      val newRequest = request.withFormUrlEncodedBody(
-       "registeredForVATYes" -> "true"
+       "registeredForVAT" -> "true",
+       "vrnNumber" -> "123456789"
      )
 
-     when(controller.dataCacheConnector.fetchDataShortLivedCache[AboutTheBusiness](any())
+     when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
        (any(), any(), any())).thenReturn(Future.successful(None))
 
-     when(controller.dataCacheConnector.saveDataShortLivedCache[AboutTheBusiness](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+     when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
+       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)
      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
-   }*/
+   }
 
-
+  }
 
 }
 

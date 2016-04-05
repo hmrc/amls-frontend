@@ -33,6 +33,11 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
         be(Success(ExpectedBusinessTurnover.Seventh))
     }
 
+    "throw error on missing data" in {
+      ExpectedBusinessTurnover.formRule.validate(Map.empty) must
+        be(Failure(Seq((Path \ "expectedBusinessTurnover", Seq(ValidationError("error.required.ba.business.turnover"))))))
+    }
+
     "throw error on invalid data" in {
       ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("20"))) must
         be(Failure(Seq((Path \ "expectedBusinessTurnover", Seq(ValidationError("error.invalid"))))))

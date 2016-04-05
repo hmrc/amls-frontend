@@ -40,14 +40,30 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
 
       val data = Map(
         "isRedress" -> Seq("true"),
-        "propertyRedressScheme" -> Seq("04")
+        "propertyRedressScheme" -> Seq("04"),
+          "other" -> Seq("")
       )
 
       RedressScheme.formRedressRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "other") -> Seq(ValidationError("error.required"))
+          (Path \ "other") -> Seq(ValidationError("error.required.eab.redress.scheme.name"))
         )))
     }
+
+    "fail to validate given an `other` with max value" in {
+
+      val data = Map(
+        "isRedress" -> Seq("true"),
+        "propertyRedressScheme" -> Seq("04"),
+        "other" -> Seq("asadasas"*50)
+      )
+
+      RedressScheme.formRedressRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "other") -> Seq(ValidationError("error.invalid.eab.redress.scheme.name"))
+        )))
+    }
+
 
     "fail to validate given a non-enum value" in {
 

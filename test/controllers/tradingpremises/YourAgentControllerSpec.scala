@@ -48,11 +48,10 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on get display the your agent page with pre populated data" in new Fixture {
 
-      val agentsRegisteredName = AgentsRegisteredName("Agents Name")
       val taxType: TaxType = TaxTypeSelfAssesment
       val businessStructure: BusinessStructure = LimitedLiabilityPartnership
 
-      val yourAgent = YourAgent(agentsRegisteredName, taxType, businessStructure)
+      val yourAgent = YourAgent("Agents Name", taxType, businessStructure)
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
@@ -87,11 +86,10 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "agentsBusinessStructure" -> "01"
       )
 
-      val agentsRegisteredName = AgentsRegisteredName("Agents Registered Name")
       val taxType: TaxType = TaxTypeSelfAssesment
       val businessStructure: BusinessStructure = LimitedLiabilityPartnership
 
-      val yourAgent = YourAgent(agentsRegisteredName, taxType, businessStructure)
+      val yourAgent = YourAgent("Agents Registered Name", taxType, businessStructure)
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
@@ -112,11 +110,10 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "agentsBusinessStructure" -> "01"
       )
 
-      val agentsRegisteredName = AgentsRegisteredName("Agents Registered Name")
       val taxType: TaxType = TaxTypeSelfAssesment
       val businessStructure: BusinessStructure = LimitedLiabilityPartnership
 
-      val yourAgent = YourAgent(agentsRegisteredName, taxType, businessStructure)
+      val yourAgent = YourAgent("Agents Registered Name", taxType, businessStructure)
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
@@ -128,6 +125,5 @@ class YourAgentControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId).url))
 
     }
-
   }
 }
