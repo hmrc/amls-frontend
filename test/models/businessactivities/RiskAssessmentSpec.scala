@@ -60,7 +60,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
     "write correct data for risk assessment value" in {
       val model = Map(
         "hasPolicy" -> Seq("true"),
-        "riskassessments" -> Seq("01", "02")
+        "riskassessments[]" -> Seq("01", "02")
       )
 
       RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must
