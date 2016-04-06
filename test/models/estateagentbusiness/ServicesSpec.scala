@@ -45,13 +45,13 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "write correct data for services value" in {
 
       Services.formWrites.writes(Services(Set(Residential, Commercial, Auction))) must
-        be(Map("services" -> Seq("01","02","03")))
+        be(Map("services[]" -> Seq("01","02","03")))
 
       Services.formWrites.writes(Services(Set(AssetManagement, BusinessTransfer, LandManagement))) must
-        be(Map("services" -> Seq("06","05","07")))
+        be(Map("services[]" -> Seq("06","05","07")))
 
       Services.formWrites.writes(Services(Set(Relocation, Development, SocialHousing))) must
-        be(Map("services" -> Seq("04","08","09")))
+        be(Map("services[]" -> Seq("04","08","09")))
 
     }
 
