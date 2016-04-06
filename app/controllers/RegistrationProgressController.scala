@@ -19,7 +19,7 @@ trait RegistrationProgressController extends BaseController {
     implicit authContext => implicit request =>
       service.sections map {
         sections =>
-          Ok(registration_progress(sections, true/*declarationAvailable(sections)*/))
+          Ok(registration_progress(sections, declarationAvailable(sections)))
       }
   }
 }
