@@ -19,7 +19,7 @@ object SaRegistered {
 
   implicit val formRule: Rule[UrlFormEncoded, SaRegistered] = From[UrlFormEncoded] { __ =>
   import play.api.data.mapping.forms.Rules._
-    (__ \ "saRegistered").read[Boolean] flatMap {
+    (__ \ "saRegistered").read[Boolean].withMessage("error.required.sa.registration") flatMap {
       case true =>
         (__ \ "utrNumber").read(utrType) fmap (SaRegisteredYes.apply)
       case false => Rule.fromMapping { _ => Success(SaRegisteredNo) }

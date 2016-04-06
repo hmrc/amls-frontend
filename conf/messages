@@ -194,6 +194,12 @@ progress.msb.time = 6
 progress.tcsp.name = Trust or company service provider
 progress.tcsp.description = Registration information specifically for trust or company service providers.
 progress.tcsp.time = 8
+progress.responsiblepeople.name = Responsible People
+progress.responsiblepeople.description = Information about the people in charge of your business.
+progress.responsiblepeople.time = 10
+progress.declarationavailable = All sections complete: you can now submit the registration.
+progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
+
 
 # Confirmation page
 confirmation.lede = You have submitted the registration. Now pay the registration fee.
@@ -581,9 +587,26 @@ responsiblepeople.whatyouneed.line_8 = national insurance number
 responsiblepeople.whatyouneed.line_9 = VAT number and Self Assessment number
 responsiblepeople.whatyouneed.line_10 = details of relevant experience and training
 
+responsiblepeople.addperson.title = What''s the name of this responsible person?
+responsiblepeople.addperson.firstname = First name
+responsiblepeople.addperson.middlename = Middle name (optional)
+responsiblepeople.addperson.lastname = Last name
+
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
 
 # Custom error messages
+error.required.firstname = Enter a first name.
+error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
+
+error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 characters
+
+error.required.lastname = Enter a last name.
+error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
+
+# Custom error messages
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
+error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
+
+summary.responsiblepeople = Responsible People
