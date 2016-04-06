@@ -5,41 +5,46 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.responsiblepeople.{SaRegistered, ResponsiblePeople}
+import utils.RepeatingSection
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
-trait PersonAddressController extends BaseController {
+trait PersonAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key) map {
-        case Some(ResponsiblePeople(Some(data))) =>
-          Ok(person_address(Form2[SaRegistered](data), edit))
-        case _ =>
-          Ok(person_address(EmptyForm, edit))
-      }
-      }
-
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      Form2[SaRegistered](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(registered_for_self_assessment(f, edit)))
-        case ValidForm(_, data) =>
-          for {
-            resPeople <- dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key)
-            _ <- dataCacheConnector.save[ResponsiblePeople](ResponsiblePeople.key,
-              resPeople.saRegistered(data)
-            )
-          } yield edit match {
-            case true =>  Redirect(routes.WhatYouNeedController.get())//Todo
-            case false => Redirect(routes.WhatYouNeedController.get())//Todo
+  def get(index: Int, edit: Boolean = false) =
+    ResponsiblePeopleToggle {
+      Authorised.async {
+        implicit authContext => implicit request =>
+          getData[ResponsiblePeople](index) map {
+            case Some(ResponsiblePeople(_, Some(data))) =>
+              Ok(registered_for_self_assessment(Form2[SaRegistered](data), edit, index))
+            case _ =>
+              Ok(registered_for_self_assessment(EmptyForm, edit, index))
           }
       }
-  }
+    }
+
+  def post(index: Int, edit: Boolean = false) =
+    ResponsiblePeopleToggle {
+      Authorised.async {
+        implicit authContext => implicit request =>
+          Form2[SaRegistered](request.body) match {
+            case f: InvalidForm =>
+              Future.successful(BadRequest(registered_for_self_assessment(f, edit, index)))
+            case ValidForm(_, data) =>
+              for {
+                _ <- updateData[ResponsiblePeople](index) {
+                  case _ => Some(ResponsiblePeople(saRegistered = Some(data)))
+                }
+              } yield {
+                Redirect(routes.AddPersonController.get(index, edit))
+              }
+          }
+      }
+    }
 }
 
 object PersonAddressController extends PersonAddressController{
