@@ -46,10 +46,10 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "successfully subscribe" in {
 
       when {
-        DESConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/$safeId"), eqTo(request), any())(any(), any(), any())
+        DESConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/TestOrgRef/$safeId"), eqTo(request), any())(any(), any(), any())
       } thenReturn Future.successful(response)
 
-      whenReady (DESConnector.subscribe(request, safeId)) {
+      whenReady (DESConnector.subscribe(request, safeId, "TestOrgRef")) {
         _ mustBe response
       }
     }

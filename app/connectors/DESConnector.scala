@@ -13,11 +13,11 @@ trait DESConnector {
   private[connectors] def url: String
 
   def subscribe
-  (subscriptionRequest: SubscriptionRequest, safeId:String)
+  (subscriptionRequest: SubscriptionRequest, safeId:String, orgRef:String)
   (implicit
    headerCarrier: HeaderCarrier
   ): Future[SubscriptionResponse] = {
-    val postUrl = s"$url/$safeId"
+    val postUrl = s"$url/$orgRef/$safeId"
     http.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest)
   }
 }
