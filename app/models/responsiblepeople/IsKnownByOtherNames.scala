@@ -17,18 +17,18 @@ case object IsKnownByOtherNamesNo extends IsKnownByOtherNames
 
 object IsKnownByOtherNames {
 
-  val maxNameTypeLength = 35
-  val firstNameType = notEmpty.withMessage("error.required.firstname") compose
-    maxLength(maxNameTypeLength).withMessage("error.invalid.length.firstname")
+  val otherFirstNameType  = AddPerson.firstNameType
+  val otherMiddleNameType  = AddPerson.middleNameType
+  val otherLastNameType  = AddPerson.lastNameType
 
   implicit val formRule: Rule[UrlFormEncoded, IsKnownByOtherNames] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import utils.MappingUtils.Implicits._
     (__ \ "isKnownByOtherNames").read[Boolean] flatMap {
       case true => (
-        (__ \ "otherfirstnames").read(firstNameType) and
-        (__ \ "othermiddlenames").read(optionR(firstNameType)) and
-        (__ \ "otherlastnames").read(firstNameType)
+        (__ \ "otherfirstnames").read(otherFirstNameType) and
+        (__ \ "othermiddlenames").read(optionR(otherMiddleNameType)) and
+        (__ \ "otherlastnames").read(otherLastNameType)
         )(IsKnownByOtherNamesYes.apply _)
       case false => Rule.fromMapping { _ => Success(IsKnownByOtherNamesNo) }
     }

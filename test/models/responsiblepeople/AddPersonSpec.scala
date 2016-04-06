@@ -53,7 +53,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         "lastName" -> Seq("Doe"),
         "isKnownByOtherNames" -> Seq("false")
       )
-      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", Some("Envy"), "Doe", false)))
+      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
     }
 
     "successfully validate given the middle name is optional" in {
@@ -63,7 +63,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         "isKnownByOtherNames" -> Seq("false")
 
       )
-      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", None, "Doe", false)))
+      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", None, "Doe", IsKnownByOtherNamesNo)))
     }
 
 
@@ -126,12 +126,12 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         "isKnownByOtherNames" -> Seq(false)
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", false)))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
     }
 
     "Write the json successfully from the AddPerson domain object created" in {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe", false)
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
 
       val json = Json.obj(
         "firstName" -> "John",

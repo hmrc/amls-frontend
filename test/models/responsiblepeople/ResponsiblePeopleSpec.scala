@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
 
-  val addPerson = AddPerson("John", Some("Envy"), "Doe", false)
+  val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
   val responsiblePeopleModel = ResponsiblePeople(Some(addPerson))
 
   "ResponsiblePeople" must {

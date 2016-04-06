@@ -4,7 +4,7 @@ import java.util.UUID
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{AddPerson, ResponsiblePeople}
+import models.responsiblepeople.{AddPerson, IsKnownByOtherNamesNo, IsKnownByOtherNamesYes, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -66,7 +66,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on get display the persons page with fields populated" in new Fixture {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe", false)
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
       val responsiblePeople = ResponsiblePeople(Some(addPerson))
 
       when(addPersonController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
