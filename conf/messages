@@ -142,7 +142,9 @@ lbl.day = Day
 lbl.month = Month
 lbl.year = Year
 lbl.date.example = For example, 31 3 2017
-
+lbl.nationality = Nationality
+lbl.nino = National Insurance number
+lbl.passport.number = Passport number
 lbl.uk = UK
 lbl.overseas = Overseas
 lbl.select.all = Select all that apply
@@ -610,3 +612,14 @@ error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) 
 error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
 
 summary.responsiblepeople = Responsible People
+
+responsiblepeople.person.a.resident.title = Is this person a UK resident?
+responsiblepeople.person.a.resident.heading = Is this person a UK resident?
+
+responsiblepeople.dob.lbl = Date of birth
+responsiblepeople.dob.lbl.hint = For example, 31 3 1980
+responsiblepeople.passporttype.lbl = What type of passport does this person have?
+responsiblepeople.uk.passport.lbl = UK passport
+responsiblepeople.non.uk.passport.lbl = Non-UK passport
+responsiblepeople.no.passport.lbl = This person doesn't have a passport
+responsiblepeople.country.of.birth.lbl = Country of birth

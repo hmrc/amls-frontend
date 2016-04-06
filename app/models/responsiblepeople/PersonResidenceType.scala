@@ -54,4 +54,7 @@ object PersonResidenceType {
         (__ \ "nationality").write[String]
       ) (unlift(PersonResidenceType.unapply))
   }
+
+  implicit def convert(s: PersonResidenceType): Option[ResponsiblePeople] =
+    Some(ResponsiblePeople(None, Some(s), None))
 }
