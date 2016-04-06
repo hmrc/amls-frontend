@@ -51,7 +51,7 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
 
       IsKnownByOtherNames.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "isKnownByOtherNames") -> Seq(ValidationError("error.required"))
+          (Path \ "isKnownByOtherNames") -> Seq(ValidationError("error.required.rp.isknownbyothernames"))
         )))
     }
 
