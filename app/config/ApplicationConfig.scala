@@ -36,4 +36,5 @@ object ApplicationConfig extends ServicesConfig {
   lazy val enrolUrl = s"$ggUrl/enrol"
 
   lazy val responsiblePeopleToggle = getConfBool("feature-toggle.responsible-people", false)
+  lazy val enrolmentToggle = getConfBool("feature-toggle.gg-enrolment", false)
 }

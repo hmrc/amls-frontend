@@ -1,6 +1,7 @@
 package services
 
-import connectors.{DESConnector, DataCacheConnector}
+import config.ApplicationConfig
+import connectors.{DESConnector, DataCacheConnector, GovernmentGatewayConnector}
 import models.{SubscriptionRequest, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
@@ -115,7 +116,28 @@ trait SubscriptionService extends DataCacheService {
 }
 
 object SubscriptionService extends SubscriptionService {
+
+  object MockGGService extends GovernmentGatewayService {
+
+    import play.api.http.Status.OK
+
+    override private[services] def ggConnector: GovernmentGatewayConnector = GovernmentGatewayConnector
+
+    override def enrol
+    (mlrRefNo: String, safeId: String)
+    (implicit
+     hc: HeaderCarrier,
+     ec: ExecutionContext
+    ): Future[HttpResponse] = Future.successful(HttpResponse(OK))
+  }
+
   override private[services] val cacheConnector = DataCacheConnector
   override private[services] val desConnector = DESConnector
-  override private[services] val ggService = GovernmentGatewayService
+  override private[services] val ggService = {
+    if (ApplicationConfig.enrolmentToggle) {
+      GovernmentGatewayService
+    } else {
+      MockGGService
+    }
+  }
 }
