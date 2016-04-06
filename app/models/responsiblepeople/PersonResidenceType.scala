@@ -13,12 +13,15 @@ case class PersonResidenceType (
 
 object PersonResidenceType {
 
+  import utils.MappingUtils.Implicits._
+  import models.FormTypes._
+
   implicit val formRule: Rule[UrlFormEncoded, PersonResidenceType] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     (
       __.read[ResidenceType] and
-      (__ \ "countryOfBirth").read[Country] and
-      (__ \ "nationality").read[String]
+      (__ \ "countryOfBirth").read[Country].withMessage("error.required.rp.birth.country") and
+      (__ \ "nationality").read(nationalityType)
       )(PersonResidenceType.apply _)
   }
 

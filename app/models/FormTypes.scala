@@ -104,4 +104,6 @@ object FormTypes {
   val noUKPassportType = notEmpty.withMessage("error.required.non.uk.passport") compose
     maxLength(nonUKPassportLength).withMessage("error.invalid.non.uk.passport")
 
+  val nationalityType = notEmpty.withMessage("error.required.nationality")
+
 }

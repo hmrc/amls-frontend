@@ -6,15 +6,14 @@ import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{From, Rule, To, Write}
 import play.api.libs.json.{Writes, Reads}
 
-
 sealed trait ResidenceType
 
-case class UKResidence (nino: String) extends ResidenceType
+case class UKResidence(nino: String) extends ResidenceType
 
-case class NonUKResidence (
-                          dateOfBirth: LocalDate,
-                          passportType: PassportType
-                          ) extends ResidenceType
+case class NonUKResidence(
+                           dateOfBirth: LocalDate,
+                           passportType: PassportType
+                         ) extends ResidenceType
 
 object ResidenceType {
 
@@ -29,27 +28,35 @@ object ResidenceType {
         (
           (__ \ "dateOfBirth").read(localDateRule) and
             __.read[PassportType]
-          )(NonUKResidence.apply _)
+          ) (NonUKResidence.apply _)
     }
   }
 
-  implicit val formWrites: Write[ResidenceType, UrlFormEncoded] = Write {
+  implicit def formWrites
+  (implicit
+   w: Write[NonUKResidence, UrlFormEncoded]
+  ) = Write[ResidenceType, UrlFormEncoded] {
     case f: UKResidence =>
       Map(
+        "isUKResidence" -> Seq("true"),
         "nino" -> Seq(f.nino)
       )
     case f: NonUKResidence =>
-      formWritesNonUK.writes(f)
+      Map(
+        "isUKResidence" -> Seq("false")
+      ) ++
+      w.writes(f)
+
   }
 
   implicit val formWritesNonUK: Write[NonUKResidence, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-      import models.FormTypes.localDateWrite
-      import play.api.data.mapping.forms.Writes._
-      import play.api.libs.functional.syntax.unlift
-      (
-        (__ \ "dateOfBirth").write(localDateWrite) ~
-          __.write[PassportType]
-        ) (unlift(NonUKResidence.unapply))
+    import models.FormTypes.localDateWrite
+    import play.api.data.mapping.forms.Writes._
+    import play.api.libs.functional.syntax.unlift
+    (
+      (__ \ "dateOfBirth").write(localDateWrite) ~
+        __.write[PassportType]
+      ) (unlift(NonUKResidence.unapply))
   }
 
 
@@ -57,9 +64,7 @@ object ResidenceType {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
-      (__ \ "nino").read[String] andKeep (
-            (__ \ "nino").read[String] fmap UKResidence.apply map identity[ResidenceType]
-      ) orElse
+      (__ \ "nino").read[String] fmap UKResidence.apply map identity[ResidenceType] orElse
       (
         (__ \ "dateOfBirth").read[LocalDate] and
           __.read[PassportType]
@@ -74,12 +79,12 @@ object ResidenceType {
       case a: UKResidence =>
         Json.obj(
           "nino" -> a.nino
-          )
+        )
       case a: NonUKResidence =>
         (
-          (__ \ "yourName").write[LocalDate] and
-            (__ \ "businessName").write[PassportType]
-        )(unlift(NonUKResidence.unapply)).writes(a)
+          (__ \ "dateOfBirth").write[LocalDate] and
+            __.write[PassportType]
+          ) (unlift(NonUKResidence.unapply)).writes(a)
     }
   }
 

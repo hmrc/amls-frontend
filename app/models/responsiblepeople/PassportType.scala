@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import models.estateagentbusiness.Other
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
@@ -20,9 +21,9 @@ object PassportType {
     import models.FormTypes._
     (__ \ "passportType").read[String] flatMap {
       case "01" =>
-        (__ \ "passportNumberUk").read(ukPassportType) fmap UKPassport.apply
+        (__ \ "ukPassportNumber").read(ukPassportType) fmap UKPassport.apply
       case "02" =>
-        (__ \ "passportNumberNonUk").read(descriptionType) fmap NonUKPassport.apply
+        (__ \ "nonUKPassportNumber").read(noUKPassportType) fmap NonUKPassport.apply
       case "03" => NoPassport
       case _ =>
         (Path \ "passportType") -> Seq(ValidationError("error.invalid"))
@@ -32,40 +33,40 @@ object PassportType {
   implicit val formWrites: Write[PassportType, UrlFormEncoded] = Write {
     case UKPassport(ukNumber) =>  Map(
       "passportType" -> "01",
-      "passportNumberUk" -> ukNumber
+      "ukPassportNumber" -> ukNumber
     )
     case NonUKPassport(nonUKNumber) =>   Map(
       "passportType" -> "02",
-      "passportNumberNonUk" -> nonUKNumber
+      "nonUKPassportNumber" -> nonUKNumber
     )
     case NoPassport => "passportType" -> "03"
   }
 
-  implicit val jsonReads = {
+  implicit val jsonReads : Reads[PassportType] = {
     import play.api.libs.json.Reads.StringReads
-    (__ \ "passportType").read[String].flatMap[PassportType] {
-      case "01" =>
-        (JsPath \ "passportType").read[String] map {
-          UKPassport(_)
-        }
-      case "02" =>
-        (JsPath \ "passportType").read[String] map {
-          NonUKPassport(_)
-        }
-      case "03" => NoPassport
-      case _ =>
-        ValidationError("error.invalid")
-    }
+      (__ \ "passportType").read[String].flatMap[PassportType] {
+        case "01" =>
+          (__ \ "ukPassportNumber").read[String] map {
+            UKPassport(_)
+          }
+        case "02" =>
+          (__ \ "nonUKPassportNumber").read[String] map {
+            NonUKPassport(_)
+          }
+        case "03" => NoPassport
+        case _ =>
+          ValidationError("error.invalid")
+      }
   }
 
   implicit val jsonWrites = Writes[PassportType] {
     case UKPassport(ukNumber) =>  Json.obj(
       "passportType" -> "01",
-      "passportNumberUk" -> ukNumber
+      "ukPassportNumber" -> ukNumber
     )
     case NonUKPassport(nonUKNumber) =>  Json.obj(
       "passportType" -> "02",
-      "passportNumberNonUk" -> nonUKNumber
+      "nonUKPassportNumber" -> nonUKNumber
     )
     case NoPassport => Json.obj("passportType" -> "03")
   }
