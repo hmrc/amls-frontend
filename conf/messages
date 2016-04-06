@@ -577,6 +577,10 @@ responsiblepeople.addperson.middlename = Middle name (optional)
 responsiblepeople.addperson.lastname = Last name
 responsiblepeople.addperson.isknownbyothernames = Has this person ever been known by other names?
 
+responsiblepeople.addperson.otherfirstnames = Other first names
+responsiblepeople.addperson.othermiddlenames = Other middle names (optional)
+responsiblepeople.addperson.otherlastnames = Other last names
+
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
 
