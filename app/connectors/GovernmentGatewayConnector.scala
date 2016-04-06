@@ -28,7 +28,7 @@ trait GovernmentGatewayConnector {
         response
     } recoverWith {
       case e =>
-        Logger.error(s"$prefix - Failure response")
+        Logger.warn(s"$prefix - Failure response")
         Future.failed(e)
     }
   }
