@@ -3,45 +3,44 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ResponsiblePeople, SaRegistered}
+import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import models.responsiblepeople.{SaRegistered, ResponsiblePeople}
+import utils.RepeatingSection
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
-trait RegisteredForSelfAssessmentController extends BaseController {
+trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) =
+  def get(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-          dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key) map {
+          getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(_, Some(data))) =>
-              Ok(registered_for_self_assessment(Form2[SaRegistered](data), edit))
+              Ok(registered_for_self_assessment(Form2[SaRegistered](data), edit, index))
             case _ =>
-              Ok(registered_for_self_assessment(EmptyForm, edit))
+              Ok(registered_for_self_assessment(EmptyForm, edit, index))
           }
       }
     }
 
-  def post(edit: Boolean = false) =
+  def post(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           Form2[SaRegistered](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(registered_for_self_assessment(f, edit)))
+              Future.successful(BadRequest(registered_for_self_assessment(f, edit, index)))
             case ValidForm(_, data) =>
               for {
-                resPeople <- dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key)
-                _ <- dataCacheConnector.save[ResponsiblePeople](ResponsiblePeople.key,
-                  resPeople.saRegistered(data)
-                )
-              } yield edit match {
-                case true => Redirect(routes.WhatYouNeedController.get(1)) //Todo
-                case false => Redirect(routes.WhatYouNeedController.get(1)) //Todo
+                _ <- updateData[ResponsiblePeople](index) {
+                  case _ => Some(ResponsiblePeople(saRegistered = Some(data)))
+                }
+              } yield {
+                Redirect(routes.AddPersonController.get(index, edit))
               }
           }
       }
