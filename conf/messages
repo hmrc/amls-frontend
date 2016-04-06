@@ -591,5 +591,6 @@ error.invalid.length.lastname = Enter a valid Last name. It must be less or equa
 # Custom error messages
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
+error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
 
 summary.responsiblepeople = Responsible People

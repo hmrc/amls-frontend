@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, index: Int)(implicit request: Request[_])
 
 @target = @{
 s"""${f("utrNumber").id}-fieldset"""
@@ -14,7 +14,7 @@ title = Messages("responsiblepeople.registeredforselfassessment.title")
 @heading("responsiblepeople.registeredforselfassessment.title", "summary.responsiblepeople")
 
 
-    @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(edit)) {
+    @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit)) {
 
         @inlineRadioGroup(f("saRegistered")) {
             @legend("TODO", jsHidden = true)
