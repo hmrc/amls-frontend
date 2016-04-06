@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.responsiblepeople.{PreviousHomeAddress, ResponsiblePeople}
+import models.responsiblepeople._
 import utils.RepeatingSection
 import views.html.responsiblepeople.previous_home_address
 
@@ -34,10 +34,18 @@ trait PreviousHomeAddressController extends RepeatingSection with BaseController
         case ValidForm(_, data) =>
           for {
             _ <- updateData[ResponsiblePeople](index) {
-              case _ => Some(ResponsiblePeople(Some(data)))
+              case Some(ResponsiblePeople(add, sa, _)) =>
+                Some(ResponsiblePeople(add, sa, Some(data)))
+              case _ =>
+                Some(ResponsiblePeople(previousHomeAddress = Some(data)))
             }
-          } yield {
-            Redirect(routes.PreviousHomeAddressController.get(index, edit))
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get()) //TODO: Responsible Person Details
+            case false =>
+              data.TimeAtAddress match {
+                case ThreeYearsPlus => Redirect(routes.PreviousHomeAddressController.get(index, edit)) //TODO: Business Position
+                case _ => Redirect(routes.PreviousHomeAddressController.get(index, edit)) //TODO: Additional Address
+              }
           }
       }
     }

@@ -1,6 +1,6 @@
 package models.responsiblepeople
 
-import models.FormTypes
+import models.Country
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -14,9 +14,8 @@ class PreviousHomeAddressSpec extends PlaySpec with MockitoSugar {
   val DefaultAddressLine3 = None
   val DefaultAddressLine4 = None
   val DefaultPostcode = "NE1 7YX"
-  val DefaultCountry = "GP"
-  val DefaultTimeAtAddress = "0"
-
+  val DefaultForeignCountry = Country("Spain", "ES")
+  val DefaultTimeAtAddress = ZeroToFiveMonths
 
   val ValidUKObject = PreviousHomeAddressUK(
     DefaultAddressLine1,
@@ -31,7 +30,7 @@ class PreviousHomeAddressSpec extends PlaySpec with MockitoSugar {
     DefaultAddressLine2,
     DefaultAddressLine3,
     DefaultAddressLine4,
-    DefaultCountry,
+    DefaultForeignCountry,
     DefaultTimeAtAddress)
 
   "Form Rules and Writes" must {
@@ -41,15 +40,15 @@ class PreviousHomeAddressSpec extends PlaySpec with MockitoSugar {
       "addressLine1" -> Seq(DefaultAddressLine1),
       "addressLine2" -> Seq(DefaultAddressLine2),
       "postCode" -> Seq(DefaultPostcode),
-      "timeAtAddress" -> Seq(DefaultTimeAtAddress)
+      "timeAtAddress" -> Seq("01")
     )
 
     val ValidNonUKForm = Map(
       "isUK" -> Seq("false"),
       "addressLineNonUK1" -> Seq(DefaultAddressLine1),
       "addressLineNonUK2" -> Seq(DefaultAddressLine2),
-      "country" -> Seq(DefaultCountry),
-      "timeAtAddress" -> Seq(DefaultTimeAtAddress)
+      "country" -> Seq("ES"),
+      "timeAtAddress" -> Seq("01")
     )
 
     "successfully validate to a UK object given correct fields" in {
@@ -70,14 +69,14 @@ class PreviousHomeAddressSpec extends PlaySpec with MockitoSugar {
     "throw error when mandatory timeAtAddress field is missing" in {
       PreviousHomeAddress.formRule.validate(ValidUKForm - "timeAtAddress") must be(
         Failure(Seq(
-          (Path \ "timeAtAddress") -> Seq(ValidationError("error.required"))
+          (Path \ "timeAtAddress") -> Seq(ValidationError("error.required.timeAtAddress"))
         )))
     }
 
     "throw error when mandatory postcode field is missing for UK address" in {
-      PreviousHomeAddress.formRule.validate(ValidUKForm - "postcode") must be(
+      PreviousHomeAddress.formRule.validate(ValidUKForm - "postCode") must be(
         Failure(Seq(
-          (Path \ "postcode") -> Seq(ValidationError("error.required"))
+          (Path \ "postCode") -> Seq(ValidationError("error.required"))
         )))
     }
 
@@ -96,14 +95,13 @@ class PreviousHomeAddressSpec extends PlaySpec with MockitoSugar {
         )))
     }
 
-    "throw error when length of country exceeds max length" in {
+    "throw error when an invalid country code is given" in {
       val model =  ValidNonUKForm ++ Map("country" -> Seq("HGHHHH"))
       PreviousHomeAddress.formRule.validate(model) must be(
         Failure(Seq(
-          (Path \ "country") -> Seq(ValidationError("error.maxLength", FormTypes.maxCountryTypeLength))
+          (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
         )))
     }
-
 
   }
 
@@ -113,14 +111,14 @@ class PreviousHomeAddressSpec extends PlaySpec with MockitoSugar {
       "previousAddressLine1" -> DefaultAddressLine1,
       "previousAddressLine2" -> DefaultAddressLine2,
       "previousAddressPostCode" -> DefaultPostcode,
-      "previousTimeAtAddress" -> DefaultTimeAtAddress
+      "previousTimeAtAddress" -> "01"
     )
 
     val DefaultNonUKJson = Json.obj(
       "previousAddressLine1" -> DefaultAddressLine1,
       "previousAddressLine2" -> DefaultAddressLine2,
-      "previousAddressCountry" -> DefaultCountry,
-      "previousTimeAtAddress" -> DefaultTimeAtAddress
+      "previousAddressCountry" -> "ES",
+      "previousTimeAtAddress" -> "01"
     )
 
     "Round trip a UK Address correctly" in {

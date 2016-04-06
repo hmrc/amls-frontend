@@ -16,7 +16,7 @@ trait RegisteredForSelfAssessmentController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key) map {
-        case Some(ResponsiblePeople(_, Some(data))) =>
+        case Some(ResponsiblePeople(_, Some(data), _)) =>
           Ok(registered_for_self_assessment(Form2[SaRegistered](data), edit))
         case _ =>
           Ok(registered_for_self_assessment(EmptyForm, edit))
