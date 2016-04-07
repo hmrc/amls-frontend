@@ -19,8 +19,8 @@ trait PersonAddressController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            /*case Some(ResponsiblePeople(_, _, Some(data))) =>
-              Ok(person_address(Form2[PersonAddressHistory](data), edit, index))*/
+            case Some(ResponsiblePeople(_, _, Some(data))) =>
+              Ok(person_address(Form2[PersonAddressHistory](data), edit, index))
             case _ =>
               Ok(person_address(EmptyForm, edit, index))
           }
@@ -34,14 +34,14 @@ trait PersonAddressController extends RepeatingSection with BaseController {
           Form2[PersonAddressHistory](request.body) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(person_address(f, edit, index)))
-            /*case ValidForm(_, data) =>
+            case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
                   case _ => Some(ResponsiblePeople(personAddressHistory = Some(data)))
                 }
               } yield {
                 Redirect(routes.AddPersonController.get(index, edit))
-              }*/
+              }
           }
       }
     }
