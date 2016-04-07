@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import play.api.libs.json.Json
 import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -30,13 +31,16 @@ object ResponsiblePeople {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get())
-    cache.getEntry[ResponsiblePeople](key).fold(notStarted) {
-      model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, controllers.responsiblepeople.routes.SummaryController.get())
-        } else {
-          Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get())
+    val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
+    cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
+      case model if model.isEmpty => complete
+      case model if model forall { _.isComplete } => complete
+      case model =>
+        val index = model.indexWhere {
+          case model if !model.isComplete => true
+          case _ => false
         }
+        Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get())
     }
   }
 
@@ -46,8 +50,8 @@ object ResponsiblePeople {
     override def apply(): String = key
   }
 
-  //implicit val format = Json.format[ResponsiblePeople]
-  import play.api.libs.functional.syntax._
+  implicit val format = Json.format[ResponsiblePeople]
+  /*import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   implicit val reads: Reads[ResponsiblePeople] = (
@@ -65,7 +69,7 @@ object ResponsiblePeople {
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }
-  }
+  }*/
 
   implicit def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())

@@ -44,10 +44,9 @@ title = Messages("responsiblepeople.person.a.resident.title")
         @legend("responsiblepeople.country.of.birth.lbl", bold = true)
         @country(f("countryOfBirth"))
 
-        @input(
-            field = f("nationality"),
-            labelText = Messages("lbl.nationality")
-        )
+        @legend("lbl.nationality", bold = true)
+        @country(f("nationality"))
+
         @submit(edit)
     }
 }

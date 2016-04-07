@@ -40,7 +40,7 @@ class PassportTypeSpec extends PlaySpec {
       )))
     }
 
-    "write correct no UK model" in {
+    "write correct no UKPassport model" in {
       val data = Map(
         "passportType" -> Seq("02"),
         "nonUKPassportNumber" -> Seq("AA1234567")
@@ -48,6 +48,14 @@ class PassportTypeSpec extends PlaySpec {
       PassportType.formWrites.writes(NonUKPassport("AA1234567")) must be(data)
 
     }
+
+    "write correct no NoPassport model" in {
+      val data = Map(
+        "passportType" -> Seq("03")
+      )
+      PassportType.formWrites.writes(NoPassport) must be(data)
+    }
+
     "fail to validate given an invalid value" in {
 
       val urlFormEncoded = Map("passportType" -> Seq("10"))

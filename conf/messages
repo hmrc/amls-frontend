@@ -38,15 +38,13 @@ error.required.name.of.business = Enter the name of the business.
 error.invalid.name.of.business = You can''t enter more than 120 characters for the name of the business.
 error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 
-#National insurance number
 error.required.nino = Enter the National Insurance number.
 error.invalid.nino = Enter a valid National Insurance number. It must be 9 characters long, and can only be letters and numbers.
 
-#passport TODO
-error.required.uk.passport = Enter a Passport Number
-error.invalid.uk.passport = Enter a valid Passport Number
-error.required.non.uk.passport = Enter a Passport Number
-error.invalid.non.uk.passport = Enter a valid Passport Number
+error.required.uk.passport = Enter the UK passport number.
+error.invalid.uk.passport =  Enter a valid UK passport number. It must be 9 characters long, and can only be numbers or letters. Do not enter punctuation or other characters.
+error.required.non.uk.passport = Enter the non-UK passport number.
+error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can't enter more than 40 characters.
 
 # Custom error messages
 error.required.bm.register.service = Select at least one activity that you need to register.
@@ -610,8 +608,6 @@ error.invalid.length.lastname = Enter a valid Last name. It must be less or equa
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
 error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
-
-summary.responsiblepeople = Responsible People
 
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.person.a.resident.heading = Is this person a UK resident?

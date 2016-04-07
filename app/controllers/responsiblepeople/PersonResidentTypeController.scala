@@ -42,8 +42,9 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                   case Some(ResponsiblePeople(Some(x), value, Some(y))) => Some(ResponsiblePeople(Some(x), value, Some(y)))
                   case _ => data
                 }
-              } yield {
-                Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
+              } yield edit match {
+                case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
+                case true  => Redirect(routes.SummaryController.get())
               }
           }
       }

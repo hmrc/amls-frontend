@@ -8,20 +8,19 @@ import play.api.libs.json.{Reads, Writes}
 case class PersonResidenceType (
                                isUKResidence : ResidenceType,
                                countryOfBirth: Country,
-                               nationality: String
+                               nationality: Country
                               )
 
 object PersonResidenceType {
 
   import utils.MappingUtils.Implicits._
-  import models.FormTypes._
 
   implicit val formRule: Rule[UrlFormEncoded, PersonResidenceType] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     (
       __.read[ResidenceType] and
       (__ \ "countryOfBirth").read[Country].withMessage("error.required.rp.birth.country") and
-      (__ \ "nationality").read(nationalityType)
+      (__ \ "nationality").read[Country].withMessage("error.required.nationality")
       )(PersonResidenceType.apply _)
   }
 
@@ -31,7 +30,7 @@ object PersonResidenceType {
     (
       __.write[ResidenceType] and
         (__ \ "countryOfBirth").write[Country] and
-        (__ \ "nationality").write[String]
+        (__ \ "nationality").write[Country]
       ) (unlift(PersonResidenceType.unapply))
   }
 
@@ -41,7 +40,7 @@ object PersonResidenceType {
     (
       __.read[ResidenceType] and
         (__ \ "countryOfBirth").read[Country] and
-        (__ \ "nationality").read[String]
+        (__ \ "nationality").read[Country]
       ) (PersonResidenceType.apply _)
   }
 
@@ -51,7 +50,7 @@ object PersonResidenceType {
     (
       __.write[ResidenceType] and
         (__ \ "countryOfBirth").write[Country] and
-        (__ \ "nationality").write[String]
+        (__ \ "nationality").write[Country]
       ) (unlift(PersonResidenceType.unapply))
   }
 
