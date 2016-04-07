@@ -108,17 +108,17 @@ class PreviousHomeAddressSpec extends PlaySpec with MockitoSugar {
   "JSON" must {
 
     val DefaultUKJson = Json.obj(
-      "previousAddressLine1" -> DefaultAddressLine1,
-      "previousAddressLine2" -> DefaultAddressLine2,
-      "previousAddressPostCode" -> DefaultPostcode,
-      "previousTimeAtAddress" -> "01"
+      "addressLine1" -> DefaultAddressLine1,
+      "addressLine2" -> DefaultAddressLine2,
+      "postCode" -> DefaultPostcode,
+      "timeAtAddress" -> "01"
     )
 
     val DefaultNonUKJson = Json.obj(
-      "previousAddressLine1" -> DefaultAddressLine1,
-      "previousAddressLine2" -> DefaultAddressLine2,
-      "previousAddressCountry" -> "ES",
-      "previousTimeAtAddress" -> "01"
+      "addressLine1" -> DefaultAddressLine1,
+      "addressLine2" -> DefaultAddressLine2,
+      "country" -> "ES",
+      "timeAtAddress" -> "01"
     )
 
     "Round trip a UK Address correctly" in {

@@ -90,20 +90,20 @@ object PreviousHomeAddress {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
-    (__ \ "previousAddressPostCode").read[String] andKeep (
-      ((__ \ "previousAddressLine1").read[String] and
-        (__ \ "previousAddressLine2").read[String] and
-        (__ \ "previousAddressLine3").readNullable[String] and
-        (__ \ "previousAddressLine4").readNullable[String] and
-        (__ \ "previousAddressPostCode").read[String] and
-        (__ \ "previousTimeAtAddress").read[TimeAtAddress]) (PreviousHomeAddressUK.apply _) map identity[PreviousHomeAddress]
+    (__ \ "postCode").read[String] andKeep (
+      ((__ \ "addressLine1").read[String] and
+        (__ \ "addressLine2").read[String] and
+        (__ \ "addressLine3").readNullable[String] and
+        (__ \ "addressLine4").readNullable[String] and
+        (__ \ "postCode").read[String] and
+        (__ \ "timeAtAddress").read[TimeAtAddress]) (PreviousHomeAddressUK.apply _) map identity[PreviousHomeAddress]
       ) orElse
-      ((__ \ "previousAddressLine1").read[String] and
-        (__ \ "previousAddressLine2").read[String] and
-        (__ \ "previousAddressLine3").readNullable[String] and
-        (__ \ "previousAddressLine4").readNullable[String] and
-        (__ \ "previousAddressCountry").read[Country] and
-        (__ \ "previousTimeAtAddress").read[TimeAtAddress]) (PreviousHomeAddressNonUK.apply _)
+      ((__ \ "addressLine1").read[String] and
+        (__ \ "addressLine2").read[String] and
+        (__ \ "addressLine3").readNullable[String] and
+        (__ \ "addressLine4").readNullable[String] and
+        (__ \ "country").read[Country] and
+        (__ \ "timeAtAddress").read[TimeAtAddress]) (PreviousHomeAddressNonUK.apply _)
   }
 
   implicit val jsonWrites: Writes[PreviousHomeAddress] = {
@@ -113,21 +113,21 @@ object PreviousHomeAddress {
     Writes[PreviousHomeAddress] {
       case a: PreviousHomeAddressUK =>
         (
-          (__ \ "previousAddressLine1").write[String] and
-            (__ \ "previousAddressLine2").write[String] and
-            (__ \ "previousAddressLine3").writeNullable[String] and
-            (__ \ "previousAddressLine4").writeNullable[String] and
-            (__ \ "previousAddressPostCode").write[String] and
-            (__ \ "previousTimeAtAddress").write[TimeAtAddress]
+          (__ \ "addressLine1").write[String] and
+            (__ \ "addressLine2").write[String] and
+            (__ \ "addressLine3").writeNullable[String] and
+            (__ \ "addressLine4").writeNullable[String] and
+            (__ \ "postCode").write[String] and
+            (__ \ "timeAtAddress").write[TimeAtAddress]
           ) (unlift(PreviousHomeAddressUK.unapply)).writes(a)
       case a: PreviousHomeAddressNonUK =>
         (
-          (__ \ "previousAddressLine1").write[String] and
-            (__ \ "previousAddressLine2").write[String] and
-            (__ \ "previousAddressLine3").writeNullable[String] and
-            (__ \ "previousAddressLine4").writeNullable[String] and
-            (__ \ "previousAddressCountry").write[Country] and
-            (__ \ "previousTimeAtAddress").write[TimeAtAddress]
+          (__ \ "addressLine1").write[String] and
+            (__ \ "addressLine2").write[String] and
+            (__ \ "addressLine3").writeNullable[String] and
+            (__ \ "addressLine4").writeNullable[String] and
+            (__ \ "country").write[Country] and
+            (__ \ "timeAtAddress").write[TimeAtAddress]
           ) (unlift(PreviousHomeAddressNonUK.unapply)).writes(a)
     }
   }

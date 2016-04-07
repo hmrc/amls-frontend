@@ -14,11 +14,12 @@ case object ThreeYearsPlus extends TimeAtAddress
 object TimeAtAddress {
 
   implicit val timeAtAddressFormRead = Rule[String, TimeAtAddress] {
+    case ""   => Failure(Seq(Path -> Seq(ValidationError(Messages("error.required.timeAtAddress")))))
     case "01" => Success(ZeroToFiveMonths)
     case "02" => Success(SixToElevenMonths)
     case "03" => Success(OneToThreeYears)
     case "04" => Success(ThreeYearsPlus)
-    case _ =>  Failure(Seq(Path -> Seq(ValidationError(Messages("error.required.timeAtAddress")))))
+    case _ =>  Failure(Seq(Path -> Seq(ValidationError(Messages("error.invalid")))))
   }
 
   implicit val timeAtAddressFormWrite = Write[TimeAtAddress, Seq[String]] {

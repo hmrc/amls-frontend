@@ -4,7 +4,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsObject, JsSuccess, Json}
+import play.api.libs.json._
 
 class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
@@ -29,12 +29,10 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
         ))))
     }
 
-
-
     "throw error when there is invalid data" in {
       TimeAtAddress.timeAtAddressFormRead.validate("INVALID") must be(
         Failure(Seq(
-          Path -> Seq(ValidationError("error.invalid", "Boolean")
+          Path -> Seq(ValidationError("error.invalid")
         ))))
     }
 
@@ -49,11 +47,11 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
     }
 
     "Serialise ZeroToFiveMonths as expected" in {
-      Json.toJson(ZeroToFiveMonths) must be(Json.obj("timeAtAddress" -> "01"))
+      Json.toJson(ZeroToFiveMonths) must be (JsString("01"))
     }
 
     "Deserialise ZeroToFiveMonths as expected" in {
-      Json.obj("timeAtAddress" -> "01").as[PreviousHomeAddress] must be(ZeroToFiveMonths)
+      JsString("01").as[TimeAtAddress] must be(ZeroToFiveMonths)
     }
 
   }

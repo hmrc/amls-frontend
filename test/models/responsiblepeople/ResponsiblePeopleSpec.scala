@@ -7,7 +7,10 @@ import play.api.libs.json.Json
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
 
   val addPerson = AddPerson("John", Some("Envy"), "Doe")
-  val responsiblePeopleModel = ResponsiblePeople(Some(addPerson))
+  val previousHomeAddress = PreviousHomeAddressUK("Line 1", "Line 2", None, None, "NE15GH", ZeroToFiveMonths)
+
+  //TODO: Add SA Registered model.
+  val responsiblePeopleModel = ResponsiblePeople(Some(addPerson), None, Some(previousHomeAddress))
 
   "ResponsiblePeople" must {
 
@@ -17,13 +20,24 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       newResponsiblePeople.addPerson.get.firstName must be (addPersonUpdated.firstName)
     }
 
+    "update the model with previous home address" in {
+      val previousHomeAddressNew = previousHomeAddress.copy(addressLine1 = "New Line 1")
+      val newResponsiblePeople = responsiblePeopleModel.previousHomeAddress(previousHomeAddressNew)
+      newResponsiblePeople.previousHomeAddress.get must be (previousHomeAddressNew)
+    }
+
     "validate complete json" must {
 
       val completeJson = Json.obj(
         "addPerson" -> Json.obj(
           "firstName" -> "John",
           "middleName" -> "Envy",
-          "lastName" -> "Doe"
+          "lastName" -> "Doe"),
+        "previousHomeAddress" -> Json.obj(
+          "addressLine1" -> "Line 1",
+          "addressLine2" -> "Line 2",
+          "postCode" -> "NE15GH",
+          "timeAtAddress" -> "01"
         ))
 
       "Serialise as expected" in {
