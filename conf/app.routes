@@ -147,6 +147,9 @@ POST        /responsible-people/your-name/:index            controllers.responsi
 GET         /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
+
 GET         /responsible-people/summary                     controllers.responsiblepeople.SummaryController.get()
 
 GET         /responsible-people/additional-address/:index   controllers.responsiblepeople.PreviousHomeAddressController.get(index:Int, edit: Boolean ?= false)

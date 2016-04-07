@@ -39,10 +39,7 @@ trait PreviousHomeAddressController extends RepeatingSection with BaseController
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
-                  case Some(ResponsiblePeople(add, sa, _)) =>
-                    Some(ResponsiblePeople(add, sa, Some(data)))
-                  case _ =>
-                    Some(ResponsiblePeople(previousHomeAddress = Some(data)))
+                  case _ => Some(ResponsiblePeople(previousHomeAddress = Some(data)))
                 }
               } yield edit match {
                 case true => Redirect(routes.SummaryController.get()) //TODO: Responsible Person Details

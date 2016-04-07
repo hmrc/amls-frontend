@@ -19,7 +19,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, Some(data), _)) =>
+            case Some(ResponsiblePeople(_, _, _, Some(data))) =>
               Ok(registered_for_self_assessment(Form2[SaRegistered](data), edit, index))
             case _ =>
               Ok(registered_for_self_assessment(EmptyForm, edit, index))
