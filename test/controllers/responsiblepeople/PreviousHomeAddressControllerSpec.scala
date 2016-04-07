@@ -1,7 +1,5 @@
 package controllers.responsiblepeople
 
-import java.util.UUID
-
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
@@ -212,6 +210,71 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
     }
 
 
+    "must go to the correct location when edit mode is on" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "isUK" -> "true",
+        "addressLine1" -> "Line 1",
+        "addressLine2" -> "Line 2",
+        "postCode" -> "NE17YH",
+        "timeAtAddress" -> "01"
+      )
+
+      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = previousHomeAddressController.post(RecordId, true)(requestWithParams)
+      status(result) must be(SEE_OTHER)
+      //TODO: Update this to new location once implementated.
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+    }
+
+    "must go to the correct location when edit mode is off and time at address is less than 3 years" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "isUK" -> "true",
+        "addressLine1" -> "Line 1",
+        "addressLine2" -> "Line 2",
+        "postCode" -> "NE17YH",
+        "timeAtAddress" -> "01"
+      )
+
+      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = previousHomeAddressController.post(RecordId)(requestWithParams)
+      status(result) must be(SEE_OTHER)
+      //TODO: Update this to new location once implementated.
+      redirectLocation(result) must be(Some(routes.PreviousHomeAddressController.get(RecordId).url))
+    }
+
+    "must go to the correct location when edit mode is off and time at address is greater than 3 years" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "isUK" -> "true",
+        "addressLine1" -> "Line 1",
+        "addressLine2" -> "Line 2",
+        "postCode" -> "NE17YH",
+        "timeAtAddress" -> "04"
+      )
+
+      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = previousHomeAddressController.post(RecordId)(requestWithParams)
+      status(result) must be(SEE_OTHER)
+      //TODO: Update this to new location once implementated.
+      redirectLocation(result) must be(Some(routes.PreviousHomeAddressController.get(RecordId).url))
+    }
 
   }
 
