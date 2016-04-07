@@ -36,6 +36,7 @@ title = Messages("responsiblepeople.person.a.resident.title")
                     @fieldset("TODO", jsHidden = true, id = s"""${f("nonUKPassportNumber").id}-fieldset""") {
                         @input(f("nonUKPassportNumber"), "lbl.passport.number", bold = false)
                     }
+                    <p class="form-block">or</p>
                     @radio(f("passportType"), "responsiblepeople.no.passport.lbl", "03")
                 }
             }
