@@ -5,7 +5,6 @@ import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
 
