@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.responsiblepeople.{SaRegistered, ResponsiblePeople}
+import models.responsiblepeople.{PersonAddressHistory, ResponsiblePeople}
 import utils.RepeatingSection
 import views.html.responsiblepeople._
 
@@ -19,10 +19,10 @@ trait PersonAddressController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, Some(data))) =>
-              Ok(registered_for_self_assessment(Form2[SaRegistered](data), edit, index))
+            case Some(ResponsiblePeople(_, _, Some(data))) =>
+              Ok(person_address(Form2[PersonAddressHistory](data), edit, index))
             case _ =>
-              Ok(registered_for_self_assessment(EmptyForm, edit, index))
+              Ok(person_address(EmptyForm, edit, index))
           }
       }
     }
@@ -31,13 +31,13 @@ trait PersonAddressController extends RepeatingSection with BaseController {
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-          Form2[SaRegistered](request.body) match {
+          Form2[PersonAddressHistory](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(registered_for_self_assessment(f, edit, index)))
+              Future.successful(BadRequest(person_address(f, edit, index)))
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
-                  case _ => Some(ResponsiblePeople(saRegistered = Some(data)))
+                  case _ => Some(ResponsiblePeople(personAddressHistory = Some(data)))
                 }
               } yield {
                 Redirect(routes.AddPersonController.get(index, edit))

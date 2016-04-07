@@ -18,7 +18,7 @@ trait AddPersonController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(data), _)) =>
+            case Some(ResponsiblePeople(Some(data), _, _)) =>
               Ok(views.html.responsiblepeople.add_person(Form2[AddPerson](data), edit, index))
             case _ =>
               Ok(views.html.responsiblepeople.add_person(EmptyForm, edit, index))

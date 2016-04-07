@@ -5,7 +5,8 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
-                             saRegistered: Option[SaRegistered] = None ) {
+                             saRegistered: Option[SaRegistered] = None,
+                             personAddressHistory: Option[PersonAddressHistory] = None) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
@@ -13,9 +14,12 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def saRegistered(sa: SaRegistered): ResponsiblePeople =
     this.copy(saRegistered = Some(sa))
 
+  def personAddressHistory(pa: PersonAddressHistory): ResponsiblePeople =
+    this.copy(personAddressHistory = Some(pa))
+
   def isComplete: Boolean =
     this match {
-      case ResponsiblePeople(_, _) => true
+      case ResponsiblePeople(_, _, _) => true
       case _ => false
     }
 

@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @main(
     title = Messages("responsiblepeople.wherepersonlives.title")
@@ -10,7 +10,7 @@
 
     @heading("responsiblepeople.wherepersonlives.title", "summary.responsiblepeople")
 
-    @form(f, controllers.responsiblepeople.routes.WhatYouNeedController.get()) {
+    @form(f, controllers.responsiblepeople.routes.PersonAddressController.post(index)) {
 
         @inlineRadioGroup(f("isUK")) {
             @legend("TODO", jsHidden = true)
