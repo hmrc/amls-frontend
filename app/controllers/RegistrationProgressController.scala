@@ -25,6 +25,7 @@ trait RegistrationProgressController extends BaseController {
 }
 
 object RegistrationProgressController extends RegistrationProgressController {
+  // $COVERAGE-OFF$
   override protected val authConnector: AuthConnector = AMLSAuthConnector
   override private[controllers] val service = ProgressService
 }

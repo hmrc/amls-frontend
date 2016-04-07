@@ -46,6 +46,7 @@ trait TransactionRecordController extends BaseController {
 }
 
 object TransactionRecordController extends TransactionRecordController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

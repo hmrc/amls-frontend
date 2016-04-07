@@ -49,6 +49,7 @@ trait AddPersonController extends RepeatingSection with BaseController {
 }
 
 object AddPersonController extends AddPersonController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }

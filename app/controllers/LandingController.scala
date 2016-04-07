@@ -34,6 +34,7 @@ trait LandingController extends BaseController {
 }
 
 object LandingController extends LandingController {
+  // $COVERAGE-OFF$
   override private[controllers] val landingService = LandingService
   override protected val authConnector = AMLSAuthConnector
 }

@@ -15,5 +15,6 @@ trait WhatYouNeedController extends BaseController {
 }
 
 object WhatYouNeedController extends WhatYouNeedController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
 }

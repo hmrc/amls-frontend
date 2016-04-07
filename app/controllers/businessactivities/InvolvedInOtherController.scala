@@ -54,6 +54,7 @@ trait InvolvedInOtherController extends BaseController {
 }
 
 object InvolvedInOtherController extends InvolvedInOtherController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

@@ -55,6 +55,7 @@ trait ContactingYouController extends BaseController {
 }
 
 object ContactingYouController extends ContactingYouController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCache = DataCacheConnector
 }

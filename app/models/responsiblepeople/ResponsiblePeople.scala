@@ -31,13 +31,15 @@ object ResponsiblePeople {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get(1))
-    cache.getEntry[ResponsiblePeople](key).fold(notStarted) {
-      model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, controllers.responsiblepeople.routes.SummaryController.get())
-        } else {
-          Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get(1))
+    val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
+    cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
+      case model if model forall { _.isComplete } => complete
+      case model =>
+        val index = model.indexWhere {
+          case model if !model.isComplete => true
+          case _ => false
         }
+        Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get(index))
     }
   }
 

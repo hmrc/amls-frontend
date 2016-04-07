@@ -45,6 +45,7 @@ trait ResidentialRedressSchemeController extends BaseController {
 }
 
 object ResidentialRedressSchemeController extends ResidentialRedressSchemeController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

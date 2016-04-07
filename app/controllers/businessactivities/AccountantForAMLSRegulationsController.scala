@@ -47,6 +47,7 @@ trait AccountantForAMLSRegulationsController extends BaseController {
 }
 
 object AccountantForAMLSRegulationsController extends AccountantForAMLSRegulationsController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

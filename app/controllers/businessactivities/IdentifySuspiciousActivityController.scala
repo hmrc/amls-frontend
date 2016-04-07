@@ -48,6 +48,7 @@ trait IdentifySuspiciousActivityController extends BaseController {
 }
 
 object IdentifySuspiciousActivityController extends IdentifySuspiciousActivityController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }
