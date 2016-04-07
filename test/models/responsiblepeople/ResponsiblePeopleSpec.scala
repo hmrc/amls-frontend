@@ -5,6 +5,7 @@ import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
 
@@ -105,6 +106,17 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         val result = initial.saRegistered(NewSaRegisteredYes)
         result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(NewSaRegisteredYes)))
       }
+    }
+  }
+
+  "section" must {
+    "load what you need page" in {
+      val cacheMap = CacheMap("", Map.empty)
+
+      when(cache.getEntry[Seq[ResponsiblePeople]](key)(any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+
     }
   }
 }
