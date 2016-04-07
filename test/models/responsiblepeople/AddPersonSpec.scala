@@ -128,7 +128,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         "firstName" -> "John",
         "middleName" -> "Envy",
         "lastName" -> "Doe",
-        "isKnownByOtherNames" -> "false"
+        "isKnownByOtherNames" -> false
       )
 
       AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
@@ -142,7 +142,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         "firstName" -> "John",
         "middleName" -> "Envy",
         "lastName" -> "Doe",
-        "isKnownByOtherNames" -> "false"
+        "isKnownByOtherNames" -> false
       )
 
       AddPerson.jsonWrites.writes(addPerson) must be(json)
