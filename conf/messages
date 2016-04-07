@@ -27,6 +27,8 @@ error.required.postcode = Enter a postcode.
 error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
+#TODO
+error.required.nationality = Enter your nationality.
 
 error.required.yourname = Enter your name.
 error.invalid.yourname = You can''t enter more than 140 characters for your name.
@@ -36,6 +38,13 @@ error.required.name.of.business = Enter the name of the business.
 error.invalid.name.of.business = You can''t enter more than 120 characters for the name of the business.
 error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 
+error.required.nino = Enter the National Insurance number.
+error.invalid.nino = Enter a valid National Insurance number. It must be 9 characters long, and can only be letters and numbers.
+
+error.required.uk.passport = Enter the UK passport number.
+error.invalid.uk.passport =  Enter a valid UK passport number. It must be 9 characters long, and can only be numbers or letters. Do not enter punctuation or other characters.
+error.required.non.uk.passport = Enter the non-UK passport number.
+error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can't enter more than 40 characters.
 
 # Custom error messages
 error.required.bm.register.service = Select at least one activity that you need to register.
@@ -104,6 +113,11 @@ error.required.eab.info.about.penalty = Enter some information about the penalty
 error.invalid.eab.info.about.penalty = You can''t enter more than 255 characters for information about the penalty received.
 error.required.eab.penalised.by.professional.body = Select yes or no the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
+error.required.rp.is.uk.resident = Select yes or no to the question: is this person a UK resident?
+error.required.rp.passport = Select whether this person has a UK passport, a non-UK passport, or doesn''t have a passport.
+error.required.rp.birth.country = Enter a country of birth.
+error.required.rp.nationality = Enter a nationality.
+
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
@@ -126,7 +140,9 @@ lbl.day = Day
 lbl.month = Month
 lbl.year = Year
 lbl.date.example = For example, 31 3 2017
-
+lbl.nationality = Nationality
+lbl.nino = National Insurance number
+lbl.passport.number = Passport number
 lbl.uk = UK
 lbl.overseas = Overseas
 lbl.select.all = Select all that apply
@@ -601,4 +617,13 @@ error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
 error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
 
-summary.responsiblepeople = Responsible People
+responsiblepeople.person.a.resident.title = Is this person a UK resident?
+responsiblepeople.person.a.resident.heading = Is this person a UK resident?
+
+responsiblepeople.dob.lbl = Date of birth
+responsiblepeople.dob.lbl.hint = For example, 31 3 1980
+responsiblepeople.passporttype.lbl = What type of passport does this person have?
+responsiblepeople.uk.passport.lbl = UK passport
+responsiblepeople.non.uk.passport.lbl = Non-UK passport
+responsiblepeople.no.passport.lbl = This person doesn't have a passport
+responsiblepeople.country.of.birth.lbl = Country of birth

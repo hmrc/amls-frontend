@@ -198,6 +198,12 @@ form .date .form-group {
 form .date .form-group input[type=text] {
     width : 100%;
 }
+form .inline > label.block-label {
+    clear: none;
+}
+form .inline .block-label {
+    clear: both;
+}
 
 
 /* summary styles */

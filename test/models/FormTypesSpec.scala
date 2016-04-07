@@ -335,4 +335,38 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "nino" must {
+
+    "successfully validate" in {
+
+      ninoType.validate("abc123456") must
+        be(Success("abc123456"))
+    }
+
+    "fail to validate an empty string" in {
+
+      ninoType.validate("") must
+        equal(Failure(Seq(
+          Path -> Seq(ValidationError("error.required.nino"))
+        )))
+    }
+
+    "fail validation on exceeding maxlength" in {
+
+      ninoType.validate("1" * 10) must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.invalid.nino"))
+        )))
+    }
+
+    "fail to validate invalid data" in {
+
+      ninoType.validate("1@@@@@") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.invalid.nino"))
+        )))
+    }
+
+  }
+
 }
