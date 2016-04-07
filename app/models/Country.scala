@@ -19,9 +19,10 @@ object Country {
     case JsString(code) =>
       countries collectFirst {
         case e @ Country(_, c) if c == code =>
-          JsSuccess(e)
-      } getOrElse {
-        JsError(JsPath -> ValidationError("error.invalid"))
+          e
+      } match {
+        case Some(d) => JsSuccess(d)
+        case _ => JsError(JsPath -> ValidationError("error.invalid"))
       }
     case _ =>
       JsError(JsPath -> ValidationError("error.invalid"))
