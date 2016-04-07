@@ -615,8 +615,6 @@ responsiblepeople.addperson.otherlastnames = Other last names
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
 
-summary.responsiblepeople = Responsible People
-
 responsiblepeople.previous_home_address.title = Where was this person''s previous home address?
 responsiblepeople.previous_home_address.heading = Where was this person''s previous home address?
 responsiblepeople.previous_home_address.ukAddress = UK
