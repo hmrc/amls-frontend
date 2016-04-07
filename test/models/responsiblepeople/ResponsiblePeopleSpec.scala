@@ -125,8 +125,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       initial.isComplete must be(false)
 
     }
-
-
   }
 
   "Merge with existing model" when {

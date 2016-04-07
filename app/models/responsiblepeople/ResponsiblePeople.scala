@@ -23,7 +23,11 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def previousHomeAddress(prevAdd: PreviousHomeAddress): ResponsiblePeople =
     this.copy(previousHomeAddress = Some(prevAdd))
 
-  def isComplete: Boolean = this.productIterator.forall { case f: Option[_] => f.isDefined }
+  def isComplete: Boolean = this.productIterator.forall {
+    case Some(_) => true
+    case None => false
+    case _ => true
+  }
 
 }
 
