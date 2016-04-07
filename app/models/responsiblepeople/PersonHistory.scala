@@ -19,26 +19,26 @@ object PersonHistory {
   implicit val formRule: Rule[UrlFormEncoded, PersonHistory] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "personHistory").read[String].withMessage("error.required.ba.turnover.from.mlr") flatMap {
+    (__ \ "addressHistory").read[String].withMessage("error.required.rp.wherepersonlives.howlonglived") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third
       case "04" => Fourth
       case _ =>
-        (Path \ "personHistory") -> Seq(ValidationError("error.invalid"))
+        (Path \ "addressHistory") -> Seq(ValidationError("error.invalid"))
     }
   }
 
   implicit val formWrites: Write[PersonHistory, UrlFormEncoded] = Write {
-    case First => "personHistory" -> "01"
-    case Second => "personHistory" -> "02"
-    case Third => "personHistory" -> "03"
-    case Fourth => "personHistory" -> "04"
+    case First => "addressHistory" -> "01"
+    case Second => "addressHistory" -> "02"
+    case Third => "addressHistory" -> "03"
+    case Fourth => "addressHistory" -> "04"
   }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads
-    (__ \ "personHistory").read[String].flatMap[PersonHistory] {
+    (__ \ "addressHistory").read[String].flatMap[PersonHistory] {
       case "01" => First
       case "02" => Second
       case "03" => Third
@@ -49,9 +49,9 @@ object PersonHistory {
   }
 
   implicit val jsonWrites = Writes[PersonHistory] {
-    case First => Json.obj("personHistory" -> "01")
-    case Second => Json.obj("personHistory" -> "02")
-    case Third => Json.obj("personHistory" -> "03")
-    case Fourth => Json.obj("personHistory" -> "04")
+    case First => Json.obj("addressHistory" -> "01")
+    case Second => Json.obj("addressHistory" -> "02")
+    case Third => Json.obj("addressHistory" -> "03")
+    case Fourth => Json.obj("addressHistory" -> "04")
   }
 }
