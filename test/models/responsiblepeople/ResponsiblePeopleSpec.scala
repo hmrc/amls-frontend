@@ -99,6 +99,36 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
     }
   }
 
+  "Successfully validate if the model is complete" when {
+
+    "the model is fully complete" in {
+
+      val initial = ResponsiblePeople(
+        Some(DefaultAddPerson),
+        Some(DefaultPersonResidenceType),
+        Some(DefaultPreviousHomeAddress),
+        Some(DefaultSaRegisteredYes)
+      )
+
+      initial.isComplete must be(true)
+    }
+
+    "the model is not complete" in {
+
+      val initial = ResponsiblePeople(
+        Some(DefaultAddPerson),
+        Some(DefaultPersonResidenceType),
+        None,
+        Some(DefaultSaRegisteredYes)
+      )
+
+      initial.isComplete must be(false)
+
+    }
+
+
+  }
+
   "Merge with existing model" when {
     val initial = ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes))
 
