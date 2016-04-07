@@ -19,6 +19,8 @@ import scala.concurrent.Future
 
 class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
+  val RecordId = 1
+
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -42,16 +44,16 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneServerP
       "load the page" in new Fixture {
         when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
-        val result = controller.get()(request)
+        val result = controller.get(RecordId)(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("responsiblepeople.registeredforselfassessment.title"))
       }
     }
 
-    "on get display the is your business a franchise page with pre populated data" in new Fixture {
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(ResponsiblePeople(saRegistered = Some(SaRegisteredYes("0123456789"))))))
-      val result = controller.get()(request)
+    "on get display the page with pre populated data" in new Fixture {
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(saRegistered = Some(SaRegisteredYes("0123456789")))))))
+      val result = controller.get(RecordId)(request)
       status(result) must be(OK)
       contentAsString(result) must include ("0123456789")
     }
@@ -68,7 +70,7 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneServerP
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post()(newRequest)
+      val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
       //redirectLocation(result) must be(Some(routes.HowManyEmployeesController.get().url))
     }
@@ -79,11 +81,11 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneServerP
         "saRegistered" -> "test"
       )
 
-      val result = controller.post()(newRequest)
+      val result = controller.post(RecordId)(newRequest)
       status(result) must be(BAD_REQUEST)
 
       val document: Document  = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include("Invalid value")
+      document.select("span").html() must include(Messages("error.required.sa.registration"))
     }
 
 
@@ -99,7 +101,7 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneServerP
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post(RecordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
       //redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }

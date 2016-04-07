@@ -4,7 +4,7 @@ import java.util.UUID
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{AddPerson, ResponsiblePeople}
+import models.responsiblepeople.{AddPerson, IsKnownByOtherNamesNo, IsKnownByOtherNamesYes, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -66,7 +66,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on get display the persons page with fields populated" in new Fixture {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe")
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
       val responsiblePeople = ResponsiblePeople(Some(addPerson))
 
       when(addPersonController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -79,13 +79,15 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       document.select("input[name=firstName]").`val` must be("John")
       document.select("input[name=middleName]").`val` must be("Envy")
       document.select("input[name=lastName]").`val` must be("Doe")
+      document.select("input[isKnownByOtherNames=false]").hasAttr("checked") must be(false)
     }
 
     "must pass on post with all the mandatory parameters supplied" in new Fixture {
 
       val requestWithParams = request.withFormUrlEncodedBody(
         "firstName" -> "John",
-        "lastName" -> "Doe"
+        "lastName" -> "Doe",
+        "isKnownByOtherNames" -> "false"
       )
 
       when(addPersonController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -101,7 +103,8 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
     "must fail on post if first name not supplied" in new Fixture {
 
       val firstNameMissingInRequest = request.withFormUrlEncodedBody(
-        "lastName" -> "Doe"
+        "lastName" -> "Doe",
+        "isKnownByOtherNames" -> "false"
       )
 
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
@@ -117,7 +120,8 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
     "must fail on post if last name not supplied" in new Fixture {
 
       val lastNameMissingInRequest = request.withFormUrlEncodedBody(
-        "firstName" -> "John"
+        "firstName" -> "John",
+        "isKnownByOtherNames" -> "false"
       )
 
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())

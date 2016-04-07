@@ -5,7 +5,7 @@
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @target = @{
-    s"""${f("other").id}-fieldset"""
+    s"""${f("otherfirstnames").id}-fieldset"""
 }
 
 @main(
@@ -30,6 +30,17 @@
             field = f("lastName"),
             labelText = Messages("responsiblepeople.addperson.lastname")
         )
+
+        @inlineRadioGroup(f("isKnownByOtherNames")) {
+            @legend("responsiblepeople.addperson.isknownbyothernames", false, true)
+            @radio(f("isKnownByOtherNames"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("isKnownByOtherNames"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("otherfirstnames"), "responsiblepeople.addperson.otherfirstnames", bold = false)
+                @input(f("othermiddlenames"), "responsiblepeople.addperson.othermiddlenames", bold = false)
+                @input(f("otherlastnames"), "responsiblepeople.addperson.otherlastnames", bold = false)
+            }
+        }
 
     @submit()
   }
