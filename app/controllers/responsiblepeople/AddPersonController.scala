@@ -19,12 +19,12 @@ trait AddPersonController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-              response =>
-                val form: Form2[AddPerson] = (for {
-                  responsiblePeople <- response
-                  addPerson <- responsiblePeople.addPerson
-                } yield Form2[AddPerson](addPerson)).getOrElse(EmptyForm)
-                Ok(add_person(form, edit, index))
+            response =>
+              val form = (for {
+                addperson <- response
+                person <- addperson.addPerson
+              } yield Form2[AddPerson](person)).getOrElse(EmptyForm)
+              Ok(add_person(form, edit, index))
           }
       }
     }
@@ -52,6 +52,7 @@ trait AddPersonController extends RepeatingSection with BaseController {
 }
 
 object AddPersonController extends AddPersonController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }

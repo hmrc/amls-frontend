@@ -21,5 +21,4 @@ object NCARegistered {
   implicit val formWrites: Write[NCARegistered, UrlFormEncoded] = Write {
     case NCARegistered(registered) => Map("ncaRegistered" -> Seq(registered.toString))
   }
-
 }

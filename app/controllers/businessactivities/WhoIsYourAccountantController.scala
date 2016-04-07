@@ -48,6 +48,7 @@ trait WhoIsYourAccountantController extends BaseController {
 }
 
 object WhoIsYourAccountantController extends WhoIsYourAccountantController {
+  // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

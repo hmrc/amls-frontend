@@ -38,5 +38,4 @@ object HowManyEmployees {
           (__ \ "employeeCountAMLSSupervision").read(notEmpty.withMessage("error.required.ba.employee.count2") compose employeeCountType)
         ) (HowManyEmployees.apply _)
     }
-
 }

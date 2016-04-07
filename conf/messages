@@ -27,7 +27,6 @@ error.required.postcode = Enter a postcode.
 error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
-#TODO
 error.required.nationality = Enter your nationality.
 
 error.required.yourname = Enter your name.
@@ -82,7 +81,7 @@ error.required.ba.option.risk.assessment = Select yes or no to the question: doe
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
 error.required.ba.business.use.accountant = Select yes or no to the question: does your business use an accountant for matters relating to money laundering regulations?
 #TODO
-error.required.ba.suspicious.activity = Need Message for suspicious.activity
+error.required.ba.suspicious.activity = Select yes or no to the question:Does your business have written guidance for staff on how to identify and report suspicious activity?
 
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
 error.required.tp.trading.name = Enter a trading name.

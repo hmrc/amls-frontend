@@ -23,6 +23,7 @@ trait SummaryController extends BaseController {
 }
 
 object SummaryController extends SummaryController {
+  // $COVERAGE-OFF$
   override val dataCache = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }

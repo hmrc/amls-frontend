@@ -104,5 +104,4 @@ object Services {
   }
 
   implicit val formats = Json.format[Services]
-
 }

@@ -3,7 +3,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import forms._
 import models.responsiblepeople.{SaRegistered, ResponsiblePeople}
 import utils.RepeatingSection
 import views.html.responsiblepeople._
@@ -19,10 +19,12 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, Some(data))) =>
-              Ok(registered_for_self_assessment(Form2[SaRegistered](data), edit, index))
-            case _ =>
-              Ok(registered_for_self_assessment(EmptyForm, edit, index))
+            response =>
+              val form = (for {
+                resp <- response
+                person <- resp.saRegistered
+              } yield Form2[SaRegistered](person)).getOrElse(EmptyForm)
+              Ok(registered_for_self_assessment(form, edit, index))
           }
       }
     }
@@ -48,8 +50,8 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
 }
 
 object RegisteredForSelfAssessmentController extends RegisteredForSelfAssessmentController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
-
   override def dataCacheConnector = DataCacheConnector
 }
 

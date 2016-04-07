@@ -20,6 +20,7 @@ trait SubscriptionController extends BaseController {
 }
 
 object SubscriptionController extends SubscriptionController {
+  // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override private[controllers] def subscriptionService: SubscriptionService = SubscriptionService
 }

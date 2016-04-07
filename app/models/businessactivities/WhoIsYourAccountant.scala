@@ -105,7 +105,8 @@ object WhoIsYourAccountant {
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
 
-      val nameType = notEmpty compose maxLength(140)
+      val nameTypeLength = 140
+      val nameType = notEmpty compose maxLength(nameTypeLength)
 
       ((__ \ "name").read(nameType) and
         (__ \ "tradingName").read(optionR(nameType)) and
@@ -113,5 +114,6 @@ object WhoIsYourAccountant {
         (__).read[DoesAccountantAlsoDealWithTax])(WhoIsYourAccountant.apply _)
     }
 }
+
 
 
