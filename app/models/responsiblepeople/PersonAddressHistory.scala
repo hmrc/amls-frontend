@@ -4,7 +4,7 @@ import play.api.data.mapping.{To, Write, From, Rule}
 import play.api.data.mapping.forms._
 
 case class PersonAddressHistory(personAddress: PersonAddress,
-                                personHistory: PersonHistory)
+                                addressHistory: AddressHistory)
 
 object PersonAddressHistory {
 
@@ -15,7 +15,7 @@ object PersonAddressHistory {
   import play.api.data.mapping.forms.Rules._
   (
     (__).read[PersonAddress] and
-      (__).read[PersonHistory]
+      (__).read[AddressHistory]
     ) (PersonAddressHistory.apply _)
 }
 
@@ -24,7 +24,7 @@ object PersonAddressHistory {
     import play.api.libs.functional.syntax.unlift
     (
         (__).write[PersonAddress] and
-          (__).write[PersonHistory]
+          (__).write[AddressHistory]
       ) (unlift(PersonAddressHistory.unapply))
   }
 

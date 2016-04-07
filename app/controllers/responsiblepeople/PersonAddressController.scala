@@ -7,7 +7,7 @@ import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.responsiblepeople.{PersonAddressHistory, ResponsiblePeople}
 import utils.RepeatingSection
 import views.html.responsiblepeople._
-import models.responsiblepeople.PersonHistory._
+import models.responsiblepeople.AddressHistory._
 
 import scala.concurrent.Future
 
@@ -40,8 +40,8 @@ trait PersonAddressController extends RepeatingSection with BaseController {
                 _ <- updateData[ResponsiblePeople](index) {
                   case _ => Some(ResponsiblePeople(personAddressHistory = Some(data)))
                 }
-              } yield data.personHistory match {
-                case First | Second | Third => Redirect(routes.SummaryController.get())
+              } yield data.addressHistory match {
+                case First | Second | Third => Redirect(routes.SummaryController.get()) //TODO Redirect to page
                 case Fourth => Redirect(routes.AddPersonController.get(index, edit))
               }
           }
