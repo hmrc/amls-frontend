@@ -20,5 +20,4 @@ object AccountantForAMLSRegulations {
   implicit val formWrites: Write[AccountantForAMLSRegulations, UrlFormEncoded] = Write {
     case AccountantForAMLSRegulations(registered) => Map("accountantForAMLSRegulations" -> Seq(registered.toString))
   }
-
 }

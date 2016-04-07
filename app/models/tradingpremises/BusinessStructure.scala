@@ -80,5 +80,4 @@ object BusinessStructure {
     case UnincorporatedBody =>
       Map("agentsBusinessStructure" -> Seq("05"))
   }
-
 }
