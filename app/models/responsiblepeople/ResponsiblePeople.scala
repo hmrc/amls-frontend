@@ -30,7 +30,7 @@ object ResponsiblePeople {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
-    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get())
+    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get(1))
     val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
       case model if model.isEmpty => complete
@@ -40,7 +40,7 @@ object ResponsiblePeople {
           case model if !model.isComplete => true
           case _ => false
         }
-        Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get())
+        Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get(1))
     }
   }
 
@@ -51,25 +51,6 @@ object ResponsiblePeople {
   }
 
   implicit val format = Json.format[ResponsiblePeople]
-  /*import play.api.libs.functional.syntax._
-  import play.api.libs.json._
-
-  implicit val reads: Reads[ResponsiblePeople] = (
-    __.read[Option[AddPerson]] and
-      __.read[Option[PersonResidenceType]] and
-      __.read[Option[SaRegistered]]
-    ) (ResponsiblePeople.apply _)
-
-  implicit val writes: Writes[ResponsiblePeople] = Writes[ResponsiblePeople] {
-    model =>
-      Seq(
-        Json.toJson(model.addPerson).asOpt[JsObject],
-        Json.toJson(model.personResidenceType).asOpt[JsObject],
-        Json.toJson(model.saRegistered).asOpt[JsObject]
-      ).flatten.fold(Json.obj()) {
-        _ ++ _
-      }
-  }*/
 
   implicit def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())

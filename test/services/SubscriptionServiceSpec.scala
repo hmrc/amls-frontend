@@ -12,8 +12,10 @@ import models.governmentgateway.EnrolmentResponse
 import models.tradingpremises.TradingPremises
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.{OrgAccount, Accounts}
+import uk.gov.hmrc.play.frontend.auth.{Principal, AuthContext}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -34,6 +36,9 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
     }
 
     implicit val authContext = mock[AuthContext]
+    val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
+    when {authContext.principal}.thenReturn(principle)
+
     implicit val headerCarrier = HeaderCarrier()
 
     val enrolmentResponse = HttpResponse(OK)
@@ -98,7 +103,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
-        SubscriptionService.desConnector.subscribe(any(), eqTo(safeId))(any())
+        SubscriptionService.desConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
       } thenReturn Future.successful(subscriptionResponse)
 
       when {

@@ -1,5 +1,5 @@
 @import include._
-@()(implicit request: Request[_])
+@(index: Int)(implicit request: Request[_])
 
 @main(
     title = Messages("responsiblepeople.whatyouneed.title")
@@ -35,7 +35,7 @@
     </div>
 
     <div class="form-group">
-        <a id="what-you-need-continue" class="button" href="@controllers.responsiblepeople.routes.AddPersonController.get(1, false)">@Messages("button.continue")</a>
+        <a id="what-you-need-continue" class="button" href="@controllers.responsiblepeople.routes.AddPersonController.get(index, false)">@Messages("button.continue")</a>
     </div>
 
 }

@@ -8,11 +8,11 @@ import play.api.libs.json.Json
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
 
-  val DefaultAddPerson = AddPerson("John", Some("Envy"), "Doe")
+  val DefaultAddPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
   val DefaultPersonResidenceType = PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val DefaultSaRegisteredYes = SaRegisteredYes("0123456789")
 
-  val NewAddPerson = AddPerson("first", Some("middle"), "last")
+  val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
   val NewPersonResidenceType = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
     Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val NewSaRegisteredYes = SaRegisteredNo
@@ -22,9 +22,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   "ResponsiblePeople" must {
 
     "update the model with the person" in {
-      val addPersonUpdated = DefaultAddPerson.copy(firstName="Johny")
+      val addPersonUpdated = DefaultAddPerson.copy(firstName = "Johny")
       val newResponsiblePeople = ResponsiblePeopleModel.addPerson(addPersonUpdated)
-      newResponsiblePeople.addPerson.get.firstName must be (addPersonUpdated.firstName)
+      newResponsiblePeople.addPerson.get.firstName must be(addPersonUpdated.firstName)
     }
 
     "validate complete json" must {
@@ -33,7 +33,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         "addPerson" -> Json.obj(
           "firstName" -> "John",
           "middleName" -> "Envy",
-          "lastName" -> "Doe"
+          "lastName" -> "Doe",
+          "isKnownByOtherNames" -> false
         ))
 
       "Serialise as expected" in {
@@ -43,6 +44,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       "Deserialise as expected" in {
         completeJson.as[ResponsiblePeople] must be(ResponsiblePeopleModel)
       }
+
     }
 
     "implicitly return an existing Model if one present" in {

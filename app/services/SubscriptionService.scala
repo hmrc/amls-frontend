@@ -58,7 +58,8 @@ trait SubscriptionService extends DataCacheService {
   (cache: CacheMap, safeId: String)
   (implicit
    ac: AuthContext,
-   hc: HeaderCarrier
+   hc: HeaderCarrier,
+   ec: ExecutionContext
   ): Future[SubscriptionResponse] = {
     val request = SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
@@ -69,7 +70,8 @@ trait SubscriptionService extends DataCacheService {
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key)
     )
-    desConnector.subscribe(request, safeId)
+    val org = ac.principal.accounts.org.fold("") { _.org.value }
+    desConnector.subscribe(request, safeId, org)
   }
 
   def subscribe

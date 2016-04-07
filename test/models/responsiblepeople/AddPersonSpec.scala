@@ -4,7 +4,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class AddPersonSpec extends PlaySpec with MockitoSugar {
 
@@ -50,17 +50,20 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "firstName" -> Seq("John"),
         "middleName" -> Seq("Envy"),
-        "lastName" -> Seq("Doe")
+        "lastName" -> Seq("Doe"),
+        "isKnownByOtherNames" -> Seq("false")
       )
-      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", Some("Envy"), "Doe")))
+      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
     }
 
     "successfully validate given the middle name is optional" in {
       val urlFormEncoded = Map(
         "firstName" -> Seq("John"),
-        "lastName" -> Seq("Doe")
+        "lastName" -> Seq("Doe"),
+        "isKnownByOtherNames" -> Seq("false")
+
       )
-      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", None, "Doe")))
+      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", None, "Doe", IsKnownByOtherNamesNo)))
     }
 
 
@@ -69,14 +72,17 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
       AddPerson.formRule.validate(Map.empty) must
         be(Failure(Seq(
           (Path \ "firstName") -> Seq(ValidationError("error.required")),
-          (Path \ "lastName") -> Seq(ValidationError("error.required"))
+          (Path \ "lastName") -> Seq(ValidationError("error.required")),
+          (Path \ "isKnownByOtherNames") -> Seq(ValidationError("error.required.rp.isknownbyothernames"))
         )))
     }
 
     "fail to validate when first name is missing" in {
 
       val urlFormEncoded = Map(
-        "lastName" -> Seq("Doe"))
+        "lastName" -> Seq("Doe"),
+        "isKnownByOtherNames" -> Seq("false")
+      )
 
       AddPerson.formRule.validate(urlFormEncoded) must
         be(Failure(Seq(
@@ -87,7 +93,8 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
     "fail to validate when last name is missing" in {
 
       val urlFormEncoded = Map(
-        "firstName" -> Seq("John")
+        "firstName" -> Seq("John"),
+        "isKnownByOtherNames" -> Seq("false")
       )
 
       AddPerson.formRule.validate(urlFormEncoded) must
@@ -101,7 +108,8 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
 
       val urlFormEncoded = Map(
         "firstName" -> Seq("JohnJohnJohnJohnJohnJohnJohnJohnJohn"),
-        "lastName" -> Seq("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe")
+        "lastName" -> Seq("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe"),
+        "isKnownByOtherNames" -> Seq("false")
       )
 
       AddPerson.formRule.validate(urlFormEncoded) must
@@ -119,20 +127,22 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj(
         "firstName" -> "John",
         "middleName" -> "Envy",
-        "lastName" -> "Doe"
+        "lastName" -> "Doe",
+        "isKnownByOtherNames" -> false
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe")))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
     }
 
     "Write the json successfully from the AddPerson domain object created" in {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe")
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
 
       val json = Json.obj(
         "firstName" -> "John",
         "middleName" -> "Envy",
-        "lastName" -> "Doe"
+        "lastName" -> "Doe",
+        "isKnownByOtherNames" -> false
       )
 
       AddPerson.jsonWrites.writes(addPerson) must be(json)
