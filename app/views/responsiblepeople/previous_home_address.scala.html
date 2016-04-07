@@ -25,9 +25,7 @@ title = Messages("responsiblepeople.previous_home_address.title")
         id = s"""${f("postCode").id}-fieldset"""
     ) {
         <fieldset class="">
-            <legend class="form-label-bold">
-                @Messages("responsiblepeople.previous_home_address.address")
-            </legend>
+            @legend("responsiblepeople.previous_home_address.address", bold = true)
             @input(f("addressLine1"))
             @input(f("addressLine2"))
             @input(f("addressLine3"))
@@ -48,9 +46,7 @@ title = Messages("responsiblepeople.previous_home_address.title")
         id = s"""${f("country").id}-fieldset"""
     ) {
         <fieldset class="">
-            <legend class="form-label-bold">
-                @Messages("responsiblepeople.previous_home_address.address")
-            </legend>
+            @legend("responsiblepeople.previous_home_address.address", bold = true)
             @input(f("addressLineNonUK1"))
             @input(f("addressLineNonUK2"))
             @input(f("addressLineNonUK3"))
@@ -64,10 +60,7 @@ title = Messages("responsiblepeople.previous_home_address.title")
     }
 
     @radioGroup(f("timeAtAddress")) {
-        @legend("TODO", jsHidden = true)
-        <legend class="form-label-bold">
-            @Messages("responsiblepeople.previous_home_address.how_long")
-        </legend>
+        @legend("responsiblepeople.previous_home_address.how_long", bold = true)
         @radio(f("timeAtAddress"), "responsiblepeople.previous_home_address.0_5_months", "01")
         @radio(f("timeAtAddress"), "responsiblepeople.previous_home_address.6_11_months", "02")
         @radio(f("timeAtAddress"), "responsiblepeople.previous_home_address.1_3_years", "03")
