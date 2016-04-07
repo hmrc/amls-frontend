@@ -48,6 +48,7 @@ trait HowManyEmployeesController extends BaseController {
 }
 
 object HowManyEmployeesController extends HowManyEmployeesController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override val authConnector: AuthConnector = AMLSAuthConnector
 }

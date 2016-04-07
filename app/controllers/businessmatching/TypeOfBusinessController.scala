@@ -47,6 +47,7 @@ trait TypeOfBusinessController extends BaseController {
 }
 
 object TypeOfBusinessController extends TypeOfBusinessController {
+  // $COVERAGE-OFF$
   override private[controllers] def dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }

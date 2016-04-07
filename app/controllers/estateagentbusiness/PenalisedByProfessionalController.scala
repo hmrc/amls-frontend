@@ -41,6 +41,7 @@ trait PenalisedByProfessionalController extends BaseController {
 }
 
 object PenalisedByProfessionalController extends PenalisedByProfessionalController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

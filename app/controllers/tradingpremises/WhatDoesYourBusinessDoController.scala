@@ -102,6 +102,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
 }
 
 object WhatDoesYourBusinessDoController extends WhatDoesYourBusinessDoController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

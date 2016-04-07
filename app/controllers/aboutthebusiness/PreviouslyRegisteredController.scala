@@ -44,6 +44,7 @@ trait PreviouslyRegisteredController extends BaseController {
 }
 
 object PreviouslyRegisteredController extends PreviouslyRegisteredController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

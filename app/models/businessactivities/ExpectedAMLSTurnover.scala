@@ -61,7 +61,6 @@ object ExpectedAMLSTurnover {
     }
   }
 
-
   implicit val jsonWrites = Writes[ExpectedAMLSTurnover] {
     case First => Json.obj("expectedAMLSTurnover" -> "01")
     case Second => Json.obj("expectedAMLSTurnover" -> "02")
@@ -70,7 +69,5 @@ object ExpectedAMLSTurnover {
     case Fifth => Json.obj("expectedAMLSTurnover" -> "05")
     case Sixth => Json.obj("expectedAMLSTurnover" -> "06")
     case Seventh => Json.obj("expectedAMLSTurnover" -> "07")
-
-
   }
 }

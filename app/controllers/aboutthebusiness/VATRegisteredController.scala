@@ -44,6 +44,7 @@ trait VATRegisteredController extends BaseController {
 }
 
 object VATRegisteredController extends VATRegisteredController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

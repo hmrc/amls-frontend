@@ -48,8 +48,8 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
 }
 
 object RegisteredForSelfAssessmentController extends RegisteredForSelfAssessmentController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
-
   override def dataCacheConnector = DataCacheConnector
 }
 

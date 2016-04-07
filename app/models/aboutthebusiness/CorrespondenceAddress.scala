@@ -58,9 +58,10 @@ object CorrespondenceAddress {
       import play.api.data.mapping.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
-
-      val nameType = maxLength(140).withMessage("error.invalid.yourname")
-      val businessNameType =  maxLength(120).withMessage("error.invalid.name.of.business")
+      val nameMaxLength = 140
+      val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
+      val businessNameMaxLength = 120
+      val businessNameType =  maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business")
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
@@ -160,3 +161,4 @@ object CorrespondenceAddress {
     }
   }
 }
+

@@ -31,11 +31,6 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
   "ConfirmRegisteredOfficeController" must {
 
-    "use correct services" in new Fixture {
-      ConfirmRegisteredOfficeController.authConnector must be(AMLSAuthConnector)
-      ConfirmRegisteredOfficeController.dataCache must be(DataCacheConnector)
-    }
-
     "Get Option:" must {
 
       "load register Office" in new Fixture {

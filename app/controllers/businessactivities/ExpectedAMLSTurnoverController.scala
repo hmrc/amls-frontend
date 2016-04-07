@@ -47,6 +47,7 @@ trait ExpectedAMLSTurnoverController extends BaseController {
 }
 
 object ExpectedAMLSTurnoverController extends ExpectedAMLSTurnoverController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

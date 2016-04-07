@@ -71,7 +71,5 @@ object ExpectedBusinessTurnover {
     case Fifth => Json.obj("expectedBusinessTurnover" -> "05")
     case Sixth => Json.obj("expectedBusinessTurnover" -> "06")
     case Seventh => Json.obj("expectedBusinessTurnover" -> "07")
-
-
   }
 }

@@ -23,6 +23,7 @@ trait DeclarationController extends BaseController {
 }
 
 object DeclarationController extends DeclarationController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }
