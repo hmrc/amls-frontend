@@ -108,15 +108,4 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       }
     }
   }
-
-  "section" must {
-    "load what you need page" in {
-      val cacheMap = CacheMap("", Map.empty)
-
-      when(cache.getEntry[Seq[ResponsiblePeople]](key)(any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-
-    }
-  }
 }
