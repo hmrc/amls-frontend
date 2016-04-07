@@ -79,7 +79,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
       document.select("input[name=firstName]").`val` must be("John")
       document.select("input[name=middleName]").`val` must be("Envy")
       document.select("input[name=lastName]").`val` must be("Doe")
-      document.select("input[name=isKnownByOtherNames]").`val` must be("false")
+      document.select("input[isKnownByOtherNames=false]").hasAttr("checked") must be(false)
     }
 
     "must pass on post with all the mandatory parameters supplied" in new Fixture {
