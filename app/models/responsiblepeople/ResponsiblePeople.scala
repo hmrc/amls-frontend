@@ -25,7 +25,7 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
 
   def isComplete: Boolean =
     this match {
-      case ResponsiblePeople(_, _, _, _) => true
+      case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_)) => true
       case _ => false
     }
 }
