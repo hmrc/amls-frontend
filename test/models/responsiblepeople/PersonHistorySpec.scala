@@ -48,7 +48,7 @@ class PersonHistorySpec extends PlaySpec with MockitoSugar {
 
     "throw error on empty data" in {
       PersonHistory.formRule.validate(Map.empty) must
-        be(Failure(Seq((Path \ "personHistory", Seq(ValidationError("error.required.ba.turnover.from.mlr"))))))
+        be(Failure(Seq((Path \ "personHistory", Seq(ValidationError("error.required.rp.wherepersonlives.howlonglived"))))))
     }
   }
 
