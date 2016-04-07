@@ -103,7 +103,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
-        SubscriptionService.desConnector.subscribe(any(), eqTo(safeId), any())(any())
+        SubscriptionService.desConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
       } thenReturn Future.successful(subscriptionResponse)
 
       when {
