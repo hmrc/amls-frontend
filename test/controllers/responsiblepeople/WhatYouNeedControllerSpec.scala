@@ -26,7 +26,7 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with Moc
     "get" must {
 
       "load the page" in new Fixture {
-        val result = controller.get(request)
+        val result = controller.get(1)(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("responsiblepeople.whatyouneed.title"))
       }

@@ -49,6 +49,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
 
 object RegisteredForSelfAssessmentController extends RegisteredForSelfAssessmentController {
   override val authConnector = AMLSAuthConnector
+
   override def dataCacheConnector = DataCacheConnector
 }
 

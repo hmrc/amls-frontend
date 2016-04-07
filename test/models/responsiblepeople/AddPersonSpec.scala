@@ -50,17 +50,20 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map(
         "firstName" -> Seq("John"),
         "middleName" -> Seq("Envy"),
-        "lastName" -> Seq("Doe")
+        "lastName" -> Seq("Doe"),
+        "isKnownByOtherNames" -> Seq("false")
       )
-      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", Some("Envy"), "Doe")))
+      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
     }
 
     "successfully validate given the middle name is optional" in {
       val urlFormEncoded = Map(
         "firstName" -> Seq("John"),
-        "lastName" -> Seq("Doe")
+        "lastName" -> Seq("Doe"),
+        "isKnownByOtherNames" -> Seq("false")
+
       )
-      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", None, "Doe")))
+      AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", None, "Doe", IsKnownByOtherNamesNo)))
     }
 
 
@@ -119,20 +122,22 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj(
         "firstName" -> "John",
         "middleName" -> "Envy",
-        "lastName" -> "Doe"
+        "lastName" -> "Doe",
+        "isKnownByOtherNames" -> Seq(false)
       )
 
-      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe")))
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
     }
 
     "Write the json successfully from the AddPerson domain object created" in {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe")
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
 
       val json = Json.obj(
         "firstName" -> "John",
         "middleName" -> "Envy",
-        "lastName" -> "Doe"
+        "lastName" -> "Doe",
+        "isKnownByOtherNames" -> "false"
       )
 
       AddPerson.jsonWrites.writes(addPerson) must be(json)
