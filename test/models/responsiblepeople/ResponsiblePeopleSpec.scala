@@ -24,7 +24,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           "firstName" -> "John",
           "middleName" -> "Envy",
           "lastName" -> "Doe",
-          "isKnownByOtherNames" -> "false"
+          "isKnownByOtherNames" -> false
         ))
 
       "Serialise as expected" in {

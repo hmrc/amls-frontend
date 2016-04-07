@@ -56,7 +56,7 @@ object AddPerson {
       (__ \ "firstName").read[String] and
         (__ \ "middleName").read[Option[String]] and
         (__ \ "lastName").read[String] and
-        (__ \ "isKnownByOtherNames").read[IsKnownByOtherNames]
+        (__).read[IsKnownByOtherNames]
       ) (AddPerson.apply _)
 
   }
@@ -69,7 +69,7 @@ object AddPerson {
       (__ \ "firstName").write[String] and
         (__ \ "middleName").write[Option[String]] and
         (__ \ "lastName").write[String] and
-        (__ \ "isKnownByOtherNames").write[IsKnownByOtherNames]
+        (__).write[IsKnownByOtherNames]
       ) (unlift(AddPerson.unapply))
   }
 
