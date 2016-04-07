@@ -69,7 +69,7 @@ trait SubscriptionService extends DataCacheService {
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key)
     )
-    desConnector.subscribe(request, safeId)
+    desConnector.subscribe(request, safeId, ac.principal.accounts.org.fold(""){orgAccount => orgAccount.org.value})
   }
 
   def subscribe
