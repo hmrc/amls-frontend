@@ -24,7 +24,6 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
     this.copy(previousHomeAddress = Some(prevAdd))
 
   def isComplete: Boolean = this.productIterator.forall {
-    case Some(_) => true
     case None => false
     case _ => true
   }
