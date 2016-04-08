@@ -28,6 +28,7 @@ object FormTypes {
   val minAccountantRefNoTypeLength = 11
   val maxRoleWithinBusinessOtherType = 255
   val maxTypeOfBusinessLength = 40
+  val nonUKPassportLength = 40
 
   val notEmptyStrip = Rule.zero[String] fmap { _.trim }
 
@@ -56,8 +57,6 @@ object FormTypes {
 
   val yearRegex = "((19|20)\\d\\d)".r
   val yearType =  notEmpty.withMessage("error.required.tp.year") compose pattern(yearRegex).withMessage("error.invalid.tp.date")
-
-
 
   val localDateRule: Rule[UrlFormEncoded, LocalDate] =
     From[UrlFormEncoded] { __ =>
@@ -97,4 +96,12 @@ object FormTypes {
   val roleWithinBusinessOtherType = notEmptyStrip compose notEmpty compose maxLength(maxRoleWithinBusinessOtherType)
 
   val typeOfBusinessType = notEmptyStrip compose notEmpty compose maxLength(maxTypeOfBusinessLength)
+
+  val ninoType = notEmpty.withMessage("error.required.nino") compose pattern("^[0-9a-zA-Z_]{9}+$".r).withMessage("error.invalid.nino")
+
+  val ukPassportType = notEmpty.withMessage("error.required.uk.passport") compose pattern("^[0-9a-zA-Z_]{9}+$".r).withMessage("error.invalid.uk.passport")
+
+  val noUKPassportType = notEmpty.withMessage("error.required.non.uk.passport") compose
+    maxLength(nonUKPassportLength).withMessage("error.invalid.non.uk.passport")
+
 }

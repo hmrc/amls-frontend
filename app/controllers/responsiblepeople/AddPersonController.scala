@@ -3,9 +3,10 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms._
 import models.responsiblepeople.{AddPerson, ResponsiblePeople}
 import utils.RepeatingSection
+import views.html.responsiblepeople.add_person
 
 import scala.concurrent.Future
 
@@ -18,10 +19,12 @@ trait AddPersonController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(data), _, _)) =>
-              Ok(views.html.responsiblepeople.add_person(Form2[AddPerson](data), edit, index))
-            case _ =>
-              Ok(views.html.responsiblepeople.add_person(EmptyForm, edit, index))
+            response =>
+              val form = (for {
+                addperson <- response
+                person <- addperson.addPerson
+              } yield Form2[AddPerson](person)).getOrElse(EmptyForm)
+              Ok(add_person(form, edit, index))
           }
       }
     }
@@ -39,7 +42,7 @@ trait AddPersonController extends RepeatingSection with BaseController {
                   case _ => Some(ResponsiblePeople(Some(data)))
                 }
               } yield {
-                Redirect(routes.AddPersonController.get(index, edit))
+                Redirect(routes.PersonResidentTypeController.get(index, edit))
               }
           }
         }
@@ -49,6 +52,7 @@ trait AddPersonController extends RepeatingSection with BaseController {
 }
 
 object AddPersonController extends AddPersonController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }

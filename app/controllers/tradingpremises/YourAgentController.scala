@@ -49,6 +49,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
 }
 
 object YourAgentController extends YourAgentController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

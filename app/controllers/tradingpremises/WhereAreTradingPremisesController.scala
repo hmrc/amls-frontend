@@ -56,6 +56,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 }
 
 object WhereAreTradingPremisesController extends WhereAreTradingPremisesController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

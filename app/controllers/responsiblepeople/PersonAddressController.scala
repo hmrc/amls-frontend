@@ -20,7 +20,7 @@ trait PersonAddressController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, Some(data))) =>
+            case Some(ResponsiblePeople(_, _, _, Some(data))) =>
               Ok(person_address(Form2[PersonAddressHistory](data), edit, index))
             case _ =>
               Ok(person_address(EmptyForm, edit, index))
