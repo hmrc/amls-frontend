@@ -116,6 +116,7 @@ error.required.rp.is.uk.resident = Select yes or no to the question: is this per
 error.required.rp.passport = Select whether this person has a UK passport, a non-UK passport, or doesn''t have a passport.
 error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
+error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
 
 # Custom error messages
 error.required.firstname = Enter a first name.
