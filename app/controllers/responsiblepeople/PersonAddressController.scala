@@ -3,11 +3,11 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.responsiblepeople.AddressHistory._
 import models.responsiblepeople.{PersonAddressHistory, ResponsiblePeople}
 import utils.RepeatingSection
 import views.html.responsiblepeople._
-import models.responsiblepeople.AddressHistory._
 
 import scala.concurrent.Future
 
@@ -20,13 +20,16 @@ trait PersonAddressController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, Some(data))) =>
-              Ok(person_address(Form2[PersonAddressHistory](data), edit, index))
-            case _ =>
-              Ok(person_address(EmptyForm, edit, index))
+            response =>
+              val form = (for {
+                res <- response
+                addressHistory <- res.personAddressHistory
+              } yield Form2[PersonAddressHistory](addressHistory)).getOrElse(EmptyForm)
+              Ok(person_address(form, edit, index))
           }
       }
     }
+
 
   def post(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
@@ -54,4 +57,3 @@ object PersonAddressController extends PersonAddressController {
 
   override def dataCacheConnector = DataCacheConnector
 }
-
