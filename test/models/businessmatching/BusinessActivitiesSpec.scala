@@ -40,7 +40,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     "fail to validate on empty Map" in {
 
       BusinessActivities.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required")))))
+        be(Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service")))))
     }
 
     "fail to validate when given invalid data" in {
@@ -55,19 +55,19 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     "write correct data for businessActivities value" in {
 
       BusinessActivities.formWrites.writes(BusinessActivities(Set(EstateAgentBusinessService, BillPaymentServices, MoneyServiceBusiness))) must
-        be(Map("businessActivities" -> Seq("03","02", "05")))
+        be(Map("businessActivities[]" -> Seq("03","02", "05")))
     }
 
     "write correct data for businessActivities value on checkbox selected" in {
 
       BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices))) must
-        be(Map("businessActivities" -> Seq("01")))
+        be(Map("businessActivities[]" -> Seq("01")))
     }
 
     "write correct data for businessActivities value when 3 checkbox selected" in {
 
       BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
-        be(Map("businessActivities" -> Seq("07", "06", "04")))
+        be(Map("businessActivities[]" -> Seq("07", "06", "04")))
     }
 
     "get the value for each activity type" in {

@@ -24,7 +24,7 @@ object ExpectedBusinessTurnover {
   implicit val formRule: Rule[UrlFormEncoded, ExpectedBusinessTurnover] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "expectedBusinessTurnover").read[String] flatMap {
+    (__ \ "expectedBusinessTurnover").read[String].withMessage("error.required.ba.business.turnover") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third
@@ -71,7 +71,5 @@ object ExpectedBusinessTurnover {
     case Fifth => Json.obj("expectedBusinessTurnover" -> "05")
     case Sixth => Json.obj("expectedBusinessTurnover" -> "06")
     case Seventh => Json.obj("expectedBusinessTurnover" -> "07")
-
-
   }
 }

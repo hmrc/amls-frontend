@@ -8,6 +8,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
@@ -46,10 +47,10 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "successfully subscribe" in {
 
       when {
-        DESConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/$safeId"), eqTo(request), any())(any(), any(), any())
+        DESConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/TestOrgRef/$safeId"), eqTo(request), any())(any(), any(), any())
       } thenReturn Future.successful(response)
 
-      whenReady (DESConnector.subscribe(request, safeId)) {
+      whenReady (DESConnector.subscribe(request, safeId, "TestOrgRef")) {
         _ mustBe response
       }
     }

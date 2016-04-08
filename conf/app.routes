@@ -132,12 +132,22 @@ POST        /business-activities/accountant-details     controllers.businessacti
 
 GET         /business-activities/check-your-answers      controllers.businessactivities.SummaryController.get()
 
+GET         /declaration/add-person                         controllers.declaration.AddPersonController.get()
+POST        /declaration/add-person                         controllers.declaration.AddPersonController.post()
 
-GET         /declaration/add-person                     controllers.declaration.AddPersonController.get()
-POST        /declaration/add-person                     controllers.declaration.AddPersonController.post()
+GET         /declaration/declaration                        controllers.declaration.DeclarationController.get()
 
-GET         /declaration/declaration                    controllers.declaration.DeclarationController.get()
+GET         /confirmation                                   controllers.ConfirmationController.get()
 
-GET         /confirmation                               controllers.ConfirmationController.get()
+GET         /responsible-people/index/:index                controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
 
-GET         /responsible-people/index                  controllers.responsiblepeople.WhatYouNeedController.get()
+GET         /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/summary                     controllers.responsiblepeople.SummaryController.get()

@@ -3,6 +3,10 @@ package models.businessactivities
 import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, To, Write}
 import play.api.libs.json.Json
+import models.FormTypes._
+
+import play.api.data.mapping.forms.Rules._
+import utils.MappingUtils.Implicits._
 
 case class HowManyEmployees(employeeCount: String,
                             employeeCountAMLSSupervision: String)
@@ -11,6 +15,12 @@ case class HowManyEmployees(employeeCount: String,
 object HowManyEmployees {
 
   implicit val formats = Json.format[HowManyEmployees]
+
+  val employeeCountRegex = "^[0-9]+$".r
+  val maxEmployeeCount = 11
+  val employeeCountType = notEmptyStrip compose maxLength(maxEmployeeCount).withMessage("error.max.length.ba.employee.count") compose
+                          pattern(employeeCountRegex).withMessage("error.invalid.ba.employee.count")
+
 
   implicit val formWrites: Write[HowManyEmployees, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Writes._
@@ -23,12 +33,9 @@ object HowManyEmployees {
 
   implicit val formRule: Rule[UrlFormEncoded, HowManyEmployees] =
     From[UrlFormEncoded] { __ =>
-      import models.FormTypes._
-      import play.api.data.mapping.forms.Rules._
       (
-        (__ \ "employeeCount").read(employeeCountType) and
-          (__ \ "employeeCountAMLSSupervision").read(employeeCountType)
+        (__ \ "employeeCount").read(notEmpty.withMessage("error.required.ba.employee.count1") compose employeeCountType) and
+          (__ \ "employeeCountAMLSSupervision").read(notEmpty.withMessage("error.required.ba.employee.count2") compose employeeCountType)
         ) (HowManyEmployees.apply _)
     }
-
 }

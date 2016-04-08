@@ -17,6 +17,7 @@ trait ConfirmationController extends BaseController {
 }
 
 object ConfirmationController extends ConfirmationController {
+  // $COVERAGE-OFF$
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val subscriptionService = SubscriptionService
 }

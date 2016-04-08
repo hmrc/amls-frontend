@@ -1,8 +1,7 @@
 package config
 
-import play.api.Play
+import play.api.{Logger, Play}
 import uk.gov.hmrc.play.config.ServicesConfig
-
 import play.api.Play.current
 
 object ApplicationConfig extends ServicesConfig {
@@ -23,6 +22,7 @@ object ApplicationConfig extends ServicesConfig {
   lazy val reportAProblemUrl = contactHost + getConfigString("contact-frontend.report-a-problem-url")
 
   lazy val loginUrl = getConfigString("login.url")
+  lazy val logoutUrl = getConfigString("logout.url")
 
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
@@ -34,5 +34,15 @@ object ApplicationConfig extends ServicesConfig {
   lazy val ggUrl = baseUrl("government-gateway")
   lazy val enrolUrl = s"$ggUrl/enrol"
 
-  lazy val responsiblePeopleToggle = getConfBool("feature-toggle.responsible-people", false)
+  val responsiblePeopleToggle: Boolean = {
+    val value = getConfBool("feature-toggle.responsible-people", false)
+    Logger.info(s"[ApplicationConfig][responsible-people] $value")
+    value
+  }
+
+  val enrolmentToggle: Boolean = {
+    val value = getConfBool("feature-toggle.gg-enrolment", false)
+    Logger.info(s"[ApplicationConfig][gg-enrolment] $value")
+    value
+  }
 }

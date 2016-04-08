@@ -2,6 +2,7 @@ package models
 
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
+import play.api.i18n.Messages
 import play.api.libs.json._
 
 case class Country(name: String, code: String) {
@@ -30,12 +31,14 @@ object Country {
     Write { _.code }
 
   implicit val formRule: Rule[String, Country] =
-    Rule { code =>
-      countries.collectFirst {
-        case e @ Country(_, c) if c == code =>
-          Success(e)
-      } getOrElse {
-        Failure(Seq(Path -> Seq(ValidationError("error.invalid"))))
-      }
+    Rule {
+      case "" => Failure(Seq(Path -> Seq(ValidationError(Messages("error.required.country")))))
+      case code =>
+        countries.collectFirst {
+          case e @ Country(_, c) if c == code =>
+            Success(e)
+        } getOrElse {
+          Failure(Seq(Path -> Seq(ValidationError(Messages("error.invalid.country")))))
+        }
     }
 }

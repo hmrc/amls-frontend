@@ -29,7 +29,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "fail to validate on empty Map" in {
 
       Services.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required")))))
+        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required.eab.business.services")))))
 
     }
 
@@ -45,13 +45,13 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
     "write correct data for services value" in {
 
       Services.formWrites.writes(Services(Set(Residential, Commercial, Auction))) must
-        be(Map("services" -> Seq("01","02","03")))
+        be(Map("services[]" -> Seq("01","02","03")))
 
       Services.formWrites.writes(Services(Set(AssetManagement, BusinessTransfer, LandManagement))) must
-        be(Map("services" -> Seq("06","05","07")))
+        be(Map("services[]" -> Seq("06","05","07")))
 
       Services.formWrites.writes(Services(Set(Relocation, Development, SocialHousing))) must
-        be(Map("services" -> Seq("04","08","09")))
+        be(Map("services[]" -> Seq("04","08","09")))
 
     }
 

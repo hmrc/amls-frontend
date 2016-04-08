@@ -2,7 +2,8 @@ package models.businessactivities
 
 import org.scalatestplus.play.PlaySpec
 
-import play.api.data.mapping.Success
+import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -14,6 +15,11 @@ class NCARegisteredSpec extends PlaySpec {
       val data = Map("ncaRegistered" -> Seq("true"))
       val result = NCARegistered.formRule.validate(data)
       result mustBe Success(NCARegistered(true))
+    }
+
+    "fail validation for empty data" in {
+      val result = NCARegistered.formRule.validate(Map.empty)
+      result mustBe Failure(Seq((Path \ "ncaRegistered", Seq(ValidationError("error.required.ba.select.nca")))))
     }
 
     "successfully validate given a false value" in {

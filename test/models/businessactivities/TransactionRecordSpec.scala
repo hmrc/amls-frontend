@@ -41,12 +41,34 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
       val model = Map(
         "transactions[]" -> Seq("01", "02" ,"03"),
-        "name" -> Seq("test")
+        "name" -> Seq("")
       )
 
       TransactionRecord.formRule.validate(model) must
-        be(Failure(List(( Path \ "isRecorded", Seq(ValidationError("error.required"))))))
+        be(Failure(List(( Path \ "isRecorded", Seq(ValidationError("error.required.ba.select.transaction.record"))))))
 
+    }
+
+    "fail validation when field is recorded selected and software name is empty" in {
+
+      val model = Map(
+        "isRecorded" -> Seq("true"),
+        "transactions[]" -> Seq("01", "02" ,"03"),
+        "name" -> Seq("")
+      )
+      TransactionRecord.formRule.validate(model) must
+        be(Failure(List(( Path \ "name", Seq(ValidationError("error.required.ba.software.package.name"))))))
+    }
+
+    "fail validation when field is recorded selected and software name exceed max length" in {
+
+      val model = Map(
+        "isRecorded" -> Seq("true"),
+        "transactions[]" -> Seq("01", "02" ,"03"),
+        "name" -> Seq("test"*20)
+      )
+      TransactionRecord.formRule.validate(model) must
+        be(Failure(List(( Path \ "name", Seq(ValidationError("error.max.length.ba.software.package.name"))))))
     }
 
     "fail validation when none of the check boxes selected" in {
@@ -56,17 +78,14 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "transactions[]" -> Seq(),
         "name" -> Seq("test")
       )
-
       TransactionRecord.formRule.validate(model) must
-        be(Failure(List(( Path \ "transactions", Seq(ValidationError("error.required"))))))
-
+        be(Failure(List(( Path \ "transactions", Seq(ValidationError("error.required.ba.atleast.one.transaction.record"))))))
     }
-
 
     "fail to validate on empty Map" in {
 
       TransactionRecord.formRule.validate(Map.empty) must
-        be(Failure(Seq((Path \ "isRecorded") -> Seq(ValidationError("error.required")))))
+        be(Failure(Seq((Path \ "isRecorded") -> Seq(ValidationError("error.required.ba.select.transaction.record")))))
 
     }
 
@@ -76,7 +95,6 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
         "isRecorded" -> Seq("true"),
         "transactions[]" -> Seq("01, 10")
       )
-
       TransactionRecord.formRule.validate(model) must
         be(Failure(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid")))))
 
@@ -86,7 +104,7 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
       val map = Map(
         "isRecorded" -> Seq("true"),
-        "transactions" -> Seq("03","01"),
+        "transactions[]" -> Seq("03","01"),
         "name" -> Seq("test")
       )
 
@@ -99,7 +117,6 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       val map = Map(
         "isRecorded" -> Seq("false")
       )
-
       val model = TransactionRecordNo
       TransactionRecord.formWrites.writes(model) must be (map)
     }
@@ -108,19 +125,17 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
 
       val map = Map(
         "isRecorded" -> Seq("true"),
-        "transactions" -> Seq("02","01")
+        "transactions[]" -> Seq("02","01")
       )
 
       val model = TransactionRecordYes(Set(DigitalSpreadsheet, Paper))
       TransactionRecord.formWrites.writes(model) must be (map)
     }
 
-
     "form write test" in {
       val map = Map(
         "isRecorded" -> Seq("false")
       )
-
       val model = TransactionRecordNo
 
       TransactionRecord.formWrites.writes(model) must be(map)

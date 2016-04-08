@@ -1,0 +1,47 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
+
+@target = @{
+    s"""${f("otherfirstnames").id}-fieldset"""
+}
+
+@main(
+    title = Messages("responsiblepeople.addperson.title")
+) {
+
+    @heading("responsiblepeople.addperson.title", "summary.responsiblepeople")
+
+    @form(f, controllers.responsiblepeople.routes.AddPersonController.post(index, edit)) {
+
+        @input(
+            field = f("firstName"),
+            labelText = Messages("responsiblepeople.addperson.firstname")
+        )
+
+        @input(
+            field = f("middleName"),
+            labelText = Messages("responsiblepeople.addperson.middlename")
+        )
+
+        @input(
+            field = f("lastName"),
+            labelText = Messages("responsiblepeople.addperson.lastname")
+        )
+
+        @inlineRadioGroup(f("isKnownByOtherNames")) {
+            @legend("responsiblepeople.addperson.isknownbyothernames", false, true)
+            @radio(f("isKnownByOtherNames"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("isKnownByOtherNames"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("otherfirstnames"), "responsiblepeople.addperson.otherfirstnames", bold = false)
+                @input(f("othermiddlenames"), "responsiblepeople.addperson.othermiddlenames", bold = false)
+                @input(f("otherlastnames"), "responsiblepeople.addperson.otherlastnames", bold = false)
+            }
+        }
+
+    @submit()
+  }
+}

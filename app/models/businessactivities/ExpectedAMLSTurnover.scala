@@ -23,7 +23,7 @@ object ExpectedAMLSTurnover {
   implicit val formRule: Rule[UrlFormEncoded, ExpectedAMLSTurnover] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "expectedAMLSTurnover").read[String] flatMap {
+    (__ \ "expectedAMLSTurnover").read[String].withMessage("error.required.ba.turnover.from.mlr") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third
@@ -61,7 +61,6 @@ object ExpectedAMLSTurnover {
     }
   }
 
-
   implicit val jsonWrites = Writes[ExpectedAMLSTurnover] {
     case First => Json.obj("expectedAMLSTurnover" -> "01")
     case Second => Json.obj("expectedAMLSTurnover" -> "02")
@@ -70,7 +69,5 @@ object ExpectedAMLSTurnover {
     case Fifth => Json.obj("expectedAMLSTurnover" -> "05")
     case Sixth => Json.obj("expectedAMLSTurnover" -> "06")
     case Seventh => Json.obj("expectedAMLSTurnover" -> "07")
-
-
   }
 }

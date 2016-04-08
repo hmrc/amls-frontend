@@ -16,7 +16,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
     "fail to validate on empty map" in {
       RiskAssessmentPolicy.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "hasPolicy") -> Seq(ValidationError("error.required")))))
+        be(Failure(Seq((Path \ "hasPolicy") -> Seq(ValidationError("error.required.ba.option.risk.assessment")))))
     }
 
     "successfully validate given an enum value" in {
@@ -43,7 +43,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
       RiskAssessmentPolicy.formReads.validate(model) must
         be(Failure(Seq(
-          (Path \ "riskassessments") -> Seq(ValidationError("error.required"))
+          (Path \ "riskassessments") -> Seq(ValidationError("error.required.ba.risk.assessment.format"))
         )))
     }
 
@@ -60,7 +60,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
     "write correct data for risk assessment value" in {
       val model = Map(
         "hasPolicy" -> Seq("true"),
-        "riskassessments" -> Seq("01", "02")
+        "riskassessments[]" -> Seq("01", "02")
       )
 
       RiskAssessmentPolicy.formWrites.writes(RiskAssessmentPolicyYes(Set(PaperBased, Digital))) must

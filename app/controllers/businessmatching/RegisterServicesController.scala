@@ -42,7 +42,8 @@ trait RegisterServicesController  extends BaseController {
   }
 }
 
-object RegisterServicesController extends RegisterServicesController   {
+object RegisterServicesController extends RegisterServicesController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

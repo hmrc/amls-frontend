@@ -5,6 +5,7 @@ import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.i18n.{Messages, Lang}
 import play.api.libs.json._
+import utils.TraversableValidators._
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity]){
 
@@ -91,25 +92,21 @@ object BusinessActivity {
 }
 
 object BusinessActivities {
+
   import utils.MappingUtils.Implicits._
-    implicit def formReads
-    (implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
-      From[UrlFormEncoded] { __ =>
-        val data = (__ \ "businessActivities").read[Set[BusinessActivity]]
-        data flatMap(f =>
-          if(f.seq.isEmpty) {
-            (Path \ "businessActivities") -> Seq(ValidationError("error.required"))
-          } else {
-            data fmap BusinessActivities.apply
-          })
-      }
 
-    implicit def formWrites
-    (implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded] { data =>
-      Map("businessActivities" -> data.businessActivities.toSeq.map(w.writes))
-    }
+  implicit def formReads
+  (implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
+    From[UrlFormEncoded] { __ =>
+     (__ \ "businessActivities").read(minLength[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) fmap BusinessActivities.apply
+   }
 
-    implicit val formats = Json.format[BusinessActivities]
+  implicit def formWrites
+  (implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded] { data =>
+    Map("businessActivities[]" -> data.businessActivities.toSeq.map(w.writes))
+  }
+
+  implicit val formats = Json.format[BusinessActivities]
 }
 
 

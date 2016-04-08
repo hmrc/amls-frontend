@@ -25,8 +25,8 @@ trait InvolvedInOtherController extends BaseController {
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           } yield {
             (for {
-              businessActivties <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-              involvedInOther <- businessActivties.involvedInOther
+              businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
+              involvedInOther <- businessActivities.involvedInOther
             } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching)))
               .getOrElse (Ok(involved_in_other_name(EmptyForm, edit, businessMatching)))
           }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
@@ -54,6 +54,7 @@ trait InvolvedInOtherController extends BaseController {
 }
 
 object InvolvedInOtherController extends InvolvedInOtherController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

@@ -1,5 +1,6 @@
 package services
 
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
@@ -7,6 +8,7 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => _, _}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.registrationprogress.{NotStarted, Section}
+import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -43,6 +45,23 @@ trait ProgressService {
         // TODO Error instead of empty map
     }) getOrElse Seq.empty
 
+  private def mandatorySections(implicit cache: CacheMap): Seq[Section] =
+    Seq(
+      BusinessMatching.section,
+      AboutTheBusiness.section,
+      BusinessActivities.section,
+      BankDetails.section,
+      TradingPremises.section
+    )
+
+  private def responsiblePeople(implicit cache: CacheMap): Seq[Section] =
+    ApplicationConfig.responsiblePeopleToggle match {
+      case true =>
+        Seq(ResponsiblePeople.section)
+      case _ =>
+        Seq.empty
+    }
+
   def sections
   (implicit
    hc: HeaderCarrier,
@@ -54,12 +73,10 @@ trait ProgressService {
         optionCache map {
           implicit cache =>
             Seq(
-              BusinessMatching.section,
-              AboutTheBusiness.section,
-              BusinessActivities.section,
-              BankDetails.section,
-              TradingPremises.section
-            ) ++ dependentSections
+              mandatorySections,
+              responsiblePeople,
+              dependentSections
+            ).foldLeft[Seq[Section]](Seq.empty) { _ ++ _ }
         } getOrElse Seq.empty
     }
 }

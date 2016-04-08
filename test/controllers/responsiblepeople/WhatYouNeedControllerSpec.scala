@@ -8,7 +8,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
-class WhatYouNeeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -26,7 +26,7 @@ class WhatYouNeeControllerSpec extends PlaySpec with OneServerPerSuite with Mock
     "get" must {
 
       "load the page" in new Fixture {
-        val result = controller.get(request)
+        val result = controller.get(1)(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("responsiblepeople.whatyouneed.title"))
       }
