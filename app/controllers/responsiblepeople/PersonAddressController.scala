@@ -41,6 +41,7 @@ trait PersonAddressController extends RepeatingSection with BaseController {
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
+                  case Some(rp) => Some(rp.personAddressHistory(data))
                   case _ => Some(ResponsiblePeople(personAddressHistory = Some(data)))
                 }
               } yield data.addressHistory match {

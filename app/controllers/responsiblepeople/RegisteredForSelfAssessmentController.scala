@@ -39,6 +39,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
+                  case Some(rp) => Some(rp.saRegistered(data))
                   case _ => Some(ResponsiblePeople(saRegistered = Some(data)))
                 }
               } yield {
