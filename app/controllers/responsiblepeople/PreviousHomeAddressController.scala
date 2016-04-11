@@ -42,18 +42,16 @@ trait PreviousHomeAddressController extends RepeatingSection with BaseController
                   case Some(res) => Some(res.previousHomeAddress(data))
                   case _ => Some(ResponsiblePeople(previousHomeAddress = Some(data)))
                 }
-              } yield edit match {
-                case true => Redirect(routes.SummaryController.get()) //TODO: Responsible Person Details
-                case false =>
-                  data.TimeAtAddress match {
-                    case ThreeYearsPlus => Redirect(routes.PreviousHomeAddressController.get(index, edit)) //TODO: Business Position
-                    case _ => Redirect(routes.PreviousHomeAddressController.get(index, edit)) //TODO: Additional Address
-                  }
+              } yield (data.getTimeAtAddress, edit) match {
+                case (ThreeYearsPlus, false) => Redirect(routes.PreviousHomeAddressController.get(index, edit)) //TODO: Business Position
+                case (_, false) => Redirect(routes.PreviousHomeAddressController.get(index, edit)) //TODO: Additional Address
+                case (_, true) => Redirect(routes.SummaryController.get()) //TODO: Responsible Person Details
               }
           }
         }
       }
     }
+
 }
 
 object PreviousHomeAddressController extends PreviousHomeAddressController {

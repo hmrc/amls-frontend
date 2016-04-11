@@ -7,10 +7,11 @@ import play.api.data.mapping.forms.UrlFormEncoded
 
 sealed trait PreviousHomeAddress {
 
-  val TimeAtAddress: TimeAtAddress = this match {
-    case uk: PreviousHomeAddressUK => uk.timeAtAddress
-    case non: PreviousHomeAddressNonUK => non.timeAtAddress
+  def getTimeAtAddress: TimeAtAddress = this match {
+      case a: PreviousHomeAddressUK => a.timeAtAddress
+      case a: PreviousHomeAddressNonUK => a.timeAtAddress
   }
+
 
 }
 
