@@ -19,7 +19,7 @@ object PassportType {
   implicit val formRule: Rule[UrlFormEncoded, PassportType] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "passportType").read[String] flatMap {
+    (__ \ "passportType").read[String].withMessage("error.required.rp.passport.option") flatMap {
       case "01" =>
         (__ \ "ukPassportNumber").read(ukPassportType) fmap UKPassport.apply
       case "02" =>
