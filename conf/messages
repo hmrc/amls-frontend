@@ -43,7 +43,7 @@ error.invalid.nino = Enter a valid National Insurance number. It must be 9 chara
 error.required.uk.passport = Enter the UK passport number.
 error.invalid.uk.passport =  Enter a valid UK passport number. It must be 9 characters long, and can only be numbers or letters. Do not enter punctuation or other characters.
 error.required.non.uk.passport = Enter the non-UK passport number.
-error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can't enter more than 40 characters.
+error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can''t enter more than 40 characters.
 
 # Custom error messages
 error.required.bm.register.service = Select at least one activity that you need to register.
@@ -116,6 +116,7 @@ error.required.rp.is.uk.resident = Select yes or no to the question: is this per
 error.required.rp.passport = Select whether this person has a UK passport, a non-UK passport, or doesn''t have a passport.
 error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
+error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
 
 # Custom error messages
 error.required.firstname = Enter a first name.
