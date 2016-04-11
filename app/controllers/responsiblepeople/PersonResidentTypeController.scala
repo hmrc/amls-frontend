@@ -39,7 +39,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
-                  case Some(res: ResponsiblePeople) => Some(res.personResidenceType(data))
+                  case Some(res) => Some(res.personResidenceType(data))
                   case _ => data
                 }
               } yield edit match {
