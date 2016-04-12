@@ -92,6 +92,9 @@ trait SubscriptionService extends DataCacheService {
     } yield subscription
   }
 
+  private def subscriptionQuantity(subscription: SubscriptionResponse): Int =
+    if (subscription.registrationFee == 0) 0 else 1
+
   def getSubscription
   (implicit
    ec: ExecutionContext,
@@ -105,10 +108,11 @@ trait SubscriptionService extends DataCacheService {
           subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
           premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
         } yield {
+          val subQuantity = subscriptionQuantity(subscription)
           val mlrRegNo = subscription.amlsRefNo
           val total = subscription.totalFees
           val rows = Seq(
-            BreakdownRow(Submission.message, Submission.quantity, Submission.feePer, subscription.registrationFee),
+            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer),
             BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee)
           )
           Future.successful((mlrRegNo, Currency.fromBD(total), rows))

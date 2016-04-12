@@ -1,0 +1,73 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_])
+
+@main(
+title = Messages("responsiblepeople.previous_home_address.title")
+) {
+
+@heading("responsiblepeople.previous_home_address.heading", "summary.responsiblepeople")
+
+@form(f, controllers.responsiblepeople.routes.PreviousHomeAddressController.post(index, edit)) {
+
+    @inlineRadioGroup(f("isUK")) {
+        @legend("TODO", jsHidden = true)
+        @radio(f("isUK"), "responsiblepeople.previous_home_address.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
+        @radio(f("isUK"), "responsiblepeople.previous_home_address.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
+    }
+
+    @fieldset(
+        legend = "TODO",
+        jsHidden = true,
+        panel = false,
+        id = s"""${f("postCode").id}-fieldset"""
+    ) {
+        <fieldset class="">
+            @legend("responsiblepeople.previous_home_address.address", bold = true)
+            @input(f("addressLine1"))
+            @input(f("addressLine2"))
+            @input(f("addressLine3"))
+            @input(f("addressLine4"))
+        </fieldset>
+
+        @input(
+            field = f("postCode"),
+            labelText = "responsiblepeople.previous_home_address.postCode",
+            classes = Seq("postcode")
+        )
+    }
+
+    @fieldset(
+        legend = "TODO",
+        jsHidden = true,
+        panel = false,
+        id = s"""${f("country").id}-fieldset"""
+    ) {
+        <fieldset class="">
+            @legend("responsiblepeople.previous_home_address.address", bold = true)
+            @input(f("addressLineNonUK1"))
+            @input(f("addressLineNonUK2"))
+            @input(f("addressLineNonUK3"))
+            @input(f("addressLineNonUK4"))
+        </fieldset>
+
+        @country(
+            field = f("country"),
+            labelText = "responsiblepeople.previous_home_address.country"
+        )
+    }
+
+    @radioGroup(f("timeAtAddress")) {
+        @legend("responsiblepeople.previous_home_address.how_long", bold = true)
+        @radio(f("timeAtAddress"), "responsiblepeople.previous_home_address.0_5_months", "01")
+        @radio(f("timeAtAddress"), "responsiblepeople.previous_home_address.6_11_months", "02")
+        @radio(f("timeAtAddress"), "responsiblepeople.previous_home_address.1_3_years", "03")
+        @radio(f("timeAtAddress"), "responsiblepeople.previous_home_address.more_3_years", "04")
+    }
+
+    @submit(edit)
+}
+
+}

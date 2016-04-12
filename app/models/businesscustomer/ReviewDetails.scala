@@ -25,16 +25,14 @@ object ReviewDetails {
     import play.api.libs.json._
     (
       (__ \ "businessName").read[String] and
-      (
-        (__ \ "businessType").readNullable[String] map {
+        (__ \ "businessType").readNullable[String].map[Option[BusinessType]] {
           case Some("Sole Trader") => Some(SoleProprietor)
           case Some("Corporate Body") => Some(LimitedCompany)
           case Some("Partnership") => Some(Partnership)
           case Some("LLP") => Some(LPrLLP)
           case Some("Unincorporated Body") => Some(UnincorporatedBody)
           case _ => None
-        }
-      ) and
+      } and
       (__ \ "businessAddress").read[Address] and
       (__ \ "safeId").read[String]
     )(ReviewDetails.apply _)

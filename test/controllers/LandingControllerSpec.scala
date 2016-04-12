@@ -29,7 +29,7 @@ class LandingControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
     "load the correct view after calling get" when {
 
       "the landing service has a saved form" in new Fixture {
-        when(controller.landingService.hasSavedForm(any(), any(), any())) thenReturn Future.successful(true)
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
@@ -44,7 +44,7 @@ class LandingControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
                                            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("United Kingdom", "GB")),
                                            safeId = ""))
 
-          when(controller.landingService.hasSavedForm(any(), any(), any())) thenReturn Future.successful(false)
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           val result = controller.get()(request)
@@ -53,7 +53,7 @@ class LandingControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
         }
 
         "the landing service has no valid review details" in new Fixture {
-          when(controller.landingService.hasSavedForm(any(), any(), any())) thenReturn Future.successful(false)
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
