@@ -32,7 +32,7 @@ trait DESConnector {
       case Some(OrgAccount(_, Org(ref))) => ("org", ref )
       case Some(SaAccount(_, SaUtr(ref))) => ("sa", ref )
       case Some(CtAccount(_, CtUtr(ref))) => ("ct", ref )
-      case None => throw new IllegalArgumentException("authcontext does not contain any of the expected account types")
+      case _ => throw new IllegalArgumentException("authcontext does not contain any of the expected account types")
     }
 
     val postUrl = s"$url/$accountType/$accountId/$safeId"
