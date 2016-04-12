@@ -46,7 +46,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
                 _ <- doUpdate(index, data)
               } yield (data.timeAtAddress, edit) match {
                 //TODO: Change this first case to the Business Position page.
-                case (ThreeYearsPlus, false) => Redirect(routes.CurrentAddressController.get(index, edit))
+                case (ThreeYearsPlus, false) => Redirect(routes.AdditionalAddressController.get(index, edit))
                 case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit))
                 case (_, true) => Redirect(routes.SummaryController.get())
               }

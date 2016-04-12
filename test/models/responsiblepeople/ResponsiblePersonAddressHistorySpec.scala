@@ -1,79 +1,78 @@
 package models.responsiblepeople
 
 import models.Country
-import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
-import org.joda.time.LocalDate
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
+class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
 
-  val DefaultAddPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
-  val DefaultPersonResidenceType = PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
-  val DefaultSaRegisteredYes = SaRegisteredYes("0123456789")
-
-  val DefaultCurrentAddress = ResponsiblePersonAddress(PersonAddressUK("add1", "add2", None, None, "NE981ZZ"), ZeroToFiveMonths)
-  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH"), ZeroToFiveMonths)
-
-  val DefaultAddressHistory = ResponsiblePersonAddressHistory(
-    currentAddress = Some(DefaultCurrentAddress),
-    additionalAddress = Some(DefaultAdditionalAddress)
-  )
-
-  val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
+  val DefaultCurrentAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ"), ZeroToFiveMonths)
+  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH"), SixToElevenMonths)
+  val DefaultAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE1234"), OneToThreeYears)
 
   val NewCurrentAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), ZeroToFiveMonths)
   val NewAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR")), ZeroToFiveMonths)
+  val NewAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("UK", "UK")), SixToElevenMonths)
+
+  val DefaultAddressHistory = ResponsiblePersonAddressHistory(
+    currentAddress = Some(DefaultCurrentAddress),
+    additionalAddress = Some(DefaultAdditionalAddress),
+    additionalExtraAddress = Some(DefaultAdditionalExtraAddress)
+  )
 
   val NewAddressHistory = ResponsiblePersonAddressHistory(
     currentAddress = Some(NewCurrentAddress),
-    additionalAddress = Some(NewAdditionalAddress)
+    additionalAddress = Some(NewAdditionalAddress),
+    additionalExtraAddress = Some(NewAdditionalExtraAddress)
   )
 
-  val NewPersonResidenceType = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
-    Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
-  val NewSaRegisteredYes = SaRegisteredNo
+  "ResponsiblePersonAddressHistory" must {
 
-  val ResponsiblePeopleModel = ResponsiblePeople(
-    addPerson = Some(DefaultAddPerson),
-    addressHistory = Some(DefaultAddressHistory)
-  )
-
-  "ResponsiblePeople" must {
-
-    "update the model with the person" in {
-      val addPersonUpdated = DefaultAddPerson.copy(firstName = "Johny")
-      val newResponsiblePeople = ResponsiblePeopleModel.addPerson(addPersonUpdated)
-      newResponsiblePeople.addPerson.get.firstName must be(addPersonUpdated.firstName)
+    "update the model with current address" in {
+      val updated = DefaultAddressHistory.currentAddress(NewCurrentAddress)
+      updated.currentAddress must be(NewCurrentAddress)
     }
 
-    "update the model with new address history" in {
-      val newResponsiblePeople = ResponsiblePeopleModel.addressHistory(NewAddressHistory)
-      newResponsiblePeople.addressHistory.fold(fail("No address found.")) { x => x must be (NewAddressHistory) }
+    "update the model with new additionalAddress" in {
+      val updated = DefaultAddressHistory.additionalAddress(NewCurrentAddress)
+      updated.additionalAddress must be(NewCurrentAddress)
+    }
+
+    "update the model with new additionalExtraAddress" in {
+      val updated = DefaultAddressHistory.additionalExtraAddress(NewCurrentAddress)
+      updated.additionalExtraAddress must be(NewCurrentAddress)
     }
 
     "validate complete json" must {
 
       val completeJson = Json.obj(
-        "addPerson" -> Json.obj(
-          "firstName" -> "John",
-          "middleName" -> "Envy",
-          "lastName" -> "Doe",
-          "isKnownByOtherNames" -> false),
-        "previousHomeAddress" -> Json.obj(
+        "currentAddress" -> Json.obj(
+          "addressLine1" -> "Line 1",
+          "addressLine2" -> "Line 2",
+          "postCode" -> "NE981ZZ",
+          "timeAtAddress" -> "01"
+        ),
+        "additionalAddress" -> Json.obj(
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
           "postCode" -> "NE15GH",
-          "timeAtAddress" -> "01"
+          "timeAtAddress" -> "02"
+        ),
+        "additionalExtraAddress" -> Json.obj(
+          "addressLine1" -> "Line 1",
+          "addressLine2" -> "Line 2",
+          "postCode" -> "NE1234",
+          "timeAtAddress" -> "03"
         ))
 
       "Serialise as expected" in {
-        Json.toJson(ResponsiblePeopleModel) must be(completeJson)
+        Json.toJson(DefaultAddressHistory) must be(completeJson)
       }
 
       "Deserialise as expected" in {
-        completeJson.as[ResponsiblePeople] must be(ResponsiblePeopleModel)
+        completeJson.as[ResponsiblePersonAddressHistory] must be(DefaultAddressHistory)
       }
 
     }
@@ -193,4 +192,3 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       }
     }
   }
-}

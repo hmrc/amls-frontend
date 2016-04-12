@@ -3,6 +3,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
+import models.responsiblepeople.TimeAtAddress.{ZeroToFiveMonths, SixToElevenMonths}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -17,7 +18,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
@@ -25,7 +26,7 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val previousHomeAddressController = new AdditionalAddressController {
+    val additionalAddressController = new AdditionalAddressController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
     }
@@ -42,10 +43,10 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
 
     "on get() display the persons page when no existing data in keystore" in new Fixture {
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[ResponsiblePeople](any())
+      when(additionalAddressController.dataCacheConnector.fetch[ResponsiblePeople](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = previousHomeAddressController.get(RecordId)(request)
+      val result = additionalAddressController.get(RecordId)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
@@ -69,13 +70,15 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
 
     "on get() display the previous home address with UK fields populated" in new Fixture {
 
-      val prevAddress = PreviousHomeAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH", ZeroToFiveMonths)
-      val responsiblePeople = ResponsiblePeople(previousHomeAddress = Some(prevAddress))
+      val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+      val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+      val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+      val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      val result = previousHomeAddressController.get(RecordId)(request)
+      val result = additionalAddressController.get(RecordId)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
@@ -90,13 +93,15 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
 
     "on get() display the previous home address with non-UK fields populated" in new Fixture {
 
-      val prevAddress = PreviousHomeAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"), SixToElevenMonths)
-      val responsiblePeople = ResponsiblePeople(previousHomeAddress = Some(prevAddress))
+      val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
+      val additionalAddress = ResponsiblePersonAddress(nonUKAddress, SixToElevenMonths)
+      val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
+      val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      val result = previousHomeAddressController.get(RecordId)(request)
+      val result = additionalAddressController.get(RecordId)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
@@ -119,13 +124,13 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
         "timeAtAddress" -> "01"
       )
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId)(requestWithParams)
+      val result = additionalAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
     }
 
@@ -139,13 +144,13 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
         "timeAtAddress" -> "02"
       )
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId)(requestWithParams)
+      val result = additionalAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
     }
 
@@ -153,14 +158,14 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
 
       val line1MissingRequest = request.withFormUrlEncodedBody()
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId)(line1MissingRequest)
+      val result = additionalAddressController.post(RecordId)(line1MissingRequest)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isUK]").html() must include(Messages("error.required"))
+      document.select("a[href=#isUK]").html() must include(Messages("error.required.uk.or.overseas"))
     }
 
     "must fail on post if default fields for UK not supplied" in new Fixture {
@@ -173,10 +178,10 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
         "timeAtAddress" -> ""
       )
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId)(requestWithMissingParams)
+      val result = additionalAddressController.post(RecordId)(requestWithMissingParams)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
@@ -196,10 +201,10 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
         "timeAtAddress" -> ""
       )
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId)(requestWithMissingParams)
+      val result = additionalAddressController.post(RecordId)(requestWithMissingParams)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
@@ -220,13 +225,13 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
         "timeAtAddress" -> "01"
       )
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId, true)(requestWithParams)
+      val result = additionalAddressController.post(RecordId, true)(requestWithParams)
       status(result) must be(SEE_OTHER)
       //TODO: Update this to new location once implementated.
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
@@ -242,16 +247,16 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
         "timeAtAddress" -> "01"
       )
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId)(requestWithParams)
+      val result = additionalAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
       //TODO: Update this to new location once implementated.
-      redirectLocation(result) must be(Some(routes.PreviousHomeAddressController.get(RecordId).url))
+      redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
     }
 
     "must go to the correct location when edit mode is off and time at address is greater than 3 years" in new Fixture {
@@ -264,16 +269,16 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
         "timeAtAddress" -> "04"
       )
 
-      when(previousHomeAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(previousHomeAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = previousHomeAddressController.post(RecordId)(requestWithParams)
+      val result = additionalAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
       //TODO: Update this to new location once implementated.
-      redirectLocation(result) must be(Some(routes.PreviousHomeAddressController.get(RecordId).url))
+      redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
     }
 
   }

@@ -21,6 +21,7 @@ object TimeAtAddress {
     import play.api.data.mapping.forms.Rules._
 
     (__ \ "timeAtAddress").read[String].withMessage("error.required.rp.wherepersonlives.howlonglived") flatMap {
+      case "" => (Path \ "timeAtAddress") -> Seq(ValidationError("error.required.timeAtAddress"))
       case "01" => ZeroToFiveMonths
       case "02" => SixToElevenMonths
       case "03" => OneToThreeYears
