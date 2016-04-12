@@ -19,13 +19,13 @@ trait AddPersonController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-          response =>
-            val form = (for {
-              addperson <- response
-              person <- addperson.addPerson
-            } yield Form2[AddPerson](person)).getOrElse(EmptyForm)
-            Ok(add_person(form, edit, index))
-      }
+            response =>
+              val form = (for {
+                addperson <- response
+                person <- addperson.addPerson
+              } yield Form2[AddPerson](person)).getOrElse(EmptyForm)
+              Ok(add_person(form, edit, index))
+          }
       }
     }
 

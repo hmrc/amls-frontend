@@ -6,7 +6,7 @@ import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople}
 import utils.RepeatingSection
-import views.html.responsiblepeople._
+import views.html.responsiblepeople.person_residence_type
 
 import scala.concurrent.Future
 
@@ -39,7 +39,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
-                  case Some(ResponsiblePeople(Some(x), value, Some(y))) => Some(ResponsiblePeople(Some(x), value, Some(y)))
+                  case Some(res) => Some(res.personResidenceType(data))
                   case _ => data
                 }
               } yield edit match {

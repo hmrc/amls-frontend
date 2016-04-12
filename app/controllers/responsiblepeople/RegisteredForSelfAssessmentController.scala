@@ -19,13 +19,13 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-          response =>
-            val form = (for {
-              resp <- response
-              person <- resp.saRegistered
-            } yield Form2[SaRegistered](person)).getOrElse(EmptyForm)
-            Ok(registered_for_self_assessment(form, edit, index))
-      }
+            response =>
+              val form = (for {
+                resp <- response
+                person <- resp.saRegistered
+              } yield Form2[SaRegistered](person)).getOrElse(EmptyForm)
+              Ok(registered_for_self_assessment(form, edit, index))
+          }
       }
     }
 
