@@ -54,20 +54,22 @@
         </table>
     }
 
-    <table>
-        <tr>
-            <th class="summary-title">@Messages("aboutthebusiness.registeredforvat.title")</th>
-            <td colspan="2"><a href="@controllers.aboutthebusiness.routes.VATRegisteredController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.vatRegistered.map {
-                    case VATRegisteredNo => { @Messages("lbl.na") }
-                    case VATRegisteredYes(v) => { @v }
-                }
-            </td>
-        </tr>
-    </table>
+    @model.vatRegistered.map { vatRegistered =>
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("aboutthebusiness.registeredforvat.title")</th>
+                <td colspan="2"><a href="@controllers.aboutthebusiness.routes.VATRegisteredController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @vatRegistered match {
+                        case VATRegisteredNo => { @Messages("lbl.na") }
+                        case VATRegisteredYes(v) => { @v }
+                    }
+                </td>
+            </tr>
+        </table>
+    }
 
     <table>
         <tr>
