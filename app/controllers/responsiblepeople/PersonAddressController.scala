@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.AddressHistory._
-import models.responsiblepeople.{PersonAddressHistory, ResponsiblePeople}
+import models.responsiblepeople.{PersonAddressHistory, ResponsiblePeople, UKAddress}
 import utils.RepeatingSection
 import views.html.responsiblepeople._
 
@@ -14,6 +14,8 @@ import scala.concurrent.Future
 trait PersonAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
+
+  val defaultAddressHistory = PersonAddressHistory(UKAddress("", "", None, None, ""), First)
 
   def get(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
@@ -24,7 +26,10 @@ trait PersonAddressController extends RepeatingSection with BaseController {
               val form = (for {
                 res <- response
                 addressHistory <- res.personAddressHistory
-              } yield Form2[PersonAddressHistory](addressHistory)).getOrElse(EmptyForm)
+              } yield
+                Form2[PersonAddressHistory](addressHistory)).
+                getOrElse(Form2[PersonAddressHistory](defaultAddressHistory))
+
               Ok(person_address(form, edit, index))
           }
       }
