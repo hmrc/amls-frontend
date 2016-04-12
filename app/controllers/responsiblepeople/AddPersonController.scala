@@ -39,6 +39,7 @@ trait AddPersonController extends RepeatingSection with BaseController {
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
+                  case Some(rp) => Some(rp.addPerson(data))
                   case _ => Some(ResponsiblePeople(Some(data)))
                 }
               } yield {

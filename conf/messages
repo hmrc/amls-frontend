@@ -616,6 +616,36 @@ responsiblepeople.addperson.otherlastnames = Other last names
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
 
+# Custom error messages
+error.required.firstname = Enter a first name.
+error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
+error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 characters
+error.required.lastname = Enter a last name.
+error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
+error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
+error.required.otherfirstnames = Enter all other first names.
+error.required.otherlastnames  = Enter all other last names.
+
+# Custom error messages
+error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
+error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
+error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
+
+summary.responsiblepeople = Responsible People
+
+responsiblepeople.wherepersonlives.title = Where does this person live?
+responsiblepeople.wherepersonlives.ukAddress = UK
+responsiblepeople.wherepersonlives.nonUkAddress = Overseas
+responsiblepeople.wherepersonlives.address = Address
+responsiblepeople.wherepersonlives.postcode = Postcode
+responsiblepeople.wherepersonlives.country = Country
+responsiblepeople.wherepersonlives.address_history = How long has this person lived at this address?
+responsiblepeople.wherepersonlives.5_months_history = 0 to 5 months
+responsiblepeople.wherepersonlives.11_months_history = 6 to 11 months
+responsiblepeople.wherepersonlives.3_years_history = 1 to 3 years
+responsiblepeople.wherepersonlives.more_years_history = More than 3 years
+error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
+
 responsiblepeople.previous_home_address.title = Where was this person''s previous home address?
 responsiblepeople.previous_home_address.heading = Where was this person''s previous home address?
 responsiblepeople.previous_home_address.ukAddress = UK
