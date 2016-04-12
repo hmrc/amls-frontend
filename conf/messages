@@ -217,17 +217,18 @@ progress.declarationunavailable = You can't finish the registration until you've
 
 
 # Confirmation page
-confirmation.lede = You have submitted the registration. Now pay the registration fee.
-confirmation.code = Confirmation code: {0}
+confirmation.lede = You have submitted the registration.
+confirmation.thankyou = Thank you for registering online.
+confirmation.thankyou.p = We cannot currently receive payments. HM Revenue and Customs will contact you within 4 weeks to arrange payment for the registration fee. This does not affect your registration for anti-money laundering supervision.
 confirmation.fee = Your registration fee:
 confirmation.breakdown = How your registration fee has been calculated:
-confirmation.sidebar.title = Confirmation code
+confirmation.sidebar.code = Confirmation code: {0}
 confirmation.sidebar.lede = You have registered for anti-money laundering supervision, pending payment.
-confirmation.sidebar.code = Your confirmation code is: {0}
-confirmation.sidebar.time = You have 30 days to pay the registration fee.
+confirmation.sidebar.contact = Quote this code if you need to contact HM Revenue and Customs about your registration.
 confirmation.quantity = Quantity
 confirmation.feeperitem = Fee per item
 confirmation.totalfee = Total fee
+confirmation.registrationfee = Registration fee
 confirmation.submission = Application submission
 confirmation.tradingpremises = Trading Premises
 
