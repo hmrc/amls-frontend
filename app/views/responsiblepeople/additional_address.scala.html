@@ -10,7 +10,7 @@ title = Messages("responsiblepeople.previous_home_address.title")
 
 @heading("responsiblepeople.previous_home_address.heading", "summary.responsiblepeople")
 
-@form(f, controllers.responsiblepeople.routes.PreviousHomeAddressController.post(index, edit)) {
+@form(f, controllers.responsiblepeople.routes.AdditionalAddressController.post(index, edit)) {
 
     @inlineRadioGroup(f("isUK")) {
         @legend("TODO", jsHidden = true)

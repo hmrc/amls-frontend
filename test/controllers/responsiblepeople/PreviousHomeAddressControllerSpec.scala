@@ -25,7 +25,7 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val previousHomeAddressController = new PreviousHomeAddressController {
+    val previousHomeAddressController = new AdditionalAddressController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
     }
@@ -36,8 +36,8 @@ class PreviousHomeAddressControllerSpec extends PlaySpec with OneServerPerSuite 
   "PreviousHomeAddressController" must {
 
     "use the correct services" in new Fixture {
-      PreviousHomeAddressController.dataCacheConnector must be(DataCacheConnector)
-      PreviousHomeAddressController.authConnector must be(AMLSAuthConnector)
+      AdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
+      AdditionalAddressController.authConnector must be(AMLSAuthConnector)
     }
 
     "on get() display the persons page when no existing data in keystore" in new Fixture {
