@@ -12,6 +12,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   val DefaultPreviousHomeAddress = PreviousHomeAddressUK("Line 1", "Line 2", None, None, "NE15GH", ZeroToFiveMonths)
   val DefaultPersonResidenceType = PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val DefaultSaRegisteredYes = SaRegisteredYes("0123456789")
+  val DefaultPersonAddressHistory = PersonAddressHistory(UKAddress("add1", "add2", None, None, "NE981ZZ"), AddressHistory.First)
 
   val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
   val NewPreviousHomeAddress = PreviousHomeAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"), SixToElevenMonths)
@@ -107,7 +108,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultAddPerson),
         Some(DefaultPersonResidenceType),
         Some(DefaultPreviousHomeAddress),
-        Some(DefaultSaRegisteredYes)
+        Some(DefaultSaRegisteredYes),
+        Some(DefaultPersonAddressHistory)
       )
 
       initial.isComplete must be(true)
@@ -119,7 +121,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultAddPerson),
         Some(DefaultPersonResidenceType),
         None,
-        Some(DefaultSaRegisteredYes)
+        Some(DefaultSaRegisteredYes),
+        None
       )
 
       initial.isComplete must be(false)
