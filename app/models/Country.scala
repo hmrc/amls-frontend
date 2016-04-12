@@ -17,7 +17,7 @@ object Country {
 
   implicit val reads = Reads[Country] {
     case JsString(code) =>
-      countries collectFirst[JsResult[Country]] {
+      countries collectFirst {
         case e @ Country(_, c) if c == code =>
           JsSuccess(e)
       } getOrElse {
