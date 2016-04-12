@@ -17,12 +17,11 @@ object Country {
 
   implicit val reads = Reads[Country] {
     case JsString(code) =>
-      countries collectFirst {
+      countries collectFirst[JsResult[Country]] {
         case e @ Country(_, c) if c == code =>
-          e
-      } match {
-        case Some(d) => JsSuccess(d)
-        case _ => JsError(JsPath -> ValidationError("error.invalid"))
+          JsSuccess(e)
+      } getOrElse {
+        JsError(JsPath -> ValidationError("error.invalid"))
       }
     case _ =>
       JsError(JsPath -> ValidationError("error.invalid"))
