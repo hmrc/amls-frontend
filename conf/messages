@@ -157,6 +157,7 @@ lbl.year = Year
 lbl.date.example = For example, 31 3 2017
 lbl.nationality = Nationality
 lbl.nino = National Insurance number
+lbl.nino.hint = For example: QQ123456C
 lbl.passport.number = Passport number
 lbl.uk = UK
 lbl.overseas = Overseas
