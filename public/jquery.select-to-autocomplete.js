@@ -56,8 +56,6 @@ THE SOFTWARE.
       var select_id = (context['$select_field'][0].id)
       var $text_field = $( '<input type="text"></input>' );
 
-
-
       if ( settings['copy-attributes-to-text-field'] ) {
         var attrs = {};
         var raw_attrs = context.$select_field[0].attributes;
@@ -71,7 +69,6 @@ THE SOFTWARE.
         attrs["id"] = select_id + "-text"
         attrs["name"] = select_id + "-text"
         $text_field.attr( attrs );
-        console.log(attrs)
       }
       $text_field.blur(function() {
         var valid_values = context.$select_field.find('option').map(function(i, option) { return $(option).text(); });

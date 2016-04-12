@@ -16,7 +16,7 @@ title = Messages("responsiblepeople.person.a.resident.title")
             @radio(f("isUKResidence"), "lbl.yes", "true", target = s"#${f("targetyes").id}-fieldset")
             @radio(f("isUKResidence"), "lbl.no", "false", target = s"#${f("targetno").id}-fieldset")
             @fieldset("TODO", jsHidden = true, id = s"""${f("targetyes").id}-fieldset""") {
-                @input(f("nino"), "lbl.nino", bold = false)
+                @input(f("nino"), "lbl.nino", "lbl.nino.hint", bold = false)
             }
             @fieldset("TODO", jsHidden = true, id = s"""${f("targetno").id}-fieldset""") {
                 @date(
