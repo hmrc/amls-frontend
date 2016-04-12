@@ -8,6 +8,10 @@ $(function () {
         'border' : 'none'
     });
 
+    $(function(){
+        $('.country-selector').selectToAutocomplete();
+    });
+
     (function () {
         var checkedInputs = 'input[type="checkbox"], input[type="radio"]';
 
