@@ -1,6 +1,7 @@
 package controllers
 
 import config.{AMLSAuthConnector, ApplicationConfig}
+import models.SubscriptionResponse
 import play.api.Logger
 import play.api.mvc.Call
 import services.LandingService
@@ -15,11 +16,18 @@ trait LandingController extends BaseController {
   // TODO: GG Enrolment routing
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      landingService.hasSavedForm flatMap {
-        case true =>
-          // If we have a saved form, skip business matching.
-          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-        case false =>
+      landingService.cacheMap flatMap {
+        case Some(cache) =>
+          cache.getEntry[SubscriptionResponse](SubscriptionResponse.key) map {
+            _ =>
+              // If we have a previous subscription then redirect to the confirmtaion controller
+              Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
+          } getOrElse {
+            // If we have no previous subscription, but we have a saved form,
+            // redirect to the registration progress page
+            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          }
+        case None =>
           landingService.reviewDetails flatMap {
             case Some(reviewDetails) =>
               landingService.updateReviewDetails(reviewDetails) map {
