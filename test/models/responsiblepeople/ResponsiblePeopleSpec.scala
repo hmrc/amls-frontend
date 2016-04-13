@@ -13,7 +13,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   val DefaultPersonResidenceType = PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val DefaultSaRegisteredYes = SaRegisteredYes("0123456789")
 
-  val DefaultCurrentAddress = ResponsiblePersonAddress(PersonAddressUK("add1", "add2", None, None, "NE981ZZ"), ZeroToFiveMonths)
+  val DefaultCurrentAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ"), ZeroToFiveMonths)
   val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH"), ZeroToFiveMonths)
 
   val DefaultAddressHistory = ResponsiblePersonAddressHistory(
@@ -60,13 +60,31 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           "firstName" -> "John",
           "middleName" -> "Envy",
           "lastName" -> "Doe",
-          "isKnownByOtherNames" -> false),
-        "previousHomeAddress" -> Json.obj(
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "NE15GH",
-          "timeAtAddress" -> "01"
-        ))
+          "isKnownByOtherNames" -> false
+        ),
+        "addressHistory" -> Json.obj(
+          "currentAddress" -> Json.obj(
+            "personAddress" -> Json.obj(
+              "personAddressLine1" -> "Line 1",
+              "personAddressLine2" -> "Line 2",
+              "personAddressPostCode" -> "NE981ZZ"
+            ),
+            "timeAtAddress" -> Json.obj(
+              "timeAtAddress" -> "01"
+            )
+          ),
+          "additionalAddress" -> Json.obj(
+            "personAddress" -> Json.obj(
+              "personAddressLine1" -> "Line 1",
+              "personAddressLine2" -> "Line 2",
+              "personAddressPostCode" -> "NE15GH"
+            ),
+            "timeAtAddress" -> Json.obj(
+              "timeAtAddress" -> "01"
+            )
+          )
+        )
+      )
 
       "Serialise as expected" in {
         Json.toJson(ResponsiblePeopleModel) must be(completeJson)
