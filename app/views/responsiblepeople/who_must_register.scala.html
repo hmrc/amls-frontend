@@ -1,0 +1,28 @@
+@import include._
+@(index: Int)(implicit request: Request[_])
+
+@sidebar = {
+<div class="bevel-container">
+    <h3 class="heading-small">@Messages("responsiblepeople.sidebar.title")</h3>
+    <p>@Messages("responsiblepeople.sidebar.information")</p>
+</div>
+}
+
+@main(
+    title = Messages("responsiblepeople.whomustregister.title"),
+    sidebar = sidebar
+) {
+
+    @heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
+
+    <ul class="list-bullet form-group">
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whomustregister.line_1")</li>
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whomustregister.line_2")</li>
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whomustregister.line_3")</li>
+    </ul>
+
+    <div class="form-group">
+        <a id="who-must-register-continue" class="button" href="@controllers.responsiblepeople.routes.WhatYouNeedController.get(index)">@Messages("button.continue")</a>
+    </div>
+
+}
