@@ -5,7 +5,6 @@ import models.FormTypes._
 import models.businesscustomer.Address
 import play.api.data.mapping.forms._
 import play.api.data.mapping._
-import play.api.data.validation.ValidationError
 import play.api.libs.json.{Writes, Reads, Json}
 
 sealed trait RegisteredOffice {

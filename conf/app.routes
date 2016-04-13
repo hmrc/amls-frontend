@@ -157,3 +157,6 @@ GET         /responsible-people/summary                     controllers.responsi
 
 GET         /responsible-people/additional-address/:index   controllers.responsiblepeople.PreviousHomeAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/additional-address/:index   controllers.responsiblepeople.PreviousHomeAddressController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)

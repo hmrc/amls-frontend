@@ -9,7 +9,8 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
                              previousHomeAddress: Option[PreviousHomeAddress] = None,
                              saRegistered: Option[SaRegistered] = None,
-                             personAddressHistory: Option[PersonAddressHistory] = None
+                             personAddressHistory: Option[PersonAddressHistory] = None,
+                             vatRegistered: Option[VATRegistered] = None
                           ) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
@@ -26,6 +27,9 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
 
   def previousHomeAddress(prevAdd: PreviousHomeAddress): ResponsiblePeople =
     this.copy(previousHomeAddress = Some(prevAdd))
+
+  def vatRegistered(v: VATRegistered): ResponsiblePeople =
+    this.copy(vatRegistered = Some(v))
 
   def isComplete: Boolean = this.productIterator.forall {
     case None => false

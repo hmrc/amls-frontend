@@ -673,3 +673,7 @@ responsiblepeople.non.uk.passport.lbl = Non-UK passport
 responsiblepeople.no.passport.lbl = This person doesn't have a passport
 responsiblepeople.country.of.birth.lbl = Country of birth
 responsiblepeople.or.lbl = or
+
+responsiblepeople.registeredforvat.title = Is this person registered for VAT in the UK?
+responsiblepeople.registeredforvat.heading = Is this person registered for VAT in the UK?
+responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number

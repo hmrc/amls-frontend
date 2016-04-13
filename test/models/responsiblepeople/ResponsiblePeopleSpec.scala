@@ -13,12 +13,14 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   val DefaultPersonResidenceType = PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val DefaultSaRegisteredYes = SaRegisteredYes("0123456789")
   val DefaultPersonAddressHistory = PersonAddressHistory(UKAddress("add1", "add2", None, None, "NE981ZZ"), AddressHistory.First)
+  val DefaultVatRegisteredNo = VATRegisteredNo
 
   val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
   val NewPreviousHomeAddress = PreviousHomeAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"), SixToElevenMonths)
   val NewPersonResidenceType = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
     Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val NewSaRegisteredYes = SaRegisteredNo
+  val NewVatRegisteredYes = VATRegisteredYes("12345678")
 
   val ResponsiblePeopleModel = ResponsiblePeople(
     addPerson = Some(DefaultAddPerson),
@@ -61,7 +63,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       "Deserialise as expected" in {
         completeJson.as[ResponsiblePeople] must be(ResponsiblePeopleModel)
       }
-
     }
 
     "implicitly return an existing Model if one present" in {
@@ -98,6 +99,14 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         result must be (ResponsiblePeople(None, None, None, Some(DefaultSaRegisteredYes)))
       }
     }
+
+
+    "Merged with VatRegistered" must {
+      "return ResponsiblePeople with correct VatRegistered" in {
+        val result = initial.vatRegistered(DefaultVatRegisteredNo)
+        result must be (ResponsiblePeople(vatRegistered = Some(DefaultVatRegisteredNo)))
+      }
+    }
   }
 
   "Successfully validate if the model is complete" when {
@@ -109,7 +118,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultPersonResidenceType),
         Some(DefaultPreviousHomeAddress),
         Some(DefaultSaRegisteredYes),
-        Some(DefaultPersonAddressHistory)
+        Some(DefaultPersonAddressHistory),
+        Some(DefaultVatRegisteredNo)
       )
 
       initial.isComplete must be(true)
@@ -131,33 +141,47 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   }
 
   "Merge with existing model" when {
-    val initial = ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes))
+    val initial = ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress),
+      Some(DefaultSaRegisteredYes), None, Some(DefaultVatRegisteredNo))
 
     "Merged with add person" must {
       "return ResponsiblePeople with correct add person" in {
         val result = initial.addPerson(NewAddPerson)
-        result must be (ResponsiblePeople(Some(NewAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(Some(NewAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress),
+          Some(DefaultSaRegisteredYes), None, Some(DefaultVatRegisteredNo)))
       }
     }
 
     "Merged with DefaultPersonResidenceType" must {
       "return ResponsiblePeople with correct DefaultPersonResidenceType" in {
         val result = initial.personResidenceType(NewPersonResidenceType)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(NewPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(NewPersonResidenceType), Some(DefaultPreviousHomeAddress),
+          Some(DefaultSaRegisteredYes), None, Some(DefaultVatRegisteredNo)))
       }
     }
 
     "Merged with DefaultPreviousHomeAddress" must {
       "return ResponsiblePeople with correct DefaultPreviousHomeAddress" in {
         val result = initial.previousHomeAddress(NewPreviousHomeAddress)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(NewPreviousHomeAddress), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(NewPreviousHomeAddress),
+          Some(DefaultSaRegisteredYes), None, Some(DefaultVatRegisteredNo)))
       }
     }
 
     "Merged with DefaultSaRegisteredYes" must {
       "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
         val result = initial.saRegistered(NewSaRegisteredYes)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(NewSaRegisteredYes)))
+        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress),
+          Some(NewSaRegisteredYes), None, Some(DefaultVatRegisteredNo)))
+      }
+    }
+
+
+    "Merged with VATRegistered" must {
+      "return ResponsiblePeople with correct VATRegistered" in {
+        val result = initial.vatRegistered(NewVatRegisteredYes)
+        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType),
+          Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes), None, Some(NewVatRegisteredYes)))
       }
     }
   }
