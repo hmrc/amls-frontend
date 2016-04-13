@@ -140,6 +140,7 @@ GET         /declaration/declaration                        controllers.declarat
 GET         /confirmation                                   controllers.ConfirmationController.get()
 
 GET         /responsible-people/index/:index                controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
+GET         /responsible-people/who-must-register/:index    controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
 
 GET         /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
