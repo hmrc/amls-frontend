@@ -9,6 +9,7 @@ sealed trait TimeAtAddress
 
 object TimeAtAddress {
 
+  case object Empty extends TimeAtAddress
   case object ZeroToFiveMonths extends TimeAtAddress
   case object SixToElevenMonths extends TimeAtAddress
   case object OneToThreeYears extends TimeAtAddress
@@ -32,6 +33,7 @@ object TimeAtAddress {
   }
 
   implicit val formWrites: Write[TimeAtAddress, UrlFormEncoded] = Write {
+    case Empty => Map.empty
     case ZeroToFiveMonths => "timeAtAddress" -> "01"
     case SixToElevenMonths => "timeAtAddress" -> "02"
     case OneToThreeYears => "timeAtAddress" -> "03"

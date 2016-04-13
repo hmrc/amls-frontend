@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.responsiblepeople.TimeAtAddress.ThreeYearsPlus
+import models.responsiblepeople.TimeAtAddress.{Empty, ZeroToFiveMonths, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -17,6 +17,8 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
+  final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), Empty)
+
   def get(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
       Authorised.async {
@@ -27,7 +29,7 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
                 responsiblePeople <- response
                 addressHistory <- responsiblePeople.addressHistory
                 additionalAddress <- addressHistory.additionalAddress
-              } yield Form2[ResponsiblePersonAddress](additionalAddress)).getOrElse(EmptyForm)
+              } yield Form2[ResponsiblePersonAddress](additionalAddress)).getOrElse(Form2(DefaultAddressHistory))
               Ok(additional_address(form, edit, index))
           }
       }

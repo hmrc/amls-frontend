@@ -50,7 +50,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=isUK][value=true]").hasAttr("checked") must be(false)
+      document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
       document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
       document.select("input[name=addressLine1]").`val` must be("")
       document.select("input[name=addressLine2]").`val` must be("")
