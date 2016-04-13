@@ -23,9 +23,9 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def addressHistory(hist: ResponsiblePersonAddressHistory): ResponsiblePeople =
     this.copy(addressHistory = Some(hist))
 
-  def isComplete: Boolean = this.productIterator.forall {
-    case None => false
-    case _ => true
+  def isComplete: Boolean = this match {
+    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(_)) if add.isComplete => true
+    case _ => false
   }
 
 }

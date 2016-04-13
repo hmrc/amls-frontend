@@ -9,7 +9,7 @@ import play.api.libs.json.Json
 class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
 
   val DefaultCurrentAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ"), ZeroToFiveMonths)
-  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH"), SixToElevenMonths)
+  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), SixToElevenMonths)
   val DefaultAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE1234"), OneToThreeYears)
 
   val NewCurrentAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), ZeroToFiveMonths)
@@ -32,39 +32,51 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
 
     "update the model with current address" in {
       val updated = DefaultAddressHistory.currentAddress(NewCurrentAddress)
-      updated.currentAddress must be(NewCurrentAddress)
+      updated.currentAddress must be(Some(NewCurrentAddress))
     }
 
     "update the model with new additionalAddress" in {
-      val updated = DefaultAddressHistory.additionalAddress(NewCurrentAddress)
-      updated.additionalAddress must be(NewCurrentAddress)
+      val updated = DefaultAddressHistory.additionalAddress(NewAdditionalAddress)
+      updated.additionalAddress must be(Some(NewAdditionalAddress))
     }
 
     "update the model with new additionalExtraAddress" in {
-      val updated = DefaultAddressHistory.additionalExtraAddress(NewCurrentAddress)
-      updated.additionalExtraAddress must be(NewCurrentAddress)
+      val updated = DefaultAddressHistory.additionalExtraAddress(NewAdditionalExtraAddress)
+      updated.additionalExtraAddress must be(Some(NewAdditionalExtraAddress))
     }
 
     "validate complete json" must {
 
       val completeJson = Json.obj(
         "currentAddress" -> Json.obj(
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "NE981ZZ",
-          "timeAtAddress" -> "01"
+          "personAddress" -> Json.obj(
+            "personAddressLine1" -> "Line 1",
+            "personAddressLine2" -> "Line 2",
+            "personAddressPostCode" -> "NE981ZZ"
+          ),
+          "timeAtAddress" -> Json.obj(
+            "timeAtAddress" -> "01"
+          )
         ),
         "additionalAddress" -> Json.obj(
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "NE15GH",
-          "timeAtAddress" -> "02"
+          "personAddress" -> Json.obj(
+            "personAddressLine1" -> "Line 1",
+            "personAddressLine2" -> "Line 2",
+            "personAddressCountry" -> "ES"
+          ),
+          "timeAtAddress" -> Json.obj(
+            "timeAtAddress" -> "02"
+          )
         ),
         "additionalExtraAddress" -> Json.obj(
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "NE1234",
-          "timeAtAddress" -> "03"
+          "personAddress" -> Json.obj(
+            "personAddressLine1" -> "Line 1",
+            "personAddressLine2" -> "Line 2",
+            "personAddressPostCode" -> "NE1234"
+          ),
+          "timeAtAddress" -> Json.obj(
+            "timeAtAddress" -> "03"
+          )
         ))
 
       "Serialise as expected" in {
@@ -76,119 +88,59 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
       }
 
     }
-
-    "implicitly return an existing Model if one present" in {
-      val responsiblePeople = ResponsiblePeople.default(Some(ResponsiblePeopleModel))
-      responsiblePeople must be(ResponsiblePeopleModel)
-    }
-
-    "implicitly return an empty Model if not present" in {
-      val responsiblePeople = ResponsiblePeople.default(None)
-      responsiblePeople must be(ResponsiblePeople())
-    }
-  }
-
-  "None" when {
-    val initial: Option[ResponsiblePeople] = None
-
-    "Merged with add person" must {
-      "return ResponsiblePeople with correct add person" in {
-        val result = initial.addPerson(DefaultAddPerson)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson)))
-      }
-    }
-
-    "Merged with DefaultPersonResidenceType" must {
-      "return ResponsiblePeople with correct DefaultPersonResidenceType" in {
-        val result = initial.personResidenceType(DefaultPersonResidenceType)
-        result must be (ResponsiblePeople(None, Some(DefaultPersonResidenceType)))
-      }
-    }
-
-    "Merged with DefaultSaRegisteredYes" must {
-      "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
-        val result = initial.saRegistered(DefaultSaRegisteredYes)
-        result must be (ResponsiblePeople(None, None, None, Some(DefaultSaRegisteredYes)))
-      }
-    }
   }
 
   "Successfully validate if the model is complete" when {
 
     "the model is fully complete" in {
 
-      val initial = ResponsiblePeople(
-        Some(DefaultAddPerson),
-        Some(DefaultPersonResidenceType),
-        Some(DefaultAddressHistory),
-        Some(DefaultSaRegisteredYes)
+      val initial = ResponsiblePersonAddressHistory(
+        Some(DefaultCurrentAddress),
+        Some(DefaultAdditionalAddress),
+        Some(DefaultAdditionalExtraAddress)
       )
 
       initial.isComplete must be(true)
     }
 
-    "the model is not complete" in {
-
-      val initial = ResponsiblePeople(
-        Some(DefaultAddPerson),
-        Some(DefaultPersonResidenceType),
-        Some(DefaultAddressHistory),
-        None
-      )
-
-      initial.isComplete must be(false)
-
+    "the model has a current address" in {
+      val initial = ResponsiblePersonAddressHistory(Some(DefaultCurrentAddress), None, None)
+      initial.isComplete must be(true)
     }
 
-    "the model address history is set but not completed" in {
-
-      val PartialAddressHistory = ResponsiblePersonAddressHistory()
-
-      val initial = ResponsiblePeople(
-        Some(DefaultAddPerson),
-        Some(DefaultPersonResidenceType),
-        Some(PartialAddressHistory),
-        Some(DefaultSaRegisteredYes)
-      )
-
+    "the model is incomplete" in {
+      val initial = ResponsiblePersonAddressHistory(None, None, None)
       initial.isComplete must be(false)
-
     }
+
   }
 
   "Merge with existing model" when {
 
-    val initial = ResponsiblePeople(
-      Some(DefaultAddPerson),
-      Some(DefaultPersonResidenceType),
-      Some(DefaultAddressHistory),
-      Some(DefaultSaRegisteredYes))
+    val initial = ResponsiblePersonAddressHistory(
+      Some(DefaultCurrentAddress),
+      Some(DefaultAdditionalAddress),
+      Some(DefaultAdditionalExtraAddress))
 
     "Merged with add person" must {
       "return ResponsiblePeople with correct add person" in {
-        val result = initial.addPerson(NewAddPerson)
-        result must be (ResponsiblePeople(Some(NewAddPerson), Some(DefaultPersonResidenceType), Some(DefaultAddressHistory), Some(DefaultSaRegisteredYes)))
+        val result = initial.currentAddress(NewCurrentAddress)
+        result must be (ResponsiblePersonAddressHistory(Some(NewCurrentAddress), Some(DefaultAdditionalAddress), Some(DefaultAdditionalExtraAddress)))
       }
     }
 
     "Merged with DefaultPersonResidenceType" must {
       "return ResponsiblePeople with correct DefaultPersonResidenceType" in {
-        val result = initial.personResidenceType(NewPersonResidenceType)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(NewPersonResidenceType), Some(DefaultAddressHistory), Some(DefaultSaRegisteredYes)))
+        val result = initial.additionalAddress(NewAdditionalAddress)
+        result must be (ResponsiblePersonAddressHistory(Some(DefaultCurrentAddress), Some(NewAdditionalAddress), Some(DefaultAdditionalExtraAddress)))
       }
     }
 
     "Merged with DefaultPreviousHomeAddress" must {
       "return ResponsiblePeople with correct DefaultPreviousHomeAddress" in {
-        val result = initial.addressHistory(NewAddressHistory)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(NewAddressHistory), Some(DefaultSaRegisteredYes)))
-      }
-    }
-
-    "Merged with DefaultSaRegisteredYes" must {
-      "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
-        val result = initial.saRegistered(NewSaRegisteredYes)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultAddressHistory), Some(NewSaRegisteredYes)))
+        val result = initial.additionalExtraAddress(NewAdditionalExtraAddress)
+        result must be (ResponsiblePersonAddressHistory(Some(DefaultCurrentAddress), Some(DefaultAdditionalAddress), Some(NewAdditionalExtraAddress)))
       }
     }
   }
+}
