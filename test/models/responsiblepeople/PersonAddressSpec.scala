@@ -22,14 +22,14 @@ class PersonAddressSpec extends PlaySpec {
   val NewPostcode = "CR6 5HG"
   val NewCountry = "AB"
 
-  val DefaultUKAddress = UKAddress(
+  val DefaultUKAddress = PersonAddressUK(
     DefaultAddressLine1,
     DefaultAddressLine2,
     DefaultAddressLine3,
     DefaultAddressLine4,
     DefaultPostcode)
 
-  val DefaultNonUKAddress = NonUKAddress(
+  val DefaultNonUKAddress = PersonAddressNonUK(
     DefaultAddressLine1,
     DefaultAddressLine2,
     DefaultAddressLine3,

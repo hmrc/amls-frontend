@@ -1,6 +1,7 @@
 package models.responsiblepeople
 
 import models.Country
+import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -9,20 +10,34 @@ import play.api.libs.json.Json
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
 
   val DefaultAddPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
-  val DefaultPreviousHomeAddress = PreviousHomeAddressUK("Line 1", "Line 2", None, None, "NE15GH", ZeroToFiveMonths)
   val DefaultPersonResidenceType = PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val DefaultSaRegisteredYes = SaRegisteredYes("0123456789")
-  val DefaultPersonAddressHistory = PersonAddressHistory(UKAddress("add1", "add2", None, None, "NE981ZZ"), AddressHistory.First)
+
+  val DefaultCurrentAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ"), ZeroToFiveMonths)
+  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH"), ZeroToFiveMonths)
+
+  val DefaultAddressHistory = ResponsiblePersonAddressHistory(
+    currentAddress = Some(DefaultCurrentAddress),
+    additionalAddress = Some(DefaultAdditionalAddress)
+  )
 
   val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
-  val NewPreviousHomeAddress = PreviousHomeAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"), SixToElevenMonths)
+
+  val NewCurrentAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), ZeroToFiveMonths)
+  val NewAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR")), ZeroToFiveMonths)
+
+  val NewAddressHistory = ResponsiblePersonAddressHistory(
+    currentAddress = Some(NewCurrentAddress),
+    additionalAddress = Some(NewAdditionalAddress)
+  )
+
   val NewPersonResidenceType = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
     Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val NewSaRegisteredYes = SaRegisteredNo
 
   val ResponsiblePeopleModel = ResponsiblePeople(
     addPerson = Some(DefaultAddPerson),
-    previousHomeAddress = Some(DefaultPreviousHomeAddress)
+    addressHistory = Some(DefaultAddressHistory)
   )
 
   "ResponsiblePeople" must {
@@ -33,10 +48,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       newResponsiblePeople.addPerson.get.firstName must be(addPersonUpdated.firstName)
     }
 
-    "update the model with previous home address" in {
-      val previousHomeAddressNew = DefaultPreviousHomeAddress.copy(addressLine1 = "New Line 1")
-      val newResponsiblePeople = ResponsiblePeopleModel.previousHomeAddress(previousHomeAddressNew)
-      newResponsiblePeople.previousHomeAddress.fold(fail("No address found.")) { x => x must be (previousHomeAddressNew) }
+    "update the model with new address history" in {
+      val newResponsiblePeople = ResponsiblePeopleModel.addressHistory(NewAddressHistory)
+      newResponsiblePeople.addressHistory.fold(fail("No address found.")) { x => x must be (NewAddressHistory) }
     }
 
     "validate complete json" must {
@@ -46,13 +60,31 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           "firstName" -> "John",
           "middleName" -> "Envy",
           "lastName" -> "Doe",
-          "isKnownByOtherNames" -> false),
-        "previousHomeAddress" -> Json.obj(
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "NE15GH",
-          "timeAtAddress" -> "01"
-        ))
+          "isKnownByOtherNames" -> false
+        ),
+        "addressHistory" -> Json.obj(
+          "currentAddress" -> Json.obj(
+            "personAddress" -> Json.obj(
+              "personAddressLine1" -> "Line 1",
+              "personAddressLine2" -> "Line 2",
+              "personAddressPostCode" -> "NE981ZZ"
+            ),
+            "timeAtAddress" -> Json.obj(
+              "timeAtAddress" -> "01"
+            )
+          ),
+          "additionalAddress" -> Json.obj(
+            "personAddress" -> Json.obj(
+              "personAddressLine1" -> "Line 1",
+              "personAddressLine2" -> "Line 2",
+              "personAddressPostCode" -> "NE15GH"
+            ),
+            "timeAtAddress" -> Json.obj(
+              "timeAtAddress" -> "01"
+            )
+          )
+        )
+      )
 
       "Serialise as expected" in {
         Json.toJson(ResponsiblePeopleModel) must be(completeJson)
@@ -107,9 +139,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       val initial = ResponsiblePeople(
         Some(DefaultAddPerson),
         Some(DefaultPersonResidenceType),
-        Some(DefaultPreviousHomeAddress),
-        Some(DefaultSaRegisteredYes),
-        Some(DefaultPersonAddressHistory)
+        Some(DefaultAddressHistory),
+        Some(DefaultSaRegisteredYes)
       )
 
       initial.isComplete must be(true)
@@ -120,9 +151,23 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       val initial = ResponsiblePeople(
         Some(DefaultAddPerson),
         Some(DefaultPersonResidenceType),
-        None,
-        Some(DefaultSaRegisteredYes),
+        Some(DefaultAddressHistory),
         None
+      )
+
+      initial.isComplete must be(false)
+
+    }
+
+    "the model address history is set but not completed" in {
+
+      val PartialAddressHistory = ResponsiblePersonAddressHistory()
+
+      val initial = ResponsiblePeople(
+        Some(DefaultAddPerson),
+        Some(DefaultPersonResidenceType),
+        Some(PartialAddressHistory),
+        Some(DefaultSaRegisteredYes)
       )
 
       initial.isComplete must be(false)
@@ -131,33 +176,38 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   }
 
   "Merge with existing model" when {
-    val initial = ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes))
+
+    val initial = ResponsiblePeople(
+      Some(DefaultAddPerson),
+      Some(DefaultPersonResidenceType),
+      Some(DefaultAddressHistory),
+      Some(DefaultSaRegisteredYes))
 
     "Merged with add person" must {
       "return ResponsiblePeople with correct add person" in {
         val result = initial.addPerson(NewAddPerson)
-        result must be (ResponsiblePeople(Some(NewAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(Some(NewAddPerson), Some(DefaultPersonResidenceType), Some(DefaultAddressHistory), Some(DefaultSaRegisteredYes)))
       }
     }
 
     "Merged with DefaultPersonResidenceType" must {
       "return ResponsiblePeople with correct DefaultPersonResidenceType" in {
         val result = initial.personResidenceType(NewPersonResidenceType)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(NewPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(NewPersonResidenceType), Some(DefaultAddressHistory), Some(DefaultSaRegisteredYes)))
       }
     }
 
     "Merged with DefaultPreviousHomeAddress" must {
       "return ResponsiblePeople with correct DefaultPreviousHomeAddress" in {
-        val result = initial.previousHomeAddress(NewPreviousHomeAddress)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(NewPreviousHomeAddress), Some(DefaultSaRegisteredYes)))
+        val result = initial.addressHistory(NewAddressHistory)
+        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(NewAddressHistory), Some(DefaultSaRegisteredYes)))
       }
     }
 
     "Merged with DefaultSaRegisteredYes" must {
       "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
         val result = initial.saRegistered(NewSaRegisteredYes)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultPreviousHomeAddress), Some(NewSaRegisteredYes)))
+        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultAddressHistory), Some(NewSaRegisteredYes)))
       }
     }
   }
