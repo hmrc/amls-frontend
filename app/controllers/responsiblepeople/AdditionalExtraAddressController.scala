@@ -3,17 +3,17 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.responsiblepeople.TimeAtAddress.{Empty, ZeroToFiveMonths, ThreeYearsPlus}
-import models.responsiblepeople._
+import forms.{ValidForm, InvalidForm, Form2}
+import models.responsiblepeople.TimeAtAddress.Empty
+import models.responsiblepeople.{ResponsiblePersonAddressHistory, ResponsiblePeople, PersonAddressUK, ResponsiblePersonAddress}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.RepeatingSection
-import views.html.responsiblepeople.additional_address
+import views.html.responsiblepeople.additional_extra_address
 
 import scala.concurrent.Future
 
-trait AdditionalAddressController extends RepeatingSection with BaseController {
+trait AdditionalExtraAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
@@ -28,9 +28,9 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
               val form: Form2[ResponsiblePersonAddress] = (for {
                 responsiblePeople <- response
                 addressHistory <- responsiblePeople.addressHistory
-                additionalAddress <- addressHistory.additionalAddress
-              } yield Form2[ResponsiblePersonAddress](additionalAddress)).getOrElse(Form2(DefaultAddressHistory))
-              Ok(additional_address(form, edit, index))
+                additionalExtraAddress <- addressHistory.additionalExtraAddress
+              } yield Form2[ResponsiblePersonAddress](additionalExtraAddress)).getOrElse(Form2(DefaultAddressHistory))
+              Ok(additional_extra_address(form, edit, index))
           }
       }
     }
@@ -41,13 +41,12 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
         implicit authContext => implicit request => {
           Form2[ResponsiblePersonAddress](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.responsiblepeople.additional_address(f, edit, index)))
+              Future.successful(BadRequest(views.html.responsiblepeople.additional_extra_address(f, edit, index)))
             case ValidForm(_, data) =>
               for {
                 _ <- doUpdate(index, data)
               } yield (data.timeAtAddress, edit) match {
-                case (ThreeYearsPlus, false) => Redirect(routes.AdditionalAddressController.get(index, edit)) //TODO: Business Position
-                case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
+                case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit)) //TODO: Business Position
                 case (_, true) => Redirect(routes.SummaryController.get()) //TODO: Responsible Person Details
               }
           }
@@ -60,21 +59,21 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
       case Some(res) => {
         Some(res.addressHistory(
           res.addressHistory match {
-            case Some(a) => a.additionalAddress(data)
-            case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
+            case Some(a) => a.additionalExtraAddress(data)
+            case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
           })
         )
       }
       case _ =>
         Some(ResponsiblePeople(
           addressHistory = Some(ResponsiblePersonAddressHistory(
-            additionalAddress = Some(data)))))
+            additionalExtraAddress = Some(data)))))
     }
   }
 
 }
 
-object AdditionalAddressController extends AdditionalAddressController {
+object AdditionalExtraAddressController extends AdditionalExtraAddressController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }
