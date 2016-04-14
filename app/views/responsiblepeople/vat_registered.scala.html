@@ -1,0 +1,28 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean, index: Int)(implicit request: Request[_])
+
+@target = @{
+    s"""${f("vrnNumber").id}-fieldset"""
+}
+
+@main(
+    title = Messages("responsiblepeople.registeredforvat.title")
+) {
+
+    @heading("responsiblepeople.registeredforvat.heading", "summary.responsiblepeople")
+
+    @form(f, controllers.responsiblepeople.routes.VATRegisteredController.post(index, edit)) {
+
+        @inlineRadioGroup(f("registeredForVAT")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("registeredForVAT"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("vrnNumber"), "responsiblepeople.registeredforvat.lbl.vatNumber", bold = false)
+            }
+        }
+        @submit(edit)
+    }
+}
