@@ -686,3 +686,7 @@ responsiblepeople.non.uk.passport.lbl = Non-UK passport
 responsiblepeople.no.passport.lbl = This person doesn't have a passport
 responsiblepeople.country.of.birth.lbl = Country of birth
 responsiblepeople.or.lbl = or
+
+responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
+responsiblepeople.training.heading = Has this person had training in anti-money laundering or counter-terrorism funding?
+responsiblepeople.training.datesandduration = Please give a brief description, including approximate dates and duration

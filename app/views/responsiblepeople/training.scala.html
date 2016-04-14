@@ -1,0 +1,29 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
+
+@target = @{
+    s"""${f("datesandduration").id}-fieldset"""
+}
+
+@main(
+    title = Messages("responsiblepeople.training.heading")
+) {
+
+    @heading("responsiblepeople.training.heading", "summary.responsiblepeople")
+
+    @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
+
+        @inlineRadioGroup(f("hadTraining")) {
+            @radio(f("hadTraining"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("hadTraining"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @textarea(f("datesandduration"), "responsiblepeople.training.datesandduration", bold = false)
+            }
+        }
+
+    @submit()
+  }
+}
