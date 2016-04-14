@@ -21,31 +21,29 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
     additionalAddress = Some(DefaultAdditionalAddress)
   )
   val DefaultVatRegisteredNo = VATRegisteredNo
-
   val DefaultPositions = Positions(Set(BeneficialOwner, InternalAccountant))
+  val DefaultPersonRegistered = PersonRegistered(true)
 
   val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
-
   val NewCurrentAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), ZeroToFiveMonths)
   val NewAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR")), ZeroToFiveMonths)
-
   val NewAddressHistory = ResponsiblePersonAddressHistory(
     currentAddress = Some(NewCurrentAddress),
     additionalAddress = Some(NewAdditionalAddress)
   )
-
   val NewPersonResidenceType = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
     Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val NewSaRegisteredYes = SaRegisteredNo
-  val NewVatRegisteredYes = VATRegisteredYes("12345678")
-
+  val NewVatRegisteredYes = VATRegisteredYes("123456789")
   val NewPositions = Positions(Set(Director, SoleProprietor))
+  val NewPersonRegistered = PersonRegistered(false)
 
   val ResponsiblePeopleModel = ResponsiblePeople(
     addPerson = Some(DefaultAddPerson),
     addressHistory = Some(DefaultAddressHistory),
     positions = Some(DefaultPositions),
-    saRegistered = Some(DefaultSaRegisteredYes)
+    saRegistered = Some(DefaultSaRegisteredYes),
+    vatRegistered = Some(NewVatRegisteredYes)
   )
 
   "ResponsiblePeople" must {
@@ -98,6 +96,10 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         "saRegistered" -> Json.obj(
           "saRegistered" -> true,
           "utrNumber" -> "0123456789"
+        ),
+        "vatRegistered" -> Json.obj(
+          "registeredForVAT" -> true,
+          "vrnNumber" -> "123456789"
         )
       )
 
@@ -152,11 +154,17 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       }
     }
 
-
     "Merged with VatRegistered" must {
       "return ResponsiblePeople with correct VatRegistered" in {
         val result = initial.vatRegistered(DefaultVatRegisteredNo)
         result must be (ResponsiblePeople(vatRegistered = Some(DefaultVatRegisteredNo)))
+      }
+    }
+
+    "Merged with personRegistered" must {
+      "return ResponsiblePeople with correct personRegistered" in {
+        val result = initial.personRegistered(DefaultPersonRegistered)
+        result must be (ResponsiblePeople(personRegistered = Some(DefaultPersonRegistered)))
       }
     }
   }
@@ -171,7 +179,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultAddressHistory),
         Some(DefaultPositions),
         Some(DefaultSaRegisteredYes),
-        Some(DefaultVatRegisteredNo)
+        Some(DefaultVatRegisteredNo),
+        Some(DefaultPersonRegistered)
       )
 
       initial.isComplete must be(true)
@@ -188,7 +197,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       )
 
       initial.isComplete must be(false)
-
     }
 
     "the model address history is set but not completed" in {
@@ -215,7 +223,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       Some(DefaultAddressHistory),
       Some(DefaultPositions),
       Some(DefaultSaRegisteredYes),
-      Some(DefaultVatRegisteredNo))
+      Some(DefaultVatRegisteredNo),
+      Some(DefaultPersonRegistered)
+    )
 
     "Merged with add person" must {
       "return ResponsiblePeople with correct NewAddPerson" in {
@@ -227,7 +237,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultAddressHistory),
           Some(DefaultPositions),
           Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultVatRegisteredNo),
+          Some(DefaultPersonRegistered)
+        ))
       }
     }
 
@@ -240,7 +252,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultAddressHistory),
           Some(DefaultPositions),
           Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultVatRegisteredNo),
+          Some(DefaultPersonRegistered)
+        ))
       }
     }
 
@@ -253,7 +267,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(NewAddressHistory),
           Some(DefaultPositions),
           Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultVatRegisteredNo),
+          Some(DefaultPersonRegistered)
+        ))
       }
     }
 
@@ -266,7 +282,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultAddressHistory),
           Some(NewPositions),
           Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultVatRegisteredNo),
+          Some(DefaultPersonRegistered)
+        ))
       }
     }
 
@@ -279,7 +297,9 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultAddressHistory),
           Some(DefaultPositions),
           Some(NewSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultVatRegisteredNo),
+          Some(DefaultPersonRegistered)
+        ))
       }
     }
 
@@ -292,7 +312,24 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultAddressHistory),
           Some(DefaultPositions),
           Some(DefaultSaRegisteredYes),
-          Some(NewVatRegisteredYes)))
+          Some(NewVatRegisteredYes),
+          Some(DefaultPersonRegistered)
+        ))
+      }
+    }
+
+    "Merged with PersonRegistered" must {
+      "return ResponsiblePeople with correct PersonRegistered" in {
+        val result = initial.personRegistered(NewPersonRegistered)
+        result must be (ResponsiblePeople(
+          Some(DefaultAddPerson),
+          Some(DefaultPersonResidenceType),
+          Some(DefaultAddressHistory),
+          Some(DefaultPositions),
+          Some(DefaultSaRegisteredYes),
+          Some(DefaultVatRegisteredNo),
+          Some(NewPersonRegistered)
+        ))
       }
     }
   }

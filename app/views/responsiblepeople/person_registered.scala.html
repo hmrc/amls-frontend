@@ -1,0 +1,23 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], index: Int)(implicit request: Request[_])
+
+@main(
+    title = Messages("responsiblepeople.person.registered.title")
+) {
+
+    @heading("responsiblepeople.person.registered.neading", "summary.responsiblepeople")
+
+    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
+        <span>@Messages("responsiblepeople.have.registered.person.text", index) </span>
+
+        @inlineRadioGroup(f("registerAnother")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("registerAnother"), "lbl.yes", "true")
+            @radio(f("registerAnother"), "lbl.no", "false")
+        }
+
+        @submit()
+    }
+}

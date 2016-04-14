@@ -167,3 +167,6 @@ POST        /responsible-people/additional-extra-address/:index   controllers.re
 
 GET         /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.get(index:Int)
+POST        /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.post(index:Int)

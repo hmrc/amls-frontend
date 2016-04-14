@@ -10,7 +10,8 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
                              addressHistory: Option[ResponsiblePersonAddressHistory] = None,
                              positions: Option[Positions] = None,
                              saRegistered: Option[SaRegistered] = None,
-                             vatRegistered: Option[VATRegistered] = None
+                             vatRegistered: Option[VATRegistered] = None,
+                             personRegistered : Option[PersonRegistered] = None
                           ) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
@@ -31,11 +32,13 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def vatRegistered(v: VATRegistered): ResponsiblePeople =
     this.copy(vatRegistered = Some(v))
 
+  def personRegistered(v: PersonRegistered): ResponsiblePeople =
+    this.copy(personRegistered = Some(v))
+
   def isComplete: Boolean = this match {
-    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(pos), Some(_), Some(_)) if add.isComplete && pos.isComplete => true
+    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(pos), Some(_), Some(_), Some(_)) if add.isComplete && pos.isComplete => true
     case _ => false
   }
-
 }
 
 object ResponsiblePeople {
