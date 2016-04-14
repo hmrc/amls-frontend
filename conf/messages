@@ -647,18 +647,31 @@ responsiblepeople.wherepersonlives.3_years_history = 1 to 3 years
 responsiblepeople.wherepersonlives.more_years_history = More than 3 years
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 
-responsiblepeople.previous_home_address.title = Where was this person''s previous home address?
-responsiblepeople.previous_home_address.heading = Where was this person''s previous home address?
-responsiblepeople.previous_home_address.ukAddress = UK
-responsiblepeople.previous_home_address.nonUkAddress = Overseas
-responsiblepeople.previous_home_address.address = Address
-responsiblepeople.previous_home_address.postCode = Postcode
-responsiblepeople.previous_home_address.country = Country
-responsiblepeople.previous_home_address.how_long = How long did they live at this address?
-responsiblepeople.previous_home_address.0_5_months = 0 to 5 months
-responsiblepeople.previous_home_address.6_11_months = 6 to 11 months
-responsiblepeople.previous_home_address.1_3_years = 1 to 3 years
-responsiblepeople.previous_home_address.more_3_years = More than 3 years
+responsiblepeople.additional_address.title = Where was this person''s previous home address?
+responsiblepeople.additional_address.heading = Where was this person''s previous home address?
+responsiblepeople.additional_address.ukAddress = UK
+responsiblepeople.additional_address.nonUkAddress = Overseas
+responsiblepeople.additional_address.address = Address
+responsiblepeople.additional_address.postCode = Postcode
+responsiblepeople.additional_address.country = Country
+responsiblepeople.additional_address.how_long = How long did they live at this address?
+responsiblepeople.additional_address.0_5_months = 0 to 5 months
+responsiblepeople.additional_address.6_11_months = 6 to 11 months
+responsiblepeople.additional_address.1_3_years = 1 to 3 years
+responsiblepeople.additional_address.more_3_years = More than 3 years
+
+responsiblepeople.additional_extra_address.title = Where was this person''s other previous home address?
+responsiblepeople.additional_extra_address.heading = Where was this person''s other previous home address?
+responsiblepeople.additional_extra_address.ukAddress = UK
+responsiblepeople.additional_extra_address.nonUkAddress = Overseas
+responsiblepeople.additional_extra_address.address = Address
+responsiblepeople.additional_extra_address.postCode = Postcode
+responsiblepeople.additional_extra_address.country = Country
+responsiblepeople.additional_extra_address.how_long = How long did they live at this address?
+responsiblepeople.additional_extra_address.0_5_months = 0 to 5 months
+responsiblepeople.additional_extra_address.6_11_months = 6 to 11 months
+responsiblepeople.additional_extra_address.1_3_years = 1 to 3 years
+responsiblepeople.additional_extra_address.more_3_years = More than 3 years
 
 error.required.timeAtAddress = Select how long this person lived at this address.
 

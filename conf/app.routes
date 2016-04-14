@@ -158,3 +158,6 @@ GET         /responsible-people/summary                     controllers.responsi
 
 GET         /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
