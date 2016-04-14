@@ -20,6 +20,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
     currentAddress = Some(DefaultCurrentAddress),
     additionalAddress = Some(DefaultAdditionalAddress)
   )
+  val DefaultVatRegisteredNo = VATRegisteredNo
 
   val DefaultPositions = Positions(Set(BeneficialOwner, InternalAccountant))
 
@@ -36,6 +37,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   val NewPersonResidenceType = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
     Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val NewSaRegisteredYes = SaRegisteredNo
+  val NewVatRegisteredYes = VATRegisteredYes("12345678")
 
   val NewPositions = Positions(Set(Director, SoleProprietor))
 
@@ -106,7 +108,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       "Deserialise as expected" in {
         completeJson.as[ResponsiblePeople] must be(ResponsiblePeopleModel)
       }
-
     }
 
     "implicitly return an existing Model if one present" in {
@@ -150,6 +151,14 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         result must be (ResponsiblePeople(None, None, None, None, Some(DefaultSaRegisteredYes)))
       }
     }
+
+
+    "Merged with VatRegistered" must {
+      "return ResponsiblePeople with correct VatRegistered" in {
+        val result = initial.vatRegistered(DefaultVatRegisteredNo)
+        result must be (ResponsiblePeople(vatRegistered = Some(DefaultVatRegisteredNo)))
+      }
+    }
   }
 
   "Successfully validate if the model is complete" when {
@@ -161,7 +170,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultPersonResidenceType),
         Some(DefaultAddressHistory),
         Some(DefaultPositions),
-        Some(DefaultSaRegisteredYes)
+        Some(DefaultSaRegisteredYes),
+        Some(DefaultVatRegisteredNo)
       )
 
       initial.isComplete must be(true)
@@ -192,7 +202,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultPositions),
         Some(DefaultSaRegisteredYes)
       )
-
       initial.isComplete must be(false)
 
     }
@@ -205,17 +214,20 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       Some(DefaultPersonResidenceType),
       Some(DefaultAddressHistory),
       Some(DefaultPositions),
-      Some(DefaultSaRegisteredYes))
+      Some(DefaultSaRegisteredYes),
+      Some(DefaultVatRegisteredNo))
 
     "Merged with add person" must {
       "return ResponsiblePeople with correct NewAddPerson" in {
         val result = initial.addPerson(NewAddPerson)
+
         result must be (ResponsiblePeople(
           Some(NewAddPerson),
           Some(DefaultPersonResidenceType),
           Some(DefaultAddressHistory),
           Some(DefaultPositions),
-          Some(DefaultSaRegisteredYes)))
+          Some(DefaultSaRegisteredYes),
+          Some(DefaultVatRegisteredNo)))
       }
     }
 
@@ -227,7 +239,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(NewPersonResidenceType),
           Some(DefaultAddressHistory),
           Some(DefaultPositions),
-          Some(DefaultSaRegisteredYes)))
+          Some(DefaultSaRegisteredYes),
+          Some(DefaultVatRegisteredNo)))
       }
     }
 
@@ -239,7 +252,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultPersonResidenceType),
           Some(NewAddressHistory),
           Some(DefaultPositions),
-          Some(DefaultSaRegisteredYes)))
+          Some(DefaultSaRegisteredYes),
+          Some(DefaultVatRegisteredNo)))
       }
     }
 
@@ -251,7 +265,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultPersonResidenceType),
           Some(DefaultAddressHistory),
           Some(NewPositions),
-          Some(DefaultSaRegisteredYes)))
+          Some(DefaultSaRegisteredYes),
+          Some(DefaultVatRegisteredNo)))
       }
     }
 
@@ -263,7 +278,21 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
           Some(DefaultPersonResidenceType),
           Some(DefaultAddressHistory),
           Some(DefaultPositions),
-          Some(NewSaRegisteredYes)))
+          Some(NewSaRegisteredYes),
+          Some(DefaultVatRegisteredNo)))
+      }
+    }
+
+    "Merged with VATRegistered" must {
+      "return ResponsiblePeople with correct NewVatRegisteredYes" in {
+        val result = initial.vatRegistered(NewVatRegisteredYes)
+        result must be (ResponsiblePeople(
+          Some(DefaultAddPerson),
+          Some(DefaultPersonResidenceType),
+          Some(DefaultAddressHistory),
+          Some(DefaultPositions),
+          Some(DefaultSaRegisteredYes),
+          Some(NewVatRegisteredYes)))
       }
     }
   }

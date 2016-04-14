@@ -140,6 +140,7 @@ GET         /declaration/declaration                        controllers.declarat
 GET         /confirmation                                   controllers.ConfirmationController.get()
 
 GET         /responsible-people/index/:index                controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
+GET         /responsible-people/who-must-register/:index    controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
 
 GET         /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
@@ -160,3 +161,9 @@ POST        /responsible-people/additional-address/:index   controllers.responsi
 
 GET         /responsible-people/position/:index   controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/position/:index   controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)

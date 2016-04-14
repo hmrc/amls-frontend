@@ -43,12 +43,12 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
 
         val document = Jsoup.parse(contentAsString(result))
         document.title must include(Messages("responsiblepeople.position_within_business.title"))
-        document.select("input[name=positions[]][value=01]").hasAttr("selected") must be(false)
-        document.select("input[name=positions[]][value=02]").hasAttr("selected") must be(false)
-        document.select("input[name=positions[]][value=03]").hasAttr("selected") must be(false)
-        document.select("input[name=positions[]][value=04]").hasAttr("selected") must be(false)
-        document.select("input[name=positions[]][value=05]").hasAttr("selected") must be(false)
-        document.select("input[name=positions[]][value=06]").hasAttr("selected") must be(false)
+        document.select("input[value=01]").hasAttr("checked") must be(false)
+        document.select("input[value=02]").hasAttr("checked") must be(false)
+        document.select("input[value=03]").hasAttr("checked") must be(false)
+        document.select("input[value=04]").hasAttr("checked") must be(false)
+        document.select("input[value=05]").hasAttr("checked") must be(false)
+        document.select("input[value=06]").hasAttr("checked") must be(false)
 
       }
 
@@ -104,8 +104,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
-      //TODO: Update to Is this person registered for VAT in the UK?
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
     }
 
     "submit with valid data as a sole proprietor" in new Fixture {
@@ -117,8 +116,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
-      //TODO: Update to Is this person registered for VAT in the UK?
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
     }
 
     "submit with all other valid data types" in new Fixture {
@@ -147,8 +145,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
-      //TODO: Update to Is this person registered for VAT in the UK?
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId).url))
 
     }
 
@@ -187,7 +184,6 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = controller.post(RecordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      //TODO: Update to correct location once created.
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
     }
   }

@@ -233,7 +233,6 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
 
       val result = additionalAddressController.post(RecordId, true)(requestWithParams)
       status(result) must be(SEE_OTHER)
-      //TODO: Update this to new location once implementated.
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
@@ -244,7 +243,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
         "addressLine1" -> "Line 1",
         "addressLine2" -> "Line 2",
         "postCode" -> "NE17YH",
-        "timeAtAddress" -> "01"
+        "timeAtAddress" -> "03"
       )
 
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -255,8 +254,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
 
       val result = additionalAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
-      //TODO: Update this to new location once implementated.
-      redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
+      redirectLocation(result) must be(Some(routes.AdditionalExtraAddressController.get(RecordId).url))
     }
 
     "must go to the correct location when edit mode is off and time at address is greater than 3 years" in new Fixture {
@@ -277,8 +275,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
 
       val result = additionalAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
-      //TODO: Update this to new location once implementated.
-      redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
+      redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
     }
 
   }

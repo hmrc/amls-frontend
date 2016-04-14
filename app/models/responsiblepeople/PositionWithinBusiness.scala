@@ -6,7 +6,11 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import utils.TraversableValidators._
 
-case class Positions(positions: Set[PositionWithinBusiness])
+case class Positions(positions: Set[PositionWithinBusiness]) {
+
+  def isComplete = positions.nonEmpty
+
+}
 
 sealed trait PositionWithinBusiness
 
