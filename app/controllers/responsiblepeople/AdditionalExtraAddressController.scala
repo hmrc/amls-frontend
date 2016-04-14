@@ -3,17 +3,17 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress.{Empty, ZeroToFiveMonths, ThreeYearsPlus}
-import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddressHistory, ResponsiblePersonAddress, ResponsiblePeople}
+import forms.{ValidForm, InvalidForm, Form2}
+import models.responsiblepeople.TimeAtAddress.Empty
+import models.responsiblepeople.{ResponsiblePersonAddressHistory, ResponsiblePeople, PersonAddressUK, ResponsiblePersonAddress}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.RepeatingSection
-import views.html.responsiblepeople._
+import views.html.responsiblepeople.additional_extra_address
 
 import scala.concurrent.Future
 
-trait CurrentAddressController extends RepeatingSection with BaseController {
+trait AdditionalExtraAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
@@ -25,34 +25,32 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             response =>
-              val form = (for {
-                res <- response
-                addressHistory <- res.addressHistory
-                currentAddress <- addressHistory.currentAddress
-              } yield Form2[ResponsiblePersonAddress](currentAddress)).getOrElse(Form2(DefaultAddressHistory))
-              Ok(current_address(form, edit, index))
+              val form: Form2[ResponsiblePersonAddress] = (for {
+                responsiblePeople <- response
+                addressHistory <- responsiblePeople.addressHistory
+                additionalExtraAddress <- addressHistory.additionalExtraAddress
+              } yield Form2[ResponsiblePersonAddress](additionalExtraAddress)).getOrElse(Form2(DefaultAddressHistory))
+              Ok(additional_extra_address(form, edit, index))
           }
       }
     }
 
-
   def post(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
       Authorised.async {
-        implicit authContext => implicit request =>
+        implicit authContext => implicit request => {
           Form2[ResponsiblePersonAddress](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(current_address(f, edit, index)))
+              Future.successful(BadRequest(views.html.responsiblepeople.additional_extra_address(f, edit, index)))
             case ValidForm(_, data) =>
               for {
                 _ <- doUpdate(index, data)
               } yield (data.timeAtAddress, edit) match {
-                //TODO: Change this first case to the Business Position page.
-                case (ThreeYearsPlus, false) => Redirect(routes.AdditionalAddressController.get(index, edit))
-                case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit))
+                case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit)) //TODO: Business Position
                 case (_, true) => Redirect(routes.SummaryController.get())
               }
           }
+        }
       }
     }
 
@@ -61,22 +59,22 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
       case Some(res) => {
         Some(res.addressHistory(
           res.addressHistory match {
-            case Some(a) => a.currentAddress(data)
-            case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
+            case Some(a) => a.additionalExtraAddress(data)
+            case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
           })
         )
       }
       case _ =>
         Some(ResponsiblePeople(
           addressHistory = Some(ResponsiblePersonAddressHistory(
-            currentAddress = Some(data)))))
+            additionalExtraAddress = Some(data)))))
     }
   }
 
 }
 
-object CurrentAddressController extends CurrentAddressController {
+object AdditionalExtraAddressController extends AdditionalExtraAddressController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
-  override def dataCacheConnector = DataCacheConnector
+  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

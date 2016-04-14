@@ -53,6 +53,7 @@ object TimeAtAddress {
     }
 
   implicit val jsonWrites = Writes[TimeAtAddress] {
+      case Empty => JsNull
       case ZeroToFiveMonths => Json.obj("timeAtAddress" -> "01")
       case SixToElevenMonths => Json.obj("timeAtAddress" -> "02")
       case OneToThreeYears => Json.obj("timeAtAddress" -> "03")
