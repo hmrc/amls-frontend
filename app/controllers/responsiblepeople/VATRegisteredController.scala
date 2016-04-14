@@ -22,8 +22,8 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
             response =>
               val form = (for {
                 resp <- response
-                person <- resp.vatRegistered
-              } yield Form2[VATRegistered](person)).getOrElse(EmptyForm)
+                vat <- resp.vatRegistered
+              } yield Form2[VATRegistered](vat)).getOrElse(EmptyForm)
               Ok(vat_registered(form, edit, index))
           }
       }
