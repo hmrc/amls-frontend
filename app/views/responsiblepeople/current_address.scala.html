@@ -10,7 +10,7 @@
 
     @heading("responsiblepeople.wherepersonlives.title", "summary.responsiblepeople")
 
-    @form(f, controllers.responsiblepeople.routes.PersonAddressController.post(index)) {
+    @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index)) {
 
         @inlineRadioGroup(f("isUK")) {
             @legend("TODO", jsHidden = true)
@@ -61,12 +61,12 @@
             )
         }
 
-        @radioGroup(f("addressHistory")) {
+        @radioGroup(f("timeAtAddress")) {
             @legend("responsiblepeople.wherepersonlives.address_history", jsHidden = true)
-            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.5_months_history", "01")
-            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.11_months_history", "02")
-            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.3_years_history", "03")
-            @radio(f("addressHistory"), "responsiblepeople.wherepersonlives.more_years_history", "04")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.11_months_history", "02")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.3_years_history", "03")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.more_years_history", "04")
         }
         @submit(edit)
     }
