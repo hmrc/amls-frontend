@@ -285,6 +285,10 @@ aboutthebusiness.whatyouneed.line_4 = email address
 aboutthebusiness.registeredforvat.title = Is this business registered for VAT?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
 
+aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax?
+aboutthebusiness.registeredforcorporationtax.taxReference = Corporation Tax Reference
+aboutthebusiness.registeredforcorporationtax.taxReferenceHint = For example: 1234567890
+
 aboutthebusiness.contactingyou.title = How can we contact you?
 aboutthebusiness.contactingyou.lbl = We may need to get in touch to discuss your registration.
 aboutthebusiness.contactingyou.email.lbl = Email address

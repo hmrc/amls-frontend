@@ -1,50 +1,51 @@
 package controllers.aboutthebusiness
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.aboutthebusiness._
-import views.html.aboutthebusiness._
+import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import models.aboutthebusiness.{CorporationTaxRegistered, AboutTheBusiness}
+import views.html.aboutthebusiness.corporation_tax_registered
 
 import scala.concurrent.Future
 
-trait VATRegisteredController extends BaseController {
+trait CorporationTaxRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_, Some(data), _, _, _, _)) =>
-          Ok(vat_registered(Form2[VATRegistered](data), edit))
-        case _ =>
-          Ok(vat_registered(EmptyForm, edit))
+          response =>
+          val form: Form2[CorporationTaxRegistered] = (for {
+            aboutTheBusiness <- response
+            corporationTaxRegistered <- aboutTheBusiness.corporationTaxRegistered
+          } yield Form2[CorporationTaxRegistered](corporationTaxRegistered)).getOrElse(EmptyForm)
+          Ok(corporation_tax_registered(form, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[VATRegistered](request.body) match {
+      Form2[CorporationTaxRegistered](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(vat_registered(f, edit)))
+          Future.successful(BadRequest(corporation_tax_registered(f, edit)))
         case ValidForm(_, data) =>
           for {
             aboutTheBusiness <- dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
             _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.vatRegistered(data)
+              aboutTheBusiness.corporationTaxRegistered(data)
             )
           } yield edit match {
             case true =>  Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.CorporationTaxRegisteredController.get())
+            case false => Redirect(routes.ConfirmRegisteredOfficeController.get())
           }
       }
     }
   }
 }
 
-object VATRegisteredController extends VATRegisteredController {
-  // $COVERAGE-OFF$
+object CorporationTaxRegisteredController extends CorporationTaxRegisteredController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }
