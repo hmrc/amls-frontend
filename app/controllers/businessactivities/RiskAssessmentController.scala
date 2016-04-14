@@ -48,6 +48,7 @@ trait RiskAssessmentController extends BaseController {
 }
 
 object RiskAssessmentController extends RiskAssessmentController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

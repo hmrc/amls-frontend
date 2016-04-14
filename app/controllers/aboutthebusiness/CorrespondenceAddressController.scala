@@ -43,6 +43,7 @@ trait CorrespondenceAddressController extends BaseController {
 }
 
 object CorrespondenceAddressController extends CorrespondenceAddressController {
+  // $COVERAGE-OFF$
   override protected val dataConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

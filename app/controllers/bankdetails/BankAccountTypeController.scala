@@ -48,6 +48,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
 }
 
 object BankAccountTypeController extends BankAccountTypeController {
+  // $COVERAGE-OFF$
     override val authConnector = AMLSAuthConnector
     override val dataCacheConnector = DataCacheConnector
 }

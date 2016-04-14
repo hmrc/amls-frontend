@@ -31,11 +31,6 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
   "ConfirmRegisteredOfficeController" must {
 
-    "use correct services" in new Fixture {
-      ConfirmRegisteredOfficeController.authConnector must be(AMLSAuthConnector)
-      ConfirmRegisteredOfficeController.dataCache must be(DataCacheConnector)
-    }
-
     "Get Option:" must {
 
       "load register Office" in new Fixture {
@@ -98,7 +93,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("This field is required"))
+        contentAsString(result) must include(Messages("error.required.atb.confirm.office"))
 
       }
 
@@ -111,7 +106,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include ("There are errors in your form submission")
+        contentAsString(result) must include(Messages("err.summary"))
 
       }
     }

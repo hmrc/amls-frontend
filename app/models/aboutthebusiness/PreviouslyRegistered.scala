@@ -13,13 +13,14 @@ case object PreviouslyRegisteredNo extends PreviouslyRegistered
 
 object PreviouslyRegistered {
 
-  import models.FormTypes._
+  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, PreviouslyRegistered] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "previouslyRegistered").read[Boolean] flatMap {
+    (__ \ "previouslyRegistered").read[Boolean].withMessage("error.required.atb.previously.registered") flatMap {
       case true =>
-        (__ \ "prevMLRRegNo").read(prevMLRRegNoType) fmap (PreviouslyRegisteredYes.apply _)
+        (__ \ "prevMLRRegNo").read(notEmpty.withMessage("error.required.atb.mlr.number")
+          compose pattern("^([0-9]{8}|[0-9]{15})$".r).withMessage("error.invalid.atb.mlr.number")) fmap PreviouslyRegisteredYes.apply
       case false => Rule.fromMapping { _ => Success(PreviouslyRegisteredNo) }
     }
   }
@@ -34,7 +35,7 @@ object PreviouslyRegistered {
 
   implicit val jsonReads: Reads[PreviouslyRegistered] =
     (__ \ "previouslyRegistered").read[Boolean] flatMap {
-      case true => (__ \ "prevMLRRegNo").read[String] map (PreviouslyRegisteredYes.apply _)
+      case true => (__ \ "prevMLRRegNo").read[String] map PreviouslyRegisteredYes.apply
       case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
     }
 

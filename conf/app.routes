@@ -135,12 +135,35 @@ POST        /business-activities/accountant-details     controllers.businessacti
 
 GET         /business-activities/check-your-answers      controllers.businessactivities.SummaryController.get()
 
+GET         /declaration/add-person                         controllers.declaration.AddPersonController.get()
+POST        /declaration/add-person                         controllers.declaration.AddPersonController.post()
 
-GET         /declaration/add-person                     controllers.declaration.AddPersonController.get()
-POST        /declaration/add-person                     controllers.declaration.AddPersonController.post()
+GET         /declaration/declaration                        controllers.declaration.DeclarationController.get()
 
-GET         /declaration/declaration                    controllers.declaration.DeclarationController.get()
+GET         /confirmation                                   controllers.ConfirmationController.get()
 
-GET         /confirmation                               controllers.ConfirmationController.get()
+GET         /responsible-people/index/:index                controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
+GET         /responsible-people/who-must-register/:index    controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
 
+GET         /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/address/:index             controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/address/:index             controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/summary                     controllers.responsiblepeople.SummaryController.get()
+
+GET         /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)

@@ -5,10 +5,8 @@
 
 @sidebar = {
     <div class="bevel-container">
-        <h3 class="heading-small">@Messages("confirmation.sidebar.title")</h3>
-        <p>@Messages("confirmation.sidebar.lede")</p>
-        <p>@Messages("confirmation.sidebar.code", mlrRegNo)</p>
-        <p>@Messages("confirmation.sidebar.time")</p>
+        <h3 class="heading-small">@Messages("confirmation.sidebar.code", mlrRegNo)</h3>
+        <p>@Messages("confirmation.sidebar.contact")</p>
     </div>
 }
 
@@ -19,8 +17,11 @@
 
     <div class="confirmation">
         <h1 class="heading-large">@Messages("confirmation.lede")</h1>
-        <p class="heading-small">@Messages("confirmation.code", mlrRegNo)</p>
     </div>
+
+    <h2 class="heading-medium">@Messages("confirmation.thankyou")</h2>
+
+    <p>@Messages("confirmation.thankyou.p")</p>
 
     <div class="panel-wide form-group">
         <div>@Messages("confirmation.fee")</div>
@@ -35,7 +36,7 @@
         <thead>
             <tr>
                 <th>&nbsp;</th>
-                <th width="15%">@Messages("confirmation.quantity")</th>
+                <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
                 <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
                 <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
             </tr>
@@ -45,12 +46,16 @@
                 case BreakdownRow(label, quantity, perItem, total) => {
                     <tr>
                         <td>@Messages(label)</td>
-                        <td>@quantity</td>
+                        <td class="numeric">@quantity</td>
                         <td class="numeric">@perItem</td>
                         <td class="numeric">@total</td>
                     </tr>
                 }
             }
+            <tr>
+                <th colspan="3">@Messages("confirmation.registrationfee")</th>
+                <th class="numeric">@total</th>
+            </tr>
         </tbody>
     </table>
 }

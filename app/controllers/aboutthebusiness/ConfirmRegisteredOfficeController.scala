@@ -49,6 +49,7 @@ trait ConfirmRegisteredOfficeController extends BaseController {
 }
 
 object ConfirmRegisteredOfficeController extends ConfirmRegisteredOfficeController {
+  // $COVERAGE-OFF$
   override val dataCache = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }

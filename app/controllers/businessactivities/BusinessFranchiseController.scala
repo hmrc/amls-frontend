@@ -46,6 +46,7 @@ trait BusinessFranchiseController extends BaseController {
 }
 
 object BusinessFranchiseController extends BusinessFranchiseController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

@@ -1,0 +1,41 @@
+@import include._
+@(index: Int)(implicit request: Request[_])
+
+@main(
+    title = Messages("responsiblepeople.whatyouneed.title")
+) {
+
+    @heading("responsiblepeople.whatyouneed.heading", "summary.responsiblepeople")
+    <div class="form-group">
+        <span>@Messages("responsiblepeople.whatyouneed.requiredinfo")</span>
+    </div>
+
+
+    <ul class="list-bullet form-group">
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_1")</li>
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_2")</li>
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_3")</li>
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_4")</li>
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_5")</li>
+        <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_6")</li>
+    </ul>
+
+
+    <div class="form-group">
+        <span>@Messages("responsiblepeople.whatyouneed.possiblerequiredinfo")</span>
+    </div>
+
+   <div class="form-group">
+        <ul class="list-bullet form-group">
+            <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_7")</li>
+            <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_8")</li>
+            <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_9")</li>
+            <li class="no-padding no-margin">@Messages("responsiblepeople.whatyouneed.line_10")</li>
+        </ul>
+    </div>
+
+    <div class="form-group">
+        <a id="what-you-need-continue" class="button" href="@controllers.responsiblepeople.routes.AddPersonController.get(index, false)">@Messages("button.continue")</a>
+    </div>
+
+}

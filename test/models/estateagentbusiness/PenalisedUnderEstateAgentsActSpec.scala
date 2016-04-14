@@ -26,14 +26,36 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
         be(Success(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before")))
     }
 
+    "fail to validate given mandatory field" in {
+
+      PenalisedUnderEstateAgentsAct.formRule.validate(Map.empty) must
+        be(Failure(Seq(
+          (Path \ "penalisedUnderEstateAgentsAct") -> Seq(ValidationError("error.required.eab.penalised.under.act"))
+        )))
+    }
+
+
     "fail to validate given a `Yes` but no details provided" in {
       val data = Map(
-        "penalisedUnderEstateAgentsAct" -> Seq("true")
+        "penalisedUnderEstateAgentsAct" -> Seq("true"),
+        "penalisedUnderEstateAgentsActDetails" -> Seq("")
       )
 
       PenalisedUnderEstateAgentsAct.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.required"))
+          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.required.eab.info.about.penalty"))
+        )))
+    }
+
+    "fail to validate given a `Yes` but max details provided" in {
+      val data = Map(
+        "penalisedUnderEstateAgentsAct" -> Seq("true"),
+        "penalisedUnderEstateAgentsActDetails" -> Seq("zxzxcz"*50)
+      )
+
+      PenalisedUnderEstateAgentsAct.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "penalisedUnderEstateAgentsActDetails") -> Seq(ValidationError("error.invalid.eab.info.about.penalty"))
         )))
     }
 

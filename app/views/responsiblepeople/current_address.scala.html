@@ -1,0 +1,73 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("responsiblepeople.wherepersonlives.title")
+) {
+
+    @heading("responsiblepeople.wherepersonlives.title", "summary.responsiblepeople")
+
+    @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index)) {
+
+        @inlineRadioGroup(f("isUK")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isUK"), "responsiblepeople.wherepersonlives.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
+            @radio(f("isUK"), "responsiblepeople.wherepersonlives.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
+        }
+
+        @fieldset(
+            legend = "TODO",
+            jsHidden = true,
+            panel = false,
+            id = s"""${f("postCode").id}-fieldset"""
+        ) {
+            <fieldset class="">
+                <legend class="form-label-bold">
+                    @Messages("responsiblepeople.wherepersonlives.address")
+                </legend>
+                @input(f("addressLine1"))
+                @input(f("addressLine2"))
+                @input(f("addressLine3"))
+                @input(f("addressLine4"))
+            </fieldset>
+            @input(
+                field = f("postCode"),
+                labelText = "responsiblepeople.wherepersonlives.postcode",
+                classes = Seq("postcode")
+            )
+        }
+
+        @fieldset(
+            legend = "TODO",
+            jsHidden = true,
+            panel = false,
+            id = s"""${f("country").id}-fieldset"""
+        ) {
+            <fieldset class="">
+                <legend class="form-label-bold">
+                    @Messages("responsiblepeople.wherepersonlives.address")
+                </legend>
+                @input(f("addressLineNonUK1"))
+                @input(f("addressLineNonUK2"))
+                @input(f("addressLineNonUK3"))
+                @input(f("addressLineNonUK4"))
+            </fieldset>
+            @country(
+                field = f("country"),
+                labelText = "responsiblepeople.wherepersonlives.country"
+            )
+        }
+
+        @radioGroup(f("timeAtAddress")) {
+            @legend("responsiblepeople.wherepersonlives.address_history", jsHidden = true)
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.11_months_history", "02")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.3_years_history", "03")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.more_years_history", "04")
+        }
+        @submit(edit)
+    }
+}

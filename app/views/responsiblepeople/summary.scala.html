@@ -1,0 +1,12 @@
+@import include._
+@import models.responsiblepeople._
+
+@(model: ResponsiblePeople)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
+
+}

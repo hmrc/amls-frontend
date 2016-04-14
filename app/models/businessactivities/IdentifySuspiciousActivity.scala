@@ -13,7 +13,8 @@ object IdentifySuspiciousActivity {
   implicit val formRule: Rule[UrlFormEncoded, IdentifySuspiciousActivity] =
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
-      (__ \ "hasWrittenGuidance").read[Boolean] fmap (IdentifySuspiciousActivity.apply)
+      import utils.MappingUtils.Implicits._
+      (__ \ "hasWrittenGuidance").read[Boolean].withMessage("error.required.ba.suspicious.activity") fmap (IdentifySuspiciousActivity.apply)
     }
 
   implicit val formWrites: Write[IdentifySuspiciousActivity, UrlFormEncoded] =

@@ -1,5 +1,6 @@
 package models.estateagentbusiness
 
+import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{From, Rule, Success, Write}
 import play.api.libs.json._
@@ -12,12 +13,17 @@ case object PenalisedUnderEstateAgentsActNo extends PenalisedUnderEstateAgentsAc
 
 object PenalisedUnderEstateAgentsAct {
 
-  import models.FormTypes._
+  import utils.MappingUtils.Implicits._
+
+  val maxPenalisedTypeLength = 255
+  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") compose
+    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
 
   implicit val formRule: Rule[UrlFormEncoded, PenalisedUnderEstateAgentsAct] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "penalisedUnderEstateAgentsAct").read[Boolean] flatMap {
-      case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) fmap (PenalisedUnderEstateAgentsActYes.apply)
+
+    (__ \ "penalisedUnderEstateAgentsAct").read[Boolean].withMessage("error.required.eab.penalised.under.act") flatMap {
+      case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) fmap PenalisedUnderEstateAgentsActYes.apply
       case false => Rule.fromMapping { _ => Success(PenalisedUnderEstateAgentsActNo) }
     }
   }
@@ -32,7 +38,7 @@ object PenalisedUnderEstateAgentsAct {
 
   implicit val jsonReads: Reads[PenalisedUnderEstateAgentsAct] =
     (__ \ "penalisedUnderEstateAgentsAct").read[Boolean] flatMap {
-      case true => (__ \ "penalisedUnderEstateAgentsActDetails").read[String] map (PenalisedUnderEstateAgentsActYes.apply _)
+      case true => (__ \ "penalisedUnderEstateAgentsActDetails").read[String] map PenalisedUnderEstateAgentsActYes.apply
       case false => Reads(_ => JsSuccess(PenalisedUnderEstateAgentsActNo))
     }
 

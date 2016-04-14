@@ -19,7 +19,8 @@
         @if(field.hasErrors) {
             <span class="error-notification">@field.error</span>
         }
-        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")">
+
+        <select name="@field.name" id="@field.id" class="country-selector @classes.mkString(" ")">
             <option value=""></option>
             @models.countries.map { case Country(name, code) =>
                 <option value="@code" @if(field.value.contains(code)) {selected} >@name</option>

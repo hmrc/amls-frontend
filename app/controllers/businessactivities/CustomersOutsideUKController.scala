@@ -46,6 +46,7 @@ trait CustomersOutsideUKController extends BaseController {
 }
 
 object CustomersOutsideUKController extends CustomersOutsideUKController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

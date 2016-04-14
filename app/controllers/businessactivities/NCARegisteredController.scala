@@ -47,6 +47,7 @@ trait NCARegisteredController extends BaseController {
 }
 
 object NCARegisteredController extends NCARegisteredController {
+  // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

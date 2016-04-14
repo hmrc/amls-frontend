@@ -49,6 +49,7 @@ trait CompanyRegistrationNumberController extends BaseController {
 }
 
 object CompanyRegistrationNumberController extends CompanyRegistrationNumberController {
+  // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override private[controllers] def dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

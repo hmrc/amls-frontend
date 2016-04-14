@@ -8,6 +8,10 @@ $(function () {
         'border' : 'none'
     });
 
+    $(function(){
+        $('.country-selector').selectToAutocomplete();
+    });
+
     (function () {
         var checkedInputs = 'input[type="checkbox"], input[type="radio"]';
 
@@ -53,9 +57,11 @@ $(function () {
                 }
             });
 
-            $('input[name="' + $self.prop('name') + '"][value!="' + $self.val() + '"]').change(function () {
-                hide();
-            });
+            if ($self.prop('type') != "checkbox") {
+                $('input[name="' + $self.prop('name') + '"][value!="' + $self.val() + '"]').change(function () {
+                    hide();
+                });
+            }
 
             if ($self.prop('checked') === true) {
                 $target.show();

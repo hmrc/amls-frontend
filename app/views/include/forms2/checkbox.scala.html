@@ -2,6 +2,7 @@
     f: forms.Field,
     labelText: String,
     value: String,
+    disabled: Boolean = false,
     target: String = ""
 )(implicit lang: Lang)
 
@@ -9,10 +10,11 @@
     <input
             id="@{f.id}-@value"
             type="checkbox"
-            name="@{f.name}[]"
+            name="@{f.name}"
             value="@value"
             @if(f.value.contains(value)) {checked="checked"}
             @if(target.nonEmpty) {data-toggle="@target"}
+            @if(disabled) {disabled}
     >
     @Messages(labelText)
 </label>

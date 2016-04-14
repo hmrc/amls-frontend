@@ -23,14 +23,15 @@ class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
     "no items have been selected" must {
       "reject with a required message" in {
         val formData = Map("activities[]" -> Seq())
-        WhatDoesYourBusinessDo.formRule.validate(formData) must be (Failure(List((Path \ "activities") -> List(ValidationError("error.required")))))
+        WhatDoesYourBusinessDo.formRule.validate(formData) must be
+        Failure(List((Path \ "activities") -> List(ValidationError("error.required.tp.activity.your.business.do"))))
       }
     }
   }
 
   it must {
     "write correctly to a form" in {
-      val formData = Map("activities" -> Seq("02", "03", "05"))
+      val formData = Map("activities[]" -> Seq("02", "03", "05"))
       WhatDoesYourBusinessDo.formWrite.writes(model) must be (formData)
     }
   }

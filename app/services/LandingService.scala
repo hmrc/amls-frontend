@@ -15,6 +15,7 @@ trait LandingService {
   private[services] def cacheConnector: DataCacheConnector
   private[services] def keyStore: KeystoreConnector
 
+  @deprecated("fetch the cacheMap itself instead")
   def hasSavedForm
   (implicit
    hc: HeaderCarrier,
@@ -25,6 +26,14 @@ trait LandingService {
       case Some(_) => true
       case None => false
     }
+
+  def cacheMap
+  (implicit
+   hc: HeaderCarrier,
+   ec: ExecutionContext,
+   ac: AuthContext
+  ): Future[Option[CacheMap]] =
+    cacheConnector.fetchAll
 
   def reviewDetails
   (implicit

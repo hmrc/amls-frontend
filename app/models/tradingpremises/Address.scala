@@ -22,16 +22,17 @@ case class Address(
 }
 
 object Address {
+  import utils.MappingUtils.Implicits._
 
   implicit val formR: Rule[UrlFormEncoded, Address] =
     From[UrlFormEncoded] { __ =>
       import models.FormTypes._
       import play.api.data.mapping.forms.Rules._
       (
-        (__ \ "addressLine1").read(addressType) ~
-          (__ \ "addressLine2").read(addressType) ~
-          (__ \ "addressLine3").read(optionR(addressType)) ~
-          (__ \ "addressLine4").read(optionR(addressType)) ~
+        (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
+          (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
+          (__ \ "addressLine3").read(optionR(validateAddress)) ~
+          (__ \ "addressLine4").read(optionR(validateAddress)) ~
           (__ \ "postcode").read(postcodeType)
         )(Address.apply _)
     }

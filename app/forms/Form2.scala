@@ -38,11 +38,11 @@ case class InvalidForm(
                       ) extends CompletedForm[Nothing] {
 
   override def errors(path: Path): Seq[ValidationError] =
-    errors.toMap.get(path).getOrElse(Seq.empty)
+    errors.toMap.getOrElse(path, Seq.empty)
 
   override def apply(path: Path): Field = {
-    val v = data.get(PM.asKey(path)).getOrElse(Seq.empty)
-    val e = errors.toMap.get(path).getOrElse(Seq.empty)
+    val v = data.getOrElse(PM.asKey(path), Seq.empty)
+    val e = errors.toMap.getOrElse(path, Seq.empty)
     InvalidField(path, v, e)
   }
 }
