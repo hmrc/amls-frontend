@@ -28,7 +28,6 @@ object FormTypes {
   val minAccountantRefNoTypeLength = 11
   val maxRoleWithinBusinessOtherType = 255
   val maxTypeOfBusinessLength = 40
-  val maxCorporationTaxTypeLength = 10
 
   val nonUKPassportLength = 40
 
@@ -41,7 +40,8 @@ object FormTypes {
   val vrnTypeRegex = "^[0-9]{9}$".r
   val vrnType = notEmpty.withMessage("error.required.vat.number") compose pattern(vrnTypeRegex).withMessage("error.invalid.vat.number")
 
-  val corporationTaxType = notEmpty compose maxLength(maxCorporationTaxTypeLength) compose pattern("^[0-9]{10}$".r)
+  val corporationTaxType = notEmpty.withMessage("error.required.atb.corporation.tax.number") compose
+    pattern("^[0-9]{10}$".r).withMessage("error.invalid.atb.corporation.tax.number")
 
   val addressType = notEmpty compose maxLength(maxAddressLength)
 

@@ -56,6 +56,9 @@ error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registr
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
 error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
 error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
+error.required.atb.corporation.tax = Select yes or no to the question: is your business registered for Corporation Tax?
+error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
+error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
 
 error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
