@@ -9,8 +9,9 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
                              addressHistory: Option[ResponsiblePersonAddressHistory] = None,
                              saRegistered: Option[SaRegistered] = None,
-                             vatRegistered: Option[VATRegistered] = None
-                          ) {
+                             vatRegistered: Option[VATRegistered] = None,
+                             training: Option[Training] = None
+                            ) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
@@ -27,9 +28,11 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def vatRegistered(v: VATRegistered): ResponsiblePeople =
     this.copy(vatRegistered = Some(v))
 
-
+  def training(t: Training): ResponsiblePeople =
+    this.copy(training = Some(t))
+  
   def isComplete: Boolean = this match {
-    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(_), Some(_)) if add.isComplete => true
+    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(_), Some(_), _) if add.isComplete => true
     case _ => false
   }
 
@@ -42,7 +45,9 @@ object ResponsiblePeople {
     val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get(1))
     val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
-      case model if model forall { _.isComplete } => complete
+      case model if model forall {
+        _.isComplete
+      } => complete
       case model =>
         val index = model.indexWhere {
           case model if !model.isComplete => true
