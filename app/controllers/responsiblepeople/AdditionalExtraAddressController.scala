@@ -46,7 +46,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
               for {
                 _ <- doUpdate(index, data)
               } yield (data.timeAtAddress, edit) match {
-                case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit)) //TODO: Business Position
+                case (_, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
                 case (_, true) => Redirect(routes.SummaryController.get())
               }
           }

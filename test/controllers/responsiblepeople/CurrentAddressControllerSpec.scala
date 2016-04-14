@@ -277,8 +277,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneServerPerSuite with 
 
       val result = currentAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
-      //TODO: Update this to new location once implementated.
-      redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
+      redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
     }
 
   }
