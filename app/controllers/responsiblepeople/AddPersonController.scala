@@ -21,8 +21,8 @@ trait AddPersonController extends RepeatingSection with BaseController {
           getData[ResponsiblePeople](index) map {
             response =>
               val form = (for {
-                addperson <- response
-                person <- addperson.addPerson
+                responsiblePeople <- response
+                person <- responsiblePeople.addPerson
               } yield Form2[AddPerson](person)).getOrElse(EmptyForm)
               Ok(add_person(form, edit, index))
           }

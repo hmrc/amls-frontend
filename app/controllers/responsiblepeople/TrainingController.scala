@@ -4,9 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.responsiblepeople.{AddPerson, ResponsiblePeople}
+import models.responsiblepeople.{ResponsiblePeople, Training}
 import utils.RepeatingSection
-import views.html.responsiblepeople.add_person
 
 import scala.concurrent.Future
 
@@ -20,13 +19,11 @@ trait TrainingController extends RepeatingSection with BaseController {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             response =>
-/*
               val form = (for {
-                addperson <- response
-                person <- addperson.addPerson
-              } yield Form2[AddPerson](person)).getOrElse(EmptyForm)
-*/
-              Ok(views.html.responsiblepeople.training(EmptyForm, edit, index))
+                responsiblePeople <- response
+                training <- responsiblePeople.training
+              } yield Form2[Training](training)).getOrElse(EmptyForm)
+              Ok(views.html.responsiblepeople.training(form, edit, index))
           }
       }
     }
@@ -35,17 +32,17 @@ trait TrainingController extends RepeatingSection with BaseController {
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request => {
-          Form2[AddPerson](request.body) match {
+          Form2[Training](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.responsiblepeople.add_person(f, edit, index)))
+              Future.successful(BadRequest(views.html.responsiblepeople.training(f, edit, index)))
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.addPerson(data))
-                  case _ => Some(ResponsiblePeople(Some(data)))
+                  case Some(rp) => Some(rp.training(data))
+                  case _ => Some(ResponsiblePeople(training = Some(data)))
                 }
               } yield {
-                Redirect(routes.PersonResidentTypeController.get(index, edit))
+                Redirect(routes.TrainingController.get(index, edit))
               }
           }
         }
