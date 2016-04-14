@@ -5,7 +5,7 @@
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @target = @{
-    s"""${f("datesandduration").id}-fieldset"""
+    s"""${f("information").id}-fieldset"""
 }
 
 @main(
@@ -20,7 +20,7 @@
             @radio(f("hadTraining"), "lbl.yes", "true", target = s"#$target")
             @radio(f("hadTraining"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {
-                @textarea(f("datesandduration"), "responsiblepeople.training.datesandduration", bold = false)
+                @textarea(f("information"), "responsiblepeople.training.information", bold = false)
             }
         }
 
