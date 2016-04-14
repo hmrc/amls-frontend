@@ -47,7 +47,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
                 _ <- doUpdate(index, data)
               } yield (data.timeAtAddress, edit) match {
                 case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit)) //TODO: Business Position
-                case (_, true) => Redirect(routes.SummaryController.get()) //TODO: Responsible Person Details
+                case (_, true) => Redirect(routes.SummaryController.get())
               }
           }
         }
@@ -74,6 +74,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
 }
 
 object AdditionalExtraAddressController extends AdditionalExtraAddressController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

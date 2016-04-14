@@ -48,7 +48,7 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
               } yield (data.timeAtAddress, edit) match {
                 case (ThreeYearsPlus, false) => Redirect(routes.AdditionalAddressController.get(index, edit)) //TODO: Business Position
                 case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
-                case (_, true) => Redirect(routes.SummaryController.get()) //TODO: Responsible Person Details
+                case (_, true) => Redirect(routes.SummaryController.get())
               }
           }
         }
@@ -75,6 +75,7 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
 }
 
 object AdditionalAddressController extends AdditionalAddressController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

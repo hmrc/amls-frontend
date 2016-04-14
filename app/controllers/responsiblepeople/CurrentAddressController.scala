@@ -76,7 +76,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
 }
 
 object CurrentAddressController extends CurrentAddressController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
-
   override def dataCacheConnector = DataCacheConnector
 }
