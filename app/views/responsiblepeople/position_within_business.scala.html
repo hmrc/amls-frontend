@@ -1,0 +1,28 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean, index: Int)(implicit lang: Lang, request: Request[_])
+
+@main(title = Messages("responsiblepeople.position_within_business.title")) {
+
+    @heading("responsiblepeople.position_within_business.title", "summary.responsiblepeople")
+
+    <div class="form-group">
+        <div class="icon-important"></div>
+        <span class="notice notice-important">@Messages("responsiblepeople.position_within_business.important")</span>
+    </div>
+
+    @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit)) {
+        @radioGroup(f("positions")) {
+            @legend("lbl.select.all")
+            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.01", "01")
+            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.02", "02")
+            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.03", "03")
+            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.04", "04")
+            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.05", "05")
+            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.06", "06")
+        }
+
+        @submit(edit)
+    }
+}

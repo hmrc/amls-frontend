@@ -4,6 +4,9 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
+import utils.TraversableValidators._
+
+case class Positions(positions: Set[PositionWithinBusiness])
 
 sealed trait PositionWithinBusiness
 
@@ -18,52 +21,66 @@ object PositionWithinBusiness {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val formRule: Rule[UrlFormEncoded, PositionWithinBusiness] =
-    From[UrlFormEncoded] { readerURLFormEncoded =>
-      import models.FormTypes._
-      import play.api.data.mapping.forms.Rules._
-      (readerURLFormEncoded \ "positionWithinBusiness").read[String] flatMap {
-        case "01" => BeneficialOwner
-        case "02" => Director
-        case "03" => InternalAccountant
-        case "04" => NominatedOfficer
-        case "05" => Partner
-        case "06" => SoleProprietor
-        case _ =>
-          (Path \ "positionWithinBusiness") -> Seq(ValidationError("error.required.positionWithinBusiness"))
-      }
-    }
-
-  implicit val formWrite: Write[PositionWithinBusiness, UrlFormEncoded] = Write {
-    case BeneficialOwner => "positionWithinBusiness" -> "01"
-    case Director => "positionWithinBusiness" -> "02"
-    case InternalAccountant => "positionWithinBusiness" -> "03"
-    case NominatedOfficer => "positionWithinBusiness" -> "04"
-    case Partner => "positionWithinBusiness" -> "05"
-    case SoleProprietor => "positionWithinBusiness" -> "06"
+  implicit val formRule = Rule[String, PositionWithinBusiness] {
+    case "01" => Success(BeneficialOwner)
+    case "02" => Success(Director)
+    case "03" => Success(InternalAccountant)
+    case "04" => Success(NominatedOfficer)
+    case "05" => Success(Partner)
+    case "06" => Success(SoleProprietor)
+    case _ =>
+      Failure(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid"))))
   }
 
-  implicit val jsonReads: Reads[PositionWithinBusiness] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-
-    (__ \ "positionWithinBusiness").read[String].flatMap[PositionWithinBusiness] {
-      case "01" => BeneficialOwner
-      case "02" => Director
-      case "03" => InternalAccountant
-      case "04" => NominatedOfficer
-      case "05" => Partner
-      case "06" => SoleProprietor
-      case _ => ValidationError("error.invalid")
-    }
+  implicit val formWrite = Write[PositionWithinBusiness, String] {
+      case BeneficialOwner => "01"
+      case Director => "02"
+      case InternalAccountant => "03"
+      case NominatedOfficer => "04"
+      case Partner => "05"
+      case SoleProprietor => "06"
   }
+
+  implicit val jsonReads: Reads[PositionWithinBusiness] =
+    Reads {
+      case JsString("01") => JsSuccess(BeneficialOwner)
+      case JsString("02") => JsSuccess(Director)
+      case JsString("03") => JsSuccess(InternalAccountant)
+      case JsString("04") => JsSuccess(NominatedOfficer)
+      case JsString("05") => JsSuccess(Partner)
+      case JsString("06") => JsSuccess(SoleProprietor)
+      case _ => JsError((JsPath \ "positions") -> ValidationError("error.invalid"))
+    }
 
   implicit val jsonWrites = Writes[PositionWithinBusiness] {
-    case BeneficialOwner => Json.obj("positionWithinBusiness" -> "01")
-    case Director => Json.obj("positionWithinBusiness" -> "02")
-    case InternalAccountant => Json.obj("positionWithinBusiness" -> "03")
-    case NominatedOfficer => Json.obj("positionWithinBusiness" -> "04")
-    case Partner => Json.obj("positionWithinBusiness" -> "05")
-    case SoleProprietor => Json.obj("positionWithinBusiness" -> "06")
+    case BeneficialOwner => JsString("01")
+    case Director => JsString("02")
+    case InternalAccountant => JsString("03")
+    case NominatedOfficer => JsString("04")
+    case Partner => JsString("05")
+    case SoleProprietor => JsString("06")
   }
+}
+
+object Positions {
+  import utils.MappingUtils.Implicits._
+
+  implicit def formReads
+  (implicit
+   p: Path => RuleLike[UrlFormEncoded, Set[PositionWithinBusiness]]
+  ): Rule[UrlFormEncoded, Positions] =
+    From[UrlFormEncoded] { __ =>
+      (__ \ "positions")
+        .read(minLength[Set[PositionWithinBusiness]](1)
+        .withMessage("error.required.positionWithinBusiness")) fmap Positions.apply
+    }
+
+  implicit def formWrites
+  (implicit
+   w: Write[PositionWithinBusiness, String]
+  ) = Write[Positions, UrlFormEncoded] { data =>
+    Map("positions[]" -> data.positions.toSeq.map(w.writes))
+  }
+
+  implicit val formats = Json.format[Positions]
 }

@@ -21,6 +21,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
     additionalAddress = Some(DefaultAdditionalAddress)
   )
 
+  val DefaultPositions = Positions(Set(BeneficialOwner, InternalAccountant))
+
   val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
 
   val NewCurrentAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), ZeroToFiveMonths)
@@ -35,9 +37,13 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
     Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
   val NewSaRegisteredYes = SaRegisteredNo
 
+  val NewPositions = Positions(Set(Director, SoleProprietor))
+
   val ResponsiblePeopleModel = ResponsiblePeople(
     addPerson = Some(DefaultAddPerson),
-    addressHistory = Some(DefaultAddressHistory)
+    addressHistory = Some(DefaultAddressHistory),
+    positions = Some(DefaultPositions),
+    saRegistered = Some(DefaultSaRegisteredYes)
   )
 
   "ResponsiblePeople" must {
@@ -83,6 +89,13 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
               "timeAtAddress" -> "01"
             )
           )
+        ),
+        "positions" -> Json.obj(
+          "positions" -> Seq("01", "03")
+        ),
+        "saRegistered" -> Json.obj(
+          "saRegistered" -> true,
+          "utrNumber" -> "0123456789"
         )
       )
 
@@ -124,10 +137,17 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       }
     }
 
+    "Merged with DefaultPositions" must {
+      "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
+        val result = initial.positions(DefaultPositions)
+        result must be (ResponsiblePeople(None, None, None, Some(DefaultPositions), None))
+      }
+    }
+
     "Merged with DefaultSaRegisteredYes" must {
       "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
         val result = initial.saRegistered(DefaultSaRegisteredYes)
-        result must be (ResponsiblePeople(None, None, None, Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(None, None, None, None, Some(DefaultSaRegisteredYes)))
       }
     }
   }
@@ -140,6 +160,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultAddPerson),
         Some(DefaultPersonResidenceType),
         Some(DefaultAddressHistory),
+        Some(DefaultPositions),
         Some(DefaultSaRegisteredYes)
       )
 
@@ -152,6 +173,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultAddPerson),
         Some(DefaultPersonResidenceType),
         Some(DefaultAddressHistory),
+        Some(DefaultPositions),
         None
       )
 
@@ -167,6 +189,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultAddPerson),
         Some(DefaultPersonResidenceType),
         Some(PartialAddressHistory),
+        Some(DefaultPositions),
         Some(DefaultSaRegisteredYes)
       )
 
@@ -181,33 +204,66 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
       Some(DefaultAddPerson),
       Some(DefaultPersonResidenceType),
       Some(DefaultAddressHistory),
+      Some(DefaultPositions),
       Some(DefaultSaRegisteredYes))
 
     "Merged with add person" must {
-      "return ResponsiblePeople with correct add person" in {
+      "return ResponsiblePeople with correct NewAddPerson" in {
         val result = initial.addPerson(NewAddPerson)
-        result must be (ResponsiblePeople(Some(NewAddPerson), Some(DefaultPersonResidenceType), Some(DefaultAddressHistory), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(
+          Some(NewAddPerson),
+          Some(DefaultPersonResidenceType),
+          Some(DefaultAddressHistory),
+          Some(DefaultPositions),
+          Some(DefaultSaRegisteredYes)))
       }
     }
 
     "Merged with DefaultPersonResidenceType" must {
-      "return ResponsiblePeople with correct DefaultPersonResidenceType" in {
+      "return ResponsiblePeople with correct NewPersonResidenceType" in {
         val result = initial.personResidenceType(NewPersonResidenceType)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(NewPersonResidenceType), Some(DefaultAddressHistory), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(
+          Some(DefaultAddPerson),
+          Some(NewPersonResidenceType),
+          Some(DefaultAddressHistory),
+          Some(DefaultPositions),
+          Some(DefaultSaRegisteredYes)))
       }
     }
 
-    "Merged with DefaultPreviousHomeAddress" must {
-      "return ResponsiblePeople with correct DefaultPreviousHomeAddress" in {
+    "Merged with DefaultAddressHistory" must {
+      "return ResponsiblePeople with correct NewAddressHistory" in {
         val result = initial.addressHistory(NewAddressHistory)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(NewAddressHistory), Some(DefaultSaRegisteredYes)))
+        result must be (ResponsiblePeople(
+          Some(DefaultAddPerson),
+          Some(DefaultPersonResidenceType),
+          Some(NewAddressHistory),
+          Some(DefaultPositions),
+          Some(DefaultSaRegisteredYes)))
+      }
+    }
+
+    "Merged with DefaultPositions" must {
+      "return ResponsiblePeople with correct NewPositions" in {
+        val result = initial.positions(NewPositions)
+        result must be (ResponsiblePeople(
+          Some(DefaultAddPerson),
+          Some(DefaultPersonResidenceType),
+          Some(DefaultAddressHistory),
+          Some(NewPositions),
+          Some(DefaultSaRegisteredYes)))
       }
     }
 
     "Merged with DefaultSaRegisteredYes" must {
-      "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
+      "return ResponsiblePeople with correct NewSaRegisteredYes" in {
         val result = initial.saRegistered(NewSaRegisteredYes)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson), Some(DefaultPersonResidenceType), Some(DefaultAddressHistory), Some(NewSaRegisteredYes)))
+        result must be (ResponsiblePeople(
+          Some(DefaultAddPerson),
+          Some(DefaultPersonResidenceType),
+          Some(DefaultAddressHistory),
+          Some(DefaultPositions),
+          Some(NewSaRegisteredYes)))
       }
     }
   }

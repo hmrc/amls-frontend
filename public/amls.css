@@ -236,6 +236,15 @@ table.summary ul li {
     display: inline-block;
 }
 
+.icon-important {
+    display: inline-block;
+    padding-right: 1px;
+    padding-bottom: 1px;
+}
+
+.notice-important {
+    padding-left: 55px;
+}
 
 
 .touchevents .date-of-birth {

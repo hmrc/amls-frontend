@@ -2,9 +2,9 @@ package models.responsiblepeople
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.mapping.{Success, Path, Failure}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 
 class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
@@ -13,30 +13,37 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
     "PositionInBusiness" must {
 
       "successfully validate" in {
-        PositionWithinBusiness.formRule.validate(Map("positionWithinBusiness" -> Seq("01"))) must be(Success(BeneficialOwner))
-        PositionWithinBusiness.formRule.validate(Map("positionWithinBusiness" -> Seq("02"))) must be(Success(Director))
-        PositionWithinBusiness.formRule.validate(Map("positionWithinBusiness" -> Seq("03"))) must be(Success(InternalAccountant))
-        PositionWithinBusiness.formRule.validate(Map("positionWithinBusiness" -> Seq("04"))) must be(Success(NominatedOfficer))
-        PositionWithinBusiness.formRule.validate(Map("positionWithinBusiness" -> Seq("05"))) must be(Success(Partner))
-        PositionWithinBusiness.formRule.validate(Map("positionWithinBusiness" -> Seq("06"))) must be(Success(SoleProprietor))
+        PositionWithinBusiness.formRule.validate("01") must be (Success(BeneficialOwner))
+        PositionWithinBusiness.formRule.validate("02") must be (Success(Director))
+        PositionWithinBusiness.formRule.validate("03") must be (Success(InternalAccountant))
+        PositionWithinBusiness.formRule.validate("04") must be (Success(NominatedOfficer))
+        PositionWithinBusiness.formRule.validate("05") must be (Success(Partner))
+        PositionWithinBusiness.formRule.validate("06") must be (Success(SoleProprietor))
       }
 
       "fail to validate an empty string" in {
-        PositionWithinBusiness.formRule.validate(Map("positionWithinBusiness" -> Seq(""))) must
+        PositionWithinBusiness.formRule.validate("") must
           be(Failure(Seq(
-            (Path \ "positionWithinBusiness") -> Seq(ValidationError("error.required.positionWithinBusiness"))
+            (Path \ "positions") -> Seq(ValidationError("error.invalid"))
+          )))
+      }
+
+      "fail to validate an invalid string" in {
+        PositionWithinBusiness.formRule.validate("10") must
+          be(Failure(Seq(
+            (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }
 
     }
 
     "write correct data from enum value" in {
-      PositionWithinBusiness.formWrite.writes(BeneficialOwner) must be(Map("positionWithinBusiness" -> Seq("01")))
-      PositionWithinBusiness.formWrite.writes(Director) must be(Map("positionWithinBusiness" -> Seq("02")))
-      PositionWithinBusiness.formWrite.writes(InternalAccountant) must be(Map("positionWithinBusiness" -> Seq("03")))
-      PositionWithinBusiness.formWrite.writes(NominatedOfficer) must be(Map("positionWithinBusiness" -> Seq("04")))
-      PositionWithinBusiness.formWrite.writes(Partner) must be(Map("positionWithinBusiness" -> Seq("05")))
-      PositionWithinBusiness.formWrite.writes(SoleProprietor) must be(Map("positionWithinBusiness" -> Seq("06")))
+      PositionWithinBusiness.formWrite.writes(BeneficialOwner) must be("01")
+      PositionWithinBusiness.formWrite.writes(Director) must be("02")
+      PositionWithinBusiness.formWrite.writes(InternalAccountant) must be("03")
+      PositionWithinBusiness.formWrite.writes(NominatedOfficer) must be("04")
+      PositionWithinBusiness.formWrite.writes(Partner) must be("05")
+      PositionWithinBusiness.formWrite.writes(SoleProprietor) must be("06")
     }
 
   }
@@ -44,63 +51,62 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
   "JSON validation" must {
 
     "successfully validate given a BeneficialOwner value" in {
-      Json.fromJson[PositionWithinBusiness](Json.obj("positionWithinBusiness" -> "01")) must
-        be(JsSuccess(BeneficialOwner, JsPath \ "positionWithinBusiness"))
+      Json.fromJson[PositionWithinBusiness](JsString("01")) must
+        be(JsSuccess(BeneficialOwner))
     }
 
     "successfully validate given a Director value" in {
-      Json.fromJson[PositionWithinBusiness](Json.obj("positionWithinBusiness" -> "02")) must
-        be(JsSuccess(Director, JsPath \ "positionWithinBusiness"))
+      Json.fromJson[PositionWithinBusiness](JsString("02")) must
+        be(JsSuccess(Director))
     }
 
     "successfully validate given a InternalAccountant value" in {
-      Json.fromJson[PositionWithinBusiness](Json.obj("positionWithinBusiness" -> "03")) must
-        be(JsSuccess(InternalAccountant, JsPath \ "positionWithinBusiness"))
+      Json.fromJson[PositionWithinBusiness](JsString("03")) must
+        be(JsSuccess(InternalAccountant))
     }
 
     "successfully validate given a NominatedOfficer value" in {
-      Json.fromJson[PositionWithinBusiness](Json.obj("positionWithinBusiness" -> "04")) must
-        be(JsSuccess(NominatedOfficer, JsPath \ "positionWithinBusiness"))
+      Json.fromJson[PositionWithinBusiness](JsString("04")) must
+        be(JsSuccess(NominatedOfficer))
     }
 
     "successfully validate given a Partner value" in {
-      Json.fromJson[PositionWithinBusiness](Json.obj("positionWithinBusiness" -> "05")) must
-        be(JsSuccess(Partner, JsPath \ "positionWithinBusiness"))
+      Json.fromJson[PositionWithinBusiness](JsString("05")) must
+        be(JsSuccess(Partner))
     }
 
     "successfully validate given a SoleProprietor value" in {
-      Json.fromJson[PositionWithinBusiness](Json.obj("positionWithinBusiness" -> "06")) must
-        be(JsSuccess(SoleProprietor, JsPath \ "positionWithinBusiness"))
+      Json.fromJson[PositionWithinBusiness](JsString("06")) must
+        be(JsSuccess(SoleProprietor))
     }
 
     "fail to validate when given an empty value" in {
-      val json = Json.obj("positionWithinBusiness" -> "")
-      Json.fromJson[PositionWithinBusiness](json) must
-        be(JsError((JsPath \ "positionWithinBusiness") -> ValidationError("error.invalid")))
+      Json.fromJson[PositionWithinBusiness](JsString("")) must
+        be(JsError((JsPath \ "positions") -> ValidationError("error.invalid")))
     }
 
     "write the correct value for BeneficialOwner" in {
-      Json.toJson(BeneficialOwner) must be(Json.obj("positionWithinBusiness" -> "01"))
+      Json.toJson(BeneficialOwner) must be(JsString("01"))
     }
 
     "write the correct value for Director" in {
-      Json.toJson(Director) must be(Json.obj("positionWithinBusiness" -> "02"))
+      Json.toJson(Director) must be(JsString("02"))
     }
 
     "write the correct value for InternalAccountant" in {
-      Json.toJson(InternalAccountant) must be(Json.obj("positionWithinBusiness" -> "03"))
+      Json.toJson(InternalAccountant) must be(JsString("03"))
     }
 
     "write the correct value for NominatedOfficer" in {
-      Json.toJson(NominatedOfficer) must be(Json.obj("positionWithinBusiness" -> "04"))
+      Json.toJson(NominatedOfficer) must be(JsString("04"))
     }
 
     "write the correct value for Partner" in {
-      Json.toJson(Partner) must be(Json.obj("positionWithinBusiness" -> "05"))
+      Json.toJson(Partner) must be(JsString("05"))
     }
 
     "write the correct value for SoleProprietor" in {
-      Json.toJson(SoleProprietor) must be(Json.obj("positionWithinBusiness" -> "06"))
+      Json.toJson(SoleProprietor) must be(JsString("06"))
     }
   }
 
