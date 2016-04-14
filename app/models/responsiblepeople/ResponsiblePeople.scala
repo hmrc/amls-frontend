@@ -8,7 +8,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
                              addressHistory: Option[ResponsiblePersonAddressHistory] = None,
-                             saRegistered: Option[SaRegistered] = None
+                             saRegistered: Option[SaRegistered] = None,
+                             vatRegistered: Option[VATRegistered] = None
                           ) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
@@ -23,8 +24,12 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def addressHistory(hist: ResponsiblePersonAddressHistory): ResponsiblePeople =
     this.copy(addressHistory = Some(hist))
 
+  def vatRegistered(v: VATRegistered): ResponsiblePeople =
+    this.copy(vatRegistered = Some(v))
+
+
   def isComplete: Boolean = this match {
-    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(_)) if add.isComplete => true
+    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(_), Some(_)) if add.isComplete => true
     case _ => false
   }
 
