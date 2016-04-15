@@ -9,9 +9,9 @@ import play.api.data.mapping.forms.UrlFormEncoded
 
 sealed trait Training
 
-case class HadTrainingYes(information: String) extends Training
+case class TrainingYes(information: String) extends Training
 
-case object HadTrainingNo extends Training
+case object TrainingNo extends Training
 
 object Training {
 
@@ -25,33 +25,33 @@ object Training {
 
   implicit val formRule: Rule[UrlFormEncoded, Training] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "hadTraining").read[Boolean].withMessage("error.required.rp.training") flatMap {
+    (__ \ "training").read[Boolean].withMessage("error.required.rp.training") flatMap {
       case true =>
-        (__ \ "information").read(informationType) fmap (HadTrainingYes.apply)
-      case false => Rule.fromMapping { _ => Success(HadTrainingNo) }
+        (__ \ "information").read(informationType) fmap (TrainingYes.apply)
+      case false => Rule.fromMapping { _ => Success(TrainingNo) }
     }
   }
 
   implicit val formWrites: Write[Training, UrlFormEncoded] = Write {
-    case a: HadTrainingYes => Map(
-      "hadTraining" -> Seq("true"),
+    case a: TrainingYes => Map(
+      "training" -> Seq("true"),
       "information" -> Seq(a.information)
     )
-    case HadTrainingNo => Map("hadTraining" -> Seq("false"))
+    case TrainingNo => Map("training" -> Seq("false"))
   }
 
   implicit val jsonReads: Reads[Training] =
-    (__ \ "hadTraining").read[Boolean] flatMap {
-      case true => (__ \ "information").read[String] map (HadTrainingYes.apply _)
-      case false => Reads(_ => JsSuccess(HadTrainingNo))
+    (__ \ "training").read[Boolean] flatMap {
+      case true => (__ \ "information").read[String] map (TrainingYes.apply _)
+      case false => Reads(_ => JsSuccess(TrainingNo))
     }
 
   implicit val jsonWrites = Writes[Training] {
-    case HadTrainingYes(information) => Json.obj(
-      "hadTraining" -> true,
+    case TrainingYes(information) => Json.obj(
+      "training" -> true,
       "information" -> information
     )
-    case HadTrainingNo => Json.obj("hadTraining" -> false)
+    case TrainingNo => Json.obj("training" -> false)
   }
 
 }
