@@ -35,7 +35,7 @@ trait PersonRegisteredController extends RepeatingSection with BaseController {
             case ValidForm(_, data) =>
                data.registerAnotherPerson match {
                 case true => Future.successful(Redirect(routes.AddPersonController.get(index + 1, false)))
-                case false  => Future.successful(Redirect(routes.SummaryController.get()))
+                case false => Future.successful(Redirect(routes.SummaryController.get()))
               }
           }
       }

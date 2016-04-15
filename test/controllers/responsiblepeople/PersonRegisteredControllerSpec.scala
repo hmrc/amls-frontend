@@ -32,7 +32,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       "load the Person Registered page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(1)(request)
@@ -40,6 +40,17 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneServerPerSuite wit
 
         val htmlValue = Jsoup.parse(contentAsString(result))
         htmlValue.title mustBe Messages("responsiblepeople.person.registered.title")
+      }
+
+      "load the Person Registered page1" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,None), ResponsiblePeople(None,None)))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("responsiblepeople.have.registered.person.text", 2))
       }
     }
 
@@ -96,7 +107,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("err.summary"))
+      contentAsString(result) must include(Messages("responsiblepeople.want.to.register.another.person"))
 
     }
   }
