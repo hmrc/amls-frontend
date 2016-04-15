@@ -214,7 +214,6 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
       status(result) must be(SEE_OTHER)
-      //TODO: Update this to new location once implementated.
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
@@ -233,8 +232,7 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
-      //TODO: Update this to new location once implementated.
-      redirectLocation(result) must be(Some(routes.AdditionalExtraAddressController.get(RecordId).url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(RecordId).url))
     }
 
 

@@ -5,6 +5,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness._
+import models.businessmatching.BusinessType.{Partnership, SoleProprietor}
+import models.businessmatching.{BusinessType, BusinessMatching}
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
@@ -16,7 +18,7 @@ trait VATRegisteredController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_, Some(data), _, _, _)) =>
+        case Some(AboutTheBusiness(_, Some(data), _, _, _, _)) =>
           Ok(vat_registered(Form2[VATRegistered](data), edit))
         case _ =>
           Ok(vat_registered(EmptyForm, edit))
@@ -29,15 +31,32 @@ trait VATRegisteredController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(vat_registered(f, edit)))
         case ValidForm(_, data) =>
-          for {
-            aboutTheBusiness <- dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
-            _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-              aboutTheBusiness.vatRegistered(data)
-            )
-          } yield edit match {
-            case true =>  Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.ConfirmRegisteredOfficeController.get())
+          dataCacheConnector.fetchAll map {
+            optionalCache =>
+              (for {
+                cache <- optionalCache
+                businessType <- getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+              } yield {
+                dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
+                  aboutTheBusiness.vatRegistered(data))
+                  (businessType, edit) match {
+                    case (Partnership, false) => Redirect(routes.RegisteredOfficeController.get())
+                    case (_, false) => Redirect(routes.CorporationTaxRegisteredController.get())
+                    case (_, true) => Redirect(routes.SummaryController.get())
+                  }
+              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
+      }
+    }
+  }
+
+  //TODO: Move to common utility
+  private def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
+    matching flatMap { bm =>
+      bm.reviewDetails match {
+        case Some(review) => review.businessType
+        case _ => None
       }
     }
   }

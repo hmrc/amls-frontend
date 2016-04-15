@@ -20,6 +20,9 @@ POST        /business-details/previously-registered                    controlle
 GET         /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
 
+GET         /business-details/corporation-tax          controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/corporation-tax          controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
+
 GET         /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
@@ -158,6 +161,9 @@ GET         /responsible-people/summary                     controllers.responsi
 
 GET         /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/position/:index   controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/position/:index   controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)

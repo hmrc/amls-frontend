@@ -56,6 +56,9 @@ error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registr
 error.required.atb.confirm.office = Select yes or no to the question: is this your registered office or main place of business?
 error.required.atb.registered.office.uk.or.overseas = Select one option: is your registered office or main place of business in the UK or overseas?
 error.required.atb.registered.for.vat = Select yes or no to the question: is your business registered for VAT in the UK?
+error.required.atb.corporation.tax = Select yes or no to the question: is your business registered for Corporation Tax?
+error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
+error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
 
 error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
@@ -288,6 +291,10 @@ aboutthebusiness.whatyouneed.line_4 = email address
 
 aboutthebusiness.registeredforvat.title = Is this business registered for VAT?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
+
+aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax?
+aboutthebusiness.registeredforcorporationtax.taxReference = Corporation Tax Reference
+aboutthebusiness.registeredforcorporationtax.taxReferenceHint = For example: 1234567890
 
 aboutthebusiness.contactingyou.title = How can we contact you?
 aboutthebusiness.contactingyou.lbl = We may need to get in touch to discuss your registration.
@@ -678,6 +685,19 @@ responsiblepeople.additional_extra_address.1_3_years = 1 to 3 years
 responsiblepeople.additional_extra_address.more_3_years = More than 3 years
 
 error.required.timeAtAddress = Select how long this person lived at this address.
+
+
+responsiblepeople.position_within_business.title = What''s this person''s position within the business?
+responsiblepeople.position_within_business.important = The business must have a nominated officer. Only one person can register as the nominated officer.
+responsiblepeople.position_within_business.lbl.01 = Beneficial owner (holding 25% or more of shares)
+responsiblepeople.position_within_business.lbl.02 = Director
+responsiblepeople.position_within_business.lbl.03 = Internal accountant
+responsiblepeople.position_within_business.lbl.04 = Nominated officer
+responsiblepeople.position_within_business.lbl.05 = Partner
+responsiblepeople.position_within_business.lbl.06 = Sole proprietor
+
+error.required.positionWithinBusiness = Select at least one business position.
+
 
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.person.a.resident.heading = Is this person a UK resident?

@@ -54,7 +54,7 @@ trait PreviouslyRegisteredController extends BaseController {
     }
   }
 
-  def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
+  private def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
     matching flatMap { bm =>
       bm.reviewDetails match {
         case Some(review) => review.businessType
