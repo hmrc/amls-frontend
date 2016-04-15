@@ -9,7 +9,7 @@ import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-trait TrainingController extends RepeatingSection with BaseController {
+trait ExperienceTrainingController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
@@ -23,7 +23,8 @@ trait TrainingController extends RepeatingSection with BaseController {
                 responsiblePeople <- response
                 training <- responsiblePeople.training
               } yield Form2[Training](training)).getOrElse(EmptyForm)
-              Ok(views.html.responsiblepeople.training(form, edit, index))
+              println("Inside ExperienceTrainingController")
+              Ok(views.html.responsiblepeople.experience_training(form, edit, index))
           }
       }
     }
@@ -42,7 +43,7 @@ trait TrainingController extends RepeatingSection with BaseController {
                   case _ => Some(ResponsiblePeople(training = Some(data)))
                 }
               } yield {
-                Redirect(routes.TrainingController.get(index, edit))
+                Redirect(routes.ExperienceTrainingController.get(index, edit))
               }
           }
         }
@@ -51,7 +52,7 @@ trait TrainingController extends RepeatingSection with BaseController {
 
 }
 
-object TrainingController extends TrainingController {
+object ExperienceTrainingController extends TrainingController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
