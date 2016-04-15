@@ -52,7 +52,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
 
 }
 
-object ExperienceTrainingController extends TrainingController {
+object ExperienceTrainingController extends ExperienceTrainingController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
