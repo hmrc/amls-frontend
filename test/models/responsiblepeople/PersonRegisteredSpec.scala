@@ -11,7 +11,7 @@ class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "validate the given model" in {
       val data = Map(
-        "registerAnother" -> Seq("true")
+        "registerAnotherPerson" -> Seq("true")
       )
 
       PersonRegistered.formRule.validate(data) must
@@ -21,7 +21,7 @@ class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
     "successfully validate given a data model" in {
 
       val data = Map(
-        "registerAnother" -> Seq("true")
+        "registerAnotherPerson" -> Seq("true")
       )
 
       PersonRegistered.formRule.validate(data) must
@@ -32,7 +32,7 @@ class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
 
       PersonRegistered.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "registerAnother") -> Seq(ValidationError("error.required.rp.register.another.person"))
+          (Path \ "registerAnotherPerson") -> Seq(ValidationError("error.required.rp.register.another.person"))
         )))
     }
 
@@ -42,7 +42,7 @@ class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
 
       PersonRegistered.formWrites.writes(model) must
         be(Map(
-          "registerAnother" -> Seq("true")
+          "registerAnotherPerson" -> Seq("true")
         ))
     }
   }

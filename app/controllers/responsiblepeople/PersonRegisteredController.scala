@@ -18,7 +18,10 @@ trait PersonRegisteredController extends RepeatingSection with BaseController {
   ResponsiblePeopleToggle {
     Authorised.async {
       implicit authContext => implicit request =>
-        Future.successful(Ok(person_registered(EmptyForm, index)))
+        dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+          case Some(data) => Ok(person_registered(EmptyForm, data.size))
+          case _ => Ok(person_registered(EmptyForm, index))
+        }
     }
   }
 
@@ -30,9 +33,9 @@ trait PersonRegisteredController extends RepeatingSection with BaseController {
             case f: InvalidForm =>
               Future.successful(BadRequest(person_registered(f, index)))
             case ValidForm(_, data) =>
-               data.registerAnother match {
-                case false => Future.successful(Redirect(routes.AddPersonController.get(index + 1, false)))
-                case true  => Future.successful(Redirect(routes.SummaryController.get()))
+               data.registerAnotherPerson match {
+                case true => Future.successful(Redirect(routes.AddPersonController.get(index + 1, false)))
+                case false  => Future.successful(Redirect(routes.SummaryController.get()))
               }
           }
       }

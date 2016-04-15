@@ -7,15 +7,19 @@
     title = Messages("responsiblepeople.person.registered.title")
 ) {
 
-    @heading("responsiblepeople.person.registered.neading", "summary.responsiblepeople")
+    @heading("responsiblepeople.person.registered.heading", "summary.responsiblepeople")
 
     @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
-        <span>@Messages("responsiblepeople.have.registered.person.text", index) </span>
+        <div class="panel-indent panel-border-wide">
+            <p>@Messages("responsiblepeople.have.registered.person.text", index) </p>
+        </div>
+        <br>
+        <br>
 
-        @inlineRadioGroup(f("registerAnother")) {
-            @legend("TODO", jsHidden = true)
-            @radio(f("registerAnother"), "lbl.yes", "true")
-            @radio(f("registerAnother"), "lbl.no", "false")
+        @inlineRadioGroup(f("registerAnotherPerson")) {
+            @legend("responsiblepeople.want.to.register.another.person")
+            @radio(f("registerAnotherPerson"), "lbl.yes", "true")
+            @radio(f("registerAnotherPerson"), "lbl.no", "false")
         }
 
         @submit()
