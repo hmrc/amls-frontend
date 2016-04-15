@@ -13,10 +13,11 @@ case object CorporationTaxRegisteredNo extends CorporationTaxRegistered
 object CorporationTaxRegistered {
 
   import models.FormTypes._
+  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, CorporationTaxRegistered] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "registeredForCorporationTax").read[Boolean] flatMap {
+    (__ \ "registeredForCorporationTax").read[Boolean].withMessage("error.required.atb.corporation.tax") flatMap {
       case true =>
         (__ \ "corporationTaxReference").read(corporationTaxType) fmap CorporationTaxRegisteredYes.apply
       case false => Rule.fromMapping { _ => Success(CorporationTaxRegisteredNo) }

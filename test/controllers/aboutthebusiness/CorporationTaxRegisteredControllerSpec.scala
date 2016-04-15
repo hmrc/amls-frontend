@@ -3,6 +3,7 @@ package controllers.aboutthebusiness
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{CorporationTaxRegisteredYes, AboutTheBusiness}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -88,16 +89,42 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneServerPerS
       redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
     }
 
-    "on post with invalid data show an error message" in new Fixture {
+    "on post with no yes/no value selected show an error message" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "registeredForCorporationTax" -> "invalid"
+        "registeredForCorporationTax" -> ""
       )
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("error-summary-heading").text must be(Messages("err.summary"))
+      document.select("a[href=#registeredForCorporationTax]").html() must include(Messages("error.required.atb.corporation.tax"))
+    }
+
+    "on post with yes with missing tax number show an error message" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "registeredForCorporationTax" -> "true",
+        "corporationTaxReference" -> ""
+      )
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#corporationTaxReference]").html() must include(Messages("error.required.atb.corporation.tax.number"))
+    }
+
+    "on post with yes with invalid tax number show an error message" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "registeredForCorporationTax" -> "true",
+        "corporationTaxReference" -> "ABCDEF"
+      )
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#corporationTaxReference]").html() must include(Messages("error.invalid.atb.corporation.tax.number"))
     }
 
   }
