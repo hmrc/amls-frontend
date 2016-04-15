@@ -9,16 +9,16 @@
 }
 
 @main(
-    title = Messages("responsiblepeople.training.heading")
+    title = Messages("responsiblepeople.training.title")
 ) {
 
     @heading("responsiblepeople.training.heading", "summary.responsiblepeople")
 
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
 
-        @inlineRadioGroup(f("hadTraining")) {
-            @radio(f("hadTraining"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("hadTraining"), "lbl.no", "false")
+        @inlineRadioGroup(f("training")) {
+            @radio(f("training"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("training"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {
                 @textarea(f("information"), "responsiblepeople.training.information", bold = false)
             }
