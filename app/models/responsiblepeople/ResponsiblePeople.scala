@@ -49,9 +49,7 @@ object ResponsiblePeople {
     val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get(1))
     val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
-      case model if model forall {
-        _.isComplete
-      } => complete
+      case model if model forall { _.isComplete} => complete
       case model =>
         val index = model.indexWhere {
           case model if !model.isComplete => true

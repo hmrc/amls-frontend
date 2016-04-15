@@ -137,7 +137,7 @@ error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) 
 error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
 
 error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
-error.required.rp.training.information = Enter some information about this responsible person’s training in anti-money laundering or counter-terrorism funding.
+error.required.rp.training.information = Enter some information about this responsible person''s training in anti-money laundering or counter-terrorism funding.
 error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 
 button.saveandcontinue = Save and continue
