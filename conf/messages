@@ -149,6 +149,8 @@ button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 
+missing.personName = Name Unknown
+
 lbl.other = Other
 lbl.yes = Yes
 lbl.no = No

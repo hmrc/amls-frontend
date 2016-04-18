@@ -1,7 +1,7 @@
 @import include._
 @import models.responsiblepeople._
 
-@(model: Seq[ResponsiblePeople], indexesToHide : Seq[Int])(implicit request: Request[_], lang: Lang)
+@(model: Seq[ResponsiblePeople])(implicit request: Request[_], lang: Lang)
 
 @main(
     title = Messages("summary.checkyouranswers.title")
@@ -9,9 +9,27 @@
 
     @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
 
-    @model.zipWithIndex.filterNot({case (responsiblePerson, idx) => indexesToHide.contains(idx)}).map { case (responsiblePerson, idx) =>
-                @idx <br/>
-                @responsiblePerson
-                <hr />
-    }
+
+    <table>
+        <tbody>
+            @model.zipWithIndex.map { case (responsiblePerson, idx)=>
+                <tr>
+                    @responsiblePerson.addPerson.map { personDetails =>
+                        <th class="summary-title">
+                            @personDetails.firstName
+                            @personDetails.middleName
+                            @personDetails.lastName
+                        </th>
+                    }.getOrElse{
+                        <td>
+                        @Messages("missing.personName")
+                            </td>
+                    }
+                    <td>
+                        <a href="@controllers.responsiblepeople.routes.WhatYouNeedController.get(idx + 1)">@Messages("button.edit")
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
