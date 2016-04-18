@@ -729,4 +729,5 @@ responsiblepeople.training.information = Please give a brief description, includ
 responsiblepeople.person.registered.title = Responsible person registered
 responsiblepeople.person.registered.heading = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
+responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
