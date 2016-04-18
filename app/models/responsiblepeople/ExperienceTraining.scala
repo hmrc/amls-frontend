@@ -19,13 +19,13 @@ object ExperienceTraining {
 
   val maxInformationTypeLength = 255
 
-  val experienceInformationType = notEmpty.withMessage("error.required.rp.experiencetraining.experienceInformation") compose
+  val experienceInformationType = notEmpty.withMessage("error.required.rp.experiencetraining.information") compose
     maxLength(maxInformationTypeLength).withMessage("error.invalid.length.rp.experiencetraining.information")
 
 
   implicit val formRule: Rule[UrlFormEncoded, ExperienceTraining] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "experienceTraining").read[Boolean].withMessage("error.required.rp.experienceTraining") flatMap {
+    (__ \ "experienceTraining").read[Boolean].withMessage("error.required.rp.experiencetraining") flatMap {
       case true =>
         (__ \ "experienceInformation").read(experienceInformationType) fmap (ExperienceTrainingYes.apply)
       case false => Rule.fromMapping { _ => Success(ExperienceTrainingNo) }
