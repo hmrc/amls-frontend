@@ -10,7 +10,7 @@ import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
-trait PersonRegisteredController extends RepeatingSection with BaseController {
+trait PersonRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
