@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.responsiblepeople.{Partner, SoleProprietor, Positions, ResponsiblePeople}
+import models.responsiblepeople._
 import utils.RepeatingSection
 import views.html.responsiblepeople.position_within_business
 
@@ -43,7 +43,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                   case Some(res) => Some(res.positions(data))
                   case _ => Some(ResponsiblePeople(positions = Some(data)))
                 }
-              } yield (data.positions.contains(SoleProprietor) || data.positions.contains(Partner), edit) match {
+              } yield (personalTax(data), edit) match {
                 case (true, false) => Redirect(routes.VATRegisteredController.get(index))
                 case (false, false) => Redirect(routes.SummaryController.get()) //TODO: Experience page.
                 case (_, true)  => Redirect(routes.SummaryController.get())
@@ -52,6 +52,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
       }
     }
 
+  private def personalTax(x: Positions) = x.positions.exists(a => a == SoleProprietor || a == Partner)
 }
 
 object PositionWithinBusinessController extends PositionWithinBusinessController {

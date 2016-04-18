@@ -20,6 +20,9 @@ POST        /business-details/previously-registered                    controlle
 GET         /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
 
+GET         /business-details/corporation-tax          controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/corporation-tax          controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
+
 GET         /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
@@ -165,8 +168,14 @@ POST        /responsible-people/position/:index   controllers.responsiblepeople.
 GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
+
 GET         /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.get(index:Int)
 POST        /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.post(index:Int)
