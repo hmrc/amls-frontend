@@ -724,7 +724,8 @@ responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
 
 responsiblepeople.experiencetraining.title = Does this person have previous experience in these activities?
 responsiblepeople.experiencetraining.heading = Does this person have previous experience in these activities?
-responsiblepeople.experiencetraining.information = You''ve told us your business is involved in these activities:
+responsiblepeople.experiencetraining.businessactivities = You''ve told us your business is involved in these activities:
+responsiblepeople.experiencetraining.information = Please give a brief description, including approximate dates and duration
 
 responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.heading = Has this person had training in anti-money laundering or counter-terrorism funding?

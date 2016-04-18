@@ -1,8 +1,10 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
+@import models.businessmatching._
 
-@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
+
+@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @target = @{
     s"""${f("information").id}-fieldset"""
@@ -13,6 +15,12 @@
 ) {
 
     @heading("responsiblepeople.experiencetraining.heading", "summary.responsiblepeople")
+
+
+    <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
+    @bamodel.businessActivities.map { ba =>
+        <p>@Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))</p>
+    }
 
     @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit)) {
 
