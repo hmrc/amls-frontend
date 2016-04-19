@@ -22,6 +22,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   )
   val DefaultVatRegisteredNo = VATRegisteredNo
 
+  val DefaultExperienceTraining = ExperienceTrainingNo
+
   val DefaultTraining = TrainingNo
 
   val DefaultPositions = Positions(Set(BeneficialOwner, InternalAccountant))
@@ -174,6 +176,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
         Some(DefaultPositions),
         Some(DefaultSaRegisteredYes),
         Some(DefaultVatRegisteredNo),
+        Some(DefaultExperienceTraining),
         Some(DefaultTraining)
       )
 
