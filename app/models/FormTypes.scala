@@ -103,7 +103,7 @@ object FormTypes {
 
   val typeOfBusinessType = notEmptyStrip compose notEmpty compose maxLength(maxTypeOfBusinessLength)
 
-  val ninoType = notEmpty.withMessage("error.required.nino") compose pattern("^[0-9a-zA-Z_]{9}+$".r).withMessage("error.invalid.nino")
+  val ninoType = notEmpty.withMessage("error.required.nino") compose pattern("^^[A-Z]{2}[0-9]{6}[A-Z]{1}$".r).withMessage("error.invalid.nino")
 
   val ukPassportType = notEmpty.withMessage("error.required.uk.passport") compose pattern("^[0-9a-zA-Z_]{9}+$".r).withMessage("error.invalid.uk.passport")
 

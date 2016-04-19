@@ -120,6 +120,7 @@ error.required.rp.passport = Select whether this person has a UK passport, a non
 error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
+error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
 
 
 error.required.rp.phone = Enter a phone number.
@@ -154,6 +155,8 @@ button.edit = Edit
 button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
+
+missing.personName = Name Unknown
 
 lbl.other = Other
 lbl.yes = Yes
@@ -709,7 +712,6 @@ responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 
 error.required.positionWithinBusiness = Select at least one business position.
 
-
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.person.a.resident.heading = Is this person a UK resident?
 
@@ -736,3 +738,9 @@ responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
 responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.heading = Has this person had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.information = Please give a brief description, including approximate dates and duration
+
+responsiblepeople.person.registered.title = Responsible person registered
+responsiblepeople.person.registered.heading = Responsible person registered
+responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
+responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
+responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
