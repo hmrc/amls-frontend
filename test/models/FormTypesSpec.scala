@@ -122,7 +122,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       phoneNumberType.validate("") must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.required.rp.phone"))
         )))
     }
 
@@ -153,7 +153,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       emailType.validate("") must
         equal(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.required.rp.email"))
         )))
     }
 
@@ -168,7 +168,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate an email without a `@` in it" in {
 
       emailType.validate("foo") must be(Failure(Seq(
-                Path -> Seq(ValidationError("error.pattern", emailRegex))
+                Path -> Seq(ValidationError("error.invalid.rp.email"))
               )))
     }
   }
@@ -339,8 +339,8 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "successfully validate" in {
 
-      ninoType.validate("abc123456") must
-        be(Success("abc123456"))
+      ninoType.validate("AB123456B") must
+        be(Success("AB123456B"))
     }
 
     "fail to validate an empty string" in {

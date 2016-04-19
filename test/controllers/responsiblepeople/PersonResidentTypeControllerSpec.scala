@@ -44,7 +44,7 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneServerPerSuite w
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUKResidence" -> "true",
-        "nino" -> "AA3464646",
+        "nino" -> "AA346464B",
         "countryOfBirth" -> "GB",
         "nationality" -> "GB"
       )
@@ -58,7 +58,7 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneServerPerSuite w
       val result = controller.post(1)(newRequest)
       println(result)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }
 
     "Prepopulate UI with saved data" in new Fixture {
@@ -99,7 +99,7 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneServerPerSuite w
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUKResidence" -> "true",
-        "nino" -> "AA3464646",
+        "nino" -> "AA346464B",
         "countryOfBirth" -> "GB",
         "nationality" -> "GB"
       )

@@ -120,6 +120,13 @@ error.required.rp.passport = Select whether this person has a UK passport, a non
 error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
+error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
+
+
+error.required.rp.phone = Enter a phone number.
+error.invalid.rp.phone = Enter only numbers. Do not enter letters, punctuation or other characters.
+error.required.rp.email = Enter an email address.
+error.invalid.rp.email = Enter a valid email address. It must be in the format myname@example.com.
 
 # Custom error messages
 error.required.firstname = Enter a first name.
@@ -152,6 +159,8 @@ button.edit = Edit
 button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
+
+missing.personName = Name Unknown
 
 lbl.other = Other
 lbl.yes = Yes
@@ -632,6 +641,11 @@ responsiblepeople.addperson.otherlastnames = Other last names
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
 
+responsiblepeople.contact_details.title = What are the contact details for this person?
+responsiblepeople.contact_details.lbl = By providing this information, this responsible person gives HM Revenue and Customs permission to contact them.
+responsiblepeople.contact_details.phone.lbl = Phone number
+responsiblepeople.contact_details.email.lbl = Email address
+
 # Custom error messages
 error.required.firstname = Enter a first name.
 error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
@@ -702,7 +716,6 @@ responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 
 error.required.positionWithinBusiness = Select at least one business position.
 
-
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.person.a.resident.heading = Is this person a UK resident?
 
@@ -734,3 +747,9 @@ responsiblepeople.experiencetraining.information = Please give a brief descripti
 responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.heading = Has this person had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.information = Please give a brief description, including approximate dates and duration
+
+responsiblepeople.person.registered.title = Responsible person registered
+responsiblepeople.person.registered.heading = Responsible person registered
+responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
+responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
+responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?

@@ -7,116 +7,25 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
 
-  val DefaultAddPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
-  val DefaultPersonResidenceType = PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
-  val DefaultSaRegisteredYes = SaRegisteredYes("0123456789")
-
-  val DefaultCurrentAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ"), ZeroToFiveMonths)
-  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH"), ZeroToFiveMonths)
-
-  val DefaultAddressHistory = ResponsiblePersonAddressHistory(
-    currentAddress = Some(DefaultCurrentAddress),
-    additionalAddress = Some(DefaultAdditionalAddress)
-  )
-  val DefaultVatRegisteredNo = VATRegisteredNo
-
-  val DefaultExperienceTraining = ExperienceTrainingNo
-
-  val DefaultTraining = TrainingNo
-
-  val DefaultPositions = Positions(Set(BeneficialOwner, InternalAccountant))
-
-  val NewAddPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
-
-  val NewCurrentAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES")), ZeroToFiveMonths)
-  val NewAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR")), ZeroToFiveMonths)
-
-  val NewAddressHistory = ResponsiblePersonAddressHistory(
-    currentAddress = Some(NewCurrentAddress),
-    additionalAddress = Some(NewAdditionalAddress)
-  )
-
-  val NewPersonResidenceType = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
-    Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
-  val NewSaRegisteredYes = SaRegisteredNo
-  val NewVatRegisteredYes = VATRegisteredYes("12345678")
-
-  val NewPositions = Positions(Set(Director, SoleProprietor))
-
-  val ResponsiblePeopleModel = ResponsiblePeople(
-    addPerson = Some(DefaultAddPerson),
-    addressHistory = Some(DefaultAddressHistory),
-    positions = Some(DefaultPositions),
-    saRegistered = Some(DefaultSaRegisteredYes)
-  )
+class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
 
   "ResponsiblePeople" must {
 
-    "update the model with the person" in {
-      val addPersonUpdated = DefaultAddPerson.copy(firstName = "Johny")
-      val newResponsiblePeople = ResponsiblePeopleModel.addPerson(addPersonUpdated)
-      newResponsiblePeople.addPerson.get.firstName must be(addPersonUpdated.firstName)
-    }
-
-    "update the model with new address history" in {
-      val newResponsiblePeople = ResponsiblePeopleModel.addressHistory(NewAddressHistory)
-      newResponsiblePeople.addressHistory.fold(fail("No address found.")) { x => x must be (NewAddressHistory) }
-    }
-
     "validate complete json" must {
 
-      val completeJson = Json.obj(
-        "addPerson" -> Json.obj(
-          "firstName" -> "John",
-          "middleName" -> "Envy",
-          "lastName" -> "Doe",
-          "isKnownByOtherNames" -> false
-        ),
-        "addressHistory" -> Json.obj(
-          "currentAddress" -> Json.obj(
-            "personAddress" -> Json.obj(
-              "personAddressLine1" -> "Line 1",
-              "personAddressLine2" -> "Line 2",
-              "personAddressPostCode" -> "NE981ZZ"
-            ),
-            "timeAtAddress" -> Json.obj(
-              "timeAtAddress" -> "01"
-            )
-          ),
-          "additionalAddress" -> Json.obj(
-            "personAddress" -> Json.obj(
-              "personAddressLine1" -> "Line 1",
-              "personAddressLine2" -> "Line 2",
-              "personAddressPostCode" -> "NE15GH"
-            ),
-            "timeAtAddress" -> Json.obj(
-              "timeAtAddress" -> "01"
-            )
-          )
-        ),
-        "positions" -> Json.obj(
-          "positions" -> Seq("01", "03")
-        ),
-        "saRegistered" -> Json.obj(
-          "saRegistered" -> true,
-          "utrNumber" -> "0123456789"
-        )
-      )
-
       "Serialise as expected" in {
-        Json.toJson(ResponsiblePeopleModel) must be(completeJson)
+        Json.toJson(CompleteResponsiblePeople) must be(CompleteJson)
       }
 
       "Deserialise as expected" in {
-        completeJson.as[ResponsiblePeople] must be(ResponsiblePeopleModel)
+        CompleteJson.as[ResponsiblePeople] must be(CompleteResponsiblePeople)
       }
     }
 
     "implicitly return an existing Model if one present" in {
-      val responsiblePeople = ResponsiblePeople.default(Some(ResponsiblePeopleModel))
-      responsiblePeople must be(ResponsiblePeopleModel)
+      val responsiblePeople = ResponsiblePeople.default(Some(CompleteResponsiblePeople))
+      responsiblePeople must be(CompleteResponsiblePeople)
     }
 
     "implicitly return an empty Model if not present" in {
@@ -126,180 +35,358 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar {
   }
 
   "None" when {
-    val initial: Option[ResponsiblePeople] = None
 
-    "Merged with add person" must {
-      "return ResponsiblePeople with correct add person" in {
-        val result = initial.addPerson(DefaultAddPerson)
-        result must be (ResponsiblePeople(Some(DefaultAddPerson)))
+    val EmptyResponsiblePeople: Option[ResponsiblePeople] = None
+
+    "Merged with AddPerson" must {
+      "return ResponsiblePeople with correct AddPerson" in {
+        val result = EmptyResponsiblePeople.addPerson(NewValues.addPerson)
+        result must be (ResponsiblePeople(addPerson = Some(NewValues.addPerson)))
       }
     }
 
-    "Merged with DefaultPersonResidenceType" must {
-      "return ResponsiblePeople with correct DefaultPersonResidenceType" in {
-        val result = initial.personResidenceType(DefaultPersonResidenceType)
-        result must be (ResponsiblePeople(None, Some(DefaultPersonResidenceType)))
+    "Merged with PersonResidenceType" must {
+      "return ResponsiblePeople with correct PersonResidenceType" in {
+        val result = EmptyResponsiblePeople.personResidenceType(NewValues.personResidenceType)
+        result must be (ResponsiblePeople(personResidenceType = Some(NewValues.personResidenceType)))
       }
     }
 
-    "Merged with DefaultPositions" must {
-      "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
-        val result = initial.positions(DefaultPositions)
-        result must be (ResponsiblePeople(None, None, None, Some(DefaultPositions), None))
+    "Merged with ContactDetails" must {
+      "return ResponsiblePeople with correct ContactDetails" in {
+        val result = EmptyResponsiblePeople.contactDetails(NewValues.contactDetails)
+        result must be (ResponsiblePeople(contactDetails = Some(NewValues.contactDetails)))
       }
     }
 
-    "Merged with DefaultSaRegisteredYes" must {
-      "return ResponsiblePeople with correct DefaultSaRegisteredYes" in {
-        val result = initial.saRegistered(DefaultSaRegisteredYes)
-        result must be (ResponsiblePeople(None, None, None, None, Some(DefaultSaRegisteredYes)))
+    "Merged with AddressHistory" must {
+      "return ResponsiblePeople with correct AddressHistory" in {
+        val result = EmptyResponsiblePeople.addressHistory(NewValues.addressHistory)
+        result must be (ResponsiblePeople(addressHistory = Some(NewValues.addressHistory)))
       }
     }
 
+
+    "Merged with Positions" must {
+      "return ResponsiblePeople with correct Positions" in {
+        val result = EmptyResponsiblePeople.positions(NewValues.positions)
+        result must be (ResponsiblePeople(positions = Some(NewValues.positions)))
+      }
+    }
+
+    "Merged with SaRegistered" must {
+      "return ResponsiblePeople with correct SaRegistered" in {
+        val result = EmptyResponsiblePeople.saRegistered(NewValues.saRegistered)
+        result must be (ResponsiblePeople(saRegistered = Some(NewValues.saRegistered)))
+      }
+    }
 
     "Merged with VatRegistered" must {
       "return ResponsiblePeople with correct VatRegistered" in {
-        val result = initial.vatRegistered(DefaultVatRegisteredNo)
-        result must be (ResponsiblePeople(vatRegistered = Some(DefaultVatRegisteredNo)))
+        val result = EmptyResponsiblePeople.vatRegistered(NewValues.vatRegistered)
+        result must be (ResponsiblePeople(vatRegistered = Some(NewValues.vatRegistered)))
       }
     }
+
+    "Merged with experienceTraining" must {
+      "return ResponsiblePeople with correct experienceTraining" in {
+        val result = EmptyResponsiblePeople.experienceTraining(NewValues.experienceTraining)
+        result must be (ResponsiblePeople(experienceTraining = Some(NewValues.experienceTraining)))
+      }
+    }
+
+    "Merged with Training" must {
+      "return ResponsiblePeople with correct Training" in {
+        val result = EmptyResponsiblePeople.training(NewValues.training)
+        result must be (ResponsiblePeople(training = Some(NewValues.training)))
+      }
+    }
+
   }
 
   "Successfully validate if the model is complete" when {
 
     "the model is fully complete" in {
-
-      val initial = ResponsiblePeople(
-        Some(DefaultAddPerson),
-        Some(DefaultPersonResidenceType),
-        Some(DefaultAddressHistory),
-        Some(DefaultPositions),
-        Some(DefaultSaRegisteredYes),
-        Some(DefaultVatRegisteredNo),
-        Some(DefaultExperienceTraining),
-        Some(DefaultTraining)
-      )
-
-      initial.isComplete must be(true)
+      CompleteResponsiblePeople.isComplete must be(true)
     }
 
     "the model is not complete" in {
-
-      val initial = ResponsiblePeople(
-        Some(DefaultAddPerson),
-        Some(DefaultPersonResidenceType),
-        Some(DefaultAddressHistory),
-        Some(DefaultPositions),
-        None
-      )
-
+      val initial = ResponsiblePeople()
       initial.isComplete must be(false)
-
     }
 
-    "the model address history is set but not completed" in {
-
-      val PartialAddressHistory = ResponsiblePersonAddressHistory()
-
-      val initial = ResponsiblePeople(
-        Some(DefaultAddPerson),
-        Some(DefaultPersonResidenceType),
-        Some(PartialAddressHistory),
-        Some(DefaultPositions),
-        Some(DefaultSaRegisteredYes)
-      )
-      initial.isComplete must be(false)
-
-    }
   }
 
   "Merge with existing model" when {
 
-    val initial = ResponsiblePeople(
-      Some(DefaultAddPerson),
-      Some(DefaultPersonResidenceType),
-      Some(DefaultAddressHistory),
-      Some(DefaultPositions),
-      Some(DefaultSaRegisteredYes),
-      Some(DefaultVatRegisteredNo))
-
-    "Merged with add person" must {
-      "return ResponsiblePeople with correct NewAddPerson" in {
-        val result = initial.addPerson(NewAddPerson)
-
+    "Merged with add AddPerson" must {
+      "return ResponsiblePeople with correct AddPerson" in {
+        val result = CompleteResponsiblePeople.addPerson(NewValues.addPerson)
         result must be (ResponsiblePeople(
-          Some(NewAddPerson),
-          Some(DefaultPersonResidenceType),
-          Some(DefaultAddressHistory),
-          Some(DefaultPositions),
-          Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(NewValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
       }
     }
 
-    "Merged with DefaultPersonResidenceType" must {
-      "return ResponsiblePeople with correct NewPersonResidenceType" in {
-        val result = initial.personResidenceType(NewPersonResidenceType)
+    "Merged with PersonResidenceType" must {
+      "return ResponsiblePeople with correct PersonResidenceType" in {
+        val result = CompleteResponsiblePeople.personResidenceType(NewValues.personResidenceType)
         result must be (ResponsiblePeople(
-          Some(DefaultAddPerson),
-          Some(NewPersonResidenceType),
-          Some(DefaultAddressHistory),
-          Some(DefaultPositions),
-          Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultValues.addPerson),
+          Some(NewValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
       }
     }
 
-    "Merged with DefaultAddressHistory" must {
-      "return ResponsiblePeople with correct NewAddressHistory" in {
-        val result = initial.addressHistory(NewAddressHistory)
+    "Merged with ContactDetails" must {
+      "return ResponsiblePeople with correct ContactDetails" in {
+        val result = CompleteResponsiblePeople.contactDetails(NewValues.contactDetails)
         result must be (ResponsiblePeople(
-          Some(DefaultAddPerson),
-          Some(DefaultPersonResidenceType),
-          Some(NewAddressHistory),
-          Some(DefaultPositions),
-          Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(NewValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
       }
     }
 
-    "Merged with DefaultPositions" must {
-      "return ResponsiblePeople with correct NewPositions" in {
-        val result = initial.positions(NewPositions)
+    "Merged with AddressHistory" must {
+      "return ResponsiblePeople with correct AddressHistory" in {
+        val result = CompleteResponsiblePeople.addressHistory(NewValues.addressHistory)
         result must be (ResponsiblePeople(
-          Some(DefaultAddPerson),
-          Some(DefaultPersonResidenceType),
-          Some(DefaultAddressHistory),
-          Some(NewPositions),
-          Some(DefaultSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(NewValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
       }
     }
 
-    "Merged with DefaultSaRegisteredYes" must {
-      "return ResponsiblePeople with correct NewSaRegisteredYes" in {
-        val result = initial.saRegistered(NewSaRegisteredYes)
+    "Merged with Positions" must {
+      "return ResponsiblePeople with correct Positions" in {
+        val result = CompleteResponsiblePeople.positions(NewValues.positions)
         result must be (ResponsiblePeople(
-          Some(DefaultAddPerson),
-          Some(DefaultPersonResidenceType),
-          Some(DefaultAddressHistory),
-          Some(DefaultPositions),
-          Some(NewSaRegisteredYes),
-          Some(DefaultVatRegisteredNo)))
+          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(NewValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
       }
     }
 
-    "Merged with VATRegistered" must {
-      "return ResponsiblePeople with correct NewVatRegisteredYes" in {
-        val result = initial.vatRegistered(NewVatRegisteredYes)
+    "Merged with SaRegistered" must {
+      "return ResponsiblePeople with correct SaRegistered" in {
+        val result = CompleteResponsiblePeople.saRegistered(NewValues.saRegistered)
         result must be (ResponsiblePeople(
-          Some(DefaultAddPerson),
-          Some(DefaultPersonResidenceType),
-          Some(DefaultAddressHistory),
-          Some(DefaultPositions),
-          Some(DefaultSaRegisteredYes),
-          Some(NewVatRegisteredYes)))
+          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(NewValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
+      }
+    }
+
+    "Merged with VatRegistered" must {
+      "return ResponsiblePeople with correct VatRegistered" in {
+        val result = CompleteResponsiblePeople.vatRegistered(NewValues.vatRegistered)
+        result must be (ResponsiblePeople(
+          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(NewValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
+      }
+    }
+
+    "Merged with experienceTraining" must {
+      "return ResponsiblePeople with correct experienceTraining" in {
+        val result = CompleteResponsiblePeople.experienceTraining(NewValues.experienceTraining)
+        result must be (ResponsiblePeople(
+          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(NewValues.experienceTraining),
+          Some(DefaultValues.training)))
+      }
+    }
+
+    "Merged with Training" must {
+      "return ResponsiblePeople with correct Training" in {
+        val result = CompleteResponsiblePeople.training(NewValues.training)
+        result must be (ResponsiblePeople(
+          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(NewValues.training)))
       }
     }
   }
+}
+
+trait ResponsiblePeopleValues {
+
+  import DefaultValues._
+
+  object DefaultValues {
+
+    private val residence = UKResidence("AA3464646")
+    private val residenceCountry = Country("United Kingdom", "GB")
+    private val residenceNationality = Country("United Kingdom", "GB")
+    private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE981ZZ")
+    private val currentAddress = ResponsiblePersonAddress(currentPersonAddress, ZeroToFiveMonths)
+    private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH")
+    private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, ZeroToFiveMonths)
+
+    val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
+    val personResidenceType = PersonResidenceType(residence, residenceCountry, residenceNationality)
+    val saRegistered = SaRegisteredYes("0123456789")
+    val contactDetails = ContactDetails("07702743555", "test@test.com")
+    val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
+    val vatRegistered = VATRegisteredNo
+    val training = TrainingYes("test")
+    val experienceTraining = ExperienceTrainingYes("Some training")
+    val positions = Positions(Set(BeneficialOwner, InternalAccountant))
+  }
+
+  object NewValues {
+
+    private val residenceYear = 1990
+    private val residenceMonth = 2
+    private val residenceDay = 24
+    private val residenceDate = new LocalDate(residenceYear, residenceMonth, residenceDay)
+    private val residence = NonUKResidence(residenceDate, UKPassport("123464646"))
+    private val residenceCountry = Country("United Kingdom", "GB")
+    private val residenceNationality = Country("United Kingdom", "GB")
+    private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
+    private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR"))
+    private val currentAddress = ResponsiblePersonAddress(newPersonAddress, ZeroToFiveMonths)
+    private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, ZeroToFiveMonths)
+
+    val addPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
+    val contactDetails = ContactDetails("07702743444", "new@test.com")
+    val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
+    val personResidenceType = PersonResidenceType(residence, residenceCountry, residenceNationality)
+    val saRegistered = SaRegisteredNo
+    val vatRegistered = VATRegisteredYes("12345678")
+    val positions = Positions(Set(Director, SoleProprietor))
+    val experienceTraining = ExperienceTrainingNo
+    val training = TrainingNo
+  }
+
+  val CompleteResponsiblePeople = ResponsiblePeople(
+    Some(DefaultValues.addPerson),
+    Some(DefaultValues.personResidenceType),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training)
+  )
+
+
+  val CompleteJson = Json.obj(
+    "addPerson" -> Json.obj(
+      "firstName" -> "John",
+      "middleName" -> "Envy",
+      "lastName" -> "Doe",
+      "isKnownByOtherNames" -> false
+    ),
+    "personResidenceType" -> Json.obj(
+      "nino" -> "AA3464646",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "NE981ZZ"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "NE15GH"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    )
+  )
+
+  /** Make sure Responsible People model is complete */
+  assert(CompleteResponsiblePeople.isComplete)
+
 }

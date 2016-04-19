@@ -7,19 +7,23 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
+                             contactDetails: Option[ContactDetails] = None,
                              addressHistory: Option[ResponsiblePersonAddressHistory] = None,
                              positions: Option[Positions] = None,
                              saRegistered: Option[SaRegistered] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None
-                            ) {
+                          ) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
 
   def personResidenceType(pr: PersonResidenceType): ResponsiblePeople =
     this.copy(personResidenceType = Some(pr))
+
+  def contactDetails(cd: ContactDetails): ResponsiblePeople =
+    this.copy(contactDetails = Some(cd))
 
   def saRegistered(sa: SaRegistered): ResponsiblePeople =
     this.copy(saRegistered = Some(sa))
@@ -40,10 +44,13 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
     this.copy(training = Some(t))
 
   def isComplete: Boolean = this match {
-    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(pos), Some(_), Some(_), Some(_), Some(_)) if add.isComplete && pos.isComplete => true
+    case ResponsiblePeople(
+      Some(_), Some(_), Some(_), Some(_),
+      Some(_), Some(_), Some(_), Some(_),
+      Some(_)) => true
+
     case _ => false
   }
-
 }
 
 object ResponsiblePeople {

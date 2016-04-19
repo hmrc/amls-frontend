@@ -43,7 +43,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                   case _ => data
                 }
               } yield edit match {
-                case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
+                case false => Redirect(routes.ContactDetailsController.get(index, edit))
                 case true  => Redirect(routes.SummaryController.get())
               }
           }
