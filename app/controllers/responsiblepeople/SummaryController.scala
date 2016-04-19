@@ -14,8 +14,10 @@ trait SummaryController extends BaseController {
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-          dataCache.fetch[ResponsiblePeople](ResponsiblePeople.key) map {
-            case Some(data) => Ok(summary(data))
+          dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+            case Some(data) => {
+              Ok(summary(data))
+            }
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
       }
