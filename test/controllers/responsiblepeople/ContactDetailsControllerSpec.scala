@@ -1,7 +1,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{AddPerson, ContactDetails, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ContactDetails, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._

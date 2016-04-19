@@ -145,8 +145,8 @@ GET         /confirmation                                   controllers.Confirma
 GET         /responsible-people/index/:index                controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
 GET         /responsible-people/who-must-register/:index    controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
 
-GET         /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/your-name/:index            controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/your-name/:index            controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false)

@@ -37,10 +37,10 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
     val EmptyResponsiblePeople: Option[ResponsiblePeople] = None
 
-    "Merged with AddPerson" must {
-      "return ResponsiblePeople with correct AddPerson" in {
-        val result = EmptyResponsiblePeople.addPerson(NewValues.addPerson)
-        result must be (ResponsiblePeople(addPerson = Some(NewValues.addPerson)))
+    "Merged with personName" must {
+      "return ResponsiblePeople with correct personName" in {
+        val result = EmptyResponsiblePeople.personName(NewValues.personName)
+        result must be (ResponsiblePeople(personName = Some(NewValues.personName)))
       }
     }
 
@@ -111,11 +111,11 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
   "Merge with existing model" when {
 
-    "Merged with add AddPerson" must {
-      "return ResponsiblePeople with correct AddPerson" in {
-        val result = CompleteResponsiblePeople.addPerson(NewValues.addPerson)
+    "Merged with add personName" must {
+      "return ResponsiblePeople with correct personName" in {
+        val result = CompleteResponsiblePeople.personName(NewValues.personName)
         result must be (ResponsiblePeople(
-          Some(NewValues.addPerson),
+          Some(NewValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(DefaultValues.addressHistory),
@@ -130,7 +130,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct PersonResidenceType" in {
         val result = CompleteResponsiblePeople.personResidenceType(NewValues.personResidenceType)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(NewValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(DefaultValues.addressHistory),
@@ -145,7 +145,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct ContactDetails" in {
         val result = CompleteResponsiblePeople.contactDetails(NewValues.contactDetails)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(NewValues.contactDetails),
           Some(DefaultValues.addressHistory),
@@ -160,7 +160,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct AddressHistory" in {
         val result = CompleteResponsiblePeople.addressHistory(NewValues.addressHistory)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(NewValues.addressHistory),
@@ -175,7 +175,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct Positions" in {
         val result = CompleteResponsiblePeople.positions(NewValues.positions)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(DefaultValues.addressHistory),
@@ -190,7 +190,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct SaRegistered" in {
         val result = CompleteResponsiblePeople.saRegistered(NewValues.saRegistered)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(DefaultValues.addressHistory),
@@ -205,7 +205,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct VatRegistered" in {
         val result = CompleteResponsiblePeople.vatRegistered(NewValues.vatRegistered)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(DefaultValues.addressHistory),
@@ -220,7 +220,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct Training" in {
         val result = CompleteResponsiblePeople.training(NewValues.training)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(DefaultValues.addressHistory),
@@ -247,7 +247,7 @@ trait ResponsiblePeopleValues {
     private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "NE15GH")
     private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, ZeroToFiveMonths)
 
-    val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
+    val personName = PersonName("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
     val personResidenceType = PersonResidenceType(residence, residenceCountry, residenceNationality)
     val saRegistered = SaRegisteredYes("0123456789")
     val contactDetails = ContactDetails("07702743555", "test@test.com")
@@ -271,7 +271,7 @@ trait ResponsiblePeopleValues {
     private val currentAddress = ResponsiblePersonAddress(newPersonAddress, ZeroToFiveMonths)
     private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, ZeroToFiveMonths)
 
-    val addPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
+    val personName = PersonName("first", Some("middle"), "last", IsKnownByOtherNamesNo)
     val contactDetails = ContactDetails("07702743444", "new@test.com")
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
     val personResidenceType = PersonResidenceType(residence, residenceCountry, residenceNationality)
@@ -282,7 +282,7 @@ trait ResponsiblePeopleValues {
   }
 
   val CompleteResponsiblePeople = ResponsiblePeople(
-    Some(DefaultValues.addPerson),
+    Some(DefaultValues.personName),
     Some(DefaultValues.personResidenceType),
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
@@ -292,9 +292,8 @@ trait ResponsiblePeopleValues {
     Some(DefaultValues.training)
   )
 
-
   val CompleteJson = Json.obj(
-    "addPerson" -> Json.obj(
+    "personName" -> Json.obj(
       "firstName" -> "John",
       "middleName" -> "Envy",
       "lastName" -> "Doe",
