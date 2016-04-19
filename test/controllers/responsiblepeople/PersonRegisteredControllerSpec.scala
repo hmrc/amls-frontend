@@ -50,7 +50,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneServerPerSuite wit
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("responsiblepeople.have.registered.person.text", 2))
+        contentAsString(result) must include(Messages("responsiblepeople.have.registered.people.text", 2))
       }
     }
 

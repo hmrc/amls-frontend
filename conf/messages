@@ -122,6 +122,12 @@ error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
 error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
 
+
+error.required.rp.phone = Enter a phone number.
+error.invalid.rp.phone = Enter only numbers. Do not enter letters, punctuation or other characters.
+error.required.rp.email = Enter an email address.
+error.invalid.rp.email = Enter a valid email address. It must be in the format myname@example.com.
+
 # Custom error messages
 error.required.firstname = Enter a first name.
 error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
@@ -630,6 +636,11 @@ responsiblepeople.addperson.otherlastnames = Other last names
 
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
+
+responsiblepeople.contact_details.title = What are the contact details for this person?
+responsiblepeople.contact_details.lbl = By providing this information, this responsible person gives HM Revenue and Customs permission to contact them.
+responsiblepeople.contact_details.phone.lbl = Phone number
+responsiblepeople.contact_details.email.lbl = Email address
 
 # Custom error messages
 error.required.firstname = Enter a first name.

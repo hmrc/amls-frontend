@@ -16,13 +16,13 @@ class PersonResidenceTypeSpec extends PlaySpec {
       "successfully validate uk model" in {
         val ukModel = Map(
           "isUKResidence" -> Seq("true"),
-          "nino" -> Seq("AA3464646"),
+          "nino" -> Seq("AA346464B"),
           "countryOfBirth" -> Seq("GB"),
           "nationality" -> Seq("GB")
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Success(PersonResidenceType(UKResidence("AA3464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))))
+          be(Success(PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))))
       }
 
       "fail to validate on missing nino" in {
@@ -53,7 +53,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
       "fail to validate on invalid country of birth" in {
         val ukModel = Map(
           "isUKResidence" -> Seq("true"),
-          "nino" -> Seq("AAAAAAAAA"),
+          "nino" -> Seq("AA346464B"),
           "countryOfBirth" -> Seq("GBuuu"),
           "nationality" -> Seq("GB")
         )
@@ -65,7 +65,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
       "fail to validate on invalid nationality" in {
         val ukModel = Map(
           "isUKResidence" -> Seq("true"),
-          "nino" -> Seq("AAAAAAAAA"),
+          "nino" -> Seq("AA346464B"),
           "countryOfBirth" -> Seq("GB"),
           "nationality" -> Seq("")
         )
