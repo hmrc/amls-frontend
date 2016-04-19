@@ -1,0 +1,33 @@
+@import include._
+@import models.responsiblepeople._
+
+@(model: Option[ResponsiblePeople], idx: Int)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
+
+
+    <table>
+        <tbody>
+                <tr>
+                    @model.addPerson.map { personDetails =>
+                        <th class="summary-title">
+                            @personDetails.firstName
+                            @personDetails.middleName
+                            @personDetails.lastName
+                        </th>
+                    }.getOrElse{
+                        <td>
+                        @Messages("missing.personName")
+                            </td>
+                    }
+                    <td>
+                        <a href="@controllers.responsiblepeople.routes.WhatYouNeedController.get(idx)">@Messages("button.edit")
+                    </td>
+                </tr>
+        </tbody>
+    </table>
+}
