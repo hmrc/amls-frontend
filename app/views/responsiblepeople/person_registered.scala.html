@@ -1,0 +1,31 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], index: Int)(implicit request: Request[_])
+
+@main(
+    title = Messages("responsiblepeople.person.registered.title")
+) {
+
+    @heading("responsiblepeople.person.registered.heading", "summary.responsiblepeople")
+
+    @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
+        <div class="panel-indent panel-border-wide">
+            @if(index <= 1){
+                <p>@Messages("responsiblepeople.have.registered.person.text", index) </p>
+            } else {
+                <p>@Messages("responsiblepeople.have.registered.people.text", index) </p>
+            }
+        </div>
+        <br>
+        <br>
+
+        @inlineRadioGroup(f("registerAnotherPerson")) {
+            @legend("responsiblepeople.want.to.register.another.person")
+            @radio(f("registerAnotherPerson"), "lbl.yes", "true")
+            @radio(f("registerAnotherPerson"), "lbl.no", "false")
+        }
+
+        @submit()
+    }
+}

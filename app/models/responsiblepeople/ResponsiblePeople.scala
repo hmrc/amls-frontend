@@ -12,7 +12,7 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
                              saRegistered: Option[SaRegistered] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              training: Option[Training] = None
-                            ) {
+                          ) {
 
   def addPerson(ap: AddPerson): ResponsiblePeople =
     this.copy(addPerson = Some(ap))
@@ -39,7 +39,6 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
     case ResponsiblePeople(Some(_), Some(_), Some(add), Some(pos), Some(_), Some(_), Some(_)) if add.isComplete && pos.isComplete => true
     case _ => false
   }
-
 }
 
 object ResponsiblePeople {
