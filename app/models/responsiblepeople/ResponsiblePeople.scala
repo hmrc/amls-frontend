@@ -54,7 +54,7 @@ object ResponsiblePeople {
           case model if !model.isComplete => true
           case _ => false
         }
-        Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get(index))
+        Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get(index + 1))
     }
   }
 
