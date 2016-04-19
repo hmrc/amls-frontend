@@ -19,25 +19,30 @@
 
     @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit)) {
 
-        <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
-
-        <div class="form-field">
-            @bamodel.businessActivities.map { ba =>
-                    <span class="panel-indent">
-                        @Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))
-                    </span>
-            }
-            <br />
+        <div class="form-group">
+                <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
         </div>
 
-        @inlineRadioGroup(f("experienceTraining")) {
-            @radio(f("experienceTraining"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("experienceTraining"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @textarea(f("experienceInformation"), "responsiblepeople.experiencetraining.information", bold = false)
-            }
-        }
+        <div class="form-group">
+            <div class="panel-indent panel-border-wide">
+                @bamodel.businessActivities.map { ba =>
+                        <p>
+                            @Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))
+                        </p>
+                }
+            </div>
+        </div>
 
-    @submit()
+        <div class="form-field">
+            @inlineRadioGroup(f("experienceTraining")) {
+                @radio(f("experienceTraining"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("experienceTraining"), "lbl.no", "false")
+                @fieldset("TODO", jsHidden = true, id = target) {
+                    @textarea(f("experienceInformation"), "responsiblepeople.experiencetraining.information", bold = false)
+                }
+            }
+        </div>
+
+        @submit()
   }
 }

@@ -246,6 +246,9 @@ table.summary ul li {
     padding-left: 55px;
 }
 
+.spacelarge {
+    margin-bottom: 30px;
+}
 
 .touchevents .date-of-birth {
     display:block;
