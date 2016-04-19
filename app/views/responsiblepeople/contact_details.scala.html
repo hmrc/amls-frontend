@@ -1,0 +1,27 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+@import models.aboutthebusiness._
+
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang:Lang)
+
+@main(title = Messages("responsiblepeople.contact_details.title")) {
+
+    @heading("responsiblepeople.contact_details.title", "summary.responsiblepeople")
+
+    <p>@Messages("responsiblepeople.contact_details.lbl")</p>
+
+    @form(f, controllers.responsiblepeople.routes.ContactDetailsController.post(index, edit)) {
+        @input(
+            field = f("phoneNumber"),
+            labelText = Messages("responsiblepeople.contact_details.phone.lbl")
+        )
+
+        @input(
+            field = f("emailAddress"),
+            labelText = Messages("responsiblepeople.contact_details.email.lbl")
+        )
+
+        @submit()
+    }
+}

@@ -176,3 +176,6 @@ POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRe
 
 GET         /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/contacting-you/:index          controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/contacting-you/:index          controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false)

@@ -634,6 +634,11 @@ responsiblepeople.addperson.otherlastnames = Other last names
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
 
+responsiblepeople.contact_details.title = What are the contact details for this person?
+responsiblepeople.contact_details.lbl = By providing this information, this responsible person gives HM Revenue and Customs permission to contact them.
+responsiblepeople.contact_details.phone.lbl = Phone number
+responsiblepeople.contact_details.email.lbl = Email address
+
 # Custom error messages
 error.required.firstname = Enter a first name.
 error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
