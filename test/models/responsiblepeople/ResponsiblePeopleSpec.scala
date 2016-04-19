@@ -7,6 +7,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
+
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
 
   "ResponsiblePeople" must {
@@ -87,6 +88,13 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
     }
 
+    "Merged with experienceTraining" must {
+      "return ResponsiblePeople with correct experienceTraining" in {
+        val result = EmptyResponsiblePeople.experienceTraining(NewValues.experienceTraining)
+        result must be (ResponsiblePeople(experienceTraining = Some(NewValues.experienceTraining)))
+      }
+    }
+
     "Merged with Training" must {
       "return ResponsiblePeople with correct Training" in {
         val result = EmptyResponsiblePeople.training(NewValues.training)
@@ -122,6 +130,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.positions),
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
           Some(DefaultValues.training)))
       }
     }
@@ -137,6 +146,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.positions),
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
           Some(DefaultValues.training)))
       }
     }
@@ -152,6 +162,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.positions),
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
           Some(DefaultValues.training)))
       }
     }
@@ -167,6 +178,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.positions),
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
           Some(DefaultValues.training)))
       }
     }
@@ -182,6 +194,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(NewValues.positions),
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
           Some(DefaultValues.training)))
       }
     }
@@ -197,6 +210,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.positions),
           Some(NewValues.saRegistered),
           Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
           Some(DefaultValues.training)))
       }
     }
@@ -212,6 +226,23 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.positions),
           Some(DefaultValues.saRegistered),
           Some(NewValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training)))
+      }
+    }
+
+    "Merged with experienceTraining" must {
+      "return ResponsiblePeople with correct experienceTraining" in {
+        val result = CompleteResponsiblePeople.experienceTraining(NewValues.experienceTraining)
+        result must be (ResponsiblePeople(
+          Some(DefaultValues.personName),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(NewValues.experienceTraining),
           Some(DefaultValues.training)))
       }
     }
@@ -227,6 +258,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.positions),
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
           Some(NewValues.training)))
       }
     }
@@ -254,6 +286,7 @@ trait ResponsiblePeopleValues {
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
     val vatRegistered = VATRegisteredNo
     val training = TrainingYes("test")
+    val experienceTraining = ExperienceTrainingYes("Some training")
     val positions = Positions(Set(BeneficialOwner, InternalAccountant))
   }
 
@@ -278,6 +311,7 @@ trait ResponsiblePeopleValues {
     val saRegistered = SaRegisteredNo
     val vatRegistered = VATRegisteredYes("12345678")
     val positions = Positions(Set(Director, SoleProprietor))
+    val experienceTraining = ExperienceTrainingNo
     val training = TrainingNo
   }
 
@@ -289,6 +323,7 @@ trait ResponsiblePeopleValues {
     Some(DefaultValues.positions),
     Some(DefaultValues.saRegistered),
     Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
     Some(DefaultValues.training)
   )
 
@@ -339,6 +374,10 @@ trait ResponsiblePeopleValues {
     ),
     "vatRegistered" -> Json.obj(
       "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
     ),
     "training" -> Json.obj(
       "training" -> true,
