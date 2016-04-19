@@ -5,7 +5,7 @@ import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
+case class ResponsiblePeople(personName: Option[PersonName] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
                              contactDetails: Option[ContactDetails] = None,
                              addressHistory: Option[ResponsiblePersonAddressHistory] = None,
@@ -15,8 +15,8 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
                              training: Option[Training] = None
                           ) {
 
-  def addPerson(ap: AddPerson): ResponsiblePeople =
-    this.copy(addPerson = Some(ap))
+  def personName(pn: PersonName): ResponsiblePeople =
+    this.copy(personName = Some(pn))
 
   def personResidenceType(pr: PersonResidenceType): ResponsiblePeople =
     this.copy(personResidenceType = Some(pr))

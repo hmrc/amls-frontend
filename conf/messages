@@ -624,15 +624,15 @@ responsiblepeople.whatyouneed.line_8 = national insurance number
 responsiblepeople.whatyouneed.line_9 = VAT number and Self Assessment number
 responsiblepeople.whatyouneed.line_10 = details of relevant experience and training
 
-responsiblepeople.addperson.title = What''s the name of this responsible person?
-responsiblepeople.addperson.firstname = First name
-responsiblepeople.addperson.middlename = Middle name (optional)
-responsiblepeople.addperson.lastname = Last name
-responsiblepeople.addperson.isknownbyothernames = Has this person ever been known by other names?
+responsiblepeople.personName.title = What''s the name of this responsible person?
+responsiblepeople.personName.firstname = First name
+responsiblepeople.personName.middlename = Middle name (optional)
+responsiblepeople.personName.lastname = Last name
+responsiblepeople.personName.isknownbyothernames = Has this person ever been known by other names?
 
-responsiblepeople.addperson.otherfirstnames = Other first names
-responsiblepeople.addperson.othermiddlenames = Other middle names (optional)
-responsiblepeople.addperson.otherlastnames = Other last names
+responsiblepeople.personName.otherfirstnames = Other first names
+responsiblepeople.personName.othermiddlenames = Other middle names (optional)
+responsiblepeople.personName.otherlastnames = Other last names
 
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
