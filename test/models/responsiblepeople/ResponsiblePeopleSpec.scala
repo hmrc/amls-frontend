@@ -235,7 +235,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       "return ResponsiblePeople with correct experienceTraining" in {
         val result = CompleteResponsiblePeople.experienceTraining(NewValues.experienceTraining)
         result must be (ResponsiblePeople(
-          Some(DefaultValues.addPerson),
+          Some(DefaultValues.personName),
           Some(DefaultValues.personResidenceType),
           Some(DefaultValues.contactDetails),
           Some(DefaultValues.addressHistory),

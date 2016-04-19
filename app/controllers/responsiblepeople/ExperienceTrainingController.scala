@@ -64,8 +64,9 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
                       case Some(rp) => Some(rp.experienceTraining(data))
                       case _ => Some(ResponsiblePeople(experienceTraining = Some(data)))
                     }
-                  } yield {
-                    Redirect(routes.ExperienceTrainingController.get(index, edit))
+                  } yield edit match {
+                    case false => Redirect(routes.TrainingController.get(index, edit))
+                    case true => Redirect(routes.SummaryController.get())
                   }
               }
           }

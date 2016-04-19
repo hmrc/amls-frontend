@@ -149,7 +149,7 @@ class ExperienceTrainingControllerSpec extends PlaySpec with OneServerPerSuite w
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
-      //redirectLocation(result) must be(Some(routes.HowManyEmployeesController.get().url))
+      redirectLocation(result) must be(Some(routes.TrainingController.get(RecordId).url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -201,7 +201,7 @@ class ExperienceTrainingControllerSpec extends PlaySpec with OneServerPerSuite w
 
       val result = controller.post(RecordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      //redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
   }
 }
