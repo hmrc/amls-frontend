@@ -268,11 +268,11 @@ trait ResponsiblePeopleValues {
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
     private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR"))
+    private val currentAddress = ResponsiblePersonAddress(newPersonAddress, ZeroToFiveMonths)
+    private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, ZeroToFiveMonths)
 
     val addPerson = AddPerson("first", Some("middle"), "last", IsKnownByOtherNamesNo)
     val contactDetails = ContactDetails("07702743444", "new@test.com")
-    val currentAddress = ResponsiblePersonAddress(newPersonAddress, ZeroToFiveMonths)
-    val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, ZeroToFiveMonths)
     val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
     val personResidenceType = PersonResidenceType(residence, residenceCountry, residenceNationality)
     val saRegistered = SaRegisteredNo
