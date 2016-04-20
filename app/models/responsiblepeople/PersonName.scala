@@ -10,7 +10,11 @@ case class PersonName(firstName: String,
                       middleName: Option[String],
                       lastName: String,
                       isKnownByOtherNames: IsKnownByOtherNames
-                    )
+                    ) {
+
+  val fullName = s"$firstName${middleName.fold(" ")(n => s" $n ")}$lastName"
+
+}
 
 object PersonName {
 

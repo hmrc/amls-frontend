@@ -161,6 +161,7 @@ button.edit = Edit
 button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
+button.delete = Delete
 
 missing.personName = Name Unknown
 
@@ -755,3 +756,8 @@ responsiblepeople.person.registered.heading = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
+
+responsiblepeople.check_your_answers.title = Check your answers
+responsiblepeople.check_your_answers.heading = Check your answers
+responsiblepeople.your_answers.heading = Your answers
+responsiblepeople.check_your_answers.add = Add a responsible person
