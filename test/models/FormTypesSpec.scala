@@ -130,7 +130,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       phoneNumberType.validate("1" * 31) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 30))
+          Path -> Seq(ValidationError("error.max.length.rp.phone"))
         )))
     }
   }
@@ -161,7 +161,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       emailType.validate("1" * 101) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 100))
+          Path -> Seq(ValidationError("error.max.length.rp.email"))
         )))
     }
 
