@@ -68,7 +68,7 @@ object ResponsiblePeople {
       } => complete
       case model => {
         val index = model.indexWhere { m => !m.isComplete }
-        Section(messageKey, Started, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index))
+        Section(messageKey, Started, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
       }
     }
   }
