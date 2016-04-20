@@ -3,14 +3,18 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.tradingpremises.routes
 import forms._
-import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.responsiblepeople.{ExperienceTraining, ResponsiblePeople}
+import play.api.mvc.Result
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.RepeatingSection
 
 import scala.concurrent.Future
+import scala.util.Left
 
 trait ExperienceTrainingController extends RepeatingSection with BaseController {
 
