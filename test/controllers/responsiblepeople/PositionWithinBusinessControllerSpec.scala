@@ -124,12 +124,11 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      //TODO: Update to Does this person have previous experience in these activities?
       for (i <- 1 to 4) {
         val newRequest = request.withFormUrlEncodedBody("positions" -> s"0$i")
         val result = controller.post(RecordId)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ExperienceTrainingController.get(RecordId).url))
       }
     }
 
