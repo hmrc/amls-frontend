@@ -14,7 +14,7 @@
         <tbody>
             @model.zipWithIndex.map { case (responsiblePerson, idx)=>
                 <tr>
-                    @responsiblePerson.addPerson.map { personDetails =>
+                    @responsiblePerson.personName.map { personDetails =>
                         <th class="summary-title">
                             @personDetails.firstName
                             @personDetails.middleName

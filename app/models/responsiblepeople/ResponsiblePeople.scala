@@ -5,20 +5,25 @@ import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
+case class ResponsiblePeople(personName: Option[PersonName] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
+                             contactDetails: Option[ContactDetails] = None,
                              addressHistory: Option[ResponsiblePersonAddressHistory] = None,
                              positions: Option[Positions] = None,
                              saRegistered: Option[SaRegistered] = None,
                              vatRegistered: Option[VATRegistered] = None,
+                             experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None
                           ) {
 
-  def addPerson(ap: AddPerson): ResponsiblePeople =
-    this.copy(addPerson = Some(ap))
+  def personName(pn: PersonName): ResponsiblePeople =
+    this.copy(personName = Some(pn))
 
   def personResidenceType(pr: PersonResidenceType): ResponsiblePeople =
     this.copy(personResidenceType = Some(pr))
+
+  def contactDetails(cd: ContactDetails): ResponsiblePeople =
+    this.copy(contactDetails = Some(cd))
 
   def saRegistered(sa: SaRegistered): ResponsiblePeople =
     this.copy(saRegistered = Some(sa))
@@ -32,11 +37,18 @@ case class ResponsiblePeople(addPerson: Option[AddPerson] = None,
   def vatRegistered(v: VATRegistered): ResponsiblePeople =
     this.copy(vatRegistered = Some(v))
 
+  def experienceTraining(et: ExperienceTraining): ResponsiblePeople =
+    this.copy(experienceTraining = Some(et))
+
   def training(t: Training): ResponsiblePeople =
     this.copy(training = Some(t))
 
   def isComplete: Boolean = this match {
-    case ResponsiblePeople(Some(_), Some(_), Some(add), Some(pos), Some(_), Some(_), Some(_)) if add.isComplete && pos.isComplete => true
+    case ResponsiblePeople(
+      Some(_), Some(_), Some(_), Some(_),
+      Some(_), Some(_), Some(_), Some(_),
+      Some(_)) => true
+
     case _ => false
   }
 }
@@ -45,16 +57,16 @@ object ResponsiblePeople {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
-    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhatYouNeedController.get(1))
+    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhoMustRegisterController.get(1))
     val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
-      case model if model forall { _.isComplete} => complete
-      case model =>
-        val index = model.indexWhere {
-          case model if !model.isComplete => true
-          case _ => false
-        }
-        Section(messageKey, Started, controllers.responsiblepeople.routes.WhatYouNeedController.get(index + 1))
+      case model if model forall {
+        _.isComplete
+      } => complete
+      case model => {
+        val index = model.indexWhere { m => !m.isComplete }
+        Section(messageKey, Started, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+      }
     }
   }
 

@@ -4,7 +4,7 @@ import java.util.UUID
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{AddPerson, IsKnownByOtherNamesNo, IsKnownByOtherNamesYes, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, IsKnownByOtherNamesNo, IsKnownByOtherNamesYes, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -17,7 +17,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class PersonNameControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -26,7 +26,7 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val addPersonController = new AddPersonController {
+    val personNameController = new PersonNameController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
     }
@@ -37,25 +37,25 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
   "AddPersonController" must {
 
     "use the correct services" in new Fixture {
-      AddPersonController.dataCacheConnector must be(DataCacheConnector)
-      AddPersonController.authConnector must be(AMLSAuthConnector)
+      PersonNameController.dataCacheConnector must be(DataCacheConnector)
+      PersonNameController.authConnector must be(AMLSAuthConnector)
     }
 
     "on get display the persons page" in new Fixture {
 
-      when(addPersonController.dataCacheConnector.fetch[ResponsiblePeople](any())
+      when(personNameController.dataCacheConnector.fetch[ResponsiblePeople](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = addPersonController.get(RecordId)(request)
+      val result = personNameController.get(RecordId)(request)
       status(result) must be(OK)
     }
 
     "on get display the persons page with blank fields" in new Fixture {
 
-      when(addPersonController.dataCacheConnector.fetch[ResponsiblePeople](any())
+      when(personNameController.dataCacheConnector.fetch[ResponsiblePeople](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = addPersonController.get(RecordId)(request)
+      val result = personNameController.get(RecordId)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
@@ -66,13 +66,13 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
 
     "on get display the persons page with fields populated" in new Fixture {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
+      val addPerson = PersonName("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
       val responsiblePeople = ResponsiblePeople(Some(addPerson))
 
-      when(addPersonController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      val result = addPersonController.get(RecordId)(request)
+      val result = personNameController.get(RecordId)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
@@ -90,13 +90,13 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "isKnownByOtherNames" -> "false"
       )
 
-      when(addPersonController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+      when(personNameController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = addPersonController.post(RecordId)(requestWithParams)
+      val result = personNameController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
     }
 
@@ -107,10 +107,10 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "isKnownByOtherNames" -> "false"
       )
 
-      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+      when(personNameController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = addPersonController.post(RecordId)(firstNameMissingInRequest)
+      val result = personNameController.post(RecordId)(firstNameMissingInRequest)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
@@ -124,10 +124,10 @@ class AddPersonControllerSpec extends PlaySpec with OneServerPerSuite with Mocki
         "isKnownByOtherNames" -> "false"
       )
 
-      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+      when(personNameController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = addPersonController.post(RecordId)(lastNameMissingInRequest)
+      val result = personNameController.post(RecordId)(lastNameMissingInRequest)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))

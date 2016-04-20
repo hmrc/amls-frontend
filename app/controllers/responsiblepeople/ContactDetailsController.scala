@@ -3,14 +3,14 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms._
-import models.responsiblepeople.{AddPerson, ResponsiblePeople}
+import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import models.responsiblepeople.{ContactDetails, ResponsiblePeople}
 import utils.RepeatingSection
-import views.html.responsiblepeople.add_person
+import views.html.responsiblepeople.contact_details
 
 import scala.concurrent.Future
 
-trait AddPersonController extends RepeatingSection with BaseController {
+trait ContactDetailsController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
@@ -22,9 +22,9 @@ trait AddPersonController extends RepeatingSection with BaseController {
             response =>
               val form = (for {
                 responsiblePeople <- response
-                person <- responsiblePeople.addPerson
-              } yield Form2[AddPerson](person)).getOrElse(EmptyForm)
-              Ok(add_person(form, edit, index))
+                contactDetails <- responsiblePeople.contactDetails
+              } yield Form2[ContactDetails](contactDetails)).getOrElse(EmptyForm)
+              Ok(contact_details(form, edit, index))
           }
       }
     }
@@ -33,17 +33,18 @@ trait AddPersonController extends RepeatingSection with BaseController {
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request => {
-          Form2[AddPerson](request.body) match {
+          Form2[ContactDetails](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.responsiblepeople.add_person(f, edit, index)))
+              Future.successful(BadRequest(views.html.responsiblepeople.contact_details(f, edit, index)))
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.addPerson(data))
-                  case _ => Some(ResponsiblePeople(Some(data)))
+                  case Some(rp) => Some(rp.contactDetails(data))
+                  case _ => Some(ResponsiblePeople(contactDetails = Some(data)))
                 }
-              } yield {
-                Redirect(routes.PersonResidentTypeController.get(index, edit))
+              } yield edit match {
+                case false => Redirect(routes.CurrentAddressController.get(index, edit))
+                case true => Redirect(routes.SummaryController.get())
               }
           }
         }
@@ -52,7 +53,7 @@ trait AddPersonController extends RepeatingSection with BaseController {
 
 }
 
-object AddPersonController extends AddPersonController {
+object ContactDetailsController extends ContactDetailsController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector

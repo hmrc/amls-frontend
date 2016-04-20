@@ -127,7 +127,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId)(requestWithParams)
@@ -147,7 +147,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId)(requestWithParams)
@@ -158,7 +158,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
 
       val line1MissingRequest = request.withFormUrlEncodedBody()
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId)(line1MissingRequest)
@@ -178,7 +178,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
         "timeAtAddress" -> ""
       )
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId)(requestWithMissingParams)
@@ -201,7 +201,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
         "timeAtAddress" -> ""
       )
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId)(requestWithMissingParams)
@@ -228,7 +228,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId, true)(requestWithParams)
@@ -249,7 +249,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId)(requestWithParams)
@@ -270,7 +270,7 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneServerPerSuite wi
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(additionalAddressController.dataCacheConnector.save[AddPerson](any(), any())
+      when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = additionalAddressController.post(RecordId)(requestWithParams)

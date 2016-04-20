@@ -1,0 +1,48 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+@import models.businessmatching._
+
+
+@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
+
+@target = @{
+    s"""${f("information").id}-fieldset"""
+}
+
+@main(
+    title = Messages("responsiblepeople.experiencetraining.title")
+) {
+
+    @heading("responsiblepeople.experiencetraining.heading", "summary.responsiblepeople")
+
+
+    @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit)) {
+
+        <div class="form-group">
+                <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
+        </div>
+
+        <div class="form-group">
+            <div class="panel-indent panel-border-wide">
+                @bamodel.businessActivities.map { ba =>
+                        <p>
+                            @Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))
+                        </p>
+                }
+            </div>
+        </div>
+
+        <div class="form-field">
+            @inlineRadioGroup(f("experienceTraining")) {
+                @radio(f("experienceTraining"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("experienceTraining"), "lbl.no", "false")
+                @fieldset("TODO", jsHidden = true, id = target) {
+                    @textarea(f("experienceInformation"), "responsiblepeople.experiencetraining.information", bold = false)
+                }
+            }
+        </div>
+
+        @submit()
+  }
+}

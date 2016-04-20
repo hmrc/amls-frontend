@@ -50,7 +50,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneServerPerSuite wit
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("responsiblepeople.have.registered.person.text", 2))
+        contentAsString(result) must include(Messages("responsiblepeople.have.registered.people.text", 2))
       }
     }
 
@@ -68,7 +68,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneServerPerSuite wit
 
         val result = controller.post(1)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AddPersonController.get(2).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNameController.get(2).url))
       }
 
       "successfully redirect to the page on selection of 'no'" in new Fixture {

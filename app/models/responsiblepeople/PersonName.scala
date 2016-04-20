@@ -6,13 +6,13 @@ import play.api.data.mapping.{From, Rule, To, Write}
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 
-case class AddPerson(firstName: String,
-                     middleName: Option[String],
-                     lastName: String,
-                     isKnownByOtherNames: IsKnownByOtherNames
+case class PersonName(firstName: String,
+                      middleName: Option[String],
+                      lastName: String,
+                      isKnownByOtherNames: IsKnownByOtherNames
                     )
 
-object AddPerson {
+object PersonName {
 
   import play.api.libs.json._
 
@@ -26,7 +26,7 @@ object AddPerson {
   val lastNameType = notEmpty.withMessage("error.required.lastname") compose
     maxLength(maxNameTypeLength).withMessage("error.invalid.length.lastname")
 
-  implicit val formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
 
     import play.api.data.mapping.forms.Rules._
     (
@@ -34,10 +34,10 @@ object AddPerson {
         (__ \ "middleName").read(optionR(middleNameType)) and
         (__ \ "lastName").read(lastNameType) and
         (__).read[IsKnownByOtherNames]
-      ) (AddPerson.apply _)
+      ) (PersonName.apply _)
   }
 
-  implicit val formWrites: Write[AddPerson, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+  implicit val formWrites: Write[PersonName, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
@@ -45,10 +45,10 @@ object AddPerson {
         (__ \ "middleName").write[Option[String]] and
         (__ \ "lastName").write[String] and
         (__).write[IsKnownByOtherNames]
-      ) (unlift(AddPerson.unapply))
+      ) (unlift(PersonName.unapply))
   }
 
-  implicit val jsonReads: Reads[AddPerson] = {
+  implicit val jsonReads: Reads[PersonName] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
@@ -57,11 +57,11 @@ object AddPerson {
         (__ \ "middleName").read[Option[String]] and
         (__ \ "lastName").read[String] and
         (__).read[IsKnownByOtherNames]
-      ) (AddPerson.apply _)
+      ) (PersonName.apply _)
 
   }
 
-  implicit val jsonWrites: Writes[AddPerson] = {
+  implicit val jsonWrites: Writes[PersonName] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Writes._
     import play.api.libs.json._
@@ -70,7 +70,7 @@ object AddPerson {
         (__ \ "middleName").write[Option[String]] and
         (__ \ "lastName").write[String] and
         (__).write[IsKnownByOtherNames]
-      ) (unlift(AddPerson.unapply))
+      ) (unlift(PersonName.unapply))
   }
 
 }
