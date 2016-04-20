@@ -142,11 +142,11 @@ GET         /declaration/declaration                        controllers.declarat
 
 GET         /confirmation                                   controllers.ConfirmationController.get()
 
-GET         /responsible-people/index/:index                controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
 GET         /responsible-people/who-must-register/:index    controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
+GET         /responsible-people/what-you-need/:index        controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
 
-GET         /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/your-name/:index            controllers.responsiblepeople.AddPersonController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/your-name/:index            controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/your-name/:index            controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false)
@@ -174,8 +174,14 @@ POST        /responsible-people/additional-extra-address/:index   controllers.re
 GET         /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/experience-training/:index        controllers.responsiblepeople.ExperienceTrainingController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/experience-training/:index        controllers.responsiblepeople.ExperienceTrainingController.post(index:Int, edit: Boolean ?= false)
+
 GET         /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/contacting-you/:index          controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/contacting-you/:index          controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.get(index:Int)
 POST        /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.post(index:Int)

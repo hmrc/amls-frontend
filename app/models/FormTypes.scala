@@ -49,11 +49,11 @@ object FormTypes {
 
   val postcodeType = notEmpty.withMessage("error.required.postcode")  compose maxLength(maxPostCodeTypeLength).withMessage("error.invalid.postcode")
 
-  val phoneNumberType = notEmpty compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r)
+  val phoneNumberType = notEmpty.withMessage("error.required.rp.phone") compose maxLength(maxPhoneNumberLength) compose pattern("[0-9]+".r).withMessage("error.invalid.rp.phone")
 
   val emailRegex = "^.+@.+$".r
 
-  val emailType = notEmpty compose maxLength(maxEMailLength) compose pattern(emailRegex)
+  val emailType = notEmpty.withMessage("error.required.rp.email") compose maxLength(maxEMailLength) compose pattern(emailRegex).withMessage("error.invalid.rp.email")
 
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val dayType = notEmpty.withMessage("error.required.tp.date") compose pattern(dayRegex).withMessage("error.invalid.tp.date")
