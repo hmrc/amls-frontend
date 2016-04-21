@@ -15,6 +15,7 @@ object AddPerson {
 
   val key = "add-person"
 
+  //TODO: Update these read types to use correct name types.
   implicit val formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
     import models.FormTypes._
     import play.api.data.mapping.forms.Rules._
