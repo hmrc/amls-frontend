@@ -149,4 +149,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
     }
   }
 
+  "fullName" must {
+
+    "return a correctly formatted name" in {
+      PersonName("John", Some("Paul"), "Smith", IsKnownByOtherNamesNo).fullName must be ("John Paul Smith")
+      PersonName("John", None, "Smith", IsKnownByOtherNamesNo).fullName must be ("John Smith")
+    }
+
+  }
+
 }

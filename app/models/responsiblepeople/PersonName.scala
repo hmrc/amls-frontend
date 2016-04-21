@@ -12,7 +12,7 @@ case class PersonName(firstName: String,
                       isKnownByOtherNames: IsKnownByOtherNames
                     ) {
 
-  val fullName = s"$firstName${middleName.fold(" ")(n => s" $n ")}$lastName"
+  val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
 
 }
 
