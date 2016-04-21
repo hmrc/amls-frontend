@@ -6,9 +6,7 @@
 @main(
     title = Messages("summary.checkyouranswers.title")
 ) {
-
     @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
-
 
     <table>
         <tbody>
@@ -22,11 +20,11 @@
                         </th>
                     }.getOrElse{
                         <td>
-                        @Messages("missing.personName")
-                            </td>
+                            @Messages("missing.personName")
+                        </td>
                     }
                     <td>
-                        <a href="@controllers.responsiblepeople.routes.WhatYouNeedController.get(idx + 1)">@Messages("button.edit")
+                        <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit")
                     </td>
                 </tr>
             }

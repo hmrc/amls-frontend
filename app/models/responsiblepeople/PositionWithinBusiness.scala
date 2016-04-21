@@ -9,7 +9,6 @@ import utils.TraversableValidators._
 case class Positions(positions: Set[PositionWithinBusiness]) {
 
   def isComplete = positions.nonEmpty
-
 }
 
 sealed trait PositionWithinBusiness

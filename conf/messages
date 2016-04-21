@@ -161,6 +161,7 @@ button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 
 missing.personName = Name Unknown
+missing.dataItem = Unknown
 
 lbl.other = Other
 lbl.yes = Yes
