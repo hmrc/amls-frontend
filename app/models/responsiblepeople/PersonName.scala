@@ -10,7 +10,11 @@ case class PersonName(firstName: String,
                       middleName: Option[String],
                       lastName: String,
                       isKnownByOtherNames: IsKnownByOtherNames
-                    )
+                    ) {
+
+  val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+
+}
 
 object PersonName {
 
