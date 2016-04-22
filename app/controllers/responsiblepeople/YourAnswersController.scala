@@ -5,19 +5,18 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
 import utils.RepeatingSection
-import views.html.responsiblepeople.check_your_answers
-
+import views.html.responsiblepeople.your_answers
 
 trait YourAnswersController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(addOther: Boolean = false) =
+  def get() =
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-            case Some(data) => Ok(check_your_answers(data, addOther))
+            case Some(data) => Ok(your_answers(data))
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
 

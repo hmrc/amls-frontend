@@ -14,7 +14,7 @@
                 case None => Messages("missing.dataItem")
             }}
         </td>
-        <td><a href="@editRoute">@Messages("button.edit")</td>
+        <td><a href="@editRoute">@Messages("button.edit")</a></td>
     </tr>
 }
 
@@ -41,17 +41,13 @@
             <tbody>
                     <tr>
                         <th colspan="2">
-                        @person.personName.map { name =>
-                            @name.firstName
-                            @name.middleName
-                            @name.lastName
-                        }.getOrElse{
-                            @Messages("missing.personName")
-                        }
+                            @person.personName.map { name =>
+                                @name.fullName
+                            }.getOrElse{
+                                @Messages("missing.personName")
+                            }
                         </th>
-                        <td>
-                            Edit
-                        </td>
+                        <td><a href="@PersonNameController.get(idx, true)">@Messages("button.edit")</a></td>
                     </tr>
 
 
@@ -170,5 +166,11 @@
 
             </tbody>
         </table>
+
     }
+
+    <div class="form-field">
+        <a class="button" href="@controllers.responsiblepeople.routes.YourAnswersController.get()">@Messages("button.confirmandcontinue")</a>
+    </div>
+
 }

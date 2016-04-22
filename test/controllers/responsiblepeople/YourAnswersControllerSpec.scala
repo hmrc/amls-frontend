@@ -39,21 +39,10 @@ class YourAnswersControllerSpec extends PlaySpec with OneServerPerSuite with Moc
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        contentAsString(result) must include (Messages("responsiblepeople.check_your_answers.heading"))
-      }
-
-      "show the correct header when add is set to true" in new Fixture {
-        val model = ResponsiblePeople(None, None)
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
-        val result = controller.get(true)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include (Messages("responsiblepeople.your_answers.heading"))
       }
 
-      "show the 'Add a responsible person' link when add is set to true" in new Fixture {
+      "show the 'Add a responsible person' link" in new Fixture {
 
         val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", IsKnownByOtherNamesNo)))
         val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", IsKnownByOtherNamesNo)))
@@ -61,7 +50,7 @@ class YourAnswersControllerSpec extends PlaySpec with OneServerPerSuite with Moc
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(mark, john))))
 
-        val result = controller.get(true)(request)
+        val result = controller.get()(request)
         status(result) must be(OK)
 
         contentAsString(result) must include (Messages("responsiblepeople.check_your_answers.add"))
