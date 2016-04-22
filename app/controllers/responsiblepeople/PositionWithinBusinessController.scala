@@ -27,7 +27,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               Ok(position_within_business(form, edit, index))
           }
       }
-  }
+    }
 
   def post(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
@@ -46,7 +46,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               } yield (personalTax(data), edit) match {
                 case (true, false) => Redirect(routes.VATRegisteredController.get(index))
                 case (false, false) => Redirect(routes.SummaryController.get()) //TODO: Experience page.
-                case (_, true)  => Redirect(routes.SummaryController.get())
+                case (_, true) => Redirect(routes.SummaryController.get())
               }
           }
       }

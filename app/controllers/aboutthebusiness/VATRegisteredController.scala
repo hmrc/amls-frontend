@@ -7,6 +7,7 @@ import controllers.BaseController
 import models.aboutthebusiness._
 import models.businessmatching.BusinessType.{Partnership, SoleProprietor}
 import models.businessmatching.{BusinessType, BusinessMatching}
+import utils.ControllerHelper
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
@@ -35,28 +36,18 @@ trait VATRegisteredController extends BaseController {
             optionalCache =>
               (for {
                 cache <- optionalCache
-                businessType <- getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                 aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
               } yield {
                 dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
                   aboutTheBusiness.vatRegistered(data))
-                  (businessType, edit) match {
-                    case (Partnership, false) => Redirect(routes.RegisteredOfficeController.get())
-                    case (_, false) => Redirect(routes.CorporationTaxRegisteredController.get())
-                    case (_, true) => Redirect(routes.SummaryController.get())
-                  }
+                (businessType, edit) match {
+                  case (Partnership, false) => Redirect(routes.RegisteredOfficeController.get())
+                  case (_, false) => Redirect(routes.CorporationTaxRegisteredController.get())
+                  case (_, true) => Redirect(routes.SummaryController.get())
+                }
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
-      }
-    }
-  }
-
-  //TODO: Move to common utility
-  private def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
-    matching flatMap { bm =>
-      bm.reviewDetails match {
-        case Some(review) => review.businessType
-        case _ => None
       }
     }
   }
