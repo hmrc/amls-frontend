@@ -19,7 +19,6 @@ trait YourAnswersController extends RepeatingSection with BaseController {
             case Some(data) => Ok(your_answers(data))
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
-
       }
     }
 }
