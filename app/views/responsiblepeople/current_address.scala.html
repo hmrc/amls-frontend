@@ -10,7 +10,7 @@
 
     @heading("responsiblepeople.wherepersonlives.title", "summary.responsiblepeople")
 
-    @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index)) {
+    @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index,edit)) {
 
         @inlineRadioGroup(f("isUK")) {
             @legend("TODO", jsHidden = true)
