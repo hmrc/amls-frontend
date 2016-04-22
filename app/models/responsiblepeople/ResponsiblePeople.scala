@@ -46,9 +46,12 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def isComplete: Boolean = this match {
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
+      Some(pos), None, None, Some(_),
+      Some(_)) if !pos.personalTax => true
+    case ResponsiblePeople(
+      Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
       Some(_)) => true
-
     case _ => false
   }
 }
@@ -58,14 +61,14 @@ object ResponsiblePeople {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhoMustRegisterController.get(1))
-    val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
+    val complete = Section(messageKey, Completed, controllers.responsiblepeople.routes.YourAnswersController.get(true))
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
       case model if model forall {
         _.isComplete
       } => complete
       case model => {
         val index = model.indexWhere { m => !m.isComplete }
-        Section(messageKey, Started, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index))
+        Section(messageKey, Started, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
       }
     }
   }

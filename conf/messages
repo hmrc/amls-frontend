@@ -125,8 +125,10 @@ error.required.rp.register.another.person = Select yes or no to the question: Do
 
 error.required.rp.phone = Enter a phone number.
 error.invalid.rp.phone = Enter only numbers. Do not enter letters, punctuation or other characters.
+error.max.length.rp.phone = You can''t enter more than 30 digits for the person''s phone number.
 error.required.rp.email = Enter an email address.
 error.invalid.rp.email = Enter a valid email address. It must be in the format myname@example.com.
+error.max.length.rp.email = You can''t enter more than 100 characters for the person''s email address.
 
 # Custom error messages
 error.required.firstname = Enter a first name.
@@ -159,6 +161,7 @@ button.edit = Edit
 button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
+button.delete = Delete
 
 missing.personName = Name Unknown
 missing.dataItem = Unknown
@@ -616,7 +619,7 @@ declaration.declaration.guidance = guidance
 
 responsiblepeople.whatyouneed.title = Responsible People - What you need
 responsiblepeople.whatyouneed.heading = What you need
-responsiblepeople.whatyouneed.requiredinfo = For each reponsible person, you need their:
+responsiblepeople.whatyouneed.requiredinfo = For each responsible person, you need their:
 responsiblepeople.whatyouneed.line_1 = current name, and any alternative or former names
 responsiblepeople.whatyouneed.line_2 = date of birth
 responsiblepeople.whatyouneed.line_3 = nationality and country of birth
@@ -730,11 +733,11 @@ responsiblepeople.country.of.birth.lbl = Country of birth
 responsiblepeople.or.lbl = or
 
 responsiblepeople.whomustregister.title = Who must register as a responsible person
-responsiblepeople.whomustregister.line_1 = anyone who directs the business - this includes sole proprietors, partners, directors and shadow directors
-responsiblepeople.whomustregister.line_2 = anyone who owns or controls at least 25% the business
-responsiblepeople.whomustregister.line_3 = the 'nominated officer' - the person who acts as the money laundering reporting officer
+responsiblepeople.whomustregister.line_1 = everyone who directs the business – this includes sole proprietors, partners, directors and shadow directors
+responsiblepeople.whomustregister.line_2 = anyone who owns or controls more than 25% of the business
+responsiblepeople.whomustregister.line_3 = the ''nominated officer'' - the person who acts as the money laundering reporting officer
 responsiblepeople.whomustregister.sidebar.title = Automatic saving
-responsiblepeople.whomustregister.sidebar.information = Your progress is saved automatically. If you sign out you''ll have 28 days to complete your registration.
+responsiblepeople.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
 
 responsiblepeople.registeredforvat.title = Is this person registered for VAT in the UK?
 responsiblepeople.registeredforvat.heading = Is this person registered for VAT in the UK?
@@ -754,3 +757,8 @@ responsiblepeople.person.registered.heading = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
+
+responsiblepeople.check_your_answers.title = Check your answers
+responsiblepeople.check_your_answers.heading = Check your answers
+responsiblepeople.your_answers.heading = Your answers
+responsiblepeople.check_your_answers.add = Add a responsible person

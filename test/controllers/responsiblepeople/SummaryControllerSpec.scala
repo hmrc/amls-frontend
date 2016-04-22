@@ -18,7 +18,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new DetailedAnswersController$ {
+    val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -27,8 +27,8 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
   "Get" must {
 
     "use correct services" in new Fixture {
-      DetailedAnswersController$.authConnector must be(AMLSAuthConnector)
-      DetailedAnswersController$.dataCache must be(DataCacheConnector)
+      SummaryController.authConnector must be(AMLSAuthConnector)
+      SummaryController.dataCache must be(DataCacheConnector)
     }
 
     "load the summary page when section data is available" in new Fixture {

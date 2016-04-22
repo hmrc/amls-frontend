@@ -9,54 +9,39 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   import FormTypes._
 
-  "indivNameType" must {
-
-    "successfully validate" in {
-
-      indivNameType.validate("foobar") must
-        be(Success("foobar"))
-    }
-
-    "fail to validate an empty string" in {
-
-      indivNameType.validate("") must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
-        )))
-    }
-
-    "fail to validate a string longer than 35" in {
-
-      indivNameType.validate("a" * 36) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxNameTypeLength))
-        )))
-    }
+  "successfully validate the first name" in {
+    firstNameType.validate("John") must be(Success("John"))
   }
 
-  "descriptionType" must {
+  "fail validation if the first name is not provided" in {
+    firstNameType.validate("") must be(Failure(Seq(Path -> Seq(ValidationError("error.required.firstname")))))
+  }
 
-    "successfully validate" in {
+  "fail validation if the first name is more than 35 characters" in {
+    firstNameType.validate("JohnJohnJohnJohnJohnJohnJohnJohnJohnJohn") must
+      be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.firstname")))))
+  }
 
-      descriptionType.validate("foobar") must
-        be(Success("foobar"))
-    }
+  "successfully validate the middle name" in {
+    middleNameType.validate("John") must be(Success("John"))
+  }
 
-    "fail to validate an empty string" in {
+  "fail validation if the middle name is more than 35 characters" in {
+    middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
+      be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
+  }
 
-      descriptionType.validate("") must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required"))
-        )))
-    }
+  "successfully validate the last name" in {
+    lastNameType.validate("Doe") must be(Success("Doe"))
+  }
 
-    "fail to validate a string longer than 255" in {
+  "fail validation if the last name is not provided" in {
+    lastNameType.validate("") must be(Failure(Seq(Path -> Seq(ValidationError("error.required.lastname")))))
+  }
 
-      descriptionType.validate("a" * 256) must
-        be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", FormTypes.maxDescriptionTypeLength))
-        )))
-    }
+  "fail validation if the last name is more than 35 characters" in {
+    lastNameType.validate("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe") must
+      be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.lastname")))))
   }
 
   "validPostCodeType" must {
@@ -130,7 +115,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       phoneNumberType.validate("1" * 31) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 30))
+          Path -> Seq(ValidationError("error.max.length.rp.phone"))
         )))
     }
   }
@@ -161,7 +146,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       emailType.validate("1" * 101) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.maxLength", 100))
+          Path -> Seq(ValidationError("error.max.length.rp.email"))
         )))
     }
 

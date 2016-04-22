@@ -3,6 +3,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.responsiblepeople.{PersonName, ContactDetails, ResponsiblePeople}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -123,6 +124,34 @@ class ContactDetailsControllerSpec extends PlaySpec with OneServerPerSuite with 
       status(result) must be(BAD_REQUEST)
 
       contentAsString(result) must include(Messages("error.invalid.rp.email"))
+    }
+
+    "on post with greater than max length phone data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "phoneNumber" -> "1234567890123456789012345678901",
+        "emailAddress" -> "test@test.com"
+      )
+
+      val result = controller.post(1)(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#phoneNumber]").text() must include(Messages("error.max.length.rp.phone"))
+    }
+
+    "on post with greater than max length email data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "phoneNumber" -> "07702745869",
+        "emailAddress" -> ("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz@" +
+                           "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz.com")
+      )
+
+      val result = controller.post(1)(newRequest)
+      status(result) must be(BAD_REQUEST)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#emailAddress]").text() must include(Messages("error.max.length.rp.email"))
     }
 
     "on post with valid data in edit mode" in new Fixture {
