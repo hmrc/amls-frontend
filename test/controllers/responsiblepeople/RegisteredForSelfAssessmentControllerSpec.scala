@@ -72,7 +72,7 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneServerP
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
-      //redirectLocation(result) must be(Some(routes.HowManyEmployeesController.get().url))
+      redirectLocation(result) must be(Some(routes.ExperienceTrainingController.get(RecordId).url))
     }
 
 

@@ -4,8 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import models.businessmatching.{BusinessType, BusinessMatching}
 import models.responsiblepeople._
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.position_within_business
 
 import scala.concurrent.Future
@@ -18,16 +19,21 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-          getData[ResponsiblePeople](index) map {
-            response =>
-              val form: Form2[Positions] = (for {
-                responsiblePeople <- response
-                positions <- responsiblePeople.positions
-              } yield Form2[Positions](positions)).getOrElse(EmptyForm)
-              Ok(position_within_business(form, edit, index))
+          dataCacheConnector.fetchAll map {
+            optionalCache =>
+              (for {
+                cache <- optionalCache
+                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+              } yield {
+                (for {
+                  responsiblePeople <- getData[ResponsiblePeople](cache, index)
+                  positions <- responsiblePeople.positions
+                } yield Ok(position_within_business(Form2[Positions](positions), edit, index, businessType)))
+                  .getOrElse (Ok(position_within_business(EmptyForm, edit, index, businessType)))
+              }) getOrElse Ok(position_within_business(EmptyForm, edit, index, BusinessType.SoleProprietor))
           }
       }
-    }
+  }
 
   def post(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
@@ -36,23 +42,26 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
         implicit authContext => implicit request =>
           Form2[Positions](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(position_within_business(f, edit, index)))
+              for {
+                businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+              } yield  {
+                BadRequest(position_within_business(f, edit, index, ControllerHelper.getBusinessType(businessMatching).get))
+              }
             case ValidForm(_, data) =>
               for {
                 _ <- updateData[ResponsiblePeople](index) {
                   case Some(res) => Some(res.positions(data))
                   case _ => Some(ResponsiblePeople(positions = Some(data)))
                 }
-              } yield (personalTax(data), edit) match {
+              } yield (data.personalTax, edit) match {
                 case (true, false) => Redirect(routes.VATRegisteredController.get(index))
-                case (false, false) => Redirect(routes.SummaryController.get()) //TODO: Experience page.
-                case (_, true) => Redirect(routes.SummaryController.get())
+                case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
+                case (_, true)  => Redirect(routes.SummaryController.get())
               }
           }
       }
     }
 
-  private def personalTax(x: Positions) = x.positions.exists(a => a == SoleProprietor || a == Partner)
 }
 
 object PositionWithinBusinessController extends PositionWithinBusinessController {

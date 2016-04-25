@@ -1,7 +1,8 @@
 @import include._
 @import forms2._
+@import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(f: forms.Form2[_], edit: Boolean, index: Int)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType)(implicit lang: Lang, request: Request[_])
 
 @main(title = Messages("responsiblepeople.position_within_business.title")) {
 
@@ -15,12 +16,22 @@
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit)) {
         @radioGroup(f("positions")) {
             @legend("lbl.select.all")
-            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.01", "01")
-            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.02", "02")
-            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.03", "03")
-            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.04", "04")
-            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.05", "05")
-            @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.06", "06")
+            @businessType match {
+                case BusinessType.SoleProprietor => {
+                    @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.06", "06")
+                    @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.04", "04")
+                }
+                case BusinessType.Partnership => {
+                    @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.05", "05")
+                    @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.04", "04")
+                }
+                case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
+                    @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.01", "01")
+                    @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.02", "02")
+                    @checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.04", "04")
+                    <!--@checkbox(f("positions[]"), "responsiblepeople.position_within_business.lbl.03", "03")-->
+                }
+            }
         }
 
         @submit(edit)

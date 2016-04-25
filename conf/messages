@@ -161,6 +161,7 @@ button.edit = Edit
 button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
+button.delete = Delete
 
 missing.personName = Name Unknown
 
@@ -617,7 +618,7 @@ declaration.declaration.guidance = guidance
 
 responsiblepeople.whatyouneed.title = Responsible People - What you need
 responsiblepeople.whatyouneed.heading = What you need
-responsiblepeople.whatyouneed.requiredinfo = For each reponsible person, you need their:
+responsiblepeople.whatyouneed.requiredinfo = For each responsible person, you need their:
 responsiblepeople.whatyouneed.line_1 = current name, and any alternative or former names
 responsiblepeople.whatyouneed.line_2 = date of birth
 responsiblepeople.whatyouneed.line_3 = nationality and country of birth
@@ -755,3 +756,8 @@ responsiblepeople.person.registered.heading = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
+
+responsiblepeople.check_your_answers.title = Check your answers
+responsiblepeople.check_your_answers.heading = Check your answers
+responsiblepeople.your_answers.heading = Your answers
+responsiblepeople.check_your_answers.add = Add a responsible person

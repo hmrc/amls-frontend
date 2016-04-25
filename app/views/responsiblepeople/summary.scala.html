@@ -16,9 +16,7 @@
                 <tr>
                     @responsiblePerson.personName.map { personDetails =>
                         <th class="summary-title">
-                            @personDetails.firstName
-                            @personDetails.middleName
-                            @personDetails.lastName
+                            @personDetails.fullName
                         </th>
                     }.getOrElse{
                         <td>

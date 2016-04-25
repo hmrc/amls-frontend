@@ -5,26 +5,21 @@ import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, To, Write}
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
+import models.FormTypes._
 
 case class PersonName(firstName: String,
                       middleName: Option[String],
                       lastName: String,
                       isKnownByOtherNames: IsKnownByOtherNames
-                    )
+                    ) {
+
+  val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+
+}
 
 object PersonName {
 
   import play.api.libs.json._
-
-  val maxNameTypeLength = 35
-
-  val firstNameType = notEmpty.withMessage("error.required.firstname") compose
-    maxLength(maxNameTypeLength).withMessage("error.invalid.length.firstname")
-
-  val middleNameType = maxLength(maxNameTypeLength).withMessage("error.invalid.length.middlename")
-
-  val lastNameType = notEmpty.withMessage("error.required.lastname") compose
-    maxLength(maxNameTypeLength).withMessage("error.invalid.length.lastname")
 
   implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
 

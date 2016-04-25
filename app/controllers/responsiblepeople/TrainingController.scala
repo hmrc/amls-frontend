@@ -42,7 +42,7 @@ trait TrainingController extends RepeatingSection with BaseController {
                   case _ => Some(ResponsiblePeople(training = Some(data)))
                 }
               } yield {
-                Redirect(routes.SummaryController.get())
+                Redirect(routes.PersonRegisteredController.get(index))
               }
           }
         }
