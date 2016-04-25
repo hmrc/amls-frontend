@@ -45,7 +45,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               for {
                 businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
               } yield  {
-                BadRequest(position_within_business(f, edit, index, ControllerHelper.getBusinessType(businessMatching).get))
+                BadRequest(position_within_business(f, edit, index, ControllerHelper.getBusinessType(businessMatching).getOrElse(BusinessType.SoleProprietor)))
               }
             case ValidForm(_, data) =>
               for {
