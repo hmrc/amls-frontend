@@ -214,7 +214,7 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
     }
 
     "must go to the correct location when edit mode is off" in new Fixture {
