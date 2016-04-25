@@ -72,7 +72,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
                     }
                   } yield edit match {
                     case false => Redirect(routes.TrainingController.get(index, edit))
-                    case true => Redirect(routes.SummaryController.get())
+                    case true => Redirect(routes.DetailedAnswersController.get(index))
                   }
               }
           }

@@ -46,7 +46,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               } yield (data.personalTax, edit) match {
                 case (true, false) => Redirect(routes.VATRegisteredController.get(index))
                 case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
-                case (_, true)  => Redirect(routes.SummaryController.get())
+                case (_, true)  => Redirect(routes.DetailedAnswersController.get(index))
               }
           }
       }

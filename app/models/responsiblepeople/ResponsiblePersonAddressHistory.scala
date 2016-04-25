@@ -15,6 +15,7 @@ case class ResponsiblePersonAddressHistory(currentAddress: Option[ResponsiblePer
   def additionalExtraAddress(add: ResponsiblePersonAddress): ResponsiblePersonAddressHistory =
     this.copy(additionalExtraAddress = Some(add))
 
+  def removeAdditionalExtraAddress = this.copy(additionalExtraAddress = None)
 
   def isComplete: Boolean = currentAddress.isDefined
 

@@ -48,7 +48,8 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
               } yield (data.timeAtAddress, edit) match {
                 case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
                 case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
-                case (_, true) => Redirect(routes.SummaryController.get())
+                case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
+                case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
               }
           }
         }
@@ -59,8 +60,9 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
     updateData[ResponsiblePeople](index) {
       case Some(res) => {
         Some(res.addressHistory(
-          res.addressHistory match {
-            case Some(a) => a.additionalAddress(data)
+          (res.addressHistory, data.timeAtAddress) match {
+            case (Some(a), ThreeYearsPlus) => a.additionalAddress(data).removeAdditionalExtraAddress
+            case (Some(a), _) => a.additionalAddress(data)
             case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
           })
         )
