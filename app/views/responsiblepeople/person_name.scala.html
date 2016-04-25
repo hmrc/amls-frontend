@@ -4,10 +4,6 @@
 
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
-@target = @{
-    s"""${f("otherfirstnames").id}-fieldset"""
-}
-
 @main(
     title = Messages("responsiblepeople.personName.title")
 ) {
@@ -31,14 +27,34 @@
             labelText = Messages("responsiblepeople.personName.lastname")
         )
 
-        @inlineRadioGroup(f("isKnownByOtherNames")) {
-            @legend("responsiblepeople.personName.isknownbyothernames", false, true)
-            @radio(f("isKnownByOtherNames"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("isKnownByOtherNames"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @input(f("otherfirstnames"), "responsiblepeople.personName.otherfirstnames", bold = false)
-                @input(f("othermiddlenames"), "responsiblepeople.personName.othermiddlenames", bold = false)
-                @input(f("otherlastnames"), "responsiblepeople.personName.otherlastnames", bold = false)
+        @inlineRadioGroup(f("hasPreviousName")) {
+
+            @legend("responsiblepeople.personName.isknownbyothernames")
+
+            @radio(f("hasPreviousName"), "lbl.yes", "true", target = "#previous-fieldset")
+            @radio(f("hasPreviousName"), "lbl.no", "false")
+
+            @fieldset("", jsHidden = true, id = "previous-fieldset") {
+
+                @errorGroup(f("previous")) {
+                    @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
+                    @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
+                    @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
+                }
+
+                @date(f, "previous.date", "responsiblepeople.personName.previous.date.lbl")
+            }
+        }
+
+        @inlineRadioGroup(f("hasOtherNames")) {
+
+            @legend("responsiblepeople.personName.hasOtherNames")
+
+            @radio(f("hasOtherNames"), "lbl.yes", "true", target = "#otherNames-fieldset")
+            @radio(f("hasOtherNames"), "lbl.no", "false")
+
+            @fieldset("", jsHidden = true, id = "otherNames-fieldset") {
+                @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
             }
         }
 

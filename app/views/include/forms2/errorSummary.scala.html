@@ -10,7 +10,7 @@
         <ul>
             @form.errors.map { case (path, errors) =>
                 <li>
-                    <a href="#@path.key">@errors.toMessage</a>
+                    <a href="#@form(path).id">@errors.toMessage</a>
                 </li>
             }
         </ul>

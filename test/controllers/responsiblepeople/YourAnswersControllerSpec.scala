@@ -55,8 +55,8 @@ class YourAnswersControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
       "show the 'Add a responsible person' link when add is set to true" in new Fixture {
 
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", IsKnownByOtherNamesNo)))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", IsKnownByOtherNamesNo)))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(mark, john))))
@@ -74,8 +74,8 @@ class YourAnswersControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
       "correctly display responsible people's full names" in new Fixture {
 
-        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", IsKnownByOtherNamesNo)))
-        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", IsKnownByOtherNamesNo)))
+        val john = ResponsiblePeople(Some(PersonName("John", Some("Alan"), "Smith", None, None)))
+        val mark = ResponsiblePeople(Some(PersonName("Mark", None, "Smith", None, None)))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(mark, john))))
