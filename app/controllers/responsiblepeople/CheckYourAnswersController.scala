@@ -6,7 +6,7 @@ import controllers.BaseController
 import models.responsiblepeople.ResponsiblePeople
 import views.html.responsiblepeople._
 
-trait SummaryController extends BaseController {
+trait CheckYourAnswersController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
@@ -16,7 +16,7 @@ trait SummaryController extends BaseController {
         implicit authContext => implicit request =>
           dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
             case Some(data) => {
-              Ok(summary(data))
+              Ok(check_your_answers(data))
             }
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
@@ -24,7 +24,7 @@ trait SummaryController extends BaseController {
     }
 }
 
-object SummaryController extends SummaryController {
+object CheckYourAnswersController extends CheckYourAnswersController {
   // $COVERAGE-OFF$
   override val dataCache = DataCacheConnector
   override val authConnector = AMLSAuthConnector
