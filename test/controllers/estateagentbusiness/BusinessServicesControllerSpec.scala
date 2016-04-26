@@ -89,8 +89,6 @@ class BusinessServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("Invalid value")
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#services[0].services]").html() must include("Invalid value")
     }
 
     "fail submission when no check boxes were selected" in new Fixture {

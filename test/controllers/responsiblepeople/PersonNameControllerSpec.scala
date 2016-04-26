@@ -66,7 +66,7 @@ class PersonNameControllerSpec extends PlaySpec with OneServerPerSuite with Mock
 
     "on get display the persons page with fields populated" in new Fixture {
 
-      val addPerson = PersonName("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
+      val addPerson = PersonName("John", Some("Envy"), "Doe", None, None)
       val responsiblePeople = ResponsiblePeople(Some(addPerson))
 
       when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -87,7 +87,8 @@ class PersonNameControllerSpec extends PlaySpec with OneServerPerSuite with Mock
       val requestWithParams = request.withFormUrlEncodedBody(
         "firstName" -> "John",
         "lastName" -> "Doe",
-        "isKnownByOtherNames" -> "false"
+        "hasPreviousName" -> "false",
+        "hasOtherNames" -> "false"
       )
 
       when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
