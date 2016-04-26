@@ -663,7 +663,6 @@ error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 
 error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
 error.rp.previous.invalid = Enter a first name, middle name or last name.
 error.required.rp.otherNames = Enter an alternative name.
-
 error.invalid.length.otherNames = You can't enter more than 140 characters for the alternative name.
 
 # Custom error messages
