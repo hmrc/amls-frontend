@@ -1,45 +1,35 @@
 @import include._
-@import models.responsiblepeople.ResponsiblePeople
+@import models.responsiblepeople._
 
-@(responsiblePeople: Seq[ResponsiblePeople], addOther: Boolean)(implicit request: Request[_])
+@(model: Seq[ResponsiblePeople])(implicit request: Request[_], lang: Lang)
 
-@main2(
-    title = Messages("responsiblepeople.check_your_answers.title")
+@main(
+    title = Messages("summary.checkyouranswers.title")
 ) {
+    @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
 
-    @if(addOther) {
-        @heading("responsiblepeople.your_answers.heading", "summary.responsiblepeople")
-        <div class="panel-indent panel-border-wide spacelarge">
-            <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.PersonNameController.get(responsiblePeople.size + 1)">@Messages("responsiblepeople.check_your_answers.add")</a>
-        </div>
-    } else {
-        @heading("responsiblepeople.check_your_answers.heading", "summary.responsiblepeople")
-    }
-
-    <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--2-3">
-            <table>
-                @responsiblePeople.zipWithIndex.map { case (rp, index) =>
+    <table>
+        <tbody>
+            @model.zipWithIndex.map { case (responsiblePerson, idx)=>
                 <tr>
-                    <th class="summary-title" colspan="2">
-                        @rp.personName.map { pn =>
-                            @pn.fullName
-                        }.getOrElse {
+                    @responsiblePerson.personName.map { personDetails =>
+                        <th class="summary-title">
+                            @personDetails.fullName
+                        </th>
+                    }.getOrElse{
+                        <td>
                             @Messages("missing.personName")
-                        }
-                    </th>
-                    <!-- TODO: Change these to use edit and delete pages -->
-                    <td><a href="@controllers.responsiblepeople.routes.SummaryController.get()">@Messages("button.edit")</a></td>
-                    <td><a href="@controllers.responsiblepeople.routes.SummaryController.get()">@Messages("button.delete")</a></td>
+                        </td>
+                    }
+                    <td>
+                        <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit")
+                    </td>
                 </tr>
-                }
-            </table>
-        </div>
-        <div class="grid-layout__column grid-layout__column--1-3">
-            &nbsp;
-        </div>
+            }
+        </tbody>
+    </table>
+
+    <div class="form-field">
+        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.checkyouranswers.acceptandcomplete")</a>
     </div>
-
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
-
 }

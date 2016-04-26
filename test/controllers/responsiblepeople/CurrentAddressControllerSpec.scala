@@ -215,7 +215,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneServerPerSuite with 
     }
 
 
-    "must go to the correct location when edit mode is on" in new Fixture {
+    "must go to the correct location when edit mode is on and time at address is less than 3 years" in new Fixture {
 
       val requestWithParams = request.withFormUrlEncodedBody(
         "isUK" -> "true",
@@ -234,7 +234,29 @@ class CurrentAddressControllerSpec extends PlaySpec with OneServerPerSuite with 
       val result = currentAddressController.post(RecordId, true)(requestWithParams)
       status(result) must be(SEE_OTHER)
       //TODO: Update this to new location once implementated.
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+    }
+
+    "must go to the correct location when edit mode is on and time at address is more than 3 years" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "isUK" -> "true",
+        "addressLine1" -> "Line 1",
+        "addressLine2" -> "Line 2",
+        "postCode" -> "NE17YH",
+        "timeAtAddress" -> "04"
+      )
+
+      when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = currentAddressController.post(RecordId, true)(requestWithParams)
+      status(result) must be(SEE_OTHER)
+      //TODO: Update this to new location once implementated.
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
     }
 
     "must go to the correct location when edit mode is off and time at address is less than 3 years" in new Fixture {

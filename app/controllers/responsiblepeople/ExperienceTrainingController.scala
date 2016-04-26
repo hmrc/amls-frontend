@@ -7,6 +7,7 @@ import controllers.tradingpremises.routes
 import forms._
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.responsiblepeople.{ExperienceTraining, ResponsiblePeople}
+import play.api.Logger
 import play.api.mvc.Result
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -23,9 +24,14 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
   private def businessActivitiesData(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessActivities] = {
     dataCacheConnector.fetchAll map {
       cache =>
+        Logger.debug(cache.toString)
         (for {
           c <- cache
-          businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
+          businessMatching <- {
+            val a = c.getEntry[BusinessMatching](BusinessMatching.key)
+            Logger.debug(a.toString)
+            a
+          }
           activities <- businessMatching.activities
         } yield activities).getOrElse(BusinessActivities(Set.empty))
     }
@@ -66,7 +72,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
                     }
                   } yield edit match {
                     case false => Redirect(routes.TrainingController.get(index, edit))
-                    case true => Redirect(routes.SummaryController.get())
+                    case true => Redirect(routes.DetailedAnswersController.get(index))
                   }
               }
           }

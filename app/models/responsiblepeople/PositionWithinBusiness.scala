@@ -8,6 +8,7 @@ import utils.TraversableValidators._
 
 case class Positions(positions: Set[PositionWithinBusiness]) {
 
+  def isComplete = positions.nonEmpty
   def personalTax = this.positions.exists(a => a == SoleProprietor || a == Partner)
 }
 

@@ -1,0 +1,176 @@
+@import include._
+@import models.responsiblepeople._
+@import controllers.responsiblepeople.routes._
+@import utils.DateHelper
+
+@(model: Option[ResponsiblePeople], idx: Int)(implicit request: Request[_], lang: Lang)
+
+@optionalBlock[T](label : String, itemOption: Option[T], editRoute: =>Call)(content : T => Html) = {
+    <tr>
+        <td>@label :</td>
+        <td>
+            @{itemOption match {
+                case Some(item) => content(item)
+                case None => Messages("missing.dataItem")
+            }}
+        </td>
+        <td><a href="@editRoute">@Messages("button.edit")</a></td>
+    </tr>
+}
+
+@timeAtAddress(t : TimeAtAddress) = {
+    @t match {
+    case TimeAtAddress.Empty => {@Messages("missing.dataItem")}
+    case TimeAtAddress.ZeroToFiveMonths => {@Messages("responsiblepeople.additional_extra_address.0_5_months")}
+    case TimeAtAddress.SixToElevenMonths => {@Messages("responsiblepeople.additional_extra_address.6_11_months")}
+    case TimeAtAddress.OneToThreeYears => {@Messages("responsiblepeople.additional_extra_address.1_3_years")}
+    case TimeAtAddress.ThreeYearsPlus => {@Messages("responsiblepeople.additional_extra_address.more_3_years")}
+    }
+    at this address
+}
+
+@main(
+    title = Messages("summary.detailedanswers.title")
+) {
+
+    @heading("summary.detailedanswers.title", "summary.responsiblepeople")
+
+    @model.map { person =>
+
+        <table>
+            <tbody>
+                    <tr>
+                        <th colspan="2">
+                            @person.personName.map { name =>
+                                @name.fullName
+                            }.getOrElse{
+                                @Messages("missing.personName")
+                            }
+                        </th>
+                        <td><a href="@PersonNameController.get(idx, true)">@Messages("button.edit")</a></td>
+                    </tr>
+
+
+                    @optionalBlock("Previous names", person.personName, PersonNameController.get(idx, true)) {pn =>
+                        @pn.isKnownByOtherNames match {
+                            case IsKnownByOtherNamesNo => {No}
+                            case IsKnownByOtherNamesYes(fn, mn, ln) => {@fn @mn @ln}
+                        }
+                    }
+
+                    @optionalBlock("UK resident", person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
+                        @prt.isUKResidence match {
+                            case UKResidence(nino) => {
+                                Yes <br/>
+                                National Insurance Number: @nino
+                            }
+                            case NonUKResidence(dob, UKPassport(number)) => {
+                                No<br/>
+                                D.O.B : @DateHelper.formatDate(dob)<br/>
+                                Passport Number: @number
+                            }
+                            case NonUKResidence(dob, NonUKPassport(number)) => {
+                                No<br/>
+                                D.O.B : @DateHelper.formatDate(dob)<br/>
+                                Passport Number: @number
+                            }
+                            case NonUKResidence(dob, NoPassport) => {
+                                No<br/>
+                                D.O.B: @DateHelper.formatDate(dob)<br/>
+                                No Passport
+                            }
+                        }
+                    }
+
+                    @optionalBlock("Country of birth", person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
+                        @prt.countryOfBirth
+                    }
+
+                    @optionalBlock("Nationality", person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
+                        @prt.nationality
+                    }
+
+                    @optionalBlock("Phone number", person.contactDetails, ContactDetailsController.get(idx, true)) {cd =>
+                        @cd.phoneNumber
+                    }
+
+                    @optionalBlock("Email", person.contactDetails, ContactDetailsController.get(idx, true)) {cd =>
+                        @cd.emailAddress
+                    }
+
+                    @optionalBlock("Address", person.addressHistory.flatMap(_.currentAddress), CurrentAddressController.get(idx, true)) {a =>
+                        @a.personAddress.toLines.map {l => @l <br />}
+                        <br />
+                        @timeAtAddress(a.timeAtAddress)
+                    }
+
+                    @person.addressHistory.flatMap(_.additionalAddress).map { pa =>
+                        @optionalBlock("Previous Address", Some(pa), AdditionalAddressController.get(idx, true)) {a =>
+                            @a.personAddress.toLines.map {l => @l <br />}
+                            <br />
+                            @timeAtAddress(a.timeAtAddress)
+                        }
+                    }
+
+                    @person.addressHistory.flatMap(_.additionalExtraAddress).map { pa =>
+                        @optionalBlock("Other Previous Address", Some(pa), AdditionalExtraAddressController.get(idx, true)) {a =>
+                            @a.personAddress.toLines.map {l => @l <br />}
+                            <br />
+                            @timeAtAddress(a.timeAtAddress)
+                        }
+                    }
+
+                    @optionalBlock("Position", person.positions, PositionWithinBusinessController.get(idx, true)) {pos =>
+                        @pos.positions.map {
+                            case BeneficialOwner    => {@Messages("responsiblepeople.position_within_business.lbl.01")}
+                            case Director           => {@Messages("responsiblepeople.position_within_business.lbl.02")}
+                            case InternalAccountant => {@Messages("responsiblepeople.position_within_business.lbl.03")}
+                            case NominatedOfficer   => {@Messages("responsiblepeople.position_within_business.lbl.04")}
+                            case Partner            => {@Messages("responsiblepeople.position_within_business.lbl.05")}
+                            case SoleProprietor     => {@Messages("responsiblepeople.position_within_business.lbl.06")}
+                        }.mkString(", ")
+                    }
+
+                    @person.vatRegistered.map { vr =>
+                        @optionalBlock("Registered for VAT", Some(vr), VATRegisteredController.get(idx, true)) { vr2 =>
+                            @vr2 match {
+                                case VATRegisteredYes(regNo) => {Yes: @regNo}
+                                case VATRegisteredNo => {No}
+                            }
+                        }
+                    }
+
+                    @person.saRegistered.map { sar =>
+                        @optionalBlock("Registered for Self Assessment", Some(sar), RegisteredForSelfAssessmentController.get(idx, true)) { sa =>
+                            @sa match {
+                                case SaRegisteredYes(regNo) => {Yes: @regNo}
+                                case SaRegisteredNo => {No}
+                            }
+                        }
+                    }
+
+                    @optionalBlock("Previous Experience", person.experienceTraining, ExperienceTrainingController.get(idx, true)) { ex =>
+                        @ex match {
+                            case ExperienceTrainingYes(info) => {Yes: @info}
+                            case ExperienceTrainingNo => {No}
+                        }
+                    }
+
+                    @optionalBlock("Training in anti-money laundering", person.training, TrainingController.get(idx, true)) { tra =>
+                        @tra match {
+                            case TrainingYes(info) => {Yes: @info}
+                            case TrainingNo => {No}
+                        }
+                    }
+
+
+            </tbody>
+        </table>
+
+    }
+
+    <div class="form-field">
+        <a class="button" href="@controllers.responsiblepeople.routes.YourAnswersController.get()">@Messages("button.confirmandcontinue")</a>
+    </div>
+
+}

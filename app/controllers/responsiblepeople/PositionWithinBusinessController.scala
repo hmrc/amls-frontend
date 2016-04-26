@@ -44,9 +44,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                   case _ => Some(ResponsiblePeople(positions = Some(data)))
                 }
               } yield (data.personalTax, edit) match {
-                case (true, false) => Redirect(routes.VATRegisteredController.get(index))
                 case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
-                case (_, true)  => Redirect(routes.SummaryController.get())
+                case (false, true) => Redirect(routes.DetailedAnswersController.get(index))
+                case _ => Redirect(routes.VATRegisteredController.get(index, edit))
               }
           }
       }

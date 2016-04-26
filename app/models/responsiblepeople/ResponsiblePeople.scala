@@ -61,7 +61,7 @@ object ResponsiblePeople {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhoMustRegisterController.get(1))
-    val complete = Section(messageKey, Completed, controllers.responsiblepeople.routes.YourAnswersController.get(true))
+    val complete = Section(messageKey, Completed, controllers.responsiblepeople.routes.YourAnswersController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
       case model if model forall {
         _.isComplete

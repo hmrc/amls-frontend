@@ -1,0 +1,34 @@
+@import include._
+@import models.responsiblepeople.ResponsiblePeople
+
+@(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
+
+@main(
+    title = Messages("responsiblepeople.check_your_answers.title")
+) {
+
+    @heading("responsiblepeople.your_answers.heading", "summary.responsiblepeople")
+
+    <div class="panel-indent panel-border-wide spacelarge">
+        <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.PersonNameController.get(responsiblePeople.size + 1)">@Messages("responsiblepeople.check_your_answers.add")</a>
+    </div>
+
+    <table>
+        @responsiblePeople.zipWithIndex.map { case (rp, index) =>
+            <tr>
+                <th class="summary-title" colspan="2">
+                    @rp.personName.map { pn =>
+                        @pn.fullName
+                    }.getOrElse {
+                        @Messages("missing.personName")
+                    }
+                </th>
+                <td><a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1)">@Messages("button.edit")</a></td>
+            </tr>
+        }
+    </table>
+
+    <div class="form-field">
+        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.confirmandcontinue")</a>
+    </div>
+}
