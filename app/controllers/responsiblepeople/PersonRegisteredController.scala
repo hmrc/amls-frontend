@@ -35,7 +35,7 @@ trait PersonRegisteredController extends BaseController {
             case ValidForm(_, data) =>
                data.registerAnotherPerson match {
                 case true => Future.successful(Redirect(routes.PersonNameController.get(index + 1, false)))
-                case false => Future.successful(Redirect(routes.YourAnswersController.get(false)))
+                case false => Future.successful(Redirect(routes.CheckYourAnswersController.get()))
               }
           }
       }

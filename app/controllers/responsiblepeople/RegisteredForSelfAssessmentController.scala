@@ -43,7 +43,10 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
                   case _ => Some(ResponsiblePeople(saRegistered = Some(data)))
                 }
               } yield {
-                Redirect(routes.ExperienceTrainingController.get(index, edit))
+                edit match {
+                  case false => Redirect(routes.ExperienceTrainingController.get(index, edit))
+                  case true => Redirect(routes.DetailedAnswersController.get(index))
+                }
               }
           }
       }

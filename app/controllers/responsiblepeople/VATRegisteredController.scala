@@ -42,10 +42,7 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
                   case Some(rp) => Some(rp.vatRegistered(data))
                   case _ => Some(ResponsiblePeople(vatRegistered = Some(data)))
                 }
-              } yield edit match {
-                case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
-                case true  => Redirect(routes.SummaryController.get())
-              }
+              } yield Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
           }
       }
     }

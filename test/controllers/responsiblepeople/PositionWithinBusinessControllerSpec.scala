@@ -305,7 +305,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
 
       val result = controller.post(RecordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
     }
   }
 }

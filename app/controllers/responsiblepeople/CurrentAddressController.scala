@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{Empty, ZeroToFiveMonths, ThreeYearsPlus}
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddressHistory, ResponsiblePersonAddress, ResponsiblePeople}
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.RepeatingSection
@@ -46,11 +47,14 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
             case ValidForm(_, data) =>
               for {
                 _ <- doUpdate(index, data)
-              } yield (data.timeAtAddress, edit) match {
+              } yield {
+                Logger.debug(s"${data.timeAtAddress} -- $edit")
+                (data.timeAtAddress, edit) match {
                 case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
                 case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit))
-                case (_, true) => Redirect(routes.SummaryController.get())
-              }
+                case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
+                case (_, true) => Redirect(routes.AdditionalAddressController.get(index, edit))
+              }}
           }
       }
     }
@@ -59,8 +63,9 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
     updateData[ResponsiblePeople](index) {
       case Some(res) => {
         Some(res.addressHistory(
-          res.addressHistory match {
-            case Some(a) => a.currentAddress(data)
+          (res.addressHistory, data.timeAtAddress) match {
+            case (Some(a), ThreeYearsPlus) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
+            case (Some(a), _) => a.currentAddress(data)
             case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
           })
         )
