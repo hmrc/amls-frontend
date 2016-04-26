@@ -53,14 +53,14 @@
 
                     @optionalBlock("Previous names", person.personName, PersonNameController.get(idx, true)) {pn =>
                         @pn.previousName match {
-                            case None => {None}
+                            case None => {No}
                             case Some(name) => {@name.formattedPreviousName(pn) <br /> Since: @name.formattedDate}
                         }
                     }
 
                     @optionalBlock("Other names", person.personName, PersonNameController.get(idx, true)) {pn =>
                         @pn.otherNames match {
-                            case None => {None}
+                            case None => {No}
                             case Some(name) => {@name}
                         }
                     }
