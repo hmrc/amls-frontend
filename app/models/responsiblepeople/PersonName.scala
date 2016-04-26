@@ -1,12 +1,9 @@
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
-
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms._
 import play.api.data.mapping._
 import play.api.libs.json.{Writes => _}
-import utils.DateHelper
 import utils.MappingUtils.Implicits._
 import models.FormTypes._
 
