@@ -15,7 +15,7 @@ trait LandingService {
   private[services] def cacheConnector: DataCacheConnector
   private[services] def keyStore: KeystoreConnector
 
-  @deprecated("fetch the cacheMap itself instead")
+  @deprecated("fetch the cacheMap itself instead", "")
   def hasSavedForm
   (implicit
    hc: HeaderCarrier,

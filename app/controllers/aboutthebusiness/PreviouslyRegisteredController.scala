@@ -7,6 +7,7 @@ import controllers.BaseController
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegistered}
 import models.businessmatching.{BusinessType, BusinessMatching}
 import models.businessmatching.BusinessType._
+import utils.ControllerHelper
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
@@ -37,7 +38,7 @@ trait PreviouslyRegisteredController extends BaseController {
             optionalCache =>
               (for {
                 cache <- optionalCache
-                businessType <- getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                 aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
               } yield {
                 dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
@@ -50,15 +51,6 @@ trait PreviouslyRegisteredController extends BaseController {
                   }
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
-      }
-    }
-  }
-
-  private def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
-    matching flatMap { bm =>
-      bm.reviewDetails match {
-        case Some(review) => review.businessType
-        case _ => None
       }
     }
   }
