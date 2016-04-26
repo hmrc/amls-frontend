@@ -61,7 +61,7 @@ object FormTypes {
   private val lastNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.lastname")
 
   val firstNameType = firstNameRequired compose firstNameLength
-  val middleNameType = middleNameLength
+  val middleNameType = notEmpty compose middleNameLength
   val lastNameType = lastNameRequired compose lastNameLength
 
   /** VAT Registration Number Rules **/

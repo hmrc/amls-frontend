@@ -3,10 +3,15 @@
 $(function () {
     // avoids double panel-indented sections
     // should be CSS but isn't possible.
-    $('.panel-indent > .form-field--error').parent().css({
-        'padding' : 0,
-        'border' : 'none'
-    });
+    // TODO: This needs a different approach
+        $('.panel-indent > .form-field--error')
+            .filter(function () {
+                return $(this).siblings().not('legend').length == 0;
+            })
+            .parent().css({
+                'padding' : 0,
+                'border' : 'none'
+            });
 
     $(function(){
         $('.country-selector').selectToAutocomplete();

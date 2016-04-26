@@ -170,7 +170,7 @@ lbl.yes = Yes
 lbl.no = No
 lbl.your_name = Your name
 lbl.first_name = First name
-lbl.middle_name  = Middle name (optional)
+lbl.middle_name  = Middle name, if applicable
 lbl.last_name = Last name
 lbl.pleasespecify = Please specify
 lbl.na = Not applicable
@@ -633,13 +633,15 @@ responsiblepeople.whatyouneed.line_10 = details of relevant experience and train
 
 responsiblepeople.personName.title = What''s the name of this responsible person?
 responsiblepeople.personName.firstname = First name
-responsiblepeople.personName.middlename = Middle name (optional)
+responsiblepeople.personName.middlename = Middle name, if applicable
 responsiblepeople.personName.lastname = Last name
 responsiblepeople.personName.isknownbyothernames = Has this person ever been known by other names?
-
-responsiblepeople.personName.otherfirstnames = Other first names
-responsiblepeople.personName.othermiddlenames = Other middle names (optional)
-responsiblepeople.personName.otherlastnames = Other last names
+responsiblepeople.personName.hasOtherNames = Is this person known by any other names
+responsiblepeople.personName.otherfirstnames = Previous first names, if applicable
+responsiblepeople.personName.othermiddlenames = Previous middle names, if applicable
+responsiblepeople.personName.otherlastnames = Previous last names, if applicable
+responsiblepeople.personName.previous.date.lbl = When did the name legally change?
+responsiblepeople.personName.alternativeName = Alternative name
 
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Unique Taxpayer Reference(UTR) number
@@ -651,13 +653,15 @@ responsiblepeople.contact_details.email.lbl = Email address
 
 # Custom error messages
 error.required.firstname = Enter a first name.
+error.required.lastname = Enter a last name.
+error.required.rp.otherfirstnames = Enter all other first names.
+error.required.rp.otherlastnames  = Enter all other last names.
+error.required.rp.hasPreviousName = Select yes or no to the question: {0}
+#TODO: error.required.rp.hasOtherNames
 error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
 error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 characters
-error.required.lastname = Enter a last name.
 error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
-error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
-error.required.otherfirstnames = Enter all other first names.
-error.required.otherlastnames  = Enter all other last names.
+#TODO: error.invalid.length.otherNames = ???
 
 # Custom error messages
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number

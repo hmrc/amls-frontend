@@ -1,125 +1,152 @@
 package models.responsiblepeople
 
+import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsSuccess, Json}
 
+import scala.collection.mutable.ArrayBuffer
+
+@SuppressWarnings(Array("org.brianmckenna.wartremover.warts.MutableDataStructures"))
 class PersonNameSpec extends PlaySpec with MockitoSugar {
 
   "Form Rules and Writes" must {
 
     "successfully validate given all fields" in {
-      val urlFormEncoded = Map(
+
+      val data = Map(
         "firstName" -> Seq("John"),
         "middleName" -> Seq("Envy"),
         "lastName" -> Seq("Doe"),
-        "isKnownByOtherNames" -> Seq("false")
+        "hasPreviousName" -> Seq("true"),
+        "previous.firstName" -> Seq("Marty"),
+        "previous.middleName" -> Seq("Mc"),
+        "previous.lastName" -> Seq("Fly"),
+        "previous.date.year" -> Seq("1990"),
+        "previous.date.month" -> Seq("02"),
+        "previous.date.day" -> Seq("24"),
+        "hasOtherNames" -> Seq("true"),
+        "otherNames" -> Seq("Doc")
       )
-      PersonName.formRule.validate(urlFormEncoded) must be(Success(PersonName("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
+
+      PersonName.formRule.validate(data) must
+        equal(Success(
+          PersonName(
+            firstName = "John",
+            middleName = Some("Envy"),
+            lastName = "Doe",
+            previousName = Some(
+              PreviousName(
+                firstName = Some("Marty"),
+                middleName = Some("Mc"),
+                lastName = Some("Fly"),
+                // scalastyle:off magic.number
+                date = new LocalDate(1990, 2, 24)
+              )
+            ),
+            otherNames = Some("Doc")
+          )
+        ))
     }
 
-    "successfully validate given the middle name is optional" in {
-      val urlFormEncoded = Map(
+    "successfully validate given the middle name is optional and previous/other names are not required" in {
+
+      val data = Map(
         "firstName" -> Seq("John"),
         "lastName" -> Seq("Doe"),
-        "isKnownByOtherNames" -> Seq("false")
-
+        "hasPreviousName" -> Seq("false"),
+        "hasOtherNames" -> Seq("false")
       )
-      PersonName.formRule.validate(urlFormEncoded) must be(Success(PersonName("John", None, "Doe", IsKnownByOtherNamesNo)))
+
+      PersonName.formRule.validate(data) must
+        equal(Success(
+          PersonName(
+            firstName = "John",
+            middleName = None,
+            lastName = "Doe",
+            previousName = None,
+            otherNames = None
+          )
+        ))
     }
 
+    "fail validation when fields are missing (minimal)" in {
 
-    "fail validation when fields are missing" in {
+      PersonName.formRule.validate(Map(
+        "firstName" -> Seq(""),
+        "lastName" -> Seq(""),
+        "hasPreviousName" -> Seq(""),
+        "hasOtherNames" -> Seq("")
+      )) must
+        equal(Failure(Seq(
+          (Path \ "firstName") -> ArrayBuffer(ValidationError("error.required.firstname")),
+          (Path \ "lastName") -> ArrayBuffer(ValidationError("error.required.lastname")),
+          (Path \ "hasPreviousName") -> ArrayBuffer(ValidationError("error.required.rp.hasPreviousName")),
+          (Path \ "hasOtherNames") -> ArrayBuffer(ValidationError("error.required.rp.hasOtherNames"))
+        )))
 
-      PersonName.formRule.validate(Map.empty) must
-        be(Failure(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.required")),
-          (Path \ "lastName") -> Seq(ValidationError("error.required")),
-          (Path \ "isKnownByOtherNames") -> Seq(ValidationError("error.required.rp.isknownbyothernames"))
+    }
+
+    "fail validation when fields are missing (full)" in {
+
+      PersonName.formRule.validate(Map(
+        "firstName" -> Seq(""),
+        "lastName" -> Seq(""),
+        "hasPreviousName" -> Seq("true"),
+        "hasOtherNames" -> Seq("true"),
+        "previous.date.year" -> Seq(""),
+        "previous.date.month" -> Seq(""),
+        "previous.date.day" -> Seq(""),
+        "previous.firstName" -> Seq(""),
+        "previous.middleName" -> Seq(""),
+        "previous.lastName" -> Seq(""),
+        "otherNames" -> Seq("")
+      )) must
+        equal(Failure(Seq(
+          (Path \ "firstName") -> ArrayBuffer(ValidationError("error.required.firstname")),
+          (Path \ "lastName") -> ArrayBuffer(ValidationError("error.required.lastname")),
+          (Path \ "previous") -> Seq(ValidationError("error.rp.previous.invalid")),
+          (Path \ "previous" \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
+          (Path \ "otherNames") -> ArrayBuffer(ValidationError("error.required.rp.otherNames"))
         )))
     }
 
-    "fail to validate when first name is missing" in {
+    "fail to validate because of input length" in {
 
-      val urlFormEncoded = Map(
-        "lastName" -> Seq("Doe"),
-        "isKnownByOtherNames" -> Seq("false")
+      val data = Map(
+        "firstName" -> Seq("John" * 20),
+        "middleName" -> Seq("John" * 20),
+        "lastName" -> Seq("Doe" * 20),
+        "hasPreviousName" -> Seq("true"),
+        "previous.firstName" -> Seq("Marty" * 20),
+        "previous.middleName" -> Seq("Mc" * 20),
+        "previous.lastName" -> Seq("Fly" * 20),
+        "hasOtherNames" -> Seq("true"),
+        "otherNames" -> Seq("D" * 141),
+        "previous.date.year" -> Seq("1990"),
+        "previous.date.month" -> Seq("2"),
+        "previous.date.day" -> Seq("24")
       )
 
-      PersonName.formRule.validate(urlFormEncoded) must
-        be(Failure(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.required"))
+      PersonName.formRule.validate(data) must
+        equal(Failure(Seq(
+          (Path \ "firstName") -> ArrayBuffer(ValidationError("error.invalid.length.firstname")),
+          (Path \ "middleName") -> ArrayBuffer(ValidationError("error.invalid.length.middlename")),
+          (Path \ "lastName") -> ArrayBuffer(ValidationError("error.invalid.length.lastname")),
+          (Path \ "previous" \ "firstName") -> ArrayBuffer(ValidationError("error.invalid.length.firstname")),
+          (Path \ "previous" \ "middleName") -> ArrayBuffer(ValidationError("error.invalid.length.middlename")),
+          (Path \ "previous" \ "lastName") -> ArrayBuffer(ValidationError("error.invalid.length.lastname")),
+          (Path \ "otherNames") -> ArrayBuffer(ValidationError("error.invalid.length.otherNames"))
         )))
-    }
-
-    "fail to validate when last name is missing" in {
-
-      val urlFormEncoded = Map(
-        "firstName" -> Seq("John"),
-        "isKnownByOtherNames" -> Seq("false")
-      )
-
-      PersonName.formRule.validate(urlFormEncoded) must
-        be(Failure(Seq(
-          (Path \ "lastName") -> Seq(ValidationError("error.required"))
-        )))
-    }
-
-
-    "fail to validate when firstName or lastName are more than the required length" in {
-
-      val urlFormEncoded = Map(
-        "firstName" -> Seq("JohnJohnJohnJohnJohnJohnJohnJohnJohn"),
-        "lastName" -> Seq("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe"),
-        "isKnownByOtherNames" -> Seq("false")
-      )
-
-      PersonName.formRule.validate(urlFormEncoded) must
-        be(Failure(Seq(
-          (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
-          (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname"))
-        )))
-    }
-  }
-
-  "JSON" must {
-
-    "Read the json and return the AddPerson domain object successfully" in {
-
-      val json = Json.obj(
-        "firstName" -> "John",
-        "middleName" -> "Envy",
-        "lastName" -> "Doe",
-        "isKnownByOtherNames" -> false
-      )
-
-      PersonName.jsonReads.reads(json) must be(JsSuccess(PersonName("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)))
-    }
-
-    "Write the json successfully from the AddPerson domain object created" in {
-
-      val addPerson = PersonName("John", Some("Envy"), "Doe", IsKnownByOtherNamesNo)
-
-      val json = Json.obj(
-        "firstName" -> "John",
-        "middleName" -> "Envy",
-        "lastName" -> "Doe",
-        "isKnownByOtherNames" -> false
-      )
-
-      PersonName.jsonWrites.writes(addPerson) must be(json)
     }
   }
 
   "fullName" must {
 
     "return a correctly formatted name" in {
-      PersonName("John", Some("Paul"), "Smith", IsKnownByOtherNamesNo).fullName must be ("John Paul Smith")
-      PersonName("John", None, "Smith", IsKnownByOtherNamesNo).fullName must be ("John Smith")
+      PersonName("John", Some("Paul"), "Smith", None, None).fullName must be ("John Paul Smith")
+      PersonName("John", None, "Smith", None, None).fullName must be ("John Smith")
     }
-
   }
-
 }

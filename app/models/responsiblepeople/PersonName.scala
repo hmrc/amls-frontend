@@ -2,70 +2,97 @@ package models.responsiblepeople
 
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, To, Write}
+import play.api.data.mapping._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import models.FormTypes._
 
-case class PersonName(firstName: String,
-                      middleName: Option[String],
-                      lastName: String,
-                      isKnownByOtherNames: IsKnownByOtherNames
-                    ) {
+case class PersonName(
+                       firstName: String,
+                       middleName: Option[String],
+                       lastName: String,
+                       previousName: Option[PreviousName],
+                       otherNames: Option[String]
+                     ) {
 
   val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
-
 }
 
 object PersonName {
 
   import play.api.libs.json._
 
-  implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, PersonName] =
+    From[UrlFormEncoded] { __ =>
 
-    import play.api.data.mapping.forms.Rules._
-    (
-      (__ \ "firstName").read(firstNameType) and
-        (__ \ "middleName").read(optionR(middleNameType)) and
-        (__ \ "lastName").read(lastNameType) and
-        (__).read[IsKnownByOtherNames]
-      ) (PersonName.apply _)
+      val hasPreviousNameType =
+      booleanR withMessage "error.required.rp.hasPreviousName"
+
+      val hasOtherNamesType =
+        booleanR withMessage "error.required.rp.hasOtherNames"
+
+      val otherNamesLength = 140
+      val otherNamesType =
+        required("error.required.rp.otherNames") compose
+          maxWithMsg(otherNamesLength, "error.invalid.length.otherNames")
+
+      (
+        (__ \ "firstName").read(firstNameType) ~
+        (__ \ "middleName").read(optionR(middleNameType)) ~
+        (__ \ "lastName").read(lastNameType) ~
+        (__ \ "hasPreviousName").read(hasPreviousNameType).flatMap[Option[PreviousName]] {
+          case true =>
+            (__ \ "previous").read[PreviousName] fmap Some.apply
+          case false =>
+            Rule(_ => Success(None))
+        } ~
+        (__ \ "hasOtherNames").read(hasOtherNamesType).flatMap[Option[String]] {
+          case true =>
+            (__ \ "otherNames").read(otherNamesType) fmap Some.apply
+          case false =>
+            Rule(_ => Success(None))
+        }
+      )(PersonName.apply _)
+    }
+
+  implicit val formWrite = Write[PersonName, UrlFormEncoded] {
+    model =>
+
+      val name = Map(
+        "firstName" -> Seq(model.firstName),
+        "middleName" -> Seq(model.middleName getOrElse ""),
+        "lastName" -> Seq(model.lastName)
+      )
+
+      val previousName = model.previousName match {
+        case Some(previous) =>
+          Map(
+            "hasPreviousName" -> Seq("true"),
+            "previous.firstName" -> Seq(previous.firstName getOrElse ""),
+            "previous.middleName" -> Seq(previous.middleName getOrElse ""),
+            "previous.lastName" -> Seq(previous.lastName getOrElse "")
+          ) ++ (
+            localDateWrite.writes(previous.date) map {
+              case (path, value) =>
+                s"previous.date.$path" -> value
+            }
+          )
+        case None =>
+          Map("hasPreviousName" -> Seq("false"))
+      }
+
+      val otherNames = model.otherNames match {
+        case Some(otherNames) =>
+          Map(
+            "hasOtherNames" -> Seq("true"),
+            "otherNames" -> Seq(otherNames)
+          )
+        case None =>
+          Map("hasOtherNames" -> Seq("false"))
+      }
+
+      name ++ previousName ++ otherNames
   }
 
-  implicit val formWrites: Write[PersonName, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "firstName").write[String] and
-        (__ \ "middleName").write[Option[String]] and
-        (__ \ "lastName").write[String] and
-        (__).write[IsKnownByOtherNames]
-      ) (unlift(PersonName.unapply))
-  }
-
-  implicit val jsonReads: Reads[PersonName] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json.Reads._
-    import play.api.libs.json._
-    (
-      (__ \ "firstName").read[String] and
-        (__ \ "middleName").read[Option[String]] and
-        (__ \ "lastName").read[String] and
-        (__).read[IsKnownByOtherNames]
-      ) (PersonName.apply _)
-
-  }
-
-  implicit val jsonWrites: Writes[PersonName] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json.Writes._
-    import play.api.libs.json._
-    (
-      (__ \ "firstName").write[String] and
-        (__ \ "middleName").write[Option[String]] and
-        (__ \ "lastName").write[String] and
-        (__).write[IsKnownByOtherNames]
-      ) (unlift(PersonName.unapply))
-  }
-
+  implicit val format = Json.format[PersonName]
 }
