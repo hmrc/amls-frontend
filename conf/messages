@@ -635,8 +635,8 @@ responsiblepeople.personName.title = What''s the name of this responsible person
 responsiblepeople.personName.firstname = First name
 responsiblepeople.personName.middlename = Middle name, if applicable
 responsiblepeople.personName.lastname = Last name
-responsiblepeople.personName.isknownbyothernames = Has this person ever been known by other names?
-responsiblepeople.personName.hasOtherNames = Is this person known by any other names
+responsiblepeople.personName.isknownbyothernames = Has this person ever legally been known by other names?
+responsiblepeople.personName.hasOtherNames = Is this person known by any other names?
 responsiblepeople.personName.otherfirstnames = Previous first names, if applicable
 responsiblepeople.personName.othermiddlenames = Previous middle names, if applicable
 responsiblepeople.personName.otherlastnames = Previous last names, if applicable
@@ -656,12 +656,15 @@ error.required.firstname = Enter a first name.
 error.required.lastname = Enter a last name.
 error.required.rp.otherfirstnames = Enter all other first names.
 error.required.rp.otherlastnames  = Enter all other last names.
-error.required.rp.hasPreviousName = Select yes or no to the question: {0}
-#TODO: error.required.rp.hasOtherNames
+error.required.rp.hasPreviousName = Select yes or no to the question: has this person ever legally changed their name?
+error.required.rp.hasOtherNames = Select yes or no to the question: is this person known by any other names?
 error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
 error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 characters
 error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
-#TODO: error.invalid.length.otherNames = ???
+error.rp.previous.invalid = Enter a first name, middle name or last name.
+error.required.rp.otherNames = Enter an alternative name.
+
+error.invalid.length.otherNames = You can't enter more than 140 characters for the alternative name.
 
 # Custom error messages
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number

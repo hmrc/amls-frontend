@@ -25,12 +25,6 @@ object PersonName {
   implicit val formRule: Rule[UrlFormEncoded, PersonName] =
     From[UrlFormEncoded] { __ =>
 
-      val hasPreviousNameType =
-      booleanR withMessage "error.required.rp.hasPreviousName"
-
-      val hasOtherNamesType =
-        booleanR withMessage "error.required.rp.hasOtherNames"
-
       val otherNamesLength = 140
       val otherNamesType =
         required("error.required.rp.otherNames") compose
@@ -40,13 +34,13 @@ object PersonName {
         (__ \ "firstName").read(firstNameType) ~
         (__ \ "middleName").read(optionR(middleNameType)) ~
         (__ \ "lastName").read(lastNameType) ~
-        (__ \ "hasPreviousName").read(hasPreviousNameType).flatMap[Option[PreviousName]] {
+        (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
           case true =>
             (__ \ "previous").read[PreviousName] fmap Some.apply
           case false =>
             Rule(_ => Success(None))
         } ~
-        (__ \ "hasOtherNames").read(hasOtherNamesType).flatMap[Option[String]] {
+        (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames").flatMap[Option[String]] {
           case true =>
             (__ \ "otherNames").read(otherNamesType) fmap Some.apply
           case false =>
