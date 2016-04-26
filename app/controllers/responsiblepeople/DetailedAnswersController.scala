@@ -16,7 +16,7 @@ trait DetailedAnswersController extends BaseController {
         implicit authContext => implicit request =>
           dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
             case Some(data) => {
-              Ok(views.html.responsiblepeople.detailedAnswers(data.lift(index-1), index))
+              Ok(views.html.responsiblepeople.detailed_answers(data.lift(index-1), index))
             }
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }

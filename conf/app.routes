@@ -158,7 +158,7 @@ GET         /responsible-people/residency/:index             controllers.respons
 POST        /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/summary                     controllers.responsiblepeople.SummaryController.get()
-GET         /responsible-people/detailedAnswers/:index      controllers.responsiblepeople.DetailedAnswersController.get(index: Int)
+GET         /responsible-people/detailed-answers/:index      controllers.responsiblepeople.DetailedAnswersController.get(index: Int)
 
 GET         /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false)
