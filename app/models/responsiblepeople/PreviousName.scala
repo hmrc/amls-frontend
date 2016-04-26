@@ -5,13 +5,27 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
+import utils.DateHelper
 
 case class PreviousName(
                        firstName: Option[String],
                        middleName: Option[String],
                        lastName: Option[String],
                        date: LocalDate
-                       )
+                       ) {
+
+  val formattedDate = DateHelper.formatDate(date)
+
+  def formattedPreviousName(that: PersonName): String = that match {
+      case PersonName(first, middle, last, _, _) =>
+        Seq(
+          firstName orElse Some(first),
+          middleName orElse middle,
+          lastName orElse Some(last)
+        ).flatten[String].mkString(" ")
+  }
+
+}
 
 object PreviousName {
 
