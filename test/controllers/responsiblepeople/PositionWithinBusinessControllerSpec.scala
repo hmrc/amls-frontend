@@ -174,9 +174,21 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneServerPerSui
       document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
     }
 
-    "submit with valid data with edit mode" in new Fixture {
+    "submit with valid personal tax data and with edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody("positions" -> "05")
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.post(RecordId, true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(RecordId, true).url))
+    }
+
+    "submit with valid non-personal tax data with edit mode" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "01")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
