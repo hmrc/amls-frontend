@@ -52,9 +52,16 @@
 
 
                     @optionalBlock("Previous names", person.personName, PersonNameController.get(idx, true)) {pn =>
-                        @pn.isKnownByOtherNames match {
-                            case IsKnownByOtherNamesNo => {No}
-                            case IsKnownByOtherNamesYes(fn, mn, ln) => {@fn @mn @ln}
+                        @pn.previousName match {
+                            case None => {None}
+                            case Some(name) => {@name.formattedPreviousName(pn) <br /> Since: @name.formattedDate}
+                        }
+                    }
+
+                    @optionalBlock("Other names", person.personName, PersonNameController.get(idx, true)) {pn =>
+                        @pn.otherNames match {
+                            case None => {None}
+                            case Some(name) => {@name}
                         }
                     }
 

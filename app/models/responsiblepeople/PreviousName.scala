@@ -2,16 +2,34 @@ package models.responsiblepeople
 
 import org.joda.time.LocalDate
 import play.api.data.mapping._
+import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
+import utils.DateHelper
 
 case class PreviousName(
                        firstName: Option[String],
                        middleName: Option[String],
                        lastName: Option[String],
                        date: LocalDate
-                       )
+                       ) {
+
+  val formattedDate = DateHelper.formatDate(date)
+
+  private def nameFormatter(f: String, m: String, l: String) = Seq(f, m, l).mkString(" ")
+
+  def formattedPreviousName(that: PersonName) = this match {
+    case PreviousName(Some(f), None, None, _) => nameFormatter(f, that.middleName.getOrElse(""), that.lastName)
+    case PreviousName(None, Some(m), None, _) => nameFormatter(that.firstName, m, that.lastName)
+    case PreviousName(None, None, Some(l), _) => nameFormatter(that.firstName, that.middleName.getOrElse(""), l)
+    case PreviousName(None, Some(m), Some(l), _) => nameFormatter(that.firstName, m, l)
+    case PreviousName(Some(f), None, Some(l), _) => nameFormatter(f, that.middleName.getOrElse(""), l)
+    case PreviousName(Some(f), Some(m), None, _) => nameFormatter(f, m, that.lastName)
+    case PreviousName(Some(f), Some(m), Some(l), _) => nameFormatter(f, m, l)
+  }
+
+}
 
 object PreviousName {
 
