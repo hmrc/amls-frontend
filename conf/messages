@@ -1,15 +1,16 @@
 
 #
 # Conventions:-
+# err.
 # title.
 # lbl.
-# err.
 # button.
 #
 
-amls.title=Anti-Money Laundering Supervision
+########################################################################################################################
+##################################               Generic Messages     ##################################################
+########################################################################################################################
 
-# Generic Messages
 err.titleNotEntered.first_name = Enter the first name
 err.titleNotEntered.last_name =  Enter the last name
 err.invalidLength = invalid length
@@ -29,8 +30,16 @@ error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
 error.required.nationality = Enter your nationality.
 
+error.required.firstname = Enter a first name.
+error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
+error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 characters
+error.required.lastname = Enter a last name.
+error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
+error.required.otherfirstnames = Enter all other first names.
+error.required.otherlastnames  = Enter all other last names.
 error.required.yourname = Enter your name.
 error.invalid.yourname = You can''t enter more than 140 characters for your name.
+
 error.required.vat.number = Enter a VAT registration number.
 error.invalid.vat.number = Enter a VAT registration number. It must be 9 characters long, and can only be numbers
 error.required.name.of.business = Enter the name of the business.
@@ -44,8 +53,14 @@ error.required.uk.passport = Enter the UK passport number.
 error.invalid.uk.passport =  Enter a valid UK passport number. It must be 9 characters long, and can only be numbers or letters. Do not enter punctuation or other characters.
 error.required.non.uk.passport = Enter the non-UK passport number.
 error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can''t enter more than 40 characters.
+error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
+error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
+error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
 
-# Custom error messages
+########################################################################################################################
+############################        Custom error messages for different sections         ###############################
+########################################################################################################################
+
 error.required.bm.register.service = Select at least one activity that you need to register.
 error.required.bm.registration.number = Enter the company registration number.
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
@@ -68,7 +83,6 @@ error.required.ba.turnover.from.mlr = Select how much turnover you expect in the
 error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
 error.required.ba.franchise.name = Enter your franchisor’s name.
 error.max.length.ba.franchise.name = You can''t enter more than 140 characters for the franchisor’s name.
-
 error.required.ba.employee.count1 = Enter a number. If you are a sole proprietor with no employees, enter 1.
 error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punctuation or other characters.
 error.max.length.ba.employee.count = You can''t enter a number larger than 99999999999
@@ -83,14 +97,12 @@ error.required.ba.select.nca = Select yes or no to the question: has your busine
 error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a formal risk assessment policy and procedure?
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
 error.required.ba.business.use.accountant = Select yes or no to the question: does your business use an accountant for matters relating to money laundering regulations?
-#TODO
 error.required.ba.suspicious.activity = Select yes or no to the question:Does your business have written guidance for staff on how to identify and report suspicious activity?
 
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can''t enter more than 120 characters for the trading name.
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
-
 error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
@@ -108,7 +120,6 @@ error.required.eab.redress.scheme = Select yes or no to the question: is this bu
 error.required.eab.which.redress.scheme = Select which redress scheme.
 error.required.eab.redress.scheme.name = Enter the name of the redress scheme
 error.invalid.eab.redress.scheme.name = You can''t enter more than 255 characters for the name of the redress scheme.
-
 error.required.eab.business.services = Select at least one service that your business provides.
 error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 error.required.eab.info.about.penalty = Enter some information about the penalty received.
@@ -121,38 +132,32 @@ error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
 error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
-
-
 error.required.rp.phone = Enter a phone number.
 error.invalid.rp.phone = Enter only numbers. Do not enter letters, punctuation or other characters.
 error.max.length.rp.phone = You can''t enter more than 30 digits for the person''s phone number.
 error.required.rp.email = Enter an email address.
 error.invalid.rp.email = Enter a valid email address. It must be in the format myname@example.com.
 error.max.length.rp.email = You can''t enter more than 100 characters for the person''s email address.
-
-# Custom error messages
-error.required.firstname = Enter a first name.
-error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
-error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 characters
-error.required.lastname = Enter a last name.
-error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
-error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
-error.required.otherfirstnames = Enter all other first names.
-error.required.otherlastnames  = Enter all other last names.
-
-# Custom error messages
-error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
-error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
-error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
-
 error.required.rp.experiencetraining = Select yes or no to the question: Has this person have previous experience in these activities?
 error.required.rp.experiencetraining.information = Enter some information about this responsible person’s experience in these business activities.'
 error.invalid.length.rp.experiencetraining.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
-
 error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
 error.required.rp.training.information = Enter some information about this responsible person''s training in anti-money laundering or counter-terrorism funding.
 error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
+error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
+error.required.rp.otherfirstnames = Enter all other first names.
+error.required.rp.otherlastnames  = Enter all other last names.
+error.required.rp.hasPreviousName = Select yes or no to the question: has this person ever legally changed their name?
+error.required.rp.hasOtherNames = Select yes or no to the question: is this person known by any other names?
+error.rp.previous.invalid = Enter a first name, middle name or last name.
+error.required.rp.otherNames = Enter an alternative name.
+error.invalid.length.otherNames = You can't enter more than 140 characters for the alternative name.
 
+########################################################################################################################
+######################################      Custom Title and Labels           ##########################################
+########################################################################################################################
+
+amls.title=Anti-Money Laundering Supervision
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
@@ -658,18 +663,7 @@ responsiblepeople.contact_details.phone.lbl = Phone number
 responsiblepeople.contact_details.email.lbl = Email address
 
 # Custom error messages
-error.required.firstname = Enter a first name.
-error.required.lastname = Enter a last name.
-error.required.rp.otherfirstnames = Enter all other first names.
-error.required.rp.otherlastnames  = Enter all other last names.
-error.required.rp.hasPreviousName = Select yes or no to the question: has this person ever legally changed their name?
-error.required.rp.hasOtherNames = Select yes or no to the question: is this person known by any other names?
-error.invalid.length.firstname = Enter a valid First name. It must be less or equal to 35 characters
-error.invalid.length.middlename = Enter a valid Middle name less or equal to 35 characters
-error.invalid.length.lastname = Enter a valid Last name. It must be less or equal to 35 characters
-error.rp.previous.invalid = Enter a first name, middle name or last name.
-error.required.rp.otherNames = Enter an alternative name.
-error.invalid.length.otherNames = You can't enter more than 140 characters for the alternative name.
+
 
 # Custom error messages
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
