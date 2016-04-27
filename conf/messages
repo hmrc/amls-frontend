@@ -274,6 +274,7 @@ summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
 summary.businessmatching=Business matching
+summary.tcsp = Trust and company service provider information
 
 summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises
