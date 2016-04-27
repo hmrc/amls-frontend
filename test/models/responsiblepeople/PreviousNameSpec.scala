@@ -11,6 +11,21 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
   "PreviousName" must {
 
+    "have the formattedPreviousName function correctly return the value" in {
+
+      // scalastyle:off magic.number
+      val first = PreviousName(Some("Matt"), None, None, new LocalDate(1990, 2, 24))
+      val middle = PreviousName(None, Some("Matt"), None, new LocalDate(1990, 2, 24))
+      val last = PreviousName(None, None, Some("Matt"), new LocalDate(1990, 2, 24))
+
+      val personName = PersonName("John", Some("Paul"), "Smith", None, None)
+
+      first.formattedPreviousName(personName) must be ("Matt Paul Smith")
+      middle.formattedPreviousName(personName) must be ("John Matt Smith")
+      last.formattedPreviousName(personName) must be ("John Paul Matt")
+
+    }
+
     "successfully validate with all fields" in {
 
       val data: UrlFormEncoded = Map(
@@ -33,6 +48,8 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
           )
         ))
     }
+
+
 
     "successfully validate with just firstName" in {
 

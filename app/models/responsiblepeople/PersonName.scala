@@ -16,6 +16,7 @@ case class PersonName(
                      ) {
 
   val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+
 }
 
 object PersonName {
