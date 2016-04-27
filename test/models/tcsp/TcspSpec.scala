@@ -14,11 +14,11 @@ class TcspSpec extends PlaySpec with MockitoSugar {
       val completeJson = Json.obj()
       val completeModel = Tcsp()
 
-      "Serialise as expected" in {
+      "Serialise as expected" ignore {
         Json.toJson(completeModel) must be(completeJson)
       }
 
-      "Deserialise as expected" in {
+      "Deserialise as expected" ignore {
         completeJson.as[Tcsp] must be(completeModel)
       }
 
