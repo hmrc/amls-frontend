@@ -20,8 +20,7 @@ object Tcsp {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
-    //TODO: Update this route to correct page.
-    val notStarted = Section(messageKey, NotStarted, controllers.routes.RegistrationProgressController.get())
+    val notStarted = Section(messageKey, NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
     cache.getEntry[Tcsp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {

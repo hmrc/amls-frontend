@@ -188,3 +188,6 @@ GET         /responsible-people/responsible-person-registered/:index   controlle
 POST        /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.post(index:Int)
 
 GET         /responsible-people/your-answers         controllers.responsiblepeople.YourAnswersController.get()
+
+
+GET         /trust-company-service-provider/what-you-need        controllers.tcsp.WhatYouNeedController.get()

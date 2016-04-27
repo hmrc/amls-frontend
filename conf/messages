@@ -774,3 +774,13 @@ responsiblepeople.check_your_answers.heading = Check your answers
 responsiblepeople.your_answers.title = Your answers
 responsiblepeople.your_answers.heading = Your answers
 responsiblepeople.check_your_answers.add = Add a responsible person
+
+#TCSP
+
+tcsp.whatyouneed.title = What you need
+tcsp.whatyouneed.heading = What you need
+tcsp.whatyouneed.requiredinfo.heading = For this section you''ll need:
+tcsp.whatyouneed.requiredinfo.text.1 = a list of which services you provide
+tcsp.whatyouneed.requiredinfo.text.2 = if you use another Trust or Company Service Provider, its Money Laundering Regulation reference number
+tcsp.whatyouneed.sidebar.title = Automatic saving
+tcsp.whatyouneed.sidebar.information = Your progress is saved automatically. If you sign out you''ll have 28 days to complete your registration.
