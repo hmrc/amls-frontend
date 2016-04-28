@@ -20,16 +20,13 @@ object Tcsp {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
-    //TODO: Update this route to correct page.
-    val notStarted = Section(messageKey, NotStarted, controllers.routes.RegistrationProgressController.get())
+    val notStarted = Section(messageKey, NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
     cache.getEntry[Tcsp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          //TODO: Update this route to correct page.
           Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
         } else {
-          //TODO: Update this route to correct page.
-          Section(messageKey, Started, controllers.routes.RegistrationProgressController.get())
+          Section(messageKey, Started, controllers.tcsp.routes.WhatYouNeedController.get())
         }
     }
   }
@@ -40,9 +37,11 @@ object Tcsp {
     override def apply(): String = "tcsp"
   }
 
-  implicit val reads: Reads[Tcsp] = ???
+  implicit val reads: Reads[Tcsp] =
+    Reads(_ => JsSuccess(Tcsp()))
 
-  implicit val writes: Writes[Tcsp] = ???
+  implicit val writes: Writes[Tcsp] =
+    Writes(_ => Json.obj() )
 
   implicit def default(details: Option[Tcsp]): Tcsp =
     details.getOrElse(Tcsp())
