@@ -3,6 +3,7 @@ package services
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
+import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => _, _}
@@ -28,8 +29,7 @@ trait ProgressService {
     } yield ba.businessActivities.foldLeft[Seq[Section]](Seq.empty) {
       (m, n) => n match {
         case AccountancyServices =>
-          // TODO
-          m :+ Section("asp", NotStarted, controllers.routes.RegistrationProgressController.get())
+          m :+ Asp.section
         case EstateAgentBusinessService =>
           m :+ EstateAgentBusiness.section
         case HighValueDealing =>

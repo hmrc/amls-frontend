@@ -18,7 +18,7 @@ object FormTypes {
   val maxDescriptionTypeLength = 140
   val maxAddressLength = 35
   val maxPostCodeTypeLength = 10
-  val maxPhoneNumberLength = 30
+  val maxPhoneNumberLength = 24
   val maxEmailLength = 100
   val maxAccountName = 40
   val maxIBANLength = 34
