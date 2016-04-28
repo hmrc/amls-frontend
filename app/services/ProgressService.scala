@@ -74,9 +74,9 @@ trait ProgressService {
         optionCache map {
           implicit cache =>
             Seq(
-//              mandatorySections
-              responsiblePeople
-//              dependentSections
+              mandatorySections,
+              responsiblePeople,
+              dependentSections
             ).foldLeft[Seq[Section]](Seq.empty) { _ ++ _ }
         } getOrElse Seq.empty
     }
