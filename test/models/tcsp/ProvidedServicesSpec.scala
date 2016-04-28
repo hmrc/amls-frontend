@@ -2,7 +2,7 @@ package models.tcsp
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.Success
+import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -17,8 +17,10 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
     }
 
     "successfully validate given multiple selected values" in {
-      val urlFormEncoded = Map("services[]" -> Seq("01", "02"))
-      val expected = Success(ProvidedServices(Set(PhonecallHandling, EmailHandling)))
+      val urlFormEncoded = Map("services[]" -> Seq("01", "02", "03", "04", "05", "06", "07"))
+      val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
+                                         SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
+      val expected = Success(ProvidedServices(allServices))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
@@ -46,6 +48,13 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
       ProvidedServices.formWrites.writes(services) must be(expected)
     }
 
+    "show an error with an invalid value" in {
+      val urlFormEncoded = Map("services[]" -> Seq("1738"))
+      val expected = Failure(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
+      ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
+    }
+
+
   }
 
   "Json read and writes" must {
@@ -55,7 +64,11 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
     }
 
     "Serialise multiple services as expected" in {
-      Json.toJson(ProvidedServices(Set(EmailServer, MailForwarding))) must be(Json.obj("services" -> Seq("03", "05")))
+      val json = Json.obj("services" -> Seq("01", "02", "03", "04", "05", "06", "07"))
+      val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
+        SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
+      val result = Json.toJson(ProvidedServices(allServices)).\("services").as[Seq[String]]
+      result must contain allOf ("01", "02", "03", "04", "05", "06", "07")
     }
 
     "Serialise 'other' service as expected" in {
@@ -63,30 +76,32 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
     }
 
     "Deserialise single service as expected" in {
-      val json = Json.obj("services" -> Seq("01"))
+      val json = Json.obj("services" -> Set("01"))
       val expected = JsSuccess(ProvidedServices(Set(PhonecallHandling)), JsPath \ "services")
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 
     "Deserialise multiple service as expected" in {
-      val json = Json.obj("services" -> Seq("01", "03"))
-      val expected = JsSuccess(ProvidedServices(Set(PhonecallHandling, EmailServer)), JsPath \ "services")
+      val json = Json.obj("services" -> Seq("01", "02", "03", "04", "05", "06", "07"))
+      val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
+                                         SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
+      val expected = JsSuccess(ProvidedServices(allServices), JsPath \ "services")
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 
     "Deserialise 'other' service as expected" in {
-      val json = Json.obj("services" -> Seq("08"), "details" -> "other service")
+      val json = Json.obj("services" -> Set("08"), "details" -> "other service")
       val expected = JsSuccess(ProvidedServices(Set(Other("other service"))), JsPath \ "services" \ "details")
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 
     "fail when on invalid data" in {
-      Json.fromJson[ProvidedServices](Json.obj("transactions" -> Seq("40"))) must
+      Json.fromJson[ProvidedServices](Json.obj("transactions" -> Set("40"))) must
         be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
     }
 
     "fail when on missing details data" in {
-      Json.fromJson[ProvidedServices](Json.obj("transactions" -> Seq("08"))) must
+      Json.fromJson[ProvidedServices](Json.obj("transactions" -> Set("08"))) must
         be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
     }
 
