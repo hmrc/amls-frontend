@@ -29,78 +29,84 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
     "have a default function that" must {
 
-      "correctly provide a default value when none is provided" in {
+      "correctly provides a default value when none is provided" in {
         Tcsp.default(None) must be (Tcsp())
       }
 
-      "correctly provide a default value when existing value is provided" in {
+      "correctly provides a default value when existing value is provided" in {
         Tcsp.default(Some(completeTcsp)) must be (completeTcsp)
       }
 
+    }
+
+    "have a mongo key that" must {
+      "be correctly set" in {
+        Tcsp.mongoKey() must be ("tcsp")
+      }
     }
 
     "have a section function that" must {
 
       implicit val cache = mock[CacheMap]
 
-      "use the correct section message key" in {
-        Tcsp.section.name must be("tcsp")
-      }
+      "return a NotStarted Section when model is empty" in {
 
-      //TODO: Change this from ignore once model has a sub-model.
-      "have a status of Completed when model is completed" ignore {
+        val notStartedSection = Section("tcsp", NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
 
-//        when {
-//          cache.getEntry[Tcsp]("tcsp")
-//        } thenReturn Some(completeTcsp)
+        when (cache.getEntry[Tcsp]("tcsp")) thenReturn None
 
-        Tcsp.section.status must be (Completed)
+        Tcsp.section must be (notStartedSection)
 
       }
 
-      //TODO: Change this from ignore once model has a sub-model.
-      "have a status of Started when model is incomplete" ignore {
+      "return a Completed Section when model is complete" in {
 
-        //TODO: Make the model incomplete once model has two sub-models.
-        val incompleteTcsp = completeTcsp
+        val complete = mock[Tcsp]
+        val completedSection = Section("tcsp", Completed, controllers.routes.RegistrationProgressController.get())
 
-//        when {
-//          cache.getEntry[Tcsp]("tcsp")
-//        } thenReturn Some(incompleteTcsp)
+        when (complete.isComplete) thenReturn true
+        when (cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
 
-        Tcsp.section.status must be (Started)
+        Tcsp.section must be (completedSection)
 
       }
 
+      "return a Started Section when model is incomplete" in {
+
+        val incompleteTcsp = mock[Tcsp]
+        val startedSection = Section("tcsp", Started, controllers.tcsp.routes.WhatYouNeedController.get())
+
+        when(incompleteTcsp.isComplete) thenReturn false
+        when(cache.getEntry[Tcsp]("tcsp"))thenReturn Some(incompleteTcsp)
+
+        Tcsp.section must be (startedSection)
+
+      }
     }
 
     "have an isComplete function that" must {
 
       "correctly show if the model is complete" in {
-        val complete = Tcsp()
-        complete.isComplete must be (true)
+        completeTcsp.isComplete must be (true)
       }
 
       //TODO: Change this from ignore once model has a sub-model.
       "correctly show if the model is not complete" ignore {
-        val complete = Tcsp()
-        complete.isComplete must be (false)
+        val incomplete = Tcsp()
+        incomplete.isComplete must be (false)
       }
 
     }
 
     "correctly convert between json formats" must {
 
-      val completeJson = Json.obj()
-      val completeModel = Tcsp()
+      "Serialise as expected" in {
+        Json.toJson(completeTcsp) must be(completeJson)
+      }
 
-//      "Serialise as expected" ignore {
-//        Json.toJson(completeModel) must be(completeJson)
-//      }
-//
-//      "Deserialise as expected" ignore {
-//        completeJson.as[Tcsp] must be(completeModel)
-//      }
+      "Deserialise as expected" in {
+        completeJson.as[Tcsp] must be(completeTcsp)
+      }
 
     }
 

@@ -21,18 +21,14 @@ object Tcsp {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
     val notStarted = Section(messageKey, NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
-    //TODO: Uncomment this once a sub-section has been added. Json can not format empty case class.
-//    cache.getEntry[Tcsp](key).fold(notStarted) {
-//      model =>
-//        if (model.isComplete) {
-//          Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
-//        } else {
-//          //TODO: Update this route to correct page.
-//          Section(messageKey, Started, controllers.routes.RegistrationProgressController.get())
-//        }
-//    }
-    //TODO: Delete this once above is done.
-    notStarted
+    cache.getEntry[Tcsp](key).fold(notStarted) {
+      model =>
+        if (model.isComplete) {
+          Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
+        } else {
+          Section(messageKey, Started, controllers.tcsp.routes.WhatYouNeedController.get())
+        }
+    }
   }
 
   val key = "tcsp"
@@ -41,9 +37,11 @@ object Tcsp {
     override def apply(): String = "tcsp"
   }
 
-//  implicit val reads: Reads[Tcsp] = ???
-//
-//  implicit val writes: Writes[Tcsp] = ???
+  implicit val reads: Reads[Tcsp] =
+    Reads(_ => JsSuccess(Tcsp()))
+
+  implicit val writes: Writes[Tcsp] =
+    Writes(_ => Json.obj() )
 
   implicit def default(details: Option[Tcsp]): Tcsp =
     details.getOrElse(Tcsp())
