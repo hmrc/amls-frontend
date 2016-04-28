@@ -39,9 +39,13 @@ object Asp {
     override def apply(): String = "asp"
   }
 
-  implicit val reads: Reads[Asp] = ???
+  // TODO: Update this with actual code
+  implicit val reads: Reads[Asp] =
+    Reads(_ => JsSuccess(Asp()))
 
-  implicit val writes: Writes[Asp] = ???
+  // TODO: Update this with actual code
+  implicit val writes: Writes[Asp] =
+    Writes(_ => Json.obj() )
 
   implicit def default(details: Option[Asp]): Asp =
     details.getOrElse(Asp())
