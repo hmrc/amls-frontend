@@ -1,0 +1,31 @@
+@import include._
+@()(implicit request: Request[_])
+
+@sidebar = {
+<div class="bevel-container">
+    <h3 class="heading-small">@Messages("asp.whatyouneed.sidebar.title")</h3>
+    <p>@Messages("asp.whatyouneed.sidebar.information")</p>
+</div>
+}
+
+@main(
+title = Messages("asp.whatyouneed.title"),
+sidebar = sidebar
+) {
+
+@heading("asp.whatyouneed.title", "summary.asp")
+
+<div class="form-field">
+    <span>@Messages("asp.whatyouneed.subheading")</span>
+</div>
+
+<ul class="list-bullet form-group">
+    <li class="no-padding no-margin">@Messages("asp.whatyouneed.line_1")</li>
+    <li class="no-padding no-margin">@Messages("asp.whatyouneed.line_2")</li>
+</ul>
+
+<div class="form-group">
+    <a id="what-you-need-continue" class="button" href="@controllers.asp.routes.WhatYouNeedController.get()">@Messages("button.continue")</a>
+</div>
+
+}

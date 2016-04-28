@@ -20,8 +20,7 @@ object Asp {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "asp"
-    //TODO: Update this route to correct page.
-    val notStarted = Section(messageKey, NotStarted, controllers.routes.RegistrationProgressController.get())
+    val notStarted = Section(messageKey, NotStarted, controllers.asp.routes.WhatYouNeedController.get())
     cache.getEntry[Asp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
