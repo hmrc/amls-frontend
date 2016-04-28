@@ -8,7 +8,7 @@
 #
 
 ########################################################################################################################
-##################################               Generic Error Messages     ##################################################
+##################################       Generic Error Messages     ####################################################
 ########################################################################################################################
 
 err.titleNotEntered.first_name = Enter the first name
@@ -162,6 +162,10 @@ error.invalid.length.otherNames = You can't enter more than 140 characters for t
 error.required.timeAtAddress = Select how long this person lived at this address.
 error.required.positionWithinBusiness = Select at least one business position.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
+
+error.required.tcsp.service.providers = Select at least one kind of Trust or Company Service Provider
+error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
+error.required.tcsp.complex.corporate.structures  = Select yes or no to the question: do you create complex corporate structures for clients, or are you planning to do so in the future?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -704,3 +708,5 @@ asp.whatyouneed.line_1 = a list of which services you provide
 asp.whatyouneed.line_2 = your HMRC Agent Registration Number, if relevant
 asp.whatyouneed.sidebar.title = Automatic saving
 asp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
+
+
