@@ -192,4 +192,5 @@ GET         /responsible-people/your-answers         controllers.responsiblepeop
 GET         /accountancy-service-provider/what-you-need       controllers.asp.WhatYouNeedController.get()
 
 GET         /trust-company-service-provider/what-you-need        controllers.tcsp.WhatYouNeedController.get()
+GET         /trust-company-service-provider/services       controllers.tcsp.ProvidedServicesController.get()
 

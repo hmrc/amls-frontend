@@ -4,10 +4,12 @@ import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class Tcsp() {
+case class Tcsp(providedServices: Option[ProvidedServices] = None) {
+
+  def providedServices(ps: ProvidedServices): Tcsp = this.copy(providedServices = Some(ps))
 
   def isComplete: Boolean = this match {
-    case Tcsp() => true
+    case Tcsp(Some(_)) => true
     case _ => false
   }
 
@@ -15,7 +17,6 @@ case class Tcsp() {
 
 object Tcsp {
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   def section(implicit cache: CacheMap): Section = {
@@ -37,12 +38,20 @@ object Tcsp {
     override def apply(): String = "tcsp"
   }
 
-  implicit val reads: Reads[Tcsp] =
-    Reads(_ => JsSuccess(Tcsp()))
+  implicit val reads: Reads[Tcsp] = (
+    __.read[Option[ProvidedServices]]
+    ) (Tcsp.apply _)
 
   implicit val writes: Writes[Tcsp] =
-    Writes(_ => Json.obj() )
+    Writes[Tcsp] {
+      model =>
+        Seq(
+          Json.toJson(model.providedServices).asOpt[JsObject]
+        ).flatten.fold(Json.obj()) {
+          _ ++ _
+        }
+    }
 
-  implicit def default(details: Option[Tcsp]): Tcsp =
-    details.getOrElse(Tcsp())
+  implicit def default(tcsp: Option[Tcsp]): Tcsp =
+    tcsp.getOrElse(Tcsp())
 }

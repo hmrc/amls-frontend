@@ -12,14 +12,18 @@ trait TcspValues {
 
   object DefaultValues {
 
+    val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling))
+
   }
 
   object NewValues {
 
+    val NewProvidedServices = ProvidedServices(Set(EmailHandling))
+
   }
 
   val completeJson = Json.obj()
-  val completeTcsp = Tcsp()
+  val completeTcsp = Tcsp(providedServices = Some(DefaultValues.DefaultProvidedServices))
 
 }
 
@@ -90,9 +94,8 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
         completeTcsp.isComplete must be (true)
       }
 
-      //TODO: Change this from ignore once model has a sub-model.
-      "correctly show if the model is not complete" ignore {
-        val incomplete = Tcsp()
+      "correctly show if the model is not complete" in {
+        val incomplete = completeTcsp.copy(providedServices = None)
         incomplete.isComplete must be (false)
       }
 
