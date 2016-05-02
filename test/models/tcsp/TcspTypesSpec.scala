@@ -9,13 +9,13 @@ class TcspTypesSpec extends PlaySpec {
 
   "TrustOrCompanyServiceProviders" must {
 
-    val Services = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc(true, false)))
+    val Services = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true, false)))
 
     "Form Validation" must {
 
       "read valid form data and return success" in {
         val model = Map(
-          "serviceProviders[]" -> Seq("01", "02","03" ,"04"),
+          "serviceProviders[]" -> Seq("01", "02","03" ,"04", "05"),
           "onlyOffTheShelfCompsSold" -> Seq("true"),
           "complexCorpStructureCreation" -> Seq("false")
         )
@@ -26,7 +26,7 @@ class TcspTypesSpec extends PlaySpec {
 
       "read invalid form data and return failure message for required fields" in {
         val model = Map(
-          "serviceProviders[]" -> Seq("04"),
+          "serviceProviders[]" -> Seq("05"),
           "onlyOffTheShelfCompsSold" -> Seq(""),
           "complexCorpStructureCreation" -> Seq("")
         )
@@ -53,10 +53,16 @@ class TcspTypesSpec extends PlaySpec {
       }
 
       "write correct data" in {
+        val model = TcspTypes(Set(RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent(true, false)))
 
-        TcspTypes.formWrites.writes(Services) must be (Map("serviceProviders[]" -> Seq("01", "02" , "03" ,"04"),
+        TcspTypes.formWrites.writes(model) mustBe Map("serviceProviders[]" -> Seq("03" ,"04", "05"),
           "onlyOffTheShelfCompsSold" -> Seq("true"),
-          "complexCorpStructureCreation" -> Seq("false")))
+          "complexCorpStructureCreation" -> Seq("false"))
+      }
+
+      "write correct data1" in {
+        val model = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider))
+        TcspTypes.formWrites.writes(model) mustBe Map("serviceProviders[]" -> Seq("01" ,"02"))
       }
     }
 
@@ -64,7 +70,7 @@ class TcspTypesSpec extends PlaySpec {
 
       "successfully validate given values with option CompanyDirectorEtc" in {
         val json =  Json.obj(
-          "serviceProviders" -> Seq("01","02","03","04"),
+          "serviceProviders" -> Seq("01","02","03","04", "05"),
           "onlyOffTheShelfCompsSold" -> true,
           "complexCorpStructureCreation" -> false
         )

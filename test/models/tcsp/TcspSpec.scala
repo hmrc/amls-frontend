@@ -9,8 +9,8 @@ class TcspSpec extends PlaySpec with MockitoSugar {
 
   "Tcsp" must {
 
-    val DefaultCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc(true, false)))
-    val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc(true, false)))
+    val DefaultCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc, CompanyFormationAgent(true, false)))
+    val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc, CompanyFormationAgent(true, false)))
 
     "Complete Model" when {
 
