@@ -290,7 +290,7 @@ summary.aboutyou = About you
 summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
-summary.businessmatching=Business matching
+summary.businessmatching = Business matching
 summary.tcsp = Trust and company service provider information
 summary.asp = Accountancy Service Provider
 
@@ -709,4 +709,13 @@ asp.whatyouneed.line_2 = your HMRC Agent Registration Number, if relevant
 asp.whatyouneed.sidebar.title = Automatic saving
 asp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
 
+tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
+tcsp.service.provider.lbl.01 = Nominee shareholders provider
+tcsp.service.provider.lbl.02 = Trustee provider
+tcsp.service.provider.lbl.03 = Registered office, business address, or virtual office services provider
+tcsp.service.provider.lbl.04 = Company director, secretary, or partner provider
+tcsp.service.provider.lbl.05 = Trust or company formation agent
+
+tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
+tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 

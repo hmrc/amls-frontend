@@ -4,12 +4,12 @@ import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class Tcsp(
-                 trustOrCompanyServiceProviders: Option[TrustOrCompanyServiceProviders] = None
+case class Tcsp (
+                  tcspTypes: Option[TcspTypes] = None
                ) {
 
-  def trustOrCompanyServiceProviders(trust: TrustOrCompanyServiceProviders) : Tcsp =
-    this.copy(trustOrCompanyServiceProviders = Some(trust))
+  def tcspTypes(trust: TcspTypes) : Tcsp =
+    this.copy(tcspTypes = Some(trust))
 
   def isComplete: Boolean = this match {
     case Tcsp(Some(_)) => true
@@ -44,9 +44,7 @@ object Tcsp {
     override def apply(): String = "tcsp"
   }
 
-  implicit val reads: Reads[Tcsp] = ???
-
-  implicit val writes: Writes[Tcsp] = ???
+  implicit val format = Json.format[Tcsp]
 
   implicit def default(details: Option[Tcsp]): Tcsp =
     details.getOrElse(Tcsp())

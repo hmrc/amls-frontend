@@ -3,24 +3,24 @@ package models.tcsp
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsError, Json}
+import play.api.libs.json.{JsSuccess, JsPath, JsError, Json}
 
-class TrustOrCompanyServiceProvidersSpec extends PlaySpec {
+class TcspTypesSpec extends PlaySpec {
 
   "TrustOrCompanyServiceProviders" must {
 
-    val Services = TrustOrCompanyServiceProviders(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc(true, false)))
+    val Services = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc(true, false)))
 
     "Form Validation" must {
 
       "read valid form data and return success" in {
         val model = Map(
-          "serviceProviders[]" -> Seq("01", "02" ,"04"),
+          "serviceProviders[]" -> Seq("01", "02","03" ,"04"),
           "onlyOffTheShelfCompsSold" -> Seq("true"),
           "complexCorpStructureCreation" -> Seq("false")
         )
 
-        TrustOrCompanyServiceProviders.formReads.validate(model) mustBe
+        TcspTypes.formReads.validate(model) mustBe
         Success(Services)
       }
 
@@ -31,14 +31,14 @@ class TrustOrCompanyServiceProvidersSpec extends PlaySpec {
           "complexCorpStructureCreation" -> Seq("")
         )
 
-        TrustOrCompanyServiceProviders.formReads.validate(model) mustBe
+        TcspTypes.formReads.validate(model) mustBe
           Failure(Seq((Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("error.required.tcsp.off.the.shelf.companies")),
             (Path \ "complexCorpStructureCreation") -> Seq(ValidationError("error.required.tcsp.complex.corporate.structures"))))
       }
 
       "return failure message when user has not selected any of the services" in {
 
-        TrustOrCompanyServiceProviders.formReads.validate(Map.empty) mustBe
+        TcspTypes.formReads.validate(Map.empty) mustBe
           Failure(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.required.tcsp.service.providers"))))
       }
 
@@ -48,13 +48,13 @@ class TrustOrCompanyServiceProvidersSpec extends PlaySpec {
           "serviceProviders[]" -> Seq("01", "10")
         )
 
-        TrustOrCompanyServiceProviders.formReads.validate(model) mustBe
+        TcspTypes.formReads.validate(model) mustBe
           Failure(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.invalid"))))
       }
 
       "write correct data" in {
 
-        TrustOrCompanyServiceProviders.formWrites.writes(Services) must be (Map("serviceProviders[]" -> Seq("01", "02" ,"04"),
+        TcspTypes.formWrites.writes(Services) must be (Map("serviceProviders[]" -> Seq("01", "02" , "03" ,"04"),
           "onlyOffTheShelfCompsSold" -> Seq("true"),
           "complexCorpStructureCreation" -> Seq("false")))
       }
@@ -62,14 +62,25 @@ class TrustOrCompanyServiceProvidersSpec extends PlaySpec {
 
     "Json Validation" must {
 
+      "successfully validate given values with option CompanyDirectorEtc" in {
+        val json =  Json.obj(
+          "serviceProviders" -> Seq("01","02","03","04"),
+          "onlyOffTheShelfCompsSold" -> true,
+          "complexCorpStructureCreation" -> false
+        )
+
+        Json.fromJson[TcspTypes](json) must
+          be(JsSuccess(Services, JsPath \ "serviceProviders"))
+      }
+
       "Read and Write Json valid data successfully" in {
 
-        TrustOrCompanyServiceProviders.jsonReads.reads(Json.toJson(Services))
+        TcspTypes.jsonReads.reads(Json.toJson(Services))
       }
 
       "throw error message on reading invalid data" in {
 
-        Json.fromJson[TrustOrCompanyServiceProviders](Json.obj("serviceProviders" -> Seq("40"))) must
+        Json.fromJson[TcspTypes](Json.obj("serviceProviders" -> Seq("40"))) must
           be(JsError((JsPath \ "serviceProviders") \ "serviceProviders" -> ValidationError("error.invalid")))
 
       }
