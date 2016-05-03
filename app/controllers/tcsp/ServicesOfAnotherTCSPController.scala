@@ -3,7 +3,7 @@ package controllers.tcsp
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tcsp.{ServicesOfAnotherTCSP, Tcsp}
 import views.html.tcsp._
 import scala.concurrent.Future
@@ -45,6 +45,7 @@ trait ServicesOfAnotherTCSPController extends BaseController {
 }
 
 object ServicesOfAnotherTCSPController extends ServicesOfAnotherTCSPController {
+  // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
 }

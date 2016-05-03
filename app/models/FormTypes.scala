@@ -44,7 +44,6 @@ object FormTypes {
   val ibanRegex = "^[0-9a-zA-Z_]+$".r
   val ninoRegex = "^^[A-Z]{2}[0-9]{6}[A-Z]{1}$".r
   val passportRegex = "^[0-9a-zA-Z_]{9}+$".r
-  val mlrRefNumberRegex = "^[0-9]{8}|[0-9]{15}".r
 
   /** Helper Functions **/
 

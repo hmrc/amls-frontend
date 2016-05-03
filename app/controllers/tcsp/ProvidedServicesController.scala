@@ -37,9 +37,9 @@ trait ProvidedServicesController extends BaseController {
               tcsp.providedServices(data)
             )
           } yield edit match {
-            //TODO: Update to correct pages.
+            //TODO: Update to correct page.
             case true => Redirect(routes.ProvidedServicesController.get())
-            case false => Redirect(routes.ProvidedServicesController.get())
+            case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
           }
       }
   }
