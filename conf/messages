@@ -718,6 +718,9 @@ tcsp.service.provider.lbl.04 = Company director, secretary, or partner provider
 tcsp.service.provider.lbl.05 = Trust or company formation agent
 tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
+tcsp.summary.company.formation.details = Trust or company formation details
+tcsp.summary.off.the.shelf.companies.lbl = Sell off-the-shelf companies
+tcsp.summary.create.complex.corp.structure.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future
 
 #ASP
 
