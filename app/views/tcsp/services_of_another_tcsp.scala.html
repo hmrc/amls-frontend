@@ -1,0 +1,29 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+s"""${f("mlrRefNumber").id}-fieldset"""
+}
+
+@main(
+title = Messages("tcsp.servicesOfAnotherTcsp.title")
+) {
+
+@heading("tcsp.servicesOfAnotherTcsp.title", "summary.tcsp")
+
+@form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
+
+@inlineRadioGroup(f("servicesOfAnotherTcsp")) {
+@legend("TODO", jsHidden = true)
+@radio(f("servicesOfAnotherTcsp"), "lbl.yes", "true", target = s"#$target")
+@radio(f("servicesOfAnotherTcsp"), "lbl.no", "false")
+@fieldset("TODO", jsHidden = true, id = target) {
+@input(f("mlrRefNumber"), "tcsp.servicesOfAnotherTcsp.mlrregno.lbl", bold = false)
+}
+}
+
+@submit(edit)
+}
+}

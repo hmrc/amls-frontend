@@ -44,13 +44,19 @@ object FormTypes {
   val ibanRegex = "^[0-9a-zA-Z_]+$".r
   val ninoRegex = "^^[A-Z]{2}[0-9]{6}[A-Z]{1}$".r
   val passportRegex = "^[0-9a-zA-Z_]{9}+$".r
+  val mlrRefNumberRegex = "^[0-9]{8}|[0-9]{15}".r
 
   /** Helper Functions **/
 
   def maxWithMsg(length: Int, msg: String) = maxLength(length).withMessage(msg)
+
   def regexWithMsg(regex: Regex, msg: String) = pattern(regex).withMessage(msg)
+
   def required(msg: String) = notEmpty.withMessage(msg)
-  val notEmptyStrip = Rule.zero[String] fmap { _.trim }
+
+  val notEmptyStrip = Rule.zero[String] fmap {
+    _.trim
+  }
 
   /** Name Rules **/
 
@@ -85,7 +91,7 @@ object FormTypes {
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line")
 
   private val postcodeRequired = required("error.required.postcode")
-  private val postcodeLength =  maxWithMsg(maxPostCodeTypeLength, "error.invalid.postcode")
+  private val postcodeLength = maxWithMsg(maxPostCodeTypeLength, "error.invalid.postcode")
 
   val postcodeType = postcodeRequired compose postcodeLength
 
@@ -97,7 +103,7 @@ object FormTypes {
 
   private val emailRequired = required("error.required.rp.email")
   private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")
-  private val emailPattern =regexWithMsg(emailRegex, "error.invalid.rp.email")
+  private val emailPattern = regexWithMsg(emailRegex, "error.invalid.rp.email")
 
   private val dayRequired = required("error.required.tp.date")
   private val dayPattern = regexWithMsg(dayRegex, "error.invalid.tp.date")
@@ -121,10 +127,10 @@ object FormTypes {
         (__ \ "month").read[String] ~
         (__ \ "day").read[String]
       )( (y, m, d) => s"$y-$m-$d" ) compose jodaLocalDateRule("yyyy-MM-dd")
-    }.repath( _ => Path)
+    }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
-   To[UrlFormEncoded] { __ =>
+    To[UrlFormEncoded] { __ =>
      import play.api.data.mapping.forms.Writes._
      (
        (__ \ "year").write[String] ~
@@ -167,5 +173,9 @@ object FormTypes {
   val ukPassportType = passportRequired compose passportPattern
   val noUKPassportType = nonUKPassportRequired compose nonUkPassportLength
 
-
+  /** MLR reference number Rules **/
+  //TODO need to check about the pattern and required error message might need to be changed
+  private val mlrRequired = required("error.required.tcsp.mlr.reference.number")
+  private val mlrRegNumbertPattern = regexWithMsg(mlrRefNumberRegex, "error.invalid.tcsp.mlr.reference.number")
+  val mlrRefNumberPattern = mlrRequired compose mlrRegNumbertPattern
 }

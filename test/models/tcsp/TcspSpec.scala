@@ -18,8 +18,11 @@ trait TcspValues {
 
   }
 
-  val completeJson = Json.obj()
-  val completeTcsp = Tcsp()
+  val completeJson = Json.obj(
+    "servicesOfAnotherTCSP" -> true,
+    "mlrRefNumber" -> "12345678"
+  )
+  val completeTcsp = Tcsp(Some(ServicesOfAnotherTCSPYes("12345678")))
 
 }
 
@@ -30,18 +33,18 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
     "have a default function that" must {
 
       "correctly provides a default value when none is provided" in {
-        Tcsp.default(None) must be (Tcsp())
+        Tcsp.default(None) must be(Tcsp())
       }
 
       "correctly provides a default value when existing value is provided" in {
-        Tcsp.default(Some(completeTcsp)) must be (completeTcsp)
+        Tcsp.default(Some(completeTcsp)) must be(completeTcsp)
       }
 
     }
 
     "have a mongo key that" must {
       "be correctly set" in {
-        Tcsp.mongoKey() must be ("tcsp")
+        Tcsp.mongoKey() must be("tcsp")
       }
     }
 
@@ -53,9 +56,9 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
         val notStartedSection = Section("tcsp", NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
 
-        when (cache.getEntry[Tcsp]("tcsp")) thenReturn None
+        when(cache.getEntry[Tcsp]("tcsp")) thenReturn None
 
-        Tcsp.section must be (notStartedSection)
+        Tcsp.section must be(notStartedSection)
 
       }
 
@@ -64,10 +67,10 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
         val complete = mock[Tcsp]
         val completedSection = Section("tcsp", Completed, controllers.routes.RegistrationProgressController.get())
 
-        when (complete.isComplete) thenReturn true
-        when (cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
+        when(complete.isComplete) thenReturn true
+        when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
 
-        Tcsp.section must be (completedSection)
+        Tcsp.section must be(completedSection)
 
       }
 
@@ -77,9 +80,9 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
         val startedSection = Section("tcsp", Started, controllers.tcsp.routes.WhatYouNeedController.get())
 
         when(incompleteTcsp.isComplete) thenReturn false
-        when(cache.getEntry[Tcsp]("tcsp"))thenReturn Some(incompleteTcsp)
+        when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(incompleteTcsp)
 
-        Tcsp.section must be (startedSection)
+        Tcsp.section must be(startedSection)
 
       }
     }
@@ -87,13 +90,13 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
     "have an isComplete function that" must {
 
       "correctly show if the model is complete" in {
-        completeTcsp.isComplete must be (true)
+        completeTcsp.isComplete must be(true)
       }
 
       //TODO: Change this from ignore once model has a sub-model.
       "correctly show if the model is not complete" ignore {
         val incomplete = Tcsp()
-        incomplete.isComplete must be (false)
+        incomplete.isComplete must be(false)
       }
 
     }
