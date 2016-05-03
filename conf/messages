@@ -163,6 +163,9 @@ error.required.timeAtAddress = Select how long this person lived at this address
 error.required.positionWithinBusiness = Select at least one business position.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 
+#TCSP
+error.required.tcsp.provided_services.details = Enter some information about the other services your business provides.
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################

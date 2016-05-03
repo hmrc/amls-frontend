@@ -38,19 +38,7 @@ object Tcsp {
     override def apply(): String = "tcsp"
   }
 
-  implicit val reads: Reads[Tcsp] = (
-    __.read[Option[ProvidedServices]]
-    ) (Tcsp.apply _)
-
-  implicit val writes: Writes[Tcsp] =
-    Writes[Tcsp] {
-      model =>
-        Seq(
-          Json.toJson(model.providedServices).asOpt[JsObject]
-        ).flatten.fold(Json.obj()) {
-          _ ++ _
-        }
-    }
+  implicit val formats = Json.format[Tcsp]
 
   implicit def default(tcsp: Option[Tcsp]): Tcsp =
     tcsp.getOrElse(Tcsp())

@@ -55,8 +55,8 @@ object ProvidedServices {
 
   val serviceDetailsMaxLength = 255
   val serviceDetailsType = notEmptyStrip compose
-                           notEmpty.withMessage("error.required.tcsp.details") compose
-                           maxLength(serviceDetailsMaxLength).withMessage("error.invalid.tcsp.details")
+                           notEmpty.withMessage("error.required.tcsp.provided_services.details") compose
+                           maxLength(serviceDetailsMaxLength)
 
   val serviceType = minLength[Set[String]](1).withMessage("error.required.eab.business.services")
 
