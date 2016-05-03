@@ -4,12 +4,14 @@ import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class Tcsp(providedServices: Option[ProvidedServices] = None) {
+case class Tcsp (tcspTypes: Option[TcspTypes] = None,
+                 providedServices: Option[ProvidedServices] = None) {
 
+  def tcspTypes(trust: TcspTypes): Tcsp = this.copy(tcspTypes = Some(trust))
   def providedServices(ps: ProvidedServices): Tcsp = this.copy(providedServices = Some(ps))
 
   def isComplete: Boolean = this match {
-    case Tcsp(Some(_)) => true
+    case Tcsp(Some(_), Some(_)) => true
     case _ => false
   }
 

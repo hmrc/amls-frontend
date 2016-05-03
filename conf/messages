@@ -8,7 +8,7 @@
 #
 
 ########################################################################################################################
-##################################               Generic Error Messages     ##################################################
+##################################       Generic Error Messages     ####################################################
 ########################################################################################################################
 
 err.titleNotEntered.first_name = Enter the first name
@@ -165,6 +165,9 @@ error.required.rp.wherepersonlives.howlonglived = Select how long this person ha
 
 #TCSP
 error.required.tcsp.provided_services.details = Enter some information about the other services your business provides.
+error.required.tcsp.service.providers = Select at least one kind of Trust or Company Service Provider
+error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
+error.required.tcsp.complex.corporate.structures  = Select yes or no to the question: do you create complex corporate structures for clients, or are you planning to do so in the future?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -250,7 +253,7 @@ progress.hvd.time = 8
 progress.msb.name = Money service business
 progress.msb.description = Registration information specifically for money service businesses.
 progress.msb.time = 6
-progress.tcsp.name = Trust or company service provider
+progress.tcsp.name = Trust or Company service provider
 progress.tcsp.description = Registration information specifically for trust or company service providers.
 progress.tcsp.time = 8
 progress.responsiblepeople.name = Responsible People
@@ -279,9 +282,9 @@ confirmation.tradingpremises = Trading Premises
 summary.title = Your AMLS registration
 summary.sectiontitle = Service
 summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
-summary.businessactivities = Business activities
-summary.aboutbusiness = About the business
-summary.estateagentbusiness = Estate agent business
+summary.businessactivities = Business Activities
+summary.aboutbusiness = About the Business
+summary.estateagentbusiness = Estate Agent Business
 summary.tradingpremises = Trading premises
 summary.bankdetails = Bank details
 summary.responsiblepeople = Responsible people
@@ -289,8 +292,8 @@ summary.aboutyou = About you
 summary.payment = Payment
 summary.declarationlocked = Declaration (locked)
 summary.declarationlocked.title = You can’t complete this section yet
-summary.businessmatching=Business matching
-summary.tcsp = Trust and company service provider information
+summary.businessmatching = Business matching
+summary.tcsp = Trust or Company Service Provider
 summary.asp = Accountancy Service Provider
 
 summary.checkyouranswers.title = Check your answers
@@ -702,7 +705,6 @@ responsiblepeople.your_answers.heading = Your answers
 responsiblepeople.check_your_answers.add = Add a responsible person
 
 #TCSP
-
 tcsp.whatyouneed.title = What you need
 tcsp.whatyouneed.heading = What you need
 tcsp.whatyouneed.requiredinfo.heading = For this section you''ll need:
@@ -710,6 +712,14 @@ tcsp.whatyouneed.requiredinfo.text.1 = a list of which services you provide
 tcsp.whatyouneed.requiredinfo.text.2 = if you use another Trust or Company Service Provider, its Money Laundering Regulation reference number
 tcsp.whatyouneed.sidebar.title = Automatic saving
 tcsp.whatyouneed.sidebar.information = Your progress is saved automatically. If you sign out you''ll have 28 days to complete your registration.
+tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
+tcsp.service.provider.lbl.01 = Nominee shareholders provider
+tcsp.service.provider.lbl.02 = Trustee provider
+tcsp.service.provider.lbl.03 = Registered office, business address, or virtual office services provider
+tcsp.service.provider.lbl.04 = Company director, secretary, or partner provider
+tcsp.service.provider.lbl.05 = Trust or company formation agent
+tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
+tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 
 tcsp.provided_services.title = Which services does your business provide?
 tcsp.provided_services.heading = Which services does your business provide?
@@ -731,3 +741,5 @@ asp.whatyouneed.line_1 = a list of which services you provide
 asp.whatyouneed.line_2 = your HMRC Agent Registration Number, if relevant
 asp.whatyouneed.sidebar.title = Automatic saving
 asp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
+
+
