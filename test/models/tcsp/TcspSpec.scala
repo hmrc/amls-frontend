@@ -20,9 +20,9 @@ trait TcspValues {
   }
 
   val completeJson = Json.obj(
-    "serviceProviders[]" -> Seq("01", "02", "04"),
-    "onlyOffTheShelfCompsSold" -> Seq("true"),
-    "complexCorpStructureCreation" -> Seq("false")
+    "tcspTypes" -> Json.obj("serviceProviders" -> Seq("01", "02", "04", "05"),
+                   "onlyOffTheShelfCompsSold" -> true,
+                   "complexCorpStructureCreation" -> false)
   )
 
   val completeModel = Tcsp(Some(DefaultValues.DefaultCompanyServiceProviders))
@@ -89,7 +89,6 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       }
     }
 
-
     "have an isComplete function that" must {
 
       "correctly show if the model is complete" in {
@@ -101,11 +100,11 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
       "correctly convert between json formats" when {
 
-        "Serialise as expected" ignore {
+        "Serialise as expected" in {
           Json.toJson(completeModel) must be(completeJson)
         }
 
-        "Deserialise as expected" ignore {
+        "Deserialise as expected" in {
           completeJson.as[Tcsp] must be(completeModel)
         }
       }
