@@ -4,23 +4,25 @@ import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class Tcsp (
-                  tcspTypes: Option[TcspTypes] = None
-               ) {
+case class Tcsp(
+                 tcspTypes: Option[TcspTypes] = None,
+                 servicesOfAnotherTCSP: Option[ServicesOfAnotherTCSP] = None
+                 ) {
 
-  def tcspTypes(trust: TcspTypes) : Tcsp =
+  def tcspTypes(trust: TcspTypes): Tcsp =
     this.copy(tcspTypes = Some(trust))
 
+  def servicesOfAnotherTCSP(p: ServicesOfAnotherTCSP): Tcsp =
+    this.copy(servicesOfAnotherTCSP = Some(p))
+
   def isComplete: Boolean = this match {
-    case Tcsp(Some(_)) => true
+    case Tcsp(Some(_), Some(_)) => true
     case _ => false
   }
 
 }
 
 object Tcsp {
-
-  import play.api.libs.json._
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
@@ -34,6 +36,8 @@ object Tcsp {
         }
     }
   }
+
+  import play.api.libs.json._
 
   val key = "tcsp"
 
