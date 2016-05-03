@@ -251,7 +251,7 @@ progress.hvd.time = 8
 progress.msb.name = Money service business
 progress.msb.description = Registration information specifically for money service businesses.
 progress.msb.time = 6
-progress.tcsp.name = Trust or company service provider
+progress.tcsp.name = Trust or Company service provider
 progress.tcsp.description = Registration information specifically for trust or company service providers.
 progress.tcsp.time = 8
 progress.responsiblepeople.name = Responsible People
@@ -702,6 +702,25 @@ responsiblepeople.your_answers.title = Your answers
 responsiblepeople.your_answers.heading = Your answers
 responsiblepeople.check_your_answers.add = Add a responsible person
 
+#TCSP
+tcsp.whatyouneed.title = What you need
+tcsp.whatyouneed.heading = What you need
+tcsp.whatyouneed.requiredinfo.heading = For this section you''ll need:
+tcsp.whatyouneed.requiredinfo.text.1 = a list of which services you provide
+tcsp.whatyouneed.requiredinfo.text.2 = if you use another Trust or Company Service Provider, it''s Money Laundering Regulation reference number
+tcsp.whatyouneed.sidebar.title = Automatic saving
+tcsp.whatyouneed.sidebar.information = Your progress is saved automatically. If you sign out you''ll have 28 days to complete your registration.
+tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
+tcsp.service.provider.lbl.01 = Nominee shareholders provider
+tcsp.service.provider.lbl.02 = Trustee provider
+tcsp.service.provider.lbl.03 = Registered office, business address, or virtual office services provider
+tcsp.service.provider.lbl.04 = Company director, secretary, or partner provider
+tcsp.service.provider.lbl.05 = Trust or company formation agent
+tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
+tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
+
+#ASP
+
 asp.whatyouneed.title = What you need
 asp.whatyouneed.subheading = For this section you''ll need:
 asp.whatyouneed.line_1 = a list of which services you provide
@@ -709,13 +728,4 @@ asp.whatyouneed.line_2 = your HMRC Agent Registration Number, if relevant
 asp.whatyouneed.sidebar.title = Automatic saving
 asp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
 
-tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
-tcsp.service.provider.lbl.01 = Nominee shareholders provider
-tcsp.service.provider.lbl.02 = Trustee provider
-tcsp.service.provider.lbl.03 = Registered office, business address, or virtual office services provider
-tcsp.service.provider.lbl.04 = Company director, secretary, or partner provider
-tcsp.service.provider.lbl.05 = Trust or company formation agent
-
-tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
-tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 

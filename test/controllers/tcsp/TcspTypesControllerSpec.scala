@@ -91,7 +91,7 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
 
       "throw error an invalid data entry" in  new Fixture {
         val newrequest = request.withFormUrlEncodedBody(
-          "serviceProviders[]" -> "04",
+          "serviceProviders[]" -> "05",
           "onlyOffTheShelfCompsSold" -> "",
           "complexCorpStructureCreation" -> ""
         )

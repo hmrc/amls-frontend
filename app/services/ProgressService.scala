@@ -10,6 +10,7 @@ import models.businessmatching.{BusinessActivities => _, _}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.registrationprogress.{NotStarted, Section}
 import models.responsiblepeople.ResponsiblePeople
+import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -39,7 +40,7 @@ trait ProgressService {
           m :+ Section("msb", NotStarted, controllers.routes.RegistrationProgressController.get())
         case TrustAndCompanyServices =>
           // TODO
-          m :+ Section("tcsp", NotStarted, controllers.routes.RegistrationProgressController.get())
+          m :+ Tcsp.section
         case _ => m
       }
         // TODO Error instead of empty map

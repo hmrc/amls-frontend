@@ -1,0 +1,33 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@()(implicit request: Request[_])
+
+@sidebar = {
+    <div class="bevel-container">
+        <h3 class="heading-small">@Messages("tcsp.whatyouneed.sidebar.title")</h3>
+        <p>@Messages("tcsp.whatyouneed.sidebar.information")</p>
+    </div>
+}
+
+@main(
+    title = Messages("tcsp.whatyouneed.title"),
+    sidebar = sidebar
+) {
+
+    @heading("tcsp.whatyouneed.heading", "summary.tcsp")
+
+    <p>@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
+    <ul class="list-bullet form-group">
+        <li class="no-padding no-margin">@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
+        <li  class="no-padding no-margin">@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
+    </ul>
+
+    <div class="form-field">
+        <a id="what-you-need-continue" class="button" href="@controllers.tcsp.routes.TcspTypesController.get()">
+            @Messages("button.continue")
+        </a>
+    </div>
+
+}
