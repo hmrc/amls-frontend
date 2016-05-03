@@ -1,6 +1,6 @@
 package models.tcsp
 
-import models.registrationprogress.{Started, NotStarted, Section}
+import models.registrationprogress.{Completed, Started, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.scalatestplus.play.PlaySpec
@@ -64,6 +64,18 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
       }
 
+      "return a Completed Section when model is complete" in {
+
+        val complete = mock[Tcsp]
+        val completedSection = Section("tcsp", Completed, controllers.routes.RegistrationProgressController.get())
+
+        when (complete.isComplete) thenReturn true
+        when (cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
+
+        Tcsp.section must be (completedSection)
+
+      }
+
       "return a Started Section when model is incomplete" in {
 
         val incompleteTcsp = mock[Tcsp]
@@ -75,6 +87,21 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
         Tcsp.section must be (startedSection)
 
       }
+    }
+
+
+    "have an isComplete function that" must {
+
+      "correctly show if the model is complete" in {
+        completeModel.isComplete must be (true)
+      }
+
+      //TODO: Change this from ignore once model has a sub-model.
+      "correctly show if the model is not complete" ignore {
+        val incomplete = Tcsp()
+        incomplete.isComplete must be (false)
+      }
+
     }
 
     "Complete Model" when {
