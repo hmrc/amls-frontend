@@ -32,11 +32,6 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
 
   "ServicesOfAnotherTCSPController" must {
 
-    "use correct services" in new Fixture {
-      ServicesOfAnotherTCSPController.authConnector must be(AMLSAuthConnector)
-      ServicesOfAnotherTCSPController.dataCacheConnector must be(DataCacheConnector)
-    }
-
     "on get display the Does your business use the services of another Trust or Company Service Provider page" in new Fixture {
       when(controller.dataCacheConnector.fetch[Tcsp](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
@@ -80,7 +75,7 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      val document: Document  = Jsoup.parse(contentAsString(result))
+      val document: Document = Jsoup.parse(contentAsString(result))
       document.select("span").html() must include(Messages("error.invalid.tcsp.mlr.reference.number"))
 
     }
