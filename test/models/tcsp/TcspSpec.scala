@@ -95,13 +95,6 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "correctly show if the model is complete" in {
         completeModel.isComplete must be (true)
       }
-
-      //TODO: Change this from ignore once model has a sub-model.
-      "correctly show if the model is not complete" ignore {
-        val incomplete = Tcsp()
-        incomplete.isComplete must be (false)
-      }
-
     }
 
     "Complete Model" when {
