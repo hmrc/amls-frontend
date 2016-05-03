@@ -67,17 +67,44 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequestInvalid = request.withFormUrlEncodedBody(
         "servicesOfAnotherTCSP" -> "true",
         "mlrRefNumber" -> "adbg1233"
       )
 
-      val result = controller.post()(newRequest)
+      val result = controller.post()(newRequestInvalid)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("span").html() must include(Messages("error.invalid.tcsp.mlr.reference.number"))
 
+    }
+
+    "On post with missing boolean data" in new Fixture {
+
+      val newRequestInvalid = request.withFormUrlEncodedBody(
+        "servicesOfAnotherTCSP" -> ""
+      )
+
+      val result = controller.post()(newRequestInvalid)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("span").html() must include(Messages("error.required.tcsp.services.another.tcsp"))
+    }
+
+    "On post with missing mlr reference number" in new Fixture {
+
+      val newRequestInvalid = request.withFormUrlEncodedBody(
+        "servicesOfAnotherTCSP" -> "true",
+        "mlrRefNumber" -> ""
+      )
+
+      val result = controller.post()(newRequestInvalid)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("span").html() must include(Messages("error.required.tcsp.mlr.reference.number"))
     }
 
     "on post with valid data in edit mode" in new Fixture {

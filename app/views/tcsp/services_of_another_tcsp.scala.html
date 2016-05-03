@@ -17,7 +17,6 @@ s"""${f("mlrRefNumber").id}-fieldset"""
         @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
             @inlineRadioGroup(f("servicesOfAnotherTCSP")) {
-                @legend("TODO", jsHidden = true)
                 @radio(f("servicesOfAnotherTCSP"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("servicesOfAnotherTCSP"), "lbl.no", "false")
                 @fieldset("TODO", jsHidden = true, id = target) {
