@@ -172,10 +172,4 @@ object FormTypes {
   val ninoType = ninoRequired compose ninoPattern
   val ukPassportType = passportRequired compose passportPattern
   val noUKPassportType = nonUKPassportRequired compose nonUkPassportLength
-
-  /** MLR reference number Rules **/
-  //TODO need to check about the pattern and required error message might need to be changed
-  private val mlrRequired = required("error.required.tcsp.mlr.reference.number")
-  private val mlrRegNumbertPattern = regexWithMsg(mlrRefNumberRegex, "error.invalid.tcsp.mlr.reference.number")
-  val mlrRefNumberPattern = mlrRequired compose mlrRegNumbertPattern
 }

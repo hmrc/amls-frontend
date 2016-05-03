@@ -6,7 +6,7 @@ import play.api.libs.json._
 
 sealed trait ServicesOfAnotherTCSP
 
-case class ServicesOfAnotherTCSPYes(value: String) extends ServicesOfAnotherTCSP
+case class ServicesOfAnotherTCSPYes(mlrRefNumber: String) extends ServicesOfAnotherTCSP
 
 case object ServicesOfAnotherTCSPNo extends ServicesOfAnotherTCSP
 
@@ -19,7 +19,8 @@ object ServicesOfAnotherTCSP {
   import play.api.data.mapping.forms.Rules._
     (__ \ "servicesOfAnotherTCSP").read[Boolean].withMessage("error.required.tcsp.services.another.tcsp") flatMap {
       case true =>
-        (__ \ "mlrRefNumber").read(mlrRefNumberPattern) fmap ServicesOfAnotherTCSPYes.apply
+       (__ \ "mlrRefNumber").read(notEmpty.withMessage("error.required.tcsp.mlr.reference.number")
+          compose pattern("^([0-9]{8}|[0-9]{15})$".r).withMessage("error.invalid.tcsp.mlr.reference.number")) fmap ServicesOfAnotherTCSPYes.apply
       case false => Rule.fromMapping { _ => Success(ServicesOfAnotherTCSPNo) }
     }
   }
