@@ -12,26 +12,52 @@ trait TcspValues {
 
   object DefaultValues {
 
-    val DefaultCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider,
-      CompanyDirectorEtc, CompanyFormationAgent(true, false)))
+    private val offTheShelf = true
+    private val complexStructure = false
+
+    val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+    val DefaultCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,
+                                                       TrusteeProvider,
+                                                       CompanyDirectorEtc,
+                                                       CompanyFormationAgent(offTheShelf, complexStructure)))
     val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+
   }
 
   object NewValues {
 
-    val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider, CompanyFormationAgent(true, false)))
+    private val offTheShelf = true
+    private val complexStructure = false
+
+    val NewProvidedServices = ProvidedServices(Set(EmailHandling))
+    val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,
+                                                   CompanyFormationAgent(offTheShelf, complexStructure)))
     val NewServicesOfAnotherTCSP = ServicesOfAnotherTCSPNo
+
   }
 
   val completeJson = Json.obj(
-    "tcspTypes" -> Json.obj("serviceProviders" -> Seq("01", "02", "04", "05"),
+    "tcspTypes" -> Json.obj(
+      "serviceProviders" -> Seq("01", "02", "04", "05"),
       "onlyOffTheShelfCompsSold" -> true,
-      "complexCorpStructureCreation" -> false),
-    "servicesOfAnotherTCSP" -> Json.obj("servicesOfAnotherTCSP" -> true,
-      "mlrRefNumber" -> "12345678")
+      "complexCorpStructureCreation" -> false
+    ),
+    "providedServices" -> Json.obj(
+      "services" -> Seq("01", "08"),
+      "details" -> "other service"
+    ),
+    "servicesOfAnotherTCSP" -> Json.obj(
+      "servicesOfAnotherTCSP" -> true,
+      "mlrRefNumber" -> "12345678"
+    )
   )
 
-  val completeModel = Tcsp(Some(DefaultValues.DefaultCompanyServiceProviders), Some(DefaultValues.DefaultServicesOfAnotherTCSP))
+  val completeModel = Tcsp(
+    Some(DefaultValues.DefaultCompanyServiceProviders),
+    Some(DefaultValues.DefaultProvidedServices),
+    Some(DefaultValues.DefaultServicesOfAnotherTCSP)
+  )
+
 }
 
 class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
@@ -104,6 +130,10 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
     "Complete Model" when {
 
+      "correctly show if the model is complete" in {
+        completeModel.isComplete must be (true)
+      }
+
       "correctly convert between json formats" when {
 
         "Serialise as expected" in {
@@ -120,6 +150,11 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
       val initial: Option[Tcsp] = None
 
+      "correctly show if the model is incomplete" in {
+        val incompleteModel = completeModel.copy(providedServices = None)
+        incompleteModel.isComplete must be (false)
+      }
+
       "Merged with Company Service Providers" must {
         "return Tcsp with correct Company Service Providers" in {
           val result = initial.tcspTypes(NewValues.NewCompanyServiceProviders)
@@ -127,31 +162,42 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
         }
       }
 
-      "Merged with services of another tcsp" must {
+      "Merged with Provided Services" must {
+        "return Tcsp with correct Provided Services" in {
+          val result = initial.providedServices(NewValues.NewProvidedServices)
+          result must be(Tcsp(providedServices = Some(NewValues.NewProvidedServices)))
+        }
+      }
 
-        "return Tcsp with correct services of another tcsp" in {
+      "return Tcsp with correct services of another tcsp" in {
           val result = initial.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
           result must be(Tcsp(servicesOfAnotherTCSP = Some(NewValues.NewServicesOfAnotherTCSP)))
-        }
       }
     }
 
+
     "Tcsp:merge with completeModel" when {
-      val initial = Tcsp(Some(DefaultValues.DefaultCompanyServiceProviders), Some(DefaultValues.DefaultServicesOfAnotherTCSP))
 
       "model is complete" when {
 
         "Merged with Company Service Providers" must {
           "return Tcsp with correct Company Service Providers" in {
-            val result = initial.tcspTypes(NewValues.NewCompanyServiceProviders)
-            result must be(Tcsp(tcspTypes = Some(NewValues.NewCompanyServiceProviders), Some(DefaultValues.DefaultServicesOfAnotherTCSP)))
+            val result = completeModel.tcspTypes(NewValues.NewCompanyServiceProviders)
+            result.tcspTypes must be (Some(NewValues.NewCompanyServiceProviders))
+          }
+        }
+
+        "Merged with Provided Services" must {
+          "return Tcsp with correct Provided Services" in {
+            val result = completeModel.providedServices(NewValues.NewProvidedServices)
+            result.providedServices must be (Some(NewValues.NewProvidedServices))
           }
         }
 
         "Merged with services of another tcsp" must {
           "return Tcsp with correct services of another tcsp" in {
-            val result = initial.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
-            result must be(Tcsp(Some(DefaultValues.DefaultCompanyServiceProviders), servicesOfAnotherTCSP = Some(NewValues.NewServicesOfAnotherTCSP)))
+            val result = completeModel.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
+            result.servicesOfAnotherTCSP must be (Some(NewValues.NewServicesOfAnotherTCSP))
           }
         }
       }

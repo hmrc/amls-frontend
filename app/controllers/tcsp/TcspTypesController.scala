@@ -39,7 +39,7 @@ trait TcspTypesController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.TcspTypesController.get())
-            case false => Redirect(routes.TcspTypesController.get())
+            case false => Redirect(routes.ProvidedServicesController.get())
           }
         }
       }
