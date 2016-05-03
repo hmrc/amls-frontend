@@ -1,8 +1,6 @@
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.bankdetails.BankDetails
 import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -32,11 +30,6 @@ class TransactionRecordControllerSpec extends PlaySpec with MockitoSugar with On
   val emptyCache = CacheMap("", Map.empty)
 
   "TransactionRecordController" must {
-
-    "use correct services" in new Fixture {
-      TransactionRecordController.authConnector must be(AMLSAuthConnector)
-      TransactionRecordController.dataCacheConnector must be(DataCacheConnector)
-    }
 
     "load the Customer Record Page" in new Fixture  {
 

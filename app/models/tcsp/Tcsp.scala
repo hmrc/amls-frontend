@@ -5,23 +5,24 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Tcsp(
+                 tcspTypes: Option[TcspTypes] = None,
                  servicesOfAnotherTCSP: Option[ServicesOfAnotherTCSP] = None
                  ) {
+
+  def tcspTypes(trust: TcspTypes): Tcsp =
+    this.copy(tcspTypes = Some(trust))
 
   def servicesOfAnotherTCSP(p: ServicesOfAnotherTCSP): Tcsp =
     this.copy(servicesOfAnotherTCSP = Some(p))
 
   def isComplete: Boolean = this match {
-    case Tcsp(Some(_)) => true
+    case Tcsp(Some(_), Some(_)) => true
     case _ => false
   }
 
 }
 
 object Tcsp {
-
-  import play.api.libs.functional.syntax._
-  import play.api.libs.json._
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
@@ -36,7 +37,6 @@ object Tcsp {
     }
   }
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   val key = "tcsp"
@@ -44,6 +44,7 @@ object Tcsp {
   implicit val mongoKey = new MongoKey[Tcsp] {
     override def apply(): String = "tcsp"
   }
+
   implicit val format = Json.format[Tcsp]
 
   implicit def default(details: Option[Tcsp]): Tcsp =
