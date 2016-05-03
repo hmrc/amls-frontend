@@ -193,3 +193,5 @@ GET         /accountancy-service-provider/what-you-need       controllers.asp.Wh
 
 GET         /trust-company-service-provider/what-you-need        controllers.tcsp.WhatYouNeedController.get()
 
+GET         /trust-company-service-provider/service-type      controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/service-type      controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)

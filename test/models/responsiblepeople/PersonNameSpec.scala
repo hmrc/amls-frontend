@@ -6,8 +6,6 @@ import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 
-import scala.collection.mutable.ArrayBuffer
-
 @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.MutableDataStructures"))
 class PersonNameSpec extends PlaySpec with MockitoSugar {
 
@@ -80,10 +78,10 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "hasOtherNames" -> Seq("")
       )) must
         equal(Failure(Seq(
-          (Path \ "firstName") -> ArrayBuffer(ValidationError("error.required.firstname")),
-          (Path \ "lastName") -> ArrayBuffer(ValidationError("error.required.lastname")),
-          (Path \ "hasPreviousName") -> ArrayBuffer(ValidationError("error.required.rp.hasPreviousName")),
-          (Path \ "hasOtherNames") -> ArrayBuffer(ValidationError("error.required.rp.hasOtherNames"))
+          (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
+          (Path \ "lastName") -> Seq(ValidationError("error.required.lastname")),
+          (Path \ "hasPreviousName") -> Seq(ValidationError("error.required.rp.hasPreviousName")),
+          (Path \ "hasOtherNames") -> Seq(ValidationError("error.required.rp.hasOtherNames"))
         )))
 
     }
@@ -104,11 +102,11 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "otherNames" -> Seq("")
       )) must
         equal(Failure(Seq(
-          (Path \ "firstName") -> ArrayBuffer(ValidationError("error.required.firstname")),
-          (Path \ "lastName") -> ArrayBuffer(ValidationError("error.required.lastname")),
+          (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
+          (Path \ "lastName") -> Seq(ValidationError("error.required.lastname")),
           (Path \ "previous") -> Seq(ValidationError("error.rp.previous.invalid")),
           (Path \ "previous" \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
-          (Path \ "otherNames") -> ArrayBuffer(ValidationError("error.required.rp.otherNames"))
+          (Path \ "otherNames") -> Seq(ValidationError("error.required.rp.otherNames"))
         )))
     }
 
@@ -131,13 +129,13 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
       PersonName.formRule.validate(data) must
         equal(Failure(Seq(
-          (Path \ "firstName") -> ArrayBuffer(ValidationError("error.invalid.length.firstname")),
-          (Path \ "middleName") -> ArrayBuffer(ValidationError("error.invalid.length.middlename")),
-          (Path \ "lastName") -> ArrayBuffer(ValidationError("error.invalid.length.lastname")),
-          (Path \ "previous" \ "firstName") -> ArrayBuffer(ValidationError("error.invalid.length.firstname")),
-          (Path \ "previous" \ "middleName") -> ArrayBuffer(ValidationError("error.invalid.length.middlename")),
-          (Path \ "previous" \ "lastName") -> ArrayBuffer(ValidationError("error.invalid.length.lastname")),
-          (Path \ "otherNames") -> ArrayBuffer(ValidationError("error.invalid.length.otherNames"))
+          (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
+          (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
+          (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),
+          (Path \ "previous" \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
+          (Path \ "previous" \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
+          (Path \ "previous" \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),
+          (Path \ "otherNames") -> Seq(ValidationError("error.invalid.length.otherNames"))
         )))
     }
   }
