@@ -1,0 +1,31 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+
+s"""${f("agentRegNo").id}-fieldset"""
+}
+
+    @main(
+    title = Messages("asp.other.business.tax.matters.title")
+    ) {
+
+        @heading("asp.other.business.tax.matters.title", "summary.asp")
+
+        @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
+
+            @inlineRadioGroup(f("otherBusinessTaxMatters")) {
+                @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
+                @fieldset("TODO", jsHidden = true, id = target) {
+                    @input(f("agentRegNo"), "asp.other.business.tax.matters.agentrefno.lbl", bold = false)
+                }
+            }
+
+            @submit(edit)
+        }
+    }
+
+
