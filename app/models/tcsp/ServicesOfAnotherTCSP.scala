@@ -1,6 +1,7 @@
 package models.tcsp
 
 import play.api.data.mapping._
+import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 
@@ -13,16 +14,15 @@ case object ServicesOfAnotherTCSPNo extends ServicesOfAnotherTCSP
 object ServicesOfAnotherTCSP {
 
   import utils.MappingUtils.Implicits._
-  import models.FormTypes._
 
   private val mlrPattern = "^([0-9]{8}|[0-9]{15})$".r
+  val service = notEmpty.withMessage("error.required.tcsp.mlr.reference.number") compose pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number")
 
   implicit val formRule: Rule[UrlFormEncoded, ServicesOfAnotherTCSP] = From[UrlFormEncoded] { __ =>
   import play.api.data.mapping.forms.Rules._
     (__ \ "servicesOfAnotherTCSP").read[Boolean].withMessage("error.required.tcsp.services.another.tcsp") flatMap {
       case true =>
-       (__ \ "mlrRefNumber").read(notEmpty.withMessage("error.required.tcsp.mlr.reference.number")
-          compose pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number")) fmap ServicesOfAnotherTCSPYes.apply
+       (__ \ "mlrRefNumber").read(service) fmap ServicesOfAnotherTCSPYes.apply
       case false => Rule.fromMapping { _ => Success(ServicesOfAnotherTCSPNo) }
     }
   }
