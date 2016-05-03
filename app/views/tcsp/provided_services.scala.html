@@ -10,8 +10,7 @@
 
     @heading("tcsp.provided_services.heading", "summary.tcsp")
 
-    @form(f, controllers.estateagentbusiness.routes.BusinessServicesController.post(edit)) {
-        <span>@Messages("lbl.select.all")</span>
+    @form(f, controllers.tcsp.routes.ProvidedServicesController.post(edit)) {
         @radioGroup(f("services")) {
             @legend("lbl.select.all")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.01", "01")

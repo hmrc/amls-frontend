@@ -50,7 +50,6 @@ class ProvidedServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
         document.title() must be (Messages("tcsp.provided_services.title"))
 
-        println(document)
         document.select("input[id=services-08]").attr("checked") must be("checked")
         document.select("input[name=details]").`val` must be ("some other service")
       }
