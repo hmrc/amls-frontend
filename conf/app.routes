@@ -198,3 +198,6 @@ POST        /trust-company-service-provider/services       controllers.tcsp.Prov
 
 GET         /trust-company-service-provider/service-type      controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
 POST        /trust-company-service-provider/service-type      controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
+
+GET         /trust-company-service-provider/other-trust-provider  controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/other-trust-provider  controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)

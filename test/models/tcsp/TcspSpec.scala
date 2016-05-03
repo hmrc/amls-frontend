@@ -20,6 +20,7 @@ trait TcspValues {
                                                        TrusteeProvider,
                                                        CompanyDirectorEtc,
                                                        CompanyFormationAgent(offTheShelf, complexStructure)))
+    val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
 
   }
 
@@ -31,6 +32,7 @@ trait TcspValues {
     val NewProvidedServices = ProvidedServices(Set(EmailHandling))
     val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,
                                                    CompanyFormationAgent(offTheShelf, complexStructure)))
+    val NewServicesOfAnotherTCSP = ServicesOfAnotherTCSPNo
 
   }
 
@@ -43,12 +45,17 @@ trait TcspValues {
     "providedServices" -> Json.obj(
       "services" -> Seq("01", "08"),
       "details" -> "other service"
+    ),
+    "servicesOfAnotherTCSP" -> Json.obj(
+      "servicesOfAnotherTCSP" -> true,
+      "mlrRefNumber" -> "12345678"
     )
   )
 
   val completeModel = Tcsp(
     Some(DefaultValues.DefaultCompanyServiceProviders),
-    Some(DefaultValues.DefaultProvidedServices)
+    Some(DefaultValues.DefaultProvidedServices),
+    Some(DefaultValues.DefaultServicesOfAnotherTCSP)
   )
 
 }

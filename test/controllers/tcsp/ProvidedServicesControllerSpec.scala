@@ -116,7 +116,7 @@ class ProvidedServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         val result = controller.post(true)(newRequest)
 
         status(result) must be (BAD_REQUEST)
-        
+
         val document = Jsoup.parse(contentAsString(result))
         document.select("a[href=#details]").text must include(Messages("error.required.tcsp.provided_services.details"))
 
