@@ -1,6 +1,6 @@
 package models.tcsp
 
-import models.registrationprogress.{NotStarted, Section}
+import models.registrationprogress.{Started, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.scalatestplus.play.PlaySpec
@@ -24,7 +24,7 @@ trait TcspValues {
     "onlyOffTheShelfCompsSold" -> Seq("true"),
     "complexCorpStructureCreation" -> Seq("false")
   )
-  
+
   val completeModel = Tcsp(Some(DefaultValues.DefaultCompanyServiceProviders))
 }
 
@@ -61,6 +61,18 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn None
 
         Tcsp.section must be(notStartedSection)
+
+      }
+
+      "return a Started Section when model is incomplete" in {
+
+        val incompleteTcsp = mock[Tcsp]
+        val startedSection = Section("tcsp", Started, controllers.tcsp.routes.WhatYouNeedController.get())
+
+        when(incompleteTcsp.isComplete) thenReturn false
+        when(cache.getEntry[Tcsp]("tcsp"))thenReturn Some(incompleteTcsp)
+
+        Tcsp.section must be (startedSection)
 
       }
     }
