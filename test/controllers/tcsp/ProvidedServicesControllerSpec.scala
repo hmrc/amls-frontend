@@ -93,6 +93,18 @@ class ProvidedServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
 
       }
 
+      "show an error when services data not sent" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody()
+
+        val result = controller.post()(newRequest)
+
+        status(result) must be (BAD_REQUEST)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("a[href=#services]").text must include(Messages("error.required.tcsp.provided_services.services"))
+      }
+
 
       "show an error when other data not sent" in new Fixture {
 
@@ -101,13 +113,10 @@ class ProvidedServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
           "details" -> ""
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any())(any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any())(any(), any(), any())).thenReturn(Future.successful(cacheMap))
-
         val result = controller.post(true)(newRequest)
 
         status(result) must be (BAD_REQUEST)
-
+        
         val document = Jsoup.parse(contentAsString(result))
         document.select("a[href=#details]").text must include(Messages("error.required.tcsp.provided_services.details"))
 

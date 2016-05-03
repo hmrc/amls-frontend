@@ -58,7 +58,7 @@ object ProvidedServices {
                            notEmpty.withMessage("error.required.tcsp.provided_services.details") compose
                            maxLength(serviceDetailsMaxLength)
 
-  val serviceType = minLength[Set[String]](1).withMessage("error.required.eab.business.services")
+  val serviceType = minLength[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")
 
   implicit val formReads: Rule[UrlFormEncoded, ProvidedServices] =
     From[UrlFormEncoded] { __ =>

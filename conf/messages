@@ -164,6 +164,7 @@ error.required.positionWithinBusiness = Select at least one business position.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 
 #TCSP
+error.required.tcsp.provided_services.services = Select at least one service that your business provides.
 error.required.tcsp.provided_services.details = Enter some information about the other services your business provides.
 error.required.tcsp.service.providers = Select at least one kind of Trust or Company Service Provider
 error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
