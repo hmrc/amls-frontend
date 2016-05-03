@@ -1,7 +1,7 @@
 package controllers.tcsp
 
 import connectors.DataCacheConnector
-import models.tcsp.Tcsp
+import models.tcsp._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -44,12 +44,18 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
 
       "load the Kind of Tcsp are you page with pre-populated data" in new Fixture {
 
+        val tcspTypes = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
+
         when(controller.dataCacheConnector.fetch[Tcsp](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+          (any(), any(), any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("tcsp.kind.of.service.provider.title"))
+        val document = Jsoup.parse(contentAsString(result))
+        document.title must include(Messages("tcsp.kind.of.service.provider.title"))
+        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.select("input[value=02]").hasAttr("checked") must be(true)
+        document.select("input[value=04]").hasAttr("checked") must be(true)
       }
     }
 
