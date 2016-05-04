@@ -177,6 +177,10 @@ error.required.tcsp.mlr.reference.number = Please enter a valid 8-digit or 15-di
 error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation Reference Number. It must be 8 or 15 characters long, and can only be numbers.
 
 
+#### Supervision ####
+error.required.supervision.supervisor = Enter the name of your last supervisor
+error.required.supervision.reason = Enter a reason why the supervision ended
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################

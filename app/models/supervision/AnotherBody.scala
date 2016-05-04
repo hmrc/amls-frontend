@@ -23,8 +23,8 @@ object AnotherBody {
 
   private val supervisorMaxLength = 140
   private val reasonMaxLength = 255
-  private val supervisorRule = notEmpty compose maxLength(supervisorMaxLength)
-  private val reasonRule = notEmpty compose maxLength(reasonMaxLength)
+  private val supervisorRule = notEmpty.withMessage("error.required.supervision.supervisor") compose maxLength(supervisorMaxLength)
+  private val reasonRule = notEmpty.withMessage("error.required.supervision.reason") compose maxLength(reasonMaxLength)
 
   implicit val formRule: Rule[UrlFormEncoded, AnotherBody] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
