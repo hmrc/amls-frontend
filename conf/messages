@@ -775,3 +775,12 @@ supervision.whatyouneed.requiredinfo.text.5 = details of penalties you''ve recei
 
 supervision.whatyouneed.sidebar.title = Automatic saving
 supervision.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your application.
+
+supervision.another_body.title = Has your business ever been registered with another supervising body?
+supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
+supervision.another_body.lbl.supervisor = Name of your last supervisor
+supervision.another_body.startDate.lbl = Start date of supervision
+supervision.another_body.startDate.hint = For example, 31 3 2008
+supervision.another_body.endDate.lbl = End date of supervision
+supervision.another_body.endDate.hint = For examplem, 31 3 2010
+supervision.another_body.endingReason.lbl = Why did the supervision end?
