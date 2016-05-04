@@ -1,7 +1,7 @@
-package controllers.tcsp
+package controllers.asp
 
 import connectors.DataCacheConnector
-import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
+import models.asp.{OtherBusinessTaxMattersYes, Asp}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -13,15 +13,15 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
-
 import scala.concurrent.Future
 
-class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+
+class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new ServicesOfAnotherTCSPController {
+    val controller = new OtherBusinessTaxMattersController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -29,19 +29,19 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "ServicesOfAnotherTCSPController" must {
+  "OtherBusinessTaxMattersController" must {
 
-    "on get display the Does your business use the services of another Trust or Company Service Provider page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Tcsp](any())
+    "on get display the are you registered with HMRC to handle other business's tax matters page" in new Fixture {
+      when(controller.dataCacheConnector.fetch[Asp](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("tcsp.servicesOfAnotherTcsp.title"))
+      contentAsString(result) must include(Messages("asp.other.business.tax.matters.title"))
     }
 
     "on get display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Tcsp](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes("12345678"))))))
+      when(controller.dataCacheConnector.fetch[Asp](any())
+      (any(), any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes("12345678"))))))
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include("12345678")
@@ -49,14 +49,14 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
 
     "on post with valid data" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
-        "servicesOfAnotherTCSP" -> "true",
-        "mlrRefNumber" -> "12345678"
+        "otherBusinessTaxMatters" -> "true",
+        "agentRegNo" -> "12345678"
       )
 
-      when(controller.dataCacheConnector.fetch[Tcsp](any())
+      when(controller.dataCacheConnector.fetch[Asp](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Tcsp](any(), any())
+      when(controller.dataCacheConnector.save[Asp](any(), any())
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -67,62 +67,61 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
     "on post with invalid data" in new Fixture {
 
       val newRequestInvalid = request.withFormUrlEncodedBody(
-        "servicesOfAnotherTCSP" -> "true",
-        "mlrRefNumber" -> "adbg1233"
+        "otherBusinessTaxMatters" -> "true",
+        "agentRegNo" -> "adbg123312589"
       )
 
       val result = controller.post()(newRequestInvalid)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.invalid.tcsp.mlr.reference.number"))
+      document.select("span").html() must include(Messages("error.invalid.length.asp.agentRegNo"))
 
     }
 
     "On post with missing boolean data" in new Fixture {
 
       val newRequestInvalid = request.withFormUrlEncodedBody(
-        "servicesOfAnotherTCSP" -> ""
+        "otherBusinessTaxMatters" -> ""
       )
 
       val result = controller.post()(newRequestInvalid)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.tcsp.services.another.tcsp"))
+      document.select("span").html() must include(Messages("error.required.asp.other.business.tax.matters"))
     }
 
-    "On post with missing mlr reference number" in new Fixture {
+    "On post with missing agent registration number" in new Fixture {
 
       val newRequestInvalid = request.withFormUrlEncodedBody(
-        "servicesOfAnotherTCSP" -> "true",
-        "mlrRefNumber" -> ""
+        "otherBusinessTaxMatters" -> "true",
+        "agentRegNo" -> ""
       )
 
       val result = controller.post()(newRequestInvalid)
       status(result) must be(BAD_REQUEST)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.tcsp.mlr.reference.number"))
+      document.select("span").html() must include(Messages("error.required.asp.agentRegNo"))
     }
 
     "on post with valid data in edit mode" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
-        "servicesOfAnotherTCSP" -> "true",
-        "mlrRefNumber" -> "12345678"
+        "otherBusinessTaxMatters" -> "true",
+        "agentRegNo" -> "12345678"
       )
 
-      when(controller.dataCacheConnector.fetch[Tcsp](any())
+      when(controller.dataCacheConnector.fetch[Asp](any())
        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Tcsp](any(), any())
+      when(controller.dataCacheConnector.save[Asp](any(), any())
        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
     }
-
 
   }
 
