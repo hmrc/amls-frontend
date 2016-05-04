@@ -20,7 +20,7 @@ object Supervision {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "supervision"
-    val notStarted = Section(messageKey, NotStarted, controllers.routes.RegistrationProgressController.get())
+    val notStarted = Section(messageKey, NotStarted, controllers.supervision.routes.WhatYouNeedController.get())
     cache.getEntry[Supervision](key).fold(notStarted) {
       model =>
         if (model.isComplete) {

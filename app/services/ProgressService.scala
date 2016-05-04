@@ -23,30 +23,28 @@ trait ProgressService {
 
   private[services] def cacheConnector: DataCacheConnector
 
-  private def dependentSections(implicit cache: CacheMap): Seq[Section] =
+  private def dependentSections(implicit cache: CacheMap): Set[Section] =
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       ba <- bm.activities
-    } yield ba.businessActivities.foldLeft[Seq[Section]](Seq.empty) {
+    } yield ba.businessActivities.foldLeft[Set[Section]](Set.empty) {
       (m, n) => n match {
         case AccountancyServices =>
-          m :+ Asp.section
-          m :+ Supervision.section
+          m + Asp.section + Supervision.section
         case EstateAgentBusinessService =>
-          m :+ EstateAgentBusiness.section
+          m + EstateAgentBusiness.section
         case HighValueDealing =>
           // TODO
-          m :+ Section("hvd", NotStarted, controllers.routes.RegistrationProgressController.get())
+          m + Section("hvd", NotStarted, controllers.routes.RegistrationProgressController.get())
         case MoneyServiceBusiness =>
           // TODO
-          m :+ Section("msb", NotStarted, controllers.routes.RegistrationProgressController.get())
+          m + Section("msb", NotStarted, controllers.routes.RegistrationProgressController.get())
         case TrustAndCompanyServices =>
-          m :+ Tcsp.section
-          m :+ Supervision.section
+          m + Tcsp.section + Supervision.section
         case _ => m
       }
         // TODO Error instead of empty map
-    }) getOrElse Seq.empty
+    }) getOrElse Set.empty
 
   private def mandatorySections(implicit cache: CacheMap): Seq[Section] =
     Seq(

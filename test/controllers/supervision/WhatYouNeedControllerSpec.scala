@@ -28,5 +28,8 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite {
         contentAsString(result) must include(Messages("supervision.whatyouneed.title"))
       }
     }
+
+    "contain a link to the "
+
   }
 }

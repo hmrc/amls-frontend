@@ -267,8 +267,15 @@ progress.tcsp.time = 8
 progress.responsiblepeople.name = Responsible People
 progress.responsiblepeople.description = Information about the people in charge of your business.
 progress.responsiblepeople.time = 10
+progress.supervision.name = Supervision
+progress.supervision.description = Registration information specfically for Trust or Company Service Providers.
+progress.supervision.time = 4
+
+
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
+
+
 
 #### Confirmation page ####
 confirmation.lede = You have submitted the registration.

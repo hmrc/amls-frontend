@@ -1,0 +1,49 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+    s"""${f("utrNumber").id}-fieldset"""
+}
+
+@main(
+    title = Messages("supervision.another_body.title")
+)  {
+
+    @heading("supervision.another_body.title", "summary.supervision")
+
+
+    @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
+
+        @inlineRadioGroup(f("saRegistered")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("anotherBody"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("anotherBody"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("supervisorName"), "supervision.another_body.lbl.supervisor", bold = false)
+
+                @date(
+                    f = f,
+                    p = "startDate",
+                    labelText = "supervision.another_body.startDate.lbl",
+                    hintText = "supervision.another_body.startDate.hint",
+                    false
+                )
+
+                @date(
+                    f = f,
+                    p = "endDate",
+                    labelText = "supervision.another_body.endDate.lbl",
+                    hintText = "supervision.another_body.endDate.hint",
+                    false
+                )
+
+                @textarea(f("endingReason"), "supervision.another_body.endingReason.lbl", bold = false)
+
+            }
+        }
+
+        @submit(edit)
+    }
+}
