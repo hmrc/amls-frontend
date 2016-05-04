@@ -4,23 +4,27 @@ import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class Tcsp (
-                  tcspTypes: Option[TcspTypes] = None
-               ) {
+case class Tcsp (tcspTypes: Option[TcspTypes] = None,
+                 providedServices: Option[ProvidedServices] = None,
+                 servicesOfAnotherTCSP: Option[ServicesOfAnotherTCSP] = None) {
 
-  def tcspTypes(trust: TcspTypes) : Tcsp =
+  def tcspTypes(trust: TcspTypes): Tcsp =
     this.copy(tcspTypes = Some(trust))
 
+  def providedServices(ps: ProvidedServices): Tcsp =
+    this.copy(providedServices = Some(ps))
+
+  def servicesOfAnotherTCSP(p: ServicesOfAnotherTCSP): Tcsp =
+    this.copy(servicesOfAnotherTCSP = Some(p))
+
   def isComplete: Boolean = this match {
-    case Tcsp(Some(_)) => true
+    case Tcsp(Some(_), Some(_), Some(_)) => true
     case _ => false
   }
 
 }
 
 object Tcsp {
-
-  import play.api.libs.json._
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
@@ -35,14 +39,16 @@ object Tcsp {
     }
   }
 
+  import play.api.libs.json._
+
   val key = "tcsp"
 
   implicit val mongoKey = new MongoKey[Tcsp] {
     override def apply(): String = "tcsp"
   }
 
-  implicit val format = Json.format[Tcsp]
+  implicit val formats = Json.format[Tcsp]
 
-  implicit def default(details: Option[Tcsp]): Tcsp =
-    details.getOrElse(Tcsp())
+  implicit def default(tcsp: Option[Tcsp]): Tcsp =
+    tcsp.getOrElse(Tcsp())
 }

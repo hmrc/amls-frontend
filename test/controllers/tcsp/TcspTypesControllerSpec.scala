@@ -74,7 +74,7 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
 
         val result =  controller.post() (newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.TcspTypesController.get().url))
+        redirectLocation(result) must be (Some(controllers.tcsp.routes.ProvidedServicesController.get().url))
 
       }
 
@@ -89,8 +89,9 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
         when(controller.dataCacheConnector.save[Tcsp](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
-        val result =  controller.post() (newRequest)
+        val result =  controller.post(true) (newRequest)
         status(result) must be(SEE_OTHER)
+        //TODO: Update this to summary page.
         redirectLocation(result) must be (Some(controllers.tcsp.routes.TcspTypesController.get().url))
       }
 
