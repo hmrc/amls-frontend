@@ -126,13 +126,15 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "correctly show if the model is complete" in {
         completeModel.isComplete must be(true)
       }
+
+      "correctly show if the model is incomplete" in {
+        val incompleteModel = completeModel.copy(providedServices = None)
+        incompleteModel.isComplete must be (false)
+      }
+
     }
 
     "Complete Model" when {
-
-      "correctly show if the model is complete" in {
-        completeModel.isComplete must be (true)
-      }
 
       "correctly convert between json formats" when {
 
@@ -149,11 +151,6 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
     "None" when {
 
       val initial: Option[Tcsp] = None
-
-      "correctly show if the model is incomplete" in {
-        val incompleteModel = completeModel.copy(providedServices = None)
-        incompleteModel.isComplete must be (false)
-      }
 
       "Merged with Company Service Providers" must {
         "return Tcsp with correct Company Service Providers" in {

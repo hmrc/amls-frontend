@@ -10,6 +10,7 @@ import models.businessmatching.{BusinessActivities => _, _}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.registrationprogress.{NotStarted, Section}
 import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -30,6 +31,7 @@ trait ProgressService {
       (m, n) => n match {
         case AccountancyServices =>
           m :+ Asp.section
+          m :+ Supervision.section
         case EstateAgentBusinessService =>
           m :+ EstateAgentBusiness.section
         case HighValueDealing =>
@@ -39,8 +41,8 @@ trait ProgressService {
           // TODO
           m :+ Section("msb", NotStarted, controllers.routes.RegistrationProgressController.get())
         case TrustAndCompanyServices =>
-          // TODO
           m :+ Tcsp.section
+          m :+ Supervision.section
         case _ => m
       }
         // TODO Error instead of empty map
@@ -55,6 +57,7 @@ trait ProgressService {
       TradingPremises.section
     )
 
+  //TODO: Move this into mandatory sections once toggle is removed.
   private def responsiblePeople(implicit cache: CacheMap): Seq[Section] =
     ApplicationConfig.responsiblePeopleToggle match {
       case true =>
