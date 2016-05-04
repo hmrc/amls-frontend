@@ -72,17 +72,14 @@
                 }
             </td>
         </tr>
-
+        <tr>
+            <td colspan="2">
                 @model.professionalBody.map {
-                    case ProfessionalBodyNo => {}
-                    case ProfessionalBodyYes(v) => {
-                    <tr>
-                        <td colspan="2">
-                         @v
-                        </td>
-                    </tr>
-                    }
+                    case ProfessionalBodyNo => { @Messages("lbl.na") }
+                    case ProfessionalBodyYes(v) => { @v }
                 }
+            </td>
+        </tr>
     </table>
     <table>
         <tr>
@@ -97,16 +94,14 @@
                 }
             </td>
         </tr>
-            @model.penalisedUnderEstateAgentsAct.map {
-                case PenalisedUnderEstateAgentsActNo => {}
-                case PenalisedUnderEstateAgentsActYes(v) => {
-                <tr>
-                    <td colspan="2">
-                        @v
-                    </td>
-                </tr>
+        <tr>
+            <td colspan="2">
+                @model.penalisedUnderEstateAgentsAct.map {
+                    case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.na") }
+                    case PenalisedUnderEstateAgentsActYes(v) => { @v }
                 }
-            }
+            </td>
+        </tr>
     </table>
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
