@@ -786,5 +786,5 @@ supervision.another_body.lbl.supervisor = Name of your last supervisor
 supervision.another_body.startDate.lbl = Start date of supervision
 supervision.another_body.startDate.hint = For example, 31 3 2008
 supervision.another_body.endDate.lbl = End date of supervision
-supervision.another_body.endDate.hint = For examplem, 31 3 2010
+supervision.another_body.endDate.hint = For example, 31 3 2010
 supervision.another_body.endingReason.lbl = Why did the supervision end?
