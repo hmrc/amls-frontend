@@ -40,7 +40,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite {
       )
 
       when(controller.dataCache.fetch[Tcsp](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+        (any(), any(), any())).thenReturn(Future.successful(Some(model)))summary
 
       val result = controller.get()(request)
       status(result) must be(OK)

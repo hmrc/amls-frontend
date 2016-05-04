@@ -77,14 +77,18 @@
                 <th class="summary-title">@Messages("aboutthebusiness.registeredforcorporationtax.title")</th>
                 <td colspan="2"><a href="@controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true)">@Messages("button.edit")</a></td>
             </tr>
-            <tr>
-                <td colspan="2">
-                    @ctRegistered match {
-                        case CorporationTaxRegisteredNo => {}
-                        case CorporationTaxRegisteredYes(v) => { @v }
+
+                @ctRegistered match {
+                    case CorporationTaxRegisteredNo => {}
+                    case CorporationTaxRegisteredYes(v) => {
+                        <tr>
+                            <td colspan="2">
+                                @v
+                            </td>
+                        </tr>
                     }
-                </td>
-            </tr>
+                }
+
         </table>
     }
 
@@ -93,14 +97,17 @@
             <th class="summary-title">@Messages("aboutthebusiness.registeredformlr.title")</th>
             <td colspan="2"><a href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true)">@Messages("button.edit")</a></td>
         </tr>
-        <tr>
-            <td colspan="2">
+
                 @model.previouslyRegistered.map {
                     case PreviouslyRegisteredNo => {}
-                    case PreviouslyRegisteredYes(v) => { @v }
+                    case PreviouslyRegisteredYes(v) => {
+                        <tr>
+                            <td colspan="2">
+                                @v
+                            </td>
+                        </tr>
+                    }
                 }
-            </td>
-        </tr>
     </table>
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">Accept and complete section</a>
