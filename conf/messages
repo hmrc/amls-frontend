@@ -163,7 +163,10 @@ error.required.timeAtAddress = Select how long this person lived at this address
 error.required.positionWithinBusiness = Select at least one business position.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 
-#### Trust and company service provide ####
+#### Trust and company service providers ####
+
+error.required.tcsp.provided_services.services = Select at least one service that your business provides.
+error.required.tcsp.provided_services.details = Enter some information about the other services your business provides.
 
 error.required.tcsp.service.providers = Select at least one kind of Trust or Company Service Provider
 error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
@@ -733,6 +736,18 @@ tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate s
 tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another Trust or Company Service Provider?
 tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What is that company's Money Laundering Regulation reference number?
 
+
+tcsp.provided_services.title = Which services does your business provide?
+tcsp.provided_services.heading = Which services does your business provide?
+tcsp.provided_services.service.lbl.01 = Phonecall handling
+tcsp.provided_services.service.lbl.02 = Email handling
+tcsp.provided_services.service.lbl.03 = Email server
+tcsp.provided_services.service.lbl.04 = Self-collect mailboxes
+tcsp.provided_services.service.lbl.05 = Mail forwarding
+tcsp.provided_services.service.lbl.06 = Receptionist
+tcsp.provided_services.service.lbl.07 = Conference rooms
+tcsp.provided_services.service.lbl.08 = Other
+tcsp.provided_services.service.lbl.details = Please give details
 
 #ASP
 
