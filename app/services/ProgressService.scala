@@ -39,7 +39,6 @@ trait ProgressService {
           // TODO
           m :+ Section("msb", NotStarted, controllers.routes.RegistrationProgressController.get())
         case TrustAndCompanyServices =>
-          // TODO
           m :+ Tcsp.section
         case _ => m
       }

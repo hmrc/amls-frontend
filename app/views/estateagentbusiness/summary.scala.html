@@ -75,7 +75,7 @@
         <tr>
             <td colspan="2">
                 @model.professionalBody.map {
-                    case ProfessionalBodyNo => { @Messages("lbl.na") }
+                    case ProfessionalBodyNo => {}
                     case ProfessionalBodyYes(v) => { @v }
                 }
             </td>
@@ -97,7 +97,7 @@
         <tr>
             <td colspan="2">
                 @model.penalisedUnderEstateAgentsAct.map {
-                    case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.na") }
+                    case PenalisedUnderEstateAgentsActNo => {}
                     case PenalisedUnderEstateAgentsActYes(v) => { @v }
                 }
             </td>

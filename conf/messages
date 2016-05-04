@@ -742,9 +742,6 @@ tcsp.provided_services.service.lbl.06 = Receptionist
 tcsp.provided_services.service.lbl.07 = Conference rooms
 tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Please give details
-tcsp.summary.company.formation.details = Trust or company formation details
-tcsp.summary.off.the.shelf.companies.lbl = Sell off-the-shelf companies
-tcsp.summary.create.complex.corp.structure.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future
 
 #ASP
 

@@ -20,7 +20,7 @@ class TcspServiceSpec extends PlaySpec with MockitoSugar {
     }
 
     "Provide the correct messages" in {
-      val message = "tcsp.providedservices.servicename.lbl."
+      val message = "tcsp.provided_services.service.lbl."
       PhonecallHandling.getMessage must be (Messages(message + "01"))
       EmailHandling.getMessage must be (Messages(message + "02"))
       EmailServer.getMessage must be (Messages(message + "03"))
@@ -28,7 +28,7 @@ class TcspServiceSpec extends PlaySpec with MockitoSugar {
       MailForwarding.getMessage must be (Messages(message + "05"))
       Receptionist.getMessage must be (Messages(message + "06"))
       ConferenceRooms.getMessage must be (Messages(message + "07"))
-      Other("").getMessage must be (Messages(message + "08"))
+      Other("test").getMessage must be (Messages(message + "08") + ":" + "test")
     }
 
   }

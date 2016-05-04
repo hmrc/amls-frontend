@@ -63,7 +63,7 @@
             <tr>
                 <td colspan="2">
                     @vatRegistered match {
-                        case VATRegisteredNo => { @Messages("lbl.na") }
+                        case VATRegisteredNo => {}
                         case VATRegisteredYes(v) => { @v }
                     }
                 </td>
@@ -80,7 +80,7 @@
             <tr>
                 <td colspan="2">
                     @ctRegistered match {
-                        case CorporationTaxRegisteredNo => { @Messages("lbl.na") }
+                        case CorporationTaxRegisteredNo => {}
                         case CorporationTaxRegisteredYes(v) => { @v }
                     }
                 </td>
@@ -96,7 +96,7 @@
         <tr>
             <td colspan="2">
                 @model.previouslyRegistered.map {
-                    case PreviouslyRegisteredNo => { @Messages("lbl.na") }
+                    case PreviouslyRegisteredNo => {}
                     case PreviouslyRegisteredYes(v) => { @v }
                 }
             </td>
