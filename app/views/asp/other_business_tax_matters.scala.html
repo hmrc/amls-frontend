@@ -14,6 +14,8 @@ s"""${f("agentRegNo").id}-fieldset"""
 
         @heading("asp.other.business.tax.matters.title", "summary.asp")
 
+        <p>@Messages("asp.other.business.tax.matters.lbl")</p>
+
         @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
             @inlineRadioGroup(f("otherBusinessTaxMatters")) {

@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.asp.{OtherBusinessTaxMatters, Asp}
-import views.html.asp._
+import views.html.asp.other_business_tax_matters
 import scala.concurrent.Future
 
 trait OtherBusinessTaxMattersController extends BaseController {
@@ -22,6 +22,25 @@ trait OtherBusinessTaxMattersController extends BaseController {
           } yield Form2[OtherBusinessTaxMatters](otherTax)).getOrElse(EmptyForm)
           Ok(other_business_tax_matters(form, edit))
       }
+  }
+
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request => {
+      Form2[OtherBusinessTaxMatters](request.body) match {
+        case f: InvalidForm =>
+          Future.successful(BadRequest(other_business_tax_matters(f, edit)))
+        case ValidForm(_, data) =>
+          for {
+            asp <- dataCacheConnector.fetch[Asp](Asp.key)
+            _ <- dataCacheConnector.save[Asp](Asp.key,
+              asp.otherBusinessTaxMatters(data)
+            )
+          } yield edit match {
+            case true => Redirect(routes.WhatYouNeedController.get())
+            case false => Redirect(routes.WhatYouNeedController.get())
+          }
+      }
+    }
   }
 
 }
