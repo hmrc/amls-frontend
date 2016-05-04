@@ -62,7 +62,7 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -121,7 +121,7 @@ class ServicesOfAnotherTCSPControllerSpec extends PlaySpec with OneServerPerSuit
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
 
