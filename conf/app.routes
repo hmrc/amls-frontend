@@ -201,3 +201,5 @@ POST        /trust-company-service-provider/service-type      controllers.tcsp.T
 
 GET         /trust-company-service-provider/other-trust-provider  controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
 POST        /trust-company-service-provider/other-trust-provider  controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
+
+GET         /supervision/what-you-need        controllers.supervision.WhatYouNeedController.get()
