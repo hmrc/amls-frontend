@@ -33,7 +33,7 @@ sealed trait TcspService {
       case MailForwarding => Messages(s"${message}05")
       case Receptionist => Messages(s"${message}06")
       case ConferenceRooms => Messages(s"${message}07")
-      case Other(details) => Messages(s"${message}08") + ":" + details
+      case Other(details) => Messages(s"${message}08") + s":$details"
     }
   }
 }
