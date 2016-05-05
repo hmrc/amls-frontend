@@ -5,14 +5,19 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Asp(
+              services: Option[ServicesOfBusiness] = None,
               otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None
+
               ) {
+
+  def services(p: ServicesOfBusiness): Asp =
+    this.copy(services = Some(p))
 
   def otherBusinessTaxMatters(p: OtherBusinessTaxMatters): Asp =
     this.copy(otherBusinessTaxMatters = Some(p))
 
   def isComplete: Boolean = this match {
-      case Asp(Some(_)) => true
+      case Asp(Some(_), Some(_)) => true
       case _ => false
   }
 
@@ -29,10 +34,8 @@ object Asp {
     cache.getEntry[Asp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          //TODO: Update this route to correct page.
           Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
         } else {
-          //TODO: Update this route to correct page.
           Section(messageKey, Started, controllers.asp.routes.WhatYouNeedController.get())
         }
     }

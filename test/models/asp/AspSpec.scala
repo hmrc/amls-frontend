@@ -12,20 +12,28 @@ trait AspValues {
   object DefaultValues {
 
     val DefaultOtherBusinessTax = OtherBusinessTaxMattersYes("123456789")
+
+    val DefaultServices = ServicesOfBusiness(Set(Accountancy, Auditing, FinancialOrTaxAdvice))
   }
 
   object NewValues {
 
     val NewOtherBusinessTax = OtherBusinessTaxMattersNo
+
+    val NewServices = ServicesOfBusiness(Set(Accountancy, PayrollServices, FinancialOrTaxAdvice))
   }
 
   val completeJson = Json.obj(
+    "services" -> Json.obj(
+      "services" -> Seq("01", "04", "05")
+    ),
     "otherBusinessTaxMatters" -> Json.obj(
       "otherBusinessTaxMatters" -> true,
       "agentRegNo" -> "123456789"
     )
   )
   val completeModel = Asp(
+    Some(DefaultValues.DefaultServices),
     Some(DefaultValues.DefaultOtherBusinessTax)
   )
 
@@ -135,17 +143,38 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
           result must be(Asp(otherBusinessTaxMatters = Some(NewValues.NewOtherBusinessTax)))
 
         }
+
+        "Merged with services does your business provide" must {
+          "return Asp with correct services does your business provide" in {
+
+            val result = initial.services(NewValues.NewServices)
+            result must be(Asp(services = Some(NewValues.NewServices)))
+
+          }
+        }
+
       }
     }
 
-    "Tcsp:merge with completeModel" when {
+    "Asp:merge with completeModel" when {
 
       "model is complete" when {
 
         "Merged with other business tax matters" must {
           "return Asp with correct Company Service Providers" in {
+
             val result = completeModel.otherBusinessTaxMatters(NewValues.NewOtherBusinessTax)
             result.otherBusinessTaxMatters must be(Some(NewValues.NewOtherBusinessTax))
+
+          }
+        }
+
+        "Merged with services does your business provide" must {
+          "return Asp with correct services does your business provide" in {
+
+            val result = completeModel.services(NewValues.NewServices)
+            result.services must be(Some(NewValues.NewServices))
+
           }
         }
       }
