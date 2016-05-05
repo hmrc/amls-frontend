@@ -63,11 +63,23 @@
             <tr>
                 <td colspan="2">
                     @vatRegistered match {
-                        case VATRegisteredNo => { @Messages("lbl.na") }
-                        case VATRegisteredYes(v) => { @v }
+                        case VATRegisteredNo => { @Messages("lbl.no") }
+                        case VATRegisteredYes(v) => { @Messages("lbl.yes") }
                     }
                 </td>
             </tr>
+
+            @vatRegistered match {
+                case VATRegisteredNo => { }
+                case VATRegisteredYes(v) => {
+                <tr>
+                    <td colspan="2">
+                     @v
+                    </td>
+                </tr>
+                }
+            }
+
         </table>
     }
 
@@ -80,11 +92,23 @@
             <tr>
                 <td colspan="2">
                     @ctRegistered match {
-                        case CorporationTaxRegisteredNo => { @Messages("lbl.na") }
-                        case CorporationTaxRegisteredYes(v) => { @v }
+                        case CorporationTaxRegisteredNo => { @Messages("lbl.no") }
+                        case CorporationTaxRegisteredYes(v) => { @Messages("lbl.yes") }
                     }
                 </td>
             </tr>
+
+            @ctRegistered match {
+                case CorporationTaxRegisteredNo => { }
+                case CorporationTaxRegisteredYes(v) => {
+                <tr>
+                    <td colspan="2">
+                        @v
+                    </td>
+                </tr>
+                }
+            }
+
         </table>
     }
 
@@ -96,11 +120,22 @@
         <tr>
             <td colspan="2">
                 @model.previouslyRegistered.map {
-                    case PreviouslyRegisteredNo => { @Messages("lbl.na") }
-                    case PreviouslyRegisteredYes(v) => { @v }
+                    case PreviouslyRegisteredNo => { @Messages("lbl.no") }
+                    case PreviouslyRegisteredYes(v) => { @Messages("lbl.yes") }
                 }
             </td>
         </tr>
+        @model.previouslyRegistered.map {
+            case PreviouslyRegisteredNo => { }
+            case PreviouslyRegisteredYes(v) => {
+            <tr>
+                <td colspan="2">
+                    @v
+                </td>
+            </tr>
+            }
+        }
+
     </table>
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">Accept and complete section</a>

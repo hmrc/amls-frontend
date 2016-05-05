@@ -24,7 +24,7 @@ sealed trait TcspService {
   }
 
   def getMessage(implicit lang: Lang): String = {
-    val message = "tcsp.providedservices.servicename.lbl."
+    val message = "tcsp.provided_services.service.lbl."
     this match {
       case PhonecallHandling => Messages(s"${message}01")
       case EmailHandling => Messages(s"${message}02")
@@ -33,7 +33,7 @@ sealed trait TcspService {
       case MailForwarding => Messages(s"${message}05")
       case Receptionist => Messages(s"${message}06")
       case ConferenceRooms => Messages(s"${message}07")
-      case Other(_) => Messages(s"${message}08")
+      case Other(details) => Messages(s"${message}08") + ":" + details
     }
   }
 }

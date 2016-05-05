@@ -91,8 +91,7 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
 
         val result =  controller.post(true) (newRequest)
         status(result) must be(SEE_OTHER)
-        //TODO: Update this to summary page.
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.TcspTypesController.get().url))
+        redirectLocation(result) must be (Some(controllers.tcsp.routes.SummaryController.get().url))
       }
 
 
