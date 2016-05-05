@@ -27,7 +27,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
     "fail to validate on empty Map" in {
 
       ServicesOfBusiness.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required.eab.business.services")))))
+        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required.asp.business.services")))))
 
     }
 

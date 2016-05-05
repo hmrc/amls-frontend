@@ -36,7 +36,7 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("estateagentbusiness.servicess.title"))
+      contentAsString(result) must include(Messages("asp.servicess.title"))
     }
 
     "submit with valid data" in new Fixture {
@@ -101,7 +101,7 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#services]").html() must include(Messages("error.required.eab.business.services"))
+      document.select("a[href=#services]").html() must include(Messages("error.required.asp.business.services"))
     }
 
     "submit with valid data in edit mode" in new Fixture {
