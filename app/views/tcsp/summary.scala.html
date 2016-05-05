@@ -11,7 +11,9 @@
     <table>
         <tr>
             <th class="summary-title">@Messages("tcsp.kind.of.service.provider.title")</th>
-            <td colspan="2"><a href="@controllers.tcsp.routes.TcspTypesController.get(true)">@Messages("button.edit")</a></td>
+            <td colspan="2">
+                <a href="@controllers.tcsp.routes.TcspTypesController.get(true)">@Messages("button.edit")</a>
+            </td>
         </tr>
         @model.tcspTypes.map {v =>
             @v.serviceProviders.map { x=>
@@ -46,23 +48,27 @@
             }
         }
     </table>
-    <table>
-        <tr>
-            <th class="summary-title">@Messages("tcsp.provided_services.title")</th>
-            <td colspan="2"><a href="@controllers.tcsp.routes.ProvidedServicesController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        @model.providedServices.map {a=>
+    @model.tcspTypes.map {v =>
+        @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
+        <table>
+            <tr>
+                <th class="summary-title">@Messages("tcsp.provided_services.title")</th>
+                <td colspan="2"><a href="@controllers.tcsp.routes.ProvidedServicesController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @model.providedServices.map {a=>
 
-            @a.services.map { x=>
-                <tr>
-                    <td colspan="2">
-                         @x.getMessage
-                    </td>
-                </tr>
+                @a.services.map { x=>
+                    <tr>
+                        <td colspan="2">
+                             @x.getMessage
+                        </td>
+                    </tr>
+                }
+
             }
-
+        </table>
         }
-    </table>
+    }
     <table>
         <tr>
             <th class="summary-title">@Messages("tcsp.servicesOfAnotherTcsp.title")</th>

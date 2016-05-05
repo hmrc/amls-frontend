@@ -27,7 +27,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite {
   "Get" must {
 
     val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
-    val DefaultCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,
+    val DefaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
       CompanyFormationAgent(true, false)))
     val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
 
@@ -48,7 +48,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite {
       document.title must be(Messages("summary.checkyouranswers.title"))
       val elements = document.getElementsByTag("table")
       elements.get(0).select("tr").get(0).text must include(Messages("tcsp.kind.of.service.provider.title"))
-      elements.get(0).select("tr").get(1).text must include(Messages("tcsp.service.provider.lbl.01"))
+      elements.get(0).select("tr").get(1).text must include(Messages("tcsp.service.provider.lbl.03"))
       elements.get(0).select("tr").get(2).text must include(Messages("tcsp.service.provider.lbl.05"))
 
       elements.get(1).select("tr").get(0).text must include(Messages("tcsp.provided_services.title"))
