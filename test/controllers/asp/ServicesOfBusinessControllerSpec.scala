@@ -31,11 +31,6 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
   "ServicesOfBusinessController" must {
 
-    "use correct services" in new Fixture {
-      ServicesOfBusinessController.authConnector must be(AMLSAuthConnector)
-      ServicesOfBusinessController.dataCacheConnector must be(DataCacheConnector)
-    }
-
     "on get display Which services does your business provide page" in new Fixture {
       when(controller.dataCacheConnector.fetch[Asp](any())
         (any(), any(), any())).thenReturn(Future.successful(None))

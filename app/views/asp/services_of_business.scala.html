@@ -3,10 +3,10 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 @main(
-    title = Messages("estateagentbusiness.servicess.title")
+    title = Messages("asp.servicess.title")
 ) {
 
-    @heading("estateagentbusiness.servicess.title", "summary.asp")
+    @heading("asp.services.title", "summary.asp")
 
     @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
         <span>@Messages("lbl.select.all")</span>
