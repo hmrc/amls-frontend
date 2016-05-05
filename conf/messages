@@ -761,6 +761,11 @@ asp.whatyouneed.sidebar.information = Your information is saved automatically. I
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other business' tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme
+asp.service.lbl.01 = Accountancy
+asp.service.lbl.02 = Payroll services
+asp.service.lbl.03 = Bookkeeping
+asp.service.lbl.04 = Auditing
+asp.service.lbl.05 = Financial advice and/or tax advice
 
 
 
