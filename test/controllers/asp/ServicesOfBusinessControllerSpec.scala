@@ -36,7 +36,7 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("asp.servicess.title"))
+      contentAsString(result) must include(Messages("asp.services.title"))
     }
 
     "submit with valid data" in new Fixture {
