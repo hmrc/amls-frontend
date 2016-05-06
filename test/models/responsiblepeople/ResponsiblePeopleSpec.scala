@@ -131,7 +131,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -147,7 +148,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -163,7 +165,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -179,7 +182,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -195,7 +199,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -211,7 +216,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(NewValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -227,7 +233,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(NewValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -243,7 +250,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(NewValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -259,7 +267,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(NewValues.training)))
+          Some(NewValues.training),
+          Some(true)))
       }
     }
   }
@@ -325,7 +334,8 @@ trait ResponsiblePeopleValues {
     Some(DefaultValues.saRegistered),
     Some(DefaultValues.vatRegistered),
     Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training)
+    Some(DefaultValues.training),
+    Some(true)
   )
 
   val CompleteJson = Json.obj(
@@ -389,7 +399,8 @@ trait ResponsiblePeopleValues {
     "training" -> Json.obj(
       "training" -> true,
       "information" -> "test"
-    )
+    ),
+    "hasAlreadyPassedFitAndProper" -> true
   )
 
   /** Make sure Responsible People model is complete */
