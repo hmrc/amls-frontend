@@ -150,6 +150,7 @@ error.required.rp.experiencetraining.information = Enter some information about 
 error.invalid.length.rp.experiencetraining.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
 error.required.rp.training.information = Enter some information about this responsible person''s training in anti-money laundering or counter-terrorism funding.
+error.required.rp.fit_and_proper = Select yes or no to the question: Has this person already passed the fit and proper test?
 error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
 error.required.rp.otherfirstnames = Enter all other first names.
@@ -718,6 +719,7 @@ responsiblepeople.check_your_answers.heading = Check your answers
 responsiblepeople.your_answers.title = Your answers
 responsiblepeople.your_answers.heading = Your answers
 responsiblepeople.check_your_answers.add = Add a responsible person
+responsiblepeople.fit_and_proper.title = Has this person already passed the fit and proper test?
 
 #TCSP
 tcsp.whatyouneed.title = What you need

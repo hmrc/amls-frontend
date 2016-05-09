@@ -44,6 +44,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def training(t: Training): ResponsiblePeople =
     this.copy(training = Some(t))
 
+  def hasAlreadyPassedFitAndProper(value : Boolean) : ResponsiblePeople =
+    this.copy(hasAlreadyPassedFitAndProper = Some(value))
+
   def isComplete: Boolean = this match {
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),

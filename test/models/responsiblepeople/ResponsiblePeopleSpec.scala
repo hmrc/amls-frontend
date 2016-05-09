@@ -102,6 +102,13 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
     }
 
+    "Merged with FitAndProper" must {
+      "return ResponsiblePeople with correct hasAlreadyPassedFitAndProper" in {
+        val result = EmptyResponsiblePeople.hasAlreadyPassedFitAndProper(true)
+        result must be (ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true)))
+      }
+    }
+
   }
 
   "Successfully validate if the model is complete" when {
@@ -269,6 +276,23 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.experienceTraining),
           Some(NewValues.training),
           Some(true)))
+      }
+    }
+
+    "Merged with hasAlreadyPassedFitAndProper" must {
+      "return ResponsiblePeople with correct FitAndProper Value" in {
+        val result = CompleteResponsiblePeople.hasAlreadyPassedFitAndProper(false)
+        result must be (ResponsiblePeople(
+          Some(DefaultValues.personName),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training),
+          Some(false)))
       }
     }
   }
