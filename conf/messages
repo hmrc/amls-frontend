@@ -183,6 +183,10 @@ error.invalid.length.asp.agentRegNo = You can''t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 
 
+#### Supervision ####
+error.required.supervision.supervisor = Enter the name of your last supervisor
+error.required.supervision.reason = Enter a reason why the supervision ended
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
@@ -273,8 +277,15 @@ progress.tcsp.time = 8
 progress.responsiblepeople.name = Responsible People
 progress.responsiblepeople.description = Information about the people in charge of your business.
 progress.responsiblepeople.time = 10
+progress.supervision.name = Supervision
+progress.supervision.description = Registration information specfically for Trust or Company Service Providers.
+progress.supervision.time = 4
+
+
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
+
+
 
 #### Confirmation page ####
 confirmation.lede = You have submitted the registration.
@@ -751,7 +762,6 @@ tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Please give details
 
 #ASP
-
 asp.whatyouneed.title = What you need
 asp.whatyouneed.subheading = For this section you''ll need:
 asp.whatyouneed.line_1 = a list of which services you provide
@@ -768,8 +778,6 @@ asp.service.lbl.03 = Bookkeeping
 asp.service.lbl.04 = Auditing
 asp.service.lbl.05 = Financial advice and/or tax advice
 
-
-
 #Supervision
 supervision.whatyouneed.title = What you need
 supervision.whatyouneed.heading = What you need
@@ -779,6 +787,14 @@ supervision.whatyouneed.requiredinfo.text.2 = the start date and end date of you
 supervision.whatyouneed.requiredinfo.text.3 = the reason your last supervision ended
 supervision.whatyouneed.requiredinfo.text.4 = a list of your professional memberships
 supervision.whatyouneed.requiredinfo.text.5 = details of penalties you''ve received from a professional body
-
 supervision.whatyouneed.sidebar.title = Automatic saving
 supervision.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your application.
+
+supervision.another_body.title = Has your business ever been registered with another supervising body?
+supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
+supervision.another_body.lbl.supervisor = Name of your last supervisor
+supervision.another_body.startDate.lbl = Start date of supervision
+supervision.another_body.startDate.hint = For example, 31 3 2008
+supervision.another_body.endDate.lbl = End date of supervision
+supervision.another_body.endDate.hint = For example, 31 3 2010
+supervision.another_body.endingReason.lbl = Why did the supervision end?

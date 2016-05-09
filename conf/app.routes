@@ -212,3 +212,5 @@ GET         /supervision/what-you-need        controllers.supervision.WhatYouNee
 
 
 GET         /trust-company-service-provider/check-your-answers      controllers.tcsp.SummaryController.get()
+GET         /supervision/supervised       controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
+POST        /supervision/supervised       controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
