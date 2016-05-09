@@ -4,13 +4,17 @@ import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-case class Supervision(anotherBody: Option[AnotherBody] = None) {
+case class Supervision(anotherBody: Option[AnotherBody] = None,
+                       professionalBody: Option[ProfessionalBody] = None) {
 
   def anotherBody(anotherBody: AnotherBody): Supervision =
     this.copy(anotherBody = Some(anotherBody))
 
+  def professionalBody(p: ProfessionalBody): Supervision =
+    this.copy(professionalBody = Some(p))
+
   def isComplete: Boolean = this match {
-    case Supervision(Some(_)) => true
+    case Supervision(Some(_), Some(_)) => true
     case _ => false
   }
 
@@ -24,9 +28,9 @@ object Supervision {
     cache.getEntry[Supervision](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
+          Section(messageKey, Completed, controllers.supervision.routes.SummaryController.get())
         } else {
-          Section(messageKey, Started, controllers.routes.RegistrationProgressController.get())
+          Section(messageKey, Started, controllers.supervision.routes.WhatYouNeedController.get())
         }
     }
   }

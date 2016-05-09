@@ -37,9 +37,8 @@ trait AnotherBodyController extends BaseController {
               supervision.anotherBody(data)
             )
           } yield edit match {
-            //TODO: Update to correct page.
-            case true => Redirect(routes.AnotherBodyController.get())
-            case false => Redirect(routes.AnotherBodyController.get())
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.PenalisedByProfessionalController.get())
           }
       }
   }

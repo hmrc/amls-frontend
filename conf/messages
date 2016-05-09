@@ -225,6 +225,8 @@ lbl.nino.hint = For example: QQ123456C
 lbl.passport.number = Passport number
 lbl.uk = UK
 lbl.overseas = Overseas
+lbl.start.date = Start date:
+lbl.end.date = End date:
 lbl.select.all = Select all that apply
 
 lbl.residential = Residential
@@ -281,11 +283,8 @@ progress.supervision.name = Supervision
 progress.supervision.description = Registration information specfically for Trust or Company Service Providers.
 progress.supervision.time = 4
 
-
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
-
-
 
 #### Confirmation page ####
 confirmation.lede = You have submitted the registration.
@@ -799,3 +798,13 @@ supervision.another_body.startDate.hint = For example, 31 3 2008
 supervision.another_body.endDate.lbl = End date of supervision
 supervision.another_body.endDate.hint = For example, 31 3 2010
 supervision.another_body.endingReason.lbl = Why did the supervision end?
+
+supervision.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
+supervision.penalisedbyprofessional.subtitle = The penalty should relate to estate agent business activities. Examples of a penalty include:
+supervision.penalisedbyprofessional.line_1 = a fine
+supervision.penalisedbyprofessional.line_2 = a warning
+supervision.penalisedbyprofessional.line_3 = suspension
+supervision.penalisedbyprofessional.line_4 = expulsion
+supervision.penalisedbyprofessional.details.lbl = Please provide details
+
+supervision.summary.agency = Supervision Agency
