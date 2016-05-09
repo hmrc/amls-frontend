@@ -79,7 +79,7 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Asp]
-        val completedSection = Section("asp", Completed, controllers.routes.RegistrationProgressController.get())
+        val completedSection = Section("asp", Completed, controllers.asp.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Asp]("asp")) thenReturn Some(complete)

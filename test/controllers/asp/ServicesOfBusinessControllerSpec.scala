@@ -1,6 +1,5 @@
 package controllers.asp
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.asp._
 import org.jsoup.Jsoup
@@ -120,7 +119,7 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite w
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.asp.routes.OtherBusinessTaxMattersController.get().url))
+      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get().url))
     }
 
   }

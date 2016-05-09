@@ -38,7 +38,7 @@ trait ServicesOfBusinessController extends BaseController {
               businessServices.services(data))
           } yield edit match {
             case true =>
-              Redirect(routes.OtherBusinessTaxMattersController.get()) //TODO need to change this to SummaryController once we get the checkyouranswers page
+              Redirect(routes.SummaryController.get())
             case false =>
               Redirect(routes.OtherBusinessTaxMattersController.get())
 
