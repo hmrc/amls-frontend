@@ -161,23 +161,23 @@
                 </td>
             </tr>
 
-                    @model.transactionRecord.map {
-                        case TransactionRecordNo => { }
-                        case TransactionRecordYes(v) => {
-                        <tr>
-                            <td colspan="2">
-                                @v.map { x=>
-                                    @x match {
-                                        case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
-                                        case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
-                                        case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"):@software}
-                                    }
-                                    <br>
-                                }
-                            </td>
-                        </tr>
+            @model.transactionRecord.map {
+                case TransactionRecordNo => { }
+                case TransactionRecordYes(v) => {
+                <tr>
+                    <td colspan="2">
+                        @v.map { x=>
+                            @x match {
+                                case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
+                                case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
+                                case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"):@software}
+                            }
+                            <br>
                         }
-                    }
+                    </td>
+                </tr>
+                }
+            }
 
         </table>
     <table>

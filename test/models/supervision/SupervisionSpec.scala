@@ -69,7 +69,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
 
       "return a NotStarted Section when model is empty" in {
 
-        val notStartedSection = Section("supervision", NotStarted, controllers.routes.RegistrationProgressController.get())
+        val notStartedSection = Section("supervision", NotStarted, controllers.supervision.routes.WhatYouNeedController.get())
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn None
 

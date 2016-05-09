@@ -61,7 +61,26 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
 
     "Post" must {
 
-      "successfully navigate to next page while storing data in in save4later" in  new Fixture {
+      "successfully navigate to next page when option selected is Registered office/business address/virtual office services" in  new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "serviceProviders[0]" -> "01",
+          "serviceProviders[1]" -> "02",
+          "serviceProviders[2]" -> "03"
+        )
+
+        when(controller.dataCacheConnector.fetch[Tcsp](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(cacheMap))
+
+        val result =  controller.post() (newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be (Some(controllers.tcsp.routes.ProvidedServicesController.get().url))
+
+      }
+
+      "successfully navigate to next page when other then Registered office/business address/virtual office services option is selected " in  new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "serviceProviders[]" -> "01"
@@ -74,7 +93,7 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
 
         val result =  controller.post() (newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.ProvidedServicesController.get().url))
+        redirectLocation(result) must be (Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url))
 
       }
 
@@ -91,8 +110,7 @@ class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneServerP
 
         val result =  controller.post(true) (newRequest)
         status(result) must be(SEE_OTHER)
-        //TODO: Update this to summary page.
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.TcspTypesController.get().url))
+        redirectLocation(result) must be (Some(controllers.tcsp.routes.SummaryController.get().url))
       }
 
 

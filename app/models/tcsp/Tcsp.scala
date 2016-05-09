@@ -32,7 +32,7 @@ object Tcsp {
     cache.getEntry[Tcsp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
+          Section(messageKey, Completed, controllers.tcsp.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, controllers.tcsp.routes.WhatYouNeedController.get())
         }

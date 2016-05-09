@@ -191,6 +191,12 @@ GET         /responsible-people/your-answers         controllers.responsiblepeop
 
 GET         /accountancy-service-provider/what-you-need       controllers.asp.WhatYouNeedController.get()
 
+GET         /accountancy-service-provider/services       controllers.asp.ServicesOfBusinessController.get(edit: Boolean ?= false)
+POST        /accountancy-service-provider/services       controllers.asp.ServicesOfBusinessController.post(edit: Boolean ?= false)
+
+GET         /accountancy-service-provider/agent-scheme       controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
+POST        /accountancy-service-provider/agent-scheme       controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
+
 GET         /trust-company-service-provider/what-you-need        controllers.tcsp.WhatYouNeedController.get()
 
 GET         /trust-company-service-provider/services       controllers.tcsp.ProvidedServicesController.get(edit: Boolean ?= false)
@@ -204,5 +210,7 @@ POST        /trust-company-service-provider/other-trust-provider  controllers.tc
 
 GET         /supervision/what-you-need        controllers.supervision.WhatYouNeedController.get()
 
+
+GET         /trust-company-service-provider/check-your-answers      controllers.tcsp.SummaryController.get()
 GET         /supervision/supervised       controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
 POST        /supervision/supervised       controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
