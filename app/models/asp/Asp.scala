@@ -34,7 +34,7 @@ object Asp {
     cache.getEntry[Asp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.routes.RegistrationProgressController.get())
+          Section(messageKey, Completed, controllers.asp.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, controllers.asp.routes.WhatYouNeedController.get())
         }
