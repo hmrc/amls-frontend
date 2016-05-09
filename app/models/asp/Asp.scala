@@ -20,7 +20,6 @@ case class Asp(
       case Asp(Some(_), Some(_)) => true
       case _ => false
   }
-
 }
 
 object Asp {

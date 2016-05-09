@@ -720,6 +720,7 @@ responsiblepeople.your_answers.title = Your answers
 responsiblepeople.your_answers.heading = Your answers
 responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.fit_and_proper.title = Has this person already passed the fit and proper test?
+responsiblepeople.fit_and_proper.heading = Has this person already passed the fit and proper test?
 
 #TCSP
 tcsp.whatyouneed.title = What you need

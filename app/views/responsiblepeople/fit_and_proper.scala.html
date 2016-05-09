@@ -4,24 +4,17 @@
 
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
-@target = @{
-    s"""${f("information").id}-fieldset"""
-}
-
 @main(
-    title = Messages("responsiblepeople.training.title")
+    title = Messages("responsiblepeople.fit_and_proper.title")
 ) {
 
-    @heading("responsiblepeople.training.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.fit_and_proper.heading", "summary.responsiblepeople")
 
-    @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
+    @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit)) {
 
-        @inlineRadioGroup(f("training")) {
-            @radio(f("training"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("training"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @textarea(f("information"), "responsiblepeople.training.information", bold = false)
-            }
+        @inlineRadioGroup(f("fit_and_proper")) {
+            @radio(f("hasAlreadyPassedFitAndProper"), "lbl.yes", "true")
+            @radio(f("hasAlreadyPassedFitAndProper"), "lbl.no", "false")
         }
 
     @submit(edit)

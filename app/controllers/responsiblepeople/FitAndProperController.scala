@@ -6,13 +6,14 @@ import controllers.BaseController
 import forms._
 import models.responsiblepeople.{ResponsiblePeople, Training}
 import utils.{BooleanFormReadWrite, RepeatingSection}
+import play.api.Logger
 
 import scala.concurrent.Future
 
 trait FitAndProperController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
-  val FIELDNAME = "value"
+  val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
@@ -22,7 +23,6 @@ trait FitAndProperController extends RepeatingSection with BaseController {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             response =>
-
               val form = (for {
                 responsiblePeople <- response
                 fitAndProper <- responsiblePeople.hasAlreadyPassedFitAndProper
@@ -58,7 +58,7 @@ trait FitAndProperController extends RepeatingSection with BaseController {
 
 }
 
-object FitAndProperController extends TrainingController {
+object FitAndProperController extends FitAndProperController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
