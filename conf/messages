@@ -178,7 +178,8 @@ error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulat
 #### Accountancy service provide ####
 
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
-error.required.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
+error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
+error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can''t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 

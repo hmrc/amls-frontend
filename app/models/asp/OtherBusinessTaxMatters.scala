@@ -17,9 +17,11 @@ object OtherBusinessTaxMatters {
   import play.api.libs.json._
 
   val maxAgentRegNoLength = 11
+  val agentRegNoPattern =  "^([0-9a-zA-Z]{11})$".r
 
   val agentRegNoType = notEmpty.withMessage("error.required.asp.agentRegNo") compose
-    maxLength(maxAgentRegNoLength).withMessage("error.invalid.length.asp.agentRegNo")
+    maxLength(maxAgentRegNoLength).withMessage("error.invalid.length.asp.agentRegNo") compose
+    pattern(agentRegNoPattern).withMessage("error.invalid.asp.agentRegNo")
 
   implicit val formRule: Rule[UrlFormEncoded, OtherBusinessTaxMatters] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
