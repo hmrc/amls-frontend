@@ -19,11 +19,11 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
 
       val data = Map(
         "otherBusinessTaxMatters" -> Seq("true"),
-        "agentRegNo" -> Seq("12345678")
+        "agentRegNo" -> Seq("123456782fv")
       )
 
       OtherBusinessTaxMatters.formRule.validate(data) must
-        be(Success(OtherBusinessTaxMattersYes("12345678")))
+        be(Success(OtherBusinessTaxMattersYes("123456782fv")))
     }
 
     "fail when mandatory fields are missing" in {
@@ -83,8 +83,8 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
 
     "write correct data from `yes` value" in {
 
-      OtherBusinessTaxMatters.formWrites.writes(OtherBusinessTaxMattersYes("12345678")) must
-        be(Map("otherBusinessTaxMatters" -> Seq("true"), "agentRegNo" -> Seq("12345678")))
+      OtherBusinessTaxMatters.formWrites.writes(OtherBusinessTaxMattersYes("123456782fv")) must
+        be(Map("otherBusinessTaxMatters" -> Seq("true"), "agentRegNo" -> Seq("123456782fv")))
 
     }
 
@@ -100,8 +100,8 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an `Yes` value" in {
 
-      Json.fromJson[OtherBusinessTaxMatters](Json.obj("otherBusinessTaxMatters" -> true, "agentRegNo" -> "12345678")) must
-        be(JsSuccess(OtherBusinessTaxMattersYes("12345678"), JsPath \ "otherBusinessTaxMatters" \ "agentRegNo"))
+      Json.fromJson[OtherBusinessTaxMatters](Json.obj("otherBusinessTaxMatters" -> true, "agentRegNo" -> "123456782fv")) must
+        be(JsSuccess(OtherBusinessTaxMattersYes("123456782fv"), JsPath \ "otherBusinessTaxMatters" \ "agentRegNo"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -117,10 +117,10 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
       Json.toJson(OtherBusinessTaxMattersNo) must
         be(Json.obj("otherBusinessTaxMatters" -> false))
 
-      Json.toJson(OtherBusinessTaxMattersYes("12345678")) must
+      Json.toJson(OtherBusinessTaxMattersYes("123456782fv")) must
         be(Json.obj(
           "otherBusinessTaxMatters" -> true,
-          "agentRegNo" -> "12345678"
+          "agentRegNo" -> "123456782fv"
         ))
     }
   }

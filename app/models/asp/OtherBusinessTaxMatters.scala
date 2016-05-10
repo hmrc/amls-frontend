@@ -17,7 +17,7 @@ object OtherBusinessTaxMatters {
   import play.api.libs.json._
 
   val maxAgentRegNoLength = 11
-  val agentRegNoPattern =  "^([0-9]{11})$".r
+  val agentRegNoPattern =  "^([0-9a-zA-Z]{11})$".r
 
   val agentRegNoType = notEmpty.withMessage("error.required.asp.agentRegNo") compose
     maxLength(maxAgentRegNoLength).withMessage("error.invalid.length.asp.agentRegNo") compose

@@ -41,16 +41,16 @@ class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneServerPerSu
 
     "on get display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
       when(controller.dataCacheConnector.fetch[Asp](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes("12345678"))))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes("1234yh78256"))))))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include("12345678")
+      contentAsString(result) must include("1234yh78256")
     }
 
     "on post with valid data" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "otherBusinessTaxMatters" -> "true",
-        "agentRegNo" -> "12345678"
+        "agentRegNo" -> "1234yh78256"
       )
 
       when(controller.dataCacheConnector.fetch[Asp](any())
@@ -124,7 +124,7 @@ class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneServerPerSu
     "on post with valid data in edit mode" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "otherBusinessTaxMatters" -> "true",
-        "agentRegNo" -> "12345678"
+        "agentRegNo" -> "adbg1233125"
       )
 
       when(controller.dataCacheConnector.fetch[Asp](any())
