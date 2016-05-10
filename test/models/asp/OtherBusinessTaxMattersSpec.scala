@@ -48,7 +48,7 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
         )))
     }
 
-    "fail to validate given an `Yes` with invalid value" in {
+    "fail to validate given an `Yes` with more than max length value" in {
 
       val data = Map(
         "otherBusinessTaxMatters" -> Seq("true"),
@@ -58,6 +58,19 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
       OtherBusinessTaxMatters.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "agentRegNo") -> Seq(ValidationError("error.invalid.length.asp.agentRegNo"))
+        )))
+    }
+
+    "fail to validate given an `Yes` with invalid value" in {
+
+      val data = Map(
+        "otherBusinessTaxMatters" -> Seq("true"),
+        "agentRegNo" -> Seq("123qe")
+      )
+
+      OtherBusinessTaxMatters.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "agentRegNo") -> Seq(ValidationError("error.invalid.asp.agentRegNo"))
         )))
     }
 

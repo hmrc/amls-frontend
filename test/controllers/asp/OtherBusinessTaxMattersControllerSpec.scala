@@ -64,7 +64,7 @@ class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneServerPerSu
       redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
     }
 
-    "on post with invalid data" in new Fixture {
+    "on post with max data" in new Fixture {
 
       val newRequestInvalid = request.withFormUrlEncodedBody(
         "otherBusinessTaxMatters" -> "true",
@@ -76,6 +76,21 @@ class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneServerPerSu
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("span").html() must include(Messages("error.invalid.length.asp.agentRegNo"))
+
+    }
+
+    "on post with invalid data" in new Fixture {
+
+      val newRequestInvalid = request.withFormUrlEncodedBody(
+        "otherBusinessTaxMatters" -> "true",
+        "agentRegNo" -> "adbg"
+      )
+
+      val result = controller.post()(newRequestInvalid)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("span").html() must include(Messages("error.invalid.asp.agentRegNo"))
 
     }
 
