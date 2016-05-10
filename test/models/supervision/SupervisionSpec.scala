@@ -20,14 +20,16 @@ trait SupervisionValues {
     private val reason = "Ending reason"
 
     val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
+    val DefaultProfessionalBody = ProfessionalBodyYes("details")
 
   }
 
   object NewValues {
     val NewAnotherBody = AnotherBodyNo
+    val NewProfessionalBody = ProfessionalBodyNo
   }
 
-  val completeModel = Supervision(Some(DefaultValues.DefaultAnotherBody))
+  val completeModel = Supervision(Some(DefaultValues.DefaultAnotherBody), Some(DefaultValues.DefaultProfessionalBody))
 
   val completeJson = Json.obj(
     "anotherBody" -> Json.obj(
@@ -35,8 +37,10 @@ trait SupervisionValues {
       "supervisorName" -> "Company A",
       "startDate" -> "1993-08-25",
       "endDate" -> "1999-08-25",
-      "endingReason" -> "Ending reason"
-    )
+      "endingReason" -> "Ending reason"),
+      "professionalBody" -> Json.obj(
+        "penalised" -> true,
+      "professionalBody" ->"details")
   )
 
 }
@@ -80,7 +84,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Supervision]
-        val completedSection = Section("supervision", Completed, controllers.routes.RegistrationProgressController.get())
+        val completedSection = Section("supervision", Completed, controllers.supervision.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(complete)
@@ -92,7 +96,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
       "return a Started Section when model is incomplete" in {
 
         val incomplete = mock[Supervision]
-        val startedSection = Section("supervision", Started, controllers.routes.RegistrationProgressController.get())
+        val startedSection = Section("supervision", Started, controllers.supervision.routes.WhatYouNeedController.get())
 
         when(incomplete.isComplete) thenReturn false
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(incomplete)
@@ -122,8 +126,5 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
         }
       }
     }
-
-
   }
-
 }

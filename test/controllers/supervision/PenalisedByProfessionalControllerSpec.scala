@@ -1,8 +1,7 @@
 package controllers.supervision
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.estateagentbusiness._
+import models.supervision.{ProfessionalBodyYes, Supervision}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -32,13 +31,8 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
 
   "PenalisedByProfessionalController" must {
 
-    "use correct services" in new Fixture {
-      PenalisedByProfessionalController.authConnector must be(AMLSAuthConnector)
-      PenalisedByProfessionalController.dataCacheConnector must be(DataCacheConnector)
-    }
-
     "on get display the Penalised By Professional Body page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
+      when(controller.dataCacheConnector.fetch[Supervision](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -48,8 +42,8 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
 
   "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
 
-    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, None,Some(ProfessionalBodyYes("details"))))))
+    when(controller.dataCacheConnector.fetch[Supervision](any())
+      (any(), any(), any())).thenReturn(Future.successful(Some(Supervision(None, Some(ProfessionalBodyYes("details"))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -64,15 +58,15 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
       "professionalBody" -> "details"
     )
 
-    when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
+    when(controller.dataCacheConnector.fetch[Supervision](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-    when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+    when(controller.dataCacheConnector.save[Supervision](any(), any())
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
+    redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
   }
 
   "on post with invalid data" in new Fixture {
@@ -95,15 +89,15 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
       "professionalBody" -> "details"
      )
 
-     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
+     when(controller.dataCacheConnector.fetch[Supervision](any())
        (any(), any(), any())).thenReturn(Future.successful(None))
 
-     when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+     when(controller.dataCacheConnector.save[Supervision](any(), any())
        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)
-     redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
+     redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
    }
   }
 }

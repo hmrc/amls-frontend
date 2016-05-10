@@ -37,7 +37,7 @@ class AnotherBodyControllerSpec extends PlaySpec with OneServerPerSuite with Moc
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("supervision.penalisedbyprofessional.title"))
+      contentAsString(result) must include(Messages("supervision.another_body.title"))
     }
 
 
@@ -75,7 +75,7 @@ class AnotherBodyControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
+    redirectLocation(result) must be(Some(controllers.supervision.routes.PenalisedByProfessionalController.get().url))
   }
 
   "on post with invalid data" in new Fixture {
