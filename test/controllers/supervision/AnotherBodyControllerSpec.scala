@@ -81,13 +81,13 @@ class AnotherBodyControllerSpec extends PlaySpec with OneServerPerSuite with Moc
   "on post with invalid data" in new Fixture {
 
     val newRequest = request.withFormUrlEncodedBody(
-
     )
 
     val result = controller.post()(newRequest)
     status(result) must be(BAD_REQUEST)
 
     val document = Jsoup.parse(contentAsString(result))
+    document.select("a[href=#anotherBody]").html() must be(Messages("error.required.supervision.anotherbody"))
 
   }
 
