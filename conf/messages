@@ -130,7 +130,7 @@ error.required.eab.business.services = Select at least one service that your bus
 error.required.eab.penalised.under.act = Select yes or no to the question: has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 error.required.eab.info.about.penalty = Enter some information about the penalty received.
 error.invalid.eab.info.about.penalty = You can''t enter more than 255 characters for information about the penalty received.
-error.required.eab.penalised.by.professional.body = Select yes or no the question: has the business, or anyone in the business, ever been penalised by a professional body?
+error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
 #### Responsible People ####
 error.required.rp.is.uk.resident = Select yes or no to the question: is this person a UK resident?
@@ -179,10 +179,15 @@ error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulat
 #### Accountancy service provide ####
 
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
-error.required.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
+error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
+error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can''t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 
+
+#### Supervision ####
+error.required.supervision.supervisor = Enter the name of your last supervisor
+error.required.supervision.reason = Enter a reason why the supervision ended
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -222,6 +227,8 @@ lbl.nino.hint = For example: QQ123456C
 lbl.passport.number = Passport number
 lbl.uk = UK
 lbl.overseas = Overseas
+lbl.start.date = Start date:
+lbl.end.date = End date:
 lbl.select.all = Select all that apply
 
 lbl.residential = Residential
@@ -274,6 +281,10 @@ progress.tcsp.time = 8
 progress.responsiblepeople.name = Responsible People
 progress.responsiblepeople.description = Information about the people in charge of your business.
 progress.responsiblepeople.time = 10
+progress.supervision.name = Supervision
+progress.supervision.description = Registration information specfically for Trust or Company Service Providers.
+progress.supervision.time = 4
+
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
 
@@ -739,7 +750,7 @@ tcsp.service.provider.lbl.05 = Trust or company formation agent
 tcsp.off-the-shelf.companies.lbl = Do you sell only off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another Trust or Company Service Provider?
-tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What is that company's Money Laundering Regulation reference number?
+tcsp.servicesOfAnotherTcsp.mlrregno.lbl = What is that company''s Money Laundering Regulation reference number?
 
 tcsp.provided_services.title = Which services does your business provide?
 tcsp.provided_services.heading = Which services does your business provide?
@@ -754,7 +765,6 @@ tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Please give details
 
 #ASP
-
 asp.whatyouneed.title = What you need
 asp.whatyouneed.subheading = For this section you''ll need:
 asp.whatyouneed.line_1 = a list of which services you provide
@@ -770,8 +780,7 @@ asp.service.lbl.02 = Payroll services
 asp.service.lbl.03 = Bookkeeping
 asp.service.lbl.04 = Auditing
 asp.service.lbl.05 = Financial advice and/or tax advice
-
-
+asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
 supervision.whatyouneed.title = What you need
@@ -782,6 +791,24 @@ supervision.whatyouneed.requiredinfo.text.2 = the start date and end date of you
 supervision.whatyouneed.requiredinfo.text.3 = the reason your last supervision ended
 supervision.whatyouneed.requiredinfo.text.4 = a list of your professional memberships
 supervision.whatyouneed.requiredinfo.text.5 = details of penalties you''ve received from a professional body
-
 supervision.whatyouneed.sidebar.title = Automatic saving
 supervision.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your application.
+
+supervision.another_body.title = Has your business ever been registered with another supervising body?
+supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
+supervision.another_body.lbl.supervisor = Name of your last supervisor
+supervision.another_body.startDate.lbl = Start date of supervision
+supervision.another_body.startDate.hint = For example, 31 3 2008
+supervision.another_body.endDate.lbl = End date of supervision
+supervision.another_body.endDate.hint = For example, 31 3 2010
+supervision.another_body.endingReason.lbl = Why did the supervision end?
+
+supervision.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
+supervision.penalisedbyprofessional.subtitle = The penalty should relate to estate agent business activities. Examples of a penalty include:
+supervision.penalisedbyprofessional.line_1 = a fine
+supervision.penalisedbyprofessional.line_2 = a warning
+supervision.penalisedbyprofessional.line_3 = suspension
+supervision.penalisedbyprofessional.line_4 = expulsion
+supervision.penalisedbyprofessional.details.lbl = Please provide details
+
+supervision.summary.agency = Supervision Agency

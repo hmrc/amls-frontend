@@ -35,10 +35,7 @@ trait OtherBusinessTaxMattersController extends BaseController {
             _ <- dataCacheConnector.save[Asp](Asp.key,
               asp.otherBusinessTaxMatters(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.WhatYouNeedController.get())
-          }
+          } yield Redirect(routes.SummaryController.get())
       }
     }
   }
