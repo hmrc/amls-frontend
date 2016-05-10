@@ -1,0 +1,22 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@main(
+    title = Messages("asp.services.title")
+) {
+
+    @heading("asp.services.title", "summary.asp")
+
+    @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
+        @radioGroup(f("services")) {
+            @legend("", jsHidden = true, bold=false, "lbl.select.all")
+            @checkbox(f("services[]"), "asp.service.lbl.01", "01")
+            @checkbox(f("services[]"), "asp.service.lbl.02", "02")
+            @checkbox(f("services[]"), "asp.service.lbl.03", "03")
+            @checkbox(f("services[]"), "asp.service.lbl.04", "04")
+            @checkbox(f("services[]"), "asp.service.lbl.05", "05")
+        }
+        @submit(edit)
+    }
+}

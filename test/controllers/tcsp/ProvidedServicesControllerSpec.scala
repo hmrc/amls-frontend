@@ -87,8 +87,7 @@ class ProvidedServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         val result = controller.post(true)(newRequest)
 
         status(result) must be (SEE_OTHER)
-        //TODO: Update this test to new view.
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.ProvidedServicesController.get().url))
+        redirectLocation(result) must be (Some(controllers.tcsp.routes.SummaryController.get().url))
 
       }
 
@@ -120,9 +119,6 @@ class ProvidedServicesControllerSpec extends PlaySpec with OneServerPerSuite wit
         document.select("a[href=#details]").text must include(Messages("error.required.tcsp.provided_services.details"))
 
       }
-
     }
-
-
   }
 }

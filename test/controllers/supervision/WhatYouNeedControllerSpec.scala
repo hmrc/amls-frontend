@@ -1,12 +1,13 @@
 package controllers.supervision
 
 import config.AMLSAuthConnector
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
-class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite {
+class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -15,6 +16,7 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite {
       override val authConnector = self.authConnector
     }
   }
+
   "WhatYouNeedController" must {
 
     "use correct services" in new Fixture {

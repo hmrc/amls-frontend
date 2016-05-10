@@ -2,6 +2,7 @@ package services
 
 import config.ApplicationConfig
 import connectors.{DESConnector, DataCacheConnector, GovernmentGatewayConnector}
+import models.responsiblepeople.ResponsiblePeople
 import models.{SubscriptionRequest, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
@@ -68,7 +69,8 @@ trait SubscriptionService extends DataCacheService {
       aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
       bankDetailsSection = cache.getEntry[Seq[BankDetails]](BankDetails.key),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
-      businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key)
+      businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
+      responsiblePeopleSection = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
     )
 
     desConnector.subscribe(request, safeId)

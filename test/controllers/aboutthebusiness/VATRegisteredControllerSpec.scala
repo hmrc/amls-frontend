@@ -42,7 +42,7 @@ class VATRegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include("Is this business registered for VAT?")
+      contentAsString(result) must include(Messages("aboutthebusiness.registeredforvat.title"))
     }
 
 

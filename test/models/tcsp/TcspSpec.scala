@@ -57,7 +57,6 @@ trait TcspValues {
     Some(DefaultValues.DefaultProvidedServices),
     Some(DefaultValues.DefaultServicesOfAnotherTCSP)
   )
-
 }
 
 class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
@@ -73,7 +72,6 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "correctly provides a default value when existing value is provided" in {
         Tcsp.default(Some(completeModel)) must be(completeModel)
       }
-
     }
 
     "have a mongo key that" must {
@@ -99,7 +97,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Tcsp]
-        val completedSection = Section("tcsp", Completed, controllers.routes.RegistrationProgressController.get())
+        val completedSection = Section("tcsp", Completed, controllers.tcsp.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
@@ -126,6 +124,12 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "correctly show if the model is complete" in {
         completeModel.isComplete must be(true)
       }
+
+      "correctly show if the model is incomplete" in {
+        val incompleteModel = completeModel.copy(providedServices = None)
+        incompleteModel.isComplete must be (false)
+      }
+
     }
 
     "Complete Model" when {

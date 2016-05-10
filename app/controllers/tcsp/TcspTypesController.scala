@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.tcsp.{TcspTypes, Tcsp}
+import models.tcsp.{RegisteredOfficeEtc, TcspTypes, Tcsp}
 import views.html.tcsp.service_provider_types
 
 import scala.concurrent.Future
@@ -37,9 +37,12 @@ trait TcspTypesController extends BaseController {
             _ <- dataCacheConnector.save[Tcsp](Tcsp.key,
               tcsp.tcspTypes(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.TcspTypesController.get())
-            case false => Redirect(routes.ProvidedServicesController.get())
+          } yield data.serviceProviders.contains(RegisteredOfficeEtc) match {
+            case true => Redirect(routes.ProvidedServicesController.get(edit))
+            case false => edit match {
+                case true => Redirect(routes.SummaryController.get())
+                case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
+            }
           }
         }
       }

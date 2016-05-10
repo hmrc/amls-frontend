@@ -35,10 +35,7 @@ trait ServicesOfAnotherTCSPController extends BaseController {
             _ <- dataCacheConnector.save[Tcsp](Tcsp.key,
               tcsp.servicesOfAnotherTCSP(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.WhatYouNeedController.get())
-            case false => Redirect(routes.WhatYouNeedController.get())
-          }
+          } yield Redirect(routes.SummaryController.get())
       }
     }
   }

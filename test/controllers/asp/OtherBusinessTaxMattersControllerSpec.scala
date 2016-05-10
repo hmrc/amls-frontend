@@ -61,7 +61,7 @@ class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneServerPerSu
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with max data" in new Fixture {
@@ -135,7 +135,7 @@ class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneServerPerSu
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
   }

@@ -44,13 +44,13 @@
                 </tr>
                 @model.redressScheme.map { a =>
                     <tr>
-                        <td colspan="2"> @Messages("estateagentbusiness.redress.lbl")
+                        <td colspan="2">
                             @a match {
-                                case ThePropertyOmbudsman => { @Messages("estateagentbusiness.redress.lbl.01") }
-                                case OmbudsmanServices => { @Messages("estateagentbusiness.redress.lbl.02") }
-                                case PropertyRedressScheme => { @Messages("estateagentbusiness.redress.lbl.03") }
-                                case Other(value) => { @value }
-                                case RedressSchemedNo => {@Messages("lbl.na")}
+                                case ThePropertyOmbudsman => {@Messages("lbl.yes"): @Messages("estateagentbusiness.redress.lbl.01") }
+                                case OmbudsmanServices => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.02") }
+                                case PropertyRedressScheme => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.03") }
+                                case Other(value) => { @Messages("lbl.yes") : @value }
+                                case RedressSchemedNo => {@Messages("lbl.no")}
                             }
                         </td>
                     </tr>
@@ -72,14 +72,18 @@
                 }
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                @model.professionalBody.map {
-                    case ProfessionalBodyNo => { @Messages("lbl.na") }
-                    case ProfessionalBodyYes(v) => { @v }
-                }
-            </td>
-        </tr>
+
+        @model.professionalBody.map {
+            case ProfessionalBodyNo => { }
+            case ProfessionalBodyYes(v) => {
+            <tr>
+                <td colspan="2">
+                    @v
+                </td>
+            </tr>
+            }
+        }
+
     </table>
     <table>
         <tr>
@@ -94,14 +98,17 @@
                 }
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                @model.penalisedUnderEstateAgentsAct.map {
-                    case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.na") }
-                    case PenalisedUnderEstateAgentsActYes(v) => { @v }
-                }
-            </td>
-        </tr>
+
+        @model.penalisedUnderEstateAgentsAct.map {
+            case PenalisedUnderEstateAgentsActNo => { }
+            case PenalisedUnderEstateAgentsActYes(v) => {
+            <tr>
+                <td colspan="2">
+                    @v
+                </td>
+            </tr>
+            }
+        }
     </table>
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
