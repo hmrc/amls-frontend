@@ -30,6 +30,7 @@ trait SupervisionValues {
   }
 
   val completeModel = Supervision(Some(DefaultValues.DefaultAnotherBody), Some(DefaultValues.DefaultProfessionalBody))
+  val partialModel = Supervision(Some(DefaultValues.DefaultAnotherBody))
 
   val completeJson = Json.obj(
     "anotherBody" -> Json.obj(
@@ -110,6 +111,10 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
 
       "correctly show if the model is complete" in {
         completeModel.isComplete must be(true)
+      }
+
+      "correctly show if the model is incomplete" in {
+        partialModel.isComplete must be(false)
       }
     }
 
