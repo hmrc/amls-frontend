@@ -85,6 +85,28 @@ trait RepeatingSection {
     }
   }
 
+  protected def fetchAllAndUpdate[T]
+  (index: Int)
+  (fn: (CacheMap, Option[T]) => Option[T])
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ) : Future[Option[CacheMap]] = {
+    dataCacheConnector.fetchAll.map[Option[CacheMap]] {
+      optionalCacheMap => optionalCacheMap.map[CacheMap] {
+        cacheMap => {
+            cacheMap.getEntry[Seq[T]](key()).map {
+              data => putData(data.patch(index-1, fn(cacheMap, data.lift(index-1)).toSeq, 1))
+            }
+            cacheMap
+          }
+        }
+      }
+    }
+
   protected def updateData[T]
   (index: Int)
   (fn: Option[T] => Option[T])
