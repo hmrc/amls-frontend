@@ -1,0 +1,76 @@
+@import include._
+@import models.supervision._
+@import utils._
+
+@(model: Supervision)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.supervision")
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("supervision.another_body.title")</th>
+            <td colspan="2"><a href="@controllers.supervision.routes.AnotherBodyController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.anotherBody.map {
+                    case AnotherBodyNo => { @Messages("lbl.no") }
+                    case AnotherBodyYes(v,_,_,_) => { @Messages("lbl.yes") }
+                }
+            </td>
+        </tr>
+
+        @model.anotherBody.map {
+            case AnotherBodyNo => { }
+            case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
+                <tr>
+                    <td colspan="2">
+                        @Messages("supervision.summary.agency")
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @Messages("lbl.start.date") @DateHelper.formatDate(startDate)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @Messages("lbl.end.date") @DateHelper.formatDate(endDate)
+
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("supervision.penalisedbyprofessional.title")</th>
+            <td colspan="2"><a href="@controllers.supervision.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @model.professionalBody.map {
+                    case ProfessionalBodyNo => { @Messages("lbl.no") }
+                    case ProfessionalBodyYes(v) => { @Messages("lbl.yes") }
+                }
+            </td>
+        </tr>
+
+        @model.professionalBody.map {
+            case ProfessionalBodyNo => { }
+            case ProfessionalBodyYes(v) => {
+                <tr>
+                    <td colspan="2">
+                        @v
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+}
