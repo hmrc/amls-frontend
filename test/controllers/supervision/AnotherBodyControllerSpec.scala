@@ -88,7 +88,6 @@ class AnotherBodyControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
     val document = Jsoup.parse(contentAsString(result))
     document.select("a[href=#anotherBody]").html() must be(Messages("error.required.supervision.anotherbody"))
-
   }
 
    "on post with valid data in edit mode" in new Fixture {
