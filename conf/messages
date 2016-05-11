@@ -167,7 +167,6 @@ error.required.rp.wherepersonlives.howlonglived = Select how long this person ha
 
 error.required.tcsp.provided_services.services = Select at least one service that your business provides.
 error.required.tcsp.provided_services.details = Enter some information about the other services your business provides.
-
 error.required.tcsp.service.providers = Select at least one kind of Trust or Company Service Provider
 error.required.tcsp.off.the.shelf.companies = Select yes or no to the question: do you sell only off-the-shelf companies?
 error.required.tcsp.complex.corporate.structures  = Select yes or no to the question: do you create complex corporate structures for clients, or are you planning to do so in the future?
@@ -176,17 +175,18 @@ error.required.tcsp.mlr.reference.number = Please enter a valid 8-digit or 15-di
 error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation Reference Number. It must be 8 or 15 characters long, and can only be numbers.
 
 #### Accountancy service provide ####
-
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can''t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 
-
 #### Supervision ####
 error.required.supervision.supervisor = Enter the name of your last supervisor
 error.required.supervision.reason = Enter a reason why the supervision ended
+error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
+error.invalid.supervision.supervisor = You can''t enter more than 140 characters
+error.invalid.supervision.reason = You can''t enter more than 255 characters
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
