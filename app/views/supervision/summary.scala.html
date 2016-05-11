@@ -28,7 +28,7 @@
             case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
                 <tr>
                     <td colspan="2">
-                        @Messages("supervision.summary.agency")
+                        @supervisorName
                     </td>
                 </tr>
                 <tr>
@@ -39,7 +39,11 @@
                 <tr>
                     <td colspan="2">
                         @Messages("lbl.end.date") @DateHelper.formatDate(endDate)
-
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @endingReason
                     </td>
                 </tr>
             }
