@@ -1,8 +1,16 @@
 @import include._
 @()(implicit request: Request[_])
 
+@sidebar = {
+<div class="bevel-container">
+    <h3 class="heading-small">@Messages("businessactivities.whomustregister.sidebar.title")</h3>
+    <p>@Messages("businessactivities.whomustregister.sidebar.information")</p>
+</div>
+}
+
 @main(
-    title = Messages("businessactivities.whatyouneed.title")
+    title = Messages("businessactivities.whatyouneed.title"),
+    sidebar = sidebar
 ) {
 
     @heading("businessactivities.whatyouneed.heading", "summary.businessactivities")
@@ -14,8 +22,8 @@
     <div class="form-group">
         <ul class="list-bullet">
             <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_1")</li>
-            <li  class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_2")</li>
-            <li  class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_3")</li>
+            <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_2")</li>
+            <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_3")</li>
         </ul>
     </div>
 
@@ -26,9 +34,10 @@
     <div class="form-group">
         <ul class="list-bullet">
             <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_4")</li>
-            <li  class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_5")</li>
-            <li  class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_6")</li>
-            <li  class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_7")</li>
+            <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_5")</li>
+            <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_6")</li>
+            <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_7")</li>
+            <li class="no-padding no-margin">@Messages("businessactivities.whatyouneed.line_8")</li>
         </ul>
     </div>
 
