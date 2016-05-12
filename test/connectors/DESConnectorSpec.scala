@@ -31,7 +31,10 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     bankDetailsSection = None,
     aboutYouSection = None,
     businessActivitiesSection = None,
-    responsiblePeopleSection = None
+    responsiblePeopleSection = None,
+    tcspSection = None,
+    aspSection = None,
+    supervisionSection = None
   )
 
   val response = SubscriptionResponse(
