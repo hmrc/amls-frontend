@@ -238,8 +238,8 @@ amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
 #### Progress page ####
-progress.title = Registration progress
-progress.lede = Complete all the sections below to register. Once you start the application, you have 28 days to finish it.
+progress.title = Application progress
+progress.lede = Your information is saved automatically. If you sign out, you'll have 28 days to return and complete your application.
 progress.edit = Edit
 progress.continue = Continue
 progress.start = Start this section
@@ -247,11 +247,11 @@ progress.minutes = minutes to complete
 progress.submit = Submit registration
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can''t finish the registration until you''ve completed all the sections.
-progress.businessmatching.name = Business matching
+progress.businessmatching.name = Pre-application
 progress.businessmatching.description = Administrative information about your business.
 progress.businessmatching.time = 5
 progress.aboutthebusiness.name = About the business
-progress.aboutthebusiness.description = Administrative information about your business.
+progress.aboutthebusiness.description = Administrative information about your business and your current registration status.
 progress.aboutthebusiness.time = 5
 progress.businessactivities.name = Business activities
 progress.businessactivities.description = Information about how your business operates, and your anti-money laundering procedures.
@@ -281,7 +281,7 @@ progress.responsiblepeople.name = Responsible People
 progress.responsiblepeople.description = Information about the people in charge of your business.
 progress.responsiblepeople.time = 10
 progress.supervision.name = Supervision
-progress.supervision.description = Registration information specfically for Trust or Company Service Providers.
+progress.supervision.description = Information about any previous supervision for anti-money laundering.
 progress.supervision.time = 4
 
 progress.declarationavailable = All sections complete: you can now submit the registration.
