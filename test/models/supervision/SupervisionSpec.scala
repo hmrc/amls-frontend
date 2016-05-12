@@ -15,21 +15,26 @@ trait SupervisionValues {
   object DefaultValues {
 
     private val supervisor = "Company A"
-    private val start = new LocalDate(1993, 8, 25) //scalastyle:off magic.number
-    private val end = new LocalDate(1999, 8, 25)   //scalastyle:off magic.number
+    private val start = new LocalDate(1993, 8, 25)
+    //scalastyle:off magic.number
+    private val end = new LocalDate(1999, 8, 25)
+    //scalastyle:off magic.number
     private val reason = "Ending reason"
 
     val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
     val DefaultProfessionalBody = ProfessionalBodyYes("details")
-
+    val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
   }
 
   object NewValues {
     val NewAnotherBody = AnotherBodyNo
     val NewProfessionalBody = ProfessionalBodyNo
+    val ProfessionalBodyMemberYes = ProfessionalBodyMemberNo
   }
 
-  val completeModel = Supervision(Some(DefaultValues.DefaultAnotherBody), Some(DefaultValues.DefaultProfessionalBody))
+  val completeModel = Supervision(Some(DefaultValues.DefaultAnotherBody),
+    Some(DefaultValues.DefaultProfessionalBodyMember),
+    Some(DefaultValues.DefaultProfessionalBody))
   val partialModel = Supervision(Some(DefaultValues.DefaultAnotherBody))
 
   val completeJson = Json.obj(
@@ -39,9 +44,14 @@ trait SupervisionValues {
       "startDate" -> "1993-08-25",
       "endDate" -> "1999-08-25",
       "endingReason" -> "Ending reason"),
-      "professionalBody" -> Json.obj(
-        "penalised" -> true,
-      "professionalBody" ->"details")
+    "professionalBodyMember" -> Json.obj(
+      "isAMember" -> true,
+      "businessType" -> Json.arr("01", "02", "14"),
+      "specifyOtherBusiness" -> "test"
+    ),
+    "professionalBody" -> Json.obj(
+      "penalised" -> true,
+      "professionalBody" -> "details")
   )
 
 }
@@ -133,3 +143,5 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
     }
   }
 }
+
+

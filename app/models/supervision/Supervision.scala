@@ -5,16 +5,20 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Supervision(anotherBody: Option[AnotherBody] = None,
+                       professionalBodyMember: Option[ProfessionalBodyMember] = None,
                        professionalBody: Option[ProfessionalBody] = None) {
 
   def anotherBody(anotherBody: AnotherBody): Supervision =
     this.copy(anotherBody = Some(anotherBody))
 
+  def professionalBodyMember(p: ProfessionalBodyMember): Supervision =
+    this.copy(professionalBodyMember = Some(p))
+
   def professionalBody(p: ProfessionalBody): Supervision =
     this.copy(professionalBody = Some(p))
 
   def isComplete: Boolean = this match {
-    case Supervision(Some(_), Some(_)) => true
+    case Supervision(Some(_), Some(_), Some(_)) => true
     case _ => false
   }
 
