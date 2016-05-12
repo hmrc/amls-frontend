@@ -1,0 +1,46 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@main(
+    title = Messages("supervision.memberofprofessionalbody.title")
+) {
+
+    @heading("supervision.memberofprofessionalbody.title", "summary.supervision")
+
+    @form(f, controllers.supervision.routes.ProfessionalBodyMemberController.post(edit)) {
+
+        @inlineRadioGroup(f("isAMember")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isAMember"), "lbl.yes", "true", target = s"#${f("businessType").id}-fieldset")
+            @radio(f("isAMember"), "lbl.no", "false")
+        }
+
+        @fieldset("TODO", jsHidden = true, id = s"""${f("businessType").id}-fieldset""") {
+
+            @radioGroup(f("businessType")) {
+                @legend("", true, bold = true, "lbl.select.all")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.04", "04")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.05", "05")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.06", "06")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.07", "07")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.08", "08")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.09", "09")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.10", "10")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.11", "11")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#${f("specifyOtherBusiness").id}-fieldset")
+                @fieldset("TODO", jsHidden = true, id = s"""${f("specifyOtherBusiness").id}-fieldset""") {
+                    @input(f("specifyOtherBusiness"), "lbl.pleasespecify", bold = false)
+                }
+            }
+        }
+        <br>
+        @submit(edit)
+    }
+}

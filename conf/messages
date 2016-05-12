@@ -187,6 +187,10 @@ error.required.supervision.reason = Enter a reason why the supervision ended
 error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
 error.invalid.supervision.supervisor = You can''t enter more than 140 characters
 error.invalid.supervision.reason = You can''t enter more than 255 characters
+error.required.supervision.business.a.member = Select yes or no to the question: is this business a member of a professional body?
+error.required.supervision.one.professional.body = Select at least one professional body
+error.required.supervision.business.details = Enter the name of the professional body
+error.invalid.supervision.business.details = You can''t enter more than 255 characters the name of the professional body.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -808,4 +812,21 @@ supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
 supervision.penalisedbyprofessional.details.lbl = Please provide details
 
-supervision.summary.agency = Supervision Agency
+supervision.memberofprofessionalbody.title = Is your business a member of a professional body?
+supervision.memberofprofessionalbody.lbl.01 = Association of Accounting Technicians
+supervision.memberofprofessionalbody.lbl.02 = Association of Chartered Certified Accountants
+supervision.memberofprofessionalbody.lbl.03 = Association of International Accountants
+supervision.memberofprofessionalbody.lbl.04 = Association of Taxation Technicians
+supervision.memberofprofessionalbody.lbl.05 = Chartered Institute of Management Accountants
+supervision.memberofprofessionalbody.lbl.06 = Chartered Institute of Taxation
+supervision.memberofprofessionalbody.lbl.07 = Institute of Certified Bookkeepers
+supervision.memberofprofessionalbody.lbl.08 = Institute of Chartered Accountants in Ireland
+supervision.memberofprofessionalbody.lbl.09 = Institute of Chartered Accountants in Scotland
+supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants of England and Wales
+supervision.memberofprofessionalbody.lbl.11 = Institute of Financial Accountants
+supervision.memberofprofessionalbody.lbl.12 = International Association of Book-keepers
+supervision.memberofprofessionalbody.lbl.13 = Law Society
+supervision.memberofprofessionalbody.lbl.14 = Other
+
+
+

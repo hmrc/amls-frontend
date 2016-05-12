@@ -45,7 +45,7 @@ class AnotherBodyControllerSpec extends PlaySpec with OneServerPerSuite with Moc
     val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
     val end = new LocalDate(1998, 2, 24)   //scalastyle:off magic.number
     when(controller.dataCacheConnector.fetch[Supervision](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(Supervision(Some(AnotherBodyYes("Name", start, end, "Reason")), Some(ProfessionalBodyYes("details"))))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(Supervision(Some(AnotherBodyYes("Name", start, end, "Reason")), None, Some(ProfessionalBodyYes("details"))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -75,7 +75,7 @@ class AnotherBodyControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.supervision.routes.PenalisedByProfessionalController.get().url))
+    redirectLocation(result) must be(Some(controllers.supervision.routes.ProfessionalBodyMemberController.get().url))
   }
 
   "on post with invalid data" in new Fixture {
