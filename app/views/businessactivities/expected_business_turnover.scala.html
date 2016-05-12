@@ -12,10 +12,6 @@
 
     @form(f, controllers.businessactivities.routes.ExpectedBusinessTurnoverController.post(edit)) {
 
-        <span class="form-hint">
-            @Messages("businessactivities.business-turnover.line1.text")
-        </span>
-
         @radioGroup(f("expectedBusinessTurnover")) {
             @legend("TODO", jsHidden = true)
             @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.01", "01")
