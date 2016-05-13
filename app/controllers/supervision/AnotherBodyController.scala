@@ -38,7 +38,7 @@ trait AnotherBodyController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.PenalisedByProfessionalController.get())
+            case false => Redirect(routes.ProfessionalBodyMemberController.get())
           }
       }
   }
