@@ -170,6 +170,15 @@
                         }
                     }
 
+                    @person.hasAlreadyPassedFitAndProper.map {fp =>
+                        @optionalBlock("Already passed fit and proper test", person.hasAlreadyPassedFitAndProper, FitAndProperController.get(idx, true)) { fp2 =>
+                            @fp match {
+                                case true => {Yes}
+                                case false => {No}
+                            }
+                        }
+                    }
+
 
             </tbody>
         </table>

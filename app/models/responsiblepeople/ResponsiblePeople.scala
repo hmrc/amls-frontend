@@ -13,7 +13,8 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              saRegistered: Option[SaRegistered] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
-                             training: Option[Training] = None
+                             training: Option[Training] = None,
+                             hasAlreadyPassedFitAndProper: Option[Boolean] = None
                           ) {
 
   def personName(pn: PersonName): ResponsiblePeople =
@@ -43,15 +44,18 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def training(t: Training): ResponsiblePeople =
     this.copy(training = Some(t))
 
+  def hasAlreadyPassedFitAndProper(value : Boolean) : ResponsiblePeople =
+    this.copy(hasAlreadyPassedFitAndProper = Some(value))
+
   def isComplete: Boolean = this match {
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_)) if !pos.personalTax => true
+      Some(_), _) if !pos.personalTax => true //TODO-JOE : already passed fit and proper should only be missing if business is not MSB or TCSP
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
-      Some(_)) => true
+      Some(_), _) => true
     case _ => false
   }
 }

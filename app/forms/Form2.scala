@@ -55,7 +55,6 @@ object EmptyForm extends Form2[Nothing] {
 }
 
 object Form2 {
-
   def apply[A]
   (a: A)
   (implicit
