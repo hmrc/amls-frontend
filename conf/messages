@@ -100,7 +100,7 @@ error.max.length.ba.software.package.name = You can''t enter more than 40 charac
 error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
 error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a formal risk assessment policy and procedure?
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
-error.required.ba.business.use.accountant = Select yes or no to the question: does your business use an accountant for matters relating to money laundering regulations?
+error.required.ba.business.use.accountant = Select yes or no to the question: Does your business receive advice on Money Laundering Regulations and due diligence?
 error.required.ba.suspicious.activity = Select yes or no to the question:Does your business have written guidance for staff on how to identify and report suspicious activity?
 
 ####  Trading premises ####
