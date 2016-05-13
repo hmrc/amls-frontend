@@ -79,7 +79,7 @@ error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
 
 ####  Business Activities ####
-error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
+error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
 error.invalid.ba.involved.in.other.text = You can''t enter more than 255 characters
 error.required.ba.business.turnover = Select how much turnover you expect in the next 12 months.
