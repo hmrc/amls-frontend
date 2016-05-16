@@ -4,15 +4,19 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
-    title = Messages("aboutthebusiness.registeredformlr.title")
+    title = Messages("aboutthebusiness.activity.start.date.title")
 ) {
 
-    @heading("aboutthebusiness.registeredformlr.title", "summary.aboutbusiness")
-
-    <p>@Messages("aboutthebusiness.registeredformlr.lbl")</p>
+    @heading("aboutthebusiness.activity.start.date.title", "summary.aboutbusiness")
 
     @form(f, controllers.aboutthebusiness.routes.ActivityStartDateController.post(edit)) {
-
+        @date(
+            f = f,
+            p = "startDate",
+            labelText = "aboutthebusiness.activity.start.date.text",
+            hintText = "",
+            true
+        )
 
         @submit(edit)
     }

@@ -390,6 +390,8 @@ aboutthebusiness.registeredoffice.title = Where is your registered office or mai
 aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
+aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision?
+aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
 
 tradingpremises.whatyouneed.title=Trading premises - What you need
 tradingpremises.whatyouneed.heading=What you need
