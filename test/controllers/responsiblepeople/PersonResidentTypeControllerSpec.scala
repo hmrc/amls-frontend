@@ -56,7 +56,6 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneServerPerSuite w
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
-      println(result)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }

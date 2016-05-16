@@ -21,8 +21,9 @@ object ActivityStartDate {
     Write {
       case ActivityStartDate(b) =>Map(
         "startDate.day" -> Seq(b.get(DateTimeFieldType.dayOfMonth()).toString),
-      "startDate.month" -> Seq(b.get(DateTimeFieldType.monthOfYear()).toString),
-      "startDate.year" -> Seq(b.get(DateTimeFieldType.year()).toString))
+        "startDate.month" -> Seq(b.get(DateTimeFieldType.monthOfYear()).toString),
+        "startDate.year" -> Seq(b.get(DateTimeFieldType.year()).toString)
+      )
     }
 
 }

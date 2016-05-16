@@ -56,7 +56,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     "pre select uk when not in edit mode" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, Some(ukAddress), None))))
+        thenReturn(Future.successful(Some(AboutTheBusiness(None,None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -68,7 +68,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, Some(ukAddress), None))))
+        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get(true)(request)
       status(result) must be(OK)

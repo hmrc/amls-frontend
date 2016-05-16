@@ -34,22 +34,24 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 
   "AboutTheBusiness" must {
     val completeJson = Json.obj(
-      "previouslyRegistered" -> true,
-      "prevMLRRegNo" -> "12345678",
-      "startDate.day" -> "24",
-      "startDate.month" -> "2",
-      "startDate.year" -> "1990",
-      "registeredForVAT" -> true,
-      "vrnNumber" -> "123456789",
-      "registeredForCorporationTax" -> true,
-      "corporationTaxReference" -> "1234567890",
-      "phoneNumber" -> "1234567890",
-      "email" -> "test@test.com",
+      "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
+      "prevMLRRegNo" -> "12345678"),
+      "activityStartDate" -> Json.obj(
+      "startDate" -> "1990-02-24"),
+      "vatRegistered" -> Json.obj("registeredForVAT" -> true,
+      "vrnNumber" -> "123456789"),
+      "corporationTaxRegistered" -> Json.obj("registeredForCorporationTax" -> true,
+      "corporationTaxReference" -> "1234567890"),
+        "contactingYou" -> Json.obj(
+        "phoneNumber" -> "1234567890",
+        "email" -> "test@test.com"),
+        "registeredOffice" -> Json.obj(
       "addressLine1" -> "38B",
       "addressLine2" -> "Longbenton",
       "addressLine3" -> JsNull,
       "addressLine4" -> JsNull,
-      "postCode" -> "NE7 7DX",
+      "postCode" -> "NE7 7DX"),
+      "correspondenceAddress" -> Json.obj(
       "yourName" -> "Name",
       "businessName" -> "Business Name",
       "correspondenceAddressLine1" -> "address 1",
@@ -57,7 +59,9 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "correspondenceAddressLine3" -> "address 3",
       "correspondenceAddressLine4" -> "address 4",
       "correspondencePostCode" -> "NE77 0QQ"
-    )
+        )
+      )
+
 
     val completeModel = AboutTheBusiness(
       previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),

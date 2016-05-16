@@ -20,6 +20,7 @@ trait ActivityStartDateController extends BaseController {
             aboutTheBusiness <- response
             activityStartDate <- aboutTheBusiness.activityStartDate
           } yield Form2[ActivityStartDate](activityStartDate)).getOrElse(EmptyForm)
+          println(form)
           Ok(activity_start_date(form, edit))
       }
   }

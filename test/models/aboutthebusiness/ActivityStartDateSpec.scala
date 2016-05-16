@@ -4,7 +4,7 @@ import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsSuccess}
+import play.api.libs.json.{Json, JsPath, JsSuccess}
 
 
 class ActivityStartDateSpec extends PlaySpec {
@@ -56,15 +56,17 @@ class ActivityStartDateSpec extends PlaySpec {
     }
 
     "Json" should {
+
       "Read and write successfully" in {
+
         ActivityStartDate.format.reads(ActivityStartDate.format.writes(ActivityStartDate(new LocalDate(1990, 2, 24)))) must be(
           JsSuccess(ActivityStartDate(new LocalDate(1990, 2, 24)), JsPath \ "startDate"))
 
       }
 
+      "write successfully" in {
+        ActivityStartDate.format.writes(ActivityStartDate(new LocalDate(1990, 2, 24))) must be(Json.obj("startDate" ->"1990-02-24"))
+      }
     }
-
-
   }
-
-}
+ }
