@@ -45,7 +45,7 @@ trait PreviouslyRegisteredController extends BaseController {
                   aboutTheBusiness.previouslyRegistered(data))
                 (businessType, edit) match {
                     case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, false) =>
-                        Redirect(routes.VATRegisteredController.get(edit))
+                        Redirect(routes.ActivityStartDateController.get(edit))
                     case (_, true) => Redirect(routes.SummaryController.get())
                     case (_, _) => Redirect(routes.ConfirmRegisteredOfficeController.get())
                   }
