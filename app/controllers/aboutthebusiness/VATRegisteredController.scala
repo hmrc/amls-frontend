@@ -19,7 +19,7 @@ trait VATRegisteredController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_, Some(data), _, _, _, _)) =>
+        case Some(AboutTheBusiness(_, _, Some(data), _, _, _, _)) =>
           Ok(vat_registered(Form2[VATRegistered](data), edit))
         case _ =>
           Ok(vat_registered(EmptyForm, edit))
