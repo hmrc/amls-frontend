@@ -28,6 +28,8 @@ class TrainingControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(CacheMap("testCacheMap", Map()))))
   }
 
   val emptyCache = CacheMap("", Map.empty)
