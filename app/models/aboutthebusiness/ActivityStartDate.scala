@@ -17,14 +17,6 @@ object ActivityStartDate {
       (__ \ "startDate").read(localDateRule) fmap ActivityStartDate.apply
   }
 
-/*  implicit val formWritesNonUK: Write[ActivityStartDate, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import models.FormTypes.localDateWrite
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "startDate").write(localDateWrite)
-      ) (unlift(ActivityStartDate.unapply))
-  }*/
-
   implicit val formWrites: Write[ActivityStartDate, UrlFormEncoded] =
     Write {
       case ActivityStartDate(b) =>Map(
