@@ -79,7 +79,7 @@ error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
 
 ####  Business Activities ####
-error.required.ba.involved.in.other = Select yes or no to the question: does your business carry out any other activities?
+error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
 error.invalid.ba.involved.in.other.text = You can''t enter more than 255 characters
 error.required.ba.business.turnover = Select how much turnover you expect in the next 12 months.
@@ -544,10 +544,9 @@ businessactivities.whatyouneed.line_8 = your professional advisor''s HMRC Agent 
 businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor's registration.
-businessactivities.confirm-activities.title = Does your business carry out any other activities?
+businessactivities.confirm-activities.title = Is your business involved in any other activities?
 businessactivities.confirm-activities.lbl.details = Please give details
-businessactivities.confirm-activities.subtitle1 = Does your business carry out any other activities?
-businessactivities.confirm-activities.line1.text = Only list activities which relate to anti-money laundering supervision.
+businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much turnover do you expect in the next 12 months, from activities related to anti-money laundering supervision?
 businessactivities.turnover.line1.text = We may consider your business a greater risk if you have a high turnover.
