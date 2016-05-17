@@ -1,6 +1,5 @@
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.aboutthebusiness._
 import org.mockito.Matchers._
@@ -8,7 +7,6 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 

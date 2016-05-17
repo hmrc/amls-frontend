@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, ConfirmRegisteredOffice}
+import models.aboutthebusiness.{RegisteredOffice, ActivityStartDate, AboutTheBusiness, ConfirmRegisteredOffice}
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
@@ -15,14 +15,16 @@ trait ConfirmRegisteredOfficeController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      for {
-        registeredOffice <-
-          dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-      } yield registeredOffice match {
-        case Some(AboutTheBusiness(_,_, _, _, _, Some(data), _)) =>
-          Ok(confirm_registered_office_or_main_place(EmptyForm, data))
-        case _ =>
-          Redirect(routes.RegisteredOfficeController.get())
+      dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+        response =>
+          val regOffice: Option[RegisteredOffice] = (for {
+            aboutTheBusiness <- response
+            registeredOffice <- aboutTheBusiness.registeredOffice
+          } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
+          regOffice match {
+            case Some(data) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
+            case _ => Redirect(routes.RegisteredOfficeController.get())
+          }
       }
   }
 
@@ -30,14 +32,16 @@ trait ConfirmRegisteredOfficeController extends BaseController {
     implicit authContext => implicit request =>
       Form2[ConfirmRegisteredOffice](request.body) match {
         case f: InvalidForm =>
-          for {
-            aboutTheBusiness <-
-            dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
-          } yield aboutTheBusiness match {
-            case Some(AboutTheBusiness(_, _,_, _, _, Some(registeredOffice), _)) =>
-              BadRequest(confirm_registered_office_or_main_place(f, registeredOffice))
-            case _ =>
-              Redirect(routes.RegisteredOfficeController.get(edit))
+          dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
+            response =>
+              val regOffice: Option[RegisteredOffice] = (for {
+                aboutTheBusiness <- response
+                registeredOffice <- aboutTheBusiness.registeredOffice
+              } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
+              regOffice match {
+                case Some(data) => BadRequest(confirm_registered_office_or_main_place(f, data))
+                case _ => Redirect(routes.RegisteredOfficeController.get(edit))
+              }
           }
         case ValidForm(_, data) =>
           data.isRegOfficeOrMainPlaceOfBusiness match {

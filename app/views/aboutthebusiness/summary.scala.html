@@ -1,5 +1,6 @@
 @import include._
 @import models.aboutthebusiness._
+@import utils._
 
 @(model: AboutTheBusiness)(implicit request: Request[_], lang: Lang)
 
@@ -52,6 +53,20 @@
             }
 
         </table>
+    }
+
+   @model.activityStartDate.map { activityStartDate =>
+    <table>
+        <tr>
+            <th class="summary-title">@Messages("aboutthebusiness.activity.start.date.title")</th>
+            <td colspan="2"><a href="@controllers.aboutthebusiness.routes.ActivityStartDateController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)
+            </td>
+        </tr>
+    </table>
     }
 
     @model.vatRegistered.map { vatRegistered =>

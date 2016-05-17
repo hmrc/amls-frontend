@@ -5,7 +5,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegistered}
-import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType._
 import utils.ControllerHelper
 import views.html.aboutthebusiness._

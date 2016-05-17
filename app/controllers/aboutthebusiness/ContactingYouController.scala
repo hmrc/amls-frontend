@@ -3,7 +3,7 @@ package controllers.aboutthebusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms._
 import models.aboutthebusiness._
 import views.html.aboutthebusiness._
 
