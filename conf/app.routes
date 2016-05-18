@@ -1,227 +1,223 @@
 # microservice specific routes
 
-GET         /assets/*file                               controllers.AssetsController.at(path="/public", file)
+GET         /assets/*file                                               controllers.AssetsController.at(path="/public", file)
 
-GET         /                                           controllers.LandingController.get()
+GET         /                                                           controllers.LandingController.get()
 
-POST        /subscribe                                  controllers.SubscriptionController.post()
+POST        /subscribe                                                  controllers.SubscriptionController.post()
 
-GET         /unauthorised                               controllers.AmlsController.unauthorised
+GET         /unauthorised                                               controllers.AmlsController.unauthorised
 
-GET         /registration-progress                      controllers.RegistrationProgressController.get()
+GET         /registration-progress                                      controllers.RegistrationProgressController.get()
 
+GET         /business-details/contacting-you                            controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
+POST        /business-details/contacting-you                            controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
-GET         /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
-POST        /business-details/contacting-you           controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
+GET         /business-details/previously-registered                     controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/previously-registered                     controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-details/previously-registered                    controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/previously-registered                    controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
+GET         /business-details/vat                                       controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/vat                                       controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/vat                      controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
+GET         /business-details/corporation-tax                           controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
+POST        /business-details/corporation-tax                           controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-details/corporation-tax          controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/corporation-tax          controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
+GET         /business-details/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /business-details/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
-GET         /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /business-details/confirming-address       controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /business-details/new-registered-office                     controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /business-details/new-registered-office                     controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
 
-GET         /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /business-details/new-registered-office    controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /business-details/correspondence-address                    controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
+POST        /business-details/correspondence-address                    controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
 
-GET         /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
-POST        /business-details/correspondence-address   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
+GET         /business-details/index                                     controllers.aboutthebusiness.WhatYouNeedController.get()
 
-GET         /business-details/index                   controllers.aboutthebusiness.WhatYouNeedController.get()
+GET         /business-details/summary                                   controllers.aboutthebusiness.SummaryController.get()
 
-GET         /business-details/summary                  controllers.aboutthebusiness.SummaryController.get()
+GET         /trading-premises/index/:index                              controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
-GET         /trading-premises/index/:index                    controllers.tradingpremises.WhatYouNeedController.get(index: Int)
+GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/premises/:index                       controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/premises/:index                       controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/agent/:index                              controllers.tradingpremises.YourAgentController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent/:index                              controllers.tradingpremises.YourAgentController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/agent/:index                          controllers.tradingpremises.YourAgentController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/agent/:index                          controllers.tradingpremises.YourAgentController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/what-does-your-business-do/:index     controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/what-does-your-business-do/:index     controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/summary                                   controllers.tradingpremises.SummaryController.get()
+GET         /trading-premises/summary/:index                            controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
-GET         /trading-premises/summary                               controllers.tradingpremises.SummaryController.get()
-GET         /trading-premises/summary/:index                        controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+GET         /estate-agents/index                                        controllers.estateagentbusiness.WhatYouNeedController.get()
+GET         /estate-agents/penalised                                    controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /estate-agents/penalised                                    controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/index                        controllers.estateagentbusiness.WhatYouNeedController.get()
-GET         /estate-agents/penalised                    controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
-POST        /estate-agents/penalised                    controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
+GET         /estate-agents/penalties                                    controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
+POST        /estate-agents/penalties                                    controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/penalties                    controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
-POST        /estate-agents/penalties                    controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
+GET         /estate-agents/services                                     controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
+POST        /estate-agents/services                                     controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/services                     controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
-POST        /estate-agents/services                     controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
+GET         /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
+POST        /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/redress-scheme               controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
-POST        /estate-agents/redress-scheme               controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
+GET         /estate-agents/summary                                      controllers.estateagentbusiness.SummaryController.get()
 
-GET         /estate-agents/summary                      controllers.estateagentbusiness.SummaryController.get()
+GET         /business-matching/business-type                            controllers.businessmatching.BusinessTypeController.get()
+POST        /business-matching/business-type                            controllers.businessmatching.BusinessTypeController.post()
 
+GET         /business-matching/type-of-business                         controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
+POST        /business-matching/type-of-business                         controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
 
-GET         /business-matching/business-type            controllers.businessmatching.BusinessTypeController.get()
-POST        /business-matching/business-type            controllers.businessmatching.BusinessTypeController.post()
+GET         /business-matching/activities                               controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /business-matching/activities                               controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
-GET         /business-matching/type-of-business         controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
-POST        /business-matching/type-of-business         controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
+GET         /business-matching/registration-number                      controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
+POST        /business-matching/registration-number                      controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
 
-GET         /business-matching/activities               controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
-POST        /business-matching/activities               controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+GET         /business-matching/check-your-answers                       controllers.businessmatching.SummaryController.get()
 
-GET         /business-matching/registration-number      controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
-POST        /business-matching/registration-number      controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
+GET         /bank-details/index/:index                                  controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
-GET         /business-matching/check-your-answers       controllers.businessmatching.SummaryController.get()
+GET         /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
+POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
 
+GET         /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
+POST        /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
-GET         /bank-details/index/:index                         controllers.bankdetails.WhatYouNeedController.get(index: Int)
+GET         /bank-details/summary                                       controllers.bankdetails.SummaryController.get()
 
-GET         /bank-details/accounts/:index               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
-POST        /bank-details/accounts/:index               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
+GET         /business-activities/index                                  controllers.businessactivities.WhatYouNeedController.get()
 
-GET         /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
-POST        /bank-details/account-details/:index        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
+GET         /business-activities/franchise                              controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
+POST        /business-activities/franchise                              controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
-GET         /bank-details/summary                       controllers.bankdetails.SummaryController.get()
+GET         /business-activities/confirm-activities                     controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /business-activities/confirm-activities                     controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
+GET         /business-activities/procedures                             controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
+POST        /business-activities/procedures                             controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
 
-GET         /business-activities/index                  controllers.businessactivities.WhatYouNeedController.get()
+GET         /business-activities/turnover                               controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/turnover                               controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
 
-GET         /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
-POST        /business-activities/franchise              controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
+GET         /business-activities/business-turnover                      controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /business-activities/business-turnover                      controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
 
-GET         /business-activities/confirm-activities        controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
-POST        /business-activities/confirm-activities         controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
+GET         /business-activities/records                                controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
+POST        /business-activities/records                                controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
 
-GET         /business-activities/procedures             controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
-POST        /business-activities/procedures             controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
+GET         /business-activities/employment                             controllers.businessactivities.CustomersOutsideUKController.get(edit: Boolean ?= false)
+POST        /business-activities/employment                             controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)
 
-GET         /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
-POST        /business-activities/turnover           controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
+GET         /business-activities/crime-agency                           controllers.businessactivities.NCARegisteredController.get(edit: Boolean ?= false)
+POST        /business-activities/crime-agency                           controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-activities/business-turnover       controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
-POST        /business-activities/business-turnover          controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
+GET         /business-activities/accountant                             controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
+POST        /business-activities/accountant                             controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
 
-GET         /business-activities/records              controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
-POST        /business-activities/records              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
+GET         /business-activities/risk-assessment                        controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
+POST        /business-activities/risk-assessment                        controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)
 
-GET         /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.get(edit: Boolean ?= false)
-POST        /business-activities/employment            controllers.businessactivities.CustomersOutsideUKController.post(edit: Boolean ?= false)
+GET         /business-activities/employees                              controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
+POST        /business-activities/employees                              controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
 
-GET         /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.get(edit: Boolean ?= false)
-POST        /business-activities/crime-agency              controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
+GET         /business-activities/accountant-details                     controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
+POST        /business-activities/accountant-details                     controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 
-GET         /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
-POST        /business-activities/accountant              controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
+GET         /business-activities/check-your-answers                     controllers.businessactivities.SummaryController.get()
 
-GET         /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
-POST        /business-activities/risk-assessment         controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)
+GET         /declaration/add-person                                     controllers.declaration.AddPersonController.get()
+POST        /declaration/add-person                                     controllers.declaration.AddPersonController.post()
 
-GET         /business-activities/employees              controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
-POST        /business-activities/employees              controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
+GET         /declaration/declaration                                    controllers.declaration.DeclarationController.get()
 
-GET         /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
-POST        /business-activities/accountant-details     controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+GET         /confirmation                                               controllers.ConfirmationController.get()
 
-GET         /business-activities/check-your-answers      controllers.businessactivities.SummaryController.get()
+GET         /responsible-people/who-must-register/:index                controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
+GET         /responsible-people/what-you-need/:index                    controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
 
-GET         /declaration/add-person                         controllers.declaration.AddPersonController.get()
-POST        /declaration/add-person                         controllers.declaration.AddPersonController.post()
+GET         /responsible-people/your-name/:index                        controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/your-name/:index                        controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false)
 
-GET         /declaration/declaration                        controllers.declaration.DeclarationController.get()
+GET         /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/self-assessment/:index                  controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false)
 
-GET         /confirmation                                   controllers.ConfirmationController.get()
+GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/who-must-register/:index    controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
-GET         /responsible-people/what-you-need/:index        controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
+GET         /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/your-name/:index            controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/your-name/:index            controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/check-your-answers                      controllers.responsiblepeople.CheckYourAnswersController.get()
+GET         /responsible-people/person-details/:index                   controllers.responsiblepeople.DetailedAnswersController.get(index: Int)
 
-GET         /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/self-assessment/:index             controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-address/:index               controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/address/:index             controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/address/:index             controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/residency/:index             controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/check-your-answers           controllers.responsiblepeople.CheckYourAnswersController.get()
-GET         /responsible-people/person-details/:index      controllers.responsiblepeople.DetailedAnswersController.get(index: Int)
+GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/additional-address/:index   controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/vat/:index                              controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/vat/:index                              controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/position/:index   controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/position/:index   controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/experience-training/:index              controllers.responsiblepeople.ExperienceTrainingController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/experience-training/:index              controllers.responsiblepeople.ExperienceTrainingController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
-
-GET         /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/additional-extra-address/:index   controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
-
-GET         /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/vat/:index   controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false)
-
-GET         /responsible-people/experience-training/:index        controllers.responsiblepeople.ExperienceTrainingController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/experience-training/:index        controllers.responsiblepeople.ExperienceTrainingController.post(index:Int, edit: Boolean ?= false)
-
-GET         /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/training/:index                   controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/training/:index                         controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/training/:index                         controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/fit-and-proper/:index                   controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/fit-and-proper/:index                   controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/contacting-you/:index          controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false)
-POST        /responsible-people/contacting-you/:index          controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false)
+GET         /responsible-people/contacting-you/:index                   controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/contacting-you/:index                   controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false)
 
-GET         /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.get(index:Int)
-POST        /responsible-people/responsible-person-registered/:index   controllers.responsiblepeople.PersonRegisteredController.post(index:Int)
+GET         /responsible-people/responsible-person-registered/:index    controllers.responsiblepeople.PersonRegisteredController.get(index:Int)
+POST        /responsible-people/responsible-person-registered/:index    controllers.responsiblepeople.PersonRegisteredController.post(index:Int)
 
-GET         /responsible-people/your-answers         controllers.responsiblepeople.YourAnswersController.get()
+GET         /responsible-people/your-answers                            controllers.responsiblepeople.YourAnswersController.get()
 
-GET         /accountancy-service-provider/what-you-need       controllers.asp.WhatYouNeedController.get()
+GET         /accountancy-service-provider/what-you-need                 controllers.asp.WhatYouNeedController.get()
 
-GET         /accountancy-service-provider/services       controllers.asp.ServicesOfBusinessController.get(edit: Boolean ?= false)
-POST        /accountancy-service-provider/services       controllers.asp.ServicesOfBusinessController.post(edit: Boolean ?= false)
+GET         /accountancy-service-provider/services                      controllers.asp.ServicesOfBusinessController.get(edit: Boolean ?= false)
+POST        /accountancy-service-provider/services                      controllers.asp.ServicesOfBusinessController.post(edit: Boolean ?= false)
 
-GET         /accountancy-service-provider/agent-scheme       controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
-POST        /accountancy-service-provider/agent-scheme       controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
+GET         /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
+POST        /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
 
-GET         /accountancy-service-provider/check-your-answers                controllers.asp.SummaryController.get()
+GET         /accountancy-service-provider/check-your-answers            controllers.asp.SummaryController.get()
 
-GET         /trust-company-service-provider/what-you-need        controllers.tcsp.WhatYouNeedController.get()
+GET         /trust-company-service-provider/what-you-need               controllers.tcsp.WhatYouNeedController.get()
 
-GET         /trust-company-service-provider/services       controllers.tcsp.ProvidedServicesController.get(edit: Boolean ?= false)
-POST        /trust-company-service-provider/services       controllers.tcsp.ProvidedServicesController.post(edit: Boolean ?= false)
+GET         /trust-company-service-provider/services                    controllers.tcsp.ProvidedServicesController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/services                    controllers.tcsp.ProvidedServicesController.post(edit: Boolean ?= false)
 
-GET         /trust-company-service-provider/service-type      controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
-POST        /trust-company-service-provider/service-type      controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
+GET         /trust-company-service-provider/service-type                controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/service-type                controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
 
-GET         /trust-company-service-provider/other-trust-provider  controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
-POST        /trust-company-service-provider/other-trust-provider  controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
+GET         /trust-company-service-provider/other-trust-provider        controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/other-trust-provider        controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
 
-GET         /trust-company-service-provider/check-your-answers              controllers.tcsp.SummaryController.get()
+GET         /trust-company-service-provider/check-your-answers          controllers.tcsp.SummaryController.get()
 
-GET         /supervision/what-you-need        controllers.supervision.WhatYouNeedController.get()
+GET         /supervision/what-you-need                                  controllers.supervision.WhatYouNeedController.get()
 
-GET         /supervision/supervised                                         controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
-POST        /supervision/supervised                                         controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
-GET         /supervision/professional-body                                  controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
-POST        /supervision/professional-body                                  controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
+GET         /supervision/supervised                                     controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
+POST        /supervision/supervised                                     controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
+GET         /supervision/professional-body                              controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
+POST        /supervision/professional-body                              controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
 
-GET         /supervision/penalised                                          controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
-POST        /supervision/penalised                                          controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
+GET         /supervision/penalised                                      controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /supervision/penalised                                      controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /supervision/check-your-answers                                 controllers.supervision.SummaryController.get()
+GET         /supervision/check-your-answers                             controllers.supervision.SummaryController.get()
 
-
+GET         /money-service-business/what-you-need                       controllers.msb.WhatYouNeedController.get()
