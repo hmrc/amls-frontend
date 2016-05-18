@@ -88,10 +88,10 @@
 
 /* ^^^ added the above until we update assets-frontend ^^^ */
 
+/* add back some margins */
 .list {
     margin-bottom: 20px;
     margin-top: 5px;
-    padding: 0;
 }
 
 /* required as js-hidden in assets frontend is !important */
@@ -210,6 +210,13 @@ td.numeric, th.numeric {
   text-align : right;
 }
 
+/* adding this for now
+ * TODO: we really need to re-jig the markup for this */
+@media screen and (max-width: 640px) {
+    .bevel-container {
+        margin: 0;
+    }
+}
 
 /* postcode */
 /* TODO, determine if there's a class in Assets Frontend for this */
