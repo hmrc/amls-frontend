@@ -62,7 +62,6 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
         )
       )
 
-
     val completeModel = AboutTheBusiness(
       previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
       activityStartDate = Some(activityStartDate),

@@ -66,7 +66,7 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
 
     }
 
-    "on post with valid data" in new Fixture {
+    "on post with valid data with option yes" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "involvedInOther" -> "true",
@@ -84,6 +84,22 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneServerPerSuite with
       redirectLocation(result) must be(Some(routes.ExpectedBusinessTurnoverController.get().url))
     }
 
+    "on post with valid data with option no" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "involvedInOther" -> "false"
+      )
+
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.ExpectedAMLSTurnoverController.get().url))
+    }
 
     "on post with invalid data" in new Fixture {
 
