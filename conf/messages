@@ -326,6 +326,7 @@ summary.businessmatching = Business matching
 summary.tcsp = Trust or Company Service Provider
 summary.asp = Accountancy Service Provider
 summary.supervision = Supervision
+summary.msb = Money Service Business
 
 summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises
@@ -338,8 +339,6 @@ summary.checkyouranswers.agentspremises.section3 = Agents'' details
 button.checkyouranswers.acceptandcomplete = Accept and complete section
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
-
-summary.detailedanswers.title = Detailed answers
 
 aboutyou.yourdetails.title = What is your name?
 aboutyou.rolewithinbusiness.title = What is your role within the business?
@@ -738,6 +737,29 @@ responsiblepeople.your_answers.heading = Your answers
 responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.fit_and_proper.title = Has this person already passed the fit and proper test?
 responsiblepeople.fit_and_proper.heading = Has this person already passed the fit and proper test?
+responsiblepeople.detailed_answers.title = Detailed answers
+responsiblepeople.detailed_answers.previous_names = Previous names
+responsiblepeople.detailed_answers.previous_names.since = Since
+responsiblepeople.detailed_answers.other_names = Other names
+responsiblepeople.detailed_answers.uk_resident = UK resident
+responsiblepeople.detailed_answers.uk_resident.nino = National Insurance Number
+responsiblepeople.detailed_answers.uk_resident.dob = D.O.B
+responsiblepeople.detailed_answers.uk_resident.passport_number = Passport Number
+responsiblepeople.detailed_answers.uk_resident.no_passport = No passport
+responsiblepeople.detailed_answers.country_of_birth = Country of birth
+responsiblepeople.detailed_answers.nationality = Nationality
+responsiblepeople.detailed_answers.phone_number = Phone number
+responsiblepeople.detailed_answers.email = Email
+responsiblepeople.detailed_answers.address = Address
+responsiblepeople.detailed_answers.previous_address = Previous Address
+responsiblepeople.detailed_answers.other_previous_address = Other Previous Address
+responsiblepeople.detailed_answers.at_this_address = at this address
+responsiblepeople.detailed_answers.position = Position
+responsiblepeople.detailed_answers.registered_for_vat = Registered for VAT
+responsiblepeople.detailed_answers.registered_for_sa = Registered for Self Assessment
+responsiblepeople.detailed_answers.previous_experience = Previous Experience
+responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
+responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
 
 #TCSP
 tcsp.whatyouneed.title = What you need
@@ -833,6 +855,24 @@ supervision.memberofprofessionalbody.lbl.12 = International Association of Book-
 supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
 
-
-
+msb.whatyouneed.title = Money Service Business – What you need
+msb.whatyouneed.heading = What you need
+msb.whomustregister.sidebar.title = Automatic saving
+msb.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your registration.
+msb.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
+msb.whatyouneed.line_1 = a list of which services you provide
+msb.whatyouneed.line_2 = how much throughput you expect in the next 12 months
+msb.whatyouneed.line_3 = how many transactions you expect in the next 12 months
+msb.whatyouneed.line_4 = if your systems can identify linked payments
+msb.whatyouneed.line_5 = if you transfer money without using formal banking systems
+msb.whatyouneed.line_6 = how many transactions you expect in the next 12 months
+msb.whatyouneed.line_7 = which currencies you expect to be most popular with customers
+msb.whatyouneed.line_8 = who will supply your foreign currency
+msb.whatyouneed.possiblerequiredinfo.heading = Depending on your circumstances, you may also need to know:
+msb.whatyouneed.possiblerequiredinfo.line_1 = which countries your branches or agents operate in
+msb.whatyouneed.possiblerequiredinfo.line_2 = your Payment Systems Regulator registration number
+msb.whatyouneed.possiblerequiredinfo.line_3 = your Intermediary Payment Service Provider’s name
+msb.whatyouneed.possiblerequiredinfo.line_4 = your Intermediary Payment Service Provider’s HM Revenue and Customs registration number
+msb.whatyouneed.possiblerequiredinfo.line_5 = where you expect to send the largest amounts of money
+msb.whatyouneed.possiblerequiredinfo.line_6 = where you expect to send the greatest number of money transfers
 

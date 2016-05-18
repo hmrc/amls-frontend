@@ -19,9 +19,9 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
 
   def isComplete: Boolean = this match {
     case Tcsp(Some(_), Some(_), Some(_)) => true
+    case Tcsp(Some(TcspTypes(serviceProviders)), _, Some(_)) if !serviceProviders.contains(RegisteredOfficeEtc) => true
     case _ => false
   }
-
 }
 
 object Tcsp {
