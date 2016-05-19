@@ -70,7 +70,7 @@ class TrainingControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
     }
 
 
-/*    "on post with valid data and training selected yes" in new Fixture {
+    "on post with valid data and training selected yes" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "training" -> "true",
         "information" -> "I do not remember when I did the training"
@@ -111,6 +111,6 @@ class TrainingControllerSpec extends PlaySpec with OneServerPerSuite with Mockit
       val result = controller.post(RecordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
       //redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }*/
+    }
   }
 }
