@@ -21,7 +21,7 @@ private object AppDependencies {
   private val playUiVersion = "4.10.0"
   private val httpVerbsVersion = "3.3.0"
 
-  private val frontendBootstrapVersion = "6.3.0"
+  private val frontendBootstrapVersion = "6.4.0"
   private val playPartialsVersion = "4.2.0"
   private val playAuthorisedFrontendVersion = "4.7.0"
   private val playConfigVersion = "2.0.1"

@@ -43,7 +43,7 @@ class PenalisedByProfessionalControllerSpec extends PlaySpec with OneServerPerSu
   "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
 
     when(controller.dataCacheConnector.fetch[Supervision](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(Supervision(None, Some(ProfessionalBodyYes("details"))))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(Supervision(None, None, Some(ProfessionalBodyYes("details"))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)

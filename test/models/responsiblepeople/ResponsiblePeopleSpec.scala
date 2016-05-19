@@ -102,6 +102,13 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
     }
 
+    "Merged with FitAndProper" must {
+      "return ResponsiblePeople with correct hasAlreadyPassedFitAndProper" in {
+        val result = EmptyResponsiblePeople.hasAlreadyPassedFitAndProper(true)
+        result must be (ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true)))
+      }
+    }
+
   }
 
   "Successfully validate if the model is complete" when {
@@ -131,7 +138,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -147,7 +155,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -163,7 +172,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -179,7 +189,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -195,7 +206,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -211,7 +223,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(NewValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -227,7 +240,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(NewValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -243,7 +257,8 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(NewValues.experienceTraining),
-          Some(DefaultValues.training)))
+          Some(DefaultValues.training),
+          Some(true)))
       }
     }
 
@@ -259,7 +274,25 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
           Some(DefaultValues.saRegistered),
           Some(DefaultValues.vatRegistered),
           Some(DefaultValues.experienceTraining),
-          Some(NewValues.training)))
+          Some(NewValues.training),
+          Some(true)))
+      }
+    }
+
+    "Merged with hasAlreadyPassedFitAndProper" must {
+      "return ResponsiblePeople with correct FitAndProper Value" in {
+        val result = CompleteResponsiblePeople.hasAlreadyPassedFitAndProper(false)
+        result must be (ResponsiblePeople(
+          Some(DefaultValues.personName),
+          Some(DefaultValues.personResidenceType),
+          Some(DefaultValues.contactDetails),
+          Some(DefaultValues.addressHistory),
+          Some(DefaultValues.positions),
+          Some(DefaultValues.saRegistered),
+          Some(DefaultValues.vatRegistered),
+          Some(DefaultValues.experienceTraining),
+          Some(DefaultValues.training),
+          Some(false)))
       }
     }
   }
@@ -325,7 +358,8 @@ trait ResponsiblePeopleValues {
     Some(DefaultValues.saRegistered),
     Some(DefaultValues.vatRegistered),
     Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training)
+    Some(DefaultValues.training),
+    Some(true)
   )
 
   val CompleteJson = Json.obj(
@@ -389,7 +423,8 @@ trait ResponsiblePeopleValues {
     "training" -> Json.obj(
       "training" -> true,
       "information" -> "test"
-    )
+    ),
+    "hasAlreadyPassedFitAndProper" -> true
   )
 
   /** Make sure Responsible People model is complete */

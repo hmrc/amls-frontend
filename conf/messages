@@ -150,6 +150,7 @@ error.required.rp.experiencetraining.information = Enter some information about 
 error.invalid.length.rp.experiencetraining.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 error.required.rp.training = Select yes or no to the question: has this person had training in anti-money laundering or counter-terrorism funding?
 error.required.rp.training.information = Enter some information about this responsible person''s training in anti-money laundering or counter-terrorism funding.
+error.required.rp.fit_and_proper = Select yes or no to the question: Has this person already passed the fit and proper test?
 error.invalid.length.rp.training.information = Please give a brief description, including approximate dates and duration. It must not be more than 255 characters.
 error.required.rp.isknownbyothernames = Select yes or no to the question: Has this person ever been known by other names?
 error.required.rp.otherfirstnames = Enter all other first names.
@@ -187,6 +188,10 @@ error.required.supervision.reason = Enter a reason why the supervision ended
 error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
 error.invalid.supervision.supervisor = You can''t enter more than 140 characters
 error.invalid.supervision.reason = You can''t enter more than 255 characters
+error.required.supervision.business.a.member = Select yes or no to the question: is this business a member of a professional body?
+error.required.supervision.one.professional.body = Select at least one professional body
+error.required.supervision.business.details = Enter the name of the professional body
+error.invalid.supervision.business.details = You can''t enter more than 255 characters the name of the professional body.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -333,8 +338,6 @@ summary.checkyouranswers.agentspremises.section3 = Agents'' details
 button.checkyouranswers.acceptandcomplete = Accept and complete section
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
-
-summary.detailedanswers.title = Detailed answers
 
 aboutyou.yourdetails.title = What is your name?
 aboutyou.rolewithinbusiness.title = What is your role within the business?
@@ -734,6 +737,31 @@ responsiblepeople.check_your_answers.heading = Check your answers
 responsiblepeople.your_answers.title = Your answers
 responsiblepeople.your_answers.heading = Your answers
 responsiblepeople.check_your_answers.add = Add a responsible person
+responsiblepeople.fit_and_proper.title = Has this person already passed the fit and proper test?
+responsiblepeople.fit_and_proper.heading = Has this person already passed the fit and proper test?
+responsiblepeople.detailed_answers.title = Detailed answers
+responsiblepeople.detailed_answers.previous_names = Previous names
+responsiblepeople.detailed_answers.previous_names.since = Since
+responsiblepeople.detailed_answers.other_names = Other names
+responsiblepeople.detailed_answers.uk_resident = UK resident
+responsiblepeople.detailed_answers.uk_resident.nino = National Insurance Number
+responsiblepeople.detailed_answers.uk_resident.dob = D.O.B
+responsiblepeople.detailed_answers.uk_resident.passport_number = Passport Number
+responsiblepeople.detailed_answers.uk_resident.no_passport = No passport
+responsiblepeople.detailed_answers.country_of_birth = Country of birth
+responsiblepeople.detailed_answers.nationality = Nationality
+responsiblepeople.detailed_answers.phone_number = Phone number
+responsiblepeople.detailed_answers.email = Email
+responsiblepeople.detailed_answers.address = Address
+responsiblepeople.detailed_answers.previous_address = Previous Address
+responsiblepeople.detailed_answers.other_previous_address = Other Previous Address
+responsiblepeople.detailed_answers.at_this_address = at this address
+responsiblepeople.detailed_answers.position = Position
+responsiblepeople.detailed_answers.registered_for_vat = Registered for VAT
+responsiblepeople.detailed_answers.registered_for_sa = Registered for Self Assessment
+responsiblepeople.detailed_answers.previous_experience = Previous Experience
+responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
+responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
 
 #TCSP
 tcsp.whatyouneed.title = What you need
@@ -813,4 +841,21 @@ supervision.penalisedbyprofessional.line_3 = suspension
 supervision.penalisedbyprofessional.line_4 = expulsion
 supervision.penalisedbyprofessional.details.lbl = Please provide details
 
-supervision.summary.agency = Supervision Agency
+supervision.memberofprofessionalbody.title = Is your business a member of a professional body?
+supervision.memberofprofessionalbody.lbl.01 = Association of Accounting Technicians
+supervision.memberofprofessionalbody.lbl.02 = Association of Chartered Certified Accountants
+supervision.memberofprofessionalbody.lbl.03 = Association of International Accountants
+supervision.memberofprofessionalbody.lbl.04 = Association of Taxation Technicians
+supervision.memberofprofessionalbody.lbl.05 = Chartered Institute of Management Accountants
+supervision.memberofprofessionalbody.lbl.06 = Chartered Institute of Taxation
+supervision.memberofprofessionalbody.lbl.07 = Institute of Certified Bookkeepers
+supervision.memberofprofessionalbody.lbl.08 = Institute of Chartered Accountants in Ireland
+supervision.memberofprofessionalbody.lbl.09 = Institute of Chartered Accountants in Scotland
+supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants of England and Wales
+supervision.memberofprofessionalbody.lbl.11 = Institute of Financial Accountants
+supervision.memberofprofessionalbody.lbl.12 = International Association of Book-keepers
+supervision.memberofprofessionalbody.lbl.13 = Law Society
+supervision.memberofprofessionalbody.lbl.14 = Other
+
+
+
