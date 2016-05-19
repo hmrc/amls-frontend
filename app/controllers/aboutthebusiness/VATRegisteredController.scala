@@ -5,8 +5,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness._
-import models.businessmatching.BusinessType.{Partnership, SoleProprietor}
-import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.BusinessType.Partnership
+import models.businessmatching.BusinessMatching
 import utils.ControllerHelper
 import views.html.aboutthebusiness._
 

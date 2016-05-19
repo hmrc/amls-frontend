@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{RegisteredOffice, ActivityStartDate, AboutTheBusiness, ConfirmRegisteredOffice}
+import models.aboutthebusiness.{RegisteredOffice, AboutTheBusiness, ConfirmRegisteredOffice}
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
