@@ -56,19 +56,19 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite wit
     "pre select uk when not in edit mode" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, Some(ukAddress), None))))
+        thenReturn(Future.successful(Some(AboutTheBusiness(None,None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[name=isUK]").`val` must be("true")
-      document.select("input[name=addressLine2]").`val` must be("")
+      document.select("input[name=addressLine2]").`val` must be("address line")
     }
 
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, Some(ukAddress), None))))
+        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get(true)(request)
       status(result) must be(OK)

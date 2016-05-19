@@ -1,0 +1,23 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@main(
+    title = Messages("aboutthebusiness.activity.start.date.title")
+) {
+
+    @heading("aboutthebusiness.activity.start.date.title", "summary.aboutbusiness")
+
+    @form(f, controllers.aboutthebusiness.routes.ActivityStartDateController.post(edit)) {
+        @date(
+            f = f,
+            p = "startDate",
+            labelText = "aboutthebusiness.activity.start.date.text",
+            hintText = "",
+            true
+        )
+
+        @submit(edit)
+    }
+}
