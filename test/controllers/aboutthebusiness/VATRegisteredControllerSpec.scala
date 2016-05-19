@@ -49,7 +49,7 @@ class VATRegisteredControllerSpec extends PlaySpec with OneServerPerSuite with M
   "on get display the registered for VAT page with pre populated data" in new Fixture {
 
     when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("")), Some(VATRegisteredYes("123456789"))))))
+      (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("")), None, Some(VATRegisteredYes("123456789"))))))
 
     val result = controller.get()(request)
     status(result) must be(OK)

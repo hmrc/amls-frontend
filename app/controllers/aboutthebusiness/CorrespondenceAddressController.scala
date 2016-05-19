@@ -3,7 +3,7 @@ package controllers.aboutthebusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import forms.{Form2, ValidForm, InvalidForm}
 import models.aboutthebusiness.{UKCorrespondenceAddress, CorrespondenceAddress, AboutTheBusiness}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
@@ -18,10 +18,12 @@ trait CorrespondenceAddressController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-        case Some(AboutTheBusiness(_, _, _, _, _, Some(data))) =>
-          Ok(correspondence_address(Form2[CorrespondenceAddress](data), edit))
-        case _ =>
-          Ok(correspondence_address(Form2[CorrespondenceAddress](initialiseWithUK), edit))
+        response =>
+          val form: Form2[CorrespondenceAddress] = (for {
+            aboutTheBusiness <- response
+            correspondenceAddress <- aboutTheBusiness.correspondenceAddress
+          } yield Form2[CorrespondenceAddress](correspondenceAddress)).getOrElse(Form2[CorrespondenceAddress](initialiseWithUK))
+          Ok(correspondence_address(form, edit))
       }
   }
 
