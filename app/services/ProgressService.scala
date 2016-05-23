@@ -8,6 +8,7 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => _, _}
 import models.estateagentbusiness.EstateAgentBusiness
+import models.moneyservicebusiness.{MoneyServiceBusiness =>MoneyServiceBusinessModel}
 import models.registrationprogress.{NotStarted, Section}
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
@@ -37,8 +38,7 @@ trait ProgressService {
           // TODO
           m + Section("hvd", NotStarted, controllers.routes.RegistrationProgressController.get())
         case MoneyServiceBusiness =>
-          // TODO
-          m + Section("msb", NotStarted, controllers.routes.RegistrationProgressController.get())
+          m + MoneyServiceBusinessModel.section
         case TrustAndCompanyServices =>
           m + Tcsp.section + Supervision.section
         case _ => m

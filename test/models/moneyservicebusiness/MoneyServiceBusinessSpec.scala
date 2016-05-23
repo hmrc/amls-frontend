@@ -1,6 +1,6 @@
 package models.moneyservicebusiness
 
-import models.registrationprogress.{Completed, NotStarted, Section}
+import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
@@ -9,11 +9,16 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import play.api.mvc.Call
 
-class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServiceBusinessTestData{
+class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServiceBusinessTestData {
+
   "MoneyServiceBusiness" should {
+
     "have an implicit conversion from Option which" when {
+
       "called with None" should {
+
         "return a default version of MoneyServiceBusiness" in {
+
           val res:MoneyServiceBusiness = None
           res must be (emptyModel)
         }
@@ -30,7 +35,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
     "Provide an implicit mongo-key" in {
       def x(implicit mongoKey: MongoKey[MoneyServiceBusiness]) = mongoKey()
 
-      x must be("money-service-business")
+      x must be("msb")
     }
 
     "have a section function that" when {
@@ -38,15 +43,23 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 
       "model is empty" should {
         "return a NotStarted Section" in {
-          when(cacheMap.getEntry[MoneyServiceBusiness]("money-service-business")) thenReturn None
-          MoneyServiceBusiness.section must be (Section("money_service_business", NotStarted, controllers.msb.routes.WhatYouNeedController.get()))
+          when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn None
+          MoneyServiceBusiness.section must be (Section(MoneyServiceBusiness.key, NotStarted, controllers.msb.routes.WhatYouNeedController.get()))
+        }
+      }
+
+      "model is incomplete" should {
+        "return a NotStarted Section" in {
+          when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(MoneyServiceBusiness(Some(MsbServices(
+            Set(ChequeCashingScrapMetal)))))
+          MoneyServiceBusiness.section must be (Section(MoneyServiceBusiness.key, Started, controllers.msb.routes.WhatYouNeedController.get()))
         }
       }
 
       "model is complete" should {
         "return a Completed Section" in {
-          when(cacheMap.getEntry[MoneyServiceBusiness]("money-service-business")) thenReturn Some(completeModel)
-          MoneyServiceBusiness.section must be (Section("money_service_business", Completed, controllers.msb.routes.WhatYouNeedController.get()))
+          when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeModel)
+          MoneyServiceBusiness.section must be (Section(MoneyServiceBusiness.key, Completed, controllers.msb.routes.SummaryController.get()))
         }
       }
     }
@@ -73,11 +86,14 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 }
 
 trait MoneyServiceBusinessTestData {
-  val completeModel = MoneyServiceBusiness(Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
+  val completeModel = MoneyServiceBusiness(Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))), Some(ExpectedThroughput("02")))
   val emptyModel = MoneyServiceBusiness(None)
 
   val completeJson = Json.obj(
+    "msbServices" -> Json.obj(
     "msbServices" -> Json.arr("04", "03")
+    ),
+    "throughput" -> Json.obj("throughput" -> "02")
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())

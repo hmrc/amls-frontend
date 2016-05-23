@@ -5,40 +5,50 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.libs.json._
 
-case class MoneyServiceBusiness(msbServices : Option[MsbServices] = None) {
-  def isComplete = msbServices.nonEmpty
+case class MoneyServiceBusiness(
+                                 msbServices : Option[MsbServices] = None,
+                                 throughput : Option[ExpectedThroughput] = None
+                               ) {
+
+  def msbServices(p: MsbServices): MoneyServiceBusiness =
+    this.copy(msbServices = Some(p))
+
+  def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
+    this.copy(throughput = Some(p))
+
+  def isComplete: Boolean = this match {
+    case MoneyServiceBusiness(Some(_), Some(_)) => true
+    case _ => false
+  }
 }
 
-object MoneyServiceBusiness{
-  implicit def default(value : Option[MoneyServiceBusiness]) :  MoneyServiceBusiness = {
-    value.getOrElse(MoneyServiceBusiness())
-  }
+object MoneyServiceBusiness {
 
-  val key = "money-service-business"
+  val key = "msb"
 
   implicit val mongoKey = new MongoKey[MoneyServiceBusiness] {
-    def apply() = "money-service-business"
+    def apply() = "msb"
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val messageKey = "money_service_business"
+
+    val messageKey = "msb"
+
     val notStarted = Section(messageKey, NotStarted, controllers.msb.routes.WhatYouNeedController.get())
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.msb.routes.WhatYouNeedController.get())
+          Section(messageKey, Completed, controllers.msb.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, controllers.msb.routes.WhatYouNeedController.get())
         }
     }
   }
 
-  implicit val jsonReads : Reads[MoneyServiceBusiness] = Reads[MoneyServiceBusiness] { jsVal =>
-    Json.fromJson[MsbServices](jsVal).map(x => MoneyServiceBusiness(Some(x)))
-  }
+  implicit val format =  Json.format[MoneyServiceBusiness]
 
-  implicit val jsonWrites : Writes[MoneyServiceBusiness] = Writes { msb:MoneyServiceBusiness =>
-    Json.toJson(msb.msbServices)
+  implicit def default(value : Option[MoneyServiceBusiness]) :  MoneyServiceBusiness = {
+    value.getOrElse(MoneyServiceBusiness())
   }
 }
 

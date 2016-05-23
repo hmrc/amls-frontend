@@ -3,7 +3,7 @@ package controllers.msb
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.msb.Msb
+import models.moneyservicebusiness.MoneyServiceBusiness
 import views.html.msb.summary
 
 trait SummaryController extends BaseController {
@@ -12,7 +12,7 @@ trait SummaryController extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[Msb](Msb.key) map {
+      dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         case Some(data) =>
           Ok(summary(data))
         case _ =>

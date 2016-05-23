@@ -2,7 +2,7 @@ package controllers.msb
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.msb.Msb
+import models.moneyservicebusiness.MoneyServiceBusiness
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -33,9 +33,9 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
     "load the summary page when section data is available" in new Fixture {
 
-      val model = Msb(None)
+      val model = MoneyServiceBusiness(None)
 
-      when(controller.dataCache.fetch[Msb](any())
+      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -45,7 +45,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetch[Msb](any())
+      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
