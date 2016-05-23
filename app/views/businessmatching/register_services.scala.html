@@ -12,9 +12,9 @@
 
     @form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
 
-    <div class="form-field">
-        <span class="form-field">@Messages("lbl.select.all")</span>
-    </div>
+        <div class="form-field">
+            <span class="form-field">@Messages("lbl.select.all")</span>
+        </div>
 
         @radioGroup(f("businessActivities")) {
             @legend("lbl.select.all", jsHidden = true)
@@ -27,7 +27,20 @@
             @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.07", "07")
         }
 
-    @submit(edit)
+        <details class="details">
+            <summary class="summary">More detail on these categories</summary>
+            <div class="details__inner">
+                <ul class="panel-indent">
+                    <li>@Messages("businessmatching.registerservices.servicename.details.01") <a href="https://www.gov.uk/guidance/money-laundering-regulations-accountancy-service-provider-registration">@Messages("businessmatching.registerservices.servicename.details.01.anchor")</a></li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.02") <a href="https://www.gov.uk/guidance/registration-guide-for-estate-agency-businesses">@Messages("businessmatching.registerservices.servicename.details.02.anchor")</a></li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.03") <a href="https://www.gov.uk/guidance/money-laundering-regulations-high-value-dealer-registration">@Messages("businessmatching.registerservices.servicename.details.03.anchor")</a></li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.04") <a href="https://www.gov.uk/guidance/money-laundering-regulations-money-service-business-registration">@Messages("businessmatching.registerservices.servicename.details.04.anchor")</a></li>
+                    <li>@Messages("businessmatching.registerservices.servicename.details.05") <a href="https://www.gov.uk/guidance/money-laundering-regulations-trust-or-company-service-provider-registration">@Messages("businessmatching.registerservices.servicename.details.05.anchor")</a></li>
+                </ul>
+            </div>
+        </details>
+
+        @submit(edit)
 
     }
 
