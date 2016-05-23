@@ -23,6 +23,13 @@ class ExpectedThroughputSpec extends PlaySpec {
         )))
       }
 
+      "throw error for  invalid form data" in {
+        val map =  Map("throughput" -> Seq("11"))
+        ExpectedThroughput.formRule.validate(map) must be(Failure(Seq(
+          (Path \ "throughput") -> Seq(ValidationError("error.invalid"))
+        )))
+      }
+
       "successfully write data" in {
         ExpectedThroughput.formWrites.writes(ExpectedThroughput("02")) must be(Map("throughput" -> Seq("02")))
       }
