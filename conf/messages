@@ -514,13 +514,14 @@ businessmatching.registerservices.servicename.details.06.anchor=More information
 businessmatching.registerservices.servicename.details.07=‘Telecommunications, Digital and IT Payment Service Providers’ work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
 
 businessmatching.registrationnumber.title=Business matching - What''s your company registration number?
-businessmatching.registrationnumber.heading=What''s your company registration number?
+businessmatching.registrationnumber.heading=What’s your company registration number?
 businessmatching.registrationnumber.example=For example: A1234567.
-businessmatching.typeofbusiness.title =Business matching - What''s your type of business?
-businessmatching.typeofbusiness.heading = What''s your type of business?
+businessmatching.typeofbusiness.title =Business matching - What’s your type of business?
+businessmatching.typeofbusiness.heading = What's your business structure?
 businessmatching.typeofbusiness.lbl.hint = For example: association, charity, trust
-businessmatching.summary.icon.title = You will be registering the following business for anti-money laundering supervision:
-businessmatching.summary.business.address.lbl = Your business details
+businessmatching.summary.icon.title = You are applying to register the following business for anti-money laundering supervision
+businessmatching.summary.business.address.lbl = Your business:
+businessmatching.button.confirm.start = Confirm and start application
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need

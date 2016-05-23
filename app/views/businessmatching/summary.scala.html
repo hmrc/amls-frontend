@@ -9,9 +9,8 @@
 
     @heading("summary.checkyouranswers.title", "summary.businessmatching")
 
-    <div class="form-group">
-        <span class="icon-information"></span>
-        <span class="notice">@Messages("businessmatching.summary.icon.title")</span>
+    <div class="panel-wide">
+        @Messages("businessmatching.summary.icon.title")
     </div>
 
     @model.reviewDetails.map { review =>
@@ -90,5 +89,5 @@
         </table>
     }
 
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">Accept and complete section</a>
+    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("businessmatching.button.confirm.start")</a>
 }
