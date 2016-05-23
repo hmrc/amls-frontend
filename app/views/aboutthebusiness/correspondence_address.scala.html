@@ -10,9 +10,20 @@
 
     @heading("aboutthebusiness.correspondenceaddress.title", "summary.aboutbusiness")
 
-    <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
+    <div class="form-group">
+        <div class="panel-indent panel-border-wide">
+            <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
+        </div>
+    </div>
+
 
     @form(f, controllers.aboutthebusiness.routes.CorrespondenceAddressController.post(edit)) {
+
+        @inlineRadioGroup(f("isUK")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
+            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
+        }
 
         @input(
             field = f("yourName"),
@@ -25,11 +36,7 @@
         )
 
 
-        @inlineRadioGroup(f("isUK")) {
-            @legend("TODO", jsHidden = true)
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
-        }
+
 
         @fieldset(
             legend = "TODO",
@@ -38,7 +45,7 @@
             id = s"""${f("postCode").id}-fieldset"""
         ) {
             <fieldset class="">
-                <legend class="form-label-bold">
+                <legend class="form-label">
                     @Messages("aboutthebusiness.correspondenceaddress.address")
                 </legend>
                 @input(f("addressLine1"))
