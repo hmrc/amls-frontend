@@ -1,0 +1,13 @@
+@import include._
+@import models.msb._
+
+@(model: Msb)(implicit request: Request[_], lang: Lang)
+
+@main(
+    title = Messages("summary.checkyouranswers.title")
+) {
+
+    @heading("summary.checkyouranswers.title", "summary.msb")
+
+    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+}
