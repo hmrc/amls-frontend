@@ -515,7 +515,7 @@ businessmatching.registerservices.servicename.details.07=‘Telecommunications, 
 
 businessmatching.registrationnumber.title=Business matching - What''s your company registration number?
 businessmatching.registrationnumber.heading=What’s your company registration number?
-businessmatching.registrationnumber.example=For example: A1234567.
+businessmatching.registrationnumber.example=For example: A1234567
 businessmatching.typeofbusiness.title =Business matching - What’s your type of business?
 businessmatching.typeofbusiness.heading = What's your business structure?
 businessmatching.typeofbusiness.lbl.hint = For example: association, charity, trust
