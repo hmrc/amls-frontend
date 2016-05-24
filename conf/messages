@@ -457,7 +457,7 @@ estateagentbusiness.penalisedunderestateagentsact.title = Has the business, or a
 estateagentbusiness.penalisedunderestateagentsact.subtitle = Examples of a penalty include:
 estateagentbusiness.penalisedunderestateagentsact.warning = receiving a formal warning
 estateagentbusiness.penalisedunderestateagentsact.banned = being banned from taking part in estate agency activities
-estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl = Please provide details
+estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl = Give a brief overview of what the penalty was, and when it occurred.
 estateagentbusiness.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
 estateagentbusiness.penalisedbyprofessional.subtitle = The penalty should relate to estate agent business activities. Examples of a penalty include:
 estateagentbusiness.penalisedbyprofessional.line_1 = a fine
@@ -860,7 +860,7 @@ supervision.another_body.endDate.hint = For example, 31 3 2010
 supervision.another_body.endingReason.lbl = Why did the supervision end?
 
 supervision.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
-supervision.penalisedbyprofessional.subtitle = The penalty should relate to estate agent business activities. Examples of a penalty include:
+supervision.penalisedbyprofessional.subtitle = The penalty must relate to Accountancy Service Provider activities. Examples of a penalty include:
 supervision.penalisedbyprofessional.line_1 = a fine
 supervision.penalisedbyprofessional.line_2 = a warning
 supervision.penalisedbyprofessional.line_3 = suspension
