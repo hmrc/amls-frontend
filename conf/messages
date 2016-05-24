@@ -290,7 +290,7 @@ progress.supervision.description = Registration information specfically for Trus
 progress.supervision.time = 4
 
 progress.declarationavailable = All sections complete: you can now submit the registration.
-progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
+progress.declarationunavailable = You can’t finish the registration until you’ve completed all the sections.
 
 #### Confirmation page ####
 confirmation.lede = You have submitted the registration.

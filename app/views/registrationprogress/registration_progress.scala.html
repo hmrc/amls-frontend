@@ -18,17 +18,17 @@
         </div>
     </div>
 
-    <div class="grid-layout">
+    <div class="grid-layout grid-layout--stacked">
 
         @* Main section *@
-        <div class="grid-layout__column grid-layout__column--2-3">
+        <div class="grid-layout__column grid-layout__column--2-3 reg-step--steps">
             @sections.map { case Section(name, status, call) =>
                 @section(name, status, call)
             }
         </div>
 
         @* Sidebar *@
-        <div class="grid-layout__column grid-layout__column--1-3">
+        <div class="grid-layout__column grid-layout__column--1-3 reg-step--submit">
             <div class="progress-submit">
                 <h3 class="heading-small">@Messages("progress.submit")</h3>
                 <p>

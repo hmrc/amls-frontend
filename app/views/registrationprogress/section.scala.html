@@ -2,49 +2,43 @@
 
 @(name: String, status: Status, call: Call)(implicit request: Request[_], lang: Lang)
 
-<div class="progress-section">
+<a class="reg-step" href="@call.url">
     @status match {
 
         case NotStarted => {
-            <div class="left">
+            <div class="grid-layout__column grid-layout__column--2-3 reg-step--details">
                 <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
-                <p>
-                    @Messages(s"progress.$name.description")
-                </p>
+                <p>@Messages(s"progress.$name.description")</p>
             </div>
-            <div class="right not-started">
-                <div class="time-to-complete">
+            <div class="grid-layout__column grid-layout__column--1-3 reg-step--status reg-step--status__not-started">
+                <div class="grid-layout__column--2-3 reg-step--status-time">
                     <span class="heading-large">@Messages(s"progress.${name}.time")</span>
                     <p class="font-xsmall">@Messages("progress.minutes")</p>
                 </div>
-                <div class="chevron-container">
-                    <a href="@call.url"><span class="chevron">&nbsp;</span></a>
+                <div class="grid-layout__column grid-layout__column--1-3">
+                  &nbsp;
                 </div>
             </div>
         }
 
         case Started => {
-            <div class="left">
+            <div class="grid-layout__column grid-layout__column--2-3 reg-step--details">
                 <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
-                <a href="@call.url">
-                    @Messages("progress.continue")
-                </a>
+                <p>@Messages("progress.continue")</p>
             </div>
-            <div class="right not-started">
+            <div class="grid-layout__column grid-layout__column--1-3 reg-step--status reg-step--status__started">
                 &nbsp;
             </div>
         }
 
         case Completed => {
-            <div class="left">
+            <div class="grid-layout__column grid-layout__column--2-3 reg-step--details">
                 <h3 class="heading-small">@Messages(s"progress.${name}.name")</h3>
-                <a href="@call.url">
-                    @Messages("progress.edit")
-                </a>
+                <p class="reg-link">@Messages("progress.edit")</p>
             </div>
-            <div class="right complete">
-                <img src="@routes.AssetsController.at("icon-tick-white.png")" alt="completed"/>
+            <div class="grid-layout__column grid-layout__column--1-3 reg-step--status reg-step--status__completed">
+              &nbsp;
             </div>
         }
     }
-</div>
+</a>
