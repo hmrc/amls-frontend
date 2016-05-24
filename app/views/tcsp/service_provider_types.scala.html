@@ -20,12 +20,12 @@
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-fieldset")
                 @fieldset("TODO", jsHidden = true, id = s"""${f("agent").id}-fieldset""") {
                     @inlineRadioGroup(f("onlyOffTheShelfCompsSold")) {
-                        @legend("tcsp.off-the-shelf.companies.lbl", false, bold = true)
+                        @legend("tcsp.off-the-shelf.companies.lbl", false, bold = false)
                         @radio(f("onlyOffTheShelfCompsSold"), "lbl.yes", "true")
                         @radio(f("onlyOffTheShelfCompsSold"), "lbl.no", "false")
                     }
                     @inlineRadioGroup(f("complexCorpStructureCreation")) {
-                        @legend("tcsp.create.complex.corporate.structures.lbl", false, bold = true)
+                        @legend("tcsp.create.complex.corporate.structures.lbl", false, bold = false)
                         @radio(f("complexCorpStructureCreation"), "lbl.yes", "true")
                         @radio(f("complexCorpStructureCreation"), "lbl.no", "false")
                     }
