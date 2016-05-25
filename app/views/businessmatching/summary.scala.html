@@ -9,14 +9,14 @@
 
     @heading("summary.checkyouranswers.title", "summary.businessmatching")
 
-    <div class="panel-wide">
+    <div class="panel-indent panel-indent--gutter">
         @Messages("businessmatching.summary.icon.title")
     </div>
 
     @model.reviewDetails.map { review =>
-        <table>
+        <table class="table--spaced-top">
             <tr>
-                <th  colspan="2" class="summary-title">@Messages("businessmatching.summary.business.address.lbl")</th>
+                <th colspan="2">@Messages("businessmatching.summary.business.address.lbl")</th>
             </tr>
             <tr>
                 <td colspan="2">
@@ -30,10 +30,10 @@
         @review.businessType.map { m =>
             @m match {
                 case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
-                    <table>
+                    <table class="table--spaced-top">
                         <tr>
-                            <th class="summary-title">@Messages("businessmatching.registrationnumber.heading")</th>
-                            <td><a href="@controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true)">@Messages("button.edit")</a></td>
+                            <th>@Messages("businessmatching.registrationnumber.heading")</th>
+                            <td width="12"><a href="@controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true)">@Messages("button.edit")</a></td>
                         </tr>
                         <tr>
                             <td colspan="2">
@@ -45,10 +45,10 @@
                     </table>
                 }
                 case BusinessType.UnincorporatedBody => {
-                    <table>
+                    <table class="table--spaced-top">
                         <tr>
-                            <th class="summary-title">@Messages("businessmatching.typeofbusiness.heading")</th>
-                            <td><a href="@controllers.businessmatching.routes.TypeOfBusinessController.get(true)">@Messages("button.edit")</a></td>
+                            <th>@Messages("businessmatching.typeofbusiness.heading")</th>
+                            <td width="12"><a href="@controllers.businessmatching.routes.TypeOfBusinessController.get(true)">@Messages("button.edit")</a></td>
                         </tr>
                         <tr>
                             <td colspan="2">
@@ -66,10 +66,10 @@
     }
 
     @model.activities.map { activity =>
-        <table>
+        <table class="table--spaced-top">
             <tr>
-                <th class="summary-title">@Messages("businessmatching.registerservices.heading")</th>
-                <td><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
+                <th>@Messages("businessmatching.registerservices.heading")</th>
+                <td width="12"><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             @activity.businessActivities.map { line =>
             <tr>
