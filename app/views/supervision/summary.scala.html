@@ -11,8 +11,8 @@
     @heading("summary.checkyouranswers.title", "summary.supervision")
     <table>
         <tr>
-            <th class="summary-title">@Messages("supervision.another_body.title")</th>
-            <td colspan="2"><a href="@controllers.supervision.routes.AnotherBodyController.get(true)">@Messages("button.edit")</a></td>
+            <th>@Messages("supervision.another_body.title")</th>
+            <td width="12"><a href="@controllers.supervision.routes.AnotherBodyController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -48,12 +48,12 @@
                 </tr>
             }
         }
-
     </table>
+
     <table>
         <tr>
-            <th class="summary-title">@Messages("supervision.memberofprofessionalbody.title")</th>
-            <td colspan="2"><a href="@controllers.supervision.routes.ProfessionalBodyMemberController.get(true)">@Messages("button.edit")</a></td>
+            <th>@Messages("supervision.memberofprofessionalbody.title")</th>
+            <td width="12"><a href="@controllers.supervision.routes.ProfessionalBodyMemberController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -90,15 +90,14 @@
                     </td>
                 </tr>
                 }
-
             }
         }
-
     </table>
+
     <table>
         <tr>
-            <th class="summary-title">@Messages("supervision.penalisedbyprofessional.title")</th>
-            <td colspan="2"><a href="@controllers.supervision.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
+            <th>@Messages("supervision.penalisedbyprofessional.title")</th>
+            <td width="12"><a href="@controllers.supervision.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -119,7 +118,7 @@
                 </tr>
             }
         }
-
     </table>
+
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
