@@ -13,8 +13,8 @@
     @model.registeredOffice.map { a =>
         <table>
             <tr>
-                <th class="summary-title">@Messages("aboutthebusiness.registeredoffice.title")</th>
-                <td><a href="@controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true)">@Messages("button.edit")</a></td>
+                <th>@Messages("aboutthebusiness.registeredoffice.title")</th>
+                <td width="12"><a href="@controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -27,21 +27,17 @@
     }
 
     @model.contactingYou.map { c =>
-        <table>
-
+        <table class="table--spaced-top">
             <tr>
-                <th class="summary-title">@Messages("aboutthebusiness.contactingyou.title")</th>
-                <td colspan="2"><a href="@controllers.aboutthebusiness.routes.ContactingYouController.get(true)">@Messages("button.edit")</a></td>
+                <th class="">@Messages("aboutthebusiness.contactingyou.title")</th>
+                <td width="12"><a href="@controllers.aboutthebusiness.routes.ContactingYouController.get(true)">@Messages("button.edit")</a></td>
             </tr>
-
             <tr>
                 <td colspan="2">@c.phoneNumber</td>
             </tr>
-
             <tr>
                 <td colspan="2">@c.email</td>
             </tr>
-
             @model.correspondenceAddress.map { ca =>
                 <tr>
                     <td colspan="2">
@@ -51,29 +47,28 @@
                     </td>
                 </tr>
             }
-
         </table>
     }
 
    @model.activityStartDate.map { activityStartDate =>
-    <table>
-        <tr>
-            <th class="summary-title">@Messages("aboutthebusiness.activity.start.date.title")</th>
-            <td colspan="2"><a href="@controllers.aboutthebusiness.routes.ActivityStartDateController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)
-            </td>
-        </tr>
-    </table>
+        <table class="table--spaced-top">
+            <tr>
+                <th>@Messages("aboutthebusiness.activity.start.date.title")</th>
+                <td width="12"><a href="@controllers.aboutthebusiness.routes.ActivityStartDateController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)
+                </td>
+            </tr>
+        </table>
     }
 
     @model.vatRegistered.map { vatRegistered =>
-        <table>
+        <table class="table--spaced-top">
             <tr>
-                <th class="summary-title">@Messages("aboutthebusiness.registeredforvat.title")</th>
-                <td colspan="2"><a href="@controllers.aboutthebusiness.routes.VATRegisteredController.get(true)">@Messages("button.edit")</a></td>
+                <th>@Messages("aboutthebusiness.registeredforvat.title")</th>
+                <td width="12"><a href="@controllers.aboutthebusiness.routes.VATRegisteredController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -94,15 +89,14 @@
                 </tr>
                 }
             }
-
         </table>
     }
 
     @model.corporationTaxRegistered.map { ctRegistered =>
-        <table>
+        <table class="table--spaced-top ">
             <tr>
-                <th class="summary-title">@Messages("aboutthebusiness.registeredforcorporationtax.title")</th>
-                <td colspan="2"><a href="@controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true)">@Messages("button.edit")</a></td>
+                <th>@Messages("aboutthebusiness.registeredforcorporationtax.title")</th>
+                <td width="12"><a href="@controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -127,10 +121,10 @@
         </table>
     }
 
-    <table>
+    <table class="table--spaced-top">
         <tr>
-            <th class="summary-title">@Messages("aboutthebusiness.registeredformlr.title")</th>
-            <td colspan="2"><a href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true)">@Messages("button.edit")</a></td>
+            <th>@Messages("aboutthebusiness.registeredformlr.title")</th>
+            <td width="12"><a href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
