@@ -6,10 +6,15 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.libs.json._
 
 case class MoneyServiceBusiness(msbServices : Option[MsbServices] = None) {
+
+  def msbServices(services: MsbServices): MoneyServiceBusiness =
+    this.copy(msbServices = Some(services))
+
   def isComplete = msbServices.nonEmpty
 }
 
-object MoneyServiceBusiness{
+object MoneyServiceBusiness {
+
   implicit def default(value : Option[MoneyServiceBusiness]) :  MoneyServiceBusiness = {
     value.getOrElse(MoneyServiceBusiness())
   }
@@ -21,7 +26,7 @@ object MoneyServiceBusiness{
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val messageKey = "money_service_business"
+    val messageKey = "msb"
     val notStarted = Section(messageKey, NotStarted, controllers.msb.routes.WhatYouNeedController.get())
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
