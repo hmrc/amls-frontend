@@ -7,7 +7,8 @@ import play.api.libs.json._
 
 case class MoneyServiceBusiness(
                                  msbServices : Option[MsbServices] = None,
-                                 throughput : Option[ExpectedThroughput] = None
+                                 throughput : Option[ExpectedThroughput] = None,
+                                 businessUseAnIPSP: Option[BusinessUseAnIPSP] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -16,8 +17,12 @@ case class MoneyServiceBusiness(
   def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
     this.copy(throughput = Some(p))
 
+  def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
+    this.copy(businessUseAnIPSP = Some(p))
+
+
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_)) => true
+    case MoneyServiceBusiness(Some(_), Some(_), Some(_)) => true
     case _ => false
   }
 }
