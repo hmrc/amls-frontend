@@ -1,31 +1,73 @@
 package models.moneyservicebusiness
 
-import play.api.data.mapping.forms._
 import play.api.data.mapping._
+import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
-import play.api.libs.json.Json
+import play.api.libs.json._
 
-case class ExpectedThroughput(throughput: String)
+sealed trait ExpectedThroughput
 
 object ExpectedThroughput {
 
-  implicit val format = Json.format[ExpectedThroughput]
+  case object First extends ExpectedThroughput
+  case object Second extends ExpectedThroughput
+  case object Third extends ExpectedThroughput
+  case object Fourth extends ExpectedThroughput
+  case object Fifth extends ExpectedThroughput
+  case object Sixth extends ExpectedThroughput
+  case object Seventh extends ExpectedThroughput
+
 
   import utils.MappingUtils.Implicits._
 
-  implicit val formRule: Rule[UrlFormEncoded, ExpectedThroughput] =
-    From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
-      (__ \ "throughput").read[String].withMessage("error.required.msb.throughput") flatMap {x =>
-        x match {
-          case "01" | "02" | "03" | "04" | "05" | "06" | "07" => ExpectedThroughput.apply(x)
-          case _ =>  (Path \ "throughput") -> Seq(ValidationError("error.invalid"))
-        }
-      }
+  implicit val formRule: Rule[UrlFormEncoded, ExpectedThroughput] = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    import models.FormTypes._
+    (__ \ "throughput").read[String].withMessage("error.required.msb.throughput") flatMap {
+      case "01" => First
+      case "02" => Second
+      case "03" => Third
+      case "04" => Fourth
+      case "05" => Fifth
+      case "06" => Sixth
+      case "07" => Seventh
+      case _ =>
+        (Path \ "throughput") -> Seq(ValidationError("error.invalid"))
     }
+  }
 
   implicit val formWrites: Write[ExpectedThroughput, UrlFormEncoded] = Write {
-      case ExpectedThroughput(b) =>
-        Map("throughput" -> Seq(b))
+    case First => "throughput" -> "01"
+    case Second => "throughput" -> "02"
+    case Third => "throughput" -> "03"
+    case Fourth => "throughput" -> "04"
+    case Fifth => "throughput" -> "05"
+    case Sixth => "throughput" -> "06"
+    case Seventh=> "throughput" -> "07"
+  }
+
+  implicit val jsonReads = {
+    import play.api.libs.json.Reads.StringReads
+    (__ \ "throughput").read[String].flatMap[ExpectedThroughput] {
+      case "01" => First
+      case "02" => Second
+      case "03" => Third
+      case "04" => Fourth
+      case "05" => Fifth
+      case "06" => Sixth
+      case "07" => Seventh
+      case _ =>
+        ValidationError("error.invalid")
     }
+  }
+
+  implicit val jsonWrites = Writes[ExpectedThroughput] {
+    case First => Json.obj("throughput" -> "01")
+    case Second => Json.obj("throughput" -> "02")
+    case Third => Json.obj("throughput" -> "03")
+    case Fourth => Json.obj("throughput" -> "04")
+    case Fifth => Json.obj("throughput" -> "05")
+    case Sixth => Json.obj("throughput" -> "06")
+    case Seventh => Json.obj("throughput" -> "07")
+  }
 }

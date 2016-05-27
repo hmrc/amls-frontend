@@ -46,7 +46,7 @@ class ExpectedThroughputControllerSpec extends PlaySpec with OneServerPerSuite w
     "on get display the Expected throughput page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(None, Some(ExpectedThroughput("01"))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(None, Some(ExpectedThroughput.First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)

@@ -86,7 +86,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 }
 
 trait MoneyServiceBusinessTestData {
-  val completeModel = MoneyServiceBusiness(Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))), Some(ExpectedThroughput("02")))
+  val completeModel = MoneyServiceBusiness(Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))), Some(ExpectedThroughput.Second))
   val emptyModel = MoneyServiceBusiness(None)
 
   val completeJson = Json.obj(
