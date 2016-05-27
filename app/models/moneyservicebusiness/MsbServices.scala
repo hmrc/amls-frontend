@@ -25,6 +25,13 @@ object MsbService {
     case "04" => Success(ChequeCashingScrapMetal)
     case "05" => Failure(Seq(Path -> Seq(ValidationError("error.invalid"))))
   }
+
+  implicit val serviceFormW = Write[MsbService, String] {
+    case TransmittingMoney => "01"
+    case CurrencyExchange => "02"
+    case ChequeCashingNotScrapMetal => "03"
+    case ChequeCashingScrapMetal => "04"
+  }
 }
 
 object MsbServices {
@@ -65,8 +72,17 @@ object MsbServices {
         }
     }
 
-  implicit val formR: Rule[UrlFormEncoded, MsbServices] =
-    From[UrlFormEncoded] { __ =>
+  implicit def jsonW[A]
+  (implicit
+    write: Write[A, JsValue]
+  ): Writes[A] =
+    Writes {
+      a =>
+        write.writes(a)
+    }
+
+  implicit def formR[A]: Rule[A, MsbServices] =
+    From[A] { __ =>
 
       import utils.MappingUtils.Implicits._
 
@@ -76,47 +92,53 @@ object MsbServices {
       (__ \ "msbServices").read(required) fmap MsbServices.apply
     }
 
-  implicit val formW = Write[MsbServices, UrlFormEncoded] {
-    case MsbServices(services) =>
-      Map(
-        "msbServices[]" -> services.toSeq.map {
-          case TransmittingMoney => "01"
-          case CurrencyExchange => "02"
-          case ChequeCashingNotScrapMetal => "03"
-          case ChequeCashingScrapMetal => "04"
-        }
-      )
-  }
+  implicit def formW[A]: Write[MsbServices, A] =
+    To[A] { __ =>
+      import play.api.libs.functional.syntax.unlift
+      (__ \ "msbServices").write[Set[MsbService]] contramap unlift(MsbServices.unapply)
+    }
 
-  implicit val jsonReads : Reads[MsbServices] = {
-    import play.api.libs.json._
+//  implicit val formW = Write[MsbServices, UrlFormEncoded] {
+//    case MsbServices(services) =>
+//      Map(
+//        "msbServices[]" -> services.toSeq.map {
+//          case TransmittingMoney => "01"
+//          case CurrencyExchange => "02"
+//          case ChequeCashingNotScrapMetal => "03"
+//          case ChequeCashingScrapMetal => "04"
+//        }
+//      )
+//  }
 
-    (__ \ "msbServices").read[Set[String]].flatMap[Set[MsbService]] { strs : Set[String] =>
-      strs.map {
-        case "01" => Reads(_ => JsSuccess(TransmittingMoney)) map identity[MsbService]
-        case "02" => Reads(_ => JsSuccess(CurrencyExchange)) map identity[MsbService]
-        case "03" => Reads(_ => JsSuccess(ChequeCashingNotScrapMetal)) map identity[MsbService]
-        case "04" => Reads(_ => JsSuccess(ChequeCashingScrapMetal)) map identity[MsbService]
-        case _ => Reads(_ => JsError(__ \ "msbServices", ValidationError("error.invalid")))
-      }.foldLeft[Reads[Set[MsbService]]](Reads[Set[MsbService]](_ => JsSuccess(Set.empty[MsbService]))
-      ){
-        (result, next) =>
-          next flatMap { service:MsbService =>
-            result.map { services =>
-              services + service
-            }
-          }
-      }
-    } map MsbServices.apply
-  }
+//  implicit val jsonReads : Reads[MsbServices] = {
+//    import play.api.libs.json._
+//
+//    (__ \ "msbServices").read[Set[String]].flatMap[Set[MsbService]] { strs : Set[String] =>
+//      strs.map {
+//        case "01" => Reads(_ => JsSuccess(TransmittingMoney)) map identity[MsbService]
+//        case "02" => Reads(_ => JsSuccess(CurrencyExchange)) map identity[MsbService]
+//        case "03" => Reads(_ => JsSuccess(ChequeCashingNotScrapMetal)) map identity[MsbService]
+//        case "04" => Reads(_ => JsSuccess(ChequeCashingScrapMetal)) map identity[MsbService]
+//        case _ => Reads(_ => JsError(__ \ "msbServices", ValidationError("error.invalid")))
+//      }.foldLeft[Reads[Set[MsbService]]](Reads[Set[MsbService]](_ => JsSuccess(Set.empty[MsbService]))
+//      ){
+//        (result, next) =>
+//          next flatMap { service:MsbService =>
+//            result.map { services =>
+//              services + service
+//            }
+//          }
+//      }
+//    } map MsbServices.apply
+//  }
 
-  implicit val jsonWrites : Writes[MsbServices] = Writes { msbServices: MsbServices =>
-    Json.obj("msbServices" -> msbServices.services.map {
-      case TransmittingMoney => "01"
-      case CurrencyExchange => "02"
-      case ChequeCashingNotScrapMetal => "03"
-      case ChequeCashingScrapMetal => "04"
-    })
-  }
+//  implicit val jsonWrites : Writes[MsbServices] = Writes { msbServices: MsbServices =>
+//    Json.obj("msbServices" -> msbServices.services.map {
+//      case TransmittingMoney => "01"
+//      case CurrencyExchange => "02"
+//      case ChequeCashingNotScrapMetal => "03"
+//      case ChequeCashingScrapMetal => "04"
+//    })
+//  }
 }
 
