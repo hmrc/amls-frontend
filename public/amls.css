@@ -195,7 +195,7 @@ div.grid-layout {
 }
 .panel-wide {
   border-left : solid 10px #bfc1c3;
-  padding : 15px;
+  /*padding : 15px;*/
 }
 .bevel-container {
   margin : 40px 0 0 40px;
