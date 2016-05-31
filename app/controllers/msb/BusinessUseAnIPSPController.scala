@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.{BusinessUseAnIPSP, MoneyServiceBusiness, ExpectedThroughput}
+import views.html.msb.business_use_an_ipsp
 
 import scala.concurrent.Future
 
