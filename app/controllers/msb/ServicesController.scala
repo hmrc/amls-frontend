@@ -15,40 +15,32 @@ trait ServicesController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
+      cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        response =>
 
-      import play.api.data.mapping.forms.Writes._
+          val form = (for {
+            msb <- response
+            services <- msb.msbServices
+          } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
 
-//      cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-//        response =>
-//
-//          val form = (for {
-//            msb <- response
-//            services <- msb.msbServices
-//          } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
-//
-//          Ok(views.html.msb.services(form, edit))
-//      }
-
-      Future.successful(Ok("foo"))
+          Ok(views.html.msb.services(form, edit))
+      }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-
-      Future.successful(Ok("foo"))
-
-//      Form2[MsbServices](request.body) match {
-//        case f: InvalidForm =>
-//          Future.successful(BadRequest(views.html.msb.services(f, edit)))
-//        case ValidForm(_, data) =>
-//          for {
-//            msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-//            _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-//              msb.msbServices(data)
-//            )
-//              // TODO: Go to next page
-//          } yield Redirect(routes.ServicesController.get())
-//      }
+      Form2[MsbServices](request.body) match {
+        case f: InvalidForm =>
+          Future.successful(BadRequest(views.html.msb.services(f, edit)))
+        case ValidForm(_, data) =>
+          for {
+            msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+              msb.msbServices(data)
+            )
+              // TODO: Go to next page
+          } yield Redirect(routes.ServicesController.get())
+      }
   }
 }
 
