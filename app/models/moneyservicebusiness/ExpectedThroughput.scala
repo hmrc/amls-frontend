@@ -22,7 +22,6 @@ object ExpectedThroughput {
 
   implicit val formRule: Rule[UrlFormEncoded, ExpectedThroughput] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    import models.FormTypes._
     (__ \ "throughput").read[String].withMessage("error.required.msb.throughput") flatMap {
       case "01" => First
       case "02" => Second
