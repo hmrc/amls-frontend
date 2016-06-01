@@ -1,9 +1,6 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import models.businessactivities.ExpectedAMLSTurnover.First
-import models.businessactivities._
-import models.businessmatching.{BusinessActivities => activities}
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -61,10 +58,10 @@ class ExpectedThroughputControllerSpec extends PlaySpec with OneServerPerSuite w
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -78,10 +75,10 @@ class ExpectedThroughputControllerSpec extends PlaySpec with OneServerPerSuite w
         "throughput" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -95,10 +92,10 @@ class ExpectedThroughputControllerSpec extends PlaySpec with OneServerPerSuite w
         "throughput" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
