@@ -1,0 +1,28 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+
+@main(
+    title = Messages("msb.throughput.title")
+) {
+
+    @heading("msb.throughput.title", "summary.msb")
+
+    @form(f, controllers.msb.routes.ExpectedThroughputController.post(edit)) {
+
+        @radioGroup(f("throughput")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("throughput"), "msb.throughput.lbl.01", "01")
+            @radio(f("throughput"), "msb.throughput.lbl.02", "02")
+            @radio(f("throughput"), "msb.throughput.lbl.03", "03")
+            @radio(f("throughput"), "msb.throughput.lbl.04", "04")
+            @radio(f("throughput"), "msb.throughput.lbl.05", "05")
+            @radio(f("throughput"), "msb.throughput.lbl.06", "06")
+            @radio(f("throughput"), "msb.throughput.lbl.07", "07")
+
+        }
+        @submit(edit)
+    }
+}
