@@ -6,7 +6,7 @@ import models.moneyservicebusiness.{BusinessUseAnIPSPYes, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -14,7 +14,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class BusinessUseAnIPSPControllerSpec  extends PlaySpec {
+class BusinessUseAnIPSPControllerSpec  extends PlaySpec with OneServerPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -36,7 +36,7 @@ class BusinessUseAnIPSPControllerSpec  extends PlaySpec {
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.throughput.title"))
+      contentAsString(result) must include(Messages("msb.ipsp.title"))
     }
 
     "on get display the Business Use An IPSP page with pre populated data" in new Fixture {
@@ -48,7 +48,7 @@ class BusinessUseAnIPSPControllerSpec  extends PlaySpec {
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
+      document.select("input[value=true]").hasAttr("checked") must be(true)
     }
 
 
@@ -65,7 +65,7 @@ class BusinessUseAnIPSPControllerSpec  extends PlaySpec {
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.msb.throughput"))
+      contentAsString(result) must include (Messages("error.required.msb.ipsp"))
     }
 
     "on post with valid data" in new Fixture {
