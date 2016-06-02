@@ -4,7 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{MoneyServiceBusiness, MsbServices}
+import models.moneyservicebusiness.{CurrencyExchange, MoneyServiceBusiness, MsbServices, TransmittingMoney}
+import play.api.mvc.Call
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -27,6 +28,17 @@ trait ServicesController extends BaseController {
       }
   }
 
+  // TODO: Correct the routing here once pages exist
+  private def route(services: Option[MsbServices], newServices: MsbServices): Call =
+    (newServices.services -- services.map(_.services).getOrElse(Set.empty)) match {
+      case w if w.contains(TransmittingMoney) =>
+        routes.ServicesController.get()
+      case w if w.contains(CurrencyExchange) =>
+        routes.ServicesController.get()
+      case _ =>
+        routes.ServicesController.get()
+    }
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[MsbServices](request.body) match {
@@ -35,11 +47,16 @@ trait ServicesController extends BaseController {
         case ValidForm(_, data) =>
           for {
             msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+             _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.msbServices(data)
             )
               // TODO: Go to next page
-          } yield Redirect(routes.ServicesController.get())
+          } yield edit match {
+            case false =>
+              Redirect(routes.ServicesController.get())
+            case true =>
+              Redirect(route(msb.msbServices, data))
+          }
       }
   }
 }
