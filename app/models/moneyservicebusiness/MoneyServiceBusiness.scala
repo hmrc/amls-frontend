@@ -9,7 +9,7 @@ case class MoneyServiceBusiness(
                                  msbServices : Option[MsbServices] = None,
                                  throughput : Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
-                                 fundsTransfer : Option[fundsTransfer] = None
+                                 fundsTransfer : Option[FundsTransfer] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -21,7 +21,7 @@ case class MoneyServiceBusiness(
   def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
     this.copy(businessUseAnIPSP = Some(p))
 
-  def fundsTransfer(p: fundsTransfer): MoneyServiceBusiness =
+  def FundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
     this.copy(fundsTransfer = Some(p))
 
   def isComplete: Boolean = this match {
