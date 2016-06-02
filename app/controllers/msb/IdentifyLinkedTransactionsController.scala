@@ -20,8 +20,8 @@ trait IdentifyLinkedTransactionsController extends BaseController {
        response =>
          val form: Form2[IdentifyLinkedTransactions] = (for {
            msb <- response
-           accountant <- msb.identifyLinkedTransactions
-         } yield Form2[IdentifyLinkedTransactions](accountant)).getOrElse(EmptyForm)
+           transactions <- msb.identifyLinkedTransactions
+         } yield Form2[IdentifyLinkedTransactions](transactions)).getOrElse(EmptyForm)
          Ok(identify_linked_transactions(form, edit))
      }
   }
