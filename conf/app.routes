@@ -31,6 +31,9 @@ POST        /business-details/new-registered-office                     controll
 GET         /business-details/correspondence-address                    controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
 POST        /business-details/correspondence-address                    controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
 
+GET         /about-the-business/activities                              controllers.aboutthebusiness.ActivityStartDateController.get(edit: Boolean ?= false)
+POST        /about-the-business/activities                              controllers.aboutthebusiness.ActivityStartDateController.post(edit: Boolean ?= false)
+
 GET         /business-details/index                                     controllers.aboutthebusiness.WhatYouNeedController.get()
 
 GET         /business-details/summary                                   controllers.aboutthebusiness.SummaryController.get()
@@ -223,3 +226,11 @@ GET         /supervision/check-your-answers                             controll
 GET         /money-service-business/what-you-need                       controllers.msb.WhatYouNeedController.get()
 GET         /money-service-business/services                            controllers.msb.ServicesController.get(edit: Boolean ?= false)
 POST        /money-service-business/services                            controllers.msb.ServicesController.post(edit: Boolean ?= false)
+
+GET         /money-service-business/check-your-answers                  controllers.msb.SummaryController.get()
+
+GET         /money-service-business/anticipated-totals                  controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
+POST        /money-service-business/anticipated-totals                  controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
+
+GET         /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
+POST        /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)

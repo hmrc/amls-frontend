@@ -1,6 +1,5 @@
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.aboutthebusiness._
 import org.mockito.Matchers._
@@ -8,7 +7,6 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 
@@ -27,7 +25,7 @@ class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSu
   }
 
   private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "CA3 9ST")
-  private val aboutTheBusiness = AboutTheBusiness(None, None, None, None, Some(ukAddress), None)
+  private val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None)
 
   "ConfirmRegisteredOfficeController" must {
 

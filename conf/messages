@@ -195,6 +195,12 @@ error.invalid.supervision.business.details = You can''t enter more than 255 char
 
 #### Money Services Business ####
 error.required.msb.services = Select at least one service that your business provides
+error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
+error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
+error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
+error.invalid.msb.ipsp.name = You can''t enter more than 140 characters.
+error.required.msb.ipsp.reference = Enter a valid Intermediary Payment Service Provider's anti-money laundering registration number. It must be up to 15 characters, and can only be numbers.
+
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -387,11 +393,14 @@ aboutthebusiness.correspondenceaddress.country = Country
 aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision?
 aboutthebusiness.registeredformlr.lbl = This only refers to registration with HMRC
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulation registration number
+aboutthebusiness.registeredformlr.taxReferenceHint = For example: 12345678
 aboutthebusiness.confirmingyouraddress.title = Is this your registered office or main place of business?
 aboutthebusiness.registeredoffice.title = Where is your registered office or main place of business?
 aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
+aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision?
+aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
 
 tradingpremises.whatyouneed.title=Trading premises - What you need
 tradingpremises.whatyouneed.heading=What you need
@@ -495,6 +504,16 @@ businessmatching.registerservices.servicename.lbl.04=High value dealing
 businessmatching.registerservices.servicename.lbl.05=Money service business
 businessmatching.registerservices.servicename.lbl.06=Trust and company services
 businessmatching.registerservices.servicename.lbl.07=Telephone, digital and IT payment services
+businessmatching.registerservices.servicename.details.01=‘Accountancy Service Providers’ provide professional bookkeeping services, accounts preparation and signing, or tax advice.
+businessmatching.registerservices.servicename.details.01.anchor=More information about Accountancy Service Providers.
+businessmatching.registerservices.servicename.details.02=‘Estate Agent Businesses’ introduce people who want to buy or sell property, and facilitate the purchase or sale of property.
+businessmatching.registerservices.servicename.details.02.anchor=More information about Estate Agent Businesses.
+businessmatching.registerservices.servicename.details.03=‘High Value Dealers’ accept cash payments of €15,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as High Value Dealers.
+businessmatching.registerservices.servicename.details.03.anchor=More information about High Value Dealers.
+businessmatching.registerservices.servicename.details.04=‘Money Service Businesses’ exchange currency, transmit money, or cash cheques for their customers.
+businessmatching.registerservices.servicename.details.04.anchor=More information about Money Service Businesses.
+businessmatching.registerservices.servicename.details.05=‘Trust or Company Service Providers’ form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role within a company.
+businessmatching.registerservices.servicename.details.05.anchor=More information about Trust or Company Service Providers.
 businessmatching.registrationnumber.title=Business matching - What''s your company registration number?
 businessmatching.registrationnumber.heading=What''s your company registration number?
 businessmatching.registrationnumber.example=For example: A1234567.
@@ -889,3 +908,23 @@ msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
+msb.throughput.title = How much throughput do you expect in the next 12 months?
+msb.throughput.lbl.01 = £0 to £99,999
+msb.throughput.lbl.02 = £100,000 to £499,999
+msb.throughput.lbl.03 = £500,000 to £999,999
+msb.throughput.lbl.04 = £1 million to £20 million
+msb.throughput.lbl.05 = £21 million to £100 million
+msb.throughput.lbl.06 = £101 million to £1 billion
+msb.throughput.lbl.07 = More than £1 billion
+
+msb.ipsp.title = Does your business use an Intermediary Payment Service Provider?
+msb.ipsp.text = An Intermediary Payment Service Provider is involved in the transfer of funds, but isn't the Payment Service Provider for the payer or the payee.
+msb.ipsp.name.lbl = Intermediary Payment Service Provider's name
+msb.ipsp.referenceNumber.lbl= Intermediary Payment Service Provider's HM Revenue and Customs registration number
+
+
+
+
+
+

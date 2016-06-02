@@ -77,7 +77,7 @@ class PreviouslyRegisteredControllerSpec extends PlaySpec with OneServerPerSuite
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.VATRegisteredController.get().url))
+      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ActivityStartDateController.get().url))
     }
 
     "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
