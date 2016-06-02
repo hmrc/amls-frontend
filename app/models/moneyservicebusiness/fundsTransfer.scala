@@ -4,7 +4,7 @@ import play.api.data.mapping.forms._
 import play.api.data.mapping.{From, Rule, Write}
 import play.api.libs.json.Json
 
-case class fundsTransfer(transferWithoutFormalSystems: Boolean)
+case class fundsTransfer(transferWithoutFormalSystems : Boolean)
 
 object fundsTransfer {
 
