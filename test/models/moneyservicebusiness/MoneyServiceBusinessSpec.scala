@@ -86,8 +86,15 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 }
 
 trait MoneyServiceBusinessTestData {
-  val completeModel = MoneyServiceBusiness(Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))), Some(ExpectedThroughput.Second),
-    Some(BusinessUseAnIPSPYes("name" ,"123456789123456")))
+  private val msbService = MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))
+  private val businessUseAnIPSP = BusinessUseAnIPSPYes("name" ,"123456789123456")
+
+  val completeModel = MoneyServiceBusiness(Some(msbService),
+    Some(ExpectedThroughput.Second),
+    Some(businessUseAnIPSP),
+    Some(IdentifyLinkedTransactions(true))
+  )
+
   val emptyModel = MoneyServiceBusiness(None)
 
   val completeJson = Json.obj(
@@ -97,7 +104,8 @@ trait MoneyServiceBusinessTestData {
     "throughput" -> Json.obj("throughput" -> "02"),
     "businessUseAnIPSP" -> Json.obj("useAnIPSP" -> true,
                                     "name" -> "name",
-                                    "referenceNumber" -> "123456789123456")
+                                    "referenceNumber" -> "123456789123456"),
+    "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true)
 
   )
 
