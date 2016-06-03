@@ -36,7 +36,7 @@ trait ServicesController extends BaseController {
       case w if w.contains(CurrencyExchange) =>
         routes.ServicesController.get()
       case _ =>
-        routes.ServicesController.get()
+        routes.SummaryController.get()
     }
 
   def post(edit: Boolean = false) = Authorised.async {

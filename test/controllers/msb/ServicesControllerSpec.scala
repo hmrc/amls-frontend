@@ -212,7 +212,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
 
           status(result) mustBe SEE_OTHER
           // TODO redirect to the Check Your Answers page when it is built
-          redirectLocation(result) mustBe Some(routes.ServicesController.get().url)
+          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
       }
     }
   }
