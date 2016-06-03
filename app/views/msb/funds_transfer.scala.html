@@ -1,0 +1,19 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@main(
+    title = Messages("msb.fundstransfer.title")
+) {
+
+    @heading("msb.fundstransfer.title", "summary.msb")
+
+    @form(f, controllers.msb.routes.FundsTransferController.post(edit)) {
+        @inlineRadioGroup(f("fundstransfer")) {
+            @legend("msb.fundstransfer.hint", jsHidden = true)
+            @radio(f("fundstransfer"), "lbl.yes", "true")
+            @radio(f("fundstransfer"), "lbl.no", "false")
+        }
+        @submit()
+    }
+}

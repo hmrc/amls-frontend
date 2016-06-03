@@ -915,8 +915,9 @@ msb.ipsp.text = An Intermediary Payment Service Provider is involved in the tran
 msb.ipsp.name.lbl = Intermediary Payment Service Provider's name
 msb.ipsp.referenceNumber.lbl= Intermediary Payment Service Provider's HM Revenue and Customs registration number
 
-
-
+msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?
+msb.fundstransfer.heading = Do you transfer money without using formal banking systems?
+msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
 
 
 
