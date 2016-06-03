@@ -193,7 +193,8 @@ error.required.supervision.one.professional.body = Select at least one professio
 error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can''t enter more than 255 characters the name of the professional body.
 
-#### Money Service Business ####
+#### Money Services Business ####
+error.required.msb.services = Select at least one service that your business provides
 error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
 error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
 error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
@@ -899,6 +900,14 @@ msb.whatyouneed.possiblerequiredinfo.line_3 = your Intermediary Payment Service 
 msb.whatyouneed.possiblerequiredinfo.line_4 = your Intermediary Payment Service Provider’s HM Revenue and Customs registration number
 msb.whatyouneed.possiblerequiredinfo.line_5 = where you expect to send the largest amounts of money
 msb.whatyouneed.possiblerequiredinfo.line_6 = where you expect to send the greatest number of money transfers
+
+msb.services.title = Money Service Business – Which services does your business provide?
+msb.services.heading = Which services does your business provide?
+msb.services.list.heading = Select all that apply
+msb.services.list.lbl.01 = Transmitting money
+msb.services.list.lbl.02 = Currency exchange
+msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
 msb.throughput.title = How much throughput do you expect in the next 12 months?
 msb.throughput.lbl.01 = £0 to £99,999
