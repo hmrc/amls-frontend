@@ -21,7 +21,7 @@ case class MoneyServiceBusiness(
   def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
     this.copy(businessUseAnIPSP = Some(p))
 
-  def FundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
+  def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
     this.copy(fundsTransfer = Some(p))
 
   def isComplete: Boolean = this match {

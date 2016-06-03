@@ -3,10 +3,10 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 @main(
-    title = Messages("msb.fundstransfer.title")
+    title = Messages("msb.fundstransfer.heading")
 ) {
 
-    @heading("msb.fundstransfer.title", "summary.msb")
+    @heading("msb.fundstransfer.heading", "summary.msb")
 
     @form(f, controllers.msb.routes.FundsTransferController.post(edit)) {
         @inlineRadioGroup(f("fundstransfer")) {

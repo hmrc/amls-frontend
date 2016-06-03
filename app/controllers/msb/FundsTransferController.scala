@@ -1,5 +1,6 @@
 package controllers.msb
 
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -10,11 +11,11 @@ import scala.concurrent.Future
 
 trait FundsTransferController extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+  def dataCache: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
           val form: Form2[FundsTransfer] = (for {
             moneyServiceBusiness <- response
@@ -31,8 +32,8 @@ trait FundsTransferController extends BaseController {
           Future.successful(BadRequest(funds_transfer(f, edit)))
         case ValidForm(_, data) =>
           for {
-            moneyServiceBusiness <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+            moneyServiceBusiness <- dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            _ <- dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               moneyServiceBusiness.fundsTransfer(data)
             )
           } yield edit match {
@@ -44,4 +45,10 @@ trait FundsTransferController extends BaseController {
 
       }
   }
+}
+
+object FundsTransferController extends FundsTransferController {
+  // $COVERAGE-OFF$
+  override val dataCache = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
 }
