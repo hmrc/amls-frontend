@@ -208,6 +208,7 @@ button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
 button.delete = Delete
+button.payfee = Pay fee
 
 missing.personName = Name Unknown
 missing.dataItem = Unknown
@@ -295,7 +296,7 @@ progress.declarationunavailable = You can't finish the registration until you've
 #### Confirmation page ####
 confirmation.lede = You have submitted the registration.
 confirmation.thankyou = Thank you for registering online.
-confirmation.thankyou.p = We cannot currently receive payments. HM Revenue and Customs will contact you within 4 weeks to arrange payment for the registration fee. This does not affect your registration for anti-money laundering supervision.
+confirmation.thankyou.p = You now have 30 days to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
 confirmation.fee = Your registration fee:
 confirmation.breakdown = How your registration fee has been calculated:
 confirmation.sidebar.code = Confirmation code: {0}
@@ -306,7 +307,11 @@ confirmation.feeperitem = Fee per item
 confirmation.totalfee = Total fee
 confirmation.registrationfee = Registration fee
 confirmation.submission = Application submission
-confirmation.tradingpremises = Trading Premises
+confirmation.tradingpremises = Trading premises
+confirmation.responsiblepeople = Responsible people
+confirmation.whathappensnext.heading = What happens next
+confirmation.whathappensnext.p.1 = You will receive an email from HM Revenue and Customs within 45 days of paying the registration fee.
+confirmation.whathappensnext.p.2 = When you receive the email, sign back in to this website to see if your application has been approved or rejected.
 
 #### Individual pages ####
 summary.title = Your AMLS registration

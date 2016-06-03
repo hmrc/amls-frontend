@@ -406,3 +406,8 @@ table.summary ul li {
 .panel-border-wide {
     border-left-width: 10px;
 }
+
+.reg-online--pay-fee .heading-xlarge {
+  display: block;
+  margin: 0;
+}

@@ -19,18 +19,21 @@
         <h1 class="heading-large">@Messages("confirmation.lede")</h1>
     </div>
 
-    <h2 class="heading-medium">@Messages("confirmation.thankyou")</h2>
-
     <p>@Messages("confirmation.thankyou.p")</p>
 
-    <div class="panel-wide form-group">
-        <div>@Messages("confirmation.fee")</div>
-        <span class="heading-xlarge">@total</span>
+    <div class="panel-indent panel-indent--gutter reg-online--pay-fee">
+        <p>
+          @Messages("confirmation.fee")
+          <span class="heading-xlarge">@total</span>
+        </p>
+        <p>
+          <a class="button" href="@controllers.routes.ConfirmationController.get()">
+            @Messages("button.payfee")
+          </a>
+        </p>
     </div>
 
-    <p>
-        @Messages("confirmation.breakdown")
-    </p>
+    <p>@Messages("confirmation.breakdown")</p>
 
     <table>
         <thead>
@@ -58,4 +61,8 @@
             </tr>
         </tbody>
     </table>
+
+    <h2 class="heading-medium">@Messages("confirmation.whathappensnext.heading")</h2>
+    <p>@Messages("confirmation.whathappensnext.p.1")</p>
+    <p>@Messages("confirmation.whathappensnext.p.2")</p>
 }
