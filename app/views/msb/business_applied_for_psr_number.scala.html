@@ -12,7 +12,7 @@
 )  {
         @heading("msb.psr.number.title", "summary.businessactivities")
 
-        @form(f, controllers.businessactivities.routes.BusinessFranchiseController.post(edit)) {
+        @form(f, controllers.msb.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
         @inlineRadioGroup(f("appliedFor")) {
             @legend("TODO", jsHidden = true)
