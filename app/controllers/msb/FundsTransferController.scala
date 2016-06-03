@@ -30,6 +30,18 @@ trait FundsTransferController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(funds_transfer(f, edit)))
         case ValidForm(_, data) =>
+          for {
+            moneyServiceBusiness <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+              moneyServiceBusiness.fundsTransfer(data)
+            )
+          } yield edit match {
+            //todo : Implement the correct redirects when relevant pages are available
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.SummaryController.get())
+
+          }
+
       }
   }
 }

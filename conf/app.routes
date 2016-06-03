@@ -232,3 +232,6 @@ POST        /money-service-business/anticipated-totals                  controll
 
 GET         /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
 POST        /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)
+
+GET         /money-service-business/funds-transfer                      controllers.msb.FundsTransferController.get(edit: Boolean ?= false)
+POST        /money-service-business/funds-transfer                      controllers.msb.FundsTransferController.post(edit: Boolean ?= false)
