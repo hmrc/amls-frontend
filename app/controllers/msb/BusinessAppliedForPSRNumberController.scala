@@ -19,8 +19,8 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
         response =>
           val form: Form2[BusinessAppliedForPSRNumber] = (for {
             msb <- response
-            businessFranchise <- msb.businessAppliedForPSRNumber
-          } yield Form2[BusinessAppliedForPSRNumber](businessFranchise)).getOrElse(EmptyForm)
+            number <- msb.businessAppliedForPSRNumber
+          } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
           Ok(business_applied_for_psr_number(form, edit))
       }
   }
