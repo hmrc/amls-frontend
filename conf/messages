@@ -193,6 +193,15 @@ error.required.supervision.one.professional.body = Select at least one professio
 error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can''t enter more than 255 characters the name of the professional body.
 
+#### Money Services Business ####
+error.required.msb.services = Select at least one service that your business provides
+error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
+error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
+error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
+error.invalid.msb.ipsp.name = You can''t enter more than 140 characters.
+error.required.msb.ipsp.reference = Enter a valid Intermediary Payment Service Provider's anti-money laundering registration number. It must be up to 15 characters, and can only be numbers.
+error.required.msb.linked.txn = Select yes or no to the question: can your systems identify linked transactions?
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
@@ -389,6 +398,7 @@ aboutthebusiness.correspondenceaddress.country = Country
 aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision?
 aboutthebusiness.registeredformlr.lbl = This only refers to registration with HMRC
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulations registration number
+aboutthebusiness.registeredformlr.taxReferenceHint = For example: 12345678
 aboutthebusiness.confirmingyouraddress.title = Is this your registered office or main place of business?
 aboutthebusiness.registeredoffice.title = Where is your registered office or main place of business?
 aboutthebusiness.registeredoffice.address.lbl = Address
@@ -909,4 +919,33 @@ msb.whatyouneed.possiblerequiredinfo.line_3 = your Intermediary Payment Service 
 msb.whatyouneed.possiblerequiredinfo.line_4 = your Intermediary Payment Service Provider’s HM Revenue and Customs registration number
 msb.whatyouneed.possiblerequiredinfo.line_5 = where you expect to send the largest amounts of money
 msb.whatyouneed.possiblerequiredinfo.line_6 = where you expect to send the greatest number of money transfers
+
+msb.services.title = Money Service Business – Which services does your business provide?
+msb.services.heading = Which services does your business provide?
+msb.services.list.heading = Select all that apply
+msb.services.list.lbl.01 = Transmitting money
+msb.services.list.lbl.02 = Currency exchange
+msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
+msb.throughput.title = How much throughput do you expect in the next 12 months?
+msb.throughput.lbl.01 = £0 to £99,999
+msb.throughput.lbl.02 = £100,000 to £499,999
+msb.throughput.lbl.03 = £500,000 to £999,999
+msb.throughput.lbl.04 = £1 million to £20 million
+msb.throughput.lbl.05 = £21 million to £100 million
+msb.throughput.lbl.06 = £101 million to £1 billion
+msb.throughput.lbl.07 = More than £1 billion
+
+msb.ipsp.title = Does your business use an Intermediary Payment Service Provider?
+msb.ipsp.text = An Intermediary Payment Service Provider is involved in the transfer of funds, but isn't the Payment Service Provider for the payer or the payee.
+msb.ipsp.name.lbl = Intermediary Payment Service Provider's name
+msb.ipsp.referenceNumber.lbl= Intermediary Payment Service Provider's HM Revenue and Customs registration number
+
+msb.linked.txn.title = Can your systems identify linked transactions?
+
+
+
+
+
 

@@ -4,7 +4,6 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
-import play.api.libs.json.{JsError, JsSuccess, Reads}
 import play.api.data.mapping.GenericRules
 
 import scala.collection.TraversableLike
@@ -41,6 +40,9 @@ trait MappingUtils {
     /*
    * Json reads implicits
    */
+
+    import play.api.libs.json.{Reads, JsSuccess, JsError}
+
     implicit def toReadsSuccess[A, B <: A](b: B): Reads[A] =
       Reads { _ => JsSuccess(b) }
 
@@ -61,6 +63,8 @@ trait MappingUtils {
   }
 
   object JsConstraints {
+
+    import play.api.libs.json.Reads
 
     import play.api.libs.json.Reads._
 
