@@ -6,18 +6,17 @@
 ) {
 
     @heading("bankdetails.whatyouneed.heading", "summary.bankdetails")
-    <div class="form-group">
-        <p>@Messages("bankdetails.whatyouneed.requiredinfo.heading")</p>
-    </div>
-    <div class="form-group">
-        <ul class="list-bullet">
-            <li class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_1")</li>
-            <li class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_2")</li>
-            <li class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_3")</li>
-            <li class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_4")</li>
-            <li class="no-padding no-margin">@Messages("bankdetails.whatyouneed.line_5")</li>
-        </ul>
-    </div>
+
+    <p>@Messages("bankdetails.whatyouneed.requiredinfo.heading")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("bankdetails.whatyouneed.line_1")</li>
+        <li>@Messages("bankdetails.whatyouneed.line_2")</li>
+        <li>@Messages("bankdetails.whatyouneed.line_3")</li>
+        <li>@Messages("bankdetails.whatyouneed.line_4")</li>
+        <li>@Messages("bankdetails.whatyouneed.line_5")</li>
+    </ul>
+
     <div class="form-group">
         <a id="what-you-need-continue" class="button" href="@controllers.bankdetails.routes.BankAccountTypeController.get(index)">@Messages("button.continue")</a>
     </div>

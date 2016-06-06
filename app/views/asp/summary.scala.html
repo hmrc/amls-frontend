@@ -9,10 +9,10 @@
 
     @heading("summary.checkyouranswers.title", "summary.asp")
     @model.services.map { a =>
-        <table>
+        <table class="table--spaced-top">
             <tr>
-                <th class="summary-title">@Messages("asp.services.title")</th>
-                <td colspan="2"><a href="@controllers.asp.routes.ServicesOfBusinessController.get(true)">@Messages("button.edit")</a></td>
+                <th>@Messages("asp.services.title")</th>
+                <td width="12"><a href="@controllers.asp.routes.ServicesOfBusinessController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             @a.services.map { line =>
             <tr>
@@ -27,13 +27,13 @@
                 </td>
             </tr>
             }
-
         </table>
     }
-    <table>
+
+    <table class="table--spaced-top">
         <tr>
-            <th class="summary-title">@Messages("asp.other.business.tax.matters.title")</th>
-            <td colspan="2"><a href="@controllers.asp.routes.OtherBusinessTaxMattersController.get(true)">@Messages("button.edit")</a></td>
+            <th>@Messages("asp.other.business.tax.matters.title")</th>
+            <td width="12"><a href="@controllers.asp.routes.OtherBusinessTaxMattersController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -54,7 +54,7 @@
             </tr>
             }
         }
-
     </table>
+
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

@@ -14,6 +14,8 @@ s"""${f("professionalBody").id}-fieldset"""
 
     @heading("supervision.penalisedbyprofessional.title", "summary.supervision")
 
+    <p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
+
     @form(f, controllers.supervision.routes.PenalisedByProfessionalController.post(edit)) {
 
         <ul class="list-bullet form-group">
@@ -29,7 +31,7 @@ s"""${f("professionalBody").id}-fieldset"""
                 @radio(f("penalised"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("penalised"), "lbl.no", "false")
                 @fieldset("TODO", jsHidden = true, id = target) {
-                    @input(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false)
+                    @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false)
                 }
             }
         </div>
