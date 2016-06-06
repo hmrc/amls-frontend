@@ -194,7 +194,7 @@ error.required.supervision.business.details = Enter the name of the professional
 error.invalid.supervision.business.details = You can''t enter more than 255 characters the name of the professional body.
 
 #### Money Services Business ####
-error.required.msb.services = Select at least one service that your business provides
+error.required.msb.services = Select at least one service that your business provides.
 error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
 error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
 error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
