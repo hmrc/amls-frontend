@@ -25,7 +25,7 @@
             id = s"""${f("postCode").id}-fieldset"""
         ) {
             <fieldset class="">
-                <legend class="form-label-bold">
+                <legend class="form-label">
                     @Messages("responsiblepeople.wherepersonlives.address")
                 </legend>
                 @input(f("addressLine1"))
@@ -61,6 +61,7 @@
             )
         }
 
+        @Messages("responsiblepeople.wherepersonlives.address_history")
         @radioGroup(f("timeAtAddress")) {
             @legend("responsiblepeople.wherepersonlives.address_history", jsHidden = true)
             @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
