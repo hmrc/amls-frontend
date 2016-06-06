@@ -9,7 +9,8 @@ case class MoneyServiceBusiness(
                                  msbServices : Option[MsbServices] = None,
                                  throughput : Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
-                                 identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None
+                                 identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
+                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -24,8 +25,11 @@ case class MoneyServiceBusiness(
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
     this.copy(identifyLinkedTransactions = Some(p))
 
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
+    this.copy(businessAppliedForPSRNumber = Some(p))
+
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_)) => true
+    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_)) => true
     case _ => false
   }
 }

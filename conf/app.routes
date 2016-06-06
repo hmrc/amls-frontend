@@ -237,3 +237,6 @@ POST        /money-service-business/payment-service-provider            controll
 
 GET         /money-service-business/transactions                        controllers.msb.IdentifyLinkedTransactionsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transactions                        controllers.msb.IdentifyLinkedTransactionsController.post(edit: Boolean ?= false)
+
+GET         /money-service-business/psr-registration                    controllers.msb.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
+POST        /money-service-business/psr-registration                    controllers.msb.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)

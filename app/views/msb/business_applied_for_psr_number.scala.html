@@ -1,0 +1,27 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@target = @{
+    s"""${f("regNumber").id}-fieldset"""
+}
+
+@main(
+   title = Messages("msb.psr.number.title")
+)  {
+        @heading("msb.psr.number.title", "summary.msb")
+
+        @form(f, controllers.msb.routes.BusinessAppliedForPSRNumberController.post(edit)) {
+
+        @inlineRadioGroup(f("appliedFor")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("appliedFor"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("appliedFor"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("regNumber"), "msb.psr.number.lbl", bold = false)
+            }
+        }
+        @submit(edit)
+   }
+}
