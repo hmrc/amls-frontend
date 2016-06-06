@@ -45,7 +45,7 @@ object MsbService {
   }
 }
 
-private object Cache {
+sealed trait MsbServices0 {
 
   import JsonMapping._
 
@@ -96,6 +96,8 @@ private object Cache {
 }
 
 object MsbServices {
+
+  private object Cache extends MsbServices0
 
   implicit val jsonR: Reads[MsbServices] = Cache.jsonR
   implicit val jsonW: Writes[MsbServices] = Cache.jsonW
