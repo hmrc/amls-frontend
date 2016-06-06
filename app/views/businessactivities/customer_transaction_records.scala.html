@@ -19,6 +19,10 @@
 
         @fieldset("TODO", jsHidden = true, id = s"""${f("transactions").id}-fieldset""") {
 
+        <span class="form-field">
+            @Messages("businessactivities.keep.customer.records.line1.text")
+        </span>
+
             @radioGroup(f("transactions")) {
                 @legend("businessactivities.do.keep.records", true, bold = true, "lbl.select.all")
                 @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.01", "01")

@@ -1,6 +1,5 @@
 package controllers.businessactivities
 
-
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
