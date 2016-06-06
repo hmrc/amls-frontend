@@ -925,8 +925,11 @@ msb.ipsp.referenceNumber.lbl= Intermediary Payment Service Provider's HM Revenue
 
 msb.linked.txn.title = Can your systems identify linked transactions?
 
-
-
-
+msb.branchesoragents.title = Money Service Business – Do you have branches or agents in other countries?
+msb.branchesoragents.heading = Do you have branches or agents in other countries?
+msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
+msb.branchesoragents.legend = Which countries?
+msb.branchesoragents.hint = List up to 10 countries
+msb.branchesoragents.add.btn = Add another country
 
 

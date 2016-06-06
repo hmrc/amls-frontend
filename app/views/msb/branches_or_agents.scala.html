@@ -10,7 +10,33 @@
 
     @heading("msb.branchesoragents.heading", "summary.msb")
 
+    <p>@Messages("msb.branchesoragents.intro")</p>
+
     @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
+
+        @inlineRadioGroup(f("branchesOrAgents")) {
+          @radio(f("branchesOrAgents"), "lbl.yes", "true", target = s"#${f("name").id}-fieldset")
+          @radio(f("branchesOrAgents"), "lbl.no", "false")
+          @fieldset("TODO", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
+            @legend("msb.branchesoragents.legend", jsHidden = false)
+            <p class="form-hint">@Messages("msb.branchesoragents.hint")</p>
+            <div data-add-remove
+                 data-max="10"
+                 data-can-delete="false"
+                 data-add-btn-text="@Messages("msb.branchesoragents.add.btn")"
+                 data-delete-btn-text="Delete me"
+                 data-template-item="data-template">
+              <ul class="add-remove__list" data-add-remove-list>
+                <li class="add-remove__item" data-add-remove-item data-template>
+                  <input name="branchesOrAgents[]"
+                         type="text"
+                         class="form-input input--medium"
+                         data-add-remove-input />
+                </li>
+              </ul>
+            </div>
+          }
+        }
 
         @submit(edit)
     }
