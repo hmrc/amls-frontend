@@ -1,8 +1,7 @@
-package controllers.msb
+package models.moneyservicebusiness
 
-import models.moneyservicebusiness.IdentifyLinkedTransactions
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 

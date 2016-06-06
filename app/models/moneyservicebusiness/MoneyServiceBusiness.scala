@@ -10,7 +10,8 @@ case class MoneyServiceBusiness(
                                  throughput : Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
-                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None
+                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -28,8 +29,11 @@ case class MoneyServiceBusiness(
   def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
     this.copy(businessAppliedForPSRNumber = Some(p))
 
+  def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
+    this.copy(sendMoneyToOtherCountry = Some(p))
+
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
     case _ => false
   }
 }
@@ -39,12 +43,12 @@ object MoneyServiceBusiness {
   val key = "msb"
 
   implicit val mongoKey = new MongoKey[MoneyServiceBusiness] {
-    def apply() = "msb"
+    def apply() = key
   }
 
   def section(implicit cache: CacheMap): Section = {
 
-    val messageKey = "msb"
+    val messageKey = key
 
     val notStarted = Section(messageKey, NotStarted, controllers.msb.routes.WhatYouNeedController.get())
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {

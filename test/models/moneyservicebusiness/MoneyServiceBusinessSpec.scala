@@ -93,8 +93,8 @@ trait MoneyServiceBusinessTestData {
     Some(ExpectedThroughput.Second),
     Some(businessUseAnIPSP),
     Some(IdentifyLinkedTransactions(true)),
-    Some(BusinessAppliedForPSRNumberYes("123456"))
-
+    Some(BusinessAppliedForPSRNumberYes("123456")),
+    Some(SendMoneyToOtherCountry(true))
   )
 
   val emptyModel = MoneyServiceBusiness(None)
@@ -109,7 +109,8 @@ trait MoneyServiceBusinessTestData {
                                     "referenceNumber" -> "123456789123456"),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
-                                      "regNumber" -> "123456")
+                                      "regNumber" -> "123456"),
+    "sendMoneyToOtherCountry" -> Json.obj("money" -> true)
 
   )
 
