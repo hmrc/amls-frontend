@@ -204,6 +204,8 @@ error.required.msb.linked.txn = Select yes or no to the question: can your syste
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
+error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
+error.invalid.msb.transactions.in.12months = You can''t enter more than 11 characters.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
