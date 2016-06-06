@@ -1,0 +1,17 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@main(
+    title = Messages("msb.branchesoragents.title")
+) {
+
+    @heading("msb.branchesoragents.heading", "summary.msb")
+
+    @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
+
+        @submit(edit)
+    }
+}

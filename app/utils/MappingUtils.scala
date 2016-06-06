@@ -9,13 +9,22 @@ import play.api.data.mapping.GenericRules
 import scala.collection.TraversableLike
 
 object TraversableValidators {
-   def minLength[T <: Traversable[_]](expectedLength : Int) : Rule[T, T] = {
-    GenericRules.validateWith[T]("error.required")(t => t.size >= expectedLength)}
+
+  def minLength[T <: Traversable[_]](l : Int) : Rule[T, T] =
+    GenericRules.validateWith[T]("error.required") {
+      _.size >= l
+    }
+
+  def maxLength[T <: Traversable[_]](l: Int): Rule[T, T] =
+    GenericRules.validateWith[T]("error.maxLength", l) {
+      _.size <= l
+    }
 }
 
 trait MappingUtils {
 
   object Implicits {
+
     /*
    * Basic wrapping conversions to make writing mappings easier
    * Would be nice to be able to write these in a more `functional`
