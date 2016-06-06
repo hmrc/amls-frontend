@@ -81,7 +81,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneServerPe
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessAppliedForPSRNumberController.get().url))
     }
 
     "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
