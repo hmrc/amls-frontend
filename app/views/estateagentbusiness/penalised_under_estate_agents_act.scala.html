@@ -32,7 +32,7 @@ title = Messages("estateagentbusiness.penalisedunderestateagentsact.title")
                 @radio(f("penalisedUnderEstateAgentsAct"), "lbl.no", "false")
 
                 @fieldset("TODO", jsHidden = true, id = target) {
-                    @input(f("penalisedUnderEstateAgentsActDetails"), "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl", bold = false)
+                    @textarea(f("penalisedUnderEstateAgentsActDetails"), "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl", hintText = "Enter 255 characters or less." ,bold = false)
                 }
             }
         </div>

@@ -10,6 +10,8 @@ title = Messages("businessactivities.accountantForAMLSRegulations.title")
 
 @heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
 
+<p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
+
 @form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
 
     @inlineRadioGroup(f("AccountantForAMLSRegulations")) {
