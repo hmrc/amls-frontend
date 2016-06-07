@@ -66,6 +66,9 @@ error.required.sa.registration = Select yes or no to the question: is this perso
 error.required.bm.register.service = Select at least one activity that you need to register.
 error.required.bm.registration.number = Enter the company registration number.
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
+error.required.bm.businesstype.type = Enter your type of business.
+error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
+
 
 ####  About the Business ####
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
@@ -497,7 +500,7 @@ estateagentbusiness.registered.redress.title = Is this business registered with 
 estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agent business and its customers.
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
-businessmatching.businessType.title = What''s your business structure?
+businessmatching.businessType.title = What’s your business structure?
 businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.02 = Sole proprietor
 businessmatching.businessType.lbl.03 = Partnership

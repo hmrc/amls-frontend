@@ -155,7 +155,7 @@ object FormTypes {
   val accountantRefNoType = notEmpty compose maxLength(minAccountantRefNoTypeLength) compose minLength(minAccountantRefNoTypeLength)
   val declarationNameType = notEmptyStrip compose notEmpty compose maxLength(maxNameTypeLength)
   val roleWithinBusinessOtherType = notEmptyStrip compose notEmpty compose maxLength(maxRoleWithinBusinessOtherType)
-  val typeOfBusinessType = notEmptyStrip compose notEmpty compose maxLength(maxTypeOfBusinessLength)
+  val typeOfBusinessType = notEmptyStrip compose notEmpty.withMessage("error.required.bm.businesstype.type") compose maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type")
 
   /** Personal Identification Rules **/
 
