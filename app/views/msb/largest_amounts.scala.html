@@ -1,10 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+@import include._
+@import forms2._
 
-</body>
-</html>
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+
+@main(
+    title = Messages("msb.send.money.title")
+) {
+
+    @heading("msb.send.money.title", "summary.msb")
+
+    @form(f, controllers.msb.routes.LargestAmountsController.post(edit)) {
+
+
+        @submit(edit)
+    }
+}

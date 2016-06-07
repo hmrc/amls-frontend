@@ -11,9 +11,9 @@ case class MoneyServiceBusiness(
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None
-                                 identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
-                                 branchesOrAgents: Option[BranchesOrAgents] = None
+                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+                                 branchesOrAgents: Option[BranchesOrAgents] = None,
+                                 mostTransactions: Option[MostTransactions] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -36,6 +36,9 @@ case class MoneyServiceBusiness(
 
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
     this.copy(sendMoneyToOtherCountry = Some(p))
+
+  def mostTransactions(p: MostTransactions): MoneyServiceBusiness =
+    this.copy(mostTransactions = Some(p))
 
   // TODO: Apply the actual logic here when we have the complete model
   def isComplete: Boolean = this match {
