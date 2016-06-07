@@ -952,6 +952,7 @@ msb.psr.number.title = Has your business applied for a Payment Systems Regulator
 msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
+msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
 
 
 

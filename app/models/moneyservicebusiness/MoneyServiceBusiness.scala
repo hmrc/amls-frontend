@@ -33,6 +33,9 @@ case class MoneyServiceBusiness(
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
     this.copy(sendMoneyToOtherCountry = Some(p))
 
+  def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
+    this.copy(transactionsInNext12Months = Some(p))
+
   def isComplete: Boolean = this match {
     case MoneyServiceBusiness(Some(MsbServices(services)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_))
       if services.contains(TransmittingMoney) | services.contains(CurrencyExchange) => true
