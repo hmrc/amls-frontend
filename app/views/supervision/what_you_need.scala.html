@@ -20,7 +20,7 @@
 
     <p>@Messages("supervision.whatyouneed.requiredinfo.heading")</p>
 
-    <ul class="list list-bullet">
+    <ul class="list list-bullet spacelarge">
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.1")</li>
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.2")</li>
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.3")</li>
@@ -28,8 +28,8 @@
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.5")</li>
     </ul>
 
-    <div class="form-field">
-        <a id="what-you-need-continue" class="button" href="@controllers.supervision.routes.AnotherBodyController.get()">
+    <div class="form-group">
+        <a class="button" href="@controllers.supervision.routes.AnotherBodyController.get()">
             @Messages("button.continue")
         </a>
     </div>

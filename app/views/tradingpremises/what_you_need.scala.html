@@ -12,7 +12,7 @@
 
     <p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
 
-    <ul class="list list-bullet">
+    <ul class="list list-bullet spacelarge">
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.1")</li>
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.2")</li>
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.3")</li>
@@ -25,13 +25,13 @@
 
     <p>@Messages("tradingpremises.whatyouneed.agentinfo.heading.sub")</p>
 
-    <ul class="list list-bullet">
+    <ul class="list list-bullet spacelarge">
         <li>@Messages("tradingpremises.whatyouneed.agentinfo.text.1")</li>
         <li>@Messages("tradingpremises.whatyouneed.agentinfo.text.3")</li>
     </ul>
 
-    <div class="form-field">
-        <a id="what-you-need-continue" class="button" href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
+    <div class="form-group">
+        <a class="button" href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
             @Messages("button.continue")
         </a>
     </div>
