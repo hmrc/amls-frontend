@@ -9,10 +9,10 @@
     @heading("msb.fundstransfer.heading", "summary.msb")
 
     @form(f, controllers.msb.routes.FundsTransferController.post(edit)) {
-        @inlineRadioGroup(f("fundstransfer")) {
+        @inlineRadioGroup(f("transferWithoutFormalSystems")) {
             @legend("msb.fundstransfer.hint", jsHidden = true)
-            @radio(f("fundstransfer"), "lbl.yes", "true")
-            @radio(f("fundstransfer"), "lbl.no", "false")
+            @radio(f("transferWithoutFormalSystems"), "lbl.yes", "true")
+            @radio(f("transferWithoutFormalSystems"), "lbl.no", "false")
         }
         @submit()
     }

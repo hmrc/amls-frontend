@@ -7,15 +7,15 @@ import play.api.libs.json.Json
 case class FundsTransfer(transferWithoutFormalSystems: Boolean)
 
 object FundsTransfer {
-  implicit val formats = Json.format[FundsTransfer]
 
+  implicit val formats = Json.format[FundsTransfer]
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, FundsTransfer] =
     From[UrlFormEncoded] { __ =>
-import play.api.data.mapping.forms.Rules._
-(__ \ "transferWithoutFormalSystems").read[Boolean].withMessage("error.required.msb.fundsTransfer") fmap FundsTransfer.apply
-}
+      import play.api.data.mapping.forms.Rules._
+      (__ \ "transferWithoutFormalSystems").read[Boolean].withMessage("error.required.msb.fundsTransfer") fmap FundsTransfer.apply
+      }
 
   implicit val formWrites: Write[FundsTransfer, UrlFormEncoded] =
     Write {

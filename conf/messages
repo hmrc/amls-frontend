@@ -199,7 +199,7 @@ error.required.msb.ipsp = Select yes or no to the question: does your business u
 error.required.msb.ipsp.name = Enter the name of the Intermediary Payment Service Provider.
 error.invalid.msb.ipsp.name = You can''t enter more than 140 characters.
 error.required.msb.ipsp.reference = Enter a valid Intermediary Payment Service Provider's anti-money laundering registration number. It must be up to 15 characters, and can only be numbers.
-error.required.msb.fundstransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
+error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 
 
 ########################################################################################################################
