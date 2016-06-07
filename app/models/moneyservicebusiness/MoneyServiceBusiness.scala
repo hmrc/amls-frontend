@@ -10,6 +10,9 @@ case class MoneyServiceBusiness(
                                  throughput : Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
+                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None
+                                 identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
                                  branchesOrAgents: Option[BranchesOrAgents] = None
                                ) {
 
@@ -28,6 +31,12 @@ case class MoneyServiceBusiness(
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
     this.copy(branchesOrAgents = Some(p))
 
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
+    this.copy(businessAppliedForPSRNumber = Some(p))
+
+  def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
+    this.copy(sendMoneyToOtherCountry = Some(p))
+
   // TODO: Apply the actual logic here when we have the complete model
   def isComplete: Boolean = this match {
     case m if m.productIterator.forall {
@@ -43,12 +52,12 @@ object MoneyServiceBusiness {
   val key = "msb"
 
   implicit val mongoKey = new MongoKey[MoneyServiceBusiness] {
-    def apply() = "msb"
+    def apply() = key
   }
 
   def section(implicit cache: CacheMap): Section = {
 
-    val messageKey = "msb"
+    val messageKey = key
 
     val notStarted = Section(messageKey, NotStarted, controllers.msb.routes.WhatYouNeedController.get())
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {

@@ -1,0 +1,22 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+
+@main(
+    title = Messages("msb.send.money.title")
+) {
+
+    @heading("msb.send.money.title", "summary.msb")
+
+    @form(f, controllers.msb.routes.SendMoneyToOtherCountryController.post(edit)) {
+
+        @inlineRadioGroup(f("money")) {
+        @legend("TODO", jsHidden = true)
+            @radio(f("money"), "lbl.yes", "true")
+            @radio(f("money"), "lbl.no", "false")
+        }
+        @submit(edit)
+    }
+}
