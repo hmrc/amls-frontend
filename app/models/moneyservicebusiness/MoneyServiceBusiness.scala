@@ -11,8 +11,9 @@ case class MoneyServiceBusiness(
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,                                
-                                 fundsTransfer : Option[FundsTransfer] = None
+                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+                                 fundsTransfer : Option[FundsTransfer] = None,
+                                 sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -35,8 +36,11 @@ case class MoneyServiceBusiness(
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
     this.copy(sendMoneyToOtherCountry = Some(p))
 
+  def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): MoneyServiceBusiness =
+    this.copy(sendTheLargestAmountsOfMoney = Some(p))
+
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
     case _ => false
   }
 }

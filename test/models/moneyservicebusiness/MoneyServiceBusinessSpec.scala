@@ -1,5 +1,6 @@
 package models.moneyservicebusiness
 
+import models.Country
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -92,6 +93,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 trait MoneyServiceBusinessTestData {
   private val msbService = MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))
   private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
+  private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
 
   val completeModel = MoneyServiceBusiness(Some(msbService),
     Some(ExpectedThroughput.Second),
@@ -99,7 +101,8 @@ trait MoneyServiceBusinessTestData {
     Some(IdentifyLinkedTransactions(true)),
     Some(BusinessAppliedForPSRNumberYes("123456")),
     Some(SendMoneyToOtherCountry(true)),
-    Some(FundsTransfer(true))
+    Some(FundsTransfer(true)),
+    Some(sendTheLargestAmountsOfMoney)
   )
 
     val emptyModel = MoneyServiceBusiness(None)
@@ -117,7 +120,8 @@ trait MoneyServiceBusinessTestData {
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
       "regNumber" -> "123456"),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
-    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true)
+    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
+    "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB")
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())
