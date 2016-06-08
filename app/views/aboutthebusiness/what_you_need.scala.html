@@ -1,8 +1,16 @@
 @import include._
 @()(implicit request: Request[_])
 
+@sidebar = {
+<div class="bevel-container">
+    <h3>@Messages("aboutthebusiness.sidebar.title")</h3>
+    <p>@Messages("aboutthebusiness.sidebar.information")</p>
+</div>
+}
+
 @main(
-    title = Messages("aboutthebusiness.whatyouneed.title")
+    title = Messages("aboutthebusiness.whatyouneed.title"),
+    sidebar = sidebar
 ) {
 
     @heading("aboutthebusiness.whatyouneed.heading", "summary.aboutbusiness")
