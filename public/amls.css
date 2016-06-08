@@ -112,6 +112,11 @@ div.grid-layout {
     margin : 0;
 }
 
+.panel-wide {
+  border-left : solid 10px #bfc1c3;
+}
+
+
 
 /* Registration Progress */
 .progress-submit {
@@ -193,10 +198,7 @@ div.grid-layout {
 .confirmation > h1 {
   margin : 0;
 }
-.panel-wide {
-  border-left : solid 10px #bfc1c3;
-  padding : 15px;
-}
+
 .bevel-container {
   margin : 40px 0 0 40px;
   padding : 15px;
@@ -293,12 +295,8 @@ form .inline .block-label {
 
 
 /* summary styles */
-.summary-title {
-    width : 88%;
-}
-table.summary {
-    font-size: 16px;
-}
+
+
 table.summary ul li {
     font-size: 16px;
     margin-bottom: 0;
@@ -393,16 +391,4 @@ table.summary ul li {
     width:100px;
     height:auto;
     overflow:hidden;
-}
-
-.no-padding {
-    padding-left: 0;
-}
-
-.no-margin {
-    margin-left: 0;
-}
-
-.panel-border-wide {
-    border-left-width: 10px;
 }
