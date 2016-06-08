@@ -116,8 +116,7 @@ trait MoneyServiceBusinessTestData {
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
       "regNumber" -> "123456"),
-    "sendMoneyToOtherCountry" -> Json.obj("money" -> true,
-      "referenceNumber" -> "123456789123456"),
+    "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true)
   )
 
