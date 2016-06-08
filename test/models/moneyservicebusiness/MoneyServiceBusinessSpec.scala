@@ -19,15 +19,15 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 
         "return a default version of MoneyServiceBusiness" in {
 
-          val res:MoneyServiceBusiness = None
-          res must be (emptyModel)
+          val res: MoneyServiceBusiness = None
+          res must be(emptyModel)
         }
       }
 
       "called with a concrete value" should {
         "return the value passed in extracted from the option" in {
-          val res:MoneyServiceBusiness = Some(completeModel)
-          res must be (completeModel)
+          val res: MoneyServiceBusiness = Some(completeModel)
+          res must be(completeModel)
         }
       }
     }
@@ -44,7 +44,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
       "model is empty" should {
         "return a NotStarted Section" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn None
-          MoneyServiceBusiness.section must be (Section(MoneyServiceBusiness.key, NotStarted, controllers.msb.routes.WhatYouNeedController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, NotStarted, controllers.msb.routes.WhatYouNeedController.get()))
         }
       }
 
@@ -52,22 +52,22 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
         "return a NotStarted Section" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(MoneyServiceBusiness(Some(MsbServices(
             Set(ChequeCashingScrapMetal)))))
-          MoneyServiceBusiness.section must be (Section(MoneyServiceBusiness.key, Started, controllers.msb.routes.WhatYouNeedController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Started, controllers.msb.routes.WhatYouNeedController.get()))
         }
       }
 
       "model is complete" should {
         "return a Completed Section" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeModel)
-          MoneyServiceBusiness.section must be (Section(MoneyServiceBusiness.key, Completed, controllers.msb.routes.SummaryController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, controllers.msb.routes.SummaryController.get()))
         }
       }
     }
 
     "have an isComplete function that" must {
 
-      "correctly show if the model is complete" in  {
-        completeModel.isComplete must be (true)
+      "correctly show if the model is complete" in {
+        completeModel.isComplete must be(true)
       }
 
       "correctly show if the model is complete and has TransactionsInNext12Months" in  {
@@ -75,16 +75,20 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
       }
 
       "correctly show if the model is incomplete" in {
-        emptyModel.isComplete must be (false)
+        emptyModel.isComplete must be(false)
       }
     }
 
     "Serialise to expected Json" when {
-      "model is complete" in {Json.toJson(completeModel) must be (completeJson)}
+      "model is complete" in {
+        Json.toJson(completeModel) must be(completeJson)
+      }
     }
 
     "Deserialise from Json as expected" when {
-      "model is complete" in {completeJson.as[MoneyServiceBusiness] must be (completeModel)}
+      "model is complete" in {
+        completeJson.as[MoneyServiceBusiness] must be(completeModel)
+      }
     }
   }
 }
@@ -100,6 +104,7 @@ trait MoneyServiceBusinessTestData {
     Some(IdentifyLinkedTransactions(true)),
     Some(BusinessAppliedForPSRNumberYes("123456")),
     Some(SendMoneyToOtherCountry(true)),
+    Some(FundsTransfer(true)),
     Some(TransactionsInNext12Months("12345678963"))
   )
 
@@ -108,24 +113,26 @@ trait MoneyServiceBusinessTestData {
     Some(businessUseAnIPSP),
     Some(IdentifyLinkedTransactions(true)),
     Some(BusinessAppliedForPSRNumberYes("123456")),
-    Some(SendMoneyToOtherCountry(true))
+    Some(SendMoneyToOtherCountry(true)),
+    Some(FundsTransfer(true))
   )
 
+    val emptyModel = MoneyServiceBusiness(None)
 
-  val emptyModel = MoneyServiceBusiness(None)
 
   val completeJson = Json.obj(
     "msbServices" -> Json.obj(
-    "msbServices" -> Json.arr("01", "03")
+      "msbServices" -> Json.arr("01", "03")
     ),
     "throughput" -> Json.obj("throughput" -> "02"),
     "businessUseAnIPSP" -> Json.obj("useAnIPSP" -> true,
-                                    "name" -> "name",
-                                    "referenceNumber" -> "123456789123456"),
+      "name" -> "name",
+      "referenceNumber" -> "123456789123456"),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
-                                      "regNumber" -> "123456"),
+      "regNumber" -> "123456"),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
+    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
     "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963")
   )
 

@@ -12,6 +12,7 @@ case class MoneyServiceBusiness(
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+                                 fundsTransfer : Option[FundsTransfer] = None,
                                  transactionsInNext12Months: Option[TransactionsInNext12Months] = None
                                ) {
 
@@ -26,6 +27,8 @@ case class MoneyServiceBusiness(
 
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
     this.copy(identifyLinkedTransactions = Some(p))
+  def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
+    this.copy(fundsTransfer = Some(p))
 
   def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
     this.copy(businessAppliedForPSRNumber = Some(p))
@@ -37,12 +40,11 @@ case class MoneyServiceBusiness(
     this.copy(transactionsInNext12Months = Some(p))
 
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(MsbServices(services)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_))
-      if services.contains(TransmittingMoney) | services.contains(CurrencyExchange) => true
-    case MoneyServiceBusiness(Some(MsbServices(services)), Some(_), Some(_), Some(_), Some(_), Some(_), None)
-      if services.contains(ChequeCashingNotScrapMetal) | services.contains(ChequeCashingScrapMetal) => true
+    case MoneyServiceBusiness(Some(MsbServices(services)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _)
+      => true
     case _ => false
   }
+
 }
 
 object MoneyServiceBusiness {
