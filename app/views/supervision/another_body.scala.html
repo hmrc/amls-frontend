@@ -13,11 +13,12 @@
 
     @heading("supervision.another_body.title", "summary.supervision")
 
+    <p>@Messages("supervision.another_body.description")</p>
 
     @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
 
         @inlineRadioGroup(f("anotherBody")) {
-            @legend("supervision.another_body.description")
+
             @radio(f("anotherBody"), "lbl.yes", "true", target = s"#$target")
             @radio(f("anotherBody"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {
