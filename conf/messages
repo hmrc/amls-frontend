@@ -207,6 +207,7 @@ error.required.msb.linked.txn = Select yes or no to the question: can your syste
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
+error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -963,8 +964,9 @@ msb.psr.number.lbl = Registration reference number
 msb.send.money.title = Do you send money to other countries?
 
 
-
-
+msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?
+msb.fundstransfer.heading = Do you transfer money without using formal banking systems?
+msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
 
 
 

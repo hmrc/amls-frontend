@@ -11,7 +11,8 @@ case class MoneyServiceBusiness(
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None
+                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,                                
+                                 fundsTransfer : Option[FundsTransfer] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -25,6 +26,8 @@ case class MoneyServiceBusiness(
 
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
     this.copy(identifyLinkedTransactions = Some(p))
+  def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
+    this.copy(fundsTransfer = Some(p))
 
   def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
     this.copy(businessAppliedForPSRNumber = Some(p))
@@ -33,7 +36,7 @@ case class MoneyServiceBusiness(
     this.copy(sendMoneyToOtherCountry = Some(p))
 
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
     case _ => false
   }
 }
