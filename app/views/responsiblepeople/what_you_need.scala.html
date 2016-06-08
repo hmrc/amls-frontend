@@ -9,7 +9,7 @@
 
     <p>@Messages("responsiblepeople.whatyouneed.requiredinfo")</p>
 
-    <ul class="list list-bullet">
+    <ul class="list list-bullet spacelarge">
         <li>@Messages("responsiblepeople.whatyouneed.line_1")</li>
         <li>@Messages("responsiblepeople.whatyouneed.line_2")</li>
         <li>@Messages("responsiblepeople.whatyouneed.line_3")</li>
@@ -20,7 +20,7 @@
 
     <p>@Messages("responsiblepeople.whatyouneed.possiblerequiredinfo")</p>
 
-    <ul class="list list-bullet">
+    <ul class="list list-bullet spacelarge">
         <li>@Messages("responsiblepeople.whatyouneed.line_7")</li>
         <li>@Messages("responsiblepeople.whatyouneed.line_8")</li>
         <li>@Messages("responsiblepeople.whatyouneed.line_9")</li>
@@ -28,7 +28,7 @@
     </ul>
 
     <div class="form-group">
-        <a id="what-you-need-continue" class="button" href="@controllers.responsiblepeople.routes.PersonNameController.get(index, false)">@Messages("button.continue")</a>
+        <a class="button" href="@controllers.responsiblepeople.routes.PersonNameController.get(index, false)">@Messages("button.continue")</a>
     </div>
 
 }

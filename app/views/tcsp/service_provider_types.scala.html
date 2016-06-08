@@ -9,10 +9,11 @@
 
     @heading("tcsp.kind.of.service.provider.title", "summary.tcsp")
 
+    <p>@Messages("lbl.select.all")</p>
+
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
             @radioGroup(f("transactions")) {
-                @legend("", true, bold = true, "lbl.select.all")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
@@ -31,7 +32,7 @@
                     }
                 }
             }
-        <br>
+
         @submit(false)
     }
 }

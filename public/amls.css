@@ -330,6 +330,7 @@ table.summary ul li {
     padding-left: 55px;
 }
 
+/* Using this until there is some space issues fixed within the front end assets */
 .spacelarge {
     margin-bottom: 30px;
 }
