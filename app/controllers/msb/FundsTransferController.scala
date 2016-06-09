@@ -25,7 +25,7 @@ trait FundsTransferController extends BaseController {
       }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[FundsTransfer](request.body) match {
         case f: InvalidForm =>
@@ -35,19 +35,14 @@ trait FundsTransferController extends BaseController {
             moneyServiceBusiness <- dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               moneyServiceBusiness.fundsTransfer(data))
-            msbServices <- moneyServiceBusiness.msbServices
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => {
-              msbServices.services.contains(TransmittingMoney) | msbServices.services.contains(CurrencyExchange) match {
-                case true => Redirect(routes.TransactionsInNext12MonthsController.get())
-                case false => Redirect(routes.SummaryController.get())
-              }
-            }
+            case false => Redirect(routes.TransactionsInNext12MonthsController.get())
           }
       }
   }
 }
+
 
 object FundsTransferController extends FundsTransferController {
   // $COVERAGE-OFF$

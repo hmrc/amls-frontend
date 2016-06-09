@@ -35,19 +35,10 @@ trait BusinessUseAnIPSPController extends BaseController {
             _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.businessUseAnIPSP(data))
 
-             msbServices <- msb.msbServices
-
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => {
-              msbServices.services.contains(TransmittingMoney) match {
-                case true => Redirect(routes.FundsTransferController.get())
-                case false => msbServices.services.contains(CurrencyExchange) match {
-                  case true => Redirect(routes.TransactionsInNext12MonthsController.get())
-                  case false => Redirect(routes.TransactionsInNext12MonthsController.get()) // TODO need to discuss with chloe
-                }
-              }
-            }
+            case false => Redirect(routes.SummaryController.get())
+
           }
       }
     }
