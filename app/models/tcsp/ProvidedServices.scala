@@ -7,7 +7,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import play.api.data.mapping.forms.Rules.{minLength => _, _}
-import utils.TraversableValidators.minLength
+import utils.TraversableValidators.minLengthR
 import play.api.i18n.{Messages, Lang}
 
 sealed trait TcspService {
@@ -58,7 +58,7 @@ object ProvidedServices {
                            notEmpty.withMessage("error.required.tcsp.provided_services.details") compose
                            maxLength(serviceDetailsMaxLength)
 
-  val serviceType = minLength[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")
+  val serviceType = minLengthR[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")
 
   implicit val formReads: Rule[UrlFormEncoded, ProvidedServices] =
     From[UrlFormEncoded] { __ =>

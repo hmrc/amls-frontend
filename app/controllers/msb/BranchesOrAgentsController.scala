@@ -31,7 +31,7 @@ trait BranchesOrAgentsController extends BaseController {
     implicit authContext => implicit request =>
       Form2[BranchesOrAgents](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.services(f, edit)))
+          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
         case ValidForm(_, data) =>
           for {
             msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)

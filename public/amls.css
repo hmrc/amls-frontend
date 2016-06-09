@@ -406,3 +406,10 @@ table.summary ul li {
 .panel-border-wide {
     border-left-width: 10px;
 }
+
+/* aiming to give desktop enough width for the longer names,
+ * but bring the mobile view into line with the radio buttons */
+.custom-combobox-input {
+  min-width: 16.5em;
+  width: 66%;
+}

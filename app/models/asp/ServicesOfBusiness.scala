@@ -69,7 +69,7 @@ object ServicesOfBusiness {
    p: Path => RuleLike[UrlFormEncoded, Set[Service]]
     ): Rule[UrlFormEncoded, ServicesOfBusiness] =
     From[UrlFormEncoded] { __ =>
-       (__ \ "services").read(minLength[Set[Service]](1).withMessage("error.required.asp.business.services")) fmap ServicesOfBusiness.apply
+       (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.asp.business.services")) fmap ServicesOfBusiness.apply
   }
 
   implicit def formWrites
