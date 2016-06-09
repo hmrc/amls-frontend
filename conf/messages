@@ -951,6 +951,8 @@ msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
 
+msb.most.transactions.title = Where do you expect to send the largest amounts of money?
+msb.most.transactions.list.countries = List up to 3 countries
 
 
 

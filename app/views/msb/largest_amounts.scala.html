@@ -3,15 +3,20 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
-
 @main(
-    title = Messages("msb.send.money.title")
+    title = Messages("msb.most.transactions.title")
 ) {
 
-    @heading("msb.send.money.title", "summary.msb")
+    @heading("msb.most.transactions.title", "summary.msb")
 
     @form(f, controllers.msb.routes.LargestAmountsController.post(edit)) {
 
+        @fieldset("msb.most.transactions.list.countries", panel = false) {
+
+            @country(f("country_1"))
+            @country(f("country_2"))
+            @country(f("country_3"))
+        }
 
         @submit(edit)
     }
