@@ -1,0 +1,35 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@main(
+  title = Messages("msb.services.title")
+) {
+
+  <h1>which currencies</h1>
+
+  @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
+    <h2>3 countries</h2>
+    <input type="text" name="currency" /> <br/>
+    <input type="text" name="currency" /> <br/>
+    <input type="text" name="currency" /> <br/>
+
+    <h2>sources</h2>
+
+    <input type="checkbox" name="bankSource" value="Yes"/> Banks <br/>
+    <div style="border-left:3px solid gray; margin-left:10px">
+      <input type="text" name="bankNames" />
+    </div>
+
+    <input type="checkbox" name="wholesalerSource" value="Yes"/> Wholsaler <br/>
+    <div style="border-left:3px solid gray; margin-left:10px">
+      <input type="text" name="wholesalerNames" />
+    </div>
+
+    <input type="checkbox" name="customerSource" value="Yes"/> Customer <br/>
+
+    @submit()
+  }
+}

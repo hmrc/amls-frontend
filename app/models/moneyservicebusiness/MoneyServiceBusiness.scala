@@ -9,7 +9,8 @@ case class MoneyServiceBusiness(
                                  msbServices : Option[MsbServices] = None,
                                  throughput : Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
-                                 identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None
+                                 identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
+                                 whichCurrencies : Option[WhichCurrencies] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -25,7 +26,7 @@ case class MoneyServiceBusiness(
     this.copy(identifyLinkedTransactions = Some(p))
 
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_)) => true
+    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _) => true
     case _ => false
   }
 }
@@ -39,7 +40,6 @@ object MoneyServiceBusiness {
   }
 
   def section(implicit cache: CacheMap): Section = {
-
     val messageKey = "msb"
 
     val notStarted = Section(messageKey, NotStarted, controllers.msb.routes.WhatYouNeedController.get())
