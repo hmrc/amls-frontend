@@ -11,7 +11,7 @@
 
     @form(f, controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.post(edit)) {
 
-        <span>
+        <span class="form-hint">
             @Messages("estateagentbusiness.registered.redress.text")
         </span>
         @inlineRadioGroup(f("isRedress")) {
@@ -21,7 +21,7 @@
         }
 
         @fieldset("TODO", jsHidden = true, id = s"""${f("propertyRedress").id}-fieldset""") {
-            <span class="form-label-bold">
+            <span class="form-label">
                 @Messages("estateagentbusiness.which.redress.scheme.lbl")
             </span>
             @radioGroup(f("propertyRedressScheme")) {
@@ -35,6 +35,7 @@
                 }
             }
         }
+
         @submit(edit)
     }
 }

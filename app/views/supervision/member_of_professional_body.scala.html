@@ -19,8 +19,8 @@
 
         @fieldset("TODO", jsHidden = true, id = s"""${f("businessType").id}-fieldset""") {
 
+            <p>@Messages("lbl.select.all")</p>
             @radioGroup(f("businessType")) {
-                @legend("", true, bold = true, "lbl.select.all")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
