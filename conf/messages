@@ -80,6 +80,7 @@ error.required.atb.registered.for.vat = Select yes or no to the question: is you
 error.required.atb.corporation.tax = Select yes or no to the question: is your business registered for Corporation Tax?
 error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
+error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
 
 ####  Business Activities ####
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
