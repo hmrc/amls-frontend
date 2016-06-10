@@ -21,7 +21,6 @@ $(function () {
 
         this.element.hide();
         this._createAutocomplete();
-        this._createShowAllButton();
       },
 
       _createAutocomplete: function() {
@@ -31,7 +30,6 @@ $(function () {
         this.input = $( '<input>' )
           .appendTo( this.wrapper )
           .val( value )
-          .attr( 'title', '' )
           .addClass( 'custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left' )
           .autocomplete({
             delay: 0,
@@ -45,36 +43,8 @@ $(function () {
             this._trigger( 'select', event, {
               item: ui.item.option
             });
-          },
-
-          autocompletechange: '_removeIfInvalid'
+          }
         });
-      },
-
-      _createShowAllButton: function() {
-        var input = this.input,
-          wasOpen = false;
-
-        $( '<a>' )
-          .attr( 'tabIndex', -1 )
-          .attr( 'title', 'Show All Items' )
-          .appendTo( this.wrapper )
-          .removeClass( 'ui-corner-all' )
-          .addClass( 'custom-combobox-toggle ui-corner-right' )
-          .mousedown(function() {
-            wasOpen = input.autocomplete( 'widget' ).is( ':visible' );
-          })
-          .click(function() {
-            input.focus();
-
-            // Close if already visible
-            if ( wasOpen ) {
-              return;
-            }
-
-            // Pass empty string as value to search for, displaying all results
-            input.autocomplete( 'search', '' );
-          });
       },
 
       _source: function( request, response ) {
@@ -88,56 +58,36 @@ $(function () {
               option: this
             };
         }) );
-      },
-
-      _removeIfInvalid: function( event, ui ) {
-
-        // Selected an item, nothing to do
-        if ( ui.item ) {
-          return;
-        }
-
-        // Search for a match (case-insensitive)
-        var value = this.input.val(),
-          valueLowerCase = value.toLowerCase(),
-          valid = false;
-        this.element.children( 'option' ).each(function() {
-          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
-            this.selected = valid = true;
-            return false;
-          }
-        });
-
-        // Found a match, nothing to do
-        if ( valid ) {
-          return;
-        }
-
-        // Remove invalid value
-        this.input
-          .val( '' )
-          .attr( 'title', value + ' didn’t match any item' );
-        this.element.val( '' );
-        this.input.autocomplete( 'instance' ).term = '';
-      },
-
-      _destroy: function() {
-        this.wrapper.remove();
-        this.element.show();
       }
     });
-
-    // $('.country-selector').selectToAutocomplete();
-
-    // $('*[data-add-btn]').click(function () {
-    //     $('select.country-selector').selectToAutocomplete();
-    // });
 
     $('select.country-selector').combobox();
 
     $('*[data-add-btn]').click(function () {
         $('select.country-selector').combobox();
     });
+
+    (function () {
+        $.widget('custom.addOne', {
+            _create: function () {
+                var $this = $(this.element);
+                var text = $this.data('add-one');
+                var children = $this.children();
+
+                children
+                    .filter(':not(:has(option[selected]))')
+                    .addClass('js-hidden');
+
+                var $button = $('<a href="#">' + text + '</a>').click(function (e) {
+                    e.preventDefault();
+                    $this.find('div.js-hidden:first').removeClass('js-hidden');
+                });
+
+                $this.append($button.hide().fadeIn(1000));
+            }
+        });
+        $('*[data-add-one]').addOne({});
+    })();
 
     (function () {
         var checkedInputs = 'input[type="checkbox"], input[type="radio"]';

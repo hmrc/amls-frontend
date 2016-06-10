@@ -1,4 +1,4 @@
-@import forms.Form2
+@import forms.{Form2, ValidField, InvalidField}
 @import include._
 @import include.forms2._
 
@@ -19,9 +19,18 @@
           @radio(f("hasCountries"), "lbl.no", "false")
           @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset") {
             <p class="form-hint">@Messages("msb.branchesoragents.hint")</p>
-            @addRemove(10, "msb.branchesoragents.add.btn") {
-              @country(f("countries[]"))
-            }
+            <div data-add-one="@Messages("msb.branchesoragents.add.btn")">
+              @for(i <- 0 to 10) {
+                @defining(
+                  f(s"countries[$i]")
+                ) { field =>
+                  @country(field, classes = field match {
+                      case f: ValidField => Seq("")
+                      case f: InvalidField => Seq("js-hidden")
+                    })
+                }
+              }
+            </div>
           }
         }
 

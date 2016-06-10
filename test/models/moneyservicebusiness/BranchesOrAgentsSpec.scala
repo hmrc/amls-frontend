@@ -6,7 +6,7 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 
-class ForeignBranchesSpec extends PlaySpec {
+class BranchesOrAgentsSpec extends PlaySpec {
 
   "MsbServices" must {
 
@@ -103,7 +103,8 @@ class ForeignBranchesSpec extends PlaySpec {
 
       val form: UrlFormEncoded = Map(
         "hasCountries" -> Seq("true"),
-        "countries[]" -> Seq("GB", "", "", "", "", "")
+        "countries[0]" -> Seq("GB"),
+        "countries[1]" -> Seq("")
       )
 
       rule.validate(form) mustBe Success(BranchesOrAgents(Some(Seq(
