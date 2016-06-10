@@ -225,7 +225,7 @@ button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
-button.delete = Delte
+button.delete = Delete
 
 missing.personName = Name Unknown
 missing.dataItem = Unknown
