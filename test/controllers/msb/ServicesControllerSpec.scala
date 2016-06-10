@@ -103,7 +103,6 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
-      val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe SEE_OTHER
       // TODO redirect to the how much throughput page when it is built
@@ -138,7 +137,6 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
-      val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe SEE_OTHER
       // TODO redirect to the money transmitting start page when it is built
@@ -172,7 +170,6 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
-      val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe SEE_OTHER
       // TODO redirect to the Currency Exchange start page when it is built
@@ -208,7 +205,6 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
             .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
           val result = controller.post(edit = true)(newRequest)
-          val document = Jsoup.parse(contentAsString(result))
 
           status(result) mustBe SEE_OTHER
           // TODO redirect to the Check Your Answers page when it is built
