@@ -4,9 +4,9 @@ import models.Country
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.libs.json.{JsString, JsSuccess, Json, Reads}
+import play.api.libs.json._
 
-class ForeignBranchesSpec extends PlaySpec {
+class BranchesOrAgentsSpec extends PlaySpec {
 
   "MsbServices" must {
 
@@ -84,6 +84,32 @@ class ForeignBranchesSpec extends PlaySpec {
       rule.validate(form) mustBe Failure(
         Seq((Path \ "hasCountries") -> Seq(ValidationError("foo")))
       )
+    }
+
+    "successfully validate when there are empty values in the seq" in {
+
+      val form: UrlFormEncoded = Map(
+        "hasCountries" -> Seq("true"),
+        "countries[]" -> Seq("GB", "", "US", "")
+      )
+
+      rule.validate(form) mustBe Success(BranchesOrAgents(Some(Seq(
+        Country("United Kingdom", "GB"),
+        Country("United States", "US")
+      ))))
+    }
+
+    "test" in {
+
+      val form: UrlFormEncoded = Map(
+        "hasCountries" -> Seq("true"),
+        "countries[0]" -> Seq("GB"),
+        "countries[1]" -> Seq("")
+      )
+
+      rule.validate(form) mustBe Success(BranchesOrAgents(Some(Seq(
+        Country("United Kingdom", "GB")
+      ))))
     }
   }
 }

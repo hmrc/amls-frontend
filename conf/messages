@@ -66,6 +66,9 @@ error.required.sa.registration = Select yes or no to the question: is this perso
 error.required.bm.register.service = Select at least one activity that you need to register.
 error.required.bm.registration.number = Enter the company registration number.
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
+error.required.bm.businesstype.type = Enter your type of business.
+error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
+
 
 ####  About the Business ####
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
@@ -204,6 +207,7 @@ error.required.msb.linked.txn = Select yes or no to the question: can your syste
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
+error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -256,12 +260,12 @@ unauthorised.title = Unauthorised
 
 #### Progress page ####
 progress.title = Application progress
-progress.lede = Your information is saved automatically. If you sign out, you'll have 28 days to return and complete your application.
+progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 progress.edit = Edit
 progress.continue = Continue
 progress.start = Start this section
 progress.minutes = minutes to complete
-progress.submit = Submit registration
+progress.submit = Submit application
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can’t finish the registration until you’ve completed all the sections.
 progress.businessmatching.name = Pre-application
@@ -375,6 +379,8 @@ aboutthebusiness.whatyouneed.line_5 = your money Laundering Regulations registra
 aboutthebusiness.whatyouneed.line_6 = the date your business will start activities which need to be supervised
 aboutthebusiness.whatyouneed.line_7 = your VAT registration number
 aboutthebusiness.whatyouneed.line_8 = your Corporation Tax reference number
+aboutthebusiness.sidebar.title = Automatic saving
+aboutthebusiness.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 aboutthebusiness.registeredforvat.title = Is your business registered for VAT in the UK?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
 aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax?
@@ -418,7 +424,9 @@ tradingpremises.whatyouneed.requiredinfo.text.1=the trading name and address
 tradingpremises.whatyouneed.requiredinfo.text.2=whose premises they are
 tradingpremises.whatyouneed.requiredinfo.text.3=the date you''ll start trading from these premises
 tradingpremises.whatyouneed.requiredinfo.text.4=if it''s a residential address
-tradingpremises.whatyouneed.agentinfo.heading=If you use agents, we also need to know where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services. An employee is not an agent.
+tradingpremises.sidebar.title = Automatic saving
+tradingpremises.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
+tradingpremises.whatyouneed.agentinfo.heading=If you use agents, we also need to know where your agents trade from. An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
 tradingpremises.whatyouneed.agentinfo.heading.sub=You''ll need the following information for each agent:
 tradingpremises.whatyouneed.agentinfo.text.1=your agent''s registered business name
 tradingpremises.whatyouneed.agentinfo.text.2=the type of tax your agent pays
@@ -466,6 +474,8 @@ estateagentbusiness.whatyouneed.subheading = For this section you''ll need:
 estateagentbusiness.whatyouneed.line_1 = a list of which services you provide
 estateagentbusiness.whatyouneed.line_2 = which redress scheme you''re registered with, if relevant
 estateagentbusiness.whatyouneed.line_3 = information about any penalties you''ve received, if relevant
+estateagentbusiness.sidebar.title = Automatic saving
+estateagentbusiness.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 estateagentbusiness.penalisedunderestateagentsact.title = Has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 estateagentbusiness.penalisedunderestateagentsact.subtitle = Examples of a penalty include:
 estateagentbusiness.penalisedunderestateagentsact.warning = receiving a formal warning
@@ -497,12 +507,12 @@ estateagentbusiness.registered.redress.title = Is this business registered with 
 estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agent business and its customers.
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
-businessmatching.businessType.title = What''s your business structure?
-businessmatching.businessType.lbl.01 = Limited Company
-businessmatching.businessType.lbl.02 = Sole Proprietor
+businessmatching.businessType.title = What’s your business structure?
+businessmatching.businessType.lbl.01 = Limited company
+businessmatching.businessType.lbl.02 = Sole proprietor
 businessmatching.businessType.lbl.03 = Partnership
-businessmatching.businessType.lbl.04 = Limited Partnership or Limited Liability Partnership
-businessmatching.businessType.lbl.05 = Unincorporated Association or Trust
+businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
+businessmatching.businessType.lbl.05 = Unincorporated association or trust
 businessmatching.registerservices.title = Business Matching - What do you need to register?
 businessmatching.registerservices.details = More information about these categories
 businessmatching.registerservices.heading=What do you need to register?
@@ -545,6 +555,8 @@ bankdetails.whatyouneed.line_2 = if it''s a UK account
 bankdetails.whatyouneed.line_3 = the account name
 bankdetails.whatyouneed.line_4 = the sort code
 bankdetails.whatyouneed.line_5 = the account number or IBAN number
+bankdetails.sidebar.title = Automatic saving
+bankdetails.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 bankdetails.accounttype.title = What kind of bank account does your business use?
 bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
@@ -568,7 +580,7 @@ bankdetails.confirm-activities.subtitile =You’ve told us your business does th
 
 businessactivities.whatyouneed.title = Business Activities - What you need
 businessactivities.whomustregister.sidebar.title = Automatic saving
-businessactivities.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
+businessactivities.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 businessactivities.whatyouneed.heading = What you need
 businessactivities.whatyouneed.requiredinfo.heading = For this section you''ll need to know:
 businessactivities.whatyouneed.line_1 = the anticipated turnover for the next 12 months
@@ -579,7 +591,7 @@ businessactivities.whatyouneed.line_4 = in which countries your customers live o
 businessactivities.whatyouneed.line_5 = your franchisor''s name
 businessactivities.whatyouneed.line_6 = how you record transactions
 businessactivities.whatyouneed.line_7 = your professional advisor''s name and address
-businessactivities.whatyouneed.line_8 = your professional advisor''s HMRC Agent Reference Number
+businessactivities.whatyouneed.line_8 = your professional advisor’s HMRC agent code
 businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor's registration.
@@ -754,7 +766,7 @@ responsiblepeople.whomustregister.line_1 = everyone who directs the business –
 responsiblepeople.whomustregister.line_2 = anyone who owns or controls more than 25% of the business
 responsiblepeople.whomustregister.line_3 = the ''nominated officer'' - the person who acts as the money laundering reporting officer
 responsiblepeople.whomustregister.sidebar.title = Automatic saving
-responsiblepeople.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
+responsiblepeople.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 responsiblepeople.registeredforvat.title = Is this person registered for VAT in the UK?
 responsiblepeople.registeredforvat.heading = Is this person registered for VAT in the UK?
 responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
@@ -814,7 +826,7 @@ tcsp.whatyouneed.dependinginfo.text.2 = if you create complex corporate structur
 tcsp.whatyouneed.dependinginfo.text.3 = the Money Laundering Regulation reference number of the Trust or Company Service Provider you use
 
 tcsp.whatyouneed.sidebar.title = Automatic saving
-tcsp.whatyouneed.sidebar.information = Your progress is saved automatically. If you sign out you''ll have 28 days to complete your registration.
+tcsp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
 tcsp.service.provider.lbl.01 = Nominee shareholders provider
 tcsp.service.provider.lbl.02 = Trustee provider
@@ -845,7 +857,7 @@ asp.whatyouneed.line_1 = which services you provide
 asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other business’ tax matters
 asp.whatyouneed.line_3 = your HMRC Agent Registration Number, if relevant
 asp.whatyouneed.sidebar.title = Automatic saving
-asp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your registration.
+asp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other business’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme
@@ -867,7 +879,7 @@ supervision.whatyouneed.requiredinfo.text.3 = the reason your last supervision e
 supervision.whatyouneed.requiredinfo.text.4 = a list of your professional memberships
 supervision.whatyouneed.requiredinfo.text.5 = details of penalties you''ve received from a professional body
 supervision.whatyouneed.sidebar.title = Automatic saving
-supervision.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you'll have 28 days to complete your application.
+supervision.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 
 supervision.another_body.title = Has your business ever been registered with another supervising body?
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
@@ -905,7 +917,7 @@ supervision.memberofprofessionalbody.lbl.14 = Other
 msb.whatyouneed.title = Money Service Business – What you need
 msb.whatyouneed.heading = What you need
 msb.whomustregister.sidebar.title = Automatic saving
-msb.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your registration.
+msb.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 msb.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
 msb.whatyouneed.line_1 = a list of which services you provide
 msb.whatyouneed.line_2 = how much throughput you expect in the next 12 months
@@ -954,8 +966,15 @@ msb.send.money.title = Do you send money to other countries?
 msb.most.transactions.title = Where do you expect to send the largest amounts of money?
 msb.most.transactions.list.countries = List up to 3 countries
 
+msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?
+msb.fundstransfer.heading = Do you transfer money without using formal banking systems?
+msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
 
-
-
+msb.branchesoragents.title = Money Service Business – Do you have branches or agents in other countries?
+msb.branchesoragents.heading = Do you have branches or agents in other countries?
+msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
+msb.branchesoragents.legend = Which countries?
+msb.branchesoragents.hint = List up to 10 countries
+msb.branchesoragents.add.btn = Add another country
 
 

@@ -11,17 +11,26 @@ case class BranchesOrAgents(branches: Option[Seq[Country]])
 
 sealed trait BranchesOrAgents0 {
 
+  val minLength = 1
+  val maxLength = 10
+
   import JsonMapping._
 
   private implicit def rule[A]
   (implicit
    b: Path => Rule[A, Boolean],
-   s: Path => Rule[A, Seq[Country]]
+   s: Path => Rule[A, Seq[String]],
+   cR: Rule[Seq[String], Seq[Country]]
   ): Rule[A, BranchesOrAgents] =
     From[A] { __ =>
 
-      import play.api.data.mapping.GenericRules._
       import utils.MappingUtils.Implicits.RichRule
+      import TraversableValidators._
+
+       implicit val emptyToNone: String => Option[String] = {
+          case "" => None
+          case s => Some(s)
+       }
 
       val boolR =
         b andThen {
@@ -29,10 +38,9 @@ sealed trait BranchesOrAgents0 {
         }
 
       val countrySeqR = {
-        val minLength = 1
-        val maxLength = 10
-        (TraversableValidators.minLength[Seq[Country]](minLength) withMessage "bar")
-          .compose(TraversableValidators.maxLength[Seq[Country]](maxLength))
+        (seqToOptionSeq[String] compose flattenR[String] compose cR)
+          .compose(minLengthR[Seq[Country]](minLength) withMessage "bar")
+          .compose(maxLengthR[Seq[Country]](maxLength))
       }
 
       (__ \ "hasCountries").read(boolR) flatMap[Option[Seq[Country]]] {
@@ -83,6 +91,9 @@ sealed trait BranchesOrAgents0 {
 object BranchesOrAgents {
 
   private object Cache extends BranchesOrAgents0
+
+  val minLength = Cache.minLength
+  val maxLength = Cache.maxLength
 
   implicit val formR: Rule[UrlFormEncoded, BranchesOrAgents] = Cache.formR
   implicit val jsonR: Reads[BranchesOrAgents] = Cache.jsonR

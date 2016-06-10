@@ -246,6 +246,11 @@ POST        /money-service-business/psr-registration                    controll
 
 GET         /money-service-business/send-money                          controllers.msb.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
 POST        /money-service-business/send-money                          controllers.msb.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
+GET         /money-service-business/funds-transfer                      controllers.msb.FundsTransferController.get(edit: Boolean ?= false)
+POST        /money-service-business/funds-transfer                      controllers.msb.FundsTransferController.post(edit: Boolean ?= false)
+
+GET         /money-service-business/branches-or-agents                  controllers.msb.BranchesOrAgentsController.get(edit: Boolean ?= false)
+POST        /money-service-business/branches-or-agents                  controllers.msb.BranchesOrAgentsController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/largest-amounts                     controllers.msb.LargestAmountsController.get(edit: Boolean ?= false)
 POST        /money-service-business/largest-amounts                     controllers.msb.LargestAmountsController.post(edit: Boolean ?= false)

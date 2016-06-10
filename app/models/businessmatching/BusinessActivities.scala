@@ -98,7 +98,7 @@ object BusinessActivities {
   implicit def formReads
   (implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
     From[UrlFormEncoded] { __ =>
-     (__ \ "businessActivities").read(minLength[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) fmap BusinessActivities.apply
+     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) fmap BusinessActivities.apply
    }
 
   implicit def formWrites

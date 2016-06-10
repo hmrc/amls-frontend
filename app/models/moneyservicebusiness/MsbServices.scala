@@ -58,7 +58,7 @@ sealed trait MsbServices0 {
       import utils.MappingUtils.Implicits.RichRule
 
       val required =
-        TraversableValidators.minLength[Set[MsbService]](1) withMessage "error.required.msb.services"
+        TraversableValidators.minLengthR[Set[MsbService]](1) withMessage "error.required.msb.services"
 
       (__ \ "msbServices").read(required) fmap MsbServices.apply
     }

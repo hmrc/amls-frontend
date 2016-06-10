@@ -5,6 +5,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
+import play.api.data.mapping.Write
+import play.api.data.mapping.forms.UrlFormEncoded
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -31,7 +33,7 @@ trait BranchesOrAgentsController extends BaseController {
     implicit authContext => implicit request =>
       Form2[BranchesOrAgents](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.services(f, edit)))
+          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
         case ValidForm(_, data) =>
           for {
             msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
