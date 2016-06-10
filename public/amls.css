@@ -408,8 +408,24 @@ table.summary ul li {
 }
 
 /* aiming to give desktop enough width for the longer names,
- * but bring the mobile view into line with the radio buttons */
-.custom-combobox-input {
+ * but bring the mobile view into line with the radio buttons.
+ * also… style the selects as close to inputs as possible,
+ * because they'll flash on the screen before being replaced. */
+.js .custom-combobox,
+.js .country-selector,
+.js .custom-combobox-input {
+  background-color: transparent;
+  border-radius: 0;
+  height: 37px;
   min-width: 16.5em;
   width: 66%;
+  -webkit-appearance: none;
+}
+
+#hasCountries-fieldset {
+  padding-top: 10px;
+}
+
+#hasCountries-fieldset legend {
+  float: left;
 }

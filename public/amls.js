@@ -80,7 +80,10 @@ $(function () {
 
                 var $button = $('<a href="#">' + text + '</a>').click(function (e) {
                     e.preventDefault();
-                    $this.find('div.js-hidden:first').removeClass('js-hidden');
+                    $this.find('div.js-hidden:first').fadeIn(500).removeClass('js-hidden');
+                    if ($this.find('div.js-hidden').size() === 0) {
+                        $(this).hide();
+                    }
                 });
 
                 $this.append($button.hide().fadeIn(1000));
