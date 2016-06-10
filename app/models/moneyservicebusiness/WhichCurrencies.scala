@@ -1,9 +1,16 @@
 package models.moneyservicebusiness
 
+import javassist.runtime.Inner
+
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
+import play.api.data.mapping.GenericRules._
 import play.api.libs.functional.Monoid
 import play.api.libs.json.{Writes, JsValue, Reads, Format}
+import utils.OptionValidators._
+import utils.TraversableValidators
+import utils.MappingUtils.Implicits._
+
 
 case class WhichCurrencies(currencies : Seq[String]
                            , bankMoneySource : Option[BankMoneySource]
@@ -12,18 +19,22 @@ case class WhichCurrencies(currencies : Seq[String]
 
 private sealed trait WhichCurrencies0 {
 
-    private implicit def rule[A]
+  private val nameType = maxLength(140)
+  private val currencyType = TraversableValidators.minLength[Seq[String]](1)
+
+  private implicit def rule[A]
     (implicit
       a : Path => RuleLike[A, Seq[String]],
       b: Path => RuleLike[A, Option[String]],
       c: Path => RuleLike[A, Boolean]
     ) : Rule[A, WhichCurrencies] = From[A] {__ =>
-        val currencies = (__ \ "currencies").read[Seq[String]]
+
+        val currencies = (__ \ "currencies").read[Seq[String], Seq[String]](currencyType).withMessage("error.invalid.msb.wc.currencies")
 
         val bankMoneySource =
           (
             (__ \ "bankMoneySource").read[Option[String]] ~
-            (__ \ "bankNames").read[Option[String]]
+            (__ \ "bankNames").read[Option[String], Option[String]](ifPresent(nameType)).withMessage("error.invalid.msb.wc.bankNames")
           ).apply {(a,b) => (a,b) match {
               case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
               case (Some("Yes"), None) => Some(BankMoneySource(""))
@@ -33,7 +44,7 @@ private sealed trait WhichCurrencies0 {
         val wholesalerMoneySource =
           (
             (__ \ "wholesalerMoneySource").read[Option[String]] ~
-            (__ \ "wholesalerNames").read[Option[String]]
+            (__ \ "wholesalerNames").read[Option[String], Option[String]](ifPresent(nameType)).withMessage("error.invalid.msb.wc.wholesalerNames")
           ).apply {(a,b) => (a,b) match {
             case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
             case (Some("Yes"), None) => Some(WholesalerMoneySource(""))

@@ -5,12 +5,23 @@ import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
 import play.api.data.mapping.GenericRules
-
 import scala.collection.TraversableLike
 
 object TraversableValidators {
-   def minLength[T <: Traversable[_]](expectedLength : Int) : Rule[T, T] = {
+  def minLength[T <: Traversable[_]](expectedLength : Int) : Rule[T, T] = {
     GenericRules.validateWith[T]("error.required")(t => t.size >= expectedLength)}
+
+  def maxLength[T <: Traversable[_]](expectedLength : Int) : Rule[T, T] = {
+    GenericRules.validateWith[T]("error.tooLarge")(t => t.size <= expectedLength)}
+}
+
+object OptionValidators {
+  def ifPresent[A](inner: Rule[A, A]): RuleLike[Option[A], Option[A]] = {
+    Rule[Option[A], Option[A]] {
+      case Some(a) => inner.validate(a).map(x => Some(x))
+      case None => Success(None)
+    }
+  }
 }
 
 trait MappingUtils {

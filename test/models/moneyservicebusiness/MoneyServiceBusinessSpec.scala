@@ -97,6 +97,7 @@ trait MoneyServiceBusinessTestData {
     Some(ExpectedThroughput.Second),
     Some(businessUseAnIPSP),
     Some(IdentifyLinkedTransactions(true)),
+    Some(WhichCurrencies(Seq("USD", "GBP"), None, None, true)),
     Some(BusinessAppliedForPSRNumberYes("123456")),
     Some(SendMoneyToOtherCountry(true)),
     Some(FundsTransfer(true))
