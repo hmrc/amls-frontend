@@ -7,7 +7,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import play.api.data.mapping.forms.Rules.{minLength => _, _}
-import utils.TraversableValidators.minLength
+import utils.TraversableValidators.minLengthR
 
 sealed trait ProfessionalBodyMember
 
@@ -77,7 +77,7 @@ object ProfessionalBodyMember {
     From[UrlFormEncoded] { __ =>
       (__ \ "isAMember").read[Boolean].withMessage("error.required.supervision.business.a.member") flatMap {
         case true =>
-          (__ \ "businessType").read(minLength[Set[String]](1).withMessage("error.required.supervision.one.professional.body")) flatMap { z =>
+          (__ \ "businessType").read(minLengthR[Set[String]](1).withMessage("error.required.supervision.one.professional.body")) flatMap { z =>
             z.map {
               case "01" => Rule[UrlFormEncoded, BusinessType](_ => Success(AccountingTechnicians))
               case "02" => Rule[UrlFormEncoded, BusinessType](_ => Success(CharteredCertifiedAccountants))

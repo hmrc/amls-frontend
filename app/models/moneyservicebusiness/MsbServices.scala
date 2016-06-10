@@ -45,7 +45,7 @@ object MsbService {
   }
 }
 
-private object Cache {
+sealed trait MsbServices0 {
 
   import JsonMapping._
 
@@ -58,7 +58,7 @@ private object Cache {
       import utils.MappingUtils.Implicits.RichRule
 
       val required =
-        TraversableValidators.minLength[Set[MsbService]](1) withMessage "error.required.msb.services"
+        TraversableValidators.minLengthR[Set[MsbService]](1) withMessage "error.required.msb.services"
 
       (__ \ "msbServices").read(required) fmap MsbServices.apply
     }
@@ -96,6 +96,8 @@ private object Cache {
 }
 
 object MsbServices {
+
+  private object Cache extends MsbServices0
 
   implicit val jsonR: Reads[MsbServices] = Cache.jsonR
   implicit val jsonW: Writes[MsbServices] = Cache.jsonW

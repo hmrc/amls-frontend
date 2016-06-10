@@ -7,7 +7,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import play.api.data.mapping.forms.Rules.{minLength => _, _}
-import utils.TraversableValidators.minLength
+import utils.TraversableValidators.minLengthR
 
 sealed trait TransactionRecord
 
@@ -44,7 +44,7 @@ object TransactionRecord {
     From[UrlFormEncoded] { __ =>
       (__ \ "isRecorded").read[Boolean].withMessage("error.required.ba.select.transaction.record") flatMap {
         case true =>
-          (__ \ "transactions").read(minLength[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { z =>
+          (__ \ "transactions").read(minLengthR[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { z =>
             z.map {
               case "01" => Rule[UrlFormEncoded, TransactionType](_ => Success(Paper))
               case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))
