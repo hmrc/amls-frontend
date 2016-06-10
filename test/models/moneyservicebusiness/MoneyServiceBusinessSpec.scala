@@ -1,5 +1,6 @@
 package models.moneyservicebusiness
 
+import models.Country
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -105,6 +106,7 @@ trait MoneyServiceBusinessTestData {
     Some(BusinessAppliedForPSRNumberYes("123456")),
     Some(SendMoneyToOtherCountry(true)),
     Some(FundsTransfer(true)),
+    Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
     Some(TransactionsInNext12Months("12345678963"))
   )
 
@@ -133,6 +135,7 @@ trait MoneyServiceBusinessTestData {
       "regNumber" -> "123456"),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
+    "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
     "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963")
   )
 

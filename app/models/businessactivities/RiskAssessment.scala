@@ -5,7 +5,7 @@ import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.data.mapping.forms.Rules.{minLength => _, _}
-import utils.TraversableValidators.minLength
+import utils.TraversableValidators.minLengthR
 
 sealed trait RiskAssessmentPolicy
 
@@ -61,7 +61,7 @@ object RiskAssessmentPolicy {
       (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
           case true =>
              (__ \ "riskassessments").
-               read(minLength[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) fmap RiskAssessmentPolicyYes.apply
+               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) fmap RiskAssessmentPolicyYes.apply
          case false => Rule.fromMapping { _ => Success(RiskAssessmentPolicyNo) }
       }
 
