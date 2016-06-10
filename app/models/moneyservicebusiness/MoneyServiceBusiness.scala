@@ -10,6 +10,9 @@ case class MoneyServiceBusiness(
                                  throughput : Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
+                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+                                 fundsTransfer : Option[FundsTransfer] = None
                                  branchesOrAgents: Option[BranchesOrAgents] = None
                                ) {
 
@@ -24,6 +27,14 @@ case class MoneyServiceBusiness(
 
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
     this.copy(identifyLinkedTransactions = Some(p))
+  def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
+    this.copy(fundsTransfer = Some(p))
+
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
+    this.copy(businessAppliedForPSRNumber = Some(p))
+
+  def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
+    this.copy(sendMoneyToOtherCountry = Some(p))
 
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
     this.copy(branchesOrAgents = Some(p))
@@ -43,12 +54,12 @@ object MoneyServiceBusiness {
   val key = "msb"
 
   implicit val mongoKey = new MongoKey[MoneyServiceBusiness] {
-    def apply() = "msb"
+    def apply() = key
   }
 
   def section(implicit cache: CacheMap): Section = {
 
-    val messageKey = "msb"
+    val messageKey = key
 
     val notStarted = Section(messageKey, NotStarted, controllers.msb.routes.WhatYouNeedController.get())
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {

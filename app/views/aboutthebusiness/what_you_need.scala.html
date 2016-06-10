@@ -1,27 +1,43 @@
 @import include._
 @()(implicit request: Request[_])
 
+@sidebar = {
+<div class="bevel-container">
+    <h3>@Messages("aboutthebusiness.sidebar.title")</h3>
+    <p>@Messages("aboutthebusiness.sidebar.information")</p>
+</div>
+}
+
 @main(
-    title = Messages("aboutthebusiness.whatyouneed.title")
+    title = Messages("aboutthebusiness.whatyouneed.title"),
+    sidebar = sidebar
 ) {
 
     @heading("aboutthebusiness.whatyouneed.heading", "summary.aboutbusiness")
 
-    <div class="form-field">
-        <span class="panel-indent">@Messages("aboutthebusiness.whatyouneed.subheading")</span>
-    </div>
 
+    <p>@Messages("aboutthebusiness.whatyouneed.subheading")</p>
 
-    <ul class="list-bullet form-group">
-        <li class="no-padding no-margin">@Messages("aboutthebusiness.whatyouneed.line_1")</li>
-        <li class="no-padding no-margin">@Messages("aboutthebusiness.whatyouneed.line_2")</li>
-        <li class="no-padding no-margin">@Messages("aboutthebusiness.whatyouneed.line_3")</li>
-        <li class="no-padding no-margin">@Messages("aboutthebusiness.whatyouneed.line_4")</li>
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("aboutthebusiness.whatyouneed.line_1")</li>
+        <li>@Messages("aboutthebusiness.whatyouneed.line_2")</li>
+        <li>@Messages("aboutthebusiness.whatyouneed.line_3")</li>
+        <li>@Messages("aboutthebusiness.whatyouneed.line_4")</li>
     </ul>
 
-    <div class="form-field">
+    <p>@Messages("aboutthebusiness.whatyouneed.subheading_2")</p>
+
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("aboutthebusiness.whatyouneed.line_5")</li>
+        <li>@Messages("aboutthebusiness.whatyouneed.line_6")</li>
+        <li>@Messages("aboutthebusiness.whatyouneed.line_7")</li>
+        <li>@Messages("aboutthebusiness.whatyouneed.line_8")</li>
+    </ul>
+
+    <div class="form-group">
         <a class="button" href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get()">
             @Messages("button.continue")
         </a>
     </div>
+
 }

@@ -1,25 +1,25 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness.{IdentifyLinkedTransactions, MoneyServiceBusiness}
+import models.moneyservicebusiness.{SendMoneyToOtherCountry, MoneyServiceBusiness}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
-import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
-class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar  {
+class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new IdentifyLinkedTransactionsController {
+    val controller = new SendMoneyToOtherCountryController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
     }
@@ -27,27 +27,27 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneServerPe
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "IdentifyLinkedTransactionsController" must {
+  "SendMoneyToOtherCountryController" must {
 
-    "load the page systems identify linked transactions" in new Fixture {
+    "load the page 'Do you send money to other countries?'" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.linked.txn.title"))
+      contentAsString(result) must include(Messages("msb.send.money.title"))
     }
 
-    "load the page systems identify linked transactions with pre populated data" in new Fixture  {
+    "load the page 'Do you send money to other countries?' with pre populated data" in new Fixture  {
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
-        identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true))))))
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.linked.txn.title"))
+      contentAsString(result) must include(Messages("msb.send.money.title"))
 
     }
 
@@ -64,13 +64,13 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneServerPe
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.msb.linked.txn"))
+      contentAsString(result) must include (Messages("error.required.msb.send.money"))
 
     }
 
     "Successfully save data in save4later and navigate to Next page" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody (
-        "linkedTxn" -> "true"
+        "money" -> "true"
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
@@ -81,12 +81,12 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneServerPe
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessAppliedForPSRNumberController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody (
-        "linkedTxn" -> "true"
+        "money" -> "true"
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())

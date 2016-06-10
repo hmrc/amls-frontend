@@ -6,7 +6,7 @@
 
 @sidebar = {
     <div class="bevel-container">
-        <h3 class="heading-small">@Messages("tcsp.whatyouneed.sidebar.title")</h3>
+        <h3>@Messages("tcsp.whatyouneed.sidebar.title")</h3>
         <p>@Messages("tcsp.whatyouneed.sidebar.information")</p>
     </div>
 }
@@ -19,13 +19,23 @@
     @heading("tcsp.whatyouneed.heading", "summary.tcsp")
 
     <p>@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
-    <ul class="list-bullet form-group">
-        <li class="no-padding no-margin">@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
-        <li  class="no-padding no-margin">@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
+
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.3")</li>
     </ul>
 
-    <div class="form-field">
-        <a id="what-you-need-continue" class="button" href="@controllers.tcsp.routes.TcspTypesController.get()">
+    <p>@Messages("tcsp.whatyouneed.dependinginfo.heading")</p>
+
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("tcsp.whatyouneed.dependinginfo.text.1")</li>
+        <li>@Messages("tcsp.whatyouneed.dependinginfo.text.2")</li>
+        <li>@Messages("tcsp.whatyouneed.dependinginfo.text.3")</li>
+    </ul>
+
+    <div class="form-group">
+        <a class="button" href="@controllers.tcsp.routes.TcspTypesController.get()">
             @Messages("button.continue")
         </a>
     </div>
