@@ -1,5 +1,6 @@
 package models.moneyservicebusiness
 
+import models.Country
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -70,6 +71,10 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
         completeModel.isComplete must be(true)
       }
 
+      "correctly show if the model is complete and has TransactionsInNext12Months" in  {
+        completeModelWithTxnAmount.isComplete must be (true)
+      }
+
       "correctly show if the model is incomplete" in {
         emptyModel.isComplete must be(false)
       }
@@ -90,10 +95,22 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 }
 
 trait MoneyServiceBusinessTestData {
-  private val msbService = MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))
-  private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
+  private val msbService = MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))
+  private val msbService1 = MsbServices(Set(ChequeCashingNotScrapMetal))
+  private val businessUseAnIPSP = BusinessUseAnIPSPYes("name" ,"123456789123456")
 
   val completeModel = MoneyServiceBusiness(Some(msbService),
+    Some(ExpectedThroughput.Second),
+    Some(businessUseAnIPSP),
+    Some(IdentifyLinkedTransactions(true)),
+    Some(BusinessAppliedForPSRNumberYes("123456")),
+    Some(SendMoneyToOtherCountry(true)),
+    Some(FundsTransfer(true)),
+    Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+    Some(TransactionsInNext12Months("12345678963"))
+  )
+
+  val completeModelWithTxnAmount = MoneyServiceBusiness(Some(msbService1),
     Some(ExpectedThroughput.Second),
     Some(businessUseAnIPSP),
     Some(IdentifyLinkedTransactions(true)),
@@ -107,7 +124,7 @@ trait MoneyServiceBusinessTestData {
 
   val completeJson = Json.obj(
     "msbServices" -> Json.obj(
-      "msbServices" -> Json.arr("04", "03")
+      "msbServices" -> Json.arr("01", "03")
     ),
     "throughput" -> Json.obj("throughput" -> "02"),
     "businessUseAnIPSP" -> Json.obj("useAnIPSP" -> true,
@@ -117,7 +134,9 @@ trait MoneyServiceBusinessTestData {
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
       "regNumber" -> "123456"),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
-    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true)
+    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
+    "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
+    "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963")
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())

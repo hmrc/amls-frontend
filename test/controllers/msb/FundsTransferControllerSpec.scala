@@ -65,7 +65,7 @@ class FundsTransferControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.TransactionsInNext12MonthsController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -111,7 +111,7 @@ class FundsTransferControllerSpec extends PlaySpec with OneServerPerSuite with M
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.TransactionsInNext12MonthsController.get().url))
     }
   }
 

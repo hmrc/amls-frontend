@@ -9,6 +9,7 @@ sealed trait BusinessType
 object BusinessType {
 
   import play.api.data.mapping.forms.Rules._
+  import utils.MappingUtils.Implicits._
 
   case object SoleProprietor extends BusinessType
   case object LimitedCompany extends BusinessType
