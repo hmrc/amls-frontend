@@ -10,13 +10,13 @@
 
 @field = @{ f(p) }
 
-<fieldset class="form-group date @if(field.hasErrors) {form-field--error}" id="@field.id">
+<fieldset class="form-field date @if(field.hasErrors) {form-field--error}" id="@field.id">
     @legend(labelText)
     @if(hintText.nonEmpty) {
-        <span class="form-hint">@Messages(hintText)</span>
+        <span class="form-field--hint">@Messages(hintText)</span>
     }
     @if(example) {
-        <span class="form-hint">@Messages("lbl.date.example")</span>
+        <span class="form-field--hint">@Messages("lbl.date.example")</span>
     }
     @if(field.hasErrors) {
         <span class="error-notification">@field.error</span>

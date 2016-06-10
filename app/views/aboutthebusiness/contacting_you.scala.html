@@ -15,6 +15,7 @@
 
     @form(f, controllers.aboutthebusiness.routes.ContactingYouController.post(edit)) {
 
+        <div class="form-field-group">
         @input(
             field = f("phoneNumber"),
             labelText = Messages("aboutthebusiness.contactingyou.phone.lbl")
@@ -24,11 +25,12 @@
             field = f("email"),
             labelText = Messages("aboutthebusiness.contactingyou.email.lbl")
         )
+        </div>
 
 
         @registered_office_helper(model)
 
-        <div>
+        <div class="form-field">
             <span class="form-label">@Messages("aboutthebusiness.contactingyou.sendletter.lbl")</span>
             @inlineRadioGroup(f("letterToThisAddress")) {
                 @legend("TODO", jsHidden = true)
