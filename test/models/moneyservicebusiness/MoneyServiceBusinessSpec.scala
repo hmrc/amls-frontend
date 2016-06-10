@@ -91,7 +91,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 }
 
 trait MoneyServiceBusinessTestData {
-  private val msbService = MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))
+  private val msbService = MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))
   private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
   private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
 
@@ -102,15 +102,17 @@ trait MoneyServiceBusinessTestData {
     Some(BusinessAppliedForPSRNumberYes("123456")),
     Some(SendMoneyToOtherCountry(true)),
     Some(FundsTransfer(true)),
+    Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+    Some(TransactionsInNext12Months("12345678963")),
     Some(sendTheLargestAmountsOfMoney)
   )
 
-    val emptyModel = MoneyServiceBusiness(None)
+  val emptyModel = MoneyServiceBusiness(None)
 
 
   val completeJson = Json.obj(
     "msbServices" -> Json.obj(
-      "msbServices" -> Json.arr("04", "03")
+      "msbServices" -> Json.arr("01", "03")
     ),
     "throughput" -> Json.obj("throughput" -> "02"),
     "businessUseAnIPSP" -> Json.obj("useAnIPSP" -> true,
@@ -120,6 +122,9 @@ trait MoneyServiceBusinessTestData {
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
       "regNumber" -> "123456"),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
+    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
+    "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
+    "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963"),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
     "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB")
   )

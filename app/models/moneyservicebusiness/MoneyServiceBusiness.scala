@@ -13,6 +13,8 @@ case class MoneyServiceBusiness(
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  fundsTransfer : Option[FundsTransfer] = None,
+                                 branchesOrAgents: Option[BranchesOrAgents] = None,
+                                 transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
                                  sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None
                                ) {
 
@@ -39,9 +41,19 @@ case class MoneyServiceBusiness(
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): MoneyServiceBusiness =
     this.copy(sendTheLargestAmountsOfMoney = Some(p))
 
+  def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
+    this.copy(branchesOrAgents = Some(p))
+
+   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
+    this.copy(transactionsInNext12Months = Some(p))
+
+  // TODO: Apply the actual logic here when we have the complete model
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
-    case _ => false
+      case m if m.productIterator.forall {
+          case Some(_) => true
+          case None => false
+        } => true
+      case _ => false
   }
 }
 

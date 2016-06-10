@@ -5,7 +5,7 @@ import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.data.mapping.forms.Rules.{minLength => _, _}
-import utils.TraversableValidators.minLength
+import utils.TraversableValidators.minLengthR
 
 case class TcspTypes(serviceProviders: Set[ServiceProvider])
 
@@ -35,7 +35,7 @@ object TcspTypes {
 
   implicit val formReads: Rule[UrlFormEncoded, TcspTypes] = {
     From[UrlFormEncoded] { __ =>
-      (__ \ "serviceProviders").read(minLength[Set[String]](1).withMessage("error.required.tcsp.service.providers")) flatMap { service =>
+      (__ \ "serviceProviders").read(minLengthR[Set[String]](1).withMessage("error.required.tcsp.service.providers")) flatMap { service =>
         service.map {
           case "01" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(NomineeShareholdersProvider))
           case "02" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(TrusteeProvider))

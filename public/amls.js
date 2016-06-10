@@ -4,18 +4,93 @@ $(function () {
     // avoids double panel-indented sections
     // should be CSS but isn't possible.
     // TODO: This needs a different approach
-        $('.panel-indent > .form-field--error')
-            .filter(function () {
-                return $(this).siblings().not('legend').length == 0;
-            })
-            .parent().css({
-                'padding' : 0,
-                'border' : 'none'
-            });
+    $('.panel-indent > .form-field--error')
+        .filter(function () {
+            return $(this).siblings().not('legend').length === 0;
+        })
+        .parent().css({
+            'padding' : 0,
+            'border' : 'none'
+        });
 
-    $(function(){
-        $('.country-selector').selectToAutocomplete();
+    $.widget( 'custom.combobox', {
+      _create: function() {
+        this.wrapper = $( '<span>' )
+          .addClass( 'custom-combobox' )
+          .insertAfter( this.element );
+
+        this.element.hide();
+        this._createAutocomplete();
+      },
+
+      _createAutocomplete: function() {
+        var selected = this.element.children( ':selected' ),
+          value = selected.val() ? selected.text() : '';
+
+        this.input = $( '<input>' )
+          .appendTo( this.wrapper )
+          .val( value )
+          .addClass( 'custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left' )
+          .autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: $.proxy( this, '_source' )
+          });
+
+        this._on( this.input, {
+          autocompleteselect: function( event, ui ) {
+            ui.item.option.selected = true;
+            this._trigger( 'select', event, {
+              item: ui.item.option
+            });
+          }
+        });
+      },
+
+      _source: function( request, response ) {
+        var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), 'i' );
+        response( this.element.children( 'option' ).map(function() {
+          var text = $( this ).text();
+          if ( this.value && ( !request.term || matcher.test(text) ) )
+            return {
+              label: text,
+              value: text,
+              option: this
+            };
+        }) );
+      }
     });
+
+    $('select.country-selector').combobox();
+
+    $('*[data-add-btn]').click(function () {
+        $('select.country-selector').combobox();
+    });
+
+    (function () {
+        $.widget('custom.addOne', {
+            _create: function () {
+                var $this = $(this.element);
+                var text = $this.data('add-one');
+                var children = $this.children();
+
+                children
+                    .filter(':not(:has(option[selected]))')
+                    .addClass('js-hidden');
+
+                var $button = $('<a href="#">' + text + '</a>').click(function (e) {
+                    e.preventDefault();
+                    $this.find('div.js-hidden:first').fadeIn(500).removeClass('js-hidden');
+                    if ($this.find('div.js-hidden').size() === 0) {
+                        $(this).hide();
+                    }
+                });
+
+                $this.append($button.hide().fadeIn(1000));
+            }
+        });
+        $('*[data-add-one]').addOne({});
+    })();
 
     (function () {
         var checkedInputs = 'input[type="checkbox"], input[type="radio"]';

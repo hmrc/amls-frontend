@@ -75,7 +75,7 @@ object Positions {
   ): Rule[UrlFormEncoded, Positions] =
     From[UrlFormEncoded] { __ =>
       (__ \ "positions")
-        .read(minLength[Set[PositionWithinBusiness]](1)
+        .read(minLengthR[Set[PositionWithinBusiness]](1)
         .withMessage("error.required.positionWithinBusiness")) fmap Positions.apply
     }
 

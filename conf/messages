@@ -207,6 +207,8 @@ error.required.msb.linked.txn = Select yes or no to the question: can your syste
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
+error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
+error.invalid.msb.transactions.in.12months = Enter a valid number of transactions you expect in the next 12 months. It must be up to 11 characters, and can only be numbers.
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 
 ########################################################################################################################
@@ -963,10 +965,17 @@ msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
 msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
+msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
 
 msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?
 msb.fundstransfer.heading = Do you transfer money without using formal banking systems?
 msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
 
+msb.branchesoragents.title = Money Service Business – Do you have branches or agents in other countries?
+msb.branchesoragents.heading = Do you have branches or agents in other countries?
+msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
+msb.branchesoragents.legend = Which countries?
+msb.branchesoragents.hint = List up to 10 countries
+msb.branchesoragents.add.btn = Add another country
 
 
