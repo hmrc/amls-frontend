@@ -20,7 +20,7 @@ private sealed trait MostTransactions0 {
       import TraversableValidators._
 
       val seqR =
-        (minLength[Seq[Country]](1) withMessage "foo") compose (maxLength[Seq[Country]](1) withMessage "bar")
+        (minLengthR[Seq[Country]](1) withMessage "foo") compose (maxLengthR[Seq[Country]](3) withMessage "bar")
 
       (__ \ "countries").read(seqR) fmap MostTransactions.apply
     }

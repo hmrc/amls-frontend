@@ -13,8 +13,7 @@ case class MoneyServiceBusiness(
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  branchesOrAgents: Option[BranchesOrAgents] = None,
-                                 mostTransactions: Option[MostTransactions] = None
-                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+                                 mostTransactions: Option[MostTransactions] = None,
                                  fundsTransfer : Option[FundsTransfer] = None
                                ) {
 
@@ -32,12 +31,6 @@ case class MoneyServiceBusiness(
 
   def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
     this.copy(fundsTransfer = Some(p))
-
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
-    this.copy(businessAppliedForPSRNumber = Some(p))
-
-  def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
-    this.copy(sendMoneyToOtherCountry = Some(p))
 
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
     this.copy(branchesOrAgents = Some(p))
