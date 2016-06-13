@@ -17,7 +17,7 @@
         @inlineRadioGroup(f("hasCountries")) {
           @radio(f("hasCountries"), "lbl.yes", "true", target = s"#hasCountries-fieldset")
           @radio(f("hasCountries"), "lbl.no", "false")
-          @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset") {
+          @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset", data = Seq("data-toggle-new")) {
             <p class="form-hint">@Messages("msb.branchesoragents.hint")</p>
             @addRemove("msb.branchesoragents.add.btn") {
               @for(i <- 0 until 10) {

@@ -34,12 +34,12 @@ sealed trait BranchesOrAgents0 {
 
       val boolR =
         b andThen {
-          _ withMessage "foo"
+          _ withMessage "error.required.hasCountries.msb.branchesOrAgents"
         }
 
       val countrySeqR = {
         (seqToOptionSeq[String] compose flattenR[String] compose cR)
-          .compose(minLengthR[Seq[Country]](minLength) withMessage "bar")
+          .compose(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.countries.msb.branchesOrAgents")
           .compose(maxLengthR[Seq[Country]](maxLength))
       }
 

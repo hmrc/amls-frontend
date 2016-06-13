@@ -208,6 +208,8 @@ error.required.msb.psr.options = Select yes or no to the question: has your busi
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
+error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
+error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################

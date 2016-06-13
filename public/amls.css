@@ -421,6 +421,10 @@ table.summary ul li {
   -webkit-appearance: none;
 }
 
+.js *[data-toggle-new] {
+  display: none;
+}
+
 #hasCountries-fieldset {
   padding-top: 10px;
 }

@@ -12,7 +12,7 @@ case class MoneyServiceBusiness(
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
-                                 fundsTransfer : Option[FundsTransfer] = None
+                                 fundsTransfer : Option[FundsTransfer] = None,
                                  branchesOrAgents: Option[BranchesOrAgents] = None
                                ) {
 
