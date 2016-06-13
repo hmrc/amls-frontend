@@ -2,10 +2,12 @@
 
 @(model: RegisteredOffice)
 
-<div class="form-field">
-    <ul class="panel-indent address-list">
+
+    <div class="panel-indent panel-indent--gutter panel-wide">
+        <p>
         @model.toLines.map { line =>
-            <li>@line</li>
+            @line<br />
         }
-    </ul>
-</div>
+        </p>
+    </div>
+

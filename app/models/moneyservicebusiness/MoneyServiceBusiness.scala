@@ -13,7 +13,8 @@ case class MoneyServiceBusiness(
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  fundsTransfer : Option[FundsTransfer] = None,
-                                 branchesOrAgents: Option[BranchesOrAgents] = None
+                                 branchesOrAgents: Option[BranchesOrAgents] = None,
+                                 transactionsInNext12Months: Option[TransactionsInNext12Months] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -38,6 +39,9 @@ case class MoneyServiceBusiness(
 
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
     this.copy(branchesOrAgents = Some(p))
+
+   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
+    this.copy(transactionsInNext12Months = Some(p))
 
   // TODO: Apply the actual logic here when we have the complete model
   def isComplete: Boolean = this match {

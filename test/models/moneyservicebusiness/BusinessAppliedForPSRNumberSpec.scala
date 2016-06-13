@@ -3,6 +3,7 @@ package models.moneyservicebusiness
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsPath, JsSuccess}
 
 class BusinessAppliedForPSRNumberSpec extends PlaySpec {
 
@@ -46,8 +47,14 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
 
     "Json Validation" must {
 
-      "Successfully read and write data" in {
-        BusinessAppliedForPSRNumber.jsonReads.reads(BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberYes("123456")))
+      "Successfully read and write data:option yes" in {
+        BusinessAppliedForPSRNumber.jsonReads.reads(BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberYes("123456"))) must
+          be(JsSuccess(BusinessAppliedForPSRNumberYes("123456"), JsPath \ "appliedFor" \ "regNumber"))
+      }
+
+      "Successfully read and write data:option No" in {
+        BusinessAppliedForPSRNumber.jsonReads.reads(BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberNo)) must
+          be(JsSuccess(BusinessAppliedForPSRNumberNo, JsPath \ "appliedFor"))
       }
     }
   }

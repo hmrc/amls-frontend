@@ -16,13 +16,13 @@ class TypeOfBusinessSpec extends PlaySpec {
     }
 
     "throw error when required field is missing" in {
-      TypeOfBusiness.formRead.validate(Map.empty) must be(Failure(Seq((Path \ "typeOfBusiness", Seq(ValidationError("error.required"))))))
+      val formInput = Map("typeOfBusiness" -> Seq(""))
+      TypeOfBusiness.formRead.validate(formInput) must be(Failure(Seq((Path \ "typeOfBusiness", Seq(ValidationError("error.required.bm.businesstype.type"))))))
     }
 
     "throw error when input exceeds max length" in {
       val formInput = Map("typeOfBusiness" -> Seq("sometext"*10))
-      TypeOfBusiness.formRead.validate(formInput) must be(Failure(Seq((Path \ "typeOfBusiness", Seq(ValidationError("error.maxLength",
-        FormTypes.maxTypeOfBusinessLength))))))
+      TypeOfBusiness.formRead.validate(formInput) must be(Failure(Seq((Path \ "typeOfBusiness") -> Seq(ValidationError("error.invalid.bm.business.type")))))
     }
 
     "validate form write" in {
@@ -31,3 +31,6 @@ class TypeOfBusinessSpec extends PlaySpec {
 
   }
 }
+
+
+

@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.moneyservicebusiness.{FundsTransfer, MoneyServiceBusiness}
+import models.moneyservicebusiness.{CurrencyExchange, TransmittingMoney, FundsTransfer, MoneyServiceBusiness}
 import views.html.msb._
 
 import scala.concurrent.Future
@@ -25,7 +25,7 @@ trait FundsTransferController extends BaseController {
       }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[FundsTransfer](request.body) match {
         case f: InvalidForm =>
@@ -34,18 +34,15 @@ trait FundsTransferController extends BaseController {
           for {
             moneyServiceBusiness <- dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              moneyServiceBusiness.fundsTransfer(data)
-            )
+              moneyServiceBusiness.fundsTransfer(data))
           } yield edit match {
-            //todo : Implement the correct redirects when relevant pages are available
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SummaryController.get())
-
+            case false => Redirect(routes.TransactionsInNext12MonthsController.get())
           }
-
       }
   }
 }
+
 
 object FundsTransferController extends FundsTransferController {
   // $COVERAGE-OFF$
