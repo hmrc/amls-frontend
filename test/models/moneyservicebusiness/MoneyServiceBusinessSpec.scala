@@ -71,10 +71,6 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
         completeModel.isComplete must be(true)
       }
 
-      "correctly show if the model is complete and has TransactionsInNext12Months" in  {
-        completeModelWithTxnAmount.isComplete must be (true)
-      }
-
       "correctly show if the model is incomplete" in {
         emptyModel.isComplete must be(false)
       }
@@ -96,8 +92,8 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 
 trait MoneyServiceBusinessTestData {
   private val msbService = MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))
-  private val msbService1 = MsbServices(Set(ChequeCashingNotScrapMetal))
-  private val businessUseAnIPSP = BusinessUseAnIPSPYes("name" ,"123456789123456")
+  private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
+  private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
 
   val completeModel = MoneyServiceBusiness(Some(msbService),
     Some(ExpectedThroughput.Second),
@@ -107,19 +103,11 @@ trait MoneyServiceBusinessTestData {
     Some(SendMoneyToOtherCountry(true)),
     Some(FundsTransfer(true)),
     Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
-    Some(TransactionsInNext12Months("12345678963"))
+    Some(TransactionsInNext12Months("12345678963")),
+    Some(sendTheLargestAmountsOfMoney)
   )
 
-  val completeModelWithTxnAmount = MoneyServiceBusiness(Some(msbService1),
-    Some(ExpectedThroughput.Second),
-    Some(businessUseAnIPSP),
-    Some(IdentifyLinkedTransactions(true)),
-    Some(BusinessAppliedForPSRNumberYes("123456")),
-    Some(SendMoneyToOtherCountry(true)),
-    Some(FundsTransfer(true))
-  )
-
-    val emptyModel = MoneyServiceBusiness(None)
+  val emptyModel = MoneyServiceBusiness(None)
 
 
   val completeJson = Json.obj(
@@ -136,7 +124,9 @@ trait MoneyServiceBusinessTestData {
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
     "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
-    "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963")
+    "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963"),
+    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
+    "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB")
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())

@@ -60,7 +60,7 @@ object CustomersOutsideUK {
   implicit val formRuleCountry: Rule[UrlFormEncoded, Countries] = From[UrlFormEncoded] { __ =>
     import utils.MappingUtils.Implicits._
    import play.api.data.mapping.forms.Rules._
-        ((__ \ "country_1").read[Country].withMessage("error.required.ba.country.name") and
+        ((__ \ "country_1").read[Country].withMessage("error.required.country.name") and
           (__ \ "country_2").read[Option[Country]] and
           (__ \ "country_3").read[Option[Country]] and
           (__ \ "country_4").read[Option[Country]] and

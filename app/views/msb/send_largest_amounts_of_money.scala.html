@@ -1,0 +1,20 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@main(
+    title = Messages("msb.send.the.largest.amounts.of.money.title")
+) {
+
+    @heading("msb.send.the.largest.amounts.of.money.title", "summary.msb")
+
+    @form(f, controllers.msb.routes.SendTheLargestAmountsOfMoneyController.post(edit)) {
+
+        @country(f("country_1"))
+        @country(f("country_2"))
+        @country(f("country_3"))
+
+        @submit(edit)
+    }
+}

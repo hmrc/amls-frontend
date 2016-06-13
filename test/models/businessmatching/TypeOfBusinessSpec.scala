@@ -1,10 +1,8 @@
 package models.businessmatching
 
-import models.FormTypes
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Success, Path, Failure}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.JsSuccess
 
 class TypeOfBusinessSpec extends PlaySpec {
 

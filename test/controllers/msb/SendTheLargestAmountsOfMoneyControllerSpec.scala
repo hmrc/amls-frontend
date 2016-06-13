@@ -1,9 +1,8 @@
-package controllers.businessactivities
+package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
-import models.businessactivities._
+import models.moneyservicebusiness.{SendTheLargestAmountsOfMoney, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -17,12 +16,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
+class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new CustomersOutsideUKController {
+    val controller = new SendTheLargestAmountsOfMoneyController {
 
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override protected def authConnector: AuthConnector = self.authConnector
@@ -31,28 +30,24 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "CustomersOutsideUKController" must {
+  "SendTheLargestAmountsOfMoneyController" must {
 
-    "use correct services" in new Fixture {
-      CustomersOutsideUKController.authConnector must be(AMLSAuthConnector)
-      CustomersOutsideUKController.dataCacheConnector must be(DataCacheConnector)
-    }
+    "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture  {
 
-    "load the Customer Record Page" in new Fixture  {
-
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("businessactivities.customer.outside.uk.title"))
+      document.title() must be (Messages("msb.send.the.largest.amounts.of.money.title"))
     }
 
-    "pre-populate the Customer outside UK Page" in new Fixture  {
+    "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(customersOutsideUK = Some(CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB"))))))))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(MoneyServiceBusiness(
+          sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -65,32 +60,30 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
     "on post with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isOutside" -> "true",
         "country_1" -> "GS"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isOutside" -> "true",
         "country_1" -> "GS"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
@@ -101,14 +94,13 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
     "on post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isOutside" -> "true",
         "country_1" -> ""
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -118,5 +110,4 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
       document.select("a[href=#country_1]").html() must include(Messages("error.required.country.name"))
     }
   }
-
 }
