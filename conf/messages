@@ -211,6 +211,8 @@ error.required.msb.send.money = Select yes or no to the question: do you send mo
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
 error.invalid.msb.transactions.in.12months = Enter a valid number of transactions you expect in the next 12 months. It must be up to 11 characters, and can only be numbers.
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
+error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
+error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################

@@ -49,11 +49,11 @@ case class MoneyServiceBusiness(
 
   // TODO: Apply the actual logic here when we have the complete model
   def isComplete: Boolean = this match {
-      case m if m.productIterator.forall {
-          case Some(_) => true
-          case None => false
-        } => true
-      case _ => false
+    case m if m.productIterator.forall {
+        case Some(_) => true
+        case None => false
+      } => true
+    case _ => false
   }
 }
 
