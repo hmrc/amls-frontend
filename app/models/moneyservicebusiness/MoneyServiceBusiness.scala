@@ -14,6 +14,7 @@ case class MoneyServiceBusiness(
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  fundsTransfer : Option[FundsTransfer] = None,
                                  branchesOrAgents: Option[BranchesOrAgents] = None,
+                                 mostTransactions: Option[MostTransactions] = None,
                                  transactionsInNext12Months: Option[TransactionsInNext12Months] = None
                                ) {
 

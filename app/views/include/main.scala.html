@@ -16,14 +16,13 @@
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
 @styles = {
-    <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet" type="text/css"/>
-    <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet" type="text/css"/>
+    <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet"/>
+    <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>
     @linkElement
 }
 
 @scripts = {
     <script src="@routes.AssetsController.at("jquery-ui.min.js")"></script>
-    <script src="@routes.AssetsController.at("jquery.select-to-autocomplete.js")"></script>
     <script src="@routes.AssetsController.at("amls.js")"></script>
     @scriptElem
 }
