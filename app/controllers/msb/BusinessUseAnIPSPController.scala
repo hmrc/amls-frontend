@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{BusinessUseAnIPSP, MoneyServiceBusiness, ExpectedThroughput}
+import models.moneyservicebusiness._
 import views.html.msb.business_use_an_ipsp
 
 import scala.concurrent.Future
@@ -33,11 +33,12 @@ trait BusinessUseAnIPSPController extends BaseController {
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.businessUseAnIPSP(data)
-            )
+              msb.businessUseAnIPSP(data))
+
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.SummaryController.get())
+
           }
       }
     }

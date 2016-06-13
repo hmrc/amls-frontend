@@ -80,6 +80,7 @@ error.required.atb.registered.for.vat = Select yes or no to the question: is you
 error.required.atb.corporation.tax = Select yes or no to the question: is your business registered for Corporation Tax?
 error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
+error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
 
 ####  Business Activities ####
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
@@ -207,6 +208,8 @@ error.required.msb.linked.txn = Select yes or no to the question: can your syste
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
+error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
+error.invalid.msb.transactions.in.12months = Enter a valid number of transactions you expect in the next 12 months. It must be up to 11 characters, and can only be numbers.
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 
 ########################################################################################################################
@@ -962,6 +965,7 @@ msb.psr.number.title = Has your business applied for a Payment Systems Regulator
 msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
+msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
 
 msb.most.transactions.title = Where do you expect to send the largest amounts of money?
 msb.most.transactions.list.countries = List up to 3 countries
