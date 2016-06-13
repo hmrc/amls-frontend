@@ -75,7 +75,7 @@ $(function () {
                 var children = $this.children();
 
                 children
-                    .filter(':not(:has(option[selected]))')
+                    .filter(':not(:first):not(:has(option[selected]))')
                     .addClass('js-hidden');
 
                 var $button = $('<a href="#">' + text + '</a>').click(function (e) {
@@ -116,9 +116,15 @@ $(function () {
                 return hasValue;
             }
 
-            if ($inputs.filter(pred).length === 0) {
-                if ($self.prop('checked') === false) {
-                    $target.hide();
+            if ($target.attr('data-toggle-new')) {
+                if ($inputs.filter(pred).length || $self.prop('checked') === true) {
+                    $target.show();
+                }
+            } else {
+                if ($inputs.filter(pred).length === 0) {
+                    if ($self.prop('checked') === false) {
+                        $target.hide();
+                    }
                 }
             }
 
@@ -137,7 +143,7 @@ $(function () {
                 }
             });
 
-            if ($self.prop('type') != "checkbox") {
+            if ($self.prop('type') !== "checkbox") {
                 $('input[name="' + $self.prop('name') + '"][value!="' + $self.val() + '"]').change(function () {
                     hide();
                 });
