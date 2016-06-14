@@ -83,6 +83,24 @@ error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
 error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
 
+####  Bank Details ####
+error.bankdetails.accounttype = Select one kind of bank account that your business uses. If you have no bank accounts, select ‘The business doesn’t use a bank account’.
+error.bankdetails.accountname = Enter a bank account name.
+error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
+error.bankdetails.ukbankaccount = Select yes or no to the question: is this a UK bank account?
+error.bankdetails.sortcode = Enter the sort code.
+error.invalid.bankdetails.sortcode = Enter a valid sort code. It must be 6 numbers long. Do not enter letters, punctuation or other characters.
+error.max.length.bankdetails.sortcode = You can’t enter more than 6 numbers for the sort code.
+error.bankdetails.accountnumber = Enter the account number.
+error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
+error.max.length.bankdetails.accountnumber = You can’t enter more than 8 numbers for the account number.
+error.required.bankdetails.iban.account = Enter an IBAN number or an account number.
+error.invalid.bankdetails.iban =  Enter a valid IBAN number. It must be 34 characters long and must only be numbers or letters. Do not enter punctuation or other characters.
+error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
+error.invalid.bankdetails.account = Enter a valid account number. . It must be 40 characters long and must only be numbers or letters. Do not enter punctuation or other characters.
+error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
+
+
 ####  Business Activities ####
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
