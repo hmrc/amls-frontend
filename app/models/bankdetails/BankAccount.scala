@@ -29,7 +29,7 @@ object Account {
             case (Some(iban), _) => NonUKIBANNumber(iban)
             case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
             case (_, _) =>
-              (Path \ "IBANNumber") -> Seq(ValidationError("error.required"))
+              (Path \ "IBANNumber") -> Seq(ValidationError("error.required.bankdetails.iban.account"))
           }
       }
     }

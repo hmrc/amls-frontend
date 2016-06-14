@@ -94,9 +94,9 @@ error.bankdetails.accountnumber = Enter the account number.
 error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
 error.max.length.bankdetails.accountnumber = You can’t enter more than 8 numbers for the account number.
 error.required.bankdetails.iban.account = Enter an IBAN number or an account number.
-error.invalid.bankdetails.iban =  Enter a valid IBAN number. It must be 34 characters long and must only be numbers or letters. Do not enter punctuation or other characters.
+error.invalid.bankdetails.iban =  Enter a valid IBAN number. It must only be numbers or letters, and it can’t be more than 34 characters long. Do not enter punctuation or other characters.
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
-error.invalid.bankdetails.account = Enter a valid account number. . It must be 40 characters long and must only be numbers or letters. Do not enter punctuation or other characters.
+error.invalid.bankdetails.account = Enter a valid account number. It must only be numbers or letters, and it can’t be more than 40 characters long. Do not enter punctuation or other characters.
 error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
 
 
