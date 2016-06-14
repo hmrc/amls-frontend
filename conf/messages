@@ -213,6 +213,7 @@ error.invalid.msb.transactions.in.12months = Enter a valid number of transaction
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
 error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
+error.required.countries.msb.most.transactions = Enter at least one country
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -969,7 +970,7 @@ msb.psr.number.lbl = Registration reference number
 msb.send.money.title = Do you send money to other countries?
 msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
 
-msb.most.transactions.title = Where do you expect to send the largest amounts of money?
+msb.most.transactions.title = Where do you expect to send the most transactions?
 msb.most.transactions.list.countries = List up to 3 countries
 
 msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?

@@ -9,7 +9,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait LargestAmountsController extends BaseController {
+trait MostTransactionsController extends BaseController {
 
   def cache: DataCacheConnector
 
@@ -24,7 +24,7 @@ trait LargestAmountsController extends BaseController {
             transactions <- msb.mostTransactions
           } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.largest_amounts(form, edit))
+          Ok(views.html.msb.most_transactions(form, edit))
       }
   }
 
@@ -32,7 +32,7 @@ trait LargestAmountsController extends BaseController {
     implicit authContext => implicit request =>
       Form2[MostTransactions](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.largest_amounts(f, edit)))
+          Future.successful(BadRequest(views.html.msb.most_transactions(f, edit)))
         case ValidForm(_, data) =>
           for {
             msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
@@ -50,7 +50,7 @@ trait LargestAmountsController extends BaseController {
   }
 }
 
-object LargestAmountsController extends LargestAmountsController {
+object MostTransactionsController extends MostTransactionsController {
   override val cache: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

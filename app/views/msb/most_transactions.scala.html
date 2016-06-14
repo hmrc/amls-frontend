@@ -9,13 +9,13 @@
 
     @heading("msb.most.transactions.title", "summary.msb")
 
-    @form(f, controllers.msb.routes.LargestAmountsController.post(edit)) {
+    @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
 
         @fieldset("msb.most.transactions.list.countries", panel = false) {
 
-            @country(f("country_1"))
-            @country(f("country_2"))
-            @country(f("country_3"))
+            @country(f("mostTransactionsCountries[0]"))
+            @country(f("mostTransactionsCountries[1]"))
+            @country(f("mostTransactionsCountries[2]"))
         }
 
         @submit(edit)

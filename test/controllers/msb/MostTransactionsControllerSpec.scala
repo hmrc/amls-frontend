@@ -6,7 +6,7 @@ import org.specs2.mock.mockito.MockitoMatchers
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
-class LargestAmountsControllerSpec extends PlaySpec with MockitoMatchers {
+class MostTransactionsControllerSpec extends PlaySpec with MockitoMatchers {
 
   trait Fixture extends AuthorisedFixture {
     self =>

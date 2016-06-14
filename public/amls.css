@@ -405,9 +405,7 @@ table.summary ul li {
     border-left-width: 10px;
 }
 
-/* aiming to give desktop enough width for the longer names,
- * but bring the mobile view into line with the radio buttons.
- * also… style the selects as close to inputs as possible,
+/* style the selects as close to inputs as possible,
  * because they'll flash on the screen before being replaced. */
 .js .custom-combobox,
 .js .country-selector,
@@ -415,8 +413,6 @@ table.summary ul li {
   background-color: transparent;
   border-radius: 0;
   height: 37px;
-  min-width: 16.5em;
-  width: 66%;
   -webkit-appearance: none;
 }
 

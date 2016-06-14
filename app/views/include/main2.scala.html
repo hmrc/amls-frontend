@@ -16,8 +16,8 @@
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
 
 @styles = {
-    <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet"/>
     <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>
+    <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet"/>
     @linkElement
 }
 

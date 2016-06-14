@@ -12,17 +12,26 @@ private sealed trait MostTransactions0 {
 
   private implicit def rule[A]
   (implicit
-    a: Path => RuleLike[A, Seq[Country]]
+   a: Path => RuleLike[A, Seq[String]],
+   cR: Rule[Seq[String], Seq[Country]]
   ): Rule[A, MostTransactions] =
     From[A] { __ =>
 
       import utils.MappingUtils.Implicits.RichRule
       import TraversableValidators._
 
-      val seqR =
-        (minLengthR[Seq[Country]](1) withMessage "foo") compose (maxLengthR[Seq[Country]](3) withMessage "bar")
+      implicit val emptyToNone: String => Option[String] = {
+        case "" => None
+        case s => Some(s)
+      }
 
-      (__ \ "countries").read(seqR) fmap MostTransactions.apply
+      val seqR = {
+        (seqToOptionSeq[String] compose flattenR[String] compose cR)
+          .compose(minLengthR[Seq[Country]](1) withMessage "error.required.countries.msb.most.transactions")
+          .compose(maxLengthR[Seq[Country]](3))
+      }
+
+      (__ \ "mostTransactionsCountries").read(seqR) fmap MostTransactions.apply
     }
 
   private implicit def write[A]
@@ -32,7 +41,7 @@ private sealed trait MostTransactions0 {
     To[A] { __ =>
 
       import play.api.libs.functional.syntax.unlift
-      (__ \ "countries").write[Seq[Country]] contramap unlift(MostTransactions.unapply)
+      (__ \ "mostTransactionsCountries").write[Seq[Country]] contramap unlift(MostTransactions.unapply)
     }
 
   val formR: Rule[UrlFormEncoded, MostTransactions] = {
