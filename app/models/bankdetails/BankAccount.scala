@@ -17,7 +17,7 @@ object Account {
   implicit val formRead: Rule[UrlFormEncoded, Account] =
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
-      (__ \ "isUK").read[Boolean] flatMap {
+      (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") flatMap {
         case true =>
           (
             (__ \ "accountNumber").read(ukBankAccountNumberType) and
@@ -99,10 +99,7 @@ case class UKAccount(
 sealed trait NonUKAccount extends Account
 
 case class NonUKAccountNumber(accountNumber: String) extends NonUKAccount
-
 case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
-
-
 case class BankAccount(accountName: String, account: Account)
 
 object BankAccount {

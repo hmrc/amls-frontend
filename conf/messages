@@ -90,7 +90,6 @@ error.invalid.bankdetails.accountname = You can’t enter more than 40 character
 error.bankdetails.ukbankaccount = Select yes or no to the question: is this a UK bank account?
 error.bankdetails.sortcode = Enter the sort code.
 error.invalid.bankdetails.sortcode = Enter a valid sort code. It must be 6 numbers long. Do not enter letters, punctuation or other characters.
-error.max.length.bankdetails.sortcode = You can’t enter more than 6 numbers for the sort code.
 error.bankdetails.accountnumber = Enter the account number.
 error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
 error.max.length.bankdetails.accountnumber = You can’t enter more than 8 numbers for the account number.

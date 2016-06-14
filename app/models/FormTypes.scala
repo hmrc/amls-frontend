@@ -142,11 +142,11 @@ object FormTypes {
 
   //TODO: Add error messages
 
-  val accountNameType = notEmptyStrip compose notEmpty compose maxLength(maxAccountName)
-  val sortCodeType = notEmpty compose pattern(sortCodeRegex)
-  val ukBankAccountNumberType = notEmpty compose maxLength(maxUKBankAccountNumberLength) compose pattern(ukBankAccountNumberRegex)
-  val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength) compose pattern(nonUKBankAccountNumberRegex)
-  val ibanType = notEmpty compose maxLength(maxIBANLength) compose pattern(ibanRegex)
+  val accountNameType = notEmptyStrip compose notEmpty.withMessage("error.bankdetails.accountname") compose maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname")
+  val sortCodeType = notEmpty.withMessage("error.bankdetails.sortcode") compose pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode")
+  val ukBankAccountNumberType = notEmpty.withMessage("error.bankdetails.accountnumber") compose maxLength(maxUKBankAccountNumberLength).withMessage("error.invalid.bankdetails.accountnumber") compose pattern(ukBankAccountNumberRegex)
+  val nonUKBankAccountNumberType = notEmpty.withMessage("baa") compose maxLength(maxNonUKBankAccountNumberLength) compose pattern(nonUKBankAccountNumberRegex)
+  val ibanType = notEmpty.withMessage("foo") compose maxLength(maxIBANLength) compose pattern(ibanRegex)
 
   /** Business Identifier Rules */
 
