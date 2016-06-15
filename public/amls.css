@@ -407,13 +407,14 @@ table.summary ul li {
 
 /* style the selects as close to inputs as possible,
  * because they'll flash on the screen before being replaced. */
-.js .custom-combobox,
-.js .country-selector,
-.js .custom-combobox-input {
+.js [data-auto-complete],
+.js .custom-combobox-input,
+.js .ui-autocomplete-input {
+  -webkit-appearance: none;
   background-color: transparent;
   border-radius: 0;
   height: 37px;
-  -webkit-appearance: none;
+  width: 220px;
 }
 
 .js *[data-toggle-new] {
