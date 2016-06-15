@@ -29,7 +29,7 @@ private sealed trait WhichCurrencies0 {
       c: Path => RuleLike[A, Boolean]
     ) : Rule[A, WhichCurrencies] = From[A] {__ =>
 
-        val currencies = (__ \ "currencies").read[Seq[String], Seq[String]](currencyType).withMessage("error.invalid.msb.wc.currencies")
+        val currencies = (__ \ "currencies").read(currencyType).withMessage("error.invalid.msb.wc.currencies")
 
         val bankMoneySource =
           (

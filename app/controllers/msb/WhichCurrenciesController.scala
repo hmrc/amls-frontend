@@ -32,7 +32,9 @@ trait WhichCurrenciesController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[WhichCurrencies](request.body) match {
+      val foo = Form2[WhichCurrencies](request.body)
+      Logger.debug(s"=============================$foo")
+      foo match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.which_currencies(f, edit)))
         case ValidForm(_, data) =>
