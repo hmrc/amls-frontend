@@ -95,16 +95,17 @@ trait MoneyServiceBusinessTestData {
   private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
   private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
 
-  val completeModel = MoneyServiceBusiness(Some(msbService),
-    Some(ExpectedThroughput.Second),
-    Some(businessUseAnIPSP),
-    Some(IdentifyLinkedTransactions(true)),
-    Some(BusinessAppliedForPSRNumberYes("123456")),
-    Some(SendMoneyToOtherCountry(true)),
-    Some(FundsTransfer(true)),
-    Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
-    Some(TransactionsInNext12Months("12345678963")),
-    Some(sendTheLargestAmountsOfMoney)
+  val completeModel = MoneyServiceBusiness(
+    msbServices = Some(msbService),
+    throughput = Some(ExpectedThroughput.Second),
+    businessUseAnIPSP = Some(businessUseAnIPSP),
+    identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
+    businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")),
+    sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+    fundsTransfer = Some(FundsTransfer(true)),
+    branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+    transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
+    sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney)
   )
 
   val emptyModel = MoneyServiceBusiness(None)

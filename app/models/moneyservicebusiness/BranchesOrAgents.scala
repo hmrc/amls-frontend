@@ -18,8 +18,8 @@ sealed trait BranchesOrAgents0 {
 
   private implicit def rule[A]
   (implicit
-   b: Path => Rule[A, Boolean],
-   s: Path => Rule[A, Seq[String]],
+   bR: Path => Rule[A, Boolean],
+   sR: Path => Rule[A, Seq[String]],
    cR: Rule[Seq[String], Seq[Country]]
   ): Rule[A, BranchesOrAgents] =
     From[A] { __ =>
@@ -33,7 +33,7 @@ sealed trait BranchesOrAgents0 {
        }
 
       val boolR =
-        b andThen {
+        bR andThen {
           _ withMessage "error.required.hasCountries.msb.branchesOrAgents"
         }
 
