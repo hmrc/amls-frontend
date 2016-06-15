@@ -22,6 +22,9 @@ case class MoneyServiceBusiness(
   def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
     this.copy(throughput = Some(p))
 
+  def whichCurrencies(p: WhichCurrencies): MoneyServiceBusiness =
+    this.copy(whichCurrencies = Some(p))
+
   def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
     this.copy(businessUseAnIPSP = Some(p))
 
