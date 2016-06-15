@@ -13,71 +13,52 @@ $(function () {
             'border' : 'none'
         });
 
-    $.widget('custom.combobox', {
-
+	$.widget('hmrc.auto', {
       _create: function () {
 
-        this.wrapper = $('<span>')
-          .addClass('custom-combobox')
-          .insertAfter(this.element);
+        var options, _select, _change, input, value;
 
-        this.element.hide();
-        this._createAutocomplete();
-      },
+      value = this.element.find('option:selected').text();
 
-      _createAutocomplete: function () {
+      this.element.hide();
 
-        var self = this,
-          selected = this.element.children(':selected'),
-          value = selected.val() ? selected.text() : '';
+      this.element.parent('form').submit(function (e) {
+      	_change();
+      });
 
-        $('form').submit(function () {
-            console.log(self.options);
-            self.input.trigger('autocompleteselect');
-            return false;
+      options = this.element
+        .find('option')
+        .toArray()
+        .map(function (elem) {
+          return {
+          	label: elem.text,
+            value: elem.text,
+            option: elem
+          };
         });
 
-        this.input = $('<input>')
-          .appendTo(this.wrapper)
-          .val(value)
-          .addClass('custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left')
-          .autocomplete({
-            delay: 0,
-            minLength: 0,
-            source: $.proxy(this, '_source')
-          });
+      _select = function (event, ui) {
+      	ui.item.option.selected = true;
+      };
 
-        this._on(this.input, {
-          autocompleteselect: function (event, ui) {
-            console.log(this.input.val());
-            console.log(this.element.val());
-            // this._trigger('select', event, {
-            //   item: ui.item.option
-            // });
-          },
-          autocompletechange: function (event, ui) {
-            if (!ui.item) {
-                $(this.element).val('');
-            }
-          }
+      _change = function (event, ui) {
+      	options.forEach(function (e) {
+        	e.option.selected = e.label.toLowerCase() === input.val().toLowerCase();
         });
-      },
+      };
 
-      _source: function (request, response) {
-        var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), 'i');
-        response( this.element.children('option').map(function () {
-          var text = $( this ).text();
-          if (this.value && (!request.term || matcher.test(text)))
-            return {
-              label: text,
-              value: text,
-              option: this
-            };
-        }));
-      }
-    });
+    	input = $('<input>')
+      	.insertAfter(this.element)
+        .val(value)
+        .autocomplete({
+        	source: options,
+          select: _select,
+          change: _change
+        });
+    }
+  });
 
-    $('select.country-selector').combobox();
+  $('select.country-selector').auto();
 
     $('*[data-add-btn]').click(function () {
         $('select.country-selector').combobox();
