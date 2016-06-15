@@ -43,7 +43,7 @@ sealed trait BranchesOrAgents0 {
           .compose(maxLengthR[Seq[Country]](maxLength))
       }
 
-      (__ \ "hasCountries").read(boolR) flatMap[Option[Seq[Country]]] {
+      (__ \ "hasCountries").read(boolR).flatMap[Option[Seq[Country]]] {
         case true =>
           (__ \ "countries").read(countrySeqR) fmap Some.apply
         case false =>
