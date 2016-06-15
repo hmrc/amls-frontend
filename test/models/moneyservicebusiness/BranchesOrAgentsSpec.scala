@@ -61,7 +61,7 @@ class BranchesOrAgentsSpec extends PlaySpec {
       )
 
       rule.validate(form) mustBe Failure(
-        Seq((Path \ "countries") -> Seq(ValidationError("bar")))
+        Seq((Path \ "countries") -> Seq(ValidationError("error.invalid.countries.msb.branchesOrAgents")))
       )
     }
 
@@ -82,7 +82,7 @@ class BranchesOrAgentsSpec extends PlaySpec {
       val form: UrlFormEncoded = Map.empty
 
       rule.validate(form) mustBe Failure(
-        Seq((Path \ "hasCountries") -> Seq(ValidationError("foo")))
+        Seq((Path \ "hasCountries") -> Seq(ValidationError("error.required.hasCountries.msb.branchesOrAgents")))
       )
     }
 

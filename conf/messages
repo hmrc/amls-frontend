@@ -28,6 +28,7 @@ error.required.postcode = Enter a postcode.
 error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
+error.required.country.name = Enter at least one country.
 error.required.nationality = Enter your nationality.
 error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 
@@ -96,7 +97,6 @@ error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punc
 error.max.length.ba.employee.count = You can''t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter a number.
 error.required.ba.select.country  = Select yes or no to the question: do you have customers who live or work outside of the UK?
-error.required.ba.country.name = Enter at least one country.
 error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
 error.required.ba.software.package.name = Enter the name of the software package.
@@ -256,6 +256,7 @@ lbl.overseas = Overseas
 lbl.start.date = Start date:
 lbl.end.date = End date:
 lbl.select.all = Select all that apply
+lbl.list.upto.3.countries = List up to 3 countries
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -968,6 +969,7 @@ msb.psr.number.title = Has your business applied for a Payment Systems Regulator
 msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
+msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
 msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
 
 msb.most.transactions.title = Where do you expect to send the most transactions?
