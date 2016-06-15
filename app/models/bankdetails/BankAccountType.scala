@@ -18,7 +18,8 @@ object BankAccountType {
   implicit val formReads: Rule[UrlFormEncoded, Option[BankAccountType]] =
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
-      (__ \ "bankAccountType").read[String] flatMap {
+
+      (__ \ "bankAccountType").read[String].withMessage("error.bankdetails.accounttype") flatMap[Option[BankAccountType]] {
         case "01" => Some(PersonalAccount)
         case "02" => Some(BelongsToBusiness)
         case "03" => Some(BelongsToOtherBusiness)
