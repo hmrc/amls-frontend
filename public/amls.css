@@ -306,11 +306,13 @@ table.summary ul li {
 
 
 /* icons */
-.notice .icon {
-    width: 25px;
+.icon {
+    display: inline-block;
     height: 25px;
     margin-right: 10px;
+    width: 25px;
 }
+
 .notice {
     padding-left: 38px;
     top: -43px;
@@ -318,14 +320,23 @@ table.summary ul li {
     display: block;
     height: 0px;
 }
+
 .icon-information {
-    display: inline-block;
+  /* what's this here for? */
 }
 
 .icon-important {
-    display: inline-block;
     padding-right: 1px;
     padding-bottom: 1px;
+}
+
+.icon-confirmed {
+  /* we're using the same tick as the progress page,
+     which is HUGE, so we need to resize it */
+  background-size: cover;
+  height: 55px;
+  margin: -15px 0 -15px -15px;
+  width: 55px;
 }
 
 .notice-important {

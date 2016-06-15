@@ -294,7 +294,7 @@ progress.declarationavailable = All sections complete: you can now submit the re
 progress.declarationunavailable = You can't finish the registration until you've completed all the sections.
 
 #### Confirmation page ####
-confirmation.lede = You have submitted the registration.
+confirmation.lede = You have submitted the application.
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now have 30 days to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
 confirmation.fee = Your registration fee:
