@@ -216,12 +216,12 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "must be mandatory" in {
       accountNameType.validate("") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+        Failure(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
     }
 
     "be not more than 40 characters" in {
       accountNameType.validate("This name is definitely longer than 40 characters.") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", FormTypes.maxAccountName))))
+        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
       )
     }
   }
@@ -234,17 +234,17 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail validation when more than 6 digits are supplied without - " in {
       sortCodeType.validate("87654321") must be(
-      Failure(Seq(Path -> Seq(ValidationError("error.pattern", sortCodeRegex)))))
+      Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
     }
 
     "fail when 8 non digits are supplied with - " in {
       sortCodeType.validate("ab-cd-ef") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.pattern", sortCodeRegex)))))
+        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
     }
 
     "fail validation for sort code with any other pattern" in {
       sortCodeType.validate("8712341241431243124124654321") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.pattern", sortCodeRegex))))
+        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
       )
     }
   }
@@ -262,7 +262,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
 
     ukBankAccountNumberType.validate("1234567890") must be(
-      Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxUKBankAccountNumberLength)))))
+      Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
   }
 
   "For the Overseas Bank Account" must {
@@ -273,7 +273,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail validation if IBAN is longer than the permissible length" in {
       ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxIBANLength)))))
+        Failure(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
     }
 
     "validate Non UK Account supplied " in {
@@ -282,7 +282,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail validation if Non UK Account is longer than the permissible length" in {
       nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxNonUKBankAccountNumberLength)))))
+        Failure(Seq(Path -> Seq(ValidationError("error.amx.length.bankdetails.account")))))
     }
 
   }
