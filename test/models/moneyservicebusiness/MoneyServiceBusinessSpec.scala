@@ -104,8 +104,9 @@ trait MoneyServiceBusinessTestData {
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
     branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
-    transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
-    sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney)
+    sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+    mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+    transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963"))
   )
 
   val emptyModel = MoneyServiceBusiness(None)
@@ -127,6 +128,7 @@ trait MoneyServiceBusinessTestData {
     "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
     "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963"),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
+    "mostTransactions" -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
     "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB")
   )
 

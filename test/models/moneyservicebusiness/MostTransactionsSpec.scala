@@ -32,11 +32,11 @@ class MostTransactionsSpec extends PlaySpec {
     "fail to validate when there are no countries" in {
 
       val form: UrlFormEncoded = Map(
-        "countries" -> Seq.empty
+        "mostTransactionsCountries" -> Seq.empty
       )
 
       rule.validate(form) mustEqual Failure(
-        Seq((Path \ "countries") -> Seq(ValidationError("foo")))
+        Seq((Path \ "mostTransactionsCountries") -> Seq(ValidationError("error.required.countries.msb.most.transactions")))
       )
     }
 
@@ -44,11 +44,11 @@ class MostTransactionsSpec extends PlaySpec {
 
       // scalastyle:off magic.number
       val form: UrlFormEncoded = Map(
-        "countries" -> Seq.fill(4)("GB")
+        "mostTransactionsCountries[]" -> Seq.fill(4)("GB")
       )
 
       rule.validate(form) mustEqual Failure(
-        Seq((Path \ "countries") -> Seq(ValidationError("bar")))
+        Seq((Path \ "mostTransactionsCountries") -> Seq(ValidationError("error.maxLength", 3)))
       )
     }
   }
