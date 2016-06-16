@@ -30,17 +30,17 @@ trait SubscriptionService extends DataCacheService {
   private object Submission {
     val message = "confirmation.submission"
     val quantity = 1
-    val feePer = 100
+    val feePer = ApplicationConfig.regFee
   }
 
   private object Premises {
     val message = "confirmation.tradingpremises"
-    val feePer = 110
+    val feePer = ApplicationConfig.premisesFee
   }
 
   private object People {
     val message = "confirmation.responsiblepeople"
-    val feePer = 115
+    val feePer = ApplicationConfig.peopleFee
   }
 
   private def safeId(cache: CacheMap): Future[String] = {

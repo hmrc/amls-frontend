@@ -1,5 +1,6 @@
 @import include.main
 @import models.confirmation._
+@import config.ApplicationConfig
 
 @(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
 
@@ -27,7 +28,7 @@
           <span class="heading-xlarge">@total</span>
         </p>
         <p>
-          <a class="button" href="@controllers.routes.ConfirmationController.get()">
+          <a class="button" href="@ApplicationConfig.paymentsUrl">
             @Messages("button.payfee")
           </a>
         </p>
