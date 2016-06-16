@@ -1,0 +1,23 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@main(
+    title = Messages("msb.most.transactions.title")
+) {
+
+    @heading("msb.most.transactions.title", "summary.msb")
+
+    @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
+
+        @fieldset("msb.most.transactions.list.countries", panel = false) {
+
+            @country(f("mostTransactionsCountries[0]"))
+            @country(f("mostTransactionsCountries[1]"))
+            @country(f("mostTransactionsCountries[2]"))
+        }
+
+        @submit(edit)
+    }
+}
