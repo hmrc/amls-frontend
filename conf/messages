@@ -230,7 +230,7 @@ error.invalid.msb.transactions.in.12months = Enter a valid number of transaction
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
 error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
-error.required.countries.msb.most.transactions = Enter at least one country
+error.required.countries.msb.most.transactions = Enter at least one country.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -1003,4 +1003,5 @@ msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
 msb.branchesoragents.add.btn = Add another country
 
+msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
 
