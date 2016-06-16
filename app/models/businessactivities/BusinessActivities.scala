@@ -61,7 +61,7 @@ case class BusinessActivities(
       Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)
       ) => true
       case BusinessActivities(
-      Some(_), Some(_), Some(_), Some(_), Some(_), Some(_),
+      Some(_), _, Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(x), Some(_), Some(_), Some(_), _
       ) if !x.accountantForAMLSRegulations => true
       case _ => false
