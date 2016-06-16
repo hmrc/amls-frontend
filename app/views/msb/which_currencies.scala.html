@@ -5,30 +5,24 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @main(
-  title = Messages("msb.services.title")
+  title = Messages("msb.which_currencies.title")
 ) {
 
-  <h1>which currencies</h1>
+  @heading("msb.which_currencies.title", "summary.msb")
 
   @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
-    <h2>3 countries</h2>
-    <input type="text" name="currencies[]" /> <br/>
-    <input type="text" name="currencies[]" /> <br/>
-    <input type="text" name="currencies[]" /> <br/>
 
-    <h2>sources</h2>
+    @fieldset(legend = "msb.which_currencies.uptoThree", panel = false) {
+        @currency(field=f("currencies[0]"))
+        @currency(field=f("currencies[1]"))
+        @currency(field=f("currencies[2]"))
+    }
 
-    <input type="checkbox" name="bankSource" value="Yes"/> Banks <br/>
-    <div style="border-left:3px solid gray; margin-left:10px">
-      <input type="text" name="bankNames" />
-    </div>
-
-    <input type="checkbox" name="wholesalerSource" value="Yes"/> Wholsaler <br/>
-    <div style="border-left:3px solid gray; margin-left:10px">
-      <input type="text" name="wholesalerNames" />
-    </div>
-
-    <input type="checkbox" name="customerSource" value="Yes"/> Customer <br/>
+    @checkbox(f("bankSource"),"msb.which_currencies.source.banks", "Yes", target=".form-field:has(#bankNames)")
+    @input(f("bankNames"), "msb.which_currencies.source.which_banks", panel=true, jsHidden=true)
+    @checkbox(f("wholesalerSource"),"msb.which_currencies.source.wholesalers", "Yes", target=".form-field:has(#wholesalerNames)")
+    @input(f("wholesalerNames"), "msb.which_currencies.source.which_wholesalers", panel=true, jsHidden=true)
+    @checkbox(f("customerSource"),"msb.which_currencies.source.customers", "Yes")
 
     @submit()
   }
