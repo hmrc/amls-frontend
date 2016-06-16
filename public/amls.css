@@ -90,7 +90,7 @@
 
 /* add back some margins */
 .list {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     margin-top: 5px;
 }
 
@@ -108,6 +108,7 @@ div.grid-layout {
     margin : 0;
 }
 
+/* Might not need this anymore, not sure who put it in */
 .address-list li {
     margin : 0;
 }
@@ -277,15 +278,18 @@ form .inline .block-label + fieldset {
     float: none;
     margin-top : 0;
 }
-form .date .form-group {
+form .date .form-field {
     width: 60px;
     float: left;
     margin-right: 20px;
     clear: none;
 }
-form .date .form-group input[type=text] {
+form .date .form-field input[type=text] {
     width : 100%;
 }
+
+
+
 form .inline > label.block-label {
     clear: none;
 }
@@ -328,11 +332,6 @@ table.summary ul li {
 
 .notice-important {
     padding-left: 55px;
-}
-
-/* Using this until there is some space issues fixed within the front end assets */
-.spacelarge {
-    margin-bottom: 30px;
 }
 
 .touchevents .date-of-birth {
@@ -392,4 +391,43 @@ table.summary ul li {
     width:100px;
     height:auto;
     overflow:hidden;
+}
+
+.no-padding {
+    padding-left: 0;
+}
+
+.no-margin {
+    margin-left: 0;
+}
+
+.panel-border-wide {
+    border-left-width: 10px;
+}
+
+/* aiming to give desktop enough width for the longer names,
+ * but bring the mobile view into line with the radio buttons.
+ * also… style the selects as close to inputs as possible,
+ * because they'll flash on the screen before being replaced. */
+.js .custom-combobox,
+.js .country-selector,
+.js .custom-combobox-input {
+  background-color: transparent;
+  border-radius: 0;
+  height: 37px;
+  min-width: 16.5em;
+  width: 66%;
+  -webkit-appearance: none;
+}
+
+.js *[data-toggle-new] {
+  display: none;
+}
+
+#hasCountries-fieldset {
+  padding-top: 10px;
+}
+
+#hasCountries-fieldset legend {
+  float: left;
 }

@@ -13,7 +13,10 @@ case class MoneyServiceBusiness(
                                  whichCurrencies : Option[WhichCurrencies] = None,
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
-                                 fundsTransfer : Option[FundsTransfer] = None
+                                 fundsTransfer : Option[FundsTransfer] = None,
+                                 branchesOrAgents: Option[BranchesOrAgents] = None,
+                                 transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
+                                 sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -39,10 +42,19 @@ case class MoneyServiceBusiness(
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
     this.copy(sendMoneyToOtherCountry = Some(p))
 
+  def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): MoneyServiceBusiness =
+    this.copy(sendTheLargestAmountsOfMoney = Some(p))
+
+  def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
+    this.copy(branchesOrAgents = Some(p))
+
+   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
+    this.copy(transactionsInNext12Months = Some(p))
+
   def isComplete: Boolean = this match {
-    case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_)) => true
-    case _ => false
-  }
+      case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+      case _ => false
+    }
 }
 
 object MoneyServiceBusiness {

@@ -2,10 +2,16 @@
     legend: String,
     jsHidden: Boolean = false,
     panel: Boolean = true,
-    id: String = ""
+    id: String = "",
+    data: Seq[String] = Seq.empty
 )(content: Html)(implicit lang: Lang)
 
-<fieldset class="@if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}" @if(id.nonEmpty) {id="@id"}>
+<fieldset
+  class="@if(panel) {panel-indent}
+  @if(jsHidden) {amls-js-hidden}"
+  @if(id.nonEmpty) {id="@id"}
+  @data.mkString(" ")
+  >
     @include.forms2.legend(legend, jsHidden)
     @content
 </fieldset>

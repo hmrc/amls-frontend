@@ -20,7 +20,7 @@ case class WhichCurrencies(currencies : Seq[String]
 private sealed trait WhichCurrencies0 {
 
   private val nameType = maxLength(140)
-  private val currencyType = TraversableValidators.minLength[Seq[String]](1)
+  private val currencyType = TraversableValidators.minLengthR[Seq[String]](1)
 
   private implicit def rule[A]
     (implicit

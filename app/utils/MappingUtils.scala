@@ -5,14 +5,30 @@ import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
 import play.api.data.mapping.GenericRules
-import scala.collection.TraversableLike
+import scala.collection.{GenTraversableOnce, TraversableLike}
 
 object TraversableValidators {
-  def minLength[T <: Traversable[_]](expectedLength : Int) : Rule[T, T] = {
-    GenericRules.validateWith[T]("error.required")(t => t.size >= expectedLength)}
 
-  def maxLength[T <: Traversable[_]](expectedLength : Int) : Rule[T, T] = {
-    GenericRules.validateWith[T]("error.tooLarge")(t => t.size <= expectedLength)}
+  implicit def seqToOptionSeq[A]
+  (implicit
+   r: A => Option[A]
+  ): Rule[Seq[A], Seq[Option[A]]] =
+    Rule.zero[Seq[A]] fmap {
+      _ map r
+    }
+
+  implicit def flattenR[A]: Rule[Seq[Option[A]], Seq[A]] =
+    Rule.zero[Seq[Option[A]]] fmap { _ flatten }
+
+  def minLengthR[T <: Traversable[_]](l : Int) : Rule[T, T] =
+    GenericRules.validateWith[T]("error.required") {
+      _.size >= l
+    }
+    
+  def maxLengthR[T <: Traversable[_]](l: Int): Rule[T, T] =
+    GenericRules.validateWith[T]("error.maxLength", l) {
+      _.size <= l
+    }
 }
 
 object OptionValidators {
@@ -27,6 +43,7 @@ object OptionValidators {
 trait MappingUtils {
 
   object Implicits {
+
     /*
    * Basic wrapping conversions to make writing mappings easier
    * Would be nice to be able to write these in a more `functional`

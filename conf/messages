@@ -28,6 +28,7 @@ error.required.postcode = Enter a postcode.
 error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
+error.required.country.name = Enter at least one country.
 error.required.nationality = Enter your nationality.
 error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 
@@ -80,6 +81,24 @@ error.required.atb.registered.for.vat = Select yes or no to the question: is you
 error.required.atb.corporation.tax = Select yes or no to the question: is your business registered for Corporation Tax?
 error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
+error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
+
+####  Bank Details ####
+error.bankdetails.accounttype = Select one kind of bank account that your business uses. If you have no bank accounts, select ‘The business doesn’t use a bank account’.
+error.bankdetails.accountname = Enter a bank account name.
+error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
+error.bankdetails.ukbankaccount = Select yes or no to the question: is this a UK bank account?
+error.bankdetails.sortcode = Enter the sort code.
+error.invalid.bankdetails.sortcode = Enter a valid sort code. It must be 6 numbers long. Do not enter letters, punctuation or other characters.
+error.bankdetails.accountnumber = Enter the account number.
+error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
+error.max.length.bankdetails.accountnumber = You can’t enter more than 8 numbers for the account number.
+error.required.bankdetails.iban.account = Enter an IBAN number or an account number.
+error.invalid.bankdetails.iban =  Enter a valid IBAN number. It must only be numbers or letters, and it can’t be more than 34 characters long. Do not enter punctuation or other characters.
+error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
+error.invalid.bankdetails.account = Enter a valid account number. It must only be numbers or letters, and it can’t be more than 40 characters long. Do not enter punctuation or other characters.
+error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
+
 
 ####  Business Activities ####
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
@@ -95,7 +114,6 @@ error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punc
 error.max.length.ba.employee.count = You can''t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter a number.
 error.required.ba.select.country  = Select yes or no to the question: do you have customers who live or work outside of the UK?
-error.required.ba.country.name = Enter at least one country.
 error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
 error.required.ba.software.package.name = Enter the name of the software package.
@@ -207,7 +225,11 @@ error.required.msb.linked.txn = Select yes or no to the question: can your syste
 error.required.msb.psr.options = Select yes or no to the question: has your business applied for a Payment Systems Regulator (PSR) registration number?
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
+error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
+error.invalid.msb.transactions.in.12months = Enter a valid number of transactions you expect in the next 12 months. It must be up to 11 characters, and can only be numbers.
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
+error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
+error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -250,6 +272,7 @@ lbl.overseas = Overseas
 lbl.start.date = Start date:
 lbl.end.date = End date:
 lbl.select.all = Select all that apply
+lbl.list.upto.3.countries = List up to 3 countries
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -962,11 +985,18 @@ msb.psr.number.title = Has your business applied for a Payment Systems Regulator
 msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
-
+msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
+msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
 
 msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?
 msb.fundstransfer.heading = Do you transfer money without using formal banking systems?
 msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
 
+msb.branchesoragents.title = Money Service Business – Do you have branches or agents in other countries?
+msb.branchesoragents.heading = Do you have branches or agents in other countries?
+msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
+msb.branchesoragents.legend = Which countries?
+msb.branchesoragents.hint = List up to 10 countries
+msb.branchesoragents.add.btn = Add another country
 
 
