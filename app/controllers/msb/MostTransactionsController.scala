@@ -13,7 +13,7 @@ trait MostTransactionsController extends BaseController {
 
   def cache: DataCacheConnector
 
-  def get(edit: Boolean) = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
 
       cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
@@ -28,7 +28,7 @@ trait MostTransactionsController extends BaseController {
       }
   }
 
-  def post(edit: Boolean) = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[MostTransactions](request.body) match {
         case f: InvalidForm =>
