@@ -1,7 +1,8 @@
 @import include._
 @import forms2._
+@import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, activities: Set[BusinessActivity])(implicit lang: Lang, request: Request[_])
 
 
 @main(
@@ -12,23 +13,33 @@
 
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
-    <div class="form-group">
         <p>@Messages("bankdetails.confirm-activities.subtitile")</p>
-        <div class="panel-indent panel-border-wide">
+        <ul class="panel-indent panel-border-wide panel-indent--gutter">
+            @activities.map {
+                case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
+                case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
+                case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
+                case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
+                case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
+                case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
+                case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
+            }.map { x => <li>@x</li> }
+        </ul>
+
+
+        <div class="form-field-group">
+            @radioGroup(f("expectedAMLSTurnover")) {
+                @legend("businessactivities.turnover.title", jsHidden = true)
+                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.01", "01")
+                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.02", "02")
+                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.03", "03")
+                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.04", "04")
+                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.05", "05")
+                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.06", "06")
+                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.07", "07")
+            }
         </div>
-    </div>
 
-        @radioGroup(f("expectedAMLSTurnover")) {
-            @legend("TODO", jsHidden = true)
-            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.01", "01")
-            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.02", "02")
-            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.03", "03")
-            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.04", "04")
-            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.05", "05")
-            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.06", "06")
-            @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.07", "07")
-
-        }
         @submit(edit)
     }
 }

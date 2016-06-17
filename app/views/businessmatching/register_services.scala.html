@@ -14,16 +14,18 @@
 
         @Messages("lbl.select.all")
 
-        @radioGroup(f("businessActivities")) {
-            @legend("lbl.select.all", jsHidden = true)
-            @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.01", "01")
-            @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.02", "02")
-            @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.03", "03")
-            @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.04", "04", disabled = true)
-            @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.05", "05")
-            @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.06", "06")
-            @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.07", "07")
-        }
+        <div class="form-field-group">
+            @radioGroup(f("businessActivities")) {
+                @legend("lbl.select.all", jsHidden = true)
+                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.01", "01")
+                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.02", "02")
+                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.03", "03")
+                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.04", "04", disabled = true)
+                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.05", "05")
+                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.06", "06")
+                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.07", "07")
+            }
+        </div>
 
         <details class="details">
             <summary class="summary">@Messages("businessmatching.registerservices.details")</summary>
