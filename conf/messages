@@ -226,11 +226,11 @@ error.required.msb.psr.options = Select yes or no to the question: has your busi
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
-error.invalid.msb.transactions.in.12months = Enter a valid number of transactions you expect in the next 12 months. It must be up to 11 characters, and can only be numbers.
+error.invalid.msb.transactions.in.12months = Enter a number.
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
 error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
-error.required.countries.msb.most.transactions = Enter at least one country
+error.required.countries.msb.most.transactions = Enter at least one country.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -1003,4 +1003,5 @@ msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
 msb.branchesoragents.add.btn = Add another country
 
+msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
 

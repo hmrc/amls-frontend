@@ -42,8 +42,7 @@ trait BranchesOrAgentsController extends BaseController {
             )
           } yield edit match {
             case false =>
-              // TODO: Linked transactions page
-              Redirect(routes.ServicesController.get())
+              Redirect(routes.IdentifyLinkedTransactionsController.get())
             case true =>
               Redirect(routes.SummaryController.get())
           }
