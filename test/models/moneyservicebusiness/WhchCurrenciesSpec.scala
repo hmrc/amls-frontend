@@ -66,6 +66,34 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
     }
 
+    "bank money source is checked and BankNames is empty" should {
+      val formData = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[1]" -> Seq("CHF"),
+        "currencies[2]" -> Seq("EUR"),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq("")
+      )
+
+      "fail validation" in {
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")))))
+      }
+    }
+
+    "wholesaler money source is checked and wholesalere Names is empty" should {
+      val formData = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[1]" -> Seq("CHF"),
+        "currencies[2]" -> Seq("EUR"),
+        "wholesalerMoneySource" -> Seq("Yes"),
+        "wholesalerNames" -> Seq("")
+      )
+
+      "fail validation" in {
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
+      }
+    }
+
     "BankNames > 140 characters" should {
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
@@ -83,6 +111,23 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
     }
 
+    "currencies are sent as blank strings" should {
+      val formData = Map(
+        "currencies[0]" -> Seq(""),
+        "currencies[1]" -> Seq(""),
+        "currencies[2]" -> Seq(""),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq("Bank names"),
+        "wholesalerMoneySource" -> Seq("Yes"),
+        "wholesalerNames" -> Seq("wholesaler names"),
+        "customerMoneySource" -> Seq("Yes")
+      )
+
+      "fail validation" in {
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
+      }
+    }
+
     "WholesalerNames > 140 characters" should {
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
@@ -97,6 +142,18 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
 
       "fail validation " in {
         WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
+      }
+    }
+
+    "No money source specified" should {
+      "fail validation" in {
+        val formData = Map(
+          "currencies[0]" -> Seq("USD"),
+          "currencies[1]" -> Seq("CHF"),
+          "currencies[2]" -> Seq("EUR")
+        )
+
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
       }
     }
 

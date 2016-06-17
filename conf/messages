@@ -230,6 +230,10 @@ error.invalid.msb.transactions.in.12months = Enter a valid number of transaction
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
 error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
+error.invalid.msb.wc.currencies = Enter at least one currency
+error.invalid.msb.wc.moneySources = Select at least one currency supplier
+error.invalid.msb.wc.bankNames = Enter the banks’ names
+error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -1005,7 +1009,7 @@ msb.fundstransfer.heading = Do you transfer money without using formal banking s
 msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
 
 msb.branchesoragents.title = Money Service Business – Do you have branches or agents in other countries?
-msb.branchesoragents.heading = Do you have branches or agents in other countries?
+msb.branchesoragents.heading = Do you have brnches or agents in other countries?
 msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
 msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries

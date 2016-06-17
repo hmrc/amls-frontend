@@ -17,13 +17,15 @@
         @currency(field=f("currencies[1]"))
         @currency(field=f("currencies[2]"))
     }
-
-    @checkbox(f("bankSource"),"msb.which_currencies.source.banks", "Yes", target=".form-field:has(#bankNames)")
-    @input(f("bankNames"), "msb.which_currencies.source.which_banks", panel=true, jsHidden=true)
-    @checkbox(f("wholesalerSource"),"msb.which_currencies.source.wholesalers", "Yes", target=".form-field:has(#wholesalerNames)")
-    @input(f("wholesalerNames"), "msb.which_currencies.source.which_wholesalers", panel=true, jsHidden=true)
-    @checkbox(f("customerSource"),"msb.which_currencies.source.customers", "Yes")
-
+    <br/>
+    @fieldset(legend="msb.which_currencies.who", panel=false, bold=true, hint="lbl.select.all") {
+        @checkbox(f("bankMoneySource"),"msb.which_currencies.source.banks", "Yes", target=".form-field:has(#bankNames)")
+        @input(f("bankNames"), "msb.which_currencies.source.which_banks", panel=true, jsHidden=true)
+        @checkbox(f("wholesalerMoneySource"),"msb.which_currencies.source.wholesalers", "Yes", target=".form-field:has(#wholesalerNames)")
+        @input(f("wholesalerNames"), "msb.which_currencies.source.which_wholesalers", panel=true, jsHidden=true)
+        @checkbox(f("customerMoneySource"),"msb.which_currencies.source.customers", "Yes")
+    }
+    <br/>
     @submit()
   }
 }

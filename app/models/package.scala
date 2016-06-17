@@ -1,4 +1,8 @@
+import play.api.data.mapping.Rule
+
 package object models {
+
+  type ValidationRule[A] = Rule[A,A]
 
   //ISO 4217 currency codes
   //http://www.iso.org/iso/home/standards/currency_codes.htm
