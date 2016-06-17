@@ -83,7 +83,7 @@ class ExpectedThroughputControllerSpec extends PlaySpec with OneServerPerSuite w
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.BranchesOrAgentsController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {

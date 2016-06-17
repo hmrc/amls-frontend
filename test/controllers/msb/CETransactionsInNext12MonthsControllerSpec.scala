@@ -36,7 +36,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.transactions.expected.title"))
+      contentAsString(result) must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
     }
 
     "load the page 'How many currency exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture  {
@@ -54,7 +54,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "txnAmount" -> ""
+        "ceTransaction" -> ""
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
@@ -71,7 +71,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
 
     "Successfully save data in save4later and navigate to Next page" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody (
-        "txnAmount" -> "12345678963"
+        "ceTransaction" -> "12345678963"
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
@@ -87,7 +87,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
 
     "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody (
-        "txnAmount" -> "12345678963"
+        "ceTransaction" -> "12345678963"
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())

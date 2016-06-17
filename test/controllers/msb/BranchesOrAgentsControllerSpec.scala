@@ -96,8 +96,7 @@ class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with One
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      // TODO: Redirect to the correct place
-      redirectLocation(result) mustEqual Some(routes.ServicesController.get().url)
+      redirectLocation(result) mustEqual Some(routes.IdentifyLinkedTransactionsController.get().url)
     }
 
     "return a redirect to the 'Summary page' page on valid submission when edit flag is set" in new Fixture {
