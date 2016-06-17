@@ -34,7 +34,7 @@ s"""${f("IBANNumber").id}-fieldset"""
         @radio(f("isUK"), "lbl.yes", "true", target = s"#$target")
         @radio(f("isUK"), "lbl.no", "false", target = s"#$target1")
             @fieldset("TODO", jsHidden = true, id = target) {
-                @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "For example, 20-42-66", bold = false)
+                @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "For example, 204266", bold = false)
                 @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", hintText = "For example, 12345678", bold = false)
 
             }
