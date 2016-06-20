@@ -33,7 +33,6 @@ trait WhichCurrenciesController extends BaseController {
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       val foo = Form2[WhichCurrencies](request.body)
-      Logger.debug(s"=============================$foo")
       foo match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.which_currencies(f, edit)))
@@ -43,7 +42,7 @@ trait WhichCurrenciesController extends BaseController {
             _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.whichCurrencies(data)
             )
-          // TODO: Go to next page
+
           } yield Redirect(routes.SummaryController.get())
       }
     }
