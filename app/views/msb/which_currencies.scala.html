@@ -1,0 +1,31 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@main(
+  title = Messages("msb.which_currencies.title")
+) {
+
+  @heading("msb.which_currencies.title", "summary.msb")
+
+  @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
+
+    @fieldset(legend = "msb.which_currencies.uptoThree", panel = false) {
+        @currency(field=f("currencies[0]"))
+        @currency(field=f("currencies[1]"))
+        @currency(field=f("currencies[2]"))
+    }
+    <br/>
+    @fieldset(legend="msb.which_currencies.who", panel=false, bold=true, hint="lbl.select.all") {
+        @checkbox(f("bankMoneySource"),"msb.which_currencies.source.banks", "Yes", target=".form-field:has(#bankNames)")
+        @input(f("bankNames"), "msb.which_currencies.source.which_banks", panel=true, jsHidden=true)
+        @checkbox(f("wholesalerMoneySource"),"msb.which_currencies.source.wholesalers", "Yes", target=".form-field:has(#wholesalerNames)")
+        @input(f("wholesalerNames"), "msb.which_currencies.source.which_wholesalers", panel=true, jsHidden=true)
+        @checkbox(f("customerMoneySource"),"msb.which_currencies.source.customers", "Yes")
+    }
+    <br/>
+    @submit()
+  }
+}

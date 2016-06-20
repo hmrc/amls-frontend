@@ -3,7 +3,10 @@
     jsHidden: Boolean = false,
     panel: Boolean = true,
     id: String = "",
-    data: Seq[String] = Seq.empty
+    data: Seq[String] = Seq.empty,
+    bold: Boolean = false,
+    hint: String = ""
+
 )(content: Html)(implicit lang: Lang)
 
 <fieldset
@@ -12,6 +15,6 @@
   @if(id.nonEmpty) {id="@id"}
   @data.mkString(" ")
   >
-    @include.forms2.legend(legend, jsHidden)
+    @include.forms2.legend(legend, jsHidden, bold, hint)
     @content
 </fieldset>

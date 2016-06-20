@@ -100,6 +100,11 @@ trait MoneyServiceBusinessTestData {
     throughput = Some(ExpectedThroughput.Second),
     businessUseAnIPSP = Some(businessUseAnIPSP),
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
+    Some(WhichCurrencies(
+      Seq("USD", "GBP", "EUR"),
+      Some(BankMoneySource("bank names")),
+      Some(WholesalerMoneySource("Wholesaler Names")),
+      true)),
     businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
@@ -122,6 +127,14 @@ trait MoneyServiceBusinessTestData {
       "name" -> "name",
       "referenceNumber" -> "123456789123456"),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
+    "whichCurrencies" -> Json.obj(
+      "currencies" -> Json.arr("USD", "GBP", "EUR"),
+      "bankMoneySource" -> "Yes",
+      "bankNames" -> "bank names",
+      "wholesalerMoneySource" -> "Yes",
+      "wholesalerNames" -> "Wholesaler Names",
+      "customerMoneySource" -> "Yes"
+    ),
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
       "regNumber" -> "123456"),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
