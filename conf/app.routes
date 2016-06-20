@@ -232,6 +232,9 @@ GET         /money-service-business/check-your-answers                  controll
 GET         /money-service-business/anticipated-totals                  controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
 POST        /money-service-business/anticipated-totals                  controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
 
+GET         /money-service-business/currency                            controllers.msb.WhichCurrenciesController.get(edit: Boolean ?= false)
+POST         /money-service-business/currency                            controllers.msb.WhichCurrenciesController.post(edit: Boolean ?= false)
+
 GET         /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
 POST        /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)
 
