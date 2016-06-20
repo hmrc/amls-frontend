@@ -1,8 +1,8 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness.{MoneyServiceBusiness, CETransactionsInNext12Months}
-import org.mockito.Matchers._
+import models.moneyservicebusiness._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
@@ -26,6 +26,13 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
   }
 
   val emptyCache = CacheMap("", Map.empty)
+
+  val fullModel = WhichCurrencies(
+    Seq("USD", "CHF", "EUR"),
+    Some(BankMoneySource("Bank names")),
+    Some(WholesalerMoneySource("wholesaler names")),
+    true
+  )
 
   "CETransactionsInNext12MonthsController" must {
 
@@ -82,23 +89,59 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SendMoneyToOtherCountryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get().url))
     }
 
-    "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
+    "Successfully save data in save4later and navigate to Summary page in edit mode if the next page's data is in store" in new Fixture {
+
+      val incomingModel = MoneyServiceBusiness(
+        whichCurrencies = Some(fullModel)
+      )
+
+      val outgoingModel = incomingModel.copy(
+        ceTransactionsInNext12Months = Some(
+          CETransactionsInNext12Months("12345678963")
+        )
+      )
+
       val newRequest = request.withFormUrlEncodedBody (
         "ceTransaction" -> "12345678963"
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+    }
+
+    "on valid submission (edit) without next page's data" in new Fixture {
+
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
+        ceTransactionsInNext12Months = Some(
+          CETransactionsInNext12Months("12345678963")
+        )
+      )
+
+      val newRequest = request.withFormUrlEncodedBody (
+        "ceTransaction" -> "12345678963"
+      )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get().url))
     }
   }
 }

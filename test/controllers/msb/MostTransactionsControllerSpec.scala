@@ -2,7 +2,7 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.Country
-import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
+import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -80,9 +80,17 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       document.select(".amls-error-summary").size mustEqual 1
     }
 
-    "return a redirect to 'X' page on valid submission (no edit)" in new Fixture {
+    "on valid submission (no edit) (CE)" in new Fixture {
 
-      val model = MoneyServiceBusiness(
+      val incomingModel = MoneyServiceBusiness(
+        msbServices = Some(MsbServices(
+          Set(
+            CurrencyExchange
+          )
+        ))
+      )
+
+      val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
@@ -97,19 +105,20 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      // TODO Actual routing
-      redirectLocation(result) mustEqual Some(routes.ServicesController.get().url)
+      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get().url)
     }
 
-    "return a redirect to the summary page on valid submission (edit)" in new Fixture {
+    "on valid submission (no edit) (non-CE)" in new Fixture {
 
-      val model = MoneyServiceBusiness(
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
@@ -124,7 +133,106 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = false)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+    }
+
+    "return a redirect to the summary page on valid submission where the next page data exists (edit) (CE)" in new Fixture {
+
+      val incomingModel = MoneyServiceBusiness(
+        msbServices = Some(MsbServices(
+          Set(
+            CurrencyExchange
+          )
+        )),
+        ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
+          ""
+        ))
+      )
+
+      val outgoingModel = MoneyServiceBusiness(
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        )
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[]" -> "GB"
+      )
+
+      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+    }
+
+    "return a redirect to the summary page on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
+
+      val incomingModel = MoneyServiceBusiness(
+        msbServices = Some(MsbServices(
+          Set(
+            CurrencyExchange
+          )
+        ))
+      )
+
+      val outgoingModel = MoneyServiceBusiness(
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        )
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[]" -> "GB"
+      )
+
+      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(edit = true)(newRequest)
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get().url)
+    }
+
+    "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
+
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = MoneyServiceBusiness(
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        )
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "mostTransactionsCountries[]" -> "GB"
+      )
+
+      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)

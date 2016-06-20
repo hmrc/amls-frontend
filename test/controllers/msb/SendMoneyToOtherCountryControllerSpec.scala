@@ -1,8 +1,8 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness.{SendMoneyToOtherCountry, MoneyServiceBusiness}
-import org.mockito.Matchers._
+import models.moneyservicebusiness._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
@@ -48,7 +48,6 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneServerPerSu
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("msb.send.money.title"))
-
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
@@ -68,37 +67,155 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneServerPerSu
 
     }
 
-    "Successfully save data in save4later and navigate to Next page" in new Fixture {
+    "on valid post where the value is true" in new Fixture {
+
       val newRequest = request.withFormUrlEncodedBody (
         "money" -> "true"
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      val incomingModel = MoneyServiceBusiness()
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
+      val outgoingModel = incomingModel.copy(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+      )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get().url))
     }
 
-    "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
+    "on valid post where the value is false (CE)" in new Fixture {
+
       val newRequest = request.withFormUrlEncodedBody (
-        "money" -> "true"
+        "money" -> "false"
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      val incomingModel = MoneyServiceBusiness(
+        msbServices = Some(MsbServices(
+          Set(
+            TransmittingMoney,
+            CurrencyExchange
+          )
+        ))
+      )
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
+      val outgoingModel = incomingModel.copy(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
+      )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
     }
   }
 
+  "on valid post where the value is false (Non-CE)" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody (
+      "money" -> "false"
+    )
+
+    val incomingModel = MoneyServiceBusiness()
+
+    val outgoingModel = incomingModel.copy(
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
+    )
+
+    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+    when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+    val result = controller.post(false)(newRequest)
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+  }
+
+  "on valid post where the value is true in edit mode" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody (
+      "money" -> "true"
+    )
+
+    val incomingModel = MoneyServiceBusiness()
+
+    val outgoingModel = incomingModel.copy(
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+    )
+
+    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+    when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+    val result = controller.post(true)(newRequest)
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get().url))
+  }
+
+  "on valid post where the value is false in edit mode (CE)" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody (
+      "money" -> "false"
+    )
+
+    val incomingModel = MoneyServiceBusiness(
+      msbServices = Some(MsbServices(
+        Set(
+          CurrencyExchange
+        )
+      ))
+    )
+
+    val outgoingModel = incomingModel.copy(
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+    )
+
+    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+    when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+    val result = controller.post(true)(newRequest)
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+  }
+
+  "on valid post where the value is false in edit mode (Non-CE)" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody (
+      "money" -> "false"
+    )
+
+    val incomingModel = MoneyServiceBusiness()
+
+    val outgoingModel = incomingModel.copy(
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+    )
+
+    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+    when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+    val result = controller.post(true)(newRequest)
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+  }
 }
