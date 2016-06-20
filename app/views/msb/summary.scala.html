@@ -8,6 +8,51 @@
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.msb")
+    @Messages("summary.linetext")
+
+
+    <table>
+        <tr>
+            <th>@Messages("msb.services.heading")</th>
+            <td width="12"><a href="@controllers.msb.routes.ServicesController.get(true)">Edit</a></td>
+        </tr>
+        @model.msbServices.map{ services =>
+            @services.services.map { svc =>
+            <tr>
+                <td colspan="2">
+                    @svc match {
+                        case TransmittingMoney => {@Messages("msb.services.list.lbl.01")}
+                        case CurrencyExchange => {@Messages("msb.services.list.lbl.02")}
+                        case ChequeCashingNotScrapMetal => {@Messages("msb.services.list.lbl.03")}
+                        case ChequeCashingScrapMetal => {@Messages("msb.services.list.lbl.04")}
+                    }
+                </td>
+            </tr>
+            }
+        }
+    </table>
+
+    <table>
+        <tr>
+            <th>@Messages("msb.throughput.title")</th>
+            <td width="12"><a href="@controllers.msb.routes.ExpectedThroughputController.get(true)">Edit</a></td>
+        </tr>
+        @model.throughput.map{ throughput =>
+        <tr>
+            <td colspan="2">
+                @throughput match {
+                    case ExpectedThroughput.First =>   {@Messages("msb.throughput.lbl.01")}
+                    case ExpectedThroughput.Second =>  {@Messages("msb.throughput.lbl.02")}
+                    case ExpectedThroughput.Third =>   {@Messages("msb.throughput.lbl.03")}
+                    case ExpectedThroughput.Fourth =>  {@Messages("msb.throughput.lbl.04")}
+                    case ExpectedThroughput.Fifth =>   {@Messages("msb.throughput.lbl.05")}
+                    case ExpectedThroughput.Sixth =>   {@Messages("msb.throughput.lbl.06")}
+                    case ExpectedThroughput.Seventh => {@Messages("msb.throughput.lbl.07")}
+                }
+            </td>
+        </tr>
+        }
+    </table>
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
