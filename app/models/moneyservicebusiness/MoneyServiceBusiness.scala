@@ -61,7 +61,7 @@ case class MoneyServiceBusiness(
     this.copy(ceTransactionsInNext12Months = Some(p))
 
   def isComplete: Boolean = this match {
-      case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+      case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
       case _ => false
     }
 }
