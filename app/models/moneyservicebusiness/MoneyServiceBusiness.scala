@@ -15,8 +15,10 @@ case class MoneyServiceBusiness(
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  fundsTransfer : Option[FundsTransfer] = None,
                                  branchesOrAgents: Option[BranchesOrAgents] = None,
+                                 sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
+                                 mostTransactions: Option[MostTransactions] = None,
                                  transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
-                                 sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None
+                                 ceTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None
                                ) {
 
   def msbServices(p: MsbServices): MoneyServiceBusiness =
@@ -33,8 +35,12 @@ case class MoneyServiceBusiness(
 
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
     this.copy(identifyLinkedTransactions = Some(p))
+
   def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
     this.copy(fundsTransfer = Some(p))
+
+  def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
+    this.copy(branchesOrAgents = Some(p))
 
   def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
     this.copy(businessAppliedForPSRNumber = Some(p))
@@ -45,11 +51,14 @@ case class MoneyServiceBusiness(
   def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): MoneyServiceBusiness =
     this.copy(sendTheLargestAmountsOfMoney = Some(p))
 
-  def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
-    this.copy(branchesOrAgents = Some(p))
+  def mostTransactions(p: MostTransactions): MoneyServiceBusiness =
+    this.copy(mostTransactions = Some(p))
 
    def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(transactionsInNext12Months = Some(p))
+
+  def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
+    this.copy(ceTransactionsInNext12Months = Some(p))
 
   def isComplete: Boolean = this match {
       case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true

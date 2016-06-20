@@ -4,45 +4,45 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
-import play.api.data.mapping.Write
-import play.api.data.mapping.forms.UrlFormEncoded
+import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait BranchesOrAgentsController extends BaseController {
+trait MostTransactionsController extends BaseController {
 
   def cache: DataCacheConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
+
       cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
 
           val form = (for {
             msb <- response
-            branches <- msb.branchesOrAgents
-          } yield Form2[BranchesOrAgents](branches)).getOrElse(EmptyForm)
+            transactions <- msb.mostTransactions
+          } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.branches_or_agents(form, edit))
+          Ok(views.html.msb.most_transactions(form, edit))
       }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[BranchesOrAgents](request.body) match {
+      Form2[MostTransactions](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
+          Future.successful(BadRequest(views.html.msb.most_transactions(f, edit)))
         case ValidForm(_, data) =>
           for {
             msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.branchesOrAgents(data)
+              msb.mostTransactions(data)
             )
           } yield edit match {
             case false =>
-              Redirect(routes.IdentifyLinkedTransactionsController.get())
+              // TODO: Linked transactions page
+              Redirect(routes.ServicesController.get())
             case true =>
               Redirect(routes.SummaryController.get())
           }
@@ -50,7 +50,7 @@ trait BranchesOrAgentsController extends BaseController {
   }
 }
 
-object BranchesOrAgentsController extends BranchesOrAgentsController {
+object MostTransactionsController extends MostTransactionsController {
   override val cache: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
+  override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

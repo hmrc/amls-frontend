@@ -29,7 +29,7 @@ trait SendTheLargestAmountsOfMoneyController extends BaseController {
       Form2[SendTheLargestAmountsOfMoney](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(send_largest_amounts_of_money(f, edit)))
-        case ValidForm(_, data) => {
+        case ValidForm(_, data) =>
           for {
             businessActivity <-
             dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
@@ -40,7 +40,6 @@ trait SendTheLargestAmountsOfMoneyController extends BaseController {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.SummaryController.get())
           }
-        }
       }
   }
 }

@@ -226,7 +226,7 @@ error.required.msb.psr.options = Select yes or no to the question: has your busi
 error.invalid.msb.psr.number = Enter a valid PSR registration number. It must be 6 characters long, and only be numbers.
 error.required.msb.send.money = Select yes or no to the question: do you send money to other countries?
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months.
-error.invalid.msb.transactions.in.12months = Enter a valid number of transactions you expect in the next 12 months. It must be up to 11 characters, and can only be numbers.
+error.invalid.msb.transactions.in.12months = Enter a valid number. It must be 11 characters long.
 error.required.msb.fundsTransfer = Select yes or no to the question: do you transfer money without using formal banking systems?
 error.invalid.countries.msb.branchesOrAgents = Enter at least one country.
 error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the question: do you have branches or agents in other countries?
@@ -234,6 +234,7 @@ error.invalid.msb.wc.currencies = Enter at least one currency
 error.invalid.msb.wc.moneySources = Select at least one currency supplier
 error.invalid.msb.wc.bankNames = Enter the banks’ names
 error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
+error.required.countries.msb.most.transactions = Enter at least one country.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -1004,6 +1005,9 @@ msb.send.money.title = Do you send money to other countries?
 msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
 msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
 
+msb.most.transactions.title = Where do you expect to send the most transactions?
+msb.most.transactions.list.countries = List up to 3 countries
+
 msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?
 msb.fundstransfer.heading = Do you transfer money without using formal banking systems?
 msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
@@ -1015,4 +1019,5 @@ msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
 msb.branchesoragents.add.btn = Add another country
 
+msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
 
