@@ -18,7 +18,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
-        case Some(TradingPremises(Some(data), _, _)) =>
+        case Some(TradingPremises(Some(data), _, _,_)) =>
           Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
         case _ =>
           Ok(where_are_trading_premises(EmptyForm, edit, index))
@@ -37,9 +37,9 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             _ <- updateData[TradingPremises](index) {
               // This makes sure to save `None` for the agent section if
               // the user selects that the premises is theirs.
-              case Some(TradingPremises(_, _, wdbd)) if data.isOwner =>
+              case Some(TradingPremises(_, _, wdbd,_)) if data.isOwner =>
                 Some(TradingPremises(Some(data), None, wdbd))
-              case Some(TradingPremises(_, ya, wdbd)) =>
+              case Some(TradingPremises(_, ya, wdbd,_)) =>
                 Some(TradingPremises(Some(data), ya, wdbd))
               case _ => data
             }
