@@ -55,8 +55,12 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 Some(TradingPremises(
                   whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities))
                 ))
-            } map {
-              _ => Redirect(routes.SummaryController.get())
+            }
+            Future.successful {
+              activities.contains(MoneyServiceBusiness) match {
+                case true => Redirect(routes.MSBServicesController.get(index))
+                case false => Redirect(routes.SummaryController.get())
+              }
             }
           } else {
             val ba = BusinessActivities(activities)

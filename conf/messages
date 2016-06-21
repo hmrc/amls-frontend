@@ -486,6 +486,8 @@ tradingpremises.yourtradingpremises.whose.another=Another business, acting as an
 tradingpremises.yourtradingpremises.startdate=When will you start trading from these premises?
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
+tradingpremises.msb.services.title = Money Service Business – Which activities take place at these premises?
+tradingpremises.msb.services.heading = Which activities take place at these premises?
 
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
@@ -1003,5 +1005,6 @@ msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
 msb.branchesoragents.add.btn = Add another country
 
-msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
+msb.ce.transactions.expected.in.12.months.title =  Money Service Business – How many currency exchange transactions do you expect in the next 12 months?
+msb.ce.transactions.expected.in.12.months.heading =  How many currency exchange transactions do you expect in the next 12 months?
 

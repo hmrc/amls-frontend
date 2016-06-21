@@ -1,0 +1,26 @@
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], index: Int, edit: Boolean)(implicit request: Request[_])
+
+@main(
+  title = Messages("tradingpremises.msb.services.title")
+) {
+
+  @heading("tradingpremises.msb.services.heading", "summary.tradingpremises")
+
+    @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit)) {
+
+      @radioGroup(f("msbServices")) {
+          @legend("msb.services.list.heading")
+          @checkbox(f("msbServices[0]"), "msb.services.list.lbl.01", "01")
+          @checkbox(f("msbServices[1]"), "msb.services.list.lbl.02", "02")
+          @checkbox(f("msbServices[2]"), "msb.services.list.lbl.03", "03")
+          @checkbox(f("msbServices[3]"), "msb.services.list.lbl.04", "04")
+      }
+
+      @submit(edit)
+
+    }
+}

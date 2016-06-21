@@ -1,7 +1,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness._
+import models.tradingpremises._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -28,11 +28,11 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
     }
   }
 
-  "ServicesController" must {
+  "MSBServicesController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[TradingPremises](eqTo(TradingPremises.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get(1)(request)
@@ -47,13 +47,13 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
     "show a prefilled form when there is data in the store" in new Fixture {
 
-      val model = MoneyServiceBusiness(
+      val model = TradingPremises(
         msbServices = Some(
           MsbServices(Set(TransmittingMoney, CurrencyExchange))
         )
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[TradingPremises](eqTo(TradingPremises.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(model)))
 
       val result = controller.get(1)(request)
@@ -85,7 +85,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
     "return a redirect to the 'How much Throughput' page on valid submission" in new Fixture {
 
-      val model = MoneyServiceBusiness(
+      val model = TradingPremises(
         msbServices = Some(MsbServices(
           Set(TransmittingMoney)
         ))
@@ -95,10 +95,10 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
         "msbServices[0]" -> "01"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[TradingPremises](eqTo(TradingPremises.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(cache.save[TradingPremises](eqTo(TradingPremises.key), eqTo(model))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(1,edit = false)(newRequest)
@@ -109,7 +109,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
     "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
 
-      val currentModel = MoneyServiceBusiness(
+      val currentModel = TradingPremises(
         msbServices = Some(MsbServices(
           Set(ChequeCashingNotScrapMetal)
         ))
@@ -128,10 +128,10 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
         "msbServices[3]" -> "04"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[TradingPremises](eqTo(TradingPremises.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(currentModel)))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(newModel))(any(), any(), any()))
+      when(cache.save[TradingPremises](eqTo(TradingPremises.key), eqTo(newModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(1, edit = true)(newRequest)
@@ -142,7 +142,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
     "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
-      val currentModel = MoneyServiceBusiness(
+      val currentModel = TradingPremises(
         msbServices = Some(MsbServices(
           Set(ChequeCashingNotScrapMetal)
         ))
@@ -160,10 +160,10 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
         "msbServices[3]" -> "04"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[TradingPremises](eqTo(TradingPremises.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(currentModel)))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(newModel))(any(), any(), any()))
+      when(cache.save[TradingPremises](eqTo(TradingPremises.key), eqTo(newModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(1, edit = true)(newRequest)
@@ -176,7 +176,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
       Seq((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
         case (model, id) =>
-          val currentModel = MoneyServiceBusiness(
+          val currentModel = TradingPremises(
             msbServices = Some(MsbServices(
               Set(TransmittingMoney, CurrencyExchange)
             ))
@@ -194,10 +194,10 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
             "msbServices[3]" -> id
           )
 
-          when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+          when(cache.fetch[TradingPremises](eqTo(TradingPremises.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(currentModel)))
 
-          when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(newModel))(any(), any(), any()))
+          when(cache.save[TradingPremises](eqTo(TradingPremises.key), eqTo(newModel))(any(), any(), any()))
             .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
           val result = controller.post(1, edit = true)(newRequest)

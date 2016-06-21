@@ -59,7 +59,24 @@ object TradingPremises {
     override def apply(): String = "trading-premises"
   }
 
-  implicit val format = Json.format[TradingPremises]
+  implicit val reads: Reads[TradingPremises] = (
+      __.read[Option[YourTradingPremises]] and
+      __.read[Option[YourAgent]] and
+      __.read[Option[WhatDoesYourBusinessDo]] and
+      __.read[Option[MsbServices]]
+    ) (TradingPremises.apply _)
+
+  implicit val writes: Writes[TradingPremises] = Writes[TradingPremises] {
+    model =>
+      Seq(
+        Json.toJson(model.yourTradingPremises).asOpt[JsObject],
+        Json.toJson(model.yourAgent).asOpt[JsObject],
+        Json.toJson(model.whatDoesYourBusinessDoAtThisAddress).asOpt[JsObject],
+        Json.toJson(model.msbServices).asOpt[JsObject]
+      ).flatten.fold(Json.obj()) {
+        _ ++ _
+      }
+  }
 
   implicit def default(tradingPremises: Option[TradingPremises]): TradingPremises =
     tradingPremises.getOrElse(TradingPremises())

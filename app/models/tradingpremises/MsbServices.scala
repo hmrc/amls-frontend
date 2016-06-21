@@ -3,10 +3,19 @@ package models.tradingpremises
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
+import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.{JsonMapping, TraversableValidators}
 
-sealed trait MsbService
+sealed trait MsbService {
+
+  val getMessage = this match {
+    case TransmittingMoney => Messages("msb.services.list.lbl.01")
+    case CurrencyExchange => Messages("msb.services.list.lbl.01")
+    case ChequeCashingNotScrapMetal => Messages("msb.services.list.lbl.01")
+    case ChequeCashingScrapMetal => Messages("msb.services.list.lbl.01")
+  }
+}
 
 case object TransmittingMoney extends MsbService
 case object CurrencyExchange extends MsbService
