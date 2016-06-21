@@ -162,6 +162,22 @@
         </table>
     }
 
+    @model.fundsTransfer.map { ft =>
+        <table>
+            <tr>
+                <th>@Messages("msb.fundstransfer.heading")</th>
+                <td width="12"><a href="@controllers.msb.routes.FundsTransferController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @ft.transferWithoutFormalSystems match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }
+                </td>
+            </tr>
+        </table>
+    }
 
 
 
