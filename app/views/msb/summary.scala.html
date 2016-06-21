@@ -193,6 +193,22 @@
         </table>
     }
 
+    @model.sendMoneyToOtherCountry.map{ otherCountries =>
+        <table>
+            <tr>
+                <th>@Messages("msb.send.money.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.SendMoneyToOtherCountryController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @otherCountries.money match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }
+                </td>
+            </tr>
+        </table>
+    }
 
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
