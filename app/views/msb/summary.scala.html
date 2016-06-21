@@ -8,6 +8,192 @@
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.msb")
+    @Messages("summary.linetext")
+
+    @model.msbServices.map{ services =>
+        <table>
+            <tr>
+                <th>@Messages("msb.services.heading")</th>
+                <td width="12"><a href="@controllers.msb.routes.ServicesController.get(true)">Edit</a></td>
+            </tr>
+            @services.services.map { svc =>
+                <tr>
+                    <td colspan="2">
+                        @svc match {
+                            case TransmittingMoney => {@Messages("msb.services.list.lbl.01")}
+                            case CurrencyExchange => {@Messages("msb.services.list.lbl.02")}
+                            case ChequeCashingNotScrapMetal => {@Messages("msb.services.list.lbl.03")}
+                            case ChequeCashingScrapMetal => {@Messages("msb.services.list.lbl.04")}
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+
+    @model.throughput.map{ throughput =>
+        <table>
+            <tr>
+                <th>@Messages("msb.throughput.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.ExpectedThroughputController.get(true)">Edit</a></td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    @throughput match {
+                        case ExpectedThroughput.First =>   {@Messages("msb.throughput.lbl.01")}
+                        case ExpectedThroughput.Second =>  {@Messages("msb.throughput.lbl.02")}
+                        case ExpectedThroughput.Third =>   {@Messages("msb.throughput.lbl.03")}
+                        case ExpectedThroughput.Fourth =>  {@Messages("msb.throughput.lbl.04")}
+                        case ExpectedThroughput.Fifth =>   {@Messages("msb.throughput.lbl.05")}
+                        case ExpectedThroughput.Sixth =>   {@Messages("msb.throughput.lbl.06")}
+                        case ExpectedThroughput.Seventh => {@Messages("msb.throughput.lbl.07")}
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.branchesOrAgents.map { boa =>
+        <table>
+            <tr>
+                <th>@Messages("msb.branchesoragents.heading")</th>
+                <td width="12"><a href="@controllers.msb.routes.BranchesOrAgentsController.get(true)">Edit</a></td>
+            </tr>
+            @boa.branches.fold {
+                <tr>
+                    <td colspan="2">
+                        @Messages("lbl.no")
+                    </td>
+                </tr>
+            } { branches =>
+                <tr>
+                    <td colspan="2">
+                        @Messages("lbl.yes")
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @branches.map {country =>
+                            @country <br/>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+
+    @model.identifyLinkedTransactions.map { ilt =>
+        <table>
+            <tr>
+                <th>@Messages("msb.linked.txn.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.IdentifyLinkedTransactionsController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @ilt.linkedTxn match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.businessAppliedForPSRNumber.map { psr =>
+        <table>
+            <tr>
+                <th>@Messages("msb.psr.number.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.BusinessAppliedForPSRNumberController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @psr match {
+                        case BusinessAppliedForPSRNumberNo => {
+                            @Messages("lbl.no")
+                        }
+                        case BusinessAppliedForPSRNumberYes(number) => {
+                            @Messages("lbl.yes")
+                            </td>
+                            <tr>
+                                <td colspan="2">
+                                    @Messages("msb.psr.number.lbl") : @number
+                        }
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.businessUseAnIPSP.map { ipsp =>
+        <table>
+            <tr>
+                <th>@Messages("msb.ipsp.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.BusinessUseAnIPSPController.get(true)">Edit</a></td>
+            </tr>
+            @ipsp match {
+                case BusinessUseAnIPSPNo => {
+                    <tr>
+                        <td colspan="2">
+                            @Messages("lbl.no")
+                        </td>
+                    </tr>
+                }
+                case BusinessUseAnIPSPYes(name , reference) => {
+                    <tr>
+                        <td colspan="2">
+                            @Messages("lbl.yes")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @Messages("msb.summary.ipsp-name") : @name
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @Messages("msb.summary.ipsp-registration-number") : @reference
+                        </td>
+                    </tr>
+                }
+            }
+
+
+        </table>
+    }
+
+    @model.fundsTransfer.map { ft =>
+        <table>
+            <tr>
+                <th>@Messages("msb.fundstransfer.heading")</th>
+                <td width="12"><a href="@controllers.msb.routes.FundsTransferController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @ft.transferWithoutFormalSystems match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.transactionsInNext12Months.map{ trans =>
+        <table>
+            <tr>
+                <th>@Messages("msb.transactions.expected.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.TransactionsInNext12MonthsController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @trans.txnAmount
+                </td>
+            </tr>
+        </table>
+    }
+
+
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

@@ -1013,11 +1013,14 @@ msb.fundstransfer.heading = Do you transfer money without using formal banking s
 msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
 
 msb.branchesoragents.title = Money Service Business – Do you have branches or agents in other countries?
-msb.branchesoragents.heading = Do you have brnches or agents in other countries?
+msb.branchesoragents.heading = Do you have branches or agents in other countries?
 msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
 msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
 msb.branchesoragents.add.btn = Add another country
+
+msb.summary.ipsp-name = IPSP''s name
+msb.summary.ipsp-registration-number = IPSP''s HM Revenue and Customs registration number
 
 msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
 
