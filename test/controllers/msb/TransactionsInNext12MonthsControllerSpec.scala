@@ -123,7 +123,7 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServerPe
 
       val outgoingModel = incomingModel.copy(
         transactionsInNext12Months = Some(
-          TransactionsInNext12Months("10")
+          TransactionsInNext12Months("12345678963")
         )
       )
 
@@ -135,7 +135,7 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServerPe
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SendMoneyToOtherCountryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SendMoneyToOtherCountryController.get(true).url))
     }
   }
 }

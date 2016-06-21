@@ -39,7 +39,7 @@ trait CETransactionsInNext12MonthsController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SendMoneyToOtherCountryController.get())
+            case false => Redirect(routes.WhichCurrenciesController.get())
           }
       }
     }

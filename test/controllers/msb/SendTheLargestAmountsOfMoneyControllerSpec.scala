@@ -6,6 +6,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, MsbS
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
@@ -16,7 +17,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
+class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite with PatienceConfiguration with IntegrationPatience {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -123,7 +124,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSu
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
+      redirectLocation(result) must be(Some(routes.MostTransactionsController.get(true).url))
     }
 
     "on post with invalid data" in new Fixture {

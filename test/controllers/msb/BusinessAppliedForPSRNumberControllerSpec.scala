@@ -1,7 +1,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness.{BusinessAppliedForPSRNumberYes, FundsTransfer, MoneyServiceBusiness}
+import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -90,7 +90,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends PlaySpec with OneServerP
       )
 
       val incomingModel = MoneyServiceBusiness(
-        fundsTransfer = Some(FundsTransfer(true))
+        businessUseAnIPSP = Some(BusinessUseAnIPSPNo)
       )
 
       val outgoingModel = incomingModel.copy(
@@ -133,7 +133,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends PlaySpec with OneServerP
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.FundsTransferController.get().url))
+      redirectLocation(result) must be(Some(routes.BusinessUseAnIPSPController.get(true).url))
     }
   }
 }

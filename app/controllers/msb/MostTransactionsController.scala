@@ -39,12 +39,17 @@ trait MostTransactionsController extends BaseController {
             _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.mostTransactions(data)
             )
-          } yield edit match {
-            case false =>
-              // TODO: Linked transactions page
-              Redirect(routes.ServicesController.get())
-            case true =>
-              Redirect(routes.SummaryController.get())
+          } yield {
+
+            val services = msb.msbServices.map(_.services).getOrElse(Set.empty)
+
+            // TODO
+            edit match {
+              case false =>
+                Redirect(routes.CETransactionsInNext12MonthsController.get())
+              case true =>
+                Redirect(routes.SummaryController.get())
+            }
           }
       }
   }

@@ -164,7 +164,7 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneServerPerSu
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get().url))
+    redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url))
   }
 
   "on valid post where the value is false in edit mode (CE)" in new Fixture {
@@ -182,7 +182,7 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneServerPerSu
     )
 
     val outgoingModel = incomingModel.copy(
-      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
     )
 
     when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -193,7 +193,7 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneServerPerSu
 
     val result = controller.post(true)(newRequest)
     status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+    redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
   }
 
   "on valid post where the value is false in edit mode (Non-CE)" in new Fixture {
@@ -205,7 +205,7 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneServerPerSu
     val incomingModel = MoneyServiceBusiness()
 
     val outgoingModel = incomingModel.copy(
-      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
     )
 
     when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))

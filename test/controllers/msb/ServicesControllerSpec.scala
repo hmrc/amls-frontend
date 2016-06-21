@@ -105,8 +105,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      // TODO redirect to the how much throughput page when it is built
-      redirectLocation(result) mustBe Some(routes.ServicesController.get().url)
+      redirectLocation(result) mustBe Some(routes.ExpectedThroughputController.get().url)
     }
 
     "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
@@ -139,8 +138,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      // TODO redirect to the money transmitting start page when it is built
-      redirectLocation(result) mustBe Some(routes.ServicesController.get().url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get().url)
     }
 
     "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -172,8 +170,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      // TODO redirect to the Currency Exchange start page when it is built
-      redirectLocation(result) mustBe Some(routes.ServicesController.get().url)
+      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
     }
 
     "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
@@ -207,7 +204,6 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
           val result = controller.post(edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          // TODO redirect to the Check Your Answers page when it is built
           redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
       }
     }

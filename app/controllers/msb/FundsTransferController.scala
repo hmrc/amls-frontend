@@ -36,8 +36,9 @@ trait FundsTransferController extends BaseController {
             _ <- dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               moneyServiceBusiness.fundsTransfer(data))
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.TransactionsInNext12MonthsController.get())
+            case true if moneyServiceBusiness.transactionsInNext12Months.isDefined =>
+              Redirect(routes.SummaryController.get())
+            case _ => Redirect(routes.TransactionsInNext12MonthsController.get(edit))
           }
       }
   }

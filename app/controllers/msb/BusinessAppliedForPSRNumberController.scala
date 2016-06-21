@@ -37,8 +37,8 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
               msb.businessAppliedForPSRNumber(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SummaryController.get())
+            case true if msb.businessUseAnIPSP.isDefined => Redirect(routes.SummaryController.get())
+            case _ => Redirect(routes.BusinessUseAnIPSPController.get(edit))
           }
       }
     }
