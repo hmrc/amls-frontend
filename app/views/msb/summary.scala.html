@@ -55,34 +55,115 @@
     }
 
     @model.branchesOrAgents.map { boa =>
-    <table>
-        <tr>
-            <th>@Messages("msb.branchesoragents.heading")</th>
-            <td width="12"><a href="@controllers.msb.routes.BranchesOrAgentsController.get(true)">Edit</a></td>
-        </tr>
-        @boa.branches.fold {
+        <table>
             <tr>
-                <td colspan="2">
-                    @Messages("lbl.no")
-                </td>
+                <th>@Messages("msb.branchesoragents.heading")</th>
+                <td width="12"><a href="@controllers.msb.routes.BranchesOrAgentsController.get(true)">Edit</a></td>
             </tr>
-        } { branches =>
+            @boa.branches.fold {
+                <tr>
+                    <td colspan="2">
+                        @Messages("lbl.no")
+                    </td>
+                </tr>
+            } { branches =>
+                <tr>
+                    <td colspan="2">
+                        @Messages("lbl.yes")
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        @branches.map {country =>
+                            @country <br/>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+
+    @model.identifyLinkedTransactions.map { ilt =>
+        <table>
             <tr>
-                <td colspan="2">
-                    @Messages("lbl.yes")
-                </td>
+                <th>@Messages("msb.linked.txn.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.IdentifyLinkedTransactionsController.get(true)">Edit</a></td>
             </tr>
             <tr>
                 <td colspan="2">
-                    @branches.map {country =>
-                        @country <br/>
+                    @ilt.linkedTxn match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
                     }
                 </td>
             </tr>
-        }
-
-    </table>
+        </table>
     }
+
+    @model.businessAppliedForPSRNumber.map { psr =>
+        <table>
+            <tr>
+                <th>@Messages("msb.psr.number.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.BusinessAppliedForPSRNumberController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @psr match {
+                        case BusinessAppliedForPSRNumberNo => {
+                            @Messages("lbl.no")
+                        }
+                        case BusinessAppliedForPSRNumberYes(number) => {
+                            @Messages("lbl.yes")
+                            </td>
+                            <tr>
+                                <td colspan="2">
+                                    @Messages("msb.psr.number.lbl") : @number
+                        }
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.businessUseAnIPSP.map { ipsp =>
+        <table>
+            <tr>
+                <th>@Messages("msb.ipsp.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.BusinessUseAnIPSPController.get(true)">Edit</a></td>
+            </tr>
+            @ipsp match {
+                case BusinessUseAnIPSPNo => {
+                    <tr>
+                        <td colspan="2">
+                            @Messages("lbl.no")
+                        </td>
+                    </tr>
+                }
+                case BusinessUseAnIPSPYes(name , reference) => {
+                    <tr>
+                        <td colspan="2">
+                            @Messages("lbl.yes")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @Messages("msb.summary.ipsp-name") : @name
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @Messages("msb.summary.ipsp-registration-number") : @reference
+                        </td>
+                    </tr>
+                }
+            }
+
+
+        </table>
+    }
+
+
+
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
