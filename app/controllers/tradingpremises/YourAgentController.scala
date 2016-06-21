@@ -34,7 +34,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
           case ValidForm(_, data) =>
             for {
               _ <- updateData[TradingPremises](index) {
-                case Some(TradingPremises(tp, _, wdbd,_)) => Some(TradingPremises(tp, Some(data), wdbd))
+                case Some(tp) => Some(tp.yourAgent(data))
                 case _ => data
               }
             } yield edit match {

@@ -11,9 +11,9 @@ sealed trait MsbService {
 
   val getMessage = this match {
     case TransmittingMoney => Messages("msb.services.list.lbl.01")
-    case CurrencyExchange => Messages("msb.services.list.lbl.01")
-    case ChequeCashingNotScrapMetal => Messages("msb.services.list.lbl.01")
-    case ChequeCashingScrapMetal => Messages("msb.services.list.lbl.01")
+    case CurrencyExchange => Messages("msb.services.list.lbl.02")
+    case ChequeCashingNotScrapMetal => Messages("msb.services.list.lbl.03")
+    case ChequeCashingScrapMetal => Messages("msb.services.list.lbl.04")
   }
 }
 

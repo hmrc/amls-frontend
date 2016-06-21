@@ -85,7 +85,7 @@
         </table>
         @wdbd.activities.contains(MoneyServiceBusiness) match {
             case true => {
-                <table>
+                <table  class="summary">
                     <tr>
                         <th class="summary-title">
                             @Messages("tradingpremises.msb.services.heading")
@@ -96,7 +96,7 @@
                             <ul>
                                 @model.msbServices.map { a =>
                                     @a.services.map {service=>
-                                        @service.getMessage
+                                        <li>@service.getMessage</li>
 
                                     }
                                 }

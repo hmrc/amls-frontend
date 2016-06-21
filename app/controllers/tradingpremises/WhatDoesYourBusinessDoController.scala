@@ -90,18 +90,17 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
               }
             case ValidForm(_, data) =>
               updateData[TradingPremises](c, index) {
-                case Some(TradingPremises(ytp, ya, _,_)) =>
-                  Some(TradingPremises(ytp, ya, Some(data)))
-                case _ =>
-                  Some(TradingPremises(None, None, Some(data)))
+                case Some(tp) if data.activities.contains(MoneyServiceBusiness) =>
+                  Some(tp.whatDoesYourBusinessDoAtThisAddress(data))
+                case Some(tp) if !data.activities.contains(MoneyServiceBusiness) =>
+                  Some(TradingPremises(tp.yourTradingPremises, tp.yourAgent, Some(data), None))
+                case _ => Some(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(data)))
               } map {
-                _ => edit match {
-                  case true => Redirect(routes.SummaryController.getIndividual(index))
-                  case false => {
-                    data.activities.contains(MoneyServiceBusiness) match {
-                      case true =>  Redirect(routes.MSBServicesController.get(index))
-                      case false => Redirect(routes.SummaryController.get())
-                    }
+                _ =>  data.activities.contains(MoneyServiceBusiness) match {
+                  case true =>  Redirect(routes.MSBServicesController.get(index, edit))
+                  case false => edit match {
+                    case true => Redirect(routes.SummaryController.getIndividual(index))
+                    case false => Redirect(routes.SummaryController.get())
                   }
                 }
               }
