@@ -179,6 +179,20 @@
         </table>
     }
 
+    @model.transactionsInNext12Months.map{ trans =>
+        <table>
+            <tr>
+                <th>@Messages("msb.transactions.expected.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.TransactionsInNext12MonthsController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @trans.txnAmount
+                </td>
+            </tr>
+        </table>
+    }
+
 
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
