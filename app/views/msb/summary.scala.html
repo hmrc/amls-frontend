@@ -1,5 +1,6 @@
 @import include._
 @import models.moneyservicebusiness._
+@import models.Country
 
 @(model: MoneyServiceBusiness)(implicit request: Request[_], lang: Lang)
 
@@ -210,6 +211,80 @@
         </table>
     }
 
+    @model.sendTheLargestAmountsOfMoney.map { lom =>
+        <table>
+            <tr>
+                <th>@Messages("msb.send.the.largest.amounts.of.money.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true)">Edit</a></td>
+            </tr>
+            @lom.countryList.map { country =>
+                <tr>
+                    <td colspan="2">
+                        @country.name
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+
+    @model.mostTransactions.map { mt =>
+        <table>
+            <tr>
+                <th>@Messages("msb.most.transactions.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.MostTransactionsController.get(true)">Edit</a></td>
+            </tr>
+            @mt.countries.map { country =>
+            <tr>
+                <td colspan="2">
+                    @country.name
+                </td>
+            </tr>
+            }
+        </table>
+    }
+
+    @model.whichCurrencies.map { wc =>
+        <table>
+            <tr>
+                <th>@Messages("msb.which_currencies.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">Edit</a></td>
+            </tr>
+            @wc.currencies.map { cur =>
+                <tr>
+                    <td colspan="2">
+                        @cur
+                    </td>
+                </tr>
+            }
+        </table>
+        <table>
+            <tr>
+                <th>@Messages("msb.which_currencies.who")</th>
+                <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">Edit</a></td>
+            </tr>
+            @wc.bankMoneySource.map {bms =>
+                <tr>
+                    <td colspan="2">
+                        @Messages("msb.which_currencies.source.banks") : @bms.bankNames
+                    </td>
+                </tr>
+            }
+            @wc.wholesalerMoneySource.map {wms =>
+                <tr>
+                    <td colspan="2">
+                        @Messages("msb.which_currencies.source.wholesalers") : @wms.wholesalerNames
+                    </td>
+                </tr>
+            }
+            @if(wc.customerMoneySource) {
+                <tr>
+                    <td colspan="2">
+                        @Messages("msb.which_currencies.source.customers")
+                    </td>
+                </tr>
+            }
+        </table>
+    }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
