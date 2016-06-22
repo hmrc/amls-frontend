@@ -28,7 +28,7 @@ private sealed trait WhichCurrencies0 {
     }
   }
 
-  private val nameType = minLength(4) compose maxLength(140)
+  private val nameType = minLength(1) compose maxLength(140)
 
   private val currencyType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
                               TraversableValidators.flattenR[String] compose
