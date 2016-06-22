@@ -4,33 +4,42 @@
 
 @(index: Int)(implicit request: Request[_])
 
+@sidebar = {
+<div class="bevel-container">
+    <h3>@Messages("tradingpremises.sidebar.title")</h3>
+    <p>@Messages("tradingpremises.sidebar.information")</p>
+</div>
+}
+
 @main(
-    title = Messages("tradingpremises.whatyouneed.title")
+    title = Messages("tradingpremises.whatyouneed.title"),
+    sidebar = sidebar
 ) {
 
     @heading("tradingpremises.whatyouneed.heading", "summary.tradingpremises")
 
-    <div class="form-field">
-        <span class="panel-indent form-field">@Messages("tradingpremises.whatyouneed.paragraph1.text")</span>
+    <p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
+
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.1")</li>
+        <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.2")</li>
+        <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.3")</li>
+        <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
+    </ul>
+
+    <div class="panel-indent panel-indent--gutter panel-wide">
+        @Messages("tradingpremises.whatyouneed.agentinfo.heading")
     </div>
 
-    <p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
-    <ul class="list-bullet form-group">
-    <li class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.1")</li>
-    <li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.2")</li>
-    <li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.3")</li>
-    <li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
+    <p>@Messages("tradingpremises.whatyouneed.agentinfo.heading.sub")</p>
+
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("tradingpremises.whatyouneed.agentinfo.text.1")</li>
+        <li>@Messages("tradingpremises.whatyouneed.agentinfo.text.3")</li>
     </ul>
 
-    <p>@Messages("tradingpremises.whatyouneed.agentinfo.heading")</p>
-    <ul class="list-bullet form-group">
-    <li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.agentinfo.text.1")</li>
-    <li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.agentinfo.text.2")</li>
-    <li  class="no-padding no-margin">@Messages("tradingpremises.whatyouneed.agentinfo.text.3")</li>
-    </ul>
-
-    <div class="form-field">
-        <a id="what-you-need-continue" class="button" href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
+    <div class="form-group">
+        <a class="button" href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
             @Messages("button.continue")
         </a>
     </div>

@@ -38,6 +38,7 @@ case class ContactingYouForm(
 object ContactingYouForm {
 
   implicit val formats = Json.format[ContactingYouForm]
+  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ContactingYouForm] =
     From[UrlFormEncoded] { __ =>
@@ -46,7 +47,7 @@ object ContactingYouForm {
       (
         (__ \ "phoneNumber").read(phoneNumberType) and
           (__ \ "email").read(emailType) and
-          (__ \ "letterToThisAddress").read[Boolean]
+          (__ \ "letterToThisAddress").read[Boolean].withMessage("error.required.rightaddress")
         )(ContactingYouForm.apply _)
     }
 }

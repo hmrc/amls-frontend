@@ -4,11 +4,11 @@
     field: Field,
     labelText: String = "",
     hintText: String = "",
-    bold: Boolean = true,
+    bold: Boolean = false,
     classes: Seq[String] = Seq.empty
 )(implicit lang: Lang)
 
-<div class="form-group @if(field.hasErrors) {form-field--error}">
+<div class="form-field form-field--tall @if(field.hasErrors) {form-field--error}">
     <label>
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
@@ -20,7 +20,7 @@
             <span class="error-notification">@field.error</span>
         }
 
-        <select name="@field.name" id="@field.id" class="country-selector @classes.mkString(" ")">
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-auto-complete>
             <option value=""></option>
             @models.countries.map { case Country(name, code) =>
                 <option value="@code" @if(field.value.contains(code)) {selected} >@name</option>

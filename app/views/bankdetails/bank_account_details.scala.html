@@ -20,27 +20,33 @@ s"""${f("IBANNumber").id}-fieldset"""
     @heading("bankdetails.accountdetails.title", "summary.bankdetails")
     @form(f, controllers.bankdetails.routes.BankAccountController.post(index, edit)) {
 
-    @input(
-    field = f("accountName"),
-    labelText = "bankdetails.bankaccount.accountname",
-    bold = false
-    )
+    <div class="form-field-group">
+        @input(
+        field = f("accountName"),
+        labelText = "bankdetails.bankaccount.accountname",
+        bold = false
+        )
+    </div>
 
-    @inlineRadioGroup(f("isUK")) {
-    @legend("bankdetails.bankaccount.accounttype", jsHidden = false, bold = false)
-    @radio(f("isUK"), "lbl.yes", "true", target = s"#$target")
-    @radio(f("isUK"), "lbl.no", "false", target = s"#$target1")
-        @fieldset("TODO", jsHidden = true, id = target) {
-            @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
-            @input(f("sortCode"), "bankdetails.bankaccount.sortcode", bold = false)
-        }
-        @fieldset("TODO", jsHidden = true, id = target1) {
-            @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
-            <p>or</p>
-            @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
+    <div class="form-field-group">
+        @inlineRadioGroup(f("isUK")) {
+        @legend("bankdetails.bankaccount.accounttype", jsHidden = false, bold = false)
+        @radio(f("isUK"), "lbl.yes", "true", target = s"#$target")
+        @radio(f("isUK"), "lbl.no", "false", target = s"#$target1")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "For example, 204266", bold = false)
+                @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", hintText = "For example, 12345678", bold = false)
 
+            }
+            @fieldset("TODO", jsHidden = true, id = target1) {
+                @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
+                <p>or</p>
+                @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
+
+            }
         }
-    }
+    </div>
+
     @submit(edit)
 }
 

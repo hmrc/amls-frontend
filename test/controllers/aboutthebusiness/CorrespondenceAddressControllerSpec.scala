@@ -34,7 +34,7 @@ class CorrespondenceAddressControllerSpec extends PlaySpec with OneServerPerSuit
       "data exists in the keystore" in new Fixture {
 
         val correspondenceAddress = UKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, "Test")
-        val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None, Some(correspondenceAddress))
+        val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None,None, Some(correspondenceAddress))
         val fetchResult = Future.successful(Some(aboutTheBusiness))
 
         when(controller.dataConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).thenReturn(fetchResult)

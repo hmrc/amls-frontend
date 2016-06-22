@@ -1,6 +1,5 @@
 package controllers.businessactivities
 
-
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -46,7 +45,10 @@ trait InvolvedInOtherController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.ExpectedBusinessTurnoverController.get())
+            case false => data match {
+              case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get())
+              case InvolvedInOtherNo => Redirect(routes.ExpectedAMLSTurnoverController.get())
+            }
           }
       }
     }

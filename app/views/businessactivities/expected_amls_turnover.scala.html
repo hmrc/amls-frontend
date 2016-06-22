@@ -11,9 +11,12 @@
     @heading("businessactivities.turnover.title", "summary.businessactivities")
 
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
-        <span class="form-hint">
-            @Messages("businessactivities.turnover.line1.text")
-        </span>
+
+    <div class="form-group">
+        <p>@Messages("bankdetails.confirm-activities.subtitile")</p>
+        <div class="panel-indent panel-border-wide">
+        </div>
+    </div>
 
         @radioGroup(f("expectedAMLSTurnover")) {
             @legend("TODO", jsHidden = true)

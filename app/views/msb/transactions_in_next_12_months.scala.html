@@ -1,0 +1,20 @@
+@import forms.{Form2, ValidField, InvalidField}
+@import include._
+@import include.forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+
+@main(
+    title = Messages("msb.transactions.expected.title")
+) {
+
+    @heading("msb.transactions.expected.title", "summary.msb")
+
+    @form(f, controllers.msb.routes.TransactionsInNext12MonthsController.post(edit)) {
+        @input(f("txnAmount"), "", bold = false)
+
+
+        @submit(edit)
+    }
+}

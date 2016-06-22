@@ -102,7 +102,7 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneServerPerSuite with 
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("Maximum length is 40")
+      contentAsString(result) must include(Messages("error.invalid.bm.business.type"))
 
     }
 

@@ -1,0 +1,30 @@
+@import forms.{Field, Form2}
+
+@(
+    field: Field,
+    labelText: String = "",
+    hintText: String = "",
+    bold: Boolean = false,
+    classes: Seq[String] = Seq.empty
+)(implicit lang: Lang)
+
+<div class="form-field @if(field.hasErrors) {form-field--error}">
+    <label>
+        @if(labelText.nonEmpty) {
+            <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+        }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification">@field.error</span>
+        }
+
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-auto-complete>
+            <option value=""></option>
+            @models.currencies.map { currency =>
+                <option value="@currency" @if(field.value.contains(currency)) {selected} >@currency</option>
+            }
+        </select>
+    </label>
+</div>

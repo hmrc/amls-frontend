@@ -3,29 +3,28 @@
 
 @sidebar = {
 <div class="bevel-container">
-    <h3 class="heading-small">@Messages("asp.whatyouneed.sidebar.title")</h3>
+    <h3>@Messages("asp.whatyouneed.sidebar.title")</h3>
     <p>@Messages("asp.whatyouneed.sidebar.information")</p>
 </div>
 }
 
 @main(
-title = Messages("asp.whatyouneed.title"),
-sidebar = sidebar
-) {
+    title = Messages("asp.whatyouneed.title"),
+    sidebar = sidebar
+    ) {
 
-@heading("asp.whatyouneed.title", "summary.asp")
+    @heading("asp.whatyouneed.title", "summary.asp")
 
-<div class="form-field">
-    <span>@Messages("asp.whatyouneed.subheading")</span>
-</div>
+    <p>@Messages("asp.whatyouneed.subheading")</p>
 
-<ul class="list-bullet form-group">
-    <li class="no-padding no-margin">@Messages("asp.whatyouneed.line_1")</li>
-    <li class="no-padding no-margin">@Messages("asp.whatyouneed.line_2")</li>
-</ul>
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("asp.whatyouneed.line_1")</li>
+        <li>@Messages("asp.whatyouneed.line_2")</li>
+        <li>@Messages("asp.whatyouneed.line_3")</li>
+    </ul>
 
-<div class="form-group">
-    <a id="what-you-need-continue" class="button" href="@controllers.asp.routes.ServicesOfBusinessController.get()">@Messages("button.continue")</a>
-</div>
+    <div class="form-group">
+        <a class="button" href="@controllers.asp.routes.ServicesOfBusinessController.get()">@Messages("button.continue")</a>
+    </div>
 
 }

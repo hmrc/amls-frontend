@@ -1,0 +1,39 @@
+@import forms.{Form2, ValidField, InvalidField}
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@main(
+    title = Messages("msb.branchesoragents.title")
+) {
+
+    @heading("msb.branchesoragents.heading", "summary.msb")
+
+    <p>@Messages("msb.branchesoragents.intro")</p>
+
+    @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
+
+        @inlineRadioGroup(f("hasCountries")) {
+          @radio(f("hasCountries"), "lbl.yes", "true", target = s"#hasCountries-fieldset")
+          @radio(f("hasCountries"), "lbl.no", "false")
+          @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset", data = Seq("data-toggle-new")) {
+            <p class="form-hint">@Messages("msb.branchesoragents.hint")</p>
+            @addRemove("msb.branchesoragents.add.btn") {
+              @for(i <- 0 until 10) {
+                @defining(
+                  f(s"countries[$i]")
+                ) { field =>
+                  @country(field, classes = field match {
+                    case f: ValidField => Seq("")
+                    case f: InvalidField => Seq("js-hidden")
+                  })
+                }
+              }
+            }
+          }
+        }
+
+        @submit(edit)
+    }
+}
