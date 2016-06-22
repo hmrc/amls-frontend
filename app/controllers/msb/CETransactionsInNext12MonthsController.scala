@@ -38,8 +38,10 @@ trait CETransactionsInNext12MonthsController extends BaseController {
               msb.ceTransactionsInNext12Months(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.WhichCurrenciesController.get())
+            case true if msb.whichCurrencies.isDefined =>
+              Redirect(routes.SummaryController.get())
+            case _ =>
+              Redirect(routes.WhichCurrenciesController.get(edit))
           }
       }
     }

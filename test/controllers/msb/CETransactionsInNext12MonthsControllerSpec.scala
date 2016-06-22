@@ -109,7 +109,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -134,14 +134,14 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneServer
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get(true).url))
     }
   }
 }

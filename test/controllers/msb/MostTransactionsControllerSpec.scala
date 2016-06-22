@@ -28,7 +28,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
     }
   }
 
-  "LargestAmountsController" must {
+  "MostTransactionsController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
@@ -103,7 +103,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       )
 
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+        .thenReturn(Future.successful(Some(incomingModel)))
 
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -179,7 +179,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
     }
 
-    "return a redirect to the summary page on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
+    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
 
       val incomingModel = MoneyServiceBusiness(
         msbServices = Some(MsbServices(
@@ -189,7 +189,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
         ))
       )
 
-      val outgoingModel = MoneyServiceBusiness(
+      val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
@@ -198,11 +198,11 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       )
 
       val newRequest = request.withFormUrlEncodedBody(
-        "mostTransactionsCountries[]" -> "GB"
+        "mostTransactionsCountries[0]" -> "GB"
       )
 
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+        .thenReturn(Future.successful(Some(incomingModel)))
 
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -210,14 +210,14 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get().url)
+      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get(true).url)
     }
 
     "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
 
       val incomingModel = MoneyServiceBusiness()
 
-      val outgoingModel = MoneyServiceBusiness(
+      val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
