@@ -21,15 +21,15 @@
     <div class="grid-layout grid-layout--stacked">
 
         @* Main section *@
-        <div class="grid-layout__column grid-layout__column--2-3 reg-step--steps">
+        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
             @sections.map { case Section(name, status, call) =>
                 @section(name, status, call)
             }
-        </div>
+        </ul>
 
         @* Sidebar *@
-        <div class="grid-layout__column grid-layout__column--1-3 reg-step--submit">
-            <div class="progress-submit">
+        <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
+            <div class="application-submit">
                 <h3 class="heading-small">@Messages("progress.submit")</h3>
                 <p>
                     @if(declarationAvailable) {
