@@ -243,6 +243,20 @@
         </table>
     }
 
+    @model.ceTransactionsInNext12Months.map{ trans =>
+        <table>
+            <tr>
+                <th>@Messages("msb.ce.transactions.expected.in.12.months.title")</th>
+                <td width="12"><a href="@controllers.msb.routes.CETransactionsInNext12MonthsController.get(true)">Edit</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @trans.ceTransaction
+                </td>
+            </tr>
+        </table>
+    }
+
     @model.whichCurrencies.map { wc =>
         <table>
             <tr>
