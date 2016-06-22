@@ -170,5 +170,40 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
       }
     }
+
+    "No currencies or sources entered" should {
+      val formData = Map(
+        "currencies[0]" -> Seq(""),
+        "currencies[1]" -> Seq(""),
+        "currencies[2]" -> Seq(""),
+        "bankNames" -> Seq(""),
+        "wholesalerNames" -> Seq("")
+      )
+
+      "fail validation with both error messages" in {
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq(
+          (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
+          (Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))
+        )))
+      }
+    }
+
+    "No currencies entered and bankName Missing" should {
+      val formData = Map(
+        "currencies[0]" -> Seq(""),
+        "currencies[1]" -> Seq(""),
+        "currencies[2]" -> Seq(""),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq(""),
+        "wholesalerNames" -> Seq("")
+      )
+
+      "fail validation with both error messages" in {
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq(
+          (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
+          (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames"))
+        )))
+      }
+    }
   }
 }

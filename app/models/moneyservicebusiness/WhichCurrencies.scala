@@ -28,18 +28,21 @@ private sealed trait WhichCurrencies0 {
     }
   }
 
-  private val nameType = minLength(4) compose maxLength(140)
+  private val nameType = minLength(1) compose maxLength(140)
 
   private val currencyType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
                               TraversableValidators.flattenR[String] compose
                               TraversableValidators.minLengthR[Seq[String]](1)
 
-  private val validateMoneySources : ValidationRule[WhichCurrencies] = Rule[WhichCurrencies, WhichCurrencies] {
-    case x@WhichCurrencies(_, Some(_), _, _) => Success(x)
-    case x@WhichCurrencies(_, _, Some(_), _) => Success(x)
-    case x@WhichCurrencies(_, _, _, true) => Success(x)
+  private val validateMoneySources : ValidationRule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] =
+    Rule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean),
+        (Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] {
+    case x@(Some(_), _, _) => Success(x)
+    case x@( _, Some(_), _) => Success(x)
+    case x@( _, _, true) => Success(x)
     case _ => Failure(Seq((Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
   }
+
 
   private implicit def rule[A]
     (implicit
@@ -75,11 +78,13 @@ private sealed trait WhichCurrencies0 {
             case _ => false
           }
 
-        (currencies ~
-          bankMoneySource ~
-          wholesalerMoneySource ~
-          customerMoneySource)(WhichCurrencies.apply(_,_,_,_)) compose validateMoneySources
+      (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
+        .apply {(a:Seq[String], b:(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)) =>
+          (a, b) match {
+            case (c, (bms, wms, cms)) => WhichCurrencies(c, bms, wms, cms)
+          }
     }
+}
 
     private implicit def write[A]
     (implicit
