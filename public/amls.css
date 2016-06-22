@@ -30,17 +30,9 @@
 }
 
 .panel-wide {
-  border-left : solid 10px #bfc1c3;
+  border-left: solid 10px #bfc1c3;
 }
 
-
-
-/* Registration Progress */
-.progress-submit {
-  background-color : #f8f8f8;
-  margin-left : 30px;
-  padding : 15px;
-  border-bottom : #dee0e2 solid 3px;
 /* -- application progress page -- */
 .progress-steps {
   margin-bottom: 12px;
