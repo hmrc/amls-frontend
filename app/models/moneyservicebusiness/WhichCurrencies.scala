@@ -28,7 +28,10 @@ private sealed trait WhichCurrencies0 {
     }
   }
 
-  private val nameType = minLength(1) compose maxLength(140)
+  private def nameType(fieldName : String) = {
+    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") compose
+      maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long")
+  }
 
   private val currencyType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
                               TraversableValidators.flattenR[String] compose
@@ -43,7 +46,6 @@ private sealed trait WhichCurrencies0 {
     case _ => Failure(Seq((Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
   }
 
-
   private implicit def rule[A]
     (implicit
       a : Path => RuleLike[A, Seq[String]],
@@ -57,8 +59,7 @@ private sealed trait WhichCurrencies0 {
         val bankMoneySource : Rule[A, Option[BankMoneySource]]=
             (__ \ "bankMoneySource").read[Option[String]] flatMap {
               case Some("Yes") => (__ \ "bankNames")
-                                    .read(nameType)
-                                    .withMessage("error.invalid.msb.wc.bankNames")
+                                    .read(nameType("bankNames"))
                                     .fmap(names => Some(BankMoneySource(names)))
               case _ => Rule[A, Option[BankMoneySource]](_ => Success(None))
             }
@@ -67,8 +68,7 @@ private sealed trait WhichCurrencies0 {
         val wholesalerMoneySource : Rule[A, Option[WholesalerMoneySource]]=
           (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
             case Some("Yes") => (__ \ "wholesalerNames")
-                                  .read(nameType)
-                                  .withMessage("error.invalid.msb.wc.wholesalerNames")
+                                  .read(nameType("wholesalerNames"))
                                   .fmap(names => Some(WholesalerMoneySource(names)))
             case _ => Rule[A, Option[WholesalerMoneySource]](_ => Success(None))
           }

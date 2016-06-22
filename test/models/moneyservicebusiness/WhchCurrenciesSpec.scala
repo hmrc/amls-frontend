@@ -107,7 +107,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       )
 
       "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")))))
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")))))
       }
     }
 
@@ -141,7 +141,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       )
 
       "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames.too-long")))))
       }
     }
 

@@ -233,7 +233,9 @@ error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the quest
 error.invalid.msb.wc.currencies = Enter at least one currency
 error.invalid.msb.wc.moneySources = Select at least one currency supplier
 error.invalid.msb.wc.bankNames = Enter the banks’ names
+error.invalid.msb.wc.bankNames.too-long = You can''t enter more than 140 characters for the bank names
 error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
+error.invalid.msb.wc.wholesalerNames.too-long = You can''t enter more than 140 characters for the wholesaler names
 error.required.countries.msb.most.transactions = Enter at least one country.
 
 ########################################################################################################################
