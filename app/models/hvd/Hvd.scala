@@ -5,7 +5,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 
-case class Hvd (cashPayment: Option[CashPayment] = None,) {
+case class Hvd (cashPayment: Option[CashPayment] = None) {
 
   def isComplete: Boolean =
     this match {
@@ -17,6 +17,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,) {
 object Hvd {
 
   val key = "hvd"
+/*
 
   def section(implicit cache: CacheMap): Section = {
     val notStarted = Section(key, NotStarted, controllers.hvd.routes.WhatYouNeedController.get())
@@ -27,6 +28,7 @@ object Hvd {
         Section(key, Started, controllers.hvd.routes.WhatYouNeedController.get())
     }
   }
+*/
 
   implicit val format = Json.format[Hvd]
 
