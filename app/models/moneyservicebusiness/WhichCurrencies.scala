@@ -28,16 +28,21 @@ private sealed trait WhichCurrencies0 {
     }
   }
 
-  private val nameType = minLength(4) compose maxLength(140)
+  private def nameType(fieldName : String) = {
+    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") compose
+      maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long")
+  }
 
   private val currencyType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
                               TraversableValidators.flattenR[String] compose
                               TraversableValidators.minLengthR[Seq[String]](1)
 
-  private val validateMoneySources : ValidationRule[WhichCurrencies] = Rule[WhichCurrencies, WhichCurrencies] {
-    case x@WhichCurrencies(_, Some(_), _, _) => Success(x)
-    case x@WhichCurrencies(_, _, Some(_), _) => Success(x)
-    case x@WhichCurrencies(_, _, _, true) => Success(x)
+  private val validateMoneySources : ValidationRule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] =
+    Rule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean),
+        (Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] {
+    case x@(Some(_), _, _) => Success(x)
+    case x@( _, Some(_), _) => Success(x)
+    case x@( _, _, true) => Success(x)
     case _ => Failure(Seq((Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
   }
 
@@ -54,8 +59,7 @@ private sealed trait WhichCurrencies0 {
         val bankMoneySource : Rule[A, Option[BankMoneySource]]=
             (__ \ "bankMoneySource").read[Option[String]] flatMap {
               case Some("Yes") => (__ \ "bankNames")
-                                    .read(nameType)
-                                    .withMessage("error.invalid.msb.wc.bankNames")
+                                    .read(nameType("bankNames"))
                                     .fmap(names => Some(BankMoneySource(names)))
               case _ => Rule[A, Option[BankMoneySource]](_ => Success(None))
             }
@@ -64,8 +68,7 @@ private sealed trait WhichCurrencies0 {
         val wholesalerMoneySource : Rule[A, Option[WholesalerMoneySource]]=
           (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
             case Some("Yes") => (__ \ "wholesalerNames")
-                                  .read(nameType)
-                                  .withMessage("error.invalid.msb.wc.wholesalerNames")
+                                  .read(nameType("wholesalerNames"))
                                   .fmap(names => Some(WholesalerMoneySource(names)))
             case _ => Rule[A, Option[WholesalerMoneySource]](_ => Success(None))
           }
@@ -75,11 +78,13 @@ private sealed trait WhichCurrencies0 {
             case _ => false
           }
 
-        (currencies ~
-          bankMoneySource ~
-          wholesalerMoneySource ~
-          customerMoneySource)(WhichCurrencies.apply(_,_,_,_)) compose validateMoneySources
+      (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
+        .apply {(a:Seq[String], b:(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)) =>
+          (a, b) match {
+            case (c, (bms, wms, cms)) => WhichCurrencies(c, bms, wms, cms)
+          }
     }
+}
 
     private implicit def write[A]
     (implicit
