@@ -49,20 +49,24 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
         case Right((c, activities)) =>
           if (activities.size == 1) {
             updateData[TradingPremises](c, index) {
-              case Some(TradingPremises(ytp, ya, _)) =>
-                Some(TradingPremises(ytp, ya, Some(WhatDoesYourBusinessDo(activities))))
+              case Some(tp) =>
+                Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
               case _ =>
                 Some(TradingPremises(
                   whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities))
                 ))
-            } map {
-              _ => Redirect(routes.SummaryController.get())
+            }
+            Future.successful {
+              activities.contains(MoneyServiceBusiness) match {
+                case true => Redirect(routes.MSBServicesController.get(index))
+                case false => Redirect(routes.SummaryController.get())
+              }
             }
           } else {
             val ba = BusinessActivities(activities)
             Future.successful {
               getData[TradingPremises](c, index) match {
-                case Some(TradingPremises(_, _, Some(wdbd))) =>
+                case Some(TradingPremises(_, _, Some(wdbd),_)) =>
                   Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
                 case _ =>
                   Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
@@ -73,6 +77,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
       }
   }
 
+  // scalastyle:off cyclomatic.complexity
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       data(index, edit) flatMap {
@@ -85,20 +90,25 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
               }
             case ValidForm(_, data) =>
               updateData[TradingPremises](c, index) {
-                case Some(TradingPremises(ytp, ya, _)) =>
-                  Some(TradingPremises(ytp, ya, Some(data)))
-                case _ =>
-                  Some(TradingPremises(None, None, Some(data)))
+                case Some(tp) if data.activities.contains(MoneyServiceBusiness) =>
+                  Some(tp.whatDoesYourBusinessDoAtThisAddress(data))
+                case Some(tp) if !data.activities.contains(MoneyServiceBusiness) =>
+                  Some(TradingPremises(tp.yourTradingPremises, tp.yourAgent, Some(data), None))
+                case _ => Some(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(data)))
               } map {
-                _ => edit match {
-                  case true => Redirect(routes.SummaryController.getIndividual(index))
-                  case false => Redirect(routes.SummaryController.get())
+                _ =>  data.activities.contains(MoneyServiceBusiness) match {
+                  case true =>  Redirect(routes.MSBServicesController.get(index, edit))
+                  case false => edit match {
+                    case true => Redirect(routes.SummaryController.getIndividual(index))
+                    case false => Redirect(routes.SummaryController.get())
+                  }
                 }
               }
           }
         case Left(result) => Future.successful(result)
       }
   }
+  // scalastyle:on cyclomatic.complexity
 }
 
 object WhatDoesYourBusinessDoController extends WhatDoesYourBusinessDoController {

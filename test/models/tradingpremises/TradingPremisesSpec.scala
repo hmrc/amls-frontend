@@ -3,6 +3,7 @@ package models.tradingpremises
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
+import play.api.libs.json.Json
 
 class TradingPremisesSpec extends WordSpec with MustMatchers {
 
@@ -16,6 +17,22 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       BillPaymentServices,
       EstateAgentBusinessService,
       MoneyServiceBusiness))
+  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+
+  val completeModel = TradingPremises(Some(ytp), Some(yourAgent), Some(wdbd), Some(msbServices))
+  val completeJson = Json.obj("tradingName" -> "foo",
+    "addressLine1" -> "1",
+    "addressLine2" -> "2",
+    "postcode" -> "asdfasdf",
+    "isOwner" -> true,
+    "startDate" -> "1990-02-24",
+    "isResidential" -> true,
+    "agentsRegisteredName" -> "STUDENT",
+    "taxType" -> "01",
+    "agentsBusinessStructure" -> "01",
+    "activities" -> Json.arr("02", "03", "05"),
+    "msbServices" ->Json.arr("01","02")
+  )
 
   "TradingPremises" must {
 
@@ -37,6 +54,15 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       newTP.whatDoesYourBusinessDoAtThisAddress must be(Some(wdbd))
     }
 
+    "Serialise as expected" in {
+      Json.toJson(completeModel) must
+        be(completeJson)
+    }
 
+    "Deserialise as expected" in {
+      completeJson.as[TradingPremises] must
+        be(completeModel)
+    }
   }
 }
+
