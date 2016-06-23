@@ -95,16 +95,24 @@ trait MoneyServiceBusinessTestData {
   private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
   private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))
 
-  val completeModel = MoneyServiceBusiness(Some(msbService),
-    Some(ExpectedThroughput.Second),
-    Some(businessUseAnIPSP),
-    Some(IdentifyLinkedTransactions(true)),
-    Some(BusinessAppliedForPSRNumberYes("123456")),
-    Some(SendMoneyToOtherCountry(true)),
-    Some(FundsTransfer(true)),
-    Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
-    Some(TransactionsInNext12Months("12345678963")),
-    Some(sendTheLargestAmountsOfMoney)
+  val completeModel = MoneyServiceBusiness(
+    msbServices = Some(msbService),
+    throughput = Some(ExpectedThroughput.Second),
+    businessUseAnIPSP = Some(businessUseAnIPSP),
+    identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
+    Some(WhichCurrencies(
+      Seq("USD", "GBP", "EUR"),
+      Some(BankMoneySource("bank names")),
+      Some(WholesalerMoneySource("Wholesaler Names")),
+      true)),
+    businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")),
+    sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+    fundsTransfer = Some(FundsTransfer(true)),
+    branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+    sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+    mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+    transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
+    ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))
   )
 
   val emptyModel = MoneyServiceBusiness(None)
@@ -119,6 +127,14 @@ trait MoneyServiceBusinessTestData {
       "name" -> "name",
       "referenceNumber" -> "123456789123456"),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
+    "whichCurrencies" -> Json.obj(
+      "currencies" -> Json.arr("USD", "GBP", "EUR"),
+      "bankMoneySource" -> "Yes",
+      "bankNames" -> "bank names",
+      "wholesalerMoneySource" -> "Yes",
+      "wholesalerNames" -> "Wholesaler Names",
+      "customerMoneySource" -> "Yes"
+    ),
     "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
       "regNumber" -> "123456"),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
@@ -126,7 +142,9 @@ trait MoneyServiceBusinessTestData {
     "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
     "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963"),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
-    "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB")
+    "mostTransactions" -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
+    "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB"),
+    "ceTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963")
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())

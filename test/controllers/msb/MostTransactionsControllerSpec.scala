@@ -2,33 +2,33 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.Country
-import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
+import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import org.jsoup.Jsoup
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
+import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
-class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new BranchesOrAgentsController {
-      override def cache: DataCacheConnector = self.cache
+    val controller = new MostTransactionsController {
+      override val cache: DataCacheConnector = self.cache
       override protected def authConnector: AuthConnector = self.authConnector
     }
   }
 
-  "BranchesOrAgentsController" must {
+  "LargestAmountsController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
@@ -40,15 +40,18 @@ class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with One
 
       status(result) mustEqual OK
 
-      document.select("input[name=hasCountries]").size mustEqual 2
-      document.select("input[name=hasCountries][checked]").size mustEqual 0
+      document.select("select").size mustEqual 3
+      document.select("option[selected]").size mustEqual 0
+      document.select(".amls-error-summary").size mustEqual 0
     }
 
-    "show a prefilled form when store contains data" in new Fixture {
+    "show a prefilled form when there is data in the store" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(
-          BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))
+        mostTransactions = Some(
+          MostTransactions(
+            models.countries.take(3)
+          )
         )
       )
 
@@ -60,31 +63,35 @@ class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with One
 
       status(result) mustEqual OK
 
-      document.select("input[name=hasCountries]").size mustEqual 2
-      document.select("input[name=hasCountries][checked]").`val` mustEqual "true"
-      document.select("option[value=GB][selected]").size mustEqual 1
+      document.select("select").size mustEqual 3
+      document.select("option[selected]").size mustEqual 3
+      document.select(".amls-error-summary").size mustEqual 0
     }
 
-    "return a Bad request with prefilled form on invalid submission" in new Fixture {
+    "return a Bad request with errors on invalid submission" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "hasCountries" -> "true"
-      )
-
-      val result = controller.post()(newRequest)
+      val result = controller.post()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual BAD_REQUEST
+
+      document.select("select").size mustEqual 3
+      document.select("option[selected]").size mustEqual 0
+      document.select(".amls-error-summary").size mustEqual 1
     }
 
-    "return a redirect to the 'X' page on valid submission" in new Fixture {
+    "return a redirect to 'X' page on valid submission (no edit)" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(None))
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        )
       )
 
       val newRequest = request.withFormUrlEncodedBody(
-        "hasCountries" -> "false"
+        "mostTransactionsCountries[]" -> "GB"
       )
 
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
@@ -96,17 +103,22 @@ class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with One
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.IdentifyLinkedTransactionsController.get().url)
+      // TODO Actual routing
+      redirectLocation(result) mustEqual Some(routes.ServicesController.get().url)
     }
 
-    "return a redirect to the 'Summary page' page on valid submission when edit flag is set" in new Fixture {
+    "return a redirect to the summary page on valid submission (edit)" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(None))
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        )
       )
 
       val newRequest = request.withFormUrlEncodedBody(
-        "hasCountries" -> "false"
+        "mostTransactionsCountries[]" -> "GB"
       )
 
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))

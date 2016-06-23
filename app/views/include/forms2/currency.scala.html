@@ -5,12 +5,10 @@
     labelText: String = "",
     hintText: String = "",
     bold: Boolean = false,
-    classes: Seq[String] = Seq.empty,
-    panel: Boolean = false,
-    jsHidden: Boolean = false
+    classes: Seq[String] = Seq.empty
 )(implicit lang: Lang)
 
-<div class="form-field @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}">
+<div class="form-field @if(field.hasErrors) {form-field--error}">
     <label>
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
@@ -21,8 +19,12 @@
         @if(field.hasErrors) {
             <span class="error-notification">@field.error</span>
         }
-        <input name="@field.name" class="form-control @classes.mkString(" ")" type="text" value="@field.value" id="@field.id"
-               @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
-        >
+
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-auto-complete>
+            <option value=""></option>
+            @models.currencies.map { currency =>
+                <option value="@currency" @if(field.value.contains(currency)) {selected} >@currency</option>
+            }
+        </select>
     </label>
 </div>
