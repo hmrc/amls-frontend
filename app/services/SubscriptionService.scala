@@ -31,12 +31,17 @@ trait SubscriptionService extends DataCacheService {
   private object Submission {
     val message = "confirmation.submission"
     val quantity = 1
-    val feePer = 100
+    val feePer = ApplicationConfig.regFee
   }
 
   private object Premises {
     val message = "confirmation.tradingpremises"
-    val feePer = 110
+    val feePer = ApplicationConfig.premisesFee
+  }
+
+  private object People {
+    val message = "confirmation.responsiblepeople"
+    val feePer = ApplicationConfig.peopleFee
   }
 
   private def safeId(cache: CacheMap): Future[String] = {
@@ -117,13 +122,15 @@ trait SubscriptionService extends DataCacheService {
           cache <- option
           subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
           premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
         } yield {
           val subQuantity = subscriptionQuantity(subscription)
           val mlrRegNo = subscription.amlsRefNo
           val total = subscription.totalFees
           val rows = Seq(
             BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer),
-            BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee)
+            BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee),
+            BreakdownRow(People.message, people.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))
           )
           Future.successful((mlrRegNo, Currency.fromBD(total), rows))
           // TODO
