@@ -12,16 +12,18 @@
 
     @form(f, controllers.businessactivities.routes.ExpectedBusinessTurnoverController.post(edit)) {
 
-        @radioGroup(f("expectedBusinessTurnover")) {
-            @legend("TODO", jsHidden = true)
-            @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.01", "01")
-            @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.02", "02")
-            @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.03", "03")
-            @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.04", "04")
-            @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.05", "05")
-            @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.06", "06")
-            @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.07", "07")
-        }
+        <div class="form-field-group">
+            @radioGroup(f("expectedBusinessTurnover")) {
+                @legend("businessactivities.business-turnover.title", jsHidden = true)
+                @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.01", "01")
+                @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.02", "02")
+                @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.03", "03")
+                @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.04", "04")
+                @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.05", "05")
+                @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.06", "06")
+                @radio(f("expectedBusinessTurnover"), "businessactivities.business-turnover.lbl.07", "07")
+            }
+        </div>
 
         @submit(edit)
     }

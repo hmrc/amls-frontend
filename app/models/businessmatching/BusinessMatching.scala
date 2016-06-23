@@ -44,7 +44,6 @@ object BusinessMatching {
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
       model =>
         if (model.isComplete) {
-          // TODO Add summary page url
           Section(messageKey, Completed, controllers.businessmatching.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, controllers.businessmatching.routes.RegisterServicesController.get())

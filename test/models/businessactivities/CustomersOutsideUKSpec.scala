@@ -71,7 +71,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.country.name"))
         )))
     }
 
@@ -81,14 +81,14 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       CustomersOutsideUK.formRule.validate(json) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.country.name"))
         )))
     }
 
     "validate mandatory country field" in {
       CustomersOutsideUK.formRule.validate(Map("isOutside" -> Seq("true"),"country_1" -> Seq(""))) must
         be(Failure(Seq(
-          (Path \ "country_1") -> Seq(ValidationError("error.required.ba.country.name"))
+          (Path \ "country_1") -> Seq(ValidationError("error.required.country.name"))
         )))
     }
 

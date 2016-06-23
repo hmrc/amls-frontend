@@ -25,7 +25,7 @@ trait WhoIsYourAccountantController extends BaseController {
             businessActivities <- response
             whoIsYourAccountant <- businessActivities.whoIsYourAccountant
           } yield Form2[WhoIsYourAccountant](whoIsYourAccountant)).getOrElse(Form2(defaultValues))
-          Ok(views.html.who_is_your_accountant(form, edit))
+          Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
       }
   }
 
@@ -33,7 +33,7 @@ trait WhoIsYourAccountantController extends BaseController {
     implicit authContext => implicit request =>
       Form2[WhoIsYourAccountant](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.who_is_your_accountant(f, edit)))
+          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit)))
         case ValidForm(_, data) => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)

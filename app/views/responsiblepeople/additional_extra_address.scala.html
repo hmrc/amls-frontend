@@ -25,7 +25,7 @@ panel = false,
 id = s"""${f("postCode").id}-fieldset"""
 ) {
 <fieldset class="">
-    @legend("responsiblepeople.additional_extra_address.address", bold = true)
+    @legend("responsiblepeople.additional_extra_address.address", bold = false)
     @input(f("addressLine1"))
     @input(f("addressLine2"))
     @input(f("addressLine3"))
@@ -60,7 +60,7 @@ labelText = "responsiblepeople.additional_extra_address.country"
 }
 
 @radioGroup(f("timeAtAddress")) {
-@legend("responsiblepeople.additional_extra_address.how_long", bold = true)
+@legend("responsiblepeople.additional_extra_address.how_long", bold = false)
 @radio(f("timeAtAddress"), "responsiblepeople.additional_extra_address.0_5_months", "01")
 @radio(f("timeAtAddress"), "responsiblepeople.additional_extra_address.6_11_months", "02")
 @radio(f("timeAtAddress"), "responsiblepeople.additional_extra_address.1_3_years", "03")

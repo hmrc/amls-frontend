@@ -11,8 +11,8 @@
     @model.services.map { a =>
         <table>
             <tr>
-                <th class="summary-title">@Messages("estateagentbusiness.servicess.title")</th>
-                <td colspan="2"><a href="@controllers.estateagentbusiness.routes.BusinessServicesController.get(true)">@Messages("button.edit")</a></td>
+                <th>@Messages("estateagentbusiness.servicess.title")</th>
+                <td width="12"><a href="@controllers.estateagentbusiness.routes.BusinessServicesController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             @a.services.map { line =>
             <tr>
@@ -31,38 +31,37 @@
                 </td>
             </tr>
             }
-
         </table>
     }
 
-        @model.services.map { a =>
-            @if(a.services.contains(Residential)) {
-            <table>
+    @model.services.map { a =>
+        @if(a.services.contains(Residential)) {
+        <table class="table--spaced-top">
+            <tr>
+                <th>@Messages("estateagentbusiness.registered.redress.title")</th>
+                <td width="12"><a href="@controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @model.redressScheme.map { a =>
                 <tr>
-                    <th class="summary-title">@Messages("estateagentbusiness.registered.redress.title")</th>
-                    <td colspan="2"><a href="@controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true)">@Messages("button.edit")</a></td>
+                    <td colspan="2">
+                        @a match {
+                            case ThePropertyOmbudsman => {@Messages("lbl.yes"): @Messages("estateagentbusiness.redress.lbl.01") }
+                            case OmbudsmanServices => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.02") }
+                            case PropertyRedressScheme => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.03") }
+                            case Other(value) => { @Messages("lbl.yes") : @value }
+                            case RedressSchemedNo => {@Messages("lbl.no")}
+                        }
+                    </td>
                 </tr>
-                @model.redressScheme.map { a =>
-                    <tr>
-                        <td colspan="2">
-                            @a match {
-                                case ThePropertyOmbudsman => {@Messages("lbl.yes"): @Messages("estateagentbusiness.redress.lbl.01") }
-                                case OmbudsmanServices => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.02") }
-                                case PropertyRedressScheme => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.03") }
-                                case Other(value) => { @Messages("lbl.yes") : @value }
-                                case RedressSchemedNo => {@Messages("lbl.no")}
-                            }
-                        </td>
-                    </tr>
-                }
-            </table>
             }
+        </table>
         }
+    }
 
-    <table>
+    <table class="table--spaced-top">
         <tr>
-            <th class="summary-title">@Messages("estateagentbusiness.penalisedbyprofessional.title")</th>
-            <td colspan="2"><a href="@controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
+            <th>@Messages("estateagentbusiness.penalisedbyprofessional.title")</th>
+            <td width="12"><a href="@controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -83,12 +82,12 @@
             </tr>
             }
         }
-
     </table>
-    <table>
+
+    <table class="table--spaced-top">
         <tr>
-            <th class="summary-title">@Messages("estateagentbusiness.penalisedunderestateagentsact.title")</th>
-            <td colspan="2"><a href="@controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true)">@Messages("button.edit")</a></td>
+            <th>@Messages("estateagentbusiness.penalisedunderestateagentsact.title")</th>
+            <td width="12"><a href="@controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -110,5 +109,6 @@
             }
         }
     </table>
+
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

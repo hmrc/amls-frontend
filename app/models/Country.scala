@@ -12,7 +12,7 @@ case class Country(name: String, code: String) {
 object Country {
 
   implicit val writes = Writes[Country] {
-    country => JsString(country.code)
+    case Country(_, c) => JsString(c)
   }
 
   implicit val reads = Reads[Country] {
@@ -41,4 +41,14 @@ object Country {
           Failure(Seq(Path -> Seq(ValidationError(Messages("error.invalid.country")))))
         }
     }
+
+  implicit val jsonW: Write[Country, JsValue] = {
+    import play.api.data.mapping.json.Writes.string
+    formWrites compose string
+  }
+
+  implicit val jsonR: Rule[JsValue, Country] = {
+    import play.api.data.mapping.json.Rules.stringR
+    stringR compose formRule
+  }
 }

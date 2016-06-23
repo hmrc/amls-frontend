@@ -10,10 +10,22 @@
 
     @heading("aboutthebusiness.correspondenceaddress.title", "summary.aboutbusiness")
 
-    <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
+
+    <div class="panel-indent panel-indent--gutter panel-wide">
+        @Messages("aboutthebusiness.correspondenceaddress.p")
+    </div>
+
 
     @form(f, controllers.aboutthebusiness.routes.CorrespondenceAddressController.post(edit)) {
 
+
+        @inlineRadioGroup(f("isUK")) {
+            @legend("TODO", jsHidden = true)
+            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
+            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
+        }
+
+        <div class="form-field-group">
         @input(
             field = f("yourName"),
             labelText = "aboutthebusiness.correspondenceaddress.yourName"
@@ -23,55 +35,47 @@
             field = f("businessName"),
             labelText = "aboutthebusiness.correspondenceaddress.businessName"
         )
-
-
-        @inlineRadioGroup(f("isUK")) {
-            @legend("TODO", jsHidden = true)
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
-        }
+        </div>
 
         @fieldset(
-            legend = "TODO",
-            jsHidden = true,
+            legend = "aboutthebusiness.correspondenceaddress.address",
+            jsHidden = false,
             panel = false,
             id = s"""${f("postCode").id}-fieldset"""
         ) {
-            <fieldset class="">
-                <legend class="form-label-bold">
-                    @Messages("aboutthebusiness.correspondenceaddress.address")
-                </legend>
+            <div class="form-field-group">
                 @input(f("addressLine1"))
                 @input(f("addressLine2"))
                 @input(f("addressLine3"))
                 @input(f("addressLine4"))
-            </fieldset>
+            </div>
+            <div class="form-field-group">
             @input(
                 field = f("postCode"),
                 labelText = "aboutthebusiness.correspondenceaddress.postCode",
                 classes = Seq("postcode")
             )
+            </div>
         }
 
         @fieldset(
-            legend = "TODO",
-            jsHidden = true,
+            legend = "aboutthebusiness.correspondenceaddress.address",
+            jsHidden = false,
             panel = false,
             id = s"""${f("country").id}-fieldset"""
         ) {
-            <fieldset class="">
-                <legend class="form-label-bold">
-                    @Messages("aboutthebusiness.correspondenceaddress.address")
-                </legend>
+            <div class="form-field-group">
                 @input(f("addressLineNonUK1"))
                 @input(f("addressLineNonUK2"))
                 @input(f("addressLineNonUK3"))
                 @input(f("addressLineNonUK4"))
-            </fieldset>
+            </div>
+            <div class="form-field-group">
             @country(
                 field = f("country"),
                 labelText = "aboutthebusiness.correspondenceaddress.country"
             )
+            </div>
         }
 
         @submit(edit)

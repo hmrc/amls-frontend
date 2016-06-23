@@ -115,7 +115,7 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#country_1]").html() must include(Messages("error.required.ba.country.name"))
+      document.select("a[href=#country_1]").html() must include(Messages("error.required.country.name"))
     }
   }
 

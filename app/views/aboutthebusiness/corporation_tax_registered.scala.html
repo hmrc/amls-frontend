@@ -15,7 +15,7 @@ title = Messages("aboutthebusiness.registeredforcorporationtax.title")
     @form(f, controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.post(edit)) {
 
         @inlineRadioGroup(f("registeredForCorporationTax")) {
-            @legend("TODO", jsHidden = true)
+            @legend("aboutthebusiness.registeredforcorporationtax.title", jsHidden = true)
             @radio(f("registeredForCorporationTax"), "lbl.yes", "true", target = s"#$target")
             @radio(f("registeredForCorporationTax"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {

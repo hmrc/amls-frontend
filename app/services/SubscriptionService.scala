@@ -3,6 +3,7 @@ package services
 import config.ApplicationConfig
 import connectors.{DESConnector, DataCacheConnector, GovernmentGatewayConnector}
 import models.asp.Asp
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -81,6 +82,7 @@ trait SubscriptionService extends DataCacheService {
       responsiblePeopleSection = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key),
       tcspSection =  cache.getEntry[Tcsp](Tcsp.key),
       aspSection = cache.getEntry[Asp](Asp.key),
+      msbSection = cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key),
       supervisionSection = cache.getEntry[Supervision](Supervision.key)
     )
 

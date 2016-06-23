@@ -60,7 +60,7 @@ object CustomersOutsideUK {
   implicit val formRuleCountry: Rule[UrlFormEncoded, Countries] = From[UrlFormEncoded] { __ =>
     import utils.MappingUtils.Implicits._
    import play.api.data.mapping.forms.Rules._
-        ((__ \ "country_1").read[Country].withMessage("error.required.ba.country.name") and
+        ((__ \ "country_1").read[Country].withMessage("error.required.country.name") and
           (__ \ "country_2").read[Option[Country]] and
           (__ \ "country_3").read[Option[Country]] and
           (__ \ "country_4").read[Option[Country]] and
@@ -74,7 +74,7 @@ object CustomersOutsideUK {
     }
 
   implicit val formWrites: Write[CustomersOutsideUK, UrlFormEncoded] = Write {
-    case CustomersOutsideUKYes(countries) => {
+    case CustomersOutsideUKYes(countries) =>
       Map("isOutside" -> Seq("true"),
         "country_1" -> Seq(countries.country_1.code),
         "country_2" -> (countries.country_2.toSeq map { _.code }),
@@ -87,7 +87,6 @@ object CustomersOutsideUK {
         "country_9" -> (countries.country_9.toSeq map { _.code }),
         "country_10" -> (countries.country_10.toSeq map { _.code })
       )
-    }
     case CustomersOutsideUKNo => Map("isOutside" ->  Seq("false"))
   }
 
@@ -113,7 +112,7 @@ object CustomersOutsideUK {
   }
 
   implicit val jsonWrites = Writes[CustomersOutsideUK] {
-    case CustomersOutsideUKYes(countries) => {
+    case CustomersOutsideUKYes(countries) =>
       Json.obj(
         "isOutside" -> true,
         "country_1" -> countries.country_1,
@@ -127,7 +126,6 @@ object CustomersOutsideUK {
         "country_9" -> countries.country_9,
         "country_10" -> countries.country_10
       )
-    }
     case CustomersOutsideUKNo => Json.obj("isOutside" -> false)
   }
 }

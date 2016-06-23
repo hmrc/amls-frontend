@@ -5,10 +5,12 @@
     labelText: String = "",
     hintText: String = "",
     bold: Boolean = false,
-    classes: Seq[String] = Seq.empty
+    classes: Seq[String] = Seq.empty,
+    panel: Boolean = false,
+    jsHidden: Boolean = false
 )(implicit lang: Lang)
 
-<div class="form-group @if(field.hasErrors) {form-field--error}">
+<div class="form-field @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}">
     <label>
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>

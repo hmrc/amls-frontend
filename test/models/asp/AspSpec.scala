@@ -53,7 +53,6 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
       "correctly provides a default value when existing value is provided" in {
         Asp.default(Some(completeModel)) must be(completeModel)
       }
-
     }
 
     "have a mongo key that" must {

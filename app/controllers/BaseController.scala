@@ -4,7 +4,7 @@ import config.ApplicationConfig
 import controllers.auth.AmlsRegime
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import utils.FeatureToggle
+import utils.{FeatureToggle, JsonMapping}
 
 trait BaseController extends FrontendController with Actions {
 

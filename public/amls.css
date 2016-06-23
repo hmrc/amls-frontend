@@ -14,200 +14,217 @@
  * limitations under the License.
  */
 
-@media (max-width: 640px) {
-    .grid-layout--stacked .grid-layout__column {
-        display: block;
-    }
-}
-
-.grid-layout__column {
-    vertical-align: top;
-    display: table-cell;
-    width: 100%;
-}
-
-.grid-layout__column--1-4 {
-    vertical-align: top;
-    display: table-cell;
-    box-sizing: border-box;
-}
-
-@media (min-width: 641px) {
-    .grid-layout__column--1-4 {
-        width: 25%;
-    }
-}
-
-.grid-layout__column--3-4 {
-    vertical-align: top;
-    display: table-cell;
-    box-sizing: border-box;
-}
-
-@media (min-width: 641px) {
-    .grid-layout__column--3-4 {
-        width: 75%;
-    }
-}
-
-.grid-layout__column--1-2 {
-    vertical-align: top;
-    display: table-cell;
-    box-sizing: border-box;
-}
-
-@media (min-width: 641px) {
-    .grid-layout__column--1-2 {
-        width: 50%;
-    }
-}
-
-.grid-layout__column--1-3 {
-    vertical-align: top;
-    display: table-cell;
-    box-sizing: border-box;
-}
-
-@media (min-width: 641px) {
-    .grid-layout__column--1-3 {
-        width: 33.33333%;
-    }
-}
-
-.grid-layout__column--2-3 {
-    vertical-align: top;
-    display: table-cell;
-    box-sizing: border-box;
-}
-
-@media (min-width: 641px) {
-    .grid-layout__column--2-3 {
-        width: 66.66667%;
-    }
-}
-
-/* ^^^ added the above until we update assets-frontend ^^^ */
-
-/* add back some margins */
-.list {
-    margin-bottom: 20px;
-    margin-top: 5px;
-}
 
 /* required as js-hidden in assets frontend is !important */
 .amls-js-hidden {
-    display : none;
+  display: none;
 }
 
 .amls-service-info {
-    border-top : 10px solid #005ea5;
-    /*margin-bottom : 15px;*/
+  border-top: 10px solid #005ea5;
 }
 
-div.grid-layout {
-    margin : 0;
-}
-
+/* Might not need this anymore, not sure who put it in */
 .address-list li {
-    margin : 0;
+  margin: 0;
 }
 
+.panel-wide {
+  border-left: solid 10px #bfc1c3;
+}
 
-/* Registration Progress */
-.progress-submit {
-  background-color : #f8f8f8;
-  margin-left : 30px;
-  padding : 15px;
-  border-bottom : #dee0e2 solid 3px;
+/* -- application progress page -- */
+.progress-steps {
+  margin-bottom: 12px;
 }
-.progress-section {
-  display : table;
-  background-color : #f8f8f8;
-  width : 100%;
+
+.progress-steps li {
+  margin-bottom: 0;
+  margin-top: 12px;
 }
-.progress-section + .progress-section {
-  margin-top : 12px;
+
+.progress-steps li:first-child {
+  margin-top: 0;
 }
-.progress-section > .left, .progress-section > .right {
-  vertical-align : top;
-  box-sizing : border-box;
-  display : table-cell;
-  padding : 15px;
+
+/* qualified attribute selector required here, otherwise
+   all text colour takes on regular anchor colour  */
+a.progress-step {
+  background-color: #dee0e2;
+  color: #0b0c0c;
+  display: block; /* for IE8 */
+  display: flex; /* for everything else */
+  margin-bottom: 0;
+  padding: 0;
+  position: relative;
+  text-decoration: none;
+  transition: .25s ease-in;
+  transition-property: background-color, outline;
 }
-.progress-section > .left {
-  border-bottom : #dee0e2 solid 3px;
+
+/* give the whole step component a focus outline */
+.progress-step:focus {
+  outline: 3px solid #ffbf47;
 }
-.progress-section p {
-  margin : 0;
-  padding-bottom : 10px;
+
+/* mimic the anchor colours inside this block-level component */
+.progress-step__edit {
+  color: #005ea5;
 }
-.progress-section > .right {
-  padding : 20px 15px;
-  background-color : #dee0e2;
-  color : #6F777B;
-  width : 33%;
+
+.progress-step__edit:focus,
+.progress-step__edit:hover {
+  color: #2e8aca;
 }
-.progress-section:hover > .right.not-started, .right.complete {
-  background-color : #00823B;
-  color : white;
+
+.progress-step--details {
+  background: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  padding: 5px 10px 15px;
 }
-.progress-section .heading-small, .progress-submit .heading-small {
-  margin-top : 0;
+
+.progress-step--details p {
+  margin: 0;
+  padding-bottom: 10px;
 }
-.right.started {
-  background-color : #FFBF47;
-  color : white;
+
+.progress-step--status {
+  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 100%;
+  background-size: 50%;
+  border-bottom: 3px solid #dee0e2;
+  color: #6f777b;
+  padding: 0;
+  position: relative;
+  transition: .25s ease-in;
 }
-.time-to-complete {
-  display : table-cell;
-  width : 66%;
+
+.no-svg .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/chevron.png");
 }
-.chevron-container {
-  display : table-cell;
-  vertical-align : middle;
-  padding-right : 15px;
+
+.progress-step--status__completed,
+.progress-step:focus .progress-step--status__completed,
+.progress-step:hover .progress-step--status__completed {
+  border-bottom-color: #28a197;
 }
-.chevron {
-  display : inline-block;
-  height : 2.5em;
-  width : 2.5em;
-  border-bottom : solid 0.4em #6F777B;
-  border-right : solid 0.4em #6F777B;
-  transform : rotate(-45deg);
+
+.progress-step:focus .progress-step--status__started,
+.progress-step:focus .progress-step--status__not-started,
+.progress-step:hover .progress-step--status__started,
+.progress-step:hover .progress-step--status__not-started {
+  background-color: #006435;
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
+  border-bottom-color: #01552e;
+  color: #fff;
 }
-.progress-section:hover .chevron {
-  border-color : white;
+
+.no-svg .progress-step:focus .progress-step--status__started,
+.no-svg .progress-step:focus .progress-step--status__not-started,
+.no-svg .progress-step:hover .progress-step--status__started,
+.no-svg .progress-step:hover .progress-step--status__not-started {
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
 }
-.chevron-container > a:focus {
-  background : none;
+
+.progress-step--status__completed {
+  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50%;
+  transition: none;
 }
+
+.no-svg .progress-step--status__completed {
+  background-image: url("/anti-money-laundering/assets/icons/tick.png");
+}
+
+.progress-step--status-time {
+  padding: 15px 15px 0;
+}
+
+.application-submit {
+  background-color: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin-left: 30px;
+  padding: 15px;
+}
+
+.application-submit .heading-small {
+  margin-top: 0;
+}
+
+.lte-ie8 .grid-layout {
+  table-layout: fixed;
+}
+
+/* having to specify these widths for IE8 until a better fix appears.
+   we can get away with this because IE8 isn't responsive */
+
+.lte-ie8 .progress-step > .grid-layout__column--1-3 {
+  width: 213.66px;
+}
+
+.lte-ie8 .progress-step > .grid-layout__column--2-3 {
+  width: 427.33px;
+}
+
+@media screen and (max-width: 640px) {
+  .progress-step {
+    margin: 0 -0.78947em 12px;
+  }
+
+  .progress-step .grid-layout__column--1-3 {
+    float: left;
+    width: 33.33333%;
+  }
+
+  .progress-step .grid-layout__column--2-3 {
+    float: left;
+    width: 66.66667%;
+  }
+
+  .progress-step--status__started,
+  .progress-step--status__not-started {
+    background-size: 20%;
+  }
+
+  .application-submit {
+    margin: 0 -0.78947em;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 767px) {
+  .progress-step--status__started,
+  .progress-step--status__not-started {
+    background-size: 25%;
+  }
+}
+
+/* -- // application progress page -- */
 
 /* Confirmation */
 .confirmation {
-  margin : 40px 0;
-  padding : 20px 40px 20px 40px;
-  background-color : #28A197;
-  color : white;
-  text-align : center;
+  background-color: #28a197;
+  color: #fff;
+  margin: 40px 0;
+  padding: 20px 40px 20px 40px;
+  text-align: center;
 }
+
 .confirmation > h1 {
-  margin : 0;
+  margin: 0;
 }
-.panel-wide {
-  border-left : solid 10px #bfc1c3;
-  padding : 15px;
-}
+
 .bevel-container {
-  margin : 40px 0 0 40px;
-  padding : 15px;
-  border-bottom : #dee0e2 solid 3px;
-  background-color : #f8f8f8;
+  background-color: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin: 40px 0 0 40px;
+  padding: 15px;
 }
+
 .bevel-container > .heading-small {
-  margin : 10px 0 15px 0;
+  margin: 10px 0 15px 0;
 }
-td.numeric, th.numeric {
-  text-align : right;
+
+td.numeric,
+th.numeric {
+  text-align: right;
 }
 
 /* adding this for now
@@ -221,89 +238,99 @@ td.numeric, th.numeric {
 /* postcode */
 /* TODO, determine if there's a class in Assets Frontend for this */
 form input[type=text].form-control.postcode {
-    width : 20%;
+  width: 20%;
 }
 
 /* select box for countries */
 select {
-  border : 2px solid #6f777b;
-  margin : 0;
-  padding : 4px;
-  width : 50%;
+  border: 2px solid #6f777b;
+  margin: 0;
+  padding: 4px;
+  width: 50%;
 }
-
 
 /* form errors */
 .amls-error-summary {
-    background-color: white;
-    border: 5px solid #b10e1e;
-}
-.amls-error-summary li {
-    font-weight: bold;
-}
-.amls-error-summary li > a {
-    color : #b10e1e;
-}
-.form-field--error {
-    border-left-width: 5px;
-    border-color : #b10e1e;
-}
-.form-field--error span.error-notification {
-    font-weight : bold;
+  background-color: #fff;
+  border: 5px solid #b10e1e;
 }
 
+.amls-error-summary li {
+  font-weight: bold;
+}
+
+.amls-error-summary li > a {
+  color: #b10e1e;
+}
+
+.form-field--error {
+  border-left-width: 5px;
+  border-color: #b10e1e;
+}
+
+.form-field--error span.error-notification {
+  font-weight: bold;
+}
 
 /* forms */
 .form-group {
-    padding-top: 0;
-    padding-bottom: 0;
-}
-form input[type=text].form-control {
-    border : 2px solid #6f777b;
-    width : 50%;
-}
-form .form-label-bold {
-    font-size: 19px;
-    line-height: 1.31579;
-    margin-bottom : 0.5em;
-}
-form .block-label + fieldset {
-    float: left;
-    margin-top : 10px;
-}
-form .inline .block-label + fieldset {
-    float: none;
-    margin-top : 0;
-}
-form .date .form-group {
-    width: 60px;
-    float: left;
-    margin-right: 20px;
-    clear: none;
-}
-form .date .form-group input[type=text] {
-    width : 100%;
-}
-form .inline > label.block-label {
-    clear: none;
-}
-form .inline .block-label {
-    clear: both;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
+form input[type=text].form-control {
+  border: 2px solid #6f777b;
+  width: 50%;
+}
+
+form .form-label-bold {
+  font-size: 19px;
+  line-height: 1.31579;
+  margin-bottom: 0.5em;
+}
+
+form .block-label + fieldset {
+  float: left;
+  margin-top: 10px;
+}
+
+form .inline .block-label + fieldset {
+  float: none;
+  margin-top: 0;
+}
+
+form .date .form-group {
+  width: 60px;
+  float: left;
+  margin-right: 20px;
+  clear: none;
+}
+
+form .date .form-group input[type=text] {
+  width: 100%;
+}
+
+form .inline > label.block-label {
+  clear: none;
+}
+
+form .inline .block-label {
+  clear: both;
+}
 
 /* summary styles */
 .summary-title {
-    width : 88%;
-}
-table.summary {
-    font-size: 16px;
-}
-table.summary ul li {
-    font-size: 16px;
-    margin-bottom: 0;
+  width: 88%;
 }
 
+table.summary {
+  font-size: 16px;
+}
+
+table.summary ul li {
+  font-size: 16px;
+  margin-bottom: 0;
+}
 
 /* icons */
 .icon {
@@ -314,20 +341,21 @@ table.summary ul li {
 }
 
 .notice {
-    padding-left: 38px;
-    top: -43px;
-    position: relative;
-    display: block;
-    height: 0px;
+  display: block;
+  height: 0;
+  padding-left: 38px;
+  position: relative;
+  top: -43px;
 }
 
 .icon-information {
-  /* what's this here for? */
+  display: inline-block;
 }
 
 .icon-important {
-    padding-right: 1px;
-    padding-bottom: 1px;
+  display: inline-block;
+  padding-bottom: 1px;
+  padding-right: 1px;
 }
 
 .icon-confirmed {
@@ -340,82 +368,106 @@ table.summary ul li {
 }
 
 .notice-important {
-    padding-left: 55px;
+  padding-left: 55px;
 }
 
 .spacelarge {
-    margin-bottom: 30px;
+  margin-bottom: 30px;
 }
 
 .touchevents .date-of-birth {
-    display:block;
+  display: block;
 }
 
-.summary-table a:link, .summary-table a:visited {
- text-decoration:none;
- color: #005ea5;
+.summary-table a:link,
+.summary-table a:visited,
+.summary-table a:hover {
+  color: #005ea5;
+}
+
+.summary-table a:link,
+.summary-table a:visited {
+  text-decoration: none;
 }
 
 .summary-table a:hover {
- text-decoration:underline;
- color: #005ea5;
+  text-decoration: underline;
 }
 
 .summary-table .first-section {
-    border-top: 1px solid #bfc1c3;
+  border-top: 1px solid #bfc1c3;
 }
 
 .summary-table th {
-    padding-top: 15px;
-    padding-bottom: 10px;
-    font-size: 24px;
+  font-size: 24px;
+  padding-bottom: 10px;
+  padding-top: 15px;
 }
 
 .login-name {
-    text-align: right;
-    font-size: 16px;
-    margin: 0;
-    float: right;
-    padding: 10px 0 10px 0;
-    margin-top: 10px;
+  float: right;
+  font-size: 16px;
+  margin-top: 10px;
+  margin: 0;
+  padding: 10px 0 10px 0;
+  text-align: right;
 }
-
-
 
 .heading-secondary {
-    display: block;
-    font-family: "nta",Arial,sans-serif;
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 1.25;
-    padding-top: 9px;
-    padding-bottom: 0px;
-    margin-top: 0px;
-    color: #6f777b;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-top: 9px;
 }
 
-.locked {
-    color: #6F777B;
+.locked,
+.heading-secondary {
+  color: #6f777b;
 }
 
 .visibly-hidden {
-    position:absolute;
-    left:-9999px;
-    width:100px;
-    height:auto;
-    overflow:hidden;
+  position: absolute;
+  left: -9999px;
+  width: 100px;
+  height: auto;
+  overflow: hidden;
 }
 
 .no-padding {
-    padding-left: 0;
+  padding-left: 0;
 }
 
 .no-margin {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 .panel-border-wide {
-    border-left-width: 10px;
+  border-left-width: 10px;
+}
+
+/* style the selects as close to inputs as possible,
+ * because they'll flash on the screen before being replaced. */
+.js [data-auto-complete],
+.js .custom-combobox-input,
+.js .ui-autocomplete-input {
+  -webkit-appearance: none;
+  background-color: transparent;
+  border-radius: 0;
+  height: 37px;
+  width: 220px;
+}
+
+.js *[data-toggle-new] {
+  display: none;
+}
+
+#hasCountries-fieldset {
+  padding-top: 10px;
+}
+
+#hasCountries-fieldset legend {
+  float: left;
 }
 
 .reg-online--pay-fee .heading-xlarge {

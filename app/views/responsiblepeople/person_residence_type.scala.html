@@ -27,7 +27,7 @@ title = Messages("responsiblepeople.person.a.resident.title")
                     false
                 )
                 @radioGroup(f("passportType")) {
-                    @legend("responsiblepeople.passporttype.lbl", jsHidden = false, bold = true)
+                    @legend("responsiblepeople.passporttype.lbl", jsHidden = false, bold = false)
                     @radio(f("passportType"), "responsiblepeople.uk.passport.lbl", "01", target = s"#${f("ukPassportNumber").id}-fieldset")
                     @fieldset("TODO", jsHidden = true, id = s"""${f("ukPassportNumber").id}-fieldset""") {
                        @input(f("ukPassportNumber"), "lbl.passport.number", bold = false)
@@ -36,16 +36,15 @@ title = Messages("responsiblepeople.person.a.resident.title")
                     @fieldset("TODO", jsHidden = true, id = s"""${f("nonUKPassportNumber").id}-fieldset""") {
                         @input(f("nonUKPassportNumber"), "lbl.passport.number", bold = false)
                     }
-                    <p class="form-block">@Messages("responsiblepeople.or.lbl")</p>
                     @radio(f("passportType"), "responsiblepeople.no.passport.lbl", "03")
                 }
             }
         }
 
-        @legend("responsiblepeople.country.of.birth.lbl", bold = true)
+        @legend("responsiblepeople.country.of.birth.lbl", bold = false)
         @country(f("countryOfBirth"))
 
-        @legend("lbl.nationality", bold = true)
+        @legend("lbl.nationality", bold = false)
         @country(f("nationality"))
 
         @submit(edit)

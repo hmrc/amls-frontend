@@ -11,13 +11,19 @@
 
     @form(f, controllers.businessactivities.routes.RiskAssessmentController.post(edit)) {
 
-        @inlineRadioGroup(f("isRedress")) {
-            @legend("TODO", jsHidden = true)
+        @inlineRadioGroup(f("hasPolicy")) {
+            @legend("businessactivities.riskassessment.policy.tile", jsHidden = true)
             @radio(f("hasPolicy"), "lbl.yes", "true", target = s"#${f("riskassessments").id}-fieldset")
             @radio(f("hasPolicy"), "lbl.no", "false")
         }
 
         @fieldset("TODO", jsHidden = true, id = s"""${f("riskassessments").id}-fieldset""") {
+
+            <span class="form-field">
+                @Messages("businessactivities.riskassessment.policy.line1.text")
+            </span>
+
+
             @radioGroup(f("riskassessments")) {
                 @legend("businessactivities.paper.or.digital", true ,bold = true, "lbl.select.all")
                 @checkbox(f("riskassessments[]"), "businessactivities.RiskAssessmentType.lbl.01", "01")

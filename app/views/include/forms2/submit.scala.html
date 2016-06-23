@@ -1,8 +1,8 @@
 @(edit: Boolean = false, buttonMessageKey : Option[String] = None)(implicit lang: Lang)
-
-<input
+<div class="form-field">
+    <button
         type="submit"
         name="submit"
         class="button"
-        value="@Messages(buttonMessageKey.getOrElse(if (edit) "button.saveandreturn" else "button.saveandcontinue"))"
->
+    >@Messages(buttonMessageKey.getOrElse(if (edit) "button.saveandreturn" else "button.saveandcontinue"))</button>
+</div>
