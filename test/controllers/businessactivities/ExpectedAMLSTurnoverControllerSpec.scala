@@ -5,9 +5,9 @@ import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import connectors.DataCacheConnector
-import models.businessmatching.{BusinessActivities => activities, BusinessMatching}
+import models.businessmatching.{BusinessActivities => Activities, BusinessMatching}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -16,7 +16,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
-
 
 
 import scala.concurrent.Future
@@ -30,6 +29,23 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneServerPerSuite
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    val cache = mock[CacheMap]
+
+    val businessMatching = BusinessMatching(
+      activities = Some(Activities(Set.empty))
+    )
+
+    def model: Option[BusinessActivities] = None
+
+    when(controller.dataCacheConnector.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cache)))
+
+    when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+      .thenReturn(Some(businessMatching))
+
+    when(cache.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+      .thenReturn(model)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -38,9 +54,6 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneServerPerSuite
 
     "on get display the Turnover Expect In 12Months Related To AMLS page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[ExpectedAMLSTurnover](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("businessactivities.turnover.title"))
@@ -48,8 +61,7 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneServerPerSuite
 
     "on get display the Role Within Business page with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(expectedAMLSTurnover = Some(First)))))
+      override def model = Some(BusinessActivities(expectedAMLSTurnover = Some(First)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -92,6 +104,16 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneServerPerSuite
       redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
     }
 
+    "on post with invalid data" in new Fixture {
 
+      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(businessMatching)))
+
+      val result = controller.post(true)(request)
+      val document = Jsoup.parse(contentAsString(result))
+
+      status(result) mustBe BAD_REQUEST
+      document.select(".amls-error-summary").size mustEqual 1
+    }
   }
 }

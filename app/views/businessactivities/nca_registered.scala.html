@@ -11,14 +11,15 @@ title = Messages("businessactivities.ncaRegistered.title")
 @heading("businessactivities.ncaRegistered.title", "summary.businessactivities")
 
 @form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
-    <span class="form-hint">
-        @Messages("businessactivities.ncaRegistered.subtitle")
-    </span>
 
-    @inlineRadioGroup(f("NCARegisteredController")) {
-        @radio(f("ncaRegistered"), "lbl.yes", "true")
-        @radio(f("ncaRegistered"), "lbl.no", "false")
-    }
+    <p class="form-hint">@Messages("businessactivities.ncaRegistered.subtitle")</p>
+
+    <div class="form-field-group">
+        @inlineRadioGroup(f("ncaRegistered")) {
+            @radio(f("ncaRegistered"), "lbl.yes", "true")
+            @radio(f("ncaRegistered"), "lbl.no", "false")
+        }
+    </div>
     @submit(edit)
 
     }
