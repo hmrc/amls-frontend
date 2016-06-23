@@ -28,13 +28,12 @@ trait ServicesController extends BaseController {
       }
   }
 
-  // TODO: Correct the routing here once pages exist
   private def route(services: Option[MsbServices], newServices: MsbServices): Call =
     (newServices.services -- services.map(_.services).getOrElse(Set.empty)) match {
       case w if w.contains(TransmittingMoney) =>
-        routes.ServicesController.get()
+        routes.BusinessAppliedForPSRNumberController.get()
       case w if w.contains(CurrencyExchange) =>
-        routes.ServicesController.get()
+        routes.CETransactionsInNext12MonthsController.get()
       case _ =>
         routes.SummaryController.get()
     }
@@ -50,10 +49,9 @@ trait ServicesController extends BaseController {
              _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.msbServices(data)
             )
-              // TODO: Go to next page
           } yield edit match {
             case false =>
-              Redirect(routes.ServicesController.get())
+              Redirect(routes.ExpectedThroughputController.get())
             case true =>
               Redirect(route(msb.msbServices, data))
           }

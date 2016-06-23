@@ -11,7 +11,15 @@ case class SendTheLargestAmountsOfMoney (
                        country_1: Country,
                        country_2: Option[Country] = None,
                        country_3: Option[Country] = None
-                     )
+                     ) {
+
+  def countryList = {
+    this.productIterator.collect {
+      case Some(x: Country) => x
+      case x: Country => x
+    }
+  }
+}
 
 object SendTheLargestAmountsOfMoney {
 

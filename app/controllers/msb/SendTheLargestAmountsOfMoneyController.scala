@@ -31,14 +31,16 @@ trait SendTheLargestAmountsOfMoneyController extends BaseController {
           Future.successful(BadRequest(send_largest_amounts_of_money(f, edit)))
         case ValidForm(_, data) =>
           for {
-            businessActivity <-
+            msb <-
             dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              businessActivity.sendTheLargestAmountsOfMoney(data)
+              msb.sendTheLargestAmountsOfMoney(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SummaryController.get())
+            case true if msb.mostTransactions.isDefined =>
+              Redirect(routes.SummaryController.get())
+            case _ =>
+              Redirect(routes.MostTransactionsController.get(edit))
           }
       }
   }

@@ -80,7 +80,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
     }
 
-    "wholesaler money source is checked and wholesalere Names is empty" should {
+    "wholesaler money source is checked and wholesaler Names is empty" should {
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
         "currencies[1]" -> Seq("CHF"),

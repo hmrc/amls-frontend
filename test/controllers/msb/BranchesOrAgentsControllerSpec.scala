@@ -77,7 +77,7 @@ class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with One
       status(result) mustEqual BAD_REQUEST
     }
 
-    "return a redirect to the 'X' page on valid submission" in new Fixture {
+    "return a redirect to the 'Linked Transactions' page on valid submission" in new Fixture {
 
       val model = MoneyServiceBusiness(
         branchesOrAgents = Some(BranchesOrAgents(None))
