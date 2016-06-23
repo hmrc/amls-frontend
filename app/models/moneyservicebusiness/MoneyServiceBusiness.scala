@@ -70,10 +70,6 @@ object MoneyServiceBusiness {
 
   val key = "msb"
 
-  implicit val mongoKey = new MongoKey[MoneyServiceBusiness] {
-    def apply() = key
-  }
-
   def section(implicit cache: CacheMap): Section = {
     val messageKey = key
 

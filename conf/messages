@@ -238,6 +238,9 @@ error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
 error.invalid.msb.wc.wholesalerNames.too-long = You can''t enter more than 140 characters for the wholesaler names
 error.required.countries.msb.most.transactions = Enter at least one country.
 
+
+error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
@@ -471,7 +474,7 @@ tradingpremises.youragent.taxtype = What type of tax does your agent pay?
 tradingpremises.youragent.taxtype.lbl.01=Self-assessment
 tradingpremises.youragent.taxtype.lbl.02=Corporation tax
 tradingpremises.youragent.businessstructure=What is your agent''s business structure?
-tradingpremises.youragent.businessstructure.lbl.01=Sole proprietor
+#re.lbl.01=Sole proprietor
 tradingpremises.youragent.businessstructure.lbl.02=Limited liability partnership
 tradingpremises.youragent.businessstructure.lbl.03=Partnership
 tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
