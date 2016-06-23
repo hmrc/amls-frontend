@@ -1,12 +1,15 @@
 package models.hvd
 
 import models.FormTypes._
-import org.joda.time.LocalDate
+import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.data.mapping.{Write, Success, From, Rule}
 import play.api.data.mapping.forms._
+import play.api.libs.json._
 
 sealed trait CashPayment
-case class CashPaymentYes (paymentDate: LocalDate) extends CashPayment
+
+case class CashPaymentYes(paymentDate: LocalDate) extends CashPayment
+
 case object CashPaymentNo extends CashPayment
 
 object CashPayment {
@@ -23,10 +26,12 @@ object CashPayment {
   }
 
   implicit val formWrites: Write[CashPayment, UrlFormEncoded] = Write {
-    case CashPaymentYes(value) =>
+    case CashPaymentYes(date) =>
       Map("registeredForVAT" -> Seq("true"),
-        "vrnNumber" -> Seq(value)
-      )
+      "startDate.day" -> Seq(date.get(DateTimeFieldType.dayOfMonth()).toString),
+    "startDate.month" -> Seq(date.get(DateTimeFieldType.monthOfYear()).toString),
+    "startDate.year" -> Seq(date.get(DateTimeFieldType.year()).toString)
+    )
     case CashPaymentNo => Map("registeredForVAT" -> Seq("false"))
   }
 }
