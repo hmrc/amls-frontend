@@ -13,14 +13,16 @@
 
     @form(f, controllers.businessmatching.routes.BusinessTypeController.post()) {
 
+        <div class="form-field-group">
         @radioGroup(f("businessType")) {
-            @legend("TODO", jsHidden = true)
+            @legend("businessmatching.businessType.title", jsHidden = true)
             @radio(f("businessType"), "businessmatching.businessType.lbl.01", "01")
             @radio(f("businessType"), "businessmatching.businessType.lbl.02", "02")
             @radio(f("businessType"), "businessmatching.businessType.lbl.03", "03")
             @radio(f("businessType"), "businessmatching.businessType.lbl.04", "04")
             @radio(f("businessType"), "businessmatching.businessType.lbl.05", "05")
         }
+        </div>
 
         @submit(false)
     }

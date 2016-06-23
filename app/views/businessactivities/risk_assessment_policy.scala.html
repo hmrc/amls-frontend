@@ -11,8 +11,8 @@
 
     @form(f, controllers.businessactivities.routes.RiskAssessmentController.post(edit)) {
 
-        @inlineRadioGroup(f("isRedress")) {
-            @legend("TODO", jsHidden = true)
+        @inlineRadioGroup(f("hasPolicy")) {
+            @legend("businessactivities.riskassessment.policy.tile", jsHidden = true)
             @radio(f("hasPolicy"), "lbl.yes", "true", target = s"#${f("riskassessments").id}-fieldset")
             @radio(f("hasPolicy"), "lbl.no", "false")
         }

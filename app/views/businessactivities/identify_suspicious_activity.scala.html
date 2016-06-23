@@ -6,14 +6,16 @@
 @main(
     title = Messages("businessactivities.identify-suspicious-activity.title")) {
 
-        @heading("businessactivities.identify-suspicious-activity.title", "summary.businessactivities")
+    @heading("businessactivities.identify-suspicious-activity.title", "summary.businessactivities")
 
-        @form(f, controllers.businessactivities.routes.IdentifySuspiciousActivityController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.IdentifySuspiciousActivityController.post(edit)) {
 
-        @inlineRadioGroup(f("hasWrittenGuidance")) {
-            @radio(f("hasWrittenGuidance"), "lbl.yes", "true")
-            @radio(f("hasWrittenGuidance"), "lbl.no", "false")
-            }
-    @submit(edit)
-}
+        <div class="form-field-group">
+            @inlineRadioGroup(f("hasWrittenGuidance")) {
+                @radio(f("hasWrittenGuidance"), "lbl.yes", "true")
+                @radio(f("hasWrittenGuidance"), "lbl.no", "false")
+                }
+            @submit(edit)
+        </div>
+        }
     }

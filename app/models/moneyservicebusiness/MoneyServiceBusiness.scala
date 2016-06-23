@@ -10,6 +10,7 @@ case class MoneyServiceBusiness(
                                  throughput : Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
+                                 whichCurrencies : Option[WhichCurrencies] = None,
                                  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  fundsTransfer : Option[FundsTransfer] = None,
@@ -25,6 +26,9 @@ case class MoneyServiceBusiness(
 
   def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
     this.copy(throughput = Some(p))
+
+  def whichCurrencies(p: WhichCurrencies): MoneyServiceBusiness =
+    this.copy(whichCurrencies = Some(p))
 
   def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
     this.copy(businessUseAnIPSP = Some(p))
@@ -56,14 +60,10 @@ case class MoneyServiceBusiness(
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(ceTransactionsInNext12Months = Some(p))
 
-  // TODO: Apply the actual logic here when we have the complete model
   def isComplete: Boolean = this match {
-    case m if m.productIterator.forall {
-        case Some(_) => true
-        case None => false
-      } => true
-    case _ => false
-  }
+      case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+      case _ => false
+    }
 }
 
 object MoneyServiceBusiness {
@@ -75,7 +75,6 @@ object MoneyServiceBusiness {
   }
 
   def section(implicit cache: CacheMap): Section = {
-
     val messageKey = key
 
     val notStarted = Section(messageKey, NotStarted, controllers.msb.routes.WhatYouNeedController.get())

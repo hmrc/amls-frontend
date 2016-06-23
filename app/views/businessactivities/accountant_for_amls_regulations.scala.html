@@ -8,16 +8,17 @@
 title = Messages("businessactivities.accountantForAMLSRegulations.title")
 ) {
 
-@heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
+    @heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
 
-<p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
+    @form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
 
-@form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
+        <p>@Messages("businessactivities.accountantForAMLSRegulations.subtext")</p>
 
-    @inlineRadioGroup(f("AccountantForAMLSRegulations")) {
-        @radio(f("accountantForAMLSRegulations"), "lbl.yes", "true")
-        @radio(f("accountantForAMLSRegulations"), "lbl.no", "false")
-    }
+        @inlineRadioGroup(f("accountantForAMLSRegulations")) {
+            @radio(f("accountantForAMLSRegulations"), "lbl.yes", "true")
+            @radio(f("accountantForAMLSRegulations"), "lbl.no", "false")
+        }
+
     @submit(edit)
 
     }

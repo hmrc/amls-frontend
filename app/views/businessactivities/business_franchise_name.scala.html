@@ -11,24 +11,23 @@ s"""${f("franchiseName").id}-fieldset"""
 title = Messages("businessactivities.businessfranchise.title")
 )  {
 
-        @heading("businessactivities.businessfranchise.title", "summary.businessactivities")
+    @heading("businessactivities.businessfranchise.title", "summary.businessactivities")
 
+    @form(f, controllers.businessactivities.routes.BusinessFranchiseController.post(edit)) {
 
-        @form(f, controllers.businessactivities.routes.BusinessFranchiseController.post(edit)) {
+        <p class="form-hint">@Messages("businessactivities.businessfranchise.subtitle")</p>
 
-        <span class="form-hint">
-            @Messages("businessactivities.businessfranchise.subtitle")
-        </span>
-
+        <div class="form-field-group">
         @inlineRadioGroup(f("businessFranchise")) {
-            @legend("TODO", jsHidden = true)
+            @legend("businessactivities.businessfranchise.title", jsHidden = true)
             @radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
             @radio(f("businessFranchise"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("businessactivities.businessfranchise.lbl.franchisename", jsHidden = true, id = target) {
                 @input(f("franchiseName"), "businessactivities.businessfranchise.lbl.franchisename", bold = false)
             }
-     }
+        </div>
+        }
 
-    @submit(edit)
+        @submit(edit)
    }
 }

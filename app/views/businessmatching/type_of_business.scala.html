@@ -11,11 +11,14 @@
     @heading("businessmatching.typeofbusiness.heading", "summary.businessmatching")
 
     @form(f, controllers.businessmatching.routes.TypeOfBusinessController.post(edit)) {
-        @input(
-            field = f("typeOfBusiness"),
-            hintText = Messages("businessmatching.typeofbusiness.lbl.hint")
-        )
 
-            @submit(edit)
+        <div class="form-field-group">
+            @input(
+                field = f("typeOfBusiness"),
+                hintText = Messages("businessmatching.typeofbusiness.lbl.hint")
+            )
+        </div>
+
+        @submit(edit)
     }
 }

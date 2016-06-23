@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.moneyservicebusiness.MoneyServiceBusiness
+import play.api.Logger
 import views.html.msb.summary
 
 trait SummaryController extends BaseController {
