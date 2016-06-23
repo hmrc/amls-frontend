@@ -15,7 +15,6 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         case Some(data) =>
-          Logger.debug(s"----------------------------------------->>>>>>>>>$data")
           Ok(summary(data))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
