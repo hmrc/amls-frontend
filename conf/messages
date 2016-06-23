@@ -71,7 +71,7 @@ error.required.bm.businesstype.type = Enter your type of business.
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 
 
-####  About the Business ####
+###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
 error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
 error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
@@ -83,7 +83,7 @@ error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
 error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
 
-####  Bank Details ####
+###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one kind of bank account that your business uses. If you have no bank accounts, select ‘The business doesn’t use a bank account’.
 error.bankdetails.accountname = Enter a bank account name.
 error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
@@ -100,7 +100,7 @@ error.invalid.bankdetails.account = Enter a valid account number. It must only b
 error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
 
 
-####  Business Activities ####
+###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
 error.invalid.ba.involved.in.other.text = You can''t enter more than 255 characters
@@ -124,7 +124,7 @@ error.required.ba.risk.assessment.format = Select at least one format for your f
 error.required.ba.business.use.accountant = Select yes or no to the question: Does your business receive advice on Money Laundering Regulations and due diligence?
 error.required.ba.suspicious.activity = Select yes or no to the question:Does your business have written guidance for staff on how to identify and report suspicious activity?
 
-####  Trading premises ####
+###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can''t enter more than 120 characters for the trading name.
@@ -142,7 +142,7 @@ error.invalid.tp.registered.business.name = You can''t enter more than 140 chara
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
 error.required.tp.select.business.structure = Select your agent’s business structure.
 
-####  Estate Agent Business ####
+###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
 error.required.eab.which.redress.scheme = Select which redress scheme.
 error.required.eab.redress.scheme.name = Enter the name of the redress scheme
@@ -153,7 +153,7 @@ error.required.eab.info.about.penalty = Enter some information about the penalty
 error.invalid.eab.info.about.penalty = You can''t enter more than 255 characters for information about the penalty received.
 error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
-#### Responsible People ####
+############################### Responsible People ###############################
 error.required.rp.is.uk.resident = Select yes or no to the question: is this person a UK resident?
 error.required.rp.passport = Select whether this person has a UK passport, a non-UK passport, or doesn''t have a passport.
 error.required.rp.birth.country = Enter a country of birth.
@@ -185,7 +185,7 @@ error.required.timeAtAddress = Select how long this person lived at this address
 error.required.positionWithinBusiness = Select at least one business position.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 
-#### Trust and company service providers ####
+############################### Trust and company service providers ###############################
 
 error.required.tcsp.provided_services.services = Select at least one service that your business provides.
 error.required.tcsp.provided_services.details = Enter some information about the other services your business provides.
@@ -196,14 +196,14 @@ error.required.tcsp.services.another.tcsp = Select yes or no to the question: do
 error.required.tcsp.mlr.reference.number = Please enter a valid 8-digit or 15-digit number
 error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation Reference Number. It must be 8 or 15 characters long, and can only be numbers.
 
-#### Accountancy service provide ####
+############################### Accountancy service provide ###############################
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can''t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 
-#### Supervision ####
+############################### Supervision ###############################
 error.required.supervision.supervisor = Enter the name of your last supervisor
 error.required.supervision.reason = Enter a reason why the supervision ended
 error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
@@ -214,7 +214,7 @@ error.required.supervision.one.professional.body = Select at least one professio
 error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can''t enter more than 255 characters the name of the professional body.
 
-#### Money Services Business ####
+############################### Money Services Business ###############################
 error.required.msb.services = Select at least one service that your business provides.
 error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
 error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
@@ -238,7 +238,7 @@ error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
 error.invalid.msb.wc.wholesalerNames.too-long = You can''t enter more than 140 characters for the wholesaler names
 error.required.countries.msb.most.transactions = Enter at least one country.
 
-
+############################### High Value Dealer ###############################
 error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
 
 ########################################################################################################################
@@ -287,11 +287,11 @@ lbl.list.upto.3.countries = List up to 3 countries
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
 
-#### Login Page ####
+############################### Login Page ###############################
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
-#### Progress page ####
+############################### Progress page ###############################
 progress.title = Application progress
 progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 progress.edit = Edit
@@ -341,7 +341,7 @@ progress.supervision.time = 4
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can’t finish the registration until you’ve completed all the sections.
 
-#### Confirmation page ####
+############################### Confirmation page ###############################
 confirmation.lede = You have submitted the registration.
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = We cannot currently receive payments. HM Revenue and Customs will contact you within 4 weeks to arrange payment for the registration fee. This does not affect your registration for anti-money laundering supervision.
@@ -357,7 +357,7 @@ confirmation.registrationfee = Registration fee
 confirmation.submission = Application submission
 confirmation.tradingpremises = Trading Premises
 
-#### Individual pages ####
+############################### Individual pages ###############################
 summary.title = Your AMLS registration
 summary.sectiontitle = Service
 summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
