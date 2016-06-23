@@ -38,12 +38,6 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneServerPerSu
 
   "WhereAreTradingPremisesController" must {
 
-    "use correct services" in new Fixture {
-      WhereAreTradingPremisesController.authConnector must be(AMLSAuthConnector)
-      WhereAreTradingPremisesController.dataCacheConnector must be(DataCacheConnector)
-    }
-
-
     "load an empty page Where are Trading Premises without data" in new Fixture {
       when(mockDataCacheConnector.fetch[TradingPremises](any())
         (any(), any(), any())).thenReturn(Future.successful(None))

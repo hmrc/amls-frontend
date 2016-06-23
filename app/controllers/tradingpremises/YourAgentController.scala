@@ -18,7 +18,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) map {
-          case Some(TradingPremises(_, Some(data), _)) =>
+          case Some(TradingPremises(_, Some(data), _, _)) =>
             Ok(who_is_your_agent(Form2[YourAgent](data), edit, index))
           case _ =>
             Ok(who_is_your_agent(EmptyForm, edit, index))
@@ -34,7 +34,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
           case ValidForm(_, data) =>
             for {
               _ <- updateData[TradingPremises](index) {
-                case Some(TradingPremises(tp, _, wdbd)) => Some(TradingPremises(tp, Some(data), wdbd))
+                case Some(tp) => Some(tp.yourAgent(data))
                 case _ => data
               }
             } yield edit match {

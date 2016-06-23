@@ -1,5 +1,6 @@
 @import include._
 @import models.tradingpremises._
+@import models.businessmatching.MoneyServiceBusiness
 @import forms2._
 @import utils._
 
@@ -82,6 +83,30 @@
                 </td>
             </tr>
         </table>
+        @wdbd.activities.contains(MoneyServiceBusiness) match {
+            case true => {
+                <table  class="summary">
+                    <tr>
+                        <th class="summary-title">
+                            @Messages("tradingpremises.msb.services.heading")
+                        </th>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <ul>
+                                @model.msbServices.map { a =>
+                                    @a.services.map {service=>
+                                        <li>@service.getMessage</li>
+
+                                    }
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            }
+            case false => {}
+        }
     }
 
     @model.yourAgent.map { agent =>

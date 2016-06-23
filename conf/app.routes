@@ -49,6 +49,9 @@ POST        /trading-premises/agent/:index                              controll
 GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
+GET         /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false)
+
 GET         /trading-premises/summary                                   controllers.tradingpremises.SummaryController.get()
 GET         /trading-premises/summary/:index                            controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
