@@ -104,7 +104,7 @@ error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
 error.invalid.ba.involved.in.other.text = You can''t enter more than 255 characters
-error.required.ba.business.turnover = Select how much turnover you expect in the next 12 months.
+error.required.ba.business.turnover = Select how much total turnover you expect in the next 12 months.
 error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
 error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
 error.required.ba.franchise.name = Enter your franchisor’s name.
@@ -233,7 +233,9 @@ error.required.hasCountries.msb.branchesOrAgents = Select yes or no to the quest
 error.invalid.msb.wc.currencies = Enter at least one currency
 error.invalid.msb.wc.moneySources = Select at least one currency supplier
 error.invalid.msb.wc.bankNames = Enter the banks’ names
+error.invalid.msb.wc.bankNames.too-long = You can''t enter more than 140 characters for the bank names
 error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
+error.invalid.msb.wc.wholesalerNames.too-long = You can''t enter more than 140 characters for the wholesaler names
 error.required.countries.msb.most.transactions = Enter at least one country.
 
 ########################################################################################################################
@@ -623,7 +625,7 @@ businessactivities.whatyouneed.line_8 = your professional advisor’s HMRC agent
 businessactivities.businessfranchise.title = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor''s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor's registration.
-businessactivities.confirm-activities.title = Is your business involved in any other activities?
+businessactivities.confirm-activities.title = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?

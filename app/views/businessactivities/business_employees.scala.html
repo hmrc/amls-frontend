@@ -11,25 +11,21 @@ s"""${f("franchiseName").id}-fieldset"""
 title = Messages("businessactivities.employees.title")
 )  {
 
-        @heading("businessactivities.employees.title", "summary.businessactivities")
+    @heading("businessactivities.employees.title", "summary.businessactivities")
 
+    @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
 
-        @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
+        <div class="form-field-group">
+            <label class="form-label">@Messages("businessactivities.employees.line1.text")</label>
+            @input(f("employeeCount"), "", bold = false)
+        </div>
 
-        <span class="form-field">
-            @Messages("businessactivities.employees.line1.text")
-        </span>
-
-        @input(f("employeeCount"), "", bold = false)
-
-        <span class="form-field">
-            @Messages("businessactivities.employees.line2.text")
-        </span>
-
-        @input(f("employeeCountAMLSSupervision"), "", bold = false)
+        <div class="form-field-group">
+            <label class="form-label">@Messages("businessactivities.employees.line2.text")</label>
+            @input(f("employeeCountAMLSSupervision"), "", bold = false)
+        </div>
 
         @submit(edit)
 
-        }
-
-   }
+    }
+}
