@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/* vvv added the below until we update assets-frontend vvv */
 @media (max-width: 640px) {
     .grid-layout--stacked .grid-layout__column {
         display: block;
@@ -86,32 +87,31 @@
     }
 }
 
-/* ^^^ added the above until we update assets-frontend ^^^ */
-
 /* add back some margins */
 .list {
     margin-bottom: 40px;
     margin-top: 5px;
 }
 
+/* Fixes the indent with the grids */
+div.grid-layout {
+    margin : 0;
+}
+
+.panel-wide {
+  border-left : solid 10px #bfc1c3;
+}
+
+/* ^^^ added the above until we update assets-frontend ^^^ */
+
+
+
+
 /* required as js-hidden in assets frontend is !important */
 .amls-js-hidden {
     display : none;
 }
 
-.amls-service-info {
-    border-top : 10px solid #005ea5;
-    /*margin-bottom : 15px;*/
-}
-
-div.grid-layout {
-    margin : 0;
-}
-
-
-.panel-wide {
-  border-left : solid 10px #bfc1c3;
-}
 
 
 
