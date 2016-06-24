@@ -110,7 +110,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         Json.toJson(DefaultCashPaymentYes) must
           be(Json.obj(
             "acceptedAnyPayment" -> true,
-            "paymentDate" -> "1990-02-24"
+            "paymentDate" -> new LocalDate(1990, 2, 24)
           ))
       }
     }
