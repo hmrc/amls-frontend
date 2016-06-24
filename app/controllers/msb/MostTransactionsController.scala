@@ -4,7 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
+import models.moneyservicebusiness.{CurrencyExchange, MoneyServiceBusiness, MostTransactions, MsbService}
+import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -28,6 +29,21 @@ trait MostTransactionsController extends BaseController {
       }
   }
 
+  private def standardRouting(services: Set[MsbService]): Result =
+    if (services contains CurrencyExchange) {
+      Redirect(routes.CETransactionsInNext12MonthsController.get(false))
+    } else {
+      Redirect(routes.SummaryController.get())
+    }
+
+  private def editRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+    if ((services contains CurrencyExchange) &&
+      msb.ceTransactionsInNext12Months.isEmpty) {
+        Redirect(routes.CETransactionsInNext12MonthsController.get(true))
+    } else {
+      Redirect(routes.SummaryController.get())
+    }
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[MostTransactions](request.body) match {
@@ -39,12 +55,16 @@ trait MostTransactionsController extends BaseController {
             _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.mostTransactions(data)
             )
-          } yield edit match {
-            case false =>
-              // TODO: Linked transactions page
-              Redirect(routes.ServicesController.get())
-            case true =>
-              Redirect(routes.SummaryController.get())
+          } yield {
+
+            val services = msb.msbServices.map(_.services).getOrElse(Set.empty)
+
+            edit match {
+              case false =>
+                standardRouting(services)
+              case true =>
+                editRouting(services, msb)
+            }
           }
       }
   }

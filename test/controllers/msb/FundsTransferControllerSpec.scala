@@ -4,7 +4,7 @@ import connectors.DataCacheConnector
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -48,7 +48,18 @@ class FundsTransferControllerSpec extends PlaySpec with OneServerPerSuite with M
       val page = Jsoup.parse(contentAsString(result))
 
       page.select("input[type=radio][name=transferWithoutFormalSystems][checked]").`val`() must be("true")
+    }
 
+    "on post with invalid data" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody(
+        "transferWithoutFormalSystems" -> ""
+      )
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("span").html() must include(Messages("error.required.msb.fundsTransfer"))
     }
 
     "on post with valid data" in new Fixture {
@@ -68,28 +79,28 @@ class FundsTransferControllerSpec extends PlaySpec with OneServerPerSuite with M
       redirectLocation(result) must be(Some(routes.TransactionsInNext12MonthsController.get().url))
     }
 
-    "on post with invalid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "transferWithoutFormalSystems" -> ""
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.msb.fundsTransfer"))
-    }
-
-    "on post with valid data in edit mode" in new Fixture {
+    "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
       )
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+      val incomingModel = MoneyServiceBusiness(
+        transactionsInNext12Months = Some(
+          TransactionsInNext12Months("10")
+        )
+      )
 
-      when(controller.dataCache.save[MoneyServiceBusiness](any(), any())
+      val outgoingModel = incomingModel.copy(
+        fundsTransfer = Some(
+          FundsTransfer(true)
+        )
+      )
+
+      when(controller.dataCache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+       (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+      when(controller.dataCache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
@@ -97,22 +108,29 @@ class FundsTransferControllerSpec extends PlaySpec with OneServerPerSuite with M
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
-    "on post with valid data and user has selected option as no" in new Fixture {
+    "on post with valid data in edit mode when the next page's data is not in the store" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "transferWithoutFormalSystems" -> "false"
+        "transferWithoutFormalSystems" -> "true"
       )
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+      val incomingModel = MoneyServiceBusiness()
 
-      when(controller.dataCache.save[MoneyServiceBusiness](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      val outgoingModel = incomingModel.copy(
+        fundsTransfer = Some(
+          FundsTransfer(true)
+        )
+      )
 
-      val result = controller.post()(newRequest)
+      when(controller.dataCache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+      when(controller.dataCache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.TransactionsInNext12MonthsController.get().url))
+      redirectLocation(result) must be(Some(routes.TransactionsInNext12MonthsController.get(true).url))
     }
   }
-
 }

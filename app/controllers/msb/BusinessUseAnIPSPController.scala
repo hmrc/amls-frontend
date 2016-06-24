@@ -36,9 +36,10 @@ trait BusinessUseAnIPSPController extends BaseController {
               msb.businessUseAnIPSP(data))
 
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SummaryController.get())
-
+            case true if msb.fundsTransfer.isDefined =>
+              Redirect(routes.SummaryController.get())
+            case _ =>
+              Redirect(routes.FundsTransferController.get(edit))
           }
       }
     }

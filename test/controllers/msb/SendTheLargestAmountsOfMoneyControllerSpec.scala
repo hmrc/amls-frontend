@@ -2,10 +2,11 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.Country
-import models.moneyservicebusiness.{SendTheLargestAmountsOfMoney, MoneyServiceBusiness}
+import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, MsbServices, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
@@ -16,7 +17,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
+class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite with PatienceConfiguration with IntegrationPatience {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -63,25 +64,37 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSu
         "country_1" -> "GS"
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
     }
 
-    "on post with valid data in edit mode" in new Fixture {
+    "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "country_1" -> "GS"
+        "country_1" -> "GB"
+      )
+
+      val incomingModel = MoneyServiceBusiness(
+        mostTransactions = Some(MostTransactions(
+          Seq(
+            Country("United Kingdom", "UK")
+          )
+        ))
+      )
+
+      val outgoingModel = incomingModel.copy(
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -89,6 +102,29 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSu
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+    }
+
+    "on post with valid data in edit mode when the next page's data isn't in the store" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "country_1" -> "GB"
+      )
+
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
+      )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.MostTransactionsController.get(true).url))
     }
 
     "on post with invalid data" in new Fixture {

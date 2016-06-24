@@ -1,18 +1,18 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness.{WhichCurrencies, MoneyServiceBusiness}
+import models.moneyservicebusiness.{MoneyServiceBusiness, WhichCurrencies}
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite}
+import org.scalatestplus.play.OneAppPerSuite
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
-import play.api.http.Status.{SEE_OTHER, BAD_REQUEST}
+import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.http.HeaderNames.LOCATION
 import views.html.msb.which_currencies
 
@@ -22,6 +22,8 @@ class WhichCurrencyControllerSpec extends WordSpec
                                     with MockitoSugar
                                     with MustMatchers
                                     with OneAppPerSuite
+                                    with PatienceConfiguration
+                                    with IntegrationPatience
                                     with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
@@ -64,10 +66,7 @@ class WhichCurrencyControllerSpec extends WordSpec
           val result = controller.post(false).apply(newRequest)
 
           status(result) must be (SEE_OTHER)
-          val locationHeader = header(LOCATION, result)
-          locationHeader must not be (None)
-          locationHeader foreach (_ must be ("/anti-money-laundering/money-service-business/check-your-answers"))
-
+          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
         }
       }
 

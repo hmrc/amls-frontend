@@ -2,9 +2,9 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.businessactivities.BusinessActivities
-import models.moneyservicebusiness.{BusinessUseAnIPSPYes, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BusinessUseAnIPSPNo, BusinessUseAnIPSPYes, FundsTransfer, MoneyServiceBusiness}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
@@ -54,16 +54,7 @@ class BusinessUseAnIPSPControllerSpec  extends PlaySpec with OneServerPerSuite {
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-      )
-
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
+      val result = controller.post()(request)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include (Messages("error.required.msb.ipsp"))
     }
@@ -76,33 +67,61 @@ class BusinessUseAnIPSPControllerSpec  extends PlaySpec with OneServerPerSuite {
         "referenceNumber" -> "123456789123456"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.FundsTransferController.get().url))
     }
 
-    "on post with valid data in edit mode" in new Fixture {
+    "on post with valid data in edit mode with next page's data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "useAnIPSP" -> "false"
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      val incomingModel = MoneyServiceBusiness(
+        fundsTransfer = Some(FundsTransfer(true))
+      )
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+      val outgoingModel = incomingModel.copy(
+        businessUseAnIPSP = Some(BusinessUseAnIPSPNo)
+      )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
-  }
 
+    "on post with valid data in edit mode without next page's data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "useAnIPSP" -> "false"
+      )
+
+      val incomingModel = MoneyServiceBusiness(
+        fundsTransfer = Some(FundsTransfer(true))
+      )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.FundsTransferController.get(true).url))
+    }
+  }
 }

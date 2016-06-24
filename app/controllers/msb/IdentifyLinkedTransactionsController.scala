@@ -4,7 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{IdentifyLinkedTransactions, MoneyServiceBusiness}
+import models.moneyservicebusiness._
+import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb.identify_linked_transactions
 
@@ -26,20 +27,67 @@ trait IdentifyLinkedTransactionsController extends BaseController {
      }
   }
 
+  private def standardRouting(services: Set[MsbService]): Result =
+    services match {
+      case s if s contains TransmittingMoney =>
+        Redirect(routes.BusinessAppliedForPSRNumberController.get())
+      case s if s contains CurrencyExchange =>
+        Redirect(routes.CETransactionsInNext12MonthsController.get())
+      case _ =>
+        Redirect(routes.SummaryController.get())
+    }
+
+  private def editRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+    services match {
+      case s if s contains TransmittingMoney =>
+        mtRouting(services, msb)
+      case s if s contains CurrencyExchange =>
+        ceRouting(msb)
+      case _ =>
+        Redirect(routes.SummaryController.get())
+    }
+
+  private def mtRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+    if (msb.businessAppliedForPSRNumber.isDefined) {
+      editRouting(services - TransmittingMoney, msb)
+    } else {
+      Redirect(routes.BusinessAppliedForPSRNumberController.get(true))
+    }
+
+  private def ceRouting(msb: MoneyServiceBusiness): Result =
+    if (msb.ceTransactionsInNext12Months.isDefined) {
+      Redirect(routes.SummaryController.get())
+    } else {
+      Redirect(routes.CETransactionsInNext12MonthsController.get(true))
+    }
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[IdentifyLinkedTransactions](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(identify_linked_transactions(f, edit)))
         case ValidForm(_, data) =>
-          for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.identifyLinkedTransactions(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.BusinessAppliedForPSRNumberController.get())
+          dataCacheConnector.fetchAll flatMap {
+            optMap =>
+
+              val result = for {
+                cache <- optMap
+                msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                services <- msb.msbServices
+              } yield {
+                dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                  msb.identifyLinkedTransactions(data)
+                ) map {
+                  _ =>
+                    if (edit) {
+                      editRouting(services.services, msb)
+                    } else {
+                      standardRouting(services.services)
+                    }
+                }
+              }
+
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       }
     }

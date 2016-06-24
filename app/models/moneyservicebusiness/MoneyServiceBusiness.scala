@@ -1,5 +1,6 @@
 package models.moneyservicebusiness
 
+import models.Country
 import models.registrationprogress.{Completed, NotStarted, Started, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -60,10 +61,40 @@ case class MoneyServiceBusiness(
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(ceTransactionsInNext12Months = Some(p))
 
-  def isComplete: Boolean = this match {
-      case MoneyServiceBusiness(Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
-      case _ => false
+  private def allComplete: Boolean =
+    this.msbServices.isDefined &&
+    this.throughput.isDefined &&
+    this.branchesOrAgents.isDefined &&
+    this.identifyLinkedTransactions.isDefined
+
+  private def mtComplete: Boolean =
+    if (this.msbServices.exists(_.services contains TransmittingMoney)) {
+      this.businessAppliedForPSRNumber.isDefined &&
+        this.businessUseAnIPSP.isDefined &&
+        this.fundsTransfer.isDefined &&
+        this.transactionsInNext12Months.isDefined &&
+        (
+          (
+            this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(true)) &&
+              this.sendTheLargestAmountsOfMoney.isDefined &&
+              this.mostTransactions.isDefined
+            ) ||
+            this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(false))
+          )
+    } else {
+      true
     }
+
+  private def ceComplete: Boolean =
+    if (this.msbServices.exists(_.services contains CurrencyExchange)) {
+      this.ceTransactionsInNext12Months.isDefined &&
+      this.whichCurrencies.isDefined
+    } else {
+      true
+    }
+
+  def isComplete: Boolean =
+    allComplete && mtComplete && ceComplete
 }
 
 object MoneyServiceBusiness {

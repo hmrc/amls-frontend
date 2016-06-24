@@ -7,6 +7,7 @@ import play.api.Play.current
 object ApplicationConfig extends ServicesConfig {
 
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   lazy val contactHost = baseUrl("contact-frontend")
   lazy val authHost = baseUrl("auth")
@@ -33,6 +34,12 @@ object ApplicationConfig extends ServicesConfig {
 
   lazy val ggUrl = baseUrl("government-gateway")
   lazy val enrolUrl = s"$ggUrl/enrol"
+
+  lazy val paymentsUrl = getConfigString("paymentsUrl")
+
+  lazy val regFee = getConfigInt("amounts.registration")
+  lazy val premisesFee = getConfigInt("amounts.premises")
+  lazy val peopleFee = getConfigInt("amounts.people")
 
   val responsiblePeopleToggle: Boolean = {
     val value = getConfBool("feature-toggle.responsible-people", false)

@@ -4,7 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{SendMoneyToOtherCountry, MoneyServiceBusiness}
+import models.moneyservicebusiness.{CurrencyExchange, MoneyServiceBusiness, MsbService, SendMoneyToOtherCountry}
+import play.api.mvc.Result
+import play.mvc.Results.Redirect
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb.send_money_to_other_country
 
@@ -26,6 +28,27 @@ trait SendMoneyToOtherCountryController extends BaseController {
      }
   }
 
+  private def standardRouting(next: Boolean, services: Set[MsbService]): Result =
+    (next, services) match {
+      case (true, _) =>
+        Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
+      case (false, s) if s contains CurrencyExchange =>
+        Redirect(routes.CETransactionsInNext12MonthsController.get())
+      case (false, _) =>
+        Redirect(routes.SummaryController.get())
+    }
+
+  private def editRouting(next: Boolean, services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+    (next: Boolean, services) match {
+      case (true, _) if !msb.sendTheLargestAmountsOfMoney.isDefined =>
+        Redirect(routes.SendTheLargestAmountsOfMoneyController.get(true))
+      case (false, s)
+        if (s contains CurrencyExchange) && !msb.sendTheLargestAmountsOfMoney.isDefined =>
+          Redirect(routes.CETransactionsInNext12MonthsController.get(true))
+      case _ =>
+        Redirect(routes.SummaryController.get())
+    }
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[SendMoneyToOtherCountry](request.body) match {
@@ -37,9 +60,16 @@ trait SendMoneyToOtherCountryController extends BaseController {
             _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.sendMoneyToOtherCountry(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SummaryController.get())
+          } yield {
+
+            val services = msb.msbServices.map(_.services).getOrElse(Set.empty)
+
+            edit match {
+              case true =>
+                editRouting(data.money, services, msb)
+              case false =>
+                standardRouting(data.money, services)
+            }
           }
       }
     }
