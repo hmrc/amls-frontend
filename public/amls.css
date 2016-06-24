@@ -184,7 +184,9 @@ div.grid-layout {
   background : none;
 }
 
-/* Confirmation */
+
+
+/* Confirmation page */
 .confirmation {
   margin : 40px 0;
   padding : 20px 40px 20px 40px;
@@ -208,6 +210,8 @@ div.grid-layout {
 td.numeric, th.numeric {
   text-align : right;
 }
+
+
 
 /* adding this for now
  * TODO: we really need to re-jig the markup for this */
@@ -304,11 +308,6 @@ table.summary ul li {
 
 
 /* icons */
-.notice .icon {
-    width: 25px;
-    height: 25px;
-    margin-right: 10px;
-}
 .notice {
     padding-left: 38px;
     top: -43px;
