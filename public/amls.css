@@ -15,6 +15,12 @@
  */
 
 
+/* Fixes the indent, but check with Phil as to why he removed */
+div.grid-layout {
+  margin: 0;
+}
+
+
 /* required as js-hidden in assets frontend is !important */
 .amls-js-hidden {
   display: none;
