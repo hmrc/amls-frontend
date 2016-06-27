@@ -8,13 +8,15 @@
 </div>
 }
 
+@header = {
+    @heading("estateagentbusiness.whatyouneed.heading", "summary.estateagentbusiness")
+}
+
 @main(
-title = Messages("estateagentbusiness.whatyouneed.title"),
-sidebar = sidebar
+    title = Messages("estateagentbusiness.whatyouneed.title"),
+    heading = header,
+    sidebar = sidebar
 ) {
-
-@heading("estateagentbusiness.whatyouneed.heading", "summary.estateagentbusiness")
-
 
     <p>@Messages("estateagentbusiness.whatyouneed.subheading")</p>
 
