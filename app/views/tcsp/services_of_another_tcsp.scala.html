@@ -8,24 +8,27 @@
 s"""${f("mlrRefNumber").id}-fieldset"""
 }
 
-    @main(
-    title = Messages("tcsp.servicesOfAnotherTcsp.title")
-    ) {
+@header = {
+    @heading("tcsp.servicesOfAnotherTcsp.title", "summary.tcsp")
+}
 
-        @heading("tcsp.servicesOfAnotherTcsp.title", "summary.tcsp")
+@main(
+    title = Messages("tcsp.servicesOfAnotherTcsp.title"),
+    heading = header
+) {
 
-        @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
+    @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
-            @inlineRadioGroup(f("servicesOfAnotherTCSP")) {
-                @radio(f("servicesOfAnotherTCSP"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("servicesOfAnotherTCSP"), "lbl.no", "false")
-                @fieldset("TODO", jsHidden = true, id = target) {
-                    @input(f("mlrRefNumber"), "tcsp.servicesOfAnotherTcsp.mlrregno.lbl", bold = false)
-                }
+        @inlineRadioGroup(f("servicesOfAnotherTCSP")) {
+            @radio(f("servicesOfAnotherTCSP"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("servicesOfAnotherTCSP"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("mlrRefNumber"), "tcsp.servicesOfAnotherTcsp.mlrregno.lbl", bold = false)
             }
-
-            @submit(edit)
         }
+
+        @submit(edit)
     }
+}
 
 

@@ -3,11 +3,15 @@
 
 @(model: Tcsp)(implicit request: Request[_], lang: Lang)
 
+@header = {
+    @heading("summary.checkyouranswers.title", "summary.tcsp")
+}
+
 @main(
-    title = Messages("summary.checkyouranswers.title")
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
 ) {
 
-    @heading("summary.checkyouranswers.title", "summary.tcsp")
     <table>
         <tr>
             <th>@Messages("tcsp.kind.of.service.provider.title")</th>

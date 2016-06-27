@@ -11,12 +11,15 @@
     </div>
 }
 
+@header = {
+    @heading("tcsp.whatyouneed.heading", "summary.tcsp")
+}
+
 @main(
     title = Messages("tcsp.whatyouneed.title"),
+    heading = header,
     sidebar = sidebar
 ) {
-
-    @heading("tcsp.whatyouneed.heading", "summary.tcsp")
 
     <p>@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
 
