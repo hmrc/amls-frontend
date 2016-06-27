@@ -56,16 +56,21 @@ trait MappingUtils {
     def toM(pm: PM): UrlFormEncoded = {
       pm.foldLeft[Map[Path, Seq[(Path, String)]]](Map.empty) {
         case (m, (p, v)) =>
-          val path = Path(p.path.filter {
-            case n: IdxPathNode => false
-            case _ => true
+          val path = Path(p.path.foldLeft[List[PathNode]](List.empty) {
+            case (list, n: IdxPathNode) =>
+              val last = list.last match {
+                case KeyPathNode(x) =>
+                  KeyPathNode(s"$x[]")
+                case n => n
+              }
+              list.init :+ last
+            case (list, n) =>
+              list :+ n
           })
           m.updated(path, m.getOrElse(path, Seq.empty) :+ (path, v))
       }.map {
-        case (p, vs) if vs.size > 1 =>
-          s"${PM.asKey(p)}[]" -> vs.map(_._2)
         case (p, vs) =>
-          PM.asKey(p) -> vs.headOption.toSeq.map(_._2)
+          {PM.asKey(p)} -> vs.map(_._2)
       }
     }
 
