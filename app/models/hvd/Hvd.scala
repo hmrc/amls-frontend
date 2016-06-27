@@ -7,6 +7,9 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Hvd (cashPayment: Option[CashPayment] = None) {
 
+  def cashPayment(v: CashPayment): Hvd =
+    this.copy(cashPayment = Some(v))
+
   def isComplete: Boolean =
     this match {
       case Hvd(_) => true
@@ -17,7 +20,6 @@ case class Hvd (cashPayment: Option[CashPayment] = None) {
 object Hvd {
 
   val key = "hvd"
-/*
 
   def section(implicit cache: CacheMap): Section = {
     val notStarted = Section(key, NotStarted, controllers.hvd.routes.WhatYouNeedController.get())
@@ -28,7 +30,6 @@ object Hvd {
         Section(key, Started, controllers.hvd.routes.WhatYouNeedController.get())
     }
   }
-*/
 
   implicit val format = Json.format[Hvd]
 
