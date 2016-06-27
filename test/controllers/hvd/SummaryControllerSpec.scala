@@ -6,6 +6,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
@@ -33,6 +34,7 @@ class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with Mockito
 
       val result = controller.get()(request)
       status(result) must be(OK)
+      contentAsString(result) must include (Messages("summary.checkyouranswers.title"))
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
