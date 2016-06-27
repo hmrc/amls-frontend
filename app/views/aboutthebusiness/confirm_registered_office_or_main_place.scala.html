@@ -6,12 +6,12 @@
 @(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("aboutthebusiness.confirmingyouraddress.title", "summary.aboutbusiness"),
-    heading = header
+    @heading("aboutthebusiness.confirmingyouraddress.title", "summary.aboutbusiness")
 }
 
 @main(
-    title = Messages("aboutthebusiness.confirmingyouraddress.title")
+    title = Messages("aboutthebusiness.confirmingyouraddress.title"),
+    heading = header
 ) {
 
     @form(f, controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.post(edit)) {

@@ -71,8 +71,7 @@ a.progress-step {
 }
 
 .progress-step--status {
-  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 100%;
-  background-size: 50%;
+  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 90% / 33%;
   border-bottom: 3px solid #dee0e2;
   color: #6f777b;
   padding: 0;
@@ -82,6 +81,7 @@ a.progress-step {
 
 .no-svg .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/chevron.png");
+  background-position: 90%;
 }
 
 .progress-step--status__completed,
@@ -108,12 +108,23 @@ a.progress-step {
 }
 
 .progress-step--status__completed {
-  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50%;
+  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50% / 33%;
   transition: none;
 }
 
 .no-svg .progress-step--status__completed {
+  background-color: #28a197;
   background-image: url("/anti-money-laundering/assets/icons/tick.png");
+  background-position: 50%;
+}
+
+.no-svg .progress-step--status,
+.no-svg .progress-step:focus .progress-step--status__started,
+.no-svg .progress-step:focus .progress-step--status__not-started,
+.no-svg .progress-step:hover .progress-step--status__started,
+.no-svg .progress-step:hover .progress-step--status__not-started,
+.no-svg .progress-step--status__completed {
+  background-repeat: no-repeat;
 }
 
 .progress-step--status-time {
