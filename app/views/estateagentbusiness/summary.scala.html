@@ -3,11 +3,15 @@
 
 @(model: EstateAgentBusiness)(implicit request: Request[_], lang: Lang)
 
+@header = {
+    @heading("summary.checkyouranswers.title", "summary.estateagentbusiness")
+}
+
 @main(
-    title = Messages("summary.checkyouranswers.title")
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
 ) {
 
-    @heading("summary.checkyouranswers.title", "summary.estateagentbusiness")
     @model.services.map { a =>
         <table>
             <tr>

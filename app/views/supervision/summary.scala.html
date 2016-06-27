@@ -4,11 +4,15 @@
 
 @(model: Supervision)(implicit request: Request[_], lang: Lang)
 
+@header = {
+    @heading("summary.checkyouranswers.title", "summary.supervision")
+}
+
 @main(
-    title = Messages("summary.checkyouranswers.title")
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
 ) {
 
-    @heading("summary.checkyouranswers.title", "summary.supervision")
     <table>
         <tr>
             <th>@Messages("supervision.another_body.title")</th>

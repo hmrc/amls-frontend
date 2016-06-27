@@ -4,9 +4,14 @@
 
 @(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType)(implicit lang: Lang, request: Request[_])
 
-@main(title = Messages("responsiblepeople.position_within_business.title")) {
-
+@header = {
     @heading("responsiblepeople.position_within_business.title", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.position_within_business.title"),
+    heading = header
+) {
 
     <div class="form-group">
         <div class="icon-important"></div>

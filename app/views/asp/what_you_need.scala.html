@@ -8,12 +8,15 @@
 </div>
 }
 
+@header = {
+    @heading("asp.whatyouneed.title", "summary.asp")
+}
+
 @main(
     title = Messages("asp.whatyouneed.title"),
+    heading = header,
     sidebar = sidebar
-    ) {
-
-    @heading("asp.whatyouneed.title", "summary.asp")
+) {
 
     <p>@Messages("asp.whatyouneed.subheading")</p>
 

@@ -7,11 +7,14 @@
     s"""${f("vrnNumber").id}-fieldset"""
 }
 
-@main(
-    title = Messages("responsiblepeople.registeredforvat.title")
-) {
-
+@header = {
     @heading("responsiblepeople.registeredforvat.heading", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.registeredforvat.title"),
+    heading = header
+) {
 
     @form(f, controllers.responsiblepeople.routes.VATRegisteredController.post(index, edit)) {
 

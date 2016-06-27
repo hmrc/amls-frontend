@@ -3,10 +3,14 @@
 
 @(model: Seq[ResponsiblePeople])(implicit request: Request[_], lang: Lang)
 
-@main(
-    title = Messages("summary.checkyouranswers.title")
-) {
+@header = {
     @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
+) {
 
     <table>
         <tbody>

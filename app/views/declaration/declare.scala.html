@@ -4,14 +4,17 @@
 
 @(name: String)(implicit request: Request[_])
 
-@main(
-        title = Messages("declaration.declaration.title")
-      ) {
-
+@header = {
     @heading("declaration.declaration.submit", "submit.registration")
+}
+
+@main(
+    title = Messages("declaration.declaration.title"),
+    heading = header
+) {
 
     <div class="form-group">
-        <span class="icon-information"></span>
+        <span class="icon-important"></span>
         <span class="notice">@Messages("declaration.declaration.fullname") @name</span>
     </div>
 

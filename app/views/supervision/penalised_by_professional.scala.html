@@ -8,11 +8,14 @@
 s"""${f("professionalBody").id}-fieldset"""
 }
 
-@main(
-    title = Messages("supervision.penalisedbyprofessional.title")
-) {
-
+@header = {
     @heading("supervision.penalisedbyprofessional.title", "summary.supervision")
+}
+
+@main(
+    title = Messages("supervision.penalisedbyprofessional.title"),
+    heading = header
+) {
 
     <p>@Messages("supervision.penalisedbyprofessional.subtitle")</p>
 

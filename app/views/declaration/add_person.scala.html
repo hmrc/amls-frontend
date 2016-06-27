@@ -8,11 +8,14 @@
     s"""${f("other").id}-fieldset"""
 }
 
-@main(
-    title = Messages("declaration.addperson.title")
-) {
-
+@header = {
     @heading("declaration.addperson.title", "submit.registration")
+}
+
+@main(
+    title = Messages("declaration.addperson.title"),
+    heading = header
+) {
 
     @form(f, controllers.declaration.routes.AddPersonController.post()) {
 

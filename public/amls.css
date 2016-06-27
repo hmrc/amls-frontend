@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
+/* vvv added the below until we update assets-frontend vvv */
+
+/* add back some margins */
+.list {
+    margin-bottom: 40px;
+    margin-top: 5px;
+}
+
+/* Fixes the indent with the grids - not sure if there is any other way around this at present */
+div.grid-layout {
+    margin : 0;
+}
+
+/* ^^^ added the above until we update assets-frontend ^^^ */
+
+
 
 /* required as js-hidden in assets frontend is !important */
 .amls-js-hidden {
@@ -214,7 +230,6 @@ a.progress-step {
 .bevel-container {
   background-color: #f8f8f8;
   border-bottom: #dee0e2 solid 3px;
-  margin: 40px 0 0 40px;
   padding: 15px;
 }
 
@@ -299,14 +314,14 @@ form .inline .block-label + fieldset {
   margin-top: 0;
 }
 
-form .date .form-group {
+form .date .form-field {
   width: 60px;
   float: left;
   margin-right: 20px;
   clear: none;
 }
 
-form .date .form-group input[type=text] {
+form .date .form-field input[type=text] {
   width: 100%;
 }
 
@@ -365,10 +380,6 @@ table.summary ul li {
 
 .notice-important {
   padding-left: 55px;
-}
-
-.spacelarge {
-  margin-bottom: 30px;
 }
 
 .touchevents .date-of-birth {

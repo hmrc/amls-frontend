@@ -4,12 +4,14 @@
 
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
+@header = {
+    @heading("tradingpremises.youragent.heading", "summary.tradingpremises")
+}
+
 @main(
-    title = Messages("tradingpremises.youragent.title")
+    title = Messages("tradingpremises.youragent.title"),
+    heading = header
 ) {
-
-@heading("tradingpremises.youragent.heading", "summary.tradingpremises")
-
 
 @form(f, controllers.tradingpremises.routes.YourAgentController.post(index, edit)) {
 

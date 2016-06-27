@@ -11,12 +11,15 @@
 </div>
 }
 
+@header = {
+    @heading("tradingpremises.whatyouneed.heading", "summary.tradingpremises")
+}
+
 @main(
     title = Messages("tradingpremises.whatyouneed.title"),
+    heading = header,
     sidebar = sidebar
 ) {
-
-    @heading("tradingpremises.whatyouneed.heading", "summary.tradingpremises")
 
     <p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
 

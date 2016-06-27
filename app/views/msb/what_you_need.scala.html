@@ -8,12 +8,15 @@
     </div>
 }
 
+@header = {
+    @heading("msb.whatyouneed.heading", "summary.msb")
+}
+
 @main(
     title = Messages("msb.whatyouneed.title"),
+    heading = header,
     sidebar = sidebar
 ) {
-
-    @heading("msb.whatyouneed.heading", "summary.msb")
 
     <p>@Messages("msb.whatyouneed.requiredinfo.heading")</p>
 
