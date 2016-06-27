@@ -93,30 +93,71 @@
     margin-top: 5px;
 }
 
-/* Fixes the indent with the grids */
+/* Fixes the indent with the grids - not sure if there is any other way around this at present */
 div.grid-layout {
     margin : 0;
 }
-
+/* Added in the thicker border panel */
 .panel-wide {
   border-left : solid 10px #bfc1c3;
 }
+
+/* required as js-hidden in assets frontend is !important - schmucks! */
+.amls-js-hidden {
+    display : none;
+}
+
+/* Form elements */
+.form-group {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+form input[type=text].form-control {
+    border : 2px solid #6f777b;
+    width : 50%;
+}
+form .form-label-bold {
+    font-size: 19px;
+    line-height: 1.31579;
+    margin-bottom : 0.5em;
+}
+form .block-label + fieldset {
+    float: left;
+    margin-top : 10px;
+}
+form .inline .block-label + fieldset {
+    float: none;
+    margin-top : 0;
+}
+form .date .form-field {
+    width: 60px;
+    float: left;
+    margin-right: 20px;
+    clear: none;
+}
+form .date .form-field input[type=text] {
+    width : 100%;
+}
+form .inline > label.block-label {
+    clear: none;
+}
+form .inline .block-label {
+    clear: both;
+}
+
 
 /* ^^^ added the above until we update assets-frontend ^^^ */
 
 
 
 
-/* required as js-hidden in assets frontend is !important */
-.amls-js-hidden {
-    display : none;
-}
+
 
 
 
 
 /* Registration Progress */
-.progress-submit {
+/*.progress-submit {
   background-color : #f8f8f8;
   margin-left : 30px;
   padding : 15px;
@@ -151,14 +192,14 @@ div.grid-layout {
 }
 .progress-section:hover > .right.not-started, .right.complete {
   background-color : #00823B;
-  color : white;
+  color : #fff;
 }
 .progress-section .heading-small, .progress-submit .heading-small {
   margin-top : 0;
 }
 .right.started {
   background-color : #FFBF47;
-  color : white;
+  color : #fff;
 }
 .time-to-complete {
   display : table-cell;
@@ -178,12 +219,179 @@ div.grid-layout {
   transform : rotate(-45deg);
 }
 .progress-section:hover .chevron {
-  border-color : white;
+  border-color : #fff;
 }
 .chevron-container > a:focus {
   background : none;
+}*/
+
+
+
+
+/* -- application progress page -- */
+.progress-steps {
+  margin-bottom: 12px;
 }
 
+.progress-steps li {
+  margin-bottom: 0;
+  margin-top: 12px;
+}
+
+.progress-steps li:first-child {
+  margin-top: 0;
+}
+
+/* qualified attribute selector required here, otherwise
+   all text colour takes on regular anchor colour  */
+a.progress-step {
+  background-color: #dee0e2;
+  color: #0b0c0c;
+  display: block; /* for IE8 */
+  display: flex; /* for everything else */
+  margin-bottom: 0;
+  padding: 0;
+  position: relative;
+  text-decoration: none;
+  transition: .25s ease-in;
+  transition-property: background-color, outline;
+}
+
+/* give the whole step component a focus outline */
+.progress-step:focus {
+  outline: 3px solid #ffbf47;
+}
+
+/* mimic the anchor colours inside this block-level component */
+.progress-step__edit {
+  color: #005ea5;
+}
+
+.progress-step__edit:focus,
+.progress-step__edit:hover {
+  color: #2e8aca;
+}
+
+.progress-step--details {
+  background: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  padding: 5px 10px 15px;
+}
+
+.progress-step--details p {
+  margin: 0;
+  padding-bottom: 10px;
+}
+
+.progress-step--status {
+  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 100%;
+  background-size: 50%;
+  border-bottom: 3px solid #dee0e2;
+  color: #6f777b;
+  padding: 0;
+  position: relative;
+  transition: .25s ease-in;
+}
+
+.no-svg .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/chevron.png");
+}
+
+.progress-step--status__completed,
+.progress-step:focus .progress-step--status__completed,
+.progress-step:hover .progress-step--status__completed {
+  border-bottom-color: #28a197;
+}
+
+.progress-step:focus .progress-step--status__started,
+.progress-step:focus .progress-step--status__not-started,
+.progress-step:hover .progress-step--status__started,
+.progress-step:hover .progress-step--status__not-started {
+  background-color: #006435;
+  background-image: url("/anti-money-laundering/assets/icons/chevron-#fff.svg");
+  border-bottom-color: #01552e;
+  color: #fff;
+}
+
+.no-svg .progress-step:focus .progress-step--status__started,
+.no-svg .progress-step:focus .progress-step--status__not-started,
+.no-svg .progress-step:hover .progress-step--status__started,
+.no-svg .progress-step:hover .progress-step--status__not-started {
+  background-image: url("/anti-money-laundering/assets/icons/chevron-#fff.png");
+}
+
+.progress-step--status__completed {
+  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50%;
+  transition: none;
+}
+
+.no-svg .progress-step--status__completed {
+  background-image: url("/anti-money-laundering/assets/icons/tick.png");
+}
+
+.progress-step--status-time {
+  padding: 15px 15px 0;
+}
+
+.application-submit {
+  background-color: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin-left: 30px;
+  padding: 15px;
+}
+
+.application-submit .heading-small {
+  margin-top: 0;
+}
+
+.lte-ie8 .grid-layout {
+  table-layout: fixed;
+}
+
+/* having to specify these widths for IE8 until a better fix appears.
+   we can get away with this because IE8 isn't responsive */
+
+.lte-ie8 .progress-step > .grid-layout__column--1-3 {
+  width: 213.66px;
+}
+
+.lte-ie8 .progress-step > .grid-layout__column--2-3 {
+  width: 427.33px;
+}
+
+@media screen and (max-width: 640px) {
+  .progress-step {
+    margin: 0 -0.78947em 12px;
+  }
+
+  .progress-step .grid-layout__column--1-3 {
+    float: left;
+    width: 33.33333%;
+  }
+
+  .progress-step .grid-layout__column--2-3 {
+    float: left;
+    width: 66.66667%;
+  }
+
+  .progress-step--status__started,
+  .progress-step--status__not-started {
+    background-size: 20%;
+  }
+
+  .application-submit {
+    margin: 0 -0.78947em;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 767px) {
+  .progress-step--status__started,
+  .progress-step--status__not-started {
+    background-size: 25%;
+  }
+}
+
+/* -- // application progress page -- */
 
 
 /* Confirmation page */
@@ -191,7 +399,7 @@ div.grid-layout {
   margin : 40px 0;
   padding : 20px 40px 20px 40px;
   background-color : #28A197;
-  color : white;
+  color : #fff;
   text-align : center;
 }
 .confirmation > h1 {
@@ -238,7 +446,7 @@ select {
 
 /* form errors */
 .amls-error-summary {
-    background-color: white;
+    background-color: #fff;
     border: 5px solid #b10e1e;
 }
 .amls-error-summary li {
@@ -256,46 +464,6 @@ select {
 }
 
 
-/* forms */
-.form-group {
-    padding-top: 0;
-    padding-bottom: 0;
-}
-form input[type=text].form-control {
-    border : 2px solid #6f777b;
-    width : 50%;
-}
-form .form-label-bold {
-    font-size: 19px;
-    line-height: 1.31579;
-    margin-bottom : 0.5em;
-}
-form .block-label + fieldset {
-    float: left;
-    margin-top : 10px;
-}
-form .inline .block-label + fieldset {
-    float: none;
-    margin-top : 0;
-}
-form .date .form-field {
-    width: 60px;
-    float: left;
-    margin-right: 20px;
-    clear: none;
-}
-form .date .form-field input[type=text] {
-    width : 100%;
-}
-
-
-
-form .inline > label.block-label {
-    clear: none;
-}
-form .inline .block-label {
-    clear: both;
-}
 
 
 /* summary styles */
