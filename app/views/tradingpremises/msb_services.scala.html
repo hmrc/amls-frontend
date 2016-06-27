@@ -14,10 +14,10 @@
 
       @radioGroup(f("msbServices")) {
           @legend("msb.services.list.heading")
-          @checkbox(f("msbServices[0]"), "msb.services.list.lbl.01", "01")
-          @checkbox(f("msbServices[1]"), "msb.services.list.lbl.02", "02")
-          @checkbox(f("msbServices[2]"), "msb.services.list.lbl.03", "03")
-          @checkbox(f("msbServices[3]"), "msb.services.list.lbl.04", "04")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
       }
 
       @submit(edit)

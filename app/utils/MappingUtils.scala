@@ -5,6 +5,8 @@ import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
 import play.api.data.mapping.GenericRules
+import play.api.data.mapping.forms.PM.PM
+
 import scala.collection.{GenTraversableOnce, TraversableLike}
 
 object TraversableValidators {
@@ -41,6 +43,34 @@ object OptionValidators {
 }
 
 trait MappingUtils {
+
+  /**
+    * This is an overloaded version of `writeM` from the validation library which instead of serializing
+    * arrays to:
+    *   `a[0] -> "1", a[1] -> "2"`
+    * it will serialize to:
+    *   `a[] -> "1", "2"`
+    */
+  implicit def writeM[I](path: Path)(implicit w: WriteLike[I, PM]) = Write[I, UrlFormEncoded] { i =>
+
+    def toM(pm: PM): UrlFormEncoded = {
+      pm.foldLeft[Map[Path, Seq[(Path, String)]]](Map.empty) {
+        case (m, (p, v)) =>
+          val path = Path(p.path.filter {
+            case n: IdxPathNode => false
+            case _ => true
+          })
+          m.updated(path, m.getOrElse(path, Seq.empty) :+ (path, v))
+      }.map {
+        case (p, vs) if vs.size > 1 =>
+          s"${PM.asKey(p)}[]" -> vs.map(_._2)
+        case (p, vs) =>
+          PM.asKey(p) -> vs.headOption.toSeq.map(_._2)
+      }
+    }
+
+    toM(PM.repathPM(w.writes(i), path ++ _))
+  }
 
   object Implicits {
 
