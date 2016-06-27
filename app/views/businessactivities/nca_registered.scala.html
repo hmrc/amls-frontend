@@ -3,12 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
+@header = {
+    @heading("businessactivities.ncaRegistered.title", "summary.businessactivities")
+}
 
 @main(
-title = Messages("businessactivities.ncaRegistered.title")
+    title = Messages("businessactivities.ncaRegistered.title"),
+    heading = header
 ) {
-
-@heading("businessactivities.ncaRegistered.title", "summary.businessactivities")
 
 @form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
 

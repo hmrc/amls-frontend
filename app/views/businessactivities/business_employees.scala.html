@@ -7,11 +7,14 @@
 s"""${f("franchiseName").id}-fieldset"""
 }
 
-@main(
-title = Messages("businessactivities.employees.title")
-)  {
-
+@header = {
     @heading("businessactivities.employees.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.employees.title"),
+    heading = header
+)  {
 
     @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
 

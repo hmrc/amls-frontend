@@ -3,11 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@main(
-    title = Messages("aboutthebusiness.activity.start.date.title")
-) {
-
+@header = {
     @heading("aboutthebusiness.activity.start.date.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("aboutthebusiness.activity.start.date.title"),
+    heading = header
+) {
 
     @Messages("aboutthebusiness.activity.start.date.text")
 

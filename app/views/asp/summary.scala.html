@@ -3,11 +3,15 @@
 
 @(model: Asp)(implicit request: Request[_], lang: Lang)
 
+@header = {
+    @heading("summary.checkyouranswers.title", "summary.asp")
+}
+
 @main(
-    title = Messages("summary.checkyouranswers.title")
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
 ) {
 
-    @heading("summary.checkyouranswers.title", "summary.asp")
     @model.services.map { a =>
         <table class="table--spaced-top">
             <tr>

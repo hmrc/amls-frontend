@@ -6,11 +6,14 @@
 
 @(model: TradingPremises, index: Int)(implicit request: Request[_], lang: Lang)
 
-@main(
-    title = Messages("summary.checkyouranswers.title")
-) {
-
+@header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
+) {
 
     @model.yourTradingPremises.map { yta =>
         <table class="summary">

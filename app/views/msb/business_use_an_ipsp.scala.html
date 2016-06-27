@@ -3,12 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
+@header = {
+    @heading("msb.ipsp.title", "summary.msb")
+}
 
 @main(
-    title = Messages("msb.ipsp.title")
+    title = Messages("msb.ipsp.title"),
+    heading = header
 ) {
-
-    @heading("msb.ipsp.title", "summary.msb")
 
     @form(f, controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 

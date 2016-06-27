@@ -4,11 +4,14 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
-@main(
-    title = Messages("businessmatching.typeofbusiness.title")
-) {
-
+@header = {
     @heading("businessmatching.typeofbusiness.heading", "summary.businessmatching")
+}
+
+@main(
+    title = Messages("businessmatching.typeofbusiness.title"),
+    heading = header
+) {
 
     @form(f, controllers.businessmatching.routes.TypeOfBusinessController.post(edit)) {
 

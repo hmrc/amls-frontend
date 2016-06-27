@@ -3,11 +3,14 @@
 
 @(model: BusinessMatching)(implicit request: Request[_])
 
-@main(
-    title = Messages("summary.checkyouranswers.title")
-) {
-
+@header = {
     @heading("summary.checkyouranswers.title", "summary.businessmatching")
+}
+
+@main(
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
+) {
 
     <div class="panel-indent panel-indent--gutter panel-wide">
         @Messages("businessmatching.summary.icon.title")

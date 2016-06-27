@@ -5,9 +5,14 @@
 
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang:Lang)
 
-@main(title = Messages("responsiblepeople.contact_details.title")) {
-
+@header = {
     @heading("responsiblepeople.contact_details.title", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.contact_details.title"),
+    heading = header
+) {
 
     <p>@Messages("responsiblepeople.contact_details.lbl")</p>
 

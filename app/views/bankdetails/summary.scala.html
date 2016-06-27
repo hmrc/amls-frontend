@@ -4,11 +4,15 @@
 
 @(model: Seq[BankDetails])(implicit request: Request[_], lang: Lang)
 
+@header = {
+    @heading("summary.checkyouranswers.title", "summary.bankdetails")
+}
+
 @main(
-    title = Messages("summary.checkyouranswers.title")
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
 ) {
 
-    @heading("summary.checkyouranswers.title", "summary.bankdetails")
     @if(model.isEmpty) {
         @fieldset("", jsHidden = false, id = "ttt") {
             <span>@Messages("bankdetails.summary.nobank.account")</span> <br>

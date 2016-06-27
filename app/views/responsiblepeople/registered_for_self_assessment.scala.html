@@ -7,12 +7,14 @@
 s"""${f("utrNumber").id}-fieldset"""
 }
 
+@header = {
+    @heading("responsiblepeople.registeredforselfassessment.title", "summary.responsiblepeople")
+}
+
 @main(
-title = Messages("responsiblepeople.registeredforselfassessment.title")
+    title = Messages("responsiblepeople.registeredforselfassessment.title"),
+    heading = header
 )  {
-
-@heading("responsiblepeople.registeredforselfassessment.title", "summary.responsiblepeople")
-
 
     @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit)) {
 

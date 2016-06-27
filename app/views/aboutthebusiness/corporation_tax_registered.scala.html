@@ -7,10 +7,14 @@
     s"""${f("corporationTaxReference").id}-fieldset"""
 }
 
-@main(
-title = Messages("aboutthebusiness.registeredforcorporationtax.title")
-) {
+@header = {
     @heading("aboutthebusiness.registeredforcorporationtax.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("aboutthebusiness.registeredforcorporationtax.title"),
+    heading = header
+) {
 
     @form(f, controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.post(edit)) {
 

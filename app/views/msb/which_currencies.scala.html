@@ -4,11 +4,14 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@main(
-  title = Messages("msb.which_currencies.title")
-) {
+@header = {
+    @heading("msb.which_currencies.title", "summary.msb")
+}
 
-  @heading("msb.which_currencies.title", "summary.msb")
+@main(
+    title = Messages("msb.which_currencies.title"),
+    heading = header
+) {
 
   @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
 

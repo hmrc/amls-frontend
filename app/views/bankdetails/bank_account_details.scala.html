@@ -13,11 +13,15 @@ s"""${f("nonUKAccountNumber").id}-fieldset"""
 s"""${f("IBANNumber").id}-fieldset"""
 }
 
+@header = {
+    @heading("bankdetails.accountdetails.title", "summary.bankdetails")
+}
+
 @main(
-    title = Messages("bankdetails.accountdetails.title")
+    title = Messages("bankdetails.accountdetails.title"),
+    heading = header
 ) {
 
-    @heading("bankdetails.accountdetails.title", "summary.bankdetails")
     @form(f, controllers.bankdetails.routes.BankAccountController.post(index, edit)) {
 
     <div class="form-field-group">
