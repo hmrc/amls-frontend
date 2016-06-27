@@ -1,11 +1,14 @@
 @import include._
 @(index: Int)(implicit request: Request[_])
 
-@main(
-    title = Messages("responsiblepeople.whatyouneed.title")
-) {
-
+@header = {
     @heading("responsiblepeople.whatyouneed.heading", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.whatyouneed.title"),
+    heading = header
+) {
 
     <p>@Messages("responsiblepeople.whatyouneed.requiredinfo")</p>
 
