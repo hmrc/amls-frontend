@@ -4,11 +4,14 @@
 
 @(f: Form2[_], index: Int, edit: Boolean)(implicit request: Request[_])
 
-@main(
-  title = Messages("tradingpremises.msb.services.title")
-) {
+@header = {
+    @heading("tradingpremises.msb.services.heading", "summary.tradingpremises")
+}
 
-  @heading("tradingpremises.msb.services.heading", "summary.tradingpremises")
+@main(
+    title = Messages("tradingpremises.msb.services.title"),
+    heading = header
+) {
 
     @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit)) {
 
