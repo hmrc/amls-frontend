@@ -3,11 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
-@main(
-    title = Messages("msb.most.transactions.title")
-) {
-
+@header = {
     @heading("msb.most.transactions.title", "summary.msb")
+}
+
+@main(
+    title = Messages("msb.most.transactions.title"),
+    heading = header
+) {
 
     @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
 

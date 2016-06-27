@@ -4,11 +4,15 @@
 
 @(model: MoneyServiceBusiness)(implicit request: Request[_], lang: Lang)
 
+@header = {
+    @heading("summary.checkyouranswers.title", "summary.msb")
+}
+
 @main(
-    title = Messages("summary.checkyouranswers.title")
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
 ) {
 
-    @heading("summary.checkyouranswers.title", "summary.msb")
     @Messages("summary.linetext")
 
     @model.msbServices.map{ services =>

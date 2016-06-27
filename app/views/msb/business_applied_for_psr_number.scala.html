@@ -7,10 +7,14 @@
     s"""${f("regNumber").id}-fieldset"""
 }
 
+@header = {
+    @heading("msb.psr.number.title", "summary.msb")
+}
+
 @main(
-   title = Messages("msb.psr.number.title")
+   title = Messages("msb.psr.number.title"),
+    heading = header
 )  {
-        @heading("msb.psr.number.title", "summary.msb")
 
         @form(f, controllers.msb.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
