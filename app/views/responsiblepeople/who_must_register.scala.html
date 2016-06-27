@@ -8,12 +8,15 @@
 </div>
 }
 
+@header = {
+    @heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
+}
+
 @main(
     title = Messages("responsiblepeople.whomustregister.title"),
+    heading = header,
     sidebar = sidebar
 ) {
-
-    @heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
 
     <ul class="list list-bullet spacelarge">
         <li>@Messages("responsiblepeople.whomustregister.line_1")</li>

@@ -5,9 +5,15 @@
 @import models.businessmatching._
 
 @(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit lang: Lang, request: Request[_])
-@main(title = Messages("tradingpremises.whatdoesyourbusinessdo.title")) {
 
+@header = {
     @heading("tradingpremises.whatdoesyourbusinessdo.title", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("tradingpremises.whatdoesyourbusinessdo.title"),
+    heading = header
+) {
 
     @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(index, edit)) {
         @radioGroup(f("activities")) {

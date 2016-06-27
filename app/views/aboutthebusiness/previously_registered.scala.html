@@ -7,11 +7,14 @@
     s"""${f("prevMLRRegNo").id}-fieldset"""
 }
 
-@main(
-    title = Messages("aboutthebusiness.registeredformlr.title")
-) {
-
+@header = {
     @heading("aboutthebusiness.registeredformlr.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("aboutthebusiness.registeredformlr.title"),
+    heading = header
+) {
 
     <p>@Messages("aboutthebusiness.registeredformlr.lbl")</p>
 

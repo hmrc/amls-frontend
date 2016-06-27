@@ -4,11 +4,14 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@main(
-    title = Messages("msb.branchesoragents.title")
-) {
-
+@header = {
     @heading("msb.branchesoragents.heading", "summary.msb")
+}
+
+@main(
+    title = Messages("msb.branchesoragents.title"),
+    heading = header
+) {
 
     <p>@Messages("msb.branchesoragents.intro")</p>
 

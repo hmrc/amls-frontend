@@ -7,11 +7,14 @@
     s"""${f("utrNumber").id}-fieldset"""
 }
 
-@main(
-    title = Messages("supervision.another_body.title")
-)  {
-
+@header = {
     @heading("supervision.another_body.title", "summary.supervision")
+}
+
+@main(
+    title = Messages("supervision.another_body.title"),
+    heading = header
+)  {
 
     <p>@Messages("supervision.another_body.description")</p>
 

@@ -3,11 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
-@main(
-    title = Messages("businessactivities.customer.outside.uk.title")
-) {
-
+@header = {
     @heading("businessactivities.customer.outside.uk.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.customer.outside.uk.title"),
+    heading = header
+) {
 
     @form(f, controllers.businessactivities.routes.CustomersOutsideUKController.post(edit)) {
 

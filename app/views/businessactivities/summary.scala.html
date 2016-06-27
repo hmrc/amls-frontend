@@ -3,11 +3,14 @@
 
 @(model: BusinessActivities)(implicit request: Request[_], lang: Lang)
 
-@main(
-    title = Messages("summary.checkyouranswers.title")
-) {
-
+@header = {
     @heading("summary.checkyouranswers.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
+) {
 
     <table>
         <tr>

@@ -8,11 +8,14 @@
 s"""${f("professionalBody").id}-fieldset"""
 }
 
-@main(
-    title = Messages("estateagentbusiness.penalisedbyprofessional.title")
-) {
-
+@header = {
     @heading("estateagentbusiness.penalisedbyprofessional.title", "summary.estateagentbusiness")
+}
+
+@main(
+    title = Messages("estateagentbusiness.penalisedbyprofessional.title"),
+    heading = header
+) {
 
     <div class="form-field">
         @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")

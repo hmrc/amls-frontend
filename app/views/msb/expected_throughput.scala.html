@@ -3,12 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
+@header = {
+    @heading("msb.throughput.title", "summary.msb")
+}
 
 @main(
-    title = Messages("msb.throughput.title")
+    title = Messages("msb.throughput.title"),
+    heading = header
 ) {
-
-    @heading("msb.throughput.title", "summary.msb")
 
     @form(f, controllers.msb.routes.ExpectedThroughputController.post(edit)) {
 

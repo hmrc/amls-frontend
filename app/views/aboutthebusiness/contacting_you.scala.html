@@ -5,11 +5,14 @@
 
 @(f: Form2[_], model: RegisteredOffice, edit: Boolean)(implicit request: Request[_], lang:Lang)
 
-@main(
-    title = Messages("aboutthebusiness.contactingyou.title")
-) {
-
+@header = {
     @heading("aboutthebusiness.contactingyou.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("aboutthebusiness.contactingyou.title"),
+    heading = header
+) {
 
     <p>@Messages("aboutthebusiness.contactingyou.lbl")</p>
 

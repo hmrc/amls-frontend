@@ -4,12 +4,14 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
-@main(
-    title = Messages("aboutthebusiness.correspondenceaddress.title")
-) {
-
+@header = {
     @heading("aboutthebusiness.correspondenceaddress.title", "summary.aboutbusiness")
+}
 
+@main(
+    title = Messages("aboutthebusiness.correspondenceaddress.title"),
+    heading = header
+) {
 
     <div class="panel-indent panel-indent--gutter panel-wide">
         @Messages("aboutthebusiness.correspondenceaddress.p")

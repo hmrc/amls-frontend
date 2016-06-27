@@ -4,12 +4,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
+@header = {
+    @heading("msb.ce.transactions.expected.in.12.months.heading", "summary.msb")
+}
 
 @main(
-    title = Messages("msb.ce.transactions.expected.in.12.months.title")
+    title = Messages("msb.ce.transactions.expected.in.12.months.title"),
+    heading = header
 ) {
-
-    @heading("msb.ce.transactions.expected.in.12.months.heading", "summary.msb")
 
     @form(f, controllers.msb.routes.CETransactionsInNext12MonthsController.post(edit)) {
         @input(f("ceTransaction"), "", bold = false)

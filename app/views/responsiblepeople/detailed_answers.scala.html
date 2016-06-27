@@ -29,11 +29,14 @@
     @Messages("responsiblepeople.detailed_answers.at_this_address")
 }
 
-@main(
-    title = Messages("responsiblepeople.detailed_answers.title")
-) {
-
+@header = {
     @heading("responsiblepeople.detailed_answers.title", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.detailed_answers.title"),
+    heading = header
+) {
 
     @model.map { person =>
 

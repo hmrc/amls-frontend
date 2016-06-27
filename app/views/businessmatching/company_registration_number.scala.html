@@ -5,9 +5,14 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
-@main(title = Messages("businessmatching.registrationnumber.title")) {
-
+@header = {
     @heading("businessmatching.registrationnumber.heading", "summary.businessmatching")
+}
+
+@main(
+    title = Messages("businessmatching.registrationnumber.title"),
+    heading = header
+) {
 
     @form(f, controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit)) {
         <div class="form-field-group">

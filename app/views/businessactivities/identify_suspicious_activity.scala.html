@@ -3,10 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@main(
-    title = Messages("businessactivities.identify-suspicious-activity.title")) {
-
+@header = {
     @heading("businessactivities.identify-suspicious-activity.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.identify-suspicious-activity.title"),
+    heading = header
+) {
 
     @form(f, controllers.businessactivities.routes.IdentifySuspiciousActivityController.post(edit)) {
 

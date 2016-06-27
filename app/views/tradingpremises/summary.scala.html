@@ -3,11 +3,14 @@
 
 @(model: Seq[TradingPremises])(implicit request: Request[_], lang: Lang)
 
-@main(
-    title = Messages("summary.checkyouranswers.title")
-) {
-
+@header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("summary.checkyouranswers.title"),
+    heading = header
+) {
 
     <div class="form-group">
         <div class="panel-indent">

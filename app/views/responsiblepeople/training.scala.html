@@ -8,11 +8,14 @@
     s"""${f("information").id}-fieldset"""
 }
 
-@main(
-    title = Messages("responsiblepeople.training.title")
-) {
-
+@header = {
     @heading("responsiblepeople.training.heading", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.training.title"),
+    heading = header
+) {
 
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
 

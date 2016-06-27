@@ -4,11 +4,14 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@main(
-  title = Messages("msb.services.title")
-) {
+@header = {
+    @heading("msb.services.heading", "summary.msb")
+}
 
-  @heading("msb.services.heading", "summary.msb")
+@main(
+  title = Messages("msb.services.title"),
+    heading = header
+) {
 
     @form(f, controllers.msb.routes.ServicesController.post(edit)) {
 

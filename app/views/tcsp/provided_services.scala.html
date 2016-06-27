@@ -4,11 +4,14 @@
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@main(
-    title = Messages("tcsp.provided_services.title")
-) {
-
+@header = {
     @heading("tcsp.provided_services.heading", "summary.tcsp")
+}
+
+@main(
+    title = Messages("tcsp.provided_services.title"),
+    heading = header
+) {
 
     <p>@Messages("lbl.select.all")</p>
 

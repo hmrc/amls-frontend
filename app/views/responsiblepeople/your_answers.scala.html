@@ -3,11 +3,14 @@
 
 @(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
 
-@main(
-    title = Messages("responsiblepeople.your_answers.title")
-) {
-
+@header = {
     @heading("responsiblepeople.your_answers.heading", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.your_answers.title"),
+    heading = header
+) {
 
     <div class="panel-indent panel-border-wide spacelarge">
         <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.PersonNameController.get(responsiblePeople.size + 1)">@Messages("responsiblepeople.check_your_answers.add")</a>
