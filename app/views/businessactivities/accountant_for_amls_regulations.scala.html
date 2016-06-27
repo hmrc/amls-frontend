@@ -3,12 +3,14 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
+@header = {
+    @heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
+}
 
 @main(
-title = Messages("businessactivities.accountantForAMLSRegulations.title")
+    title = Messages("businessactivities.accountantForAMLSRegulations.title"),
+    heading = header
 ) {
-
-    @heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
 
     @form(f, controllers.businessactivities.routes.AccountantForAMLSRegulationsController.post(edit)) {
 

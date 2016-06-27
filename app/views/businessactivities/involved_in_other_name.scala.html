@@ -8,11 +8,14 @@
 s"""${f("details").id}-fieldset"""
 }
 
-@main(
-title = Messages("businessactivities.confirm-activities.title")
-)  {
-
+@header = {
     @heading("businessactivities.confirm-activities.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.confirm-activities.title"),
+    heading = header
+)  {
 
     <p>@Messages("bankdetails.confirm-activities.subtitile")</p>
 
