@@ -14,40 +14,6 @@
  * limitations under the License.
  */
 
-/* vvv added the below until we update assets-frontend vvv */
-
-/* add back some margins */
-.list {
-    margin-bottom: 40px;
-    margin-top: 5px;
-}
-
-/* Fixes the indent with the grids - not sure if there is any other way around this at present */
-div.grid-layout {
-    margin : 0;
-}
-
-/* ^^^ added the above until we update assets-frontend ^^^ */
-
-
-
-/* required as js-hidden in assets frontend is !important */
-.amls-js-hidden {
-  display: none;
-}
-
-.amls-service-info {
-  border-top: 10px solid #005ea5;
-}
-
-/* Might not need this anymore, not sure who put it in */
-.address-list li {
-  margin: 0;
-}
-
-.panel-wide {
-  border-left: solid 10px #bfc1c3;
-}
 
 /* -- application progress page -- */
 .progress-steps {
@@ -213,6 +179,33 @@ a.progress-step {
 }
 
 /* -- // application progress page -- */
+
+
+/* vvv added the below until we update assets-frontend vvv */
+/********************************************************************/
+/* add back some margins */
+.list {
+  margin-bottom: 40px;
+  margin-top: 5px;
+}
+
+/* Fixes the indent with the grids - not sure if there is any other way around this at present */
+div.grid-layout {
+  margin: 0;
+}
+
+.panel-wide {
+  border-left: solid 10px #bfc1c3;
+}
+
+/********************************************************************/
+/* ^^^ added the above until we update assets-frontend ^^^ */
+
+
+/* required as js-hidden in assets frontend is !important */
+.amls-js-hidden {
+  display: none;
+}
 
 /* Confirmation */
 .confirmation {
