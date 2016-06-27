@@ -1037,7 +1037,8 @@ hvd.whatyouneed.line_5 = if you are able to automatically identify linked cash p
 hvd.whatyouneed.line_6 = if you expect to receive cash payments of €15,000 from customers you've not met in person
 hvd.whatyouneed.line_7 = how much of your turnover you expect to come from cash payments over €15,000
 
-hvd.cash.payment.title = Has your business already accepted any cash payments which total €15,000 or more?
-hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total €15,000 or more?
-hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use
+hvd.cash.payment.title = Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.cash.payment.data.text = What was the date of the first payment?
+hvd.cash.payment.date.example = For example, 31 3 2015
