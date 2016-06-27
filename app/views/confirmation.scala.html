@@ -5,7 +5,7 @@
 @(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
 
 @sidebar = {
-    <div class="bevel-container">
+    <div class="user-attention">
         <h3 class="heading-small">@Messages("confirmation.sidebar.code", mlrRegNo)</h3>
         <p>@Messages("confirmation.sidebar.contact")</p>
     </div>
