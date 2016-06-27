@@ -120,17 +120,6 @@ a.progress-step {
   padding: 15px 15px 0;
 }
 
-.application-submit {
-  background-color: #f8f8f8;
-  border-bottom: #dee0e2 solid 3px;
-  margin-left: 30px;
-  padding: 15px;
-}
-
-.application-submit .heading-small {
-  margin-top: 0;
-}
-
 .lte-ie8 .grid-layout {
   table-layout: fixed;
 }
@@ -165,10 +154,6 @@ a.progress-step {
   .progress-step--status__not-started {
     background-size: 20%;
   }
-
-  .application-submit {
-    margin: 0 -0.78947em;
-  }
 }
 
 @media screen and (min-width: 641px) and (max-width: 767px) {
@@ -202,6 +187,27 @@ div.grid-layout {
 /* ^^^ added the above until we update assets-frontend ^^^ */
 
 
+
+.application-submit,
+.user-attention {
+  background-color: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin-left: 30px;
+  padding: 15px;
+}
+
+.application-submit .heading-small,
+.user-attention .heading-small {
+  margin-top: 0;
+}
+
+@media screen and (max-width: 640px) {
+  .application-submit,
+  .user-attention {
+    margin: 0 -0.78947em;
+  }
+}
+
 /* required as js-hidden in assets frontend is !important */
 .amls-js-hidden {
   display: none;
@@ -220,13 +226,13 @@ div.grid-layout {
   margin: 0;
 }
 
-.bevel-container {
+.user-attention {
   background-color: #f8f8f8;
   border-bottom: #dee0e2 solid 3px;
   padding: 15px;
 }
 
-.bevel-container > .heading-small {
+.user-attention > .heading-small {
   margin: 10px 0 15px 0;
 }
 
@@ -238,7 +244,7 @@ th.numeric {
 /* adding this for now
  * TODO: we really need to re-jig the markup for this */
 @media screen and (max-width: 640px) {
-    .bevel-container {
+    .user-attention {
         margin: 0;
     }
 }
