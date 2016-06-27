@@ -8,26 +8,29 @@
 s"""${f("agentRegNo").id}-fieldset"""
 }
 
-    @main(
-    title = Messages("asp.other.business.tax.matters.title")
-    ) {
+@header = {
+    @heading("asp.other.business.tax.matters.title", "summary.asp")
+}
 
-        @heading("asp.other.business.tax.matters.title", "summary.asp")
+@main(
+    title = Messages("asp.other.business.tax.matters.title"),
+    heading = header
+) {
 
-        <p>@Messages("asp.other.business.tax.matters.lbl")</p>
+    <p>@Messages("asp.other.business.tax.matters.lbl")</p>
 
-        @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
+    @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
-            @inlineRadioGroup(f("otherBusinessTaxMatters")) {
-                @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
-                @fieldset("TODO", jsHidden = true, id = target) {
-                    @input(f("agentRegNo"), "asp.other.business.tax.matters.agentrefno.lbl", bold = false)
-                }
+        @inlineRadioGroup(f("otherBusinessTaxMatters")) {
+            @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
+            @fieldset("TODO", jsHidden = true, id = target) {
+                @input(f("agentRegNo"), "asp.other.business.tax.matters.agentrefno.lbl", bold = false)
             }
-
-            @submit(edit)
         }
+
+        @submit(edit)
     }
+}
 
 
