@@ -813,6 +813,7 @@ responsiblepeople.experiencetraining.businessactivities = You’ve told us your 
 responsiblepeople.experiencetraining.information = Please give a brief description, including approximate dates and duration
 responsiblepeople.training.title = Has this person had training in anti-money laundering or counter-terrorism funding?
 responsiblepeople.training.heading = Has this person had training in anti-money laundering or counter-terrorism funding?
+responsiblepeople.training.hinttext = Include formal training such as courses, and informal training such as self-directed learning.
 responsiblepeople.training.information = Please give a brief description, including approximate dates and duration
 responsiblepeople.person.registered.title = Responsible person registered
 responsiblepeople.person.registered.heading = Responsible person registered
