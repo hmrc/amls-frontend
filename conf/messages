@@ -71,7 +71,7 @@ error.required.bm.businesstype.type = Enter your type of business.
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 
 
-####  About the Business ####
+###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
 error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
 error.invalid.atb.mlr.number = Enter a valid Money Laundering Regulation registration number. It must be 8 or 15 characters long, and can only be numbers.
@@ -83,7 +83,7 @@ error.required.atb.corporation.tax.number = Enter the Corporation Tax number.
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax number. It must be 10 characters long, and can only be numbers.
 error.required.rightaddress = Select yes or no to the question: Is this the right address to send you letters?
 
-####  Bank Details ####
+###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one kind of bank account that your business uses. If you have no bank accounts, select ‘The business doesn’t use a bank account’.
 error.bankdetails.accountname = Enter a bank account name.
 error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
@@ -100,7 +100,7 @@ error.invalid.bankdetails.account = Enter a valid account number. It must only b
 error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
 
 
-####  Business Activities ####
+###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
 error.invalid.ba.involved.in.other.text = You can''t enter more than 255 characters
@@ -124,7 +124,7 @@ error.required.ba.risk.assessment.format = Select at least one format for your f
 error.required.ba.business.use.accountant = Select yes or no to the question: Does your business receive advice on Money Laundering Regulations and due diligence?
 error.required.ba.suspicious.activity = Select yes or no to the question:Does your business have written guidance for staff on how to identify and report suspicious activity?
 
-####  Trading premises ####
+###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can''t enter more than 120 characters for the trading name.
@@ -142,7 +142,7 @@ error.invalid.tp.registered.business.name = You can''t enter more than 140 chara
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
 error.required.tp.select.business.structure = Select your agent’s business structure.
 
-####  Estate Agent Business ####
+###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
 error.required.eab.which.redress.scheme = Select which redress scheme.
 error.required.eab.redress.scheme.name = Enter the name of the redress scheme
@@ -153,7 +153,7 @@ error.required.eab.info.about.penalty = Enter some information about the penalty
 error.invalid.eab.info.about.penalty = You can''t enter more than 255 characters for information about the penalty received.
 error.required.eab.penalised.by.professional.body = Select yes or no to the question: has the business, or anyone in the business, ever been penalised by a professional body?
 
-#### Responsible People ####
+############################### Responsible People ###############################
 error.required.rp.is.uk.resident = Select yes or no to the question: is this person a UK resident?
 error.required.rp.passport = Select whether this person has a UK passport, a non-UK passport, or doesn''t have a passport.
 error.required.rp.birth.country = Enter a country of birth.
@@ -185,7 +185,7 @@ error.required.timeAtAddress = Select how long this person lived at this address
 error.required.positionWithinBusiness = Select at least one business position.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 
-#### Trust and company service providers ####
+############################### Trust and company service providers ###############################
 
 error.required.tcsp.provided_services.services = Select at least one service that your business provides.
 error.required.tcsp.provided_services.details = Enter some information about the other services your business provides.
@@ -196,14 +196,14 @@ error.required.tcsp.services.another.tcsp = Select yes or no to the question: do
 error.required.tcsp.mlr.reference.number = Please enter a valid 8-digit or 15-digit number
 error.invalid.tcsp.mlr.reference.number = Enter a valid Money Laundering Regulation Reference Number. It must be 8 or 15 characters long, and can only be numbers.
 
-#### Accountancy service provide ####
+############################### Accountancy service provide ###############################
 error.required.asp.other.business.tax.matters = Select yes or no to the question: are you registered with HMRC to handle other business 'tax matters?'
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can''t enter more than 11 characters.
 error.required.asp.business.services = Select at least one service that your business provides.
 
-#### Supervision ####
+############################### Supervision ###############################
 error.required.supervision.supervisor = Enter the name of your last supervisor
 error.required.supervision.reason = Enter a reason why the supervision ended
 error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
@@ -214,7 +214,7 @@ error.required.supervision.one.professional.body = Select at least one professio
 error.required.supervision.business.details = Enter the name of the professional body
 error.invalid.supervision.business.details = You can''t enter more than 255 characters the name of the professional body.
 
-#### Money Services Business ####
+############################### Money Services Business ###############################
 error.required.msb.services = Select at least one service that your business provides.
 error.required.msb.throughput = Select how much throughput you expect in the next 12 months.
 error.required.msb.ipsp = Select yes or no to the question: does your business use an Intermediary Payment Service Provider?
@@ -237,6 +237,9 @@ error.invalid.msb.wc.bankNames.too-long = You can''t enter more than 140 charact
 error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
 error.invalid.msb.wc.wholesalerNames.too-long = You can''t enter more than 140 characters for the wholesaler names
 error.required.countries.msb.most.transactions = Enter at least one country.
+
+############################### High Value Dealer ###############################
+error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -285,11 +288,11 @@ lbl.list.upto.3.countries = List up to 3 countries
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
 
-#### Login Page ####
+############################### Login Page ###############################
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
-#### Progress page ####
+############################### Progress page ###############################
 progress.title = Application progress
 progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 progress.edit = Edit
@@ -364,7 +367,7 @@ confirmation.whathappensnext.heading = What happens next
 confirmation.whathappensnext.p.1 = You will receive an email from HM Revenue and Customs within 45 days of paying the registration fee.
 confirmation.whathappensnext.p.2 = When you receive the email, sign back in to this website to see if your application has been approved or rejected.
 
-#### Individual pages ####
+############################### Individual pages ###############################
 summary.title = Your AMLS registration
 summary.sectiontitle = Service
 summary.description = Complete the sections below. Progress can be saved by using the save and continue button on each page. Once you start the application, you have 28 days to complete it.
@@ -383,6 +386,7 @@ summary.tcsp = Trust or Company Service Provider
 summary.asp = Accountancy Service Provider
 summary.supervision = Supervision
 summary.msb = Money Service Business
+summary.hvd = High Value Dealer
 
 summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises
@@ -395,6 +399,9 @@ summary.checkyouranswers.agentspremises.section3 = Agents'' details
 button.checkyouranswers.acceptandcomplete = Accept and complete section
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
+
+main.sidebar.title = Automatic saving
+main.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 
 aboutyou.yourdetails.title = What is your name?
 aboutyou.rolewithinbusiness.title = What is your role within the business?
@@ -419,8 +426,6 @@ aboutthebusiness.whatyouneed.line_5 = your money Laundering Regulations registra
 aboutthebusiness.whatyouneed.line_6 = the date your business will start activities which need to be supervised
 aboutthebusiness.whatyouneed.line_7 = your VAT registration number
 aboutthebusiness.whatyouneed.line_8 = your Corporation Tax reference number
-aboutthebusiness.sidebar.title = Automatic saving
-aboutthebusiness.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 aboutthebusiness.registeredforvat.title = Is your business registered for VAT in the UK?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
 aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax?
@@ -464,8 +469,7 @@ tradingpremises.whatyouneed.requiredinfo.text.1= the trading name and address
 tradingpremises.whatyouneed.requiredinfo.text.2= what the business does from these premises
 tradingpremises.whatyouneed.requiredinfo.text.3= the date you''ll start trading from these premises
 tradingpremises.whatyouneed.requiredinfo.text.4= if it''s a residential address
-tradingpremises.sidebar.title = Automatic saving
-tradingpremises.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
+
 tradingpremises.youragent.title=Trading premises - Who is your agent?
 tradingpremises.youragent.heading=Who is your agent?
 tradingpremises.youragent.paragraph1.text=An agent is an individual or business that works on behalf of your business to offer your services.
@@ -511,8 +515,6 @@ estateagentbusiness.whatyouneed.subheading = For this section you''ll need:
 estateagentbusiness.whatyouneed.line_1 = a list of which services you provide
 estateagentbusiness.whatyouneed.line_2 = which redress scheme you''re registered with, if relevant
 estateagentbusiness.whatyouneed.line_3 = information about any penalties you''ve received, if relevant
-estateagentbusiness.sidebar.title = Automatic saving
-estateagentbusiness.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 estateagentbusiness.penalisedunderestateagentsact.title = Has the business, or anyone in the business, ever been penalised under the Estate Agents Act 1979?
 estateagentbusiness.penalisedunderestateagentsact.subtitle = Examples of a penalty include:
 estateagentbusiness.penalisedunderestateagentsact.warning = receiving a formal warning
@@ -592,8 +594,6 @@ bankdetails.whatyouneed.line_2 = if it''s a UK account
 bankdetails.whatyouneed.line_3 = the account name
 bankdetails.whatyouneed.line_4 = the sort code
 bankdetails.whatyouneed.line_5 = the account number or IBAN number
-bankdetails.sidebar.title = Automatic saving
-bankdetails.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 bankdetails.accounttype.title = What kind of bank account does your business use?
 bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
@@ -616,8 +616,6 @@ bankdetails.summary.nobank.add.account = Add a bank account
 bankdetails.confirm-activities.subtitile =You’ve told us your business does this:
 
 businessactivities.whatyouneed.title = Business Activities - What you need
-businessactivities.whomustregister.sidebar.title = Automatic saving
-businessactivities.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 businessactivities.whatyouneed.heading = What you need
 businessactivities.whatyouneed.requiredinfo.heading = For this section you''ll need to know:
 businessactivities.whatyouneed.line_1 = the anticipated turnover for the next 12 months
@@ -802,8 +800,6 @@ responsiblepeople.whomustregister.title = Who must register as a responsible per
 responsiblepeople.whomustregister.line_1 = everyone who directs the business – this includes sole proprietors, partners, directors and shadow directors
 responsiblepeople.whomustregister.line_2 = anyone who owns or controls more than 25% of the business
 responsiblepeople.whomustregister.line_3 = the ''nominated officer'' - the person who acts as the money laundering reporting officer
-responsiblepeople.whomustregister.sidebar.title = Automatic saving
-responsiblepeople.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 responsiblepeople.registeredforvat.title = Is this person registered for VAT in the UK?
 responsiblepeople.registeredforvat.heading = Is this person registered for VAT in the UK?
 responsiblepeople.registeredforvat.lbl.vatNumber = VAT registration number
@@ -863,8 +859,6 @@ tcsp.whatyouneed.dependinginfo.text.1 = if you only sell off-the-shelf companies
 tcsp.whatyouneed.dependinginfo.text.2 = if you create complex corporate structures for clients, or plan to do so in the future
 tcsp.whatyouneed.dependinginfo.text.3 = the Money Laundering Regulation reference number of the Trust or Company Service Provider you use
 
-tcsp.whatyouneed.sidebar.title = Automatic saving
-tcsp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 tcsp.kind.of.service.provider.title = What kind of Trust or Company Service Provider are you?
 tcsp.service.provider.lbl.01 = Nominee shareholders provider
 tcsp.service.provider.lbl.02 = Trustee provider
@@ -894,8 +888,6 @@ asp.whatyouneed.subheading = For this section you’ll need to know:
 asp.whatyouneed.line_1 = which services you provide
 asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other business’ tax matters
 asp.whatyouneed.line_3 = your HMRC Agent Registration Number, if relevant
-asp.whatyouneed.sidebar.title = Automatic saving
-asp.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other business’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme
@@ -916,8 +908,6 @@ supervision.whatyouneed.requiredinfo.text.2 = the start date and end date of you
 supervision.whatyouneed.requiredinfo.text.3 = the reason your last supervision ended
 supervision.whatyouneed.requiredinfo.text.4 = a list of your professional memberships
 supervision.whatyouneed.requiredinfo.text.5 = details of penalties you''ve received from a professional body
-supervision.whatyouneed.sidebar.title = Automatic saving
-supervision.whatyouneed.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 
 supervision.another_body.title = Has your business ever been registered with another supervising body?
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
@@ -954,8 +944,6 @@ supervision.memberofprofessionalbody.lbl.14 = Other
 
 msb.whatyouneed.title = Money Service Business – What you need
 msb.whatyouneed.heading = What you need
-msb.whomustregister.sidebar.title = Automatic saving
-msb.whomustregister.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
 msb.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
 msb.whatyouneed.line_1 = a list of which services you provide
 msb.whatyouneed.line_2 = how much throughput you expect in the next 12 months
@@ -1033,6 +1021,21 @@ msb.summary.ipsp-name = IPSP''s name
 msb.summary.ipsp-registration-number = IPSP''s HM Revenue and Customs registration number
 
 msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
-msb.ce.transactions.expected.in.12.months.title =  Money Service Business – How many currency exchange transactions do you expect in the next 12 months?
-msb.ce.transactions.expected.in.12.months.heading =  How many currency exchange transactions do you expect in the next 12 months?
+msb.ce.transactions.expected.in.12.months.heading =  Money Service Business – How many currency exchange transactions do you expect in the next 12 months?
 
+hvd.whatyouneed.title = Money Service Business – What you need
+hvd.whatyouneed.heading = What you need
+hvd.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
+hvd.whatyouneed.line_1 = what your business will sell
+hvd.whatyouneed.line_2 = how you'll sell goods
+hvd.whatyouneed.line_3 = if you will be buying or selling duty-suspended excise goods
+hvd.whatyouneed.line_4 = if your business has already accepted cash payments of €15,000 or more
+hvd.whatyouneed.line_5 = if you are able to automatically identify linked cash payments of €15,000 or more
+hvd.whatyouneed.line_6 = if you expect to receive cash payments of €15,000 from customers you've not met in person
+hvd.whatyouneed.line_7 = how much of your turnover you expect to come from cash payments over €15,000
+
+hvd.cash.payment.title = Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
+hvd.cash.payment.data.text = What was the date of the first payment?
+hvd.cash.payment.date.example = For example, 31 3 2015

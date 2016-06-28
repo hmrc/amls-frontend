@@ -7,6 +7,7 @@ import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => _, _}
+import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.registrationprogress.{NotStarted, Section}
@@ -35,8 +36,7 @@ trait ProgressService {
         case EstateAgentBusinessService =>
           m + EstateAgentBusiness.section
         case HighValueDealing =>
-          // TODO
-          m + Section("hvd", NotStarted, controllers.routes.RegistrationProgressController.get())
+          m + Hvd.section
         case MoneyServiceBusiness =>
           m + Msb.section
         case TrustAndCompanyServices =>
