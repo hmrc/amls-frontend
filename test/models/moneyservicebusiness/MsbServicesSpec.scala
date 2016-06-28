@@ -44,5 +44,14 @@ class MsbServicesSpec extends PlaySpec {
       implicitly[Rule[UrlFormEncoded, MsbServices]].validate(data)
           .mustEqual(Failure(Seq((Path \ "msbServices" \ 0) -> Seq(ValidationError("error.invalid")))))
     }
+
+    "serialize with the expected structure" in {
+
+      val model = MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
+
+      MsbServices.formW.writes(model) mustEqual Map(
+        "msbServices[]" -> Seq("01", "03", "04", "02")
+      )
+    }
   }
 }

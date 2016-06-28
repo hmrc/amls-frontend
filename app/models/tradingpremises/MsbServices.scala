@@ -100,6 +100,7 @@ sealed trait MsbServices0 {
 
   val formW: Write[MsbServices, UrlFormEncoded] = {
     import play.api.data.mapping.forms.Writes._
+    import utils.MappingUtils.writeM
     implicitly[Write[MsbServices, UrlFormEncoded]]
   }
 }

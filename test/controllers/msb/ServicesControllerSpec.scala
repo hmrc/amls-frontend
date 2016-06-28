@@ -138,7 +138,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get().url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
     }
 
     "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -170,7 +170,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get(true).url)
     }
 
     "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
@@ -178,6 +178,12 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       Seq((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
         case (model, id) =>
           val currentModel = MoneyServiceBusiness(
+            ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
+              ""
+            )),
+            businessAppliedForPSRNumber = Some(
+              BusinessAppliedForPSRNumberNo
+            ),
             msbServices = Some(MsbServices(
               Set(TransmittingMoney, CurrencyExchange)
             ))

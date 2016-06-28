@@ -4,8 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{CurrencyExchange, MoneyServiceBusiness, MsbServices, TransmittingMoney}
-import play.api.mvc.Call
+import models.moneyservicebusiness._
+import play.api.mvc.{Result, Call}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -28,14 +28,28 @@ trait ServicesController extends BaseController {
       }
   }
 
-  private def route(services: Option[MsbServices], newServices: MsbServices): Call =
-    (newServices.services -- services.map(_.services).getOrElse(Set.empty)) match {
-      case w if w.contains(TransmittingMoney) =>
-        routes.BusinessAppliedForPSRNumberController.get()
-      case w if w.contains(CurrencyExchange) =>
-        routes.CETransactionsInNext12MonthsController.get()
+  private def editRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+    services match {
+      case s if s contains TransmittingMoney =>
+        mtRouting(services, msb)
+      case s if s contains CurrencyExchange =>
+        ceRouting(msb)
       case _ =>
-        routes.SummaryController.get()
+        Redirect(routes.SummaryController.get())
+    }
+
+  private def mtRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+    if (msb.businessAppliedForPSRNumber.isDefined) {
+      editRouting(services - TransmittingMoney, msb)
+    } else {
+      Redirect(routes.BusinessAppliedForPSRNumberController.get(true))
+    }
+
+  private def ceRouting(msb: MoneyServiceBusiness): Result =
+    if (msb.ceTransactionsInNext12Months.isDefined) {
+      Redirect(routes.SummaryController.get())
+    } else {
+      Redirect(routes.CETransactionsInNext12MonthsController.get(true))
     }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -53,7 +67,7 @@ trait ServicesController extends BaseController {
             case false =>
               Redirect(routes.ExpectedThroughputController.get())
             case true =>
-              Redirect(route(msb.msbServices, data))
+              editRouting(data.services, msb)
           }
       }
   }
