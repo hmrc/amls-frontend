@@ -23,7 +23,7 @@ s"""${f("utrNumber").id}-fieldset"""
             @radio(f("saRegistered"), "lbl.yes", "true", target = s"#$target")
             @radio(f("saRegistered"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {
-                @input(f("utrNumber"), "responsiblepeople.registeredforselfassessment.lbl.utrnumber", bold = false)
+                @input(f("utrNumber"), "responsiblepeople.registeredforselfassessment.lbl.utrnumber", bold = false, hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint")
             }
         }
 

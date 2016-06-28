@@ -14,40 +14,6 @@
  * limitations under the License.
  */
 
-/* vvv added the below until we update assets-frontend vvv */
-
-/* add back some margins */
-.list {
-    margin-bottom: 40px;
-    margin-top: 5px;
-}
-
-/* Fixes the indent with the grids - not sure if there is any other way around this at present */
-div.grid-layout {
-    margin : 0;
-}
-
-/* ^^^ added the above until we update assets-frontend ^^^ */
-
-
-
-/* required as js-hidden in assets frontend is !important */
-.amls-js-hidden {
-  display: none;
-}
-
-.amls-service-info {
-  border-top: 10px solid #005ea5;
-}
-
-/* Might not need this anymore, not sure who put it in */
-.address-list li {
-  margin: 0;
-}
-
-.panel-wide {
-  border-left: solid 10px #bfc1c3;
-}
 
 /* -- application progress page -- */
 .progress-steps {
@@ -105,8 +71,7 @@ a.progress-step {
 }
 
 .progress-step--status {
-  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 100%;
-  background-size: 50%;
+  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 90% / 33%;
   border-bottom: 3px solid #dee0e2;
   color: #6f777b;
   padding: 0;
@@ -116,6 +81,7 @@ a.progress-step {
 
 .no-svg .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/chevron.png");
+  background-position: 90%;
 }
 
 .progress-step--status__completed,
@@ -142,27 +108,27 @@ a.progress-step {
 }
 
 .progress-step--status__completed {
-  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50%;
+  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50% / 33%;
   transition: none;
 }
 
 .no-svg .progress-step--status__completed {
+  background-color: #28a197;
   background-image: url("/anti-money-laundering/assets/icons/tick.png");
+  background-position: 50%;
+}
+
+.no-svg .progress-step--status,
+.no-svg .progress-step:focus .progress-step--status__started,
+.no-svg .progress-step:focus .progress-step--status__not-started,
+.no-svg .progress-step:hover .progress-step--status__started,
+.no-svg .progress-step:hover .progress-step--status__not-started,
+.no-svg .progress-step--status__completed {
+  background-repeat: no-repeat;
 }
 
 .progress-step--status-time {
   padding: 15px 15px 0;
-}
-
-.application-submit {
-  background-color: #f8f8f8;
-  border-bottom: #dee0e2 solid 3px;
-  margin-left: 30px;
-  padding: 15px;
-}
-
-.application-submit .heading-small {
-  margin-top: 0;
 }
 
 .lte-ie8 .grid-layout {
@@ -199,10 +165,6 @@ a.progress-step {
   .progress-step--status__not-started {
     background-size: 20%;
   }
-
-  .application-submit {
-    margin: 0 -0.78947em;
-  }
 }
 
 @media screen and (min-width: 641px) and (max-width: 767px) {
@@ -213,6 +175,54 @@ a.progress-step {
 }
 
 /* -- // application progress page -- */
+
+
+/* vvv added the below until we update assets-frontend vvv */
+/********************************************************************/
+/* add back some margins */
+.list {
+  margin-bottom: 40px;
+  margin-top: 5px;
+}
+
+/* Fixes the indent with the grids - not sure if there is any other way around this at present */
+div.grid-layout {
+  margin: 0;
+}
+
+.panel-wide {
+  border-left: solid 10px #bfc1c3;
+}
+
+/********************************************************************/
+/* ^^^ added the above until we update assets-frontend ^^^ */
+
+
+
+.application-submit,
+.user-attention {
+  background-color: #f8f8f8;
+  border-bottom: #dee0e2 solid 3px;
+  margin-left: 30px;
+  padding: 15px;
+}
+
+.application-submit .heading-small,
+.user-attention .heading-small {
+  margin-top: 0;
+}
+
+@media screen and (max-width: 640px) {
+  .application-submit,
+  .user-attention {
+    margin: 0 -0.78947em;
+  }
+}
+
+/* required as js-hidden in assets frontend is !important */
+.amls-js-hidden {
+  display: none;
+}
 
 /* Confirmation */
 .confirmation {
@@ -227,13 +237,13 @@ a.progress-step {
   margin: 0;
 }
 
-.bevel-container {
+.user-attention {
   background-color: #f8f8f8;
   border-bottom: #dee0e2 solid 3px;
   padding: 15px;
 }
 
-.bevel-container > .heading-small {
+.user-attention > .heading-small {
   margin: 10px 0 15px 0;
 }
 
@@ -245,7 +255,7 @@ th.numeric {
 /* adding this for now
  * TODO: we really need to re-jig the markup for this */
 @media screen and (max-width: 640px) {
-    .bevel-container {
+    .user-attention {
         margin: 0;
     }
 }

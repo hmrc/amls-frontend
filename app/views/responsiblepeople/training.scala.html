@@ -18,7 +18,9 @@
 ) {
 
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
-
+        <span class="form-hint">
+            @Messages("responsiblepeople.training.hinttext")
+        </span>
         @inlineRadioGroup(f("training")) {
             @radio(f("training"), "lbl.yes", "true", target = s"#$target")
             @radio(f("training"), "lbl.no", "false")
