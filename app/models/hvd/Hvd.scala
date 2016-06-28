@@ -5,14 +5,18 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 
-case class Hvd (cashPayment: Option[CashPayment] = None) {
+case class Hvd (cashPayment: Option[CashPayment] = None,
+                products: Option[Products] = None) {
 
   def cashPayment(v: CashPayment): Hvd =
     this.copy(cashPayment = Some(v))
 
+  def products(v: Products): Hvd =
+    this.copy(products = Some(v))
+
   def isComplete: Boolean =
     this match {
-      case Hvd(_) => true
+      case Hvd(_, _) => true
       case _ => false
     }
 }

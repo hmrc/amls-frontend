@@ -1,0 +1,40 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@header = {
+    @heading("hvd.products.title", "summary.hvd")
+}
+
+@main(
+    title = Messages("hvd.products.heading"),
+    heading = header
+) {
+
+    @form(f, controllers.hvd.routes.ProductsController.post(edit)) {
+
+        <div class="form-field-group">
+            @radioGroup(f("products")) {
+                @legend("", true, bold = true, "lbl.select.all")
+                @checkbox(f("products[]"), "hvd.products.option.01", "01")
+                @checkbox(f("products[]"), "hvd.products.option.02", "02")
+                @checkbox(f("products[]"), "hvd.products.option.03", "03")
+                @checkbox(f("products[]"), "hvd.products.option.04", "04")
+                @checkbox(f("products[]"), "hvd.products.option.05", "05")
+                @checkbox(f("products[]"), "hvd.products.option.06", "06")
+                @checkbox(f("products[]"), "hvd.products.option.07", "07")
+                @checkbox(f("products[]"), "hvd.products.option.08", "08")
+                @checkbox(f("products[]"), "hvd.products.option.09", "09")
+                @checkbox(f("products[]"), "hvd.products.option.10", "10")
+                @checkbox(f("products[]"), "hvd.products.option.11", "11")
+                @checkbox(f("products[]"), "hvd.products.option.12", "12", target = s"#${f("otherDetails").id}-fieldset")
+                @fieldset("TODO", jsHidden = true, id = s"""${f("otherDetails").id}-fieldset""") {
+                    @input(f("otherDetails"), "lbl.give.details", bold = false)
+                }
+            }
+        <br>
+        </div>
+        @submit(edit)
+    }
+}

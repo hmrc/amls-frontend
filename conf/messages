@@ -291,6 +291,8 @@ lbl.list.upto.3.countries = List up to 3 countries
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
 
+lbl.give.details = Please give details
+
 ############################### Login Page ###############################
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
@@ -1043,3 +1045,19 @@ hvd.cash.payment.heading = High Value Dealer - Has your business already accepte
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.cash.payment.data.text = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 3 2015
+
+hvd.products.title = What will your business sell?
+hvd.products.heading = High Value Dealer -  What will your business sell?
+hvd.products.option.01 = Alcohol
+hvd.products.option.02 = Tobacco
+hvd.products.option.03 = Antiques
+hvd.products.option.04 = Cars
+hvd.products.option.05 = Other Motor Vehicles
+hvd.products.option.06 = Caravans
+hvd.products.option.07 = Jewellery
+hvd.products.option.08 = Gold
+hvd.products.option.09 = Scrap Metals
+hvd.products.option.10 = Mobile Phones
+hvd.products.option.11 = Clothing
+hvd.products.option.12 = Other
+
