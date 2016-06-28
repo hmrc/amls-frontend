@@ -993,7 +993,7 @@ msb.which_currencies.source.customers = Customers selling their foreign currency
 
 msb.ipsp.title = Does your business use an Intermediary Payment Service Provider?
 msb.ipsp.text = An Intermediary Payment Service Provider is involved in the transfer of funds, but isn't the Payment Service Provider for the payer or the payee.
-msb.ipsp.name.lbl = Intermediary Payment Service Provider's name
+msb.ipsp.name.lbl = Intermediary Payment Service Provider''s name
 msb.ipsp.referenceNumber.lbl= Intermediary Payment Service Provider's HM Revenue and Customs registration number
 
 msb.linked.txn.title = Can your systems identify linked transactions?
@@ -1024,7 +1024,7 @@ msb.summary.ipsp-registration-number = IPSP''s HM Revenue and Customs registrati
 msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
 msb.ce.transactions.expected.in.12.months.heading =  Money Service Business – How many currency exchange transactions do you expect in the next 12 months?
 
-hvd.whatyouneed.title = Money Service Business – What you need
+hvd.whatyouneed.title = High Value Dealer – What you need
 hvd.whatyouneed.heading = What you need
 hvd.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
 hvd.whatyouneed.line_1 = what your business will sell
