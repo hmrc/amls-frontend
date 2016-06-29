@@ -364,6 +364,7 @@ confirmation.registrationfee = Registration fee
 confirmation.submission = Application submission
 confirmation.tradingpremises = Trading premises
 confirmation.responsiblepeople = Responsible people
+confirmation.unpaidpeople = Responsible people who have passed the Fit and Proper test
 confirmation.whathappensnext.heading = What happens next
 confirmation.whathappensnext.p.1 = You will receive an email from HM Revenue and Customs within 45 days of paying the registration fee.
 confirmation.whathappensnext.p.2 = When you receive the email, sign back in to this website to see if your application has been approved or rejected.

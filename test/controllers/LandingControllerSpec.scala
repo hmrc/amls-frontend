@@ -6,7 +6,7 @@ import models.businesscustomer.{Address, ReviewDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import services.LandingService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -14,7 +14,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class LandingControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class LandingControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

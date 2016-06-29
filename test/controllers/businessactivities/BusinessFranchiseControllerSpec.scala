@@ -9,14 +9,14 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import scala.concurrent.Future
 
-class BusinessFranchiseControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures{
+class BusinessFranchiseControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
     self =>
