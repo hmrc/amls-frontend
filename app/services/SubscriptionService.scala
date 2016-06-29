@@ -117,7 +117,7 @@ trait SubscriptionService extends DataCacheService {
 
   private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubscriptionResponse): Seq[BreakdownRow] = {
     people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
-      case (a, b) =>
+      case (b, a) =>
         Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
           (if (b.nonEmpty) {
             Seq(BreakdownRow(UnpaidPeople.message, b.size, UnpaidPeople.feePer, Currency.fromBD(UnpaidPeople.feePer)))
