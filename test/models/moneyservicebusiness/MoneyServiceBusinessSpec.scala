@@ -33,12 +33,6 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
       }
     }
 
-    "Provide an implicit mongo-key" in {
-      def x(implicit mongoKey: MongoKey[MoneyServiceBusiness]) = mongoKey()
-
-      x must be("msb")
-    }
-
     "have a section function that" when {
       implicit val cacheMap = mock[CacheMap]
 

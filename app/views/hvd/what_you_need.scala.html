@@ -1,0 +1,35 @@
+@import include._
+@()(implicit request: Request[_])
+
+@sidebar = {
+    <div class="bevel-container">
+        <h3>@Messages("main.sidebar.title")</h3>
+        <p>@Messages("main.sidebar.information")</p>
+    </div>
+}
+
+@main(
+    title = Messages("hvd.whatyouneed.title"),
+    sidebar = sidebar
+) {
+
+    @heading("hvd.whatyouneed.heading", "summary.hvd")
+
+    <p>@Messages("msb.whatyouneed.requiredinfo.heading")</p>
+
+    <ul class="list list-bullet spacelarge">
+        <li>@Messages("hvd.whatyouneed.line_1")</li>
+        <li>@Messages("hvd.whatyouneed.line_2")</li>
+        <li>@Messages("hvd.whatyouneed.line_3")</li>
+        <li>@Messages("hvd.whatyouneed.line_4")</li>
+        <li>@Messages("hvd.whatyouneed.line_5")</li>
+        <li>@Messages("hvd.whatyouneed.line_6")</li>
+        <li>@Messages("hvd.whatyouneed.line_7")</li>
+    </ul>
+
+    <div class="form-group">
+        <a class="button" href="@controllers.hvd.routes.CashPaymentController.get()">
+            @Messages("button.continue")
+        </a>
+    </div>
+}
