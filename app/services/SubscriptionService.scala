@@ -44,6 +44,11 @@ trait SubscriptionService extends DataCacheService {
     val feePer = ApplicationConfig.peopleFee
   }
 
+  private object UnpaidPeople {
+    val message = "confirmation.unpaidpeople"
+    val feePer = 0
+  }
+
   private def safeId(cache: CacheMap): Future[String] = {
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -110,6 +115,18 @@ trait SubscriptionService extends DataCacheService {
   private def subscriptionQuantity(subscription: SubscriptionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
 
+  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubscriptionResponse): Seq[BreakdownRow] = {
+    people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
+      case (a, b) =>
+        Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
+          (if (b.nonEmpty) {
+            Seq(BreakdownRow(UnpaidPeople.message, b.size, UnpaidPeople.feePer, Currency.fromBD(UnpaidPeople.feePer)))
+          } else {
+            Seq.empty
+          })
+    }
+  }
+
   def getSubscription
   (implicit
    ec: ExecutionContext,
@@ -128,10 +145,9 @@ trait SubscriptionService extends DataCacheService {
           val mlrRegNo = subscription.amlsRefNo
           val total = subscription.totalFees
           val rows = Seq(
-            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer),
-            BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee),
-            BreakdownRow(People.message, people.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))
-          )
+            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+          ) ++ responsiblePeopleRows(people, subscription) ++
+            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee))
           Future.successful((mlrRegNo, Currency.fromBD(total), rows))
           // TODO
         }) getOrElse Future.failed(new Exception("TODO"))
