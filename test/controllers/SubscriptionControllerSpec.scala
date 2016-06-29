@@ -1,7 +1,7 @@
 package controllers
 
 import models.SubscriptionResponse
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsString
 import play.api.test.Helpers._
 import services.SubscriptionService
@@ -13,7 +13,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class SubscriptionControllerSpec extends PlaySpec with OneServerPerSuite {
+class SubscriptionControllerSpec extends PlaySpec with OneAppPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>

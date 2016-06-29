@@ -4,7 +4,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import org.mockito.Mockito._
@@ -15,7 +15,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
-class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
+class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>

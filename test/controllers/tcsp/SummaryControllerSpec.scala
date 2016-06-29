@@ -6,14 +6,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends PlaySpec with OneServerPerSuite {
+class SummaryControllerSpec extends PlaySpec with OneAppPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>

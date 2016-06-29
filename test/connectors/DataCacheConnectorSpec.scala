@@ -5,7 +5,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.auth.{LoggedInUser, AuthContext}
@@ -15,7 +15,7 @@ import scala.concurrent.Future
 
 class DataCacheConnectorSpec
   extends PlaySpec
-    with OneServerPerSuite
+    with OneAppPerSuite
     with MockitoSugar
     with ScalaFutures
     with IntegrationPatience {

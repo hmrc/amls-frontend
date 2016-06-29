@@ -6,13 +6,13 @@ import models.bankdetails._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

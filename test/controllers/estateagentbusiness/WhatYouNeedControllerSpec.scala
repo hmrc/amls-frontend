@@ -3,12 +3,12 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import utils.AuthorisedFixture
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 
-class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures {
+class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
