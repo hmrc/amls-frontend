@@ -15,6 +15,7 @@
 
     @form(f, controllers.responsiblepeople.routes.PersonResidentTypeController.post(index, edit)) {
 
+        <div class="form-field-group">
         @inlineRadioGroup(f("isUKResidence")) {
             @legend("TODO", jsHidden = true)
             @radio(f("isUKResidence"), "lbl.yes", "true", target = s"#${f("targetyes").id}-fieldset")
@@ -44,12 +45,15 @@
                 }
             }
         }
-
-        @legend("responsiblepeople.country.of.birth.lbl", bold = false)
-        @country(f("countryOfBirth"))
-
-        @legend("lbl.nationality", bold = false)
-        @country(f("nationality"))
+        </div>
+        <div class="form-field-group">
+            <div class="form-field">
+                @country(f("countryOfBirth"), labelText = "responsiblepeople.country.of.birth.lbl" , hintText = "responsiblepeople.country.of.birth.hint")
+            </div>
+            <div class="form-field">
+                @country(f("nationality"), labelText = "lbl.nationality", hintText = "lbl.nationality.hint")
+            </div>
+        </div>
 
         @submit(edit)
     }
