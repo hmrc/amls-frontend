@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.hvd.{Hvd, Products}
+import models.hvd.{Alcohol, Hvd, Products}
 import views.html.hvd.products
 
 import scala.concurrent.Future
@@ -37,7 +37,13 @@ trait ProductsController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.CashPaymentController.get())
+            case false => {
+              if(data.items.contains(Alcohol) | data.items.contains(Alcohol)) {
+                Redirect(routes.ProductsController.get())
+              } else {
+                Redirect(routes.CashPaymentController.get())
+              }
+            }
           }
         }
       }
