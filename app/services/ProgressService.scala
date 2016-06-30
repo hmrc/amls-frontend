@@ -35,7 +35,7 @@ trait ProgressService {
           m + Asp.section + Supervision.section
         case EstateAgentBusinessService =>
           m + EstateAgentBusiness.section
-        case HighValueDealing =>
+        case HighValueDealing if ApplicationConfig.hvdToggle =>
           m + Hvd.section
         case MoneyServiceBusiness =>
           m + Msb.section

@@ -10,12 +10,14 @@ trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
-  def get = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCache.fetch[Hvd](Hvd.key) map {
-        case Some(data) => Ok(summary(data))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get = HvdToggle {
+    Authorised.async {
+      implicit authContext => implicit request =>
+        dataCache.fetch[Hvd](Hvd.key) map {
+          case Some(data) => Ok(summary(data))
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        }
+    }
   }
 }
 

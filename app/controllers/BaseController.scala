@@ -10,4 +10,5 @@ trait BaseController extends FrontendController with Actions {
 
   protected val Authorised = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence)
   protected val ResponsiblePeopleToggle = FeatureToggle(ApplicationConfig.responsiblePeopleToggle)
+  protected val HvdToggle = FeatureToggle(ApplicationConfig.hvdToggle)
 }
