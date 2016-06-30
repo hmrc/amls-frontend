@@ -3,12 +3,12 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
-class WhatYouNeedControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 

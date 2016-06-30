@@ -6,14 +6,14 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 
 
 import scala.concurrent.Future
 
-class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

@@ -1,14 +1,14 @@
 package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.data.mapping.{Path, Failure, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 import scala.language.postfixOps
 
-class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
+class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   "Form Validation" must {
 
