@@ -41,6 +41,12 @@ object ApplicationConfig extends ServicesConfig {
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFee = getConfigInt("amounts.people")
 
+  val hvdToggle: Boolean = {
+    val value = getConfBool("feature-toggle.hvd", false)
+    Logger.info("s[ApplicationConfig][hvd]")
+    value
+  }
+
   val responsiblePeopleToggle: Boolean = {
     val value = getConfBool("feature-toggle.responsible-people", false)
     Logger.info(s"[ApplicationConfig][responsible-people] $value")
