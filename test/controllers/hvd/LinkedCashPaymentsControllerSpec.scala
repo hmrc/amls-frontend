@@ -48,13 +48,13 @@ class LinkedCashPaymentsControllerSpec extends PlaySpec  with OneAppPerSuite {
 
       val htmlValue = Jsoup.parse(contentAsString(result))
       htmlValue.title mustBe Messages("hvd.identify.linked.cash.payment.title")
-      htmlValue.getElementById("linkedCashPayment-true").attr("checked") mustBe "checked"
-      htmlValue.getElementById("linkedCashPayment-false").attr("checked") mustBe "unchecked"
+      htmlValue.getElementById("linkedCashPayments-true").`val`() mustBe "true"
+      htmlValue.getElementById("linkedCashPayments-false").`val`() mustBe "false"
     }
 
     "successfully redirect to nex page when submitted with valida data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("linkedCashPayment" -> "true")
+      val newRequest = request.withFormUrlEncodedBody("linkedCashPayments" -> "true")
 
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
@@ -64,12 +64,12 @@ class LinkedCashPaymentsControllerSpec extends PlaySpec  with OneAppPerSuite {
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
     }
 
     "successfully redirect to nex page when submitted with valida data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("linkedCashPayment" -> "false")
+      val newRequest = request.withFormUrlEncodedBody("linkedCashPayments" -> "false")
 
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
