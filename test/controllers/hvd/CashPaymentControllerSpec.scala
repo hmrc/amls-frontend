@@ -115,7 +115,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.LinkedCashPaymentsController.get().url))
       }
 
       "successfully redirect to the page on selection of 'No' when edit mode is off" in new Fixture {
@@ -129,7 +129,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.LinkedCashPaymentsController.get().url))
       }
 
     }
