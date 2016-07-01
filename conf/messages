@@ -1024,8 +1024,8 @@ msb.branchesoragents.add.btn = Add another country
 msb.summary.ipsp-name = IPSP''s name
 msb.summary.ipsp-registration-number = IPSP’s HM Revenue and Customs registration number
 
-msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
-msb.ce.transactions.expected.in.12.months.heading =  Money Service Business – How many currency exchange transactions do you expect in the next 12 months?
+msb.ce.transactions.expected.in.12.months.title =  Money Service Business – How many currency exchange transactions do you expect in the next 12 months?
+msb.ce.transactions.expected.in.12.months.heading = How many currency exchange transactions do you expect in the next 12 months?
 
 hvd.whatyouneed.title = High Value Dealer – What you need
 hvd.whatyouneed.heading = What you need
