@@ -41,7 +41,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("hvd.cash.payment.heading")
+        htmlValue.title mustBe Messages("hvd.cash.payment.title")
       }
 
       "load Yes when Cash payment from save4later returns True" in new Fixture {
