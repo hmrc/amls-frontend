@@ -240,6 +240,11 @@ error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################
 error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
+error.required.hvd.business.sell.atleast = Select at least one type of item that your business will sell.
+error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
+error.invalid.hvd.business.sell.other.details = You can''t enter more than 255 characters for the other items your business will sell.
+error.required.hvd.linked.cash.payment = Select yes or no to the question: are you able to automatically identify linked cash payments which come to €15,000 or more?
+
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -288,6 +293,8 @@ lbl.list.upto.3.countries = List up to 3 countries
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
+
+lbl.give.details = Please give details
 
 ############################### Login Page ###############################
 amls.Login.title= AMLS
@@ -1038,8 +1045,27 @@ hvd.whatyouneed.line_5 = if you are able to automatically identify linked cash p
 hvd.whatyouneed.line_6 = if you expect to receive cash payments of €15,000 from customers you’ve not met in person
 hvd.whatyouneed.line_7 = how much of your turnover you expect to come from cash payments over €15,000
 
-hvd.cash.payment.title = Has your business already accepted any cash payments which total of €15,000 or more?
-hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.title = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.heading = Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.cash.payment.data.text = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 3 2015
+
+hvd.products.title = High Value Dealer -  What will your business sell?
+hvd.products.heading = What will your business sell?
+hvd.products.option.01 = Alcohol
+hvd.products.option.02 = Tobacco
+hvd.products.option.03 = Antiques
+hvd.products.option.04 = Cars
+hvd.products.option.05 = Other Motor Vehicles
+hvd.products.option.06 = Caravans
+hvd.products.option.07 = Jewellery
+hvd.products.option.08 = Gold
+hvd.products.option.09 = Scrap Metals
+hvd.products.option.10 = Mobile Phones
+hvd.products.option.11 = Clothing
+hvd.products.option.12 = Other
+
+hvd.identify.linked.cash.payment.title = High Value Dealer - Are you able to automatically identify linked cash payments which come to €15,000 or more?
+hvd.identify.linked.cash.payment.heading = Are you able to automatically identify linked cash payments which come to €15,000 or more?
+hvd.identify.linked.cash.payments.subtitle = If you do not use Euros, please convert to the currency you use.

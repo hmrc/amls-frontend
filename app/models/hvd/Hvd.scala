@@ -5,14 +5,22 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 
-case class Hvd (cashPayment: Option[CashPayment] = None) {
+case class Hvd (cashPayment: Option[CashPayment] = None,
+                products: Option[Products] = None,
+                linkedCashPayment: Option[LinkedCashPayments] = None) {
 
   def cashPayment(v: CashPayment): Hvd =
     this.copy(cashPayment = Some(v))
 
+  def products(v: Products): Hvd =
+    this.copy(products = Some(v))
+
+  def linkedCashPayment(v: LinkedCashPayments): Hvd =
+    this.copy(linkedCashPayment = Some(v))
+
   def isComplete: Boolean =
     this match {
-      case Hvd(_) => true
+      case Hvd(Some(_), Some(_), Some(_)) => true
       case _ => false
     }
 }

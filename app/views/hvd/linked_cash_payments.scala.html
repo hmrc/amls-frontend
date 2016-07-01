@@ -1,0 +1,28 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+
+@header = {
+    @heading("hvd.identify.linked.cash.payment.heading", "summary.hvd")
+}
+
+@main(
+    title = Messages("hvd.identify.linked.cash.payment.title"),
+    heading = header
+) {
+
+    @form(f, controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
+
+    <p class="form-hint">@Messages("hvd.identify.linked.cash.payments.subtitle")</p>
+
+    <div class="form-field-group">
+        @inlineRadioGroup(f("linkedCashPayments")) {
+            @radio(f("linkedCashPayments"), "lbl.yes", "true")
+            @radio(f("linkedCashPayments"), "lbl.no", "false")
+        }
+    </div>
+    @submit(edit)
+
+    }
+}
