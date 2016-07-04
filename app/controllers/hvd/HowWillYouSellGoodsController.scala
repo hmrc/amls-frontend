@@ -39,9 +39,8 @@ trait HowWillYouSellGoodsController extends BaseController{
             _ <- dataCacheConnector.save[Hvd](Hvd.key,
               hvd.howWillYouSellGoods(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-          }
+          } yield Redirect(routes.SummaryController.get())
+
       }
     }
   }

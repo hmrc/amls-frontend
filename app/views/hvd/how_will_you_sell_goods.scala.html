@@ -15,9 +15,9 @@ title = Messages("hvd.how-will-you-sell-goods.title")
 
     @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
         @fieldset(legend = "lbl.select.all", panel=false) {
-            @checkbox(f("channels[]"), "hvd.how-will-you-sell-goods.channels.auction", "auction")
-            @checkbox(f("channels[]"), "hvd.how-will-you-sell-goods.channels.retail" , "retail" )
-            @checkbox(f("channels[]"), "hvd.how-will-you-sell-goods.channels.wholesale" , "wholesale" )
+            @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.auction", "Auction")
+            @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.retail" , "Retail" )
+            @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.wholesale" , "Wholesale" )
         }
 
         @submit(edit)
