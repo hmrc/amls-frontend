@@ -1,5 +1,6 @@
 package models.hvd
 
+
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -7,7 +8,9 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Hvd (cashPayment: Option[CashPayment] = None,
                 products: Option[Products] = None,
+                exciseGoods:  Option[ExciseGoods] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None) {
+
 
   def cashPayment(v: CashPayment): Hvd =
     this.copy(cashPayment = Some(v))
@@ -15,12 +18,15 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def products(v: Products): Hvd =
     this.copy(products = Some(v))
 
+  def exciseGoods(v: ExciseGoods): Hvd =
+    this.copy(exciseGoods = Some(v))
+
   def linkedCashPayment(v: LinkedCashPayments): Hvd =
     this.copy(linkedCashPayment = Some(v))
 
   def isComplete: Boolean =
     this match {
-      case Hvd(Some(_), Some(_), Some(_)) => true
+      case Hvd(Some(_), Some(_),Some(_), Some(_)) => true
       case _ => false
     }
 }
