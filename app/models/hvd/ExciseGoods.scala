@@ -13,7 +13,7 @@ object ExciseGoods {
 
   implicit val formRule: Rule[UrlFormEncoded, ExciseGoods] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "exciseGoods").read[Boolean].withMessage("error.required.excise.goods") fmap ExciseGoods.apply
+    (__ \ "exciseGoods").read[Boolean].withMessage("error.required.hvd.excise.goods") fmap ExciseGoods.apply
   }
 
   implicit val formWrites: Write[ExciseGoods, UrlFormEncoded] = Write {

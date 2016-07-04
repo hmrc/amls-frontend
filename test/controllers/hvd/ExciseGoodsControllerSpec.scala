@@ -35,7 +35,7 @@ class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe Messages("hvd.identify.excise.goods.title")
+      htmlValue.title mustBe Messages("hvd.excise.goods.title")
     }
 
     "successfully load UI from save4later" in new Fixture {
@@ -47,7 +47,7 @@ class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe Messages("hvd.identify.excise.goods.title")
+      htmlValue.title mustBe Messages("hvd.excise.goods.title")
       htmlValue.getElementById("exciseGoods-true").`val`() mustBe "true"
       htmlValue.getElementById("exciseGoods-false").`val`() mustBe "false"
     }

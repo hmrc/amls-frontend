@@ -244,7 +244,7 @@ error.required.hvd.business.sell.atleast = Select at least one type of item that
 error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
 error.invalid.hvd.business.sell.other.details = You can''t enter more than 255 characters for the other items your business will sell.
 error.required.hvd.linked.cash.payment = Select yes or no to the question: are you able to automatically identify linked cash payments which come to €15,000 or more?
-error.required.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
+error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
