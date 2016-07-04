@@ -1,6 +1,6 @@
 package models.hvd
 
-import play.api.data.mapping.{Success, Rule, Write}
+import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 
