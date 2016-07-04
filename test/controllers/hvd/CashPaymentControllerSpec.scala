@@ -7,7 +7,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -16,7 +16,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 
-class CashPaymentControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar {
+class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -41,7 +41,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneServerPerSuite with Moc
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("hvd.cash.payment.heading")
+        htmlValue.title mustBe Messages("hvd.cash.payment.title")
       }
 
       "load Yes when Cash payment from save4later returns True" in new Fixture {
@@ -115,7 +115,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.LinkedCashPaymentsController.get().url))
       }
 
       "successfully redirect to the page on selection of 'No' when edit mode is off" in new Fixture {
@@ -129,7 +129,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneServerPerSuite with Moc
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.LinkedCashPaymentsController.get().url))
       }
 
     }

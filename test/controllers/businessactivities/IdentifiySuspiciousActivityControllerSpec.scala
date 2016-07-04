@@ -11,13 +11,13 @@ import org.scalatest.Ignore
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with ScalaFutures{
+class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
     self =>

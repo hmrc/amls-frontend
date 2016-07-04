@@ -4,7 +4,7 @@ import models.estateagentbusiness._
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{Ignore, BeforeAndAfterEach, MustMatchers, WordSpec}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.play.{OneServerPerTest, OneServerPerSuite, PlaySpec}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.specs2.mock.Mockito
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -28,7 +28,7 @@ class IntegrationServer(override val testName : String) extends MicroServiceEmbe
 //class SubscriptionIT extends PlaySpec
 //with Mockito
 //with ScalaFutures
-//with OneServerPerTest
+//with OneAppPerSuite
 //with IntegrationPatience
 //with BeforeAndAfterEach with FrontendCookieHelper{
 //  val server = new IntegrationServer("TestName")
