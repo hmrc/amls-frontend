@@ -2,13 +2,14 @@ package models.hvd
 
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.joda.time.LocalDate
+import org.scalatest.matchers.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-class HvdSpec extends PlaySpec with MockitoSugar {
+class HvdSpec extends PlaySpec with MockitoSugar{
 
   // scalastyle:off
   val DefaultCashPayment = CashPaymentYes(new LocalDate(1956, 2, 15))
@@ -31,6 +32,13 @@ class HvdSpec extends PlaySpec with MockitoSugar {
 
     "Deserialise as expected" in {
       completeJson.as[Hvd] must be(completeModel)
+    }
+
+    "Update how will you sell goods correctly" in {
+      val sut = Hvd(Some(DefaultCashPayment), Some(HowWillYouSellGoods(Seq(Retail))))
+
+      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (Hvd(Some(DefaultCashPayment),
+                                                                                  Some(HowWillYouSellGoods(Seq(Wholesale)))))
     }
   }
   

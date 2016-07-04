@@ -1,0 +1,25 @@
+@import include._
+@import include.forms2._
+@import models.hvd._
+@import utils._
+
+
+
+@(f : forms.Form2[_], edit : Boolean)(implicit request: Request[_])
+
+@main(
+title = Messages("hvd.how-will-you-sell-goods.title")
+) {
+
+    @heading("hvd.how-will-you-sell-goods.heading", "summary.hvd")
+
+    @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
+        @fieldset(legend = "lbl.select.all", panel=false) {
+            @checkbox(f("channels[]"), "hvd.how-will-you-sell-goods.channels.auction", "auction")
+            @checkbox(f("channels[]"), "hvd.how-will-you-sell-goods.channels.retail" , "retail" )
+            @checkbox(f("channels[]"), "hvd.how-will-you-sell-goods.channels.wholesale" , "wholesale" )
+        }
+
+        @submit(edit)
+    }
+}
