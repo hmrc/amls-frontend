@@ -42,7 +42,7 @@ trait ExciseGoodsController extends BaseController {
               )
             } yield edit match {
               case true => Redirect(routes.SummaryController.get())
-              case false => Redirect(routes.SummaryController.get())
+              case false => Redirect(routes.CashPaymentController.get())
             }
         }
       }

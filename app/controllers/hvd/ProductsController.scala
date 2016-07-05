@@ -42,7 +42,7 @@ trait ProductsController extends BaseController {
               case true => Redirect(routes.SummaryController.get())
               case false => {
                 if (data.items.contains(Alcohol) | data.items.contains(Tobacco)) {
-                  Redirect(routes.CashPaymentController.get())
+                  Redirect(routes.ExciseGoodsController.get())
                 } else {
                   Redirect(routes.CashPaymentController.get())
                 }
