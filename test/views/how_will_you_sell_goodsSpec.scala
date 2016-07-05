@@ -42,7 +42,7 @@ class how_will_you_sell_goodsSpec extends WordSpec with MustMatchers with Mockit
     }
 
     "contain 3 checkboxes" in new ViewFixture {
-      form.select("input[type='checkbox']").size() must be (3)
+      form.select("input[type=checkbox]").size() must be (3)
     }
   }
 }

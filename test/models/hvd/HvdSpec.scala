@@ -35,10 +35,10 @@ class HvdSpec extends PlaySpec with MockitoSugar{
     }
 
     "Update how will you sell goods correctly" in {
-      val sut = Hvd(Some(DefaultCashPayment), Some(HowWillYouSellGoods(Seq(Retail))))
+      val sut = Hvd(cashPayment = Some(DefaultCashPayment), howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail))))
 
-      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (Hvd(Some(DefaultCashPayment),
-                                                                                  Some(HowWillYouSellGoods(Seq(Wholesale)))))
+      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (Hvd(cashPayment = Some(DefaultCashPayment),
+                                                                                howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale)))))
     }
   }
   
@@ -84,7 +84,6 @@ class HvdSpec extends PlaySpec with MockitoSugar{
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(incompleteTcsp)
 
         Hvd.section must be(startedSection)
-
       }
     }
   }
