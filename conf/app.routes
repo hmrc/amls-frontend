@@ -280,3 +280,6 @@ POST        /high-value-dealer/selling                                  controll
 
 GET         /high-value-dealer/linked-cash-payments                     controllers.hvd.LinkedCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/linked-cash-payments                     controllers.hvd.LinkedCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /high-value-dealer/excise-goods                             controllers.hvd.ExciseGoodsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/excise-goods                             controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
