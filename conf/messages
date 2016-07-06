@@ -240,7 +240,7 @@ error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################
 error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
-error.required.hvd.how-will-you-sell-goods = Select at least one sales channel
+error.required.hvd.how-will-you-sell-goods = Select at least one way that you will sell these goods.
 error.required.hvd.business.sell.atleast = Select at least one type of item that your business will sell.
 error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
 error.invalid.hvd.business.sell.other.details = You can''t enter more than 255 characters for the other items your business will sell.
