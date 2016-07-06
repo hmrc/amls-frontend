@@ -24,10 +24,6 @@ trait HowWillYouSellGoodsController extends BaseController{
             hvd <- response
             channels <- hvd.howWillYouSellGoods
           } yield Form2[HowWillYouSellGoods](channels)).getOrElse(EmptyForm)
-          form match {
-            case ValidForm(_, model) => Logger.debug(s"============> $model")
-            case x : InvalidForm => Logger.debug("Invalid form")
-          }
           Ok(how_will_you_sell_goods(form, edit))
       }
   }
@@ -39,7 +35,6 @@ trait HowWillYouSellGoodsController extends BaseController{
         case f: InvalidForm =>
           Future.successful(BadRequest(how_will_you_sell_goods(f, edit)))
         case ValidForm(_, model) =>
-          Logger.debug(s"=========> $model")
           for {
             hvd <- dataCacheConnector.fetch[Hvd](Hvd.key)
             _ <- dataCacheConnector.save[Hvd](Hvd.key,
