@@ -49,6 +49,7 @@ trait HowWillYouSellGoods0 {
 
   val formW: Write[HowWillYouSellGoods, UrlFormEncoded] = {
     import play.api.data.mapping.forms.Writes._
+    import utils.MappingUtils.writeM
     implicitly
   }
 
