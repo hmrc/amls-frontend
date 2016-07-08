@@ -35,10 +35,8 @@ trait PercentageOfCashPaymentOver15000Controller extends BaseController {
             _ <- dataCacheConnector.save[Hvd](Hvd.key,
               hvd.percentageOfCashPaymentOver15000(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.SummaryController.get())
-          }
+          } yield Redirect(routes.SummaryController.get())
+          
       }
     }
   }
