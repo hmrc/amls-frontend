@@ -1,8 +1,9 @@
 package models.hvd
 
 
-import controllers.hvd.PercentageOfCashPaymentOver15000Controller
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
+import play.api.data.mapping.{To, Write}
+import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -10,7 +11,9 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class Hvd (cashPayment: Option[CashPayment] = None,
                 products: Option[Products] = None,
                 exciseGoods:  Option[ExciseGoods] = None,
-                linkedCashPayment: Option[LinkedCashPayments] = None , percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None) {
+                linkedCashPayment: Option[LinkedCashPayments] = None,
+		            howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
+                percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None) {
 
 
   def cashPayment(v: CashPayment): Hvd =
@@ -25,13 +28,16 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def linkedCashPayment(v: LinkedCashPayments): Hvd =
     this.copy(linkedCashPayment = Some(v))
 
+  def howWillYouSellGoods(data: HowWillYouSellGoods)  : Hvd = {
+    copy(howWillYouSellGoods = Some(data))
+  }
+
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Hvd =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
-
   def isComplete: Boolean =
     this match {
-      case Hvd(Some(_), Some(_),Some(_), Some(_), Some(_)) => true
+      case Hvd(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
       case _ => false
     }
 }

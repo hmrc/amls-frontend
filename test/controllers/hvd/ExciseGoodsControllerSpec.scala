@@ -52,7 +52,7 @@ class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
       htmlValue.getElementById("exciseGoods-false").`val`() mustBe "false"
     }
 
-    "successfully redirect to nex page when submitted with valida data" in new Fixture {
+    "successfully redirect to next page when submitted with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "true")
 
@@ -64,7 +64,7 @@ class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
     }
 
     "successfully redirect to nex page when submitted with valida data in edit mode" in new Fixture {

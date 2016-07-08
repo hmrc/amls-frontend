@@ -240,6 +240,7 @@ error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################
 error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
+error.required.hvd.how-will-you-sell-goods = Select at least one way that you will sell these goods.
 error.required.hvd.business.sell.atleast = Select at least one type of item that your business will sell.
 error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
 error.invalid.hvd.business.sell.other.details = You can''t enter more than 255 characters for the other items your business will sell.
@@ -479,8 +480,7 @@ tradingpremises.whatyouneed.requiredinfo.text.1= the trading name and address
 tradingpremises.whatyouneed.requiredinfo.text.2= what the business does from these premises
 tradingpremises.whatyouneed.requiredinfo.text.3= the date you''ll start trading from these premises
 tradingpremises.whatyouneed.requiredinfo.text.4= if it''s a residential address
-tradingpremises.sidebar.title = Automatic saving
-tradingpremises.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
+
 tradingpremises.youragent.title=Trading premises - Who is your agent?
 tradingpremises.youragent.heading=Who is your agent?
 tradingpremises.youragent.paragraph1.text=An agent is an individual or business that works on behalf of your business to offer your services.
@@ -1046,6 +1046,14 @@ hvd.whatyouneed.line_5 = if you are able to automatically identify linked cash p
 hvd.whatyouneed.line_6 = if you expect to receive cash payments of €15,000 from customers you’ve not met in person
 hvd.whatyouneed.line_7 = how much of your turnover you expect to come from cash payments over €15,000
 
+hvd.how-will-you-sell-goods.title = High Value Dealer - How will you sell these goods?
+hvd.how-will-you-sell-goods.heading = How will you sell these goods?
+hvd.how-will-you-sell-goods.channels.auction = Auction
+hvd.how-will-you-sell-goods.channels.retail = Retail
+hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
+
+hvd.cash.payment.title = Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.title = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.heading = Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
