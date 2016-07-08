@@ -246,6 +246,7 @@ error.required.hvd.business.sell.other.details = Enter some information about th
 error.invalid.hvd.business.sell.other.details = You can''t enter more than 255 characters for the other items your business will sell.
 error.required.hvd.linked.cash.payment = Select yes or no to the question: are you able to automatically identify linked cash payments which come to €15,000 or more?
 error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
+error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -1080,3 +1081,11 @@ hvd.identify.linked.cash.payments.subtitle = If you do not use Euros, please con
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 hvd.excise.goods.heading = Will you be buying or selling duty-suspended excise goods?
+
+hvd.percentage.title = How much of your turnover do you expect to come from cash payments over €15,000?
+hvd.percentage.text = If you do not use Euros, please convert to the currency you use.
+hvd.percentage.lbl.01 = 0% to 20%
+hvd.percentage.lbl.02 = 21% to 40%
+hvd.percentage.lbl.03 = 41% to 60%
+hvd.percentage.lbl.04 = 61% to 80%
+hvd.percentage.lbl.05 = 81% to 100%
