@@ -7,6 +7,7 @@ import models.businessmatching.{BusinessMatching}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.asp.Asp
+import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
@@ -26,6 +27,7 @@ case class SubscriptionRequest(
                                 tcspSection: Option[Tcsp],
                                 aspSection: Option[Asp],
                                 msbSection: Option[MoneyServiceBusiness],
+                                hvdSection: Option[Hvd],
                                 supervisionSection:Option[Supervision]
                               )
 
