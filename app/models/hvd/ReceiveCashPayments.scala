@@ -3,21 +3,26 @@ package models.hvd
 import play.api.data.mapping._
 import play.api.data.mapping.forms._
 import play.api.libs.functional.Monoid
-import play.api.libs.json.{JsValue, Reads, Writes}
+import play.api.libs.json.{Writes, _}
 
-case class ReceiveCashPayments(paymentMethod: Option[Set[PaymentMethod]])
+case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
 sealed trait ReceiveCashPayments0 {
 
   private implicit def rule[A]
   (implicit
    b: Path => Rule[A, Boolean],
-   s: Path => Rule[A, Set[PaymentMethod]]
+   paymentMethodsR: Rule[A, PaymentMethods]
   ): Rule[A, ReceiveCashPayments] =
     From[A] { __ =>
-      (__ \ "receivePayments").read[Boolean].flatMap[Option[Set[PaymentMethod]]] {
+
+      import utils.MappingUtils.Implicits.RichRule
+
+      val booleanR = b andThen { _ withMessage "error.required.hvd.receive.cash.payments" }
+
+      (__ \ "receivePayments").read(booleanR).flatMap[Option[PaymentMethods]] {
         case true =>
-          (__ \ "paymentMethods").read[Set[PaymentMethod]] fmap Some.apply
+          paymentMethodsR.repath(_ \ "paymentMethods") fmap Some.apply
         case false =>
           Rule(_ => Success(None))
       } fmap ReceiveCashPayments.apply
@@ -26,8 +31,8 @@ sealed trait ReceiveCashPayments0 {
   private implicit def write[A]
   (implicit
    mon: Monoid[A],
-   b: Path => WriteLike[Boolean, A],
-   s: Path => WriteLike[Set[PaymentMethod], A]
+   b: Path => Write[Boolean, A],
+   paymentMethodsW: Write[PaymentMethods, A]
   ): Write[ReceiveCashPayments, A] =
     To[A] { __ =>
       (
@@ -35,11 +40,11 @@ sealed trait ReceiveCashPayments0 {
           case Some(_) => true
           case None => false
         } and
-        (__ \ "paymentMethods").write[Set[PaymentMethod]].contramap[Option[Set[PaymentMethod]]] {
-          case Some(set) => set
-          case None => Set.empty
-        }
-      )(a => (a.paymentMethod, a.paymentMethod))
+          Write[Option[PaymentMethods], A] {
+            case Some(a) => paymentMethodsW.writes(a)
+            case None => mon.identity
+          }
+      )(a => (a.paymentMethods, a.paymentMethods))
     }
 
   val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
@@ -47,10 +52,10 @@ sealed trait ReceiveCashPayments0 {
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
-  val jsonR: Rule[JsValue, ReceiveCashPayments] = {
-    import utils.JsonMapping._
-    import play.api.data.mapping.json.Rules.{JsValue => _, pickInJson => _, _}
-    implicitly[Rule[JsValue, ReceiveCashPayments]]
+  val jsonR: Reads[ReceiveCashPayments] = {
+    import play.api.data.mapping.json.Rules.{pickInJson => _, _}
+    import utils.JsonMapping.{genericJsonR, pickInJson}
+    implicitly[Reads[ReceiveCashPayments]]
   }
 
   val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
@@ -59,7 +64,7 @@ sealed trait ReceiveCashPayments0 {
   }
 
   val jsonW: Writes[ReceiveCashPayments] = {
-    import utils.JsonMapping._
+    import utils.JsonMapping.genericJsonW
     import play.api.data.mapping.json.Writes._
     implicitly[Writes[ReceiveCashPayments]]
   }

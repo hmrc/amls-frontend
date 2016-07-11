@@ -7,6 +7,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Hvd (cashPayment: Option[CashPayment] = None,
                 products: Option[Products] = None,
+                receiveCashPayments: Option[ReceiveCashPayments] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None) {
 
   def cashPayment(v: CashPayment): Hvd =
@@ -15,12 +16,15 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def products(v: Products): Hvd =
     this.copy(products = Some(v))
 
+  def receiveCashPayments(v: ReceiveCashPayments): Hvd =
+    this.copy(receiveCashPayments = Some(v))
+
   def linkedCashPayment(v: LinkedCashPayments): Hvd =
     this.copy(linkedCashPayment = Some(v))
 
   def isComplete: Boolean =
-    this match {
-      case Hvd(Some(_), Some(_), Some(_)) => true
+    this.productIterator.forall {
+      case Some(_) => true
       case _ => false
     }
 }

@@ -2,7 +2,7 @@ package utils
 
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsArray, JsObject, JsString, JsValue}
+import play.api.libs.json.{PathNode => _, _}
 
 trait JsonMapping {
 
@@ -19,31 +19,13 @@ trait JsonMapping {
     }
   }
 
-  def jsNodeToNode(n: json.PathNode): PathNode = {
-    n match {
-      case json.KeyPathNode(key) =>
-        KeyPathNode(key)
-      case json.IdxPathNode(idx) =>
-        IdxPathNode(idx)
-    }
-  }
-
   private def pathToJsPath(p: Path): JsPath =
     JsPath(p.path.map(nodeToJsNode _))
-
-  private def jsPathToPath(p: JsPath): Path =
-    Path(p.path.map(jsNodeToNode _))
 
   implicit def errorConversion(errs: Seq[(Path, Seq[ValidationError])]): Seq[(JsPath, Seq[ValidationError])] =
     errs map {
       case (path, errors) =>
         (pathToJsPath(path), errors)
-    }
-
-  implicit def errorConversion2(errs: Seq[(JsPath, Seq[ValidationError])]): Seq[(Path, Seq[ValidationError])] =
-    errs map {
-      case (path, errors) =>
-        (jsPathToPath(path), errors)
     }
 
   implicit def genericJsonR[A]
@@ -94,18 +76,6 @@ trait JsonMapping {
       }
     }.compose(r)
   }
-
-//  implicit def readsToRule[A]
-//  (implicit
-//   r: Reads[A]
-//  ): Rule[JsValue, A] =
-//    Rule {
-//      i =>
-//        r.reads(i) match {
-//          case JsSuccess(v, _) => Success(v)
-//          case JsError(errors) => Failure(errors)
-//        }
-//    }
 }
 
 object JsonMapping extends JsonMapping

@@ -89,7 +89,7 @@ trait MicroService {
       parallelExecution in IntegrationTest := false)
     .settings(SbtBuildInfo(): _*)
     .settings(resolvers ++= Seq(Resolver.bintrayRepo("hmrc", "releases"), Resolver.bintrayRepo("hmrc", "release-candidates")))
-    .settings(scalacOptions += "-Xlog-implicits")
+//    .settings(scalacOptions += "-Xlog-implicits")
 }
 
 private object TestPhases {
