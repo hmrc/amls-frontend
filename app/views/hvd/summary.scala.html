@@ -1,5 +1,6 @@
 @import include._
 @import models.hvd._
+@import utils.DateHelper
 
 @(model: Hvd)(implicit request: Request[_], lang: Lang)
 
@@ -37,41 +38,72 @@ title = Messages("summary.checkyouranswers.title")
     }
 
 
-@model.exciseGoods.map { eg =>
-    <table>
-        <tr>
-            <th>@Messages("hvd.excise.goods.heading")</th>
-            <td width="12"><a href="@controllers.hvd.routes.ExciseGoodsController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-               @if(eg.exciseGoods) {
-                    @Messages("lbl.yes")
-                } else {
-                    @Messages("lbl.no")
-                }
-            </td>
-        </tr>
-    </table>
-}
+    @model.exciseGoods.map { eg =>
+        <table>
+            <tr>
+                <th>@Messages("hvd.excise.goods.heading")</th>
+                <td width="12"><a href="@controllers.hvd.routes.ExciseGoodsController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                   @if(eg.exciseGoods) {
+                        @Messages("lbl.yes")
+                    } else {
+                        @Messages("lbl.no")
+                    }
+                </td>
+            </tr>
+        </table>
+    }
 
-@model.howWillYouSellGoods.map { goods =>
-<table>
-    <tr>
-        <th>@Messages("hvd.how-will-you-sell-goods.heading")</th>
-        <td width="12"><a href="@controllers.hvd.routes.HowWillYouSellGoodsController.get(true)">@Messages("button.edit")</a></td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            @{goods.channels.map {
-            case Retail => Messages("hvd.how-will-you-sell-goods.channels.retail")
-            case Wholesale => Messages("hvd.how-will-you-sell-goods.channels.wholesale")
-            case Auction => Messages("hvd.how-will-you-sell-goods.channels.auction")
-            }.mkString(", ")}
-        </td>
-    </tr>
-</table>
-}
+    @model.howWillYouSellGoods.map { goods =>
+        <table>
+            <tr>
+                <th>@Messages("hvd.how-will-you-sell-goods.heading")</th>
+                <td width="12"><a href="@controllers.hvd.routes.HowWillYouSellGoodsController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @{goods.channels.map {
+                    case Retail => Messages("hvd.how-will-you-sell-goods.channels.retail")
+                    case Wholesale => Messages("hvd.how-will-you-sell-goods.channels.wholesale")
+                    case Auction => Messages("hvd.how-will-you-sell-goods.channels.auction")
+                    }.mkString(", ")}
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.cashPayment.map { cp =>
+        <table>
+            <tr>
+                <th>@Messages("hvd.cash.payment.heading")</th>
+                <td width="12"><a href="@controllers.hvd.routes.CashPaymentController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            @cp match {
+                case CashPaymentYes(date) => {
+                        <tr>
+                            <td colspan="2">
+                                @Messages("lbl.yes")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                @DateHelper.formatDate(date)
+                            </td>
+                        </tr>
+                }
+                case CashPaymentNo => {
+                    <tr>
+                        <td colspan="2">
+                            @Messages("lbl.no")
+                        </td>
+                    </tr>
+                }
+            }
+
+        </table>
+    }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

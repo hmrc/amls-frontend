@@ -1052,8 +1052,6 @@ hvd.how-will-you-sell-goods.channels.auction = Auction
 hvd.how-will-you-sell-goods.channels.retail = Retail
 hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
 
-hvd.cash.payment.title = Has your business already accepted any cash payments which total of €15,000 or more?
-hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.title = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.heading = Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
