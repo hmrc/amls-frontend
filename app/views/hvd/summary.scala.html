@@ -1,14 +1,40 @@
 @import include._
 @import models.hvd._
-@import utils._
 
 @(model: Hvd)(implicit request: Request[_], lang: Lang)
 
 @main(
-    title = Messages("summary.checkyouranswers.title")
+title = Messages("summary.checkyouranswers.title")
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.hvd")
+
+    @model.products.map { p =>
+        <table>
+            <tr>
+                <th>@Messages("hvd.products.heading")</th>
+                <td width="12"><a href="@controllers.hvd.routes.ProductsController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @{p.sorted.map {
+                        case Alcohol => Messages("hvd.products.option.01")
+                        case Tobacco => Messages("hvd.products.option.02")
+                        case Antiques => Messages("hvd.products.option.03")
+                        case Cars => Messages("hvd.products.option.04")
+                        case OtherMotorVehicles => Messages("hvd.products.option.05")
+                        case Caravans => Messages("hvd.products.option.06")
+                        case Jewellery => Messages("hvd.products.option.07")
+                        case Gold => Messages("hvd.products.option.08")
+                        case ScrapMetals => Messages("hvd.products.option.09")
+                        case MobilePhones => Messages("hvd.products.option.10")
+                        case Clothing => Messages("hvd.products.option.11")
+                        case Other(x) => x
+                    }.mkString(", ")}
+                </td>
+            </tr>
+        </table>
+    }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
