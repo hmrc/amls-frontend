@@ -105,5 +105,41 @@ title = Messages("summary.checkyouranswers.title")
         </table>
     }
 
+    @model.linkedCashPayment.map { p =>
+        <table>
+            <tr>
+                <th>@Messages("hvd.identify.linked.cash.payment.heading")</th>
+                <td width="12"><a href="@controllers.hvd.routes.LinkedCashPaymentsController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @if(p.linkedCashPayments) {
+                        @Messages("lbl.yes")
+                    } else {
+                        @Messages("lbl.no")
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
+    @model.linkedCashPayment.map { p =>
+        <table>
+            <tr>
+                <th>@Messages("hvd.identify.linked.cash.payment.heading")</th>
+                <td width="12"><a href="@controllers.hvd.routes.LinkedCashPaymentsController.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @if(p.linkedCashPayments) {
+                        @Messages("lbl.yes")
+                    } else {
+                        @Messages("lbl.no")
+                    }
+                </td>
+            </tr>
+        </table>
+    }
+
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
