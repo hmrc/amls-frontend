@@ -37,10 +37,10 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             _ <- updateData[TradingPremises](index) {
               // This makes sure to save `None` for the agent section if
               // the user selects that the premises is theirs.
-              case Some(TradingPremises(_, _, wdbd, services)) if data.isOwner =>
-                Some(TradingPremises(Some(data), None, wdbd, services))
-              case Some(TradingPremises(_, ya, wdbd, services)) =>
-                Some(TradingPremises(Some(data), ya, wdbd, services))
+              case Some(tp) if data.isOwner =>
+                Some(TradingPremises(Some(data), None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+              case Some(tp) =>
+                Some(TradingPremises(Some(data), tp.yourAgent, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
               case _ => data
             }
           } yield (edit, data.isOwner) match {
