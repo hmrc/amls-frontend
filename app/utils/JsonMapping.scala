@@ -2,7 +2,7 @@ package utils
 
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsArray, JsObject, JsString, JsValue}
+import play.api.libs.json.{PathNode => _, _}
 
 trait JsonMapping {
 
@@ -10,7 +10,7 @@ trait JsonMapping {
   import play.api.libs.json.{JsPath, JsValue, Reads, Writes, JsSuccess, JsError}
   import play.api.data.mapping.{KeyPathNode, IdxPathNode, PathNode}
 
-  implicit def nodeToJsNode(n: PathNode): json.PathNode = {
+  def nodeToJsNode(n: PathNode): json.PathNode = {
     n match {
       case KeyPathNode(key) =>
         json.KeyPathNode(key)
@@ -76,9 +76,6 @@ trait JsonMapping {
       }
     }.compose(r)
   }
-
-  // This is here to shadow the `JsValue` import from the validation library
-  object JsValue
 }
 
 object JsonMapping extends JsonMapping

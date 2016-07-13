@@ -317,6 +317,18 @@ select {
   padding-bottom: 0;
 }
 
+/* Add some space under the last fieldset in a .panel-indent,
+   otherwise it butts up against the submit button.
+   I'd rather not have to do this. */
+.form-field-group-end {
+  margin-bottom: 30px;
+}
+
+.form-field-group-end .form-field-group {
+  margin-bottom: 0;
+}
+
+/* These are all prefixed with `form` to override some stuff (apparently) */
 form input[type=text].form-control {
   border: 2px solid #6f777b;
   width: 50%;
@@ -493,11 +505,12 @@ table.summary ul li {
   display: none;
 }
 
-#hasCountries-fieldset {
+fieldset.panel-indent {
+  box-sizing: border-box;
   padding-top: 10px;
 }
 
-#hasCountries-fieldset legend {
+fieldset.panel-indent legend {
   float: left;
 }
 
