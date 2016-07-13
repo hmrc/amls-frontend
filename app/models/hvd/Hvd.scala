@@ -11,16 +11,19 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class Hvd (cashPayment: Option[CashPayment] = None,
                 products: Option[Products] = None,
                 exciseGoods:  Option[ExciseGoods] = None,
-                linkedCashPayment: Option[LinkedCashPayments] = None,
 		            howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
-                percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None) {
-
+                percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
+                receiveCashPayments: Option[ReceiveCashPayments] = None,
+                linkedCashPayment: Option[LinkedCashPayments] = None) {
 
   def cashPayment(v: CashPayment): Hvd =
     this.copy(cashPayment = Some(v))
 
   def products(v: Products): Hvd =
     this.copy(products = Some(v))
+
+  def receiveCashPayments(v: ReceiveCashPayments): Hvd =
+    this.copy(receiveCashPayments = Some(v))
 
   def exciseGoods(v: ExciseGoods): Hvd =
     this.copy(exciseGoods = Some(v))
@@ -36,8 +39,8 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
   def isComplete: Boolean =
-    this match {
-      case Hvd(Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+    this.productIterator.forall {
+      case Some(_) => true
       case _ => false
     }
 }

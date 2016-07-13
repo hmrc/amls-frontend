@@ -290,3 +290,5 @@ POST        /high-value-dealer/excise-goods                             controll
 
 GET         /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
 POST        /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+GET         /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)

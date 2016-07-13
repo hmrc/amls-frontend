@@ -3,11 +3,10 @@
     jsHidden: Boolean = false,
     panel: Boolean = true,
     id: String = "",
+    classes: Seq[String] = Seq.empty,
     data: Seq[String] = Seq.empty,
     bold: Boolean = false,
-    hint: String = "",
-    classes: Seq[String] = Seq.empty
-
+    hint: String = ""
 )(content: Html)(implicit lang: Lang)
 
 <fieldset
