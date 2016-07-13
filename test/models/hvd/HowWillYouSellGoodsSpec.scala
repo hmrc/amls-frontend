@@ -11,15 +11,12 @@ class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers{
 
   val fullData = HowWillYouSellGoods(Seq(Wholesale, Retail, Auction))
   val fullForm = Map (
-      "salesChannels[0]" -> Seq("Wholesale"),
-      "salesChannels[1]" -> Seq("Retail"),
-      "salesChannels[2]" -> Seq("Auction")
+      "salesChannels[]" -> Seq("Wholesale","Retail","Auction")
   )
 
   "How will You Sell Goods" should {
     "Round trip through Json" in {
       val j = Json.toJson(fullData)
-      println(j)
       j.as[HowWillYouSellGoods] must be (fullData)
     }
 
@@ -30,6 +27,19 @@ class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers{
     "read from the expected form"  in {
       HowWillYouSellGoods.formR.validate(fullForm)  must be (Success(fullData))
     }
+
+    "round trip through Url encoded form" in {
+      HowWillYouSellGoods.formW.writes(
+        HowWillYouSellGoods.formR.validate(fullForm) match {
+          case Success(x) => x
+          case _ => HowWillYouSellGoods(Seq.empty)
+        }
+      ) must be (fullForm)
+
+      HowWillYouSellGoods.formR.validate(
+        HowWillYouSellGoods.formW.writes(fullData)
+      ) must be (Success(fullData))
+    } 
 
     "fail form validation of no channels are selected" in {
       val testForm = Map[String,Seq[String]]()

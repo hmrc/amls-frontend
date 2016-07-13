@@ -113,6 +113,7 @@ trait MappingUtils {
       Reads { _ => JsError(f) }
 
     implicit class RichRule[I, O](rule: Rule[I, O]) {
+
       def withMessage(message: String*): Rule[I, O] =
         Rule { d =>
           rule.validate(d).fail.map {
@@ -121,6 +122,23 @@ trait MappingUtils {
                 p -> (message map { m => ValidationError(m) })
             }
           }
+        }
+
+      def validateWith(msg: String = "error.invalid")(fn: O => Boolean): Rule[I, O] =
+        rule compose Rule[O, O] {
+          case a if fn(a) =>
+            Success(a)
+          case a =>
+            Failure(Seq(Path -> Seq(ValidationError(msg))))
+        }
+    }
+
+    implicit class RichWrite[I, O](w1: Write[I, O]) {
+
+      def andThen[I2](w2: Write[I2, I]): Write[I2, O] =
+        Write {
+          i =>
+            w1.writes(w2.writes(i))
         }
     }
   }
