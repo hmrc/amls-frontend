@@ -1,5 +1,6 @@
 @import include._
 @import models.hvd._
+@import models.hvd.PercentageOfCashPaymentOver15000._
 @import utils.DateHelper
 
 @(model: Hvd)(implicit request: Request[_], lang: Lang)
@@ -160,6 +161,26 @@ title = Messages("summary.checkyouranswers.title")
                     </tr>
                 }
             }
+        </table>
+    }
+
+    @model.percentageOfCashPaymentOver15000.map { p =>
+        <table>
+            <tr>
+                <th>@Messages("hvd.percentage.title")</th>
+                <td width="12"><a href="@controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true)">@Messages("button.edit")</a></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @p match {
+                        case First => {@Messages("hvd.percentage.lbl.01")}
+                        case Second => {@Messages("hvd.percentage.lbl.02")}
+                        case Third => {@Messages("hvd.percentage.lbl.03")}
+                        case Fourth => {@Messages("hvd.percentage.lbl.04")}
+                        case Fifth => {@Messages("hvd.percentage.lbl.05")}
+                    }
+                </td>
+            </tr>
         </table>
     }
 
