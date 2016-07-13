@@ -57,13 +57,9 @@ case class BusinessActivities(
   def isComplete: Boolean =
     this match {
       case BusinessActivities(
-      Some(_), Some(_), Some(_), Some(_), Some(_), Some(_),
-      Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)
-      ) => true
-      case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(x), Some(_), Some(_), Some(_), _
-      ) if !x.accountantForAMLSRegulations => true
+      ) => true
       case _ => false
     }
 }
