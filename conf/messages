@@ -1058,6 +1058,8 @@ hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert
 hvd.cash.payment.data.text = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 3 2015
 
+hvd.summary.payment.date.label = Date of first payment
+
 hvd.products.title = High Value Dealer -  What will your business sell?
 hvd.products.heading = What will your business sell?
 hvd.products.option.01 = Alcohol
