@@ -36,10 +36,7 @@ trait ExpectedBusinessTurnoverController extends BaseController {
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivities.expectedBusinessTurnover(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.ExpectedAMLSTurnoverController.get())
-          }
+          } yield Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
       }
     }
   }

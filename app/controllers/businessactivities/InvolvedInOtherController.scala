@@ -58,7 +58,7 @@ trait InvolvedInOtherController extends BaseController {
 
   private def getUpdatedBA(businessActivities: Option[BusinessActivities], data: InvolvedInOther): BusinessActivities = {
     (businessActivities, data) match {
-      case (Some(ba), InvolvedInOtherYes(_)) => ba.copy(involvedInOther = Some(data), expectedAMLSTurnover = None)
+      case (Some(ba), InvolvedInOtherYes(_)) => ba.copy(involvedInOther = Some(data))
       case (Some(ba), InvolvedInOtherNo) => ba.copy(involvedInOther = Some(data), expectedBusinessTurnover = None)
       case (_, _) => None
     }
