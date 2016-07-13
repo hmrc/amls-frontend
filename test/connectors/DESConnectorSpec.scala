@@ -35,6 +35,7 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     tcspSection = None,
     aspSection = None,
     msbSection = None,
+    hvdSection = None,
     supervisionSection = None
   )
 
