@@ -25,13 +25,15 @@
       @radio(f("receivePayments"), "lbl.no", "false")
     }
 
-    @fieldset("hvd.receiving.expect.to.receive", id = target, classes = Seq("form-field-group-end"), bold = true, hint = "lbl.select.all") {
-      @checkbox(f("courier"), "hvd.receiving.option.01", "true")
-      @checkbox(f("direct"), "hvd.receiving.option.02", "true")
-      @checkbox(f("other"), "hvd.receiving.option.03", "true", target = "#receive-payments-other")
+    @* @fieldset("hvd.receiving.expect.to.receive", id = target, classes = Seq("form-field-group-end"), bold = true, hint = "lbl.select.all") { *@
+    @radioGroup(f("paymentMethods"), classes = Seq("form-fieldform-field-group-end panel-indent")) {
+      @legend("hvd.receiving.expect.to.receive")
+      @checkbox(f("paymentMethods.courier"), "hvd.receiving.option.01", "true")
+      @checkbox(f("paymentMethods.direct"), "hvd.receiving.option.02", "true")
+      @checkbox(f("paymentMethods.other"), "hvd.receiving.option.03", "true", target = "#receive-payments-other")
 
       @fieldset("hvd.receiving.give.details", panel = false, id = "receive-payments-other") {
-        @input(f("details"))
+        @input(f("paymentMethods.details"))
       }
     }
 

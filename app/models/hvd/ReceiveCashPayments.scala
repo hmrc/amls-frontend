@@ -12,6 +12,7 @@ sealed trait ReceiveCashPayments0 {
   private implicit def rule[A]
   (implicit
    b: Path => Rule[A, Boolean],
+   aR: Path => Rule[A, A],
    paymentMethodsR: Rule[A, PaymentMethods]
   ): Rule[A, ReceiveCashPayments] =
     From[A] { __ =>
@@ -22,28 +23,42 @@ sealed trait ReceiveCashPayments0 {
 
       (__ \ "receivePayments").read(booleanR).flatMap[Option[PaymentMethods]] {
         case true =>
-          paymentMethodsR.repath(_ \ "paymentMethods") fmap Some.apply
+          // Ideally compose would repath here
+          (__ \ "paymentMethods").read[A] compose paymentMethodsR.repath((Path \ "paymentMethods") ++ _) fmap Some.apply
         case false =>
           Rule(_ => Success(None))
       } fmap ReceiveCashPayments.apply
+    }
+
+  private implicit def opW[I, O]
+  (implicit
+   mon: Monoid[O],
+   w: Write[I, O]
+  ): Write[Option[I], O] =
+    Write {
+      case Some(i) =>
+        w.writes(i)
+      case None =>
+        mon.identity
     }
 
   private implicit def write[A]
   (implicit
    mon: Monoid[A],
    b: Path => Write[Boolean, A],
-   paymentMethodsW: Write[PaymentMethods, A]
+   aW: Path => Write[A, A],
+   paymentMethodsW: Write[Option[PaymentMethods], A]
   ): Write[ReceiveCashPayments, A] =
     To[A] { __ =>
+
+      import utils.MappingUtils.Implicits.RichWrite
+
       (
         (__ \ "receivePayments").write[Boolean].contramap[Option[_]] {
           case Some(_) => true
           case None => false
         } and
-          Write[Option[PaymentMethods], A] {
-            case Some(a) => paymentMethodsW.writes(a)
-            case None => mon.identity
-          }
+          (__ \ "paymentMethods").write[A].andThen(paymentMethodsW)
       )(a => (a.paymentMethods, a.paymentMethods))
     }
 

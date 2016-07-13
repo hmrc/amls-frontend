@@ -5,6 +5,7 @@ import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.Monoid
 import play.api.libs.json.{JsObject, JsValue}
+import utils.TraversableValidators
 
 case class PaymentMethods(
                          courier: Boolean,
@@ -30,7 +31,26 @@ sealed trait PaymentMethods0 {
 
       import utils.MappingUtils.Implicits.RichRule
 
-      val detailsR = s andThen { _ withMessage "error.required.hvd.describe" }
+      val minLength = 1
+      val maxLength = 255
+
+      def minLengthR(l: Int) = Rule.zero[String].flatMap[String] {
+        case s if s.length >= l =>
+          Rule(_ => Success(s))
+        case _ =>
+          Rule(_ => Failure(Seq(Path -> Seq(ValidationError("error.minLength", l)))))
+      }
+
+      def maxLengthR(l: Int) = Rule.zero[String].flatMap[String] {
+        case s if s.length <= l =>
+          Rule(_ => Success(s))
+        case _ =>
+          Rule(_ => Failure(Seq(Path -> Seq(ValidationError("error.maxLength", l)))))
+      }
+
+      val detailsR: Rule[String, String] =
+        (minLengthR(minLength) withMessage "error.required.hvd.describe") compose
+          (maxLengthR(maxLength) withMessage "error.maxlength.hvd.describe")
 
       val booleanR = b andThen { _ fmap { case Some(b) => b; case None => false } }
 
@@ -43,11 +63,9 @@ sealed trait PaymentMethods0 {
           case false =>
             Rule(_ => Success(None))
         }
-      )(PaymentMethods.apply _).flatMap {
-        case methods if methods.courier || methods.direct || methods.other.isDefined =>
-          Rule(_ => Success(methods))
-        case methods =>
-          Rule(_ => Failure(Seq(Path -> Seq(ValidationError("error.required.hvd.choose.option")))))
+      )(PaymentMethods.apply _).validateWith("error.required.hvd.choose.option"){
+        methods =>
+          methods.courier || methods.direct || methods.other.isDefined
       }
     }
 
