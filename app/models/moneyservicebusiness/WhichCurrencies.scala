@@ -64,7 +64,6 @@ private sealed trait WhichCurrencies0 {
               case _ => Rule[A, Option[BankMoneySource]](_ => Success(None))
             }
 
-
         val wholesalerMoneySource : Rule[A, Option[WholesalerMoneySource]]=
           (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
             case Some("Yes") => (__ \ "wholesalerNames")

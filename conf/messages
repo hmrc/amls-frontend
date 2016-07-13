@@ -240,6 +240,7 @@ error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################
 error.required.hvd.accepted.cash.payment = Select yes or no to the question: has your business already accepted any cash payments which total €15,000 or more?
+error.required.hvd.how-will-you-sell-goods = Select at least one way that you will sell these goods.
 error.required.hvd.business.sell.atleast = Select at least one type of item that your business will sell.
 error.required.hvd.business.sell.other.details = Enter some information about the other items your business will sell.
 error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters for the other items your business will sell.
@@ -248,6 +249,8 @@ error.required.hvd.receive.cash.payments = Select yes or no to the question: do 
 error.required.hvd.describe = Please describe how you expect to receive these payments.
 error.maxlength.hvd.describe = You can’t enter more than 255 characters.
 error.required.hvd.choose.option = Please choose at least one option.
+error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
+error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
@@ -481,8 +484,7 @@ tradingpremises.whatyouneed.requiredinfo.text.1= the trading name and address
 tradingpremises.whatyouneed.requiredinfo.text.2= what the business does from these premises
 tradingpremises.whatyouneed.requiredinfo.text.3= the date you''ll start trading from these premises
 tradingpremises.whatyouneed.requiredinfo.text.4= if it''s a residential address
-tradingpremises.sidebar.title = Automatic saving
-tradingpremises.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
+
 tradingpremises.youragent.title=Trading premises - Who is your agent?
 tradingpremises.youragent.heading=Who is your agent?
 tradingpremises.youragent.paragraph1.text=An agent is an individual or business that works on behalf of your business to offer your services.
@@ -541,8 +543,8 @@ estateagentbusiness.penalisedbyprofessional.line_3 = suspension
 estateagentbusiness.penalisedbyprofessional.line_4 = expulsion
 estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Give a brief overview of what the penalty was, and when it occurred.
 estateagentbusiness.servicess.title = Which services does your business provide?
-estateagentbusiness.service.lbl.01 = Residential estate agent services
-estateagentbusiness.service.lbl.02 = Commercial estate agent services
+estateagentbusiness.service.lbl.01 = Residential estate agency services
+estateagentbusiness.service.lbl.02 = Commercial estate agency services
 estateagentbusiness.service.lbl.03 = Auctioneering
 estateagentbusiness.service.lbl.04 = Relocation agent services
 estateagentbusiness.service.lbl.05 = Business transfer agent services
@@ -1048,6 +1050,14 @@ hvd.whatyouneed.line_5 = if you are able to automatically identify linked cash p
 hvd.whatyouneed.line_6 = if you expect to receive cash payments of €15,000 from customers you’ve not met in person
 hvd.whatyouneed.line_7 = how much of your turnover you expect to come from cash payments over €15,000
 
+hvd.how-will-you-sell-goods.title = High Value Dealer - How will you sell these goods?
+hvd.how-will-you-sell-goods.heading = How will you sell these goods?
+hvd.how-will-you-sell-goods.channels.auction = Auction
+hvd.how-will-you-sell-goods.channels.retail = Retail
+hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
+
+hvd.cash.payment.title = Has your business already accepted any cash payments which total of €15,000 or more?
+hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.title = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.heading = Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
@@ -1081,3 +1091,15 @@ hvd.receiving.option.01 = By courier
 hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Other
 hvd.receiving.give.details = Please give details
+
+
+hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
+hvd.excise.goods.heading = Will you be buying or selling duty-suspended excise goods?
+
+hvd.percentage.title = How much of your turnover do you expect to come from cash payments over €15,000?
+hvd.percentage.text = If you do not use Euros, please convert to the currency you use.
+hvd.percentage.lbl.01 = 0% to 20%
+hvd.percentage.lbl.02 = 21% to 40%
+hvd.percentage.lbl.03 = 41% to 60%
+hvd.percentage.lbl.04 = 61% to 80%
+hvd.percentage.lbl.05 = 81% to 100%
