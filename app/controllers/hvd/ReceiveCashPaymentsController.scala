@@ -42,7 +42,7 @@ trait ReceiveCashPaymentsController extends BaseController {
               )
             } yield edit match {
               case true => Redirect(routes.SummaryController.get())
-              case false => Redirect(routes.LinkedCashPaymentsController.get())
+              case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
             }
         }
       }

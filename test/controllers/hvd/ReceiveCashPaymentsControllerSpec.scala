@@ -64,7 +64,7 @@ class ReceiveCashPaymentsControllerSpec extends PlaySpec with OneAppPerSuite wit
       val result = controller.post(false)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.LinkedCashPaymentsController.get().url)
+      redirectLocation(result) mustEqual Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
     }
   }
 }
