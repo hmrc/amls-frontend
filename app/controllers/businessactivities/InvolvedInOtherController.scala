@@ -40,11 +40,13 @@ trait InvolvedInOtherController extends BaseController {
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
-              businessActivities.involvedInOther(data)
-            )
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, getUpdatedBA(businessActivities, data))
+
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => data match {
+              case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get(edit))
+              case InvolvedInOtherNo => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
+            }
             case false => data match {
               case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get())
               case InvolvedInOtherNo => Redirect(routes.ExpectedAMLSTurnoverController.get())
@@ -53,7 +55,16 @@ trait InvolvedInOtherController extends BaseController {
       }
     }
   }
+
+  private def getUpdatedBA(businessActivities: Option[BusinessActivities], data: InvolvedInOther): BusinessActivities = {
+    (businessActivities, data) match {
+      case (Some(ba), InvolvedInOtherYes(_)) => ba.copy(involvedInOther = Some(data), expectedAMLSTurnover = None)
+      case (Some(ba), InvolvedInOtherNo) => ba.copy(involvedInOther = Some(data), expectedBusinessTurnover = None)
+      case (_, _) => None
+    }
+  }
 }
+
 
 object InvolvedInOtherController extends InvolvedInOtherController {
   // $COVERAGE-OFF$
