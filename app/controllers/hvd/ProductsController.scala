@@ -44,7 +44,7 @@ trait ProductsController extends BaseController {
               } else {
                 edit match {
                   case true => Redirect(routes.SummaryController.get())
-                  case false => Redirect(routes.CashPaymentController.get(edit))
+                  case false => Redirect(routes.HowWillYouSellGoodsController.get(edit))
                 }
               }
             }
