@@ -60,7 +60,7 @@ trait InvolvedInOtherController extends BaseController {
     (businessActivities, data) match {
       case (Some(ba), InvolvedInOtherYes(_)) => ba.copy(involvedInOther = Some(data))
       case (Some(ba), InvolvedInOtherNo) => ba.copy(involvedInOther = Some(data), expectedBusinessTurnover = None)
-      case (_, _) => None
+      case (_, _) => BusinessActivities(involvedInOther= Some(data))
     }
   }
 }
