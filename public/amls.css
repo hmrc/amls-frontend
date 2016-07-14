@@ -29,6 +29,10 @@
   margin-top: 0;
 }
 
+.grid-layout {
+  table-layout: fixed;
+}
+
 /* qualified attribute selector required here, otherwise
    all text colour takes on regular anchor colour  */
 a.progress-step {
@@ -38,6 +42,7 @@ a.progress-step {
   display: flex; /* for everything else */
   margin-bottom: 0;
   padding: 0;
+  overflow: hidden; /* fix for firefox focus bug */
   position: relative;
   text-decoration: none;
   transition: .25s ease-in;
@@ -59,6 +64,12 @@ a.progress-step {
   color: #2e8aca;
 }
 
+/* this fixes a layout issue in Firefox */
+.progress-step--status,
+.progress-step--details {
+  display: block;
+}
+
 .progress-step--details {
   background: #f8f8f8;
   border-bottom: #dee0e2 solid 3px;
@@ -71,7 +82,8 @@ a.progress-step {
 }
 
 .progress-step--status {
-  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 90% / 33%;
+  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 90%;
+  background-size: 33%;
   border-bottom: 3px solid #dee0e2;
   color: #6f777b;
   padding: 0;
@@ -108,7 +120,8 @@ a.progress-step {
 }
 
 .progress-step--status__completed {
-  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50% / 33%;
+  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50%;
+  background-size: 33%;
   transition: none;
 }
 
@@ -131,8 +144,16 @@ a.progress-step {
   padding: 15px 15px 0;
 }
 
-.lte-ie8 .grid-layout {
-  table-layout: fixed;
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  /* IE10+ hacks here */
+  .progress-step--status {
+    background-position: 110%;
+    background-size: 66%;
+  }
+  .progress-step--status__completed {
+    background-position: 50%;
+    background-size: 50%;
+  }
 }
 
 @media screen and (max-width: 640px) {
@@ -161,6 +182,42 @@ a.progress-step {
   .progress-step--status__not-started {
     background-size: 25%;
   }
+}
+
+/* Having to specify these widths for IE8 until a better fix appears.
+   We can get away with this because IE8 isn't responsive */
+.lte-ie8 .progress-step:before,
+.lte-ie8 .progress-step:after {
+  content: '';
+  display: table;
+}
+
+.lte-ie8 .progress-step:after {
+  clear: both;
+}
+
+.lte-ie8 .progress-step {
+  *zoom: 1;
+}
+
+.lte-ie8 .progress-step--status {
+  min-height: 105px;
+  width: 213px;
+}
+
+.lte-ie8 .progress-step--status__started,
+.lte-ie8 .progress-step--status__not-started {
+  margin-top: 5px;
+  min-height: 125px;
+}
+
+.lte-ie8 .progress-step--details {
+  width: 427px;
+}
+
+.lte-ie8 .progress-step--status,
+.lte-ie8 .progress-step--details {
+  float: left;
 }
 
 /* Having to specify these widths for IE8 until a better fix appears.
@@ -269,9 +326,9 @@ th.numeric {
 /* adding this for now
  * TODO: we really need to re-jig the markup for this */
 @media screen and (max-width: 640px) {
-    .user-attention {
-        margin: 0;
-    }
+  .user-attention {
+    margin: 0;
+  }
 }
 
 /* postcode */
@@ -351,10 +408,10 @@ form .inline .block-label + fieldset {
 }
 
 form .date .form-field {
-  width: 60px;
+  clear: none;
   float: left;
   margin-right: 20px;
-  clear: none;
+  width: 60px;
 }
 
 form .date .form-field input[type=text] {
@@ -385,10 +442,10 @@ table.summary ul li {
 
 /* icons */
 .icon {
-    display: inline-block;
-    height: 25px;
-    margin-right: 10px;
-    width: 25px;
+  display: inline-block;
+  height: 25px;
+  margin-right: 10px;
+  width: 25px;
 }
 
 .notice {
@@ -467,22 +524,6 @@ table.summary ul li {
 .locked,
 .heading-secondary {
   color: #6f777b;
-}
-
-.visibly-hidden {
-  position: absolute;
-  left: -9999px;
-  width: 100px;
-  height: auto;
-  overflow: hidden;
-}
-
-.no-padding {
-  padding-left: 0;
-}
-
-.no-margin {
-  margin-left: 0;
 }
 
 .panel-border-wide {
