@@ -71,7 +71,7 @@ class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPe
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.CashPaymentController.get().url))
+      redirectLocation(result) must be(Some(routes.ExciseGoodsController.get().url))
     }
 
     "successfully navigate to next page when the option other then alcohol and tobacco selected " in new Fixture {
@@ -89,8 +89,9 @@ class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPe
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.ProductsController.get().url))
+      redirectLocation(result) must be(Some(routes.CashPaymentController.get().url))
     }
+
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(

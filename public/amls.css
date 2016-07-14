@@ -220,6 +220,31 @@ a.progress-step {
   float: left;
 }
 
+/* Having to specify these widths for IE8 until a better fix appears.
+   We can get away with this because IE8 isn't responsive */
+
+.lte-ie8 .progress-step--status {
+  width: 213.66px;
+}
+
+.lte-ie8 .progress-step--details {
+  width: 427.33px;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+/* IE10+ hacks here, because it explodes otherwise
+   Taking the same approach as with IE8, until a better solution arrives */
+
+  .progress-step--status {
+    width: 213.66px;
+  }
+
+  .progress-step--details {
+    width: 427.33px;
+  }
+
+}
+
 /* -- // application progress page -- */
 
 

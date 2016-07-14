@@ -3,15 +3,16 @@
     jsHidden: Boolean = false,
     panel: Boolean = true,
     id: String = "",
+    classes: Seq[String] = Seq.empty,
     data: Seq[String] = Seq.empty,
     bold: Boolean = false,
     hint: String = ""
-
 )(content: Html)(implicit lang: Lang)
 
 <fieldset
   class="@if(panel) {panel-indent}
-  @if(jsHidden) {amls-js-hidden}"
+  @if(jsHidden) {amls-js-hidden}
+  @classes.mkString(" ")"
   @if(id.nonEmpty) {id="@id"}
   @data.mkString(" ")
   >
