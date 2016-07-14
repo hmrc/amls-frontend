@@ -38,13 +38,13 @@ trait ProductsController extends BaseController {
               _ <- dataCacheConnector.save[Hvd](Hvd.key,
                 hvd.products(data)
               )
-            } yield edit match {
-              case true => Redirect(routes.SummaryController.get())
-              case false => {
-                if (data.items.contains(Alcohol) | data.items.contains(Tobacco)) {
-                  Redirect(routes.ExciseGoodsController.get())
-                } else {
-                  Redirect(routes.CashPaymentController.get())
+            } yield {
+              if (data.items.contains(Alcohol) | data.items.contains(Tobacco)) {
+                Redirect(routes.ExciseGoodsController.get(edit))
+              } else {
+                edit match {
+                  case true => Redirect(routes.SummaryController.get())
+                  case false => Redirect(routes.CashPaymentController.get(edit))
                 }
               }
             }
