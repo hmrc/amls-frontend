@@ -1056,13 +1056,13 @@ hvd.how-will-you-sell-goods.channels.auction = Auction
 hvd.how-will-you-sell-goods.channels.retail = Retail
 hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
 
-hvd.cash.payment.title = Has your business already accepted any cash payments which total of €15,000 or more?
-hvd.cash.payment.heading = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.title = High Value Dealer - Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.heading = Has your business already accepted any cash payments which total of €15,000 or more?
 hvd.cash.payment.convert.currency.text = If you do not use Euros, please convert to the currency you use.
 hvd.cash.payment.data.text = What was the date of the first payment?
 hvd.cash.payment.date.example = For example, 31 3 2015
+
+hvd.summary.payment.date.label = Date of first payment
 
 hvd.products.title = High Value Dealer - What will your business sell?
 hvd.products.heading = What will your business sell?
