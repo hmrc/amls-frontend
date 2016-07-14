@@ -9,7 +9,11 @@ import play.api.libs.json.Reads.StringReads
 import play.api.data.mapping.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 
-case class Products(items: Set[ItemType])
+case class Products(items: Set[ItemType]) {
+  def sorted = {
+    items.toSeq.sortBy( it => it.value)
+  }
+}
 
 sealed trait ItemType {
   val value: String =
@@ -53,7 +57,7 @@ case object Clothing extends ItemType
 
 case class Other(details: String) extends ItemType
 
-object Products {
+object Products{
 
   import utils.MappingUtils.Implicits._
 
