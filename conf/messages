@@ -296,6 +296,7 @@ lbl.start.date = Start date:
 lbl.end.date = End date:
 lbl.select.all = Select all that apply
 lbl.list.upto.3.countries = List up to 3 countries
+lbl.vat.reg.number = VAT registration number:
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
