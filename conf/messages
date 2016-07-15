@@ -358,8 +358,8 @@ progress.visuallyhidden.not.started = This section needs starting.
 progress.visuallyhidden.started = This section needs completing.
 progress.visuallyhidden.completed = This section has been completed.
 progress.visuallyhidden.approximately = This section will take approximately
-progress.visuallyhidden.edit = You can edit this section via this link
-progress.visuallyhidden.continue = You can continue this section via this link
+progress.visuallyhidden.edit = You can edit this section.
+progress.visuallyhidden.continue = You can continue this section.
 
 #### Confirmation page ####
 confirmation.lede = You have submitted the application.

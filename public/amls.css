@@ -33,6 +33,59 @@
   table-layout: fixed;
 }
 
+/* -- Progress Step -- */
+
+/* -- Progress Step: assets -- */
+.progress-step--status,
+.no-svg .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
+  background-position: 90%;
+  background-repeat: no-repeat;
+  background-size: 33%;
+}
+
+.no-svg .progress-step--status {
+  background-image: url("/anti-money-laundering/assets/icons/chevron.png");
+}
+
+.progress-step--status__started,
+.progress-step:focus .progress-step--status__started,
+.progress-step:focus .progress-step--status__not-started,
+.progress-step:hover .progress-step--status__started,
+.progress-step:hover .progress-step--status__not-started {
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
+}
+
+.no-svg .progress-step--status__started,
+.no-svg .progress-step--status__not-started,
+.no-svg .progress-step:focus .progress-step--status__started,
+.no-svg .progress-step:focus .progress-step--status__not-started,
+.no-svg .progress-step:hover .progress-step--status__started,
+.no-svg .progress-step:hover .progress-step--status__not-started {
+  background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
+}
+
+.no-svg .progress-step--status,
+.no-svg .progress-step:focus .progress-step--status__started,
+.no-svg .progress-step:focus .progress-step--status__not-started,
+.no-svg .progress-step:hover .progress-step--status__started,
+.no-svg .progress-step:hover .progress-step--status__not-started,
+.no-svg .progress-step--status__completed {
+  background-repeat: no-repeat;
+}
+
+.progress-step--status__completed,
+.no-svg .progress-step--status__completed {
+  background-image: url("/anti-money-laundering/assets/icons/tick.svg");
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: 33%;
+}
+
+.no-svg .progress-step--status__completed {
+  background-image: url("/anti-money-laundering/assets/icons/tick.png");
+}
+
 /* qualified attribute selector required here, otherwise
    all text colour takes on regular anchor colour  */
 a.progress-step {
@@ -64,12 +117,19 @@ a.progress-step {
   color: #2e8aca;
 }
 
-/* this fixes a layout issue in Firefox */
+a.progress-step,
+.progress-step--status,
+.progress-step--details {
+  box-sizing: border-box;
+}
+
+/* this fixes a layout issue in IE & Firefox */
 .progress-step--status,
 .progress-step--details {
   display: block;
 }
 
+/* -- Progress Step: details -- */
 .progress-step--details {
   background: #f8f8f8;
   border-bottom: #dee0e2 solid 3px;
@@ -81,9 +141,8 @@ a.progress-step {
   padding-bottom: 10px;
 }
 
+/* -- Progress Step: status -- */
 .progress-step--status {
-  background: url("/anti-money-laundering/assets/icons/chevron.svg") no-repeat 90%;
-  background-size: 33%;
   border-bottom: 3px solid #dee0e2;
   color: #6f777b;
   padding: 0;
@@ -91,57 +150,39 @@ a.progress-step {
   transition: .25s ease-in;
 }
 
-.no-svg .progress-step--status {
-  background-image: url("/anti-money-laundering/assets/icons/chevron.png");
-  background-position: 90%;
-}
-
-.progress-step--status__completed,
-.progress-step:focus .progress-step--status__completed,
-.progress-step:hover .progress-step--status__completed {
-  border-bottom-color: #28a197;
-}
-
-.progress-step:focus .progress-step--status__started,
 .progress-step:focus .progress-step--status__not-started,
-.progress-step:hover .progress-step--status__started,
-.progress-step:hover .progress-step--status__not-started {
-  background-color: #006435;
-  background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
-  border-bottom-color: #01552e;
+.progress-step:hover .progress-step--status__not-started,
+.progress-step--status__started,
+.progress-step:focus .progress-step--status__started,
+.progress-step:hover .progress-step--status__started {
   color: #fff;
-}
-
-.no-svg .progress-step:focus .progress-step--status__started,
-.no-svg .progress-step:focus .progress-step--status__not-started,
-.no-svg .progress-step:hover .progress-step--status__started,
-.no-svg .progress-step:hover .progress-step--status__not-started {
-  background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
-}
-
-.progress-step--status__completed {
-  background: #28a197 url("/anti-money-laundering/assets/icons/tick.svg") no-repeat 50%;
-  background-size: 33%;
-  transition: none;
-}
-
-.no-svg .progress-step--status__completed {
-  background-color: #28a197;
-  background-image: url("/anti-money-laundering/assets/icons/tick.png");
-  background-position: 50%;
-}
-
-.no-svg .progress-step--status,
-.no-svg .progress-step:focus .progress-step--status__started,
-.no-svg .progress-step:focus .progress-step--status__not-started,
-.no-svg .progress-step:hover .progress-step--status__started,
-.no-svg .progress-step:hover .progress-step--status__not-started,
-.no-svg .progress-step--status__completed {
-  background-repeat: no-repeat;
 }
 
 .progress-step--status-time {
   padding: 15px 15px 0;
+}
+
+/* -- Progress Step: not started -- */
+.progress-step:focus .progress-step--status__not-started,
+.progress-step:hover .progress-step--status__not-started,
+.progress-step:focus .progress-step--status__started,
+.progress-step:hover .progress-step--status__started {
+  background-color: #006435;
+  border-bottom-color: #01552e;
+}
+
+/* -- Progress Step: started -- */
+.progress-step--status__started {
+  background-color: #f47738;
+  border-bottom-color: #f9641a;
+}
+
+/* -- Progress Step: completed -- */
+.progress-step--status__completed,
+.progress-step:focus .progress-step--status__completed,
+.progress-step:hover .progress-step--status__completed {
+  background-color: #28a197;
+  border-bottom-color: #088277;
 }
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -201,17 +242,17 @@ a.progress-step {
 }
 
 .lte-ie8 .progress-step--status {
-  min-height: 105px;
   width: 213px;
 }
 
+.lte-ie8 .progress-step--status,
 .lte-ie8 .progress-step--status__started,
 .lte-ie8 .progress-step--status__not-started {
-  margin-top: 5px;
-  min-height: 125px;
+  min-height: 130px;
 }
 
 .lte-ie8 .progress-step--details {
+  min-height: 110px;
   width: 427px;
 }
 
@@ -220,33 +261,7 @@ a.progress-step {
   float: left;
 }
 
-/* Having to specify these widths for IE8 until a better fix appears.
-   We can get away with this because IE8 isn't responsive */
-
-.lte-ie8 .progress-step--status {
-  width: 213.66px;
-}
-
-.lte-ie8 .progress-step--details {
-  width: 427.33px;
-}
-
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-/* IE10+ hacks here, because it explodes otherwise
-   Taking the same approach as with IE8, until a better solution arrives */
-
-  .progress-step--status {
-    width: 213.66px;
-  }
-
-  .progress-step--details {
-    width: 427.33px;
-  }
-
-}
-
 /* -- // application progress page -- */
-
 
 /* vvv added the below until we update assets-frontend vvv */
 /********************************************************************/
