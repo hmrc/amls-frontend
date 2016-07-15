@@ -27,7 +27,7 @@ trait InvolvedInOtherController extends BaseController {
               businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               involvedInOther <- businessActivities.involvedInOther
             } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching)))
-              .getOrElse (Ok(involved_in_other_name(EmptyForm, edit, businessMatching)))
+              .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching)))
           }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
       }
   }
@@ -42,15 +42,9 @@ trait InvolvedInOtherController extends BaseController {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, getUpdatedBA(businessActivities, data))
 
-          } yield edit match {
-            case true => data match {
-              case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get(edit))
-              case InvolvedInOtherNo => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
-            }
-            case false => data match {
-              case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get())
-              case InvolvedInOtherNo => Redirect(routes.ExpectedAMLSTurnoverController.get())
-            }
+          } yield data match {
+            case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get(edit))
+            case InvolvedInOtherNo => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
           }
       }
     }
@@ -60,11 +54,10 @@ trait InvolvedInOtherController extends BaseController {
     (businessActivities, data) match {
       case (Some(ba), InvolvedInOtherYes(_)) => ba.copy(involvedInOther = Some(data))
       case (Some(ba), InvolvedInOtherNo) => ba.copy(involvedInOther = Some(data), expectedBusinessTurnover = None)
-      case (_, _) => BusinessActivities(involvedInOther= Some(data))
+      case (_, _) => BusinessActivities(involvedInOther = Some(data))
     }
   }
 }
-
 
 object InvolvedInOtherController extends InvolvedInOtherController {
   // $COVERAGE-OFF$
