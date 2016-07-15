@@ -10,23 +10,23 @@ GET         /unauthorised                                               controll
 
 GET         /registration-progress                                      controllers.RegistrationProgressController.get()
 
-GET         /business-details/contacting-you                            controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
-POST        /business-details/contacting-you                            controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
+GET         /about-the-business/correspondence-address                  controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
+POST        /about-the-business/correspondence-address                  controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
-GET         /business-details/previously-registered                     controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/previously-registered                     controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
+GET         /about-the-business/previously-registered                   controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
+POST        /about-the-business/previously-registered                   controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-details/vat                                       controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/vat                                       controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
+GET         /about-the-business/vat                                     controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
+POST        /about-the-business/vat                                     controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
 
-GET         /business-details/corporation-tax                           controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
-POST        /business-details/corporation-tax                           controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
+GET         /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
+POST        /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
 GET         /business-details/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /business-details/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
-GET         /business-details/new-registered-office                     controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /business-details/new-registered-office                     controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
 
 GET         /business-details/correspondence-address                    controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
 POST        /business-details/correspondence-address                    controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
@@ -34,9 +34,9 @@ POST        /business-details/correspondence-address                    controll
 GET         /about-the-business/activities                              controllers.aboutthebusiness.ActivityStartDateController.get(edit: Boolean ?= false)
 POST        /about-the-business/activities                              controllers.aboutthebusiness.ActivityStartDateController.post(edit: Boolean ?= false)
 
-GET         /business-details/index                                     controllers.aboutthebusiness.WhatYouNeedController.get()
+GET         /about-the-business/what-you-need                           controllers.aboutthebusiness.WhatYouNeedController.get()
 
-GET         /business-details/summary                                   controllers.aboutthebusiness.SummaryController.get()
+GET         /about-the-business/check-your-answers                      controllers.aboutthebusiness.SummaryController.get()
 
 GET         /trading-premises/index/:index                              controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
@@ -84,7 +84,7 @@ POST        /business-matching/registration-number                      controll
 
 GET         /business-matching/check-your-answers                       controllers.businessmatching.SummaryController.get()
 
-GET         /bank-details/index/:index                                  controllers.bankdetails.WhatYouNeedController.get(index: Int)
+GET         /bank-details/what-you-need/:index                          controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
 GET         /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
