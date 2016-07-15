@@ -36,26 +36,29 @@ title = Messages("summary.checkyouranswers.title")
                 </td>
             </tr>
         </table>
+
+        @if(p.items.contains(Alcohol) | p.items.contains(Tobacco)) {
+            @model.exciseGoods.map { eg =>
+                <table>
+                    <tr>
+                        <th>@Messages("hvd.excise.goods.heading")</th>
+                        <td width="12"><a href="@controllers.hvd.routes.ExciseGoodsController.get(true)">@Messages("button.edit")</a></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @if(eg.exciseGoods) {
+                            @Messages("lbl.yes")
+                            } else {
+                            @Messages("lbl.no")
+                            }
+                        </td>
+                    </tr>
+                </table>
+            }
+        }
     }
 
 
-    @model.exciseGoods.map { eg =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.excise.goods.heading")</th>
-                <td width="12"><a href="@controllers.hvd.routes.ExciseGoodsController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                   @if(eg.exciseGoods) {
-                        @Messages("lbl.yes")
-                    } else {
-                        @Messages("lbl.no")
-                    }
-                </td>
-            </tr>
-        </table>
-    }
 
     @model.howWillYouSellGoods.map { goods =>
         <table>
