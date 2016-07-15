@@ -39,8 +39,10 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
   def isComplete: Boolean =
-    this.productIterator.forall {
-      case Some(_) => true
+    this match {
+      case Hvd(Some(_), Some(products), _, Some(_), Some(_), Some(_), Some(_))
+        if (products.items.forall(item => item != Alcohol && item != Tobacco)) => true
+      case Hvd(Some(_), Some(products), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
       case _ => false
     }
 }
