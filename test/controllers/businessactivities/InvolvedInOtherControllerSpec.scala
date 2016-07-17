@@ -101,6 +101,23 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       redirectLocation(result) must be(Some(routes.ExpectedAMLSTurnoverController.get().url))
     }
 
+    "on post with valid data with option no in edit mode" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "involvedInOther" -> "false"
+      )
+
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+    }
+
     "on post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -144,7 +161,7 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.ExpectedBusinessTurnoverController.get(true).url))
     }
   }
 }

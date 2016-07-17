@@ -44,7 +44,10 @@ trait InvolvedInOtherController extends BaseController {
 
           } yield data match {
             case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get(edit))
-            case InvolvedInOtherNo => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
+            case InvolvedInOtherNo => edit match {
+              case false => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
+              case true => Redirect(routes.SummaryController.get())
+            }
           }
       }
     }
