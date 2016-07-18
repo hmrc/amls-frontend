@@ -83,7 +83,7 @@ class VATRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with Mock
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
       }
 
       "go to CorporationTaxRegistered if customer is not a partnership" in new Fixture {
