@@ -296,6 +296,7 @@ lbl.start.date = Start date:
 lbl.end.date = End date:
 lbl.select.all = Select all that apply
 lbl.list.upto.3.countries = List up to 3 countries
+lbl.vat.reg.number = VAT registration number:
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -367,7 +368,7 @@ confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now have 30 days to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
 confirmation.fee = Your registration fee:
 confirmation.breakdown = How your registration fee has been calculated:
-confirmation.sidebar.code = Confirmation code: {0}
+confirmation.sidebar.code = Reference number: {0}
 confirmation.sidebar.lede = You have registered for anti-money laundering supervision, pending payment.
 confirmation.sidebar.contact = Quote this code if you need to contact HM Revenue and Customs about your registration.
 confirmation.quantity = Quantity

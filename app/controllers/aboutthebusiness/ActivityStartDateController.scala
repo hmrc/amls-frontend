@@ -38,7 +38,7 @@ trait ActivityStartDateController extends BaseController {
             )
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.VATRegisteredController.get(edit))
+            case false => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
           }
         }
       }

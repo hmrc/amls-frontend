@@ -44,9 +44,9 @@ trait VATRegisteredController extends BaseController {
                 dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
                   aboutTheBusiness.vatRegistered(data))
                 (businessType, edit) match {
-                  case (Partnership, false) => Redirect(routes.RegisteredOfficeController.get())
-                  case (_, false) => Redirect(routes.CorporationTaxRegisteredController.get())
-                  case (_, true) => Redirect(routes.SummaryController.get())
+                  case (Partnership, false) => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
+                  case (Partnership, true) => Redirect(routes.SummaryController.get())
+                  case (_, _) => Redirect(routes.CorporationTaxRegisteredController.get(edit))
                 }
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }

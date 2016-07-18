@@ -4,9 +4,10 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegistered}
-import models.businessmatching.BusinessMatching
+import models.aboutthebusiness._
+import models.businessmatching.{BusinessType, BusinessMatching}
 import models.businessmatching.BusinessType._
+import play.api.mvc.Result
 import utils.ControllerHelper
 import views.html.aboutthebusiness._
 
@@ -42,16 +43,30 @@ trait PreviouslyRegisteredController extends BaseController {
                 aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
               } yield {
                 dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-                  aboutTheBusiness.previouslyRegistered(data))
-                (businessType, edit) match {
-                    case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, false) =>
-                        Redirect(routes.ActivityStartDateController.get(edit))
-                    case (_, true) => Redirect(routes.SummaryController.get())
-                    case (_, _) => Redirect(routes.ConfirmRegisteredOfficeController.get())
-                  }
+                  getUpdatedModel(businessType, aboutTheBusiness, data))
+                getRouting(businessType, edit, data)
               }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
       }
+    }
+  }
+
+  private def getUpdatedModel(businessType: BusinessType, aboutTheBusiness: AboutTheBusiness, data: PreviouslyRegistered): AboutTheBusiness = {
+    data match {
+      case PreviouslyRegisteredYes(_) => aboutTheBusiness.copy(previouslyRegistered = Some(data), activityStartDate = None)
+      case PreviouslyRegisteredNo => aboutTheBusiness.copy(previouslyRegistered = Some(data), vatRegistered = None, corporationTaxRegistered = None)
+    }
+  }
+
+  private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
+    (businessType, edit, data) match {
+      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, _, PreviouslyRegisteredYes(_)) =>
+          Redirect (routes.VATRegisteredController.get (edit))
+      case (_, _, PreviouslyRegisteredNo) =>
+        Redirect (routes.ActivityStartDateController.get (edit))
+      case (_, true, PreviouslyRegisteredYes(_)) => Redirect(routes.SummaryController.get())
+      case (_, false, PreviouslyRegisteredYes(_)) =>
+        Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
     }
   }
 }
