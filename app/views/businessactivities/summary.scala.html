@@ -277,16 +277,20 @@
                     <td width="12"><a href="@controllers.businessactivities.routes.WhoIsYourAccountantController.get(true)">@Messages("button.edit")</a></td>
                 </tr>
                 @model.whoIsYourAccountant.map {accountant=>
-                    <tr>
-                        <td colspan="2">
-                            @accountant.accountantsName
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @accountant.accountantsTradingName
-                        </td>
-                    </tr>
+                    @if(!accountant.accountantsName.isEmpty) {
+                        <tr>
+                            <td colspan="2">
+                                @accountant.accountantsName
+                            </td>
+                        </tr>
+                    }
+                    @if(!accountant.accountantsTradingName.isEmpty){
+                        <tr>
+                            <td colspan="2">
+                                @accountant.accountantsTradingName
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         <td colspan="2">
                             @accountant.address.toLines.map {line=>
