@@ -38,7 +38,7 @@
                         @Messages("progress.declarationunavailable")
                     }
                 </p>
-                <form method="get" action="@controllers.declaration.routes.AddPersonController.get.url">
+                <form method="get" action="@controllers.declaration.routes.WhoIsRegisteringController.get.url">
                     <input type="submit" value="@Messages("progress.submit")" @if(!declarationAvailable) {disabled} class="button"></input>
                 </form>
             </div>

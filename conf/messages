@@ -70,7 +70,6 @@ error.invalid.bm.registration.number = Enter a valid company registration number
 error.required.bm.businesstype.type = Enter your type of business.
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 
-
 ###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
 error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
@@ -98,7 +97,6 @@ error.invalid.bankdetails.iban =  Enter a valid IBAN number. It must only be num
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
 error.invalid.bankdetails.account = Enter a valid account number. It must only be numbers or letters, and it can’t be more than 40 characters long. Do not enter punctuation or other characters.
 error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
-
 
 ###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
@@ -252,6 +250,9 @@ error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
 error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
 
+################################# Declaration #####################################
+error.required.declaration.who.is.registering = Select who is making the declaration. If none of the people listed are making the declaration, select ’The person is not listed above’.
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
@@ -275,6 +276,7 @@ missing.dataItem = Unknown
 lbl.other = Other
 lbl.yes = Yes
 lbl.no = No
+lbl.or = or
 lbl.your_name = Your name
 lbl.first_name = First name
 lbl.middle_name  = Middle name, if applicable
@@ -296,6 +298,7 @@ lbl.start.date = Start date:
 lbl.end.date = End date:
 lbl.select.all = Select all that apply
 lbl.list.upto.3.countries = List up to 3 countries
+lbl.some.one.else = Someone else
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -726,6 +729,8 @@ declaration.declaration.tellhmrc = I understand that the business must tell HMRC
 declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
 declaration.declaration.confirm = I confirm that I have read and understood the
 declaration.declaration.guidance = guidance
+declaration.who.is.registering.title = Who is registering this business?
+declaration.who.is.registering.text = One person must take responsibility for the accuracy of this anti-money laundering supervision registration.
 
 responsiblepeople.whatyouneed.title = Responsible People - What you need
 responsiblepeople.whatyouneed.heading = What you need
