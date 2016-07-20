@@ -21,7 +21,7 @@
         @radioGroup(f("person")) {
             @legend("", jsHidden = false)
 
-            @model.map { person =>
+            @model.map { people =>
                 @people.personName.map { obj =>
                     @radio(f("person"), obj.firstName+" "+obj.lastName, obj.firstName+obj.lastName)
                 }
