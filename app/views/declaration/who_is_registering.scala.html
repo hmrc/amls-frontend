@@ -18,16 +18,16 @@
             @Messages("declaration.who.is.registering.text")
         </p>
 
-        @radioGroup(f("people")) {
+        @radioGroup(f("person")) {
             @legend("", jsHidden = false)
 
-            @model.map { people =>
+            @model.map { person =>
                 @people.personName.map { obj =>
-                    @radio(f("people"), obj.firstName+" "+obj.lastName, obj.firstName+obj.lastName)
+                    @radio(f("person"), obj.firstName+" "+obj.lastName, obj.firstName+obj.lastName)
                 }
             }
             <p class="form-block">@Messages("lbl.or")</p>
-            @radio(f("people"), Messages("lbl.some.one.else"), "-1")
+            @radio(f("person"), Messages("lbl.some.one.else"), "-1")
         }
         @submit()
     }

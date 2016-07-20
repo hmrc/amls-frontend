@@ -31,7 +31,7 @@ trait WhoIsRegisteringController extends BaseController {
 
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
-    val rp = responsiblePeople.filter(_.personName.exists(name=> whoIsRegistering.people.equals(name.firstName.concat(name.lastName)))).head
+    val rp = responsiblePeople.filter(_.personName.exists(name=> whoIsRegistering.person.equals(name.firstName.concat(name.lastName)))).head
     rp.personName match {
       case Some(name) => Some(AddPerson(name.firstName, name.middleName, name.lastName,
         rp.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)))
@@ -69,7 +69,7 @@ trait WhoIsRegisteringController extends BaseController {
                 whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
               } yield {
                 dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
-                data.people match {
+                data.person match {
                   case "-1" => {
                     dataCacheConnector.save[AddPerson](AddPerson.key, AddPerson("", None, "", BeneficialShareholder))
                     Redirect(routes.AddPersonController.get())
