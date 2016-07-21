@@ -89,8 +89,8 @@ GET         /bank-details/what-you-need/:index                          controll
 GET         /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
 
-GET         /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
-POST        /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
+GET         /bank-details/account-details/:flow/:index                  controllers.bankdetails.BankAccountController.get(index:Int, flow: _root_.utils.RepeatingSectionFlow)
+POST        /bank-details/account-details/:flow/:index                  controllers.bankdetails.BankAccountController.post(index:Int, flow: _root_.utils.RepeatingSectionFlow)
 
 GET         /bank-details/check-your-answers                            controllers.bankdetails.SummaryController.get()
 

@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
 import models.bankdetails.{BankAccountType, BankDetails}
-import utils.RepeatingSection
+import utils.{RepeatingSectionFlow, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -37,7 +37,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
               }
           } yield {
               data match {
-                case Some(_) => Redirect(routes.BankAccountController.get(index))
+                case Some(_) => Redirect(routes.BankAccountController.get(index, if (edit) RepeatingSectionFlow.Edit else RepeatingSectionFlow.Add))
                 case _ => Redirect(routes.SummaryController.get())
               }
           }

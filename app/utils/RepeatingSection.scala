@@ -28,6 +28,21 @@ trait RepeatingSection {
     }
 
   def getData[T]
+  (index: Int)
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Future[Option[T]] = {
+    getData[T] map {
+      case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
+      case _ => None
+    }
+  }
+
+  def getData[T]
   (cache: CacheMap)
   (implicit
    user: AuthContext,
@@ -40,20 +55,6 @@ trait RepeatingSection {
       .fold(Seq.empty[T]) {
         identity
       }
-
-  def updateData[T]
-  (cache: CacheMap, index: Int)
-  (fn: Option[T] => Option[T])
-  (implicit
-   user: AuthContext,
-   hc: HeaderCarrier,
-   formats: Format[T],
-   key: MongoKey[T],
-   ec: ExecutionContext
-  ): Future[_] = {
-    val data = getData[T](cache)
-    putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
-  }
 
   def getData[T]
   (implicit
@@ -70,19 +71,18 @@ trait RepeatingSection {
     }
   }
 
-  def getData[T]
-  (index: Int)
+  def updateData[T]
+  (cache: CacheMap, index: Int)
+  (fn: Option[T] => Option[T])
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
    formats: Format[T],
    key: MongoKey[T],
    ec: ExecutionContext
-  ): Future[Option[T]] = {
-    getData[T] map {
-      case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
-      case _ => None
-    }
+  ): Future[_] = {
+    val data = getData[T](cache)
+    putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
   }
 
   protected def fetchAllAndUpdate[T]
@@ -119,6 +119,9 @@ trait RepeatingSection {
   ): Future[_] =
     getData[T] map {
       data => {
+
+        val x = data(index)
+
         putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
       }
     }

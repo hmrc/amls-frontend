@@ -26,7 +26,9 @@ trait FitAndProperController extends RepeatingSection with BaseController {
               val form = (for {
                 responsiblePeople <- response
                 fitAndProper <- responsiblePeople.hasAlreadyPassedFitAndProper
-              } yield Form2[Boolean](fitAndProper)).getOrElse(EmptyForm)
+              } yield Form2[Boolean](fitAndProper))
+                .getOrElse(EmptyForm)
+
               Ok(views.html.responsiblepeople.fit_and_proper(form, edit, index))
           }
       }

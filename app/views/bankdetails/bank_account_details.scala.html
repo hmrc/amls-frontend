@@ -1,5 +1,6 @@
 @import include._
 @import forms2._
+@import utils._
 
 @(f: forms.Form2[_], edit: Boolean, index:Int)(implicit lang: Lang, request: Request[_])
 
@@ -22,7 +23,7 @@ s"""${f("IBANNumber").id}-fieldset"""
     heading = header
 ) {
 
-    @form(f, controllers.bankdetails.routes.BankAccountController.post(index, edit)) {
+    @form(f, controllers.bankdetails.routes.BankAccountController.post(index, RepeatingSectionFlow.Add)) {
 
     <div class="form-field-group">
         @input(
