@@ -308,8 +308,9 @@ unauthorised.title = Unauthorised
 
 ############################### Progress page ###############################
 progress.title = Application progress
-progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
-progress.edit = Edit
+progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
+progress.link.edit = Edit
+progress.link.continue = Continue
 progress.continue = Section incomplete
 progress.start = Start this section
 progress.minutes = minutes to complete
@@ -335,7 +336,7 @@ progress.asp.name = Accountancy Service Provider
 progress.asp.description = Registration information specifically for Accountancy Service Providers.
 progress.asp.time = 5
 progress.eab.name = Estate Agent Business
-progress.eab.description = Registration information specifically for Estate Agent businesses.
+progress.eab.description = Registration information specifically for Estate Agency Businesses.
 progress.eab.time = 5
 progress.hvd.name = High Value Dealer
 progress.hvd.description = Registration information specifically for High Value Dealers.
@@ -357,7 +358,7 @@ progress.declarationunavailable = You can’t finish the registration until you�
 progress.visuallyhidden.not.started = This section needs starting.
 progress.visuallyhidden.started = This section needs completing.
 progress.visuallyhidden.completed = This section has been completed.
-progress.visuallyhidden.approximately = This section will take approximately
+progress.visuallyhidden.start.approx = This section needs starting and will take approximately
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
 

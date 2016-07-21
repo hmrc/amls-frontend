@@ -16,6 +16,11 @@
 
 
 /* -- application progress page -- */
+.grid-layout {
+  table-layout: fixed;
+}
+
+/* -- Progress Step -- */
 .progress-steps {
   margin-bottom: 12px;
 }
@@ -29,17 +34,11 @@
   margin-top: 0;
 }
 
-.grid-layout {
-  table-layout: fixed;
-}
-
-/* -- Progress Step -- */
-
-/* -- Progress Step: assets -- */
+/* -- Progress Step: assets (tick & chevrons) -- */
 .progress-step--status,
 .no-svg .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
-  background-position: 90%;
+  background-position: 90% 20px; /* y-axis in px for when text > 2 lines */
   background-repeat: no-repeat;
   background-size: 33%;
 }
@@ -77,7 +76,7 @@
 .progress-step--status__completed,
 .no-svg .progress-step--status__completed {
   background-image: url("/anti-money-laundering/assets/icons/tick.svg");
-  background-position: 50%;
+  background-position: center;
   background-repeat: no-repeat;
   background-size: 33%;
 }
@@ -123,17 +122,17 @@ a.progress-step,
   box-sizing: border-box;
 }
 
-/* this fixes a layout issue in IE & Firefox */
+/* `display:block` fixes a layout issue in IE & Firefox */
 .progress-step--status,
 .progress-step--details {
   display: block;
+  padding: 5px 10px 15px;
 }
 
 /* -- Progress Step: details -- */
 .progress-step--details {
-  background: #f8f8f8;
-  border-bottom: #dee0e2 solid 3px;
-  padding: 5px 10px 15px;
+  background-color: #f8f8f8;
+  border-bottom: 3px solid #dee0e2;
 }
 
 .progress-step--details p {
@@ -143,23 +142,22 @@ a.progress-step,
 
 /* -- Progress Step: status -- */
 .progress-step--status {
-  border-bottom: 3px solid #dee0e2;
+  border-bottom: 3px solid #cdcdcd;
   color: #6f777b;
-  padding: 0;
   position: relative;
   transition: .25s ease-in;
 }
 
+.progress-step--status__started,
 .progress-step:focus .progress-step--status__not-started,
 .progress-step:hover .progress-step--status__not-started,
-.progress-step--status__started,
 .progress-step:focus .progress-step--status__started,
 .progress-step:hover .progress-step--status__started {
   color: #fff;
 }
 
 .progress-step--status-time {
-  padding: 15px 15px 0;
+  padding: 15px 0 0;
 }
 
 /* -- Progress Step: not started -- */
@@ -177,6 +175,10 @@ a.progress-step,
   border-bottom-color: #f9641a;
 }
 
+.progress-step--status__started .progress-step--status-time {
+  padding-top: 18px;
+}
+
 /* -- Progress Step: completed -- */
 .progress-step--status__completed,
 .progress-step:focus .progress-step--status__completed,
@@ -188,12 +190,26 @@ a.progress-step,
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
   /* IE10+ hacks here */
   .progress-step--status {
-    background-position: 110%;
+    background-position: 140%;
     background-size: 66%;
+  }
+  @media screen and (max-width: 640px) {
+    .progress-step--status {
+      background-position: 90%;
+    }
   }
   .progress-step--status__completed {
     background-position: 50%;
     background-size: 50%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .progress-step--status__started,
+  .progress-step--status__not-started,
+  .no-svg .progress-step--status__started,
+  .no-svg .progress-step--status__not-started {
+    background-position: 90% 90%;
   }
 }
 
@@ -245,14 +261,19 @@ a.progress-step,
   width: 213px;
 }
 
+.lte-ie8 .progress-step--details,
 .lte-ie8 .progress-step--status,
 .lte-ie8 .progress-step--status__started,
 .lte-ie8 .progress-step--status__not-started {
-  min-height: 130px;
+  min-height: 136px;
+}
+
+.lte-ie8 .progress-step__complete .progress-step--status,
+.lte-ie8 .progress-step__complete .progress-step--details {
+  min-height: 90px;
 }
 
 .lte-ie8 .progress-step--details {
-  min-height: 110px;
   width: 427px;
 }
 
