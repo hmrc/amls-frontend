@@ -24,19 +24,22 @@ trait WhoIsRegisteringController extends BaseController {
             (for {
               whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
             } yield Ok(who_is_registering(Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople)))
-              .getOrElse (Ok(who_is_registering(EmptyForm, responsiblePeople)))
+              .getOrElse(Ok(who_is_registering(EmptyForm, responsiblePeople)))
           }) getOrElse Ok(who_is_registering(EmptyForm, Seq.empty))
       }
   }
 
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
-    val rp = responsiblePeople.filter(_.personName.exists(name=> whoIsRegistering.person.equals(name.firstName.concat(name.lastName)))).head
+    val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
+    val rp: ResponsiblePeople = rpOption.getOrElse(None)
+
     rp.personName match {
       case Some(name) => Some(AddPerson(name.firstName, name.middleName, name.lastName,
         rp.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)))
       case _ => None
     }
+
   }
 
   implicit def getPosition(positions: Set[PositionWithinBusiness]): RoleWithinBusiness = {
@@ -66,7 +69,6 @@ trait WhoIsRegisteringController extends BaseController {
               (for {
                 cache <- optionalCache
                 responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-                whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
               } yield {
                 dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
@@ -75,8 +77,8 @@ trait WhoIsRegisteringController extends BaseController {
                     Redirect(routes.AddPersonController.get())
                   }
                   case _ => {
-                    getAddPerson(data, responsiblePeople) map {addPerson =>
-                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
+                    getAddPerson(data, responsiblePeople) map { addPerson =>
+                      dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
                     Redirect(routes.DeclarationController.get())
                   }
