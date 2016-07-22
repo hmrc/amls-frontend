@@ -29,9 +29,9 @@
         ) {
             <div class="form-field-group">
                 @input(f("addressLine1"))
-                @input(f("addressLine2"))
-                @input(f("addressLine3"))
-                @input(f("addressLine4"))
+                @input(f("addressLine2"), requiredField = false)
+                @input(f("addressLine3"), requiredField = false)
+                @input(f("addressLine4"), requiredField = false)
             </div>
             <div class="form-field-group">
                 @input(
