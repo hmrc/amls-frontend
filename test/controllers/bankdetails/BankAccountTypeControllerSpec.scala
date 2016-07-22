@@ -10,7 +10,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{RepeatingSectionFlow, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -65,7 +65,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with  OneAppPerSuite with M
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BankAccountController.get(0).url))
+      redirectLocation(result) must be(Some(routes.BankAccountController.get(0, RepeatingSectionFlow.Add).url))
     }
 
     "on post with valid data in edit mode" in new Fixture {

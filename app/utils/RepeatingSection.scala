@@ -119,9 +119,6 @@ trait RepeatingSection {
   ): Future[_] =
     getData[T] map {
       data => {
-
-        val x = data(index)
-
         putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
       }
     }
