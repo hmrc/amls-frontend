@@ -38,7 +38,7 @@
 .progress-step--status,
 .no-svg .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
-  background-position: 90% 20px; /* y-axis in px for when text > 2 lines */
+  background-position: 90%;
   background-repeat: no-repeat;
   background-size: 33%;
 }
@@ -47,41 +47,43 @@
   background-image: url("/anti-money-laundering/assets/icons/chevron.png");
 }
 
-.progress-step--status__started,
-.progress-step:focus .progress-step--status__started,
-.progress-step:focus .progress-step--status__not-started,
-.progress-step:hover .progress-step--status__started,
-.progress-step:hover .progress-step--status__not-started {
+.progress-step__started .progress-step--status,
+.progress-step:focus .progress-step--status,
+.progress-step:hover .progress-step--status,
+.progress-step__started:focus .progress-step--status,
+.progress-step__started:hover .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
 }
 
-.no-svg .progress-step--status__started,
-.no-svg .progress-step--status__not-started,
-.no-svg .progress-step:focus .progress-step--status__started,
-.no-svg .progress-step:focus .progress-step--status__not-started,
-.no-svg .progress-step:hover .progress-step--status__started,
-.no-svg .progress-step:hover .progress-step--status__not-started {
+.no-svg .progress-step__started .progress-step--status,
+.no-svg .progress-step:focus .progress-step--status,
+.no-svg .progress-step:hover .progress-step--status,
+.no-svg .progress-step__started:focus .progress-step--status,
+.no-svg .progress-step__started:hover .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
 }
 
 .no-svg .progress-step--status,
-.no-svg .progress-step:focus .progress-step--status__started,
-.no-svg .progress-step:focus .progress-step--status__not-started,
-.no-svg .progress-step:hover .progress-step--status__started,
-.no-svg .progress-step:hover .progress-step--status__not-started,
-.no-svg .progress-step--status__completed {
+.no-svg .progress-step__started .progress-step--status,
+.no-svg .progress-step:focus .progress-step--status,
+.no-svg .progress-step:hover .progress-step--status,
+.no-svg .progress-step__started:focus .progress-step--status,
+.no-svg .progress-step__started:hover .progress-step--status,
+.no-svg .progress-step__completed {
   background-repeat: no-repeat;
 }
 
-.progress-step--status__completed,
-.no-svg .progress-step--status__completed {
+.progress-step__complete .progress-step--status,
+.progress-step__complete:hover .progress-step--status,
+.no-svg .progress-step__complete .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/tick.svg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 33%;
 }
 
-.no-svg .progress-step--status__completed {
+.no-svg .progress-step__complete .progress-step--status,
+.no-svg .progress-step__complete:hover .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/tick.png");
 }
 
@@ -148,11 +150,11 @@ a.progress-step,
   transition: .25s ease-in;
 }
 
-.progress-step--status__started,
-.progress-step:focus .progress-step--status__not-started,
-.progress-step:hover .progress-step--status__not-started,
-.progress-step:focus .progress-step--status__started,
-.progress-step:hover .progress-step--status__started {
+.progress-step__started .progress-step--status,
+.progress-step:focus .progress-step--status,
+.progress-step:hover .progress-step--status,
+.progress-step__started:focus .progress-step--status,
+.progress-step__started:hover .progress-step--status {
   color: #fff;
 }
 
@@ -161,47 +163,30 @@ a.progress-step,
 }
 
 /* -- Progress Step: not started -- */
-.progress-step:focus .progress-step--status__not-started,
-.progress-step:hover .progress-step--status__not-started,
-.progress-step:focus .progress-step--status__started,
-.progress-step:hover .progress-step--status__started {
+.progress-step:focus .progress-step--status,
+.progress-step:hover .progress-step--status,
+.progress-step__started:focus .progress-step--status,
+.progress-step__started:hover .progress-step--status {
   background-color: #006435;
   border-bottom-color: #01552e;
 }
 
 /* -- Progress Step: started -- */
-.progress-step--status__started {
+.progress-step__started .progress-step--status {
   background-color: #f47738;
   border-bottom-color: #f9641a;
 }
 
-.progress-step--status__started .progress-step--status-time {
+.progress-step__started .progress-step--status-time {
   padding-top: 18px;
 }
 
 /* -- Progress Step: completed -- */
-.progress-step--status__completed,
-.progress-step:focus .progress-step--status__completed,
-.progress-step:hover .progress-step--status__completed {
+.progress-step__complete .progress-step--status,
+.progress-step__complete:focus .progress-step--status,
+.progress-step__complete:hover .progress-step--status {
   background-color: #28a197;
   border-bottom-color: #088277;
-}
-
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-  /* IE10+ hacks here */
-  .progress-step--status {
-    background-position: 140%;
-    background-size: 66%;
-  }
-  @media screen and (max-width: 640px) {
-    .progress-step--status {
-      background-position: 90%;
-    }
-  }
-  .progress-step--status__completed {
-    background-position: 50%;
-    background-size: 50%;
-  }
 }
 
 @media screen and (max-width: 480px) {
@@ -214,6 +199,7 @@ a.progress-step,
 }
 
 @media screen and (max-width: 640px) {
+
   .progress-step {
     margin: 0 -0.78947em 12px;
   }
@@ -238,6 +224,29 @@ a.progress-step,
   .progress-step--status__started,
   .progress-step--status__not-started {
     background-size: 25%;
+  }
+}
+
+/* -- TODO: fix this – IE10+ needs a chevron kick
+@media all and
+  (-ms-high-contrast: none) and (max-width: 640px),
+  (-ms-high-contrast: active) and (max-width: 640px) {
+  .progress-step--status {
+    background-position: 90%;
+  }
+} */
+
+@media all and
+  (-ms-high-contrast: none),
+  (-ms-high-contrast: active) {
+  /* IE10+ hacks here */
+  .progress-step--status {
+    background-position: 140%;
+    background-size: 66%;
+  }
+  .progress-step--status__completed {
+    background-position: 50%;
+    background-size: 50%;
   }
 }
 

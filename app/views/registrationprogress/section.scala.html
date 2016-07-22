@@ -11,7 +11,7 @@
                 <h2 class="heading-small">@Messages(s"progress.${name}.name")</h2>
                 <p>@Messages(s"progress.$name.description")</p>
             </div>
-            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status progress-step--status__not-started">
+            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status">
                 <div class="grid-layout__column--2-3 progress-step--status-time">
                     <p class="visuallyhidden">@Messages("progress.visuallyhidden.start.approx")</p>
                     <span class="heading-large">@Messages(s"progress.${name}.time")</span>
@@ -30,7 +30,7 @@
                 <h2 class="heading-small">@Messages(s"progress.${name}.name")</h2>
                 <p>@Messages(s"progress.$name.description")</p>
             </div>
-            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status progress-step--status__started">
+            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status">
                 <div class="grid-layout__column--2-3 progress-step--status-time">
                     <p class="font-xsmall" aria-label="@Messages("progress.visuallyhidden.continue")">@Messages("progress.continue")</p>
                 </div>
@@ -48,7 +48,7 @@
                 <p class="visuallyhidden">@Messages("progress.visuallyhidden.completed")</p>
                 <p class="progress-step__edit" aria-label="@Messages("progress.visuallyhidden.edit")">@Messages("progress.link.edit")</p>
             </div>
-            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status progress-step--status__completed">
+            <div class="grid-layout__column grid-layout__column--1-3 progress-step--status">
               &nbsp;
             </div>
         </a>
