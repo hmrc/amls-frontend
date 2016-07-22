@@ -299,6 +299,7 @@ lbl.end.date = End date:
 lbl.select.all = Select all that apply
 lbl.list.upto.3.countries = List up to 3 countries
 lbl.some.one.else = Someone else
+lbl.vat.reg.number = VAT registration number:
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -370,7 +371,7 @@ confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now have 30 days to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
 confirmation.fee = Your registration fee:
 confirmation.breakdown = How your registration fee has been calculated:
-confirmation.sidebar.code = Confirmation code: {0}
+confirmation.sidebar.code = Reference number: {0}
 confirmation.sidebar.lede = You have registered for anti-money laundering supervision, pending payment.
 confirmation.sidebar.contact = Quote this code if you need to contact HM Revenue and Customs about your registration.
 confirmation.quantity = Quantity
@@ -1022,7 +1023,7 @@ msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
 msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
-msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
+msb.transactions.expected.title = How many money transfers do you expect in the next 12 months?
 
 msb.most.transactions.title = Where do you expect to send the most transactions?
 msb.most.transactions.list.countries = List up to 3 countries
@@ -1075,12 +1076,12 @@ hvd.products.option.01 = Alcohol
 hvd.products.option.02 = Tobacco
 hvd.products.option.03 = Antiques
 hvd.products.option.04 = Cars
-hvd.products.option.05 = Other Motor Vehicles
+hvd.products.option.05 = Other motor vehicles
 hvd.products.option.06 = Caravans
 hvd.products.option.07 = Jewellery
 hvd.products.option.08 = Gold
-hvd.products.option.09 = Scrap Metals
-hvd.products.option.10 = Mobile Phones
+hvd.products.option.09 = Scrap metals
+hvd.products.option.10 = Mobile phones
 hvd.products.option.11 = Clothing
 hvd.products.option.12 = Other
 

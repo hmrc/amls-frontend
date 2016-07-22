@@ -1,7 +1,6 @@
 package controllers.declaration
 
 import connectors.DataCacheConnector
-import models.bankdetails.BankDetails
 import models.declaration.{AddPerson, WhoIsRegistering}
 import models.responsiblepeople._
 import org.jsoup.Jsoup
@@ -17,7 +16,6 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
-
 
 class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 

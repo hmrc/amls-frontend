@@ -4,20 +4,13 @@
 
 @(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
 
-@sidebar = {
-    <div class="user-attention">
-        <h3 class="heading-small">@Messages("confirmation.sidebar.code", mlrRegNo)</h3>
-        <p>@Messages("confirmation.sidebar.contact")</p>
-    </div>
-}
-
 @main(
-    title = "Confirmation",
-    sidebar = sidebar
+    title = "Confirmation"
 ) {
 
     <div class="confirmation">
         <h1 class="heading-large"><img class="icon icon-confirmed" src="/anti-money-laundering/assets/icons/tick.svg" /> @Messages("confirmation.lede")</h1>
+        <h3 class="heading-small">@Messages("confirmation.sidebar.code", mlrRegNo)</h3>
     </div>
 
     <p>@Messages("confirmation.thankyou.p")</p>
