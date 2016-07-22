@@ -142,6 +142,12 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         )))
     }
 
+    "fail to validate an email with a comma instead of a dot" in {
+      emailType.validate("foo@bar,com") must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.invalid.rp.email"))
+      )))
+    }
+
     "fail to validate a string longer than 100" in {
 
       emailType.validate("1" * 101) must
