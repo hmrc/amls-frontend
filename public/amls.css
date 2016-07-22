@@ -190,10 +190,8 @@ a.progress-step,
 }
 
 @media screen and (max-width: 480px) {
-  .progress-step--status__started,
-  .progress-step--status__not-started,
-  .no-svg .progress-step--status__started,
-  .no-svg .progress-step--status__not-started {
+  .progress-step--status,
+  .no-svg .progress-step--status {
     background-position: 90% 90%;
   }
 }
@@ -214,15 +212,14 @@ a.progress-step,
     width: 66.66667%;
   }
 
-  .progress-step--status__started,
-  .progress-step--status__not-started {
+  .progress-step--status {
     background-size: 20%;
   }
 }
 
 @media screen and (min-width: 641px) and (max-width: 767px) {
-  .progress-step--status__started,
-  .progress-step--status__not-started {
+  .progress-step--status {
+    background-position: 90% 90%;
     background-size: 25%;
   }
 }
