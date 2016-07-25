@@ -21,8 +21,10 @@ trait BankAccountController extends RepeatingSection with BaseController {
             Ok(views.html.bankdetails.bank_account_details(EmptyForm, flow, index))
           case (_, Some(BankDetails(_, Some(data)))) =>
             Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), flow, index))
+          case (_, Some(BankDetails(_, _))) =>
+            Ok(views.html.bankdetails.bank_account_details(EmptyForm, flow, index))
           case _ =>
-            BadRequest
+            NotFound
         }
       }
   }
@@ -36,7 +38,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
           for {
             _ <- updateData[BankDetails](index) {
               case Some(BankDetails(Some(x), _)) => Some(BankDetails(Some(x), Some(data)))
-              case _ => data
+              case _ => Some(BankDetails(None, Some(data)))
             }
           } yield {Redirect(routes.SummaryController.get())}
         }

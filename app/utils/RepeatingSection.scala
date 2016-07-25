@@ -71,6 +71,19 @@ trait RepeatingSection {
     }
   }
 
+  def addData[T](data : T)
+    (implicit
+     user: AuthContext,
+     hc: HeaderCarrier,
+     formats: Format[T],
+     key: MongoKey[T],
+     ec: ExecutionContext): Future[Int] = {
+    getData[T].map { d =>
+      putData(d :+ data)
+      d.size + 1
+    }
+  }
+
   def updateData[T]
   (cache: CacheMap, index: Int)
   (fn: Option[T] => Option[T])
