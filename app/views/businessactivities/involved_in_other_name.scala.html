@@ -9,11 +9,11 @@ s"""${f("details").id}-fieldset"""
 }
 
 @header = {
-    @heading("businessactivities.confirm-activities.title", "summary.businessactivities")
+    @heading("businessactivities.involved.other.title", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.confirm-activities.title"),
+    title = Messages("businessactivities.involved.other.title"),
     heading = header
 )  {
 
@@ -40,11 +40,11 @@ s"""${f("details").id}-fieldset"""
 
     <div class="form-field-group">
         @inlineRadioGroup(f("involvedInOther")) {
-            @legend("businessactivities.confirm-activities.title", jsHidden = true)
+            @legend("businessactivities.involved.other.legend")
             @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
             @radio(f("involvedInOther"), "lbl.no", "false")
             @fieldset("businessactivities.confirm-activities.line1.text", jsHidden = true, id = target) {
-            @textarea(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
+                @textarea(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
             }
         }
     </div>

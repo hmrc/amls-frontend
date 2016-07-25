@@ -15,26 +15,23 @@
     @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
 
         <div class="form-field-group">
-        @inlineRadioGroup(f("isRecorded")) {
-            @legend("businessactivities.keep.customer.records.title", jsHidden = true)
-            @radio(f("isRecorded"), "lbl.yes", "true", target = s"#${f("transactions").id}-fieldset")
-            @radio(f("isRecorded"), "lbl.no", "false")
-        }
+            @inlineRadioGroup(f("isRecorded")) {
+                @legend("businessactivities.keep.customer.records.title", jsHidden = true)
+                @radio(f("isRecorded"), "lbl.yes", "true", target = s"#${f("transactions").id}-fieldset")
+                @radio(f("isRecorded"), "lbl.no", "false")
+            }
 
-
-        @fieldset("TODO", jsHidden = true, id = s"""${f("transactions").id}-fieldset""") {
-            @Messages("businessactivities.keep.customer.records.line1.text")
-            @radioGroup(f("transactions")) {
-                @legend("businessactivities.do.keep.records", true, bold = true, "lbl.select.all")
-                @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.01", "01")
-                @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.02", "02")
-                @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.03", "03", target = s"#${f("name").id}-fieldset")
-                @fieldset("TODO", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
-                    @input(f("name"), "businessactivities.name.software.pkg.lbl", bold = false)
+            @fieldset("businessactivities.keep.customer.records.line1.text", bold = true, id = s"""${f("transactions").id}-fieldset""") {
+                @radioGroup(f("transactions")) {
+                    @legend("businessactivities.do.keep.records", true, bold = true, "lbl.select.all")
+                    @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.01", "01")
+                    @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.02", "02")
+                    @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.03", "03", target = s"#${f("name").id}-fieldset")
+                    @fieldset("businessactivities.name.software.pkg.lbl", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
+                        @input(f("name"), "businessactivities.name.software.pkg.lbl", bold = false)
+                    }
                 }
             }
-        }
-        <br>
         </div>
         @submit(edit)
     }
