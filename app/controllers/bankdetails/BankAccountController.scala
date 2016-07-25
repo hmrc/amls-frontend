@@ -5,7 +5,6 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccount, BankDetails}
-import play.api.Logger
 import utils.{RepeatingSection, RepeatingSectionFlow}
 
 import scala.concurrent.Future
@@ -16,11 +15,15 @@ trait BankAccountController extends RepeatingSection with BaseController {
 
   def get(index:Int = 0, flow: RepeatingSectionFlow) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[BankDetails](index) map {
-        case Some(BankDetails(_, Some(data))) =>
-          Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), flow.isEdit, index))
-        case _ =>
-          Ok(views.html.bankdetails.bank_account_details(EmptyForm, flow.isEdit, index))
+      getData[BankDetails](index) map { oBankDetails =>
+        (flow, oBankDetails) match {
+          case (RepeatingSectionFlow.Add, _) =>
+            Ok(views.html.bankdetails.bank_account_details(EmptyForm, flow, index))
+          case (_, Some(BankDetails(_, Some(data)))) =>
+            Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), flow, index))
+          case _ =>
+            BadRequest
+        }
       }
   }
 
@@ -28,7 +31,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
     implicit authContext => implicit request => {
       Form2[BankAccount](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, flow.isEdit, index)))
+          Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, flow, index)))
         case ValidForm(_, data) => {
           for {
             _ <- updateData[BankDetails](index) {
