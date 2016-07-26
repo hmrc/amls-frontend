@@ -14,7 +14,7 @@ trait BankAccountAddController extends RepeatingSection with BaseController {
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       addData[BankDetails](None).map { idx =>
-        Redirect(routes.BankAccountTypeController.get(idx, true))
+        Redirect(routes.BankAccountTypeController.get(idx, false))
       }
   }
 }

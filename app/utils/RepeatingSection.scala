@@ -136,6 +136,23 @@ trait RepeatingSection {
       }
     }
 
+  protected def updateDataStrict[T]
+  (index: Int)
+  (fn: Option[T] => Option[T])
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Future[_] =
+    getData[T] map {
+      data => {
+        if (index < 1 || data.size < index) throw new IndexOutOfBoundsException()
+        putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
+      }
+    }
+
   protected def putData[T]
   (data: Seq[T])
   (implicit
