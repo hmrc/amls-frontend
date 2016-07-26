@@ -251,7 +251,7 @@ error.required.hvd.excise.goods = Select yes or no to the question: will you be 
 error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
 
 ################################# Declaration #####################################
-error.required.declaration.who.is.registering = Select who is making the declaration. If none of the people listed are making the declaration, select ’The person is not listed above’.
+error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ''Someone else''.
 
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
