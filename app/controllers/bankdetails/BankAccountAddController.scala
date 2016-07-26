@@ -11,10 +11,14 @@ import utils.RepeatingSection
 import scala.concurrent.Future
 
 trait BankAccountAddController extends RepeatingSection with BaseController {
-  def get() = Authorised.async {
+  def get(displayGuidance : Boolean = true) = Authorised.async {
     implicit authContext => implicit request =>
       addData[BankDetails](None).map { idx =>
-        Redirect(routes.BankAccountTypeController.get(idx, false))
+        if (displayGuidance) {
+          Redirect(routes.WhatYouNeedController.get(idx))
+        } else {
+          Redirect(routes.BankAccountTypeController.get(idx, false))
+        }
       }
   }
 }

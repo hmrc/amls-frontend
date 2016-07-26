@@ -29,7 +29,7 @@ object BankDetails {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "bankdetails"
-    val notStarted = Section(messageKey, NotStarted, controllers.bankdetails.routes.WhatYouNeedController.get(1))
+    val notStarted = Section(messageKey, NotStarted, controllers.bankdetails.routes.BankAccountAddController.get(true))
     val complete = Section(messageKey, Completed, controllers.bankdetails.routes.SummaryController.get())
     cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
       case model if model.isEmpty => complete
@@ -39,7 +39,7 @@ object BankDetails {
           case model if !model.isComplete => true
           case _ => false
         }
-        Section(messageKey, Started, controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
+        Section(messageKey, Started, controllers.bankdetails.routes.WhatYouNeedController.get(index +1 ))
     }
   }
 

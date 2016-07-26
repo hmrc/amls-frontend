@@ -1,5 +1,5 @@
 @import include._
-@(index: Int)(implicit request: Request[_])
+@(index:Int)(implicit request: Request[_])
 
 @sidebar = {
 <div class="user-attention">
@@ -29,6 +29,6 @@
     </ul>
 
      <div class="form-field">
-        <a class="button" href="@controllers.bankdetails.routes.BankAccountTypeController.get(index)">@Messages("button.continue")</a>
-    </div>
+            <a class="button" href="@controllers.bankdetails.routes.BankAccountTypeController.get(index)">@Messages("button.continue")</a>
+     </div>
 }
