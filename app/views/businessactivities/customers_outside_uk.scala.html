@@ -20,7 +20,7 @@
             @radio(f("isOutside"), "lbl.no", "false")
                 @fieldset("businessactivities.hight.value.customer.lbl", jsHidden = false, id = "isOutside-fieldset", data = Seq("data-toggle-new")) {
                     <p class="form-field--hint"> @Messages("businessactivities.hight.value.customer.lbl.hint")</p>
-                        @addRemove("msb.branchesoragents.add.btn") {
+                        @addRemove("lbl.add.another.country") {
                             @for(i <- 0 until 10) {
                                 @defining(
                                 f(s"countries[$i]")
