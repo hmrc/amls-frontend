@@ -1,9 +1,9 @@
 @(f: forms.Field)(content: Html)(implicit lang: Lang)
 <fieldset class="form-field-group">
-<div class="form-field inline @if(f.hasErrors){form-field--error}" id="@f.id">
-    @if(f.hasErrors) {
-        <span class="error-notification">@f.error</span>
-    }
-    @content
-</div>
+    <div class="form-field inline @if(f.hasErrors){form-field--error}" id="@f.id">
+        @if(f.hasErrors) {
+            <span class="error-notification">@f.error</span>
+        }
+        @content
+    </div>
 </fieldset>

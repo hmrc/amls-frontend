@@ -30,7 +30,7 @@
 }
 
 @header = {
-    @heading("responsiblepeople.detailed_answers.title", "summary.responsiblepeople")
+    @heading("responsiblepeople.detailed_answers.heading", "summary.responsiblepeople")
 }
 
 @main(
@@ -42,145 +42,144 @@
 
         <table>
             <tbody>
-                    <tr>
-                        <th colspan="2">
-                            @person.personName.map { name =>
-                                @name.fullName
-                            }.getOrElse{
-                                @Messages("missing.personName")
-                            }
-                        </th>
-                        <td><a href="@PersonNameController.get(idx, true)">@Messages("button.edit")</a></td>
-                    </tr>
+                <tr>
+                    <th colspan="2">
+                        @person.personName.map { name =>
+                            @name.fullName
+                        }.getOrElse{
+                            @Messages("missing.personName")
+                        }
+                    </th>
+                    <td><a href="@PersonNameController.get(idx, true)">@Messages("button.edit")</a></td>
+                </tr>
 
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.previous_names"), person.personName, PersonNameController.get(idx, true)) {pn =>
+                    @pn.previousName match {
+                        case None => {@Messages("lbl.no")}
+                        case Some(name) => {@name.formattedPreviousName(pn) <br /> @Messages("responsiblepeople.detailed_answers.previous_names.since"): @name.formattedDate}
+                    }
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.previous_names"), person.personName, PersonNameController.get(idx, true)) {pn =>
-                        @pn.previousName match {
-                            case None => {@Messages("lbl.no")}
-                            case Some(name) => {@name.formattedPreviousName(pn) <br /> @Messages("responsiblepeople.detailed_answers.previous_names.since"): @name.formattedDate}
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.other_names"), person.personName, PersonNameController.get(idx, true)) {pn =>
+                    @pn.otherNames match {
+                        case None => {@Messages("lbl.no")}
+                        case Some(name) => {@name}
+                    }
+                }
+
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.uk_resident"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
+                    @prt.isUKResidence match {
+                        case UKResidence(nino) => {
+                            @Messages("lbl.yes") <br/>
+                            @Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino
+                        }
+                        case NonUKResidence(dob, UKPassport(number)) => {
+                            @Messages("lbl.no")<br/>
+                            @Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)<br/>
+                            @Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number
+                        }
+                        case NonUKResidence(dob, NonUKPassport(number)) => {
+                            @Messages("lbl.no")<br/>
+                            @Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)<br/>
+                            @Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number
+                        }
+                        case NonUKResidence(dob, NoPassport) => {
+                            @Messages("lbl.no")<br/>
+                            @Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)<br/>
+                            @Messages("responsiblepeople.detailed_answers.uk_resident.no_passport")
                         }
                     }
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.other_names"), person.personName, PersonNameController.get(idx, true)) {pn =>
-                        @pn.otherNames match {
-                            case None => {@Messages("lbl.no")}
-                            case Some(name) => {@name}
-                        }
-                    }
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.country_of_birth"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
+                    @prt.countryOfBirth
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.uk_resident"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
-                        @prt.isUKResidence match {
-                            case UKResidence(nino) => {
-                                @Messages("lbl.yes") <br/>
-                                @Messages("responsiblepeople.detailed_answers.uk_resident.nino"): @nino
-                            }
-                            case NonUKResidence(dob, UKPassport(number)) => {
-                                @Messages("lbl.no")<br/>
-                                @Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)<br/>
-                                @Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number
-                            }
-                            case NonUKResidence(dob, NonUKPassport(number)) => {
-                                @Messages("lbl.no")<br/>
-                                @Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)<br/>
-                                @Messages("responsiblepeople.detailed_answers.uk_resident.passport_number"): @number
-                            }
-                            case NonUKResidence(dob, NoPassport) => {
-                                @Messages("lbl.no")<br/>
-                                @Messages("responsiblepeople.detailed_answers.uk_resident.dob"): @DateHelper.formatDate(dob)<br/>
-                                @Messages("responsiblepeople.detailed_answers.uk_resident.no_passport")
-                            }
-                        }
-                    }
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.nationality"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
+                    @prt.nationality
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.country_of_birth"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
-                        @prt.countryOfBirth
-                    }
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.phone_number"), person.contactDetails, ContactDetailsController.get(idx, true)) {cd =>
+                    @cd.phoneNumber
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.nationality"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
-                        @prt.nationality
-                    }
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.email"), person.contactDetails, ContactDetailsController.get(idx, true)) {cd =>
+                    @cd.emailAddress
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.phone_number"), person.contactDetails, ContactDetailsController.get(idx, true)) {cd =>
-                        @cd.phoneNumber
-                    }
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.address"), person.addressHistory.flatMap(_.currentAddress), CurrentAddressController.get(idx, true)) {a =>
+                    @a.personAddress.toLines.map {l => @l <br />}
+                    <br />
+                    @timeAtAddress(a.timeAtAddress)
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.email"), person.contactDetails, ContactDetailsController.get(idx, true)) {cd =>
-                        @cd.emailAddress
-                    }
-
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.address"), person.addressHistory.flatMap(_.currentAddress), CurrentAddressController.get(idx, true)) {a =>
+                @person.addressHistory.flatMap(_.additionalAddress).map { pa =>
+                    @optionalBlock(Messages("responsiblepeople.detailed_answers.previous_address"), Some(pa), AdditionalAddressController.get(idx, true)) {a =>
                         @a.personAddress.toLines.map {l => @l <br />}
                         <br />
                         @timeAtAddress(a.timeAtAddress)
                     }
+                }
 
-                    @person.addressHistory.flatMap(_.additionalAddress).map { pa =>
-                        @optionalBlock(Messages("responsiblepeople.detailed_answers.previous_address"), Some(pa), AdditionalAddressController.get(idx, true)) {a =>
-                            @a.personAddress.toLines.map {l => @l <br />}
-                            <br />
-                            @timeAtAddress(a.timeAtAddress)
+                @person.addressHistory.flatMap(_.additionalExtraAddress).map { pa =>
+                    @optionalBlock(Messages("responsiblepeople.detailed_answers.other_previous_address"), Some(pa), AdditionalExtraAddressController.get(idx, true)) {a =>
+                        @a.personAddress.toLines.map {l => @l <br />}
+                        <br />
+                        @timeAtAddress(a.timeAtAddress)
+                    }
+                }
+
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.position"), person.positions, PositionWithinBusinessController.get(idx, true)) {pos =>
+                    @pos.positions.map {
+                        case BeneficialOwner    => {@Messages("responsiblepeople.position_within_business.lbl.01")}
+                        case Director           => {@Messages("responsiblepeople.position_within_business.lbl.02")}
+                        case InternalAccountant => {@Messages("responsiblepeople.position_within_business.lbl.03")}
+                        case NominatedOfficer   => {@Messages("responsiblepeople.position_within_business.lbl.04")}
+                        case Partner            => {@Messages("responsiblepeople.position_within_business.lbl.05")}
+                        case SoleProprietor     => {@Messages("responsiblepeople.position_within_business.lbl.06")}
+                    }.mkString(", ")
+                }
+
+                @person.vatRegistered.map { vr =>
+                    @optionalBlock(Messages("responsiblepeople.detailed_answers.registered_for_vat"), Some(vr), VATRegisteredController.get(idx, true)) { vr2 =>
+                        @vr2 match {
+                            case VATRegisteredYes(regNo) => {@Messages("lbl.yes"): @regNo}
+                            case VATRegisteredNo => {@Messages("lbl.no")}
                         }
                     }
+                }
 
-                    @person.addressHistory.flatMap(_.additionalExtraAddress).map { pa =>
-                        @optionalBlock(Messages("responsiblepeople.detailed_answers.other_previous_address"), Some(pa), AdditionalExtraAddressController.get(idx, true)) {a =>
-                            @a.personAddress.toLines.map {l => @l <br />}
-                            <br />
-                            @timeAtAddress(a.timeAtAddress)
+                @person.saRegistered.map { sar =>
+                    @optionalBlock(Messages("responsiblepeople.detailed_answers.registered_for_sa"), Some(sar), RegisteredForSelfAssessmentController.get(idx, true)) { sa =>
+                        @sa match {
+                            case SaRegisteredYes(regNo) => {@Messages("lbl.yes"): @regNo}
+                            case SaRegisteredNo => {@Messages("lbl.no")}
                         }
                     }
+                }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.position"), person.positions, PositionWithinBusinessController.get(idx, true)) {pos =>
-                        @pos.positions.map {
-                            case BeneficialOwner    => {@Messages("responsiblepeople.position_within_business.lbl.01")}
-                            case Director           => {@Messages("responsiblepeople.position_within_business.lbl.02")}
-                            case InternalAccountant => {@Messages("responsiblepeople.position_within_business.lbl.03")}
-                            case NominatedOfficer   => {@Messages("responsiblepeople.position_within_business.lbl.04")}
-                            case Partner            => {@Messages("responsiblepeople.position_within_business.lbl.05")}
-                            case SoleProprietor     => {@Messages("responsiblepeople.position_within_business.lbl.06")}
-                        }.mkString(", ")
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.previous_experience"), person.experienceTraining, ExperienceTrainingController.get(idx, true)) { ex =>
+                    @ex match {
+                        case ExperienceTrainingYes(info) => {@Messages("lbl.yes"): @info}
+                        case ExperienceTrainingNo => {@Messages("lbl.no")}
                     }
+                }
 
-                    @person.vatRegistered.map { vr =>
-                        @optionalBlock(Messages("responsiblepeople.detailed_answers.registered_for_vat"), Some(vr), VATRegisteredController.get(idx, true)) { vr2 =>
-                            @vr2 match {
-                                case VATRegisteredYes(regNo) => {@Messages("lbl.yes"): @regNo}
-                                case VATRegisteredNo => {@Messages("lbl.no")}
-                            }
+                @optionalBlock(Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"), person.training, TrainingController.get(idx, true)) { tra =>
+                    @tra match {
+                        case TrainingYes(info) => {@Messages("lbl.yes"): @info}
+                        case TrainingNo => {@Messages("lbl.no")}
+                    }
+                }
+
+                @person.hasAlreadyPassedFitAndProper.map {fp =>
+                    @optionalBlock(Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), person.hasAlreadyPassedFitAndProper, FitAndProperController.get(idx, true)) { fp2 =>
+                        @fp match {
+                            case true => {@Messages("lbl.yes")}
+                            case false => {@Messages("lbl.no")}
                         }
                     }
-
-                    @person.saRegistered.map { sar =>
-                        @optionalBlock(Messages("responsiblepeople.detailed_answers.registered_for_sa"), Some(sar), RegisteredForSelfAssessmentController.get(idx, true)) { sa =>
-                            @sa match {
-                                case SaRegisteredYes(regNo) => {@Messages("lbl.yes"): @regNo}
-                                case SaRegisteredNo => {@Messages("lbl.no")}
-                            }
-                        }
-                    }
-
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.previous_experience"), person.experienceTraining, ExperienceTrainingController.get(idx, true)) { ex =>
-                        @ex match {
-                            case ExperienceTrainingYes(info) => {@Messages("lbl.yes"): @info}
-                            case ExperienceTrainingNo => {@Messages("lbl.no")}
-                        }
-                    }
-
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"), person.training, TrainingController.get(idx, true)) { tra =>
-                        @tra match {
-                            case TrainingYes(info) => {@Messages("lbl.yes"): @info}
-                            case TrainingNo => {@Messages("lbl.no")}
-                        }
-                    }
-
-                    @person.hasAlreadyPassedFitAndProper.map {fp =>
-                        @optionalBlock(Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), person.hasAlreadyPassedFitAndProper, FitAndProperController.get(idx, true)) { fp2 =>
-                            @fp match {
-                                case true => {@Messages("lbl.yes")}
-                                case false => {@Messages("lbl.no")}
-                            }
-                        }
-                    }
+                }
             </tbody>
         </table>
 

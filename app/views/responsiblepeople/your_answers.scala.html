@@ -12,7 +12,7 @@
     heading = header
 ) {
 
-    <div class="panel-indent panel-border-wide spacelarge">
+    <div class="panel-indent panel-indent--gutter panel-border-wide">
         <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.PersonNameController.get(responsiblePeople.size + 1)">@Messages("responsiblepeople.check_your_answers.add")</a>
     </div>
 
@@ -31,7 +31,7 @@
         }
     </table>
 
-    <div class="form-field">
+    <div class="form-group">
         <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.confirmandcontinue")</a>
     </div>
 }
