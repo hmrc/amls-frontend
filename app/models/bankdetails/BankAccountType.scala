@@ -19,16 +19,13 @@ object BankAccountType {
     From[UrlFormEncoded] { __ =>
       import play.api.data.mapping.forms.Rules._
 
-      (__ \ "bankAccountType").read[String].withMessage("error.bankdetails.accounttype") flatMap {x =>
-        println(s"XXXXXXX $x")
-        x match {
-          case "01" => Some(PersonalAccount)
-          case "02" => Some(BelongsToBusiness)
-          case "03" => Some(BelongsToOtherBusiness)
-          case "04" => None
-          case _ =>
-            (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
-        }
+      (__ \ "bankAccountType").read[String].withMessage("error.bankdetails.accounttype") flatMap {
+        case "01" => Some(PersonalAccount)
+        case "02" => Some(BelongsToBusiness)
+        case "03" => Some(BelongsToOtherBusiness)
+        case "04" => None
+        case _ =>
+          (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
       }
     }
 

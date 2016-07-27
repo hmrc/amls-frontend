@@ -30,13 +30,12 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
     implicit authContext => implicit request => {
       Form2[Option[BankAccountType]](request.body) match {
         case f: InvalidForm =>
-          println(s"****** BAD REQUEST --- ${request.body.asFormUrlEncoded.get("bankAccountType").mkString("|")}")
           Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index)))
-        case ValidForm(_, data) => {
+        case ValidForm(_, account) => {
           for {
               result <- updateDataStrict[BankDetails](index) {
-                case Some(BankDetails(_, Some(x))) => Some(BankDetails(data, Some(x)))
-                case _ => Some(BankDetails(data, None))
+                case Some(BankDetails(_, Some(x))) => Some(BankDetails(account, Some(x)))
+                case _ => Some(BankDetails(account, None))
               }
 
           } yield Redirect(routes.BankAccountController.get(index, edit))
