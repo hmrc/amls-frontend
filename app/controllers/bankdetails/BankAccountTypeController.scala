@@ -31,11 +31,11 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
       Form2[Option[BankAccountType]](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index)))
-        case ValidForm(_, account) => {
+        case ValidForm(_, data) => {
           for {
               result <- updateDataStrict[BankDetails](index) {
-                case Some(BankDetails(_, Some(x))) => Some(BankDetails(account, Some(x)))
-                case _ => Some(BankDetails(account, None))
+                case Some(BankDetails(_, Some(x))) => Some(BankDetails(data, Some(x)))
+                case _ => Some(BankDetails(data, None))
               }
 
           } yield Redirect(routes.BankAccountController.get(index, edit))

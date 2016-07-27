@@ -29,16 +29,17 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
   "BankAccountTypeController" when {
     "get is called" must {
-      "respond with OK and display the 'bank account type' page" when {
+      "respond with OK and display the blank 'bank account type' page" when {
         "there is no bank account type information yet" in new Fixture {
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
 
           val result = controller.get(1, false)(request)
+//          val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("unchecked")
 
           status(result) must be(OK)
           contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
-
+          //insert check that the fields are empty
         }
 
         "there is already a bank account type" in new Fixture {
@@ -54,7 +55,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       }
 
       "respond with NOT_FOUND" when {
-        "there are no bank details at all" in new Fixture {
+        "there is no bank account information at all" in new Fixture {
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
@@ -86,7 +87,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
         "not editing and there is no data" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
-            "bankAccountType" -> "04"
+            "bankAccountType" -> "04" // something weird going on here?
           )
 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))

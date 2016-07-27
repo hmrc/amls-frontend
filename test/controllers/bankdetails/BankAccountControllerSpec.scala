@@ -25,68 +25,129 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
   }
 
   val emptyCache = CacheMap("", Map.empty)
-
   val fieldElements = Array("accountName", "accountNumber", "sortCode", "IBANNumber")
 
-  "BankAccountController" must {
+  "BankAccountController" when {
+    "get is called" must {
+      "respond with OK" when {
+        "there is no bank account detail information yet" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
 
-    "get the blank page without values when the page is loaded first" in new Fixture {
+          val result = controller.get(1, false)(request)
+          val document: Document = Jsoup.parse(contentAsString(result))
 
-      when(controller.dataCacheConnector.fetch[Seq[BankAccount]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+          status(result) must be(OK)
+          for (field <- fieldElements)
+            document.select(s"input[name=$field]").`val` must be(empty)
+        }
 
-      val result = controller.get(1, false)(request) // changed this
-      val document: Document = Jsoup.parse(contentAsString(result))
-      for (field <- fieldElements)
-        document.select(s"input[name=$field]").`val` must be(empty)
+        "there is already bank account detail information" in new Fixture {
+          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
+
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(ukBankAccount))))))
+
+          val result = controller.get(1, true)(request)
+          status(result) must be(OK)
+          // check the radio buttons are checked
+        }
+      }
+
+      "respond with NOT_FOUND" when {
+        "there is no bank account information at all" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.get(1, false)(request)
+
+          status(result) must be(NOT_FOUND)
+        }
+      }
     }
 
-    "get the page with values when the page is loaded again " in new Fixture {
+    "post is called" must {
+      "respond with SEE_OTHER" when {
+        "given valid data in edit mode" in new Fixture {
 
-      val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
-      val nonUKBankAccount = BankAccount("My Account", NonUKAccountNumber("00081050223857232"))
+          val newRequest = request.withFormUrlEncodedBody(
+            "accountName" -> "test",
+            "isUK" -> "false",
+            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
+            "isIBAN" -> "false"
+          )
 
-      when(controller.dataCacheConnector.fetch[Seq[BankAccount]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ukBankAccount))))
-      val result = controller.get(1, true)(request)
-    }
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
+          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-    "on post with valid data in edit mode" in new Fixture {
+          val result = controller.post(1, true)(newRequest)
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "accountName" ->"test",
-        "isUK" -> "false",
-        "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-        "isIBAN" -> "false"
-      )
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
+        "blahblah given valid data in edit mode" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
+          val newRequest = request.withFormUrlEncodedBody(
+            "accountName" -> "test",
+            "isUK" -> "false",
+            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
+            "isIBAN" -> "false"
+          )
 
-      when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
+          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(1, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
+          val result = controller.post(1, true)(newRequest)
 
-    "on post with invalid data" in new Fixture {
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
+      }
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "accountName" ->"test",
-        "isUK" -> "true"
-      )
+      "respond with NOT_FOUND" when {
+        "given valid data in edit mode" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+          val newRequest = request.withFormUrlEncodedBody(
+            "accountName" -> "test",
+            "isUK" -> "false",
+            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
+            "isIBAN" -> "false"
+          )
 
-      when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
+          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(0, true)(newRequest)
-      status(result) must be(BAD_REQUEST)
+          val result = controller.post(50, true)(newRequest)
+
+          status(result) must be(NOT_FOUND)
+        }
+      }
+
+
+      "respond with BAD_REQUEST" when {
+        "given invalid data" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "accountName" -> "test",
+            "isUK" -> "true"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())
+            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, true)(newRequest)
+
+          status(result) must be(BAD_REQUEST)
+        }
+      }
     }
   }
-
 }
