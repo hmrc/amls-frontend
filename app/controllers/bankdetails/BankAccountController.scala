@@ -39,7 +39,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
             }
           } yield Redirect(routes.SummaryController.get())
         }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(BadRequest)
+          case _: IndexOutOfBoundsException => Future.successful(NotFound)
         }
       }
     }
