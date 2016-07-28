@@ -71,9 +71,4 @@ object YourTradingPremises {
           (__ \ "isResidential").write[Boolean]
         ) (unlift(YourTradingPremises.unapply))
     }
-
-  implicit def convert(data: YourTradingPremises): Option[TradingPremises] = {
-    Some(TradingPremises(Some(data)))
-  }
-
 }

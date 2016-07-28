@@ -1,6 +1,5 @@
 package controllers.tradingpremises
 
-import java.util.UUID
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
@@ -21,10 +20,14 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
+
 class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
-  val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
+  val mockCacheMap = mock[CacheMap]
+  val fieldElements = Array("report-name", "report-email", "report-action", "report-error")
+  val recordId1 = 1
+
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -33,11 +36,20 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
     }
+
+    val businessMatchingActivitiesAll = BusinessMatchingActivities(
+      Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+    when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+    val emptyCache = CacheMap("", Map.empty)
+    when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(emptyCache))
+
+    when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+      .thenReturn(Future.successful(Some(mockCacheMap)))
   }
 
-  val emptyCache = CacheMap("", Map.empty)
-
-  val fieldElements = Array("report-name", "report-email", "report-action", "report-error")
 
   "WhatDoesYourBusinessDoController" must {
 
@@ -49,28 +61,17 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
     "load what does your business do with empty fields" in new Fixture {
 
       val tradingPremises = TradingPremises()
-      val mockCacheMap = mock[CacheMap]
       val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(Some(businessActivities))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(tradingPremises)))
 
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
 
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
-
-      val RecordId = 1
-      val result = whatDoesYourBusinessDoController.get(RecordId)(request)
+      val result = whatDoesYourBusinessDoController.get(recordId1)(request)
 
       status(result) must be(OK)
 
@@ -82,30 +83,18 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
       val tradingPremises = TradingPremises(None, None, Some(wdbd))
-
-      val mockCacheMap = mock[CacheMap]
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")),
+      val businessActivities = BusinessActivities(
+        involvedInOther = Some(InvolvedInOtherYes("test")),
         expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Fifth))
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(Some(businessActivities))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(tradingPremises)))
 
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
-
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
-
-      val recordId = 1
-      val result = whatDoesYourBusinessDoController.get(recordId)(request)
+      val result = whatDoesYourBusinessDoController.get(recordId1)(request)
 
       status(result) must be(OK)
 
@@ -117,21 +106,14 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
     "must redirect to the trading premises with recordId when no Business Activity" in new Fixture {
 
       val tradingPremises = TradingPremises()
-      val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(None)
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val recordId = 1
-      val result = whatDoesYourBusinessDoController.get(recordId)(request)
-      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(recordId).url))
+      val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(recordId1).url))
 
       status(result) must be(SEE_OTHER)
     }
@@ -142,28 +124,17 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
     "for an Invalid Request must give a Bad Request" in new Fixture {
 
       val tradingPremises = TradingPremises(None, None, None)
-      val mockCacheMap = mock[CacheMap]
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
-
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(tradingPremises)))
 
       val invalidRequest = request.withFormUrlEncodedBody(
         "activities" -> ""
       )
 
-      val RecordId = 1
-      val result = whatDoesYourBusinessDoController.post(RecordId)(invalidRequest)
+      val result = whatDoesYourBusinessDoController.post(recordId1)(invalidRequest)
       status(result) must be(BAD_REQUEST)
     }
 
@@ -172,26 +143,18 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices))
       val tradingPremises = TradingPremises(None, None, Some(wdbd))
-      val mockCacheMap = mock[CacheMap]
+      val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
-
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(tradingPremises)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
       val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
 
-      val RecordId = 1
-      val result = whatDoesYourBusinessDoController.post(RecordId)(newRequest)
+      val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
       status(result) must be(SEE_OTHER)
     }
 
@@ -200,22 +163,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
       val tradingPremises = TradingPremises(None, None, Some(wdbd))
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices,
-        BillPaymentServices, EstateAgentBusinessService))
-      val mockCacheMap = mock[CacheMap]
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(tradingPremises)))
 
       val newRequest = request.withFormUrlEncodedBody(
         "activities[0]" -> "01",
@@ -223,8 +175,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "activities[2]" -> "03"
       )
 
-      val RecordId = 1
-      val result = whatDoesYourBusinessDoController.post(RecordId)(newRequest)
+      val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
@@ -234,22 +185,11 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
       val tradingPremises = TradingPremises(None, None, Some(wdbd))
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices,
-        BillPaymentServices, EstateAgentBusinessService))
-      val mockCacheMap = mock[CacheMap]
 
-      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any())).thenReturn(Some(Seq(tradingPremises)))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(tradingPremises)))
 
       val newRequest = request.withFormUrlEncodedBody(
         "activities[0]" -> "01",
@@ -257,10 +197,10 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "activities[2]" -> "03"
       )
 
-      val recordId = 1
-      val result = whatDoesYourBusinessDoController.post(recordId, true)(newRequest)
+      val result = whatDoesYourBusinessDoController.post(recordId1, true)(newRequest)
+
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId).url))
+      redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId1).url))
     }
   }
 }
