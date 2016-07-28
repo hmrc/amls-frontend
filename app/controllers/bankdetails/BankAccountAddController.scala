@@ -24,6 +24,7 @@ trait BankAccountAddController extends RepeatingSection with BaseController {
 }
 
 object BankAccountAddController extends BankAccountAddController {
+  // $COVERAGE-OFF$
   override def dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
