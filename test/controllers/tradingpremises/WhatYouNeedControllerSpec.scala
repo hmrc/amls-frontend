@@ -21,18 +21,20 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     }
   }
 
-  "WhatYouNeedController" must {
+  "WhatYouNeedController" when {
 
-    "use correct services" in new Fixture {
-      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
-    }
-
-
-    "load the what you need page" in new Fixture {
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("tradingpremises.whatyouneed.title"))
+    "get is called" must {
+      "respond with OK and show the 'what you need' page" in new Fixture {
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("tradingpremises.whatyouneed.title"))
+      }
     }
   }
 
+  it must {
+    "use correct services" in new Fixture {
+      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
+    }
+  }
 }

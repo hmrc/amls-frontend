@@ -3,6 +3,7 @@ package controllers.bankdetails
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import views.html.bankdetails._
 
 import scala.concurrent.Future
 
@@ -12,7 +13,7 @@ trait WhatYouNeedController extends BaseController {
 
   def get(index:Int) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.bankdetails.what_you_need(index)))
+      Future.successful(Ok(what_you_need(index)))
   }
 }
 
