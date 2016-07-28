@@ -74,6 +74,7 @@
 }
 
 .progress-step__complete .progress-step--status,
+.progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
 .no-svg .progress-step__complete .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/tick.svg");
@@ -128,13 +129,13 @@ a.progress-step,
 .progress-step--status,
 .progress-step--details {
   display: block;
-  padding: 5px 10px 15px;
 }
 
 /* -- Progress Step: details -- */
 .progress-step--details {
   background-color: #f8f8f8;
   border-bottom: 3px solid #dee0e2;
+  padding: 5px 10px 15px;
 }
 
 .progress-step--details p {
@@ -145,7 +146,8 @@ a.progress-step,
 /* -- Progress Step: status -- */
 .progress-step--status {
   border-bottom: 3px solid #cdcdcd;
-  color: #6f777b;
+  color: #364747;
+  padding: 5px 10px;
   position: relative;
   transition: .25s ease-in;
 }
@@ -177,8 +179,18 @@ a.progress-step,
   border-bottom-color: #f9641a;
 }
 
+.progress-step__started .progress-step--status {
+  display: flex;
+}
+
 .progress-step__started .progress-step--status-time {
-  padding-top: 18px;
+  align-self: center;
+  flex: 1;
+  padding-bottom: 15px; /* add bottom padding to help centre it for the flex browsers */
+}
+
+.progress-step__started .progress-step--status-time .font-xsmall {
+  margin: 0;
 }
 
 /* -- Progress Step: completed -- */

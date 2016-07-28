@@ -6,7 +6,7 @@
     @status match {
 
         case NotStarted => {
-        <a class="progress-step" href="@call.url">
+        <a class="progress-step" href="@call.url" aria-label="@Messages(s"progress.${name}.name"). @Messages(s"progress.$name.description") @Messages("progress.visuallyhidden.start.approx") @Messages(s"progress.${name}.time") @Messages("progress.minutes").">
             <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
                 <h2 class="heading-small">@Messages(s"progress.${name}.name")</h2>
                 <p>@Messages(s"progress.$name.description")</p>
@@ -25,14 +25,14 @@
         }
 
         case Started => {
-        <a class="progress-step progress-step__started" href="@call.url">
+        <a class="progress-step progress-step__started" href="@call.url" aria-label="@Messages(s"progress.${name}.name"). @Messages(s"progress.$name.description") @Messages("progress.visuallyhidden.continue")">
             <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
                 <h2 class="heading-small">@Messages(s"progress.${name}.name")</h2>
                 <p>@Messages(s"progress.$name.description")</p>
             </div>
             <div class="grid-layout__column grid-layout__column--1-3 progress-step--status">
                 <div class="grid-layout__column--2-3 progress-step--status-time">
-                    <p class="font-xsmall" aria-label="@Messages("progress.visuallyhidden.continue")">@Messages("progress.continue")</p>
+                    <p class="font-xsmall">@Messages("progress.continue")</p>
                 </div>
                 <div class="grid-layout__column grid-layout__column--1-3">
                   &nbsp;
@@ -42,11 +42,11 @@
         }
 
         case Completed => {
-        <a class="progress-step progress-step__complete" href="@call.url">
+        <a class="progress-step progress-step__complete" href="@call.url" aria-label="@Messages(s"progress.${name}.name"). @Messages("progress.visuallyhidden.completed") @Messages("progress.visuallyhidden.edit")">
             <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
                 <h2 class="heading-small">@Messages(s"progress.${name}.name")</h2>
                 <p class="visuallyhidden">@Messages("progress.visuallyhidden.completed")</p>
-                <p class="progress-step__edit" aria-label="@Messages("progress.visuallyhidden.edit")">@Messages("progress.link.edit")</p>
+                <p class="progress-step__edit">@Messages("progress.link.edit")</p>
             </div>
             <div class="grid-layout__column grid-layout__column--1-3 progress-step--status">
               &nbsp;
