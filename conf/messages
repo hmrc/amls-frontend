@@ -112,6 +112,7 @@ error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punc
 error.max.length.ba.employee.count = You can''t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter a number.
 error.required.ba.select.country  = Select yes or no to the question: do you have customers who live or work outside of the UK?
+error.invalid.ba.select.country = Enter at least one country.
 error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
 error.required.ba.software.package.name = Enter the name of the software package.
@@ -300,6 +301,7 @@ lbl.select.all = Select all that apply
 lbl.list.upto.3.countries = List up to 3 countries
 lbl.some.one.else = Someone else
 lbl.vat.reg.number = VAT registration number:
+lbl.add.another.country = Add another country
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -1037,7 +1039,6 @@ msb.branchesoragents.heading = Do you have branches or agents in other countries
 msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
 msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
-msb.branchesoragents.add.btn = Add another country
 
 msb.summary.ipsp-name = IPSP''s name
 msb.summary.ipsp-registration-number = IPSP’s HM Revenue and Customs registration number
