@@ -308,6 +308,7 @@ unauthorised.title = Unauthorised
 
 ############################### Progress page ###############################
 progress.title = Application progress – Anti-Money Laundering Supervision
+progress.heading = Application progress
 progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
 progress.link.edit = Edit
 progress.link.continue = Continue
