@@ -35,9 +35,10 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
     "on get display the blank trading premises your agent page" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
+        TradingPremises(None, None, None)))))
 
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("tradingpremises.youragent.title"))
 
