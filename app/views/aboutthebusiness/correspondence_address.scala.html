@@ -22,7 +22,7 @@
 
 
         @inlineRadioGroup(f("isUK")) {
-            @legend("TODO", jsHidden = true)
+            @legend("aboutthebusiness.correspondenceaddress.heading", jsHidden = true)
             @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
             @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
         }
