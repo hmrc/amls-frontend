@@ -1,10 +1,6 @@
 package controllers.responsiblepeople
 
-import java.util.concurrent.TimeUnit
-
 import connectors.DataCacheConnector
-import controllers.bankdetails.BankAccountTypeController
-import models.bankdetails.BankDetails
 import models.responsiblepeople.ResponsiblePeople
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -13,11 +9,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.{PropertyChecks, TableDrivenPropertyChecks}
 import org.scalatest.{Pending, WordSpecLike}
-import org.scalatestplus.play.{OneAppPerTest, OneAppPerSuite}
-import org.specs2.reporter.SpecFailureAssertionFailedError
+import org.scalatestplus.play.{ OneAppPerSuite}
 import play.api.mvc.Call
-import sun.security.provider.VerificationProvider
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 import org.scalacheck.Gen
@@ -48,7 +41,7 @@ class ResponsiblePeopleAddControllerSpec extends WordSpecLike
 
     def guidanceOptions(currentCount: Int) = Table(
       ("guidanceRequested", "expectedRedirect"),
-      (true, controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1)),
+      (true, controllers.responsiblepeople.routes.WhoMustRegisterController.get(currentCount + 1)),
       (false, controllers.responsiblepeople.routes.PersonNameController.get(currentCount + 1, false))
     )
   }

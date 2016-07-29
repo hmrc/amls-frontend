@@ -15,7 +15,7 @@ trait ResponsiblePeopleAddController extends BaseController with RepeatingSectio
       addData[ResponsiblePeople](ResponsiblePeople.default(None)).map {idx =>
         Redirect {
           displayGuidance match {
-            case true => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx)
+            case true => controllers.responsiblepeople.routes.WhoMustRegisterController.get(idx)
             case false => controllers.responsiblepeople.routes.PersonNameController.get(idx)
           }
         }
