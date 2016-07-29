@@ -143,6 +143,8 @@ GET         /declaration/declaration                                    controll
 
 GET         /confirmation                                               controllers.ConfirmationController.get()
 
+GET         /responsible-people/add                                     controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true)
+
 GET         /responsible-people/who-must-register/:index                controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
 GET         /responsible-people/what-you-need/:index                    controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
 
