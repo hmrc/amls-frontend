@@ -25,7 +25,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
       cache =>
         type Tupe = (CacheMap, Set[BusinessActivity])
         (for {
-          c <- cache
+          c: CacheMap <- cache
           bm <- c.getEntry[BusinessMatching](BusinessMatching.key)
           activities <- bm.activities flatMap {
             _.businessActivities match {

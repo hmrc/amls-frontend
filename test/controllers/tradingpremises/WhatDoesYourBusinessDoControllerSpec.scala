@@ -39,8 +39,8 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
     val businessMatchingActivitiesAll = BusinessMatchingActivities(
       Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-    when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-      .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+//    when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+//      .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
     val emptyCache = CacheMap("", Map.empty)
     when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
@@ -51,156 +51,175 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
   }
 
 
-  "WhatDoesYourBusinessDoController" must {
+  "WhatDoesYourBusinessDoController" when {
 
-    "use correct services" in new Fixture {
-      WhatDoesYourBusinessDoController.authConnector must be(AMLSAuthConnector)
-      WhatDoesYourBusinessDoController.dataCacheConnector must be(DataCacheConnector)
+    "get is called" must {
+      "respond with OK and show the 'what does your business do' page" when {
+        "there is no data - with empty form" in new Fixture {
+
+          val tradingPremises = TradingPremises()
+          val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
+
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+          when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+            .thenReturn(Some(businessActivities))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+          val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+
+          status(result) must be(OK)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select(s"input[id=activities-01]").hasAttr("checked") must be(false)
+        }
+
+        "there is data - with form populated" in new Fixture {
+
+          val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
+          val tradingPremises = TradingPremises(None, None, Some(wdbd))
+          val businessActivities = BusinessActivities(
+            involvedInOther = Some(InvolvedInOtherYes("test")),
+            expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Fifth))
+
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+          when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+            .thenReturn(Some(businessActivities))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+          val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          status(result) must be(OK)
+          document.select(s"input[id=activities-01]").hasAttr("checked") must be(true)
+
+        }
+      }
+
+      "respond with SEE_OTHER and show the trading premises page" when {
+        "there is no business activity" in new Fixture {
+
+          val tradingPremises = TradingPremises()
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(None)
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+
+          val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(recordId1).url))
+        }
+      }
     }
 
-    "load what does your business do with empty fields" in new Fixture {
+    "post is called" must {
 
-      val tradingPremises = TradingPremises()
-      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
+      "respond with BAD_REQUEST" when {
+        "given an Invalid Request" in new Fixture {
 
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(tradingPremises)))
+          val tradingPremises = TradingPremises(None, None, None)
+
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+          val invalidRequest = request.withFormUrlEncodedBody(
+            "activities" -> ""
+          )
+          val result = whatDoesYourBusinessDoController.post(recordId1)(invalidRequest)
+
+          status(result) must be(BAD_REQUEST)
+        }
+      }
+
+      "respond with SEE_OTHER" when {
+        "given a Valid Request with SINGLE Activity and show the summary page" in new Fixture {
+
+          val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices))
+          val tradingPremises = TradingPremises(None, None, Some(wdbd))
+          val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
+
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
+
+          val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
+
+          val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
+          status(result) must be(SEE_OTHER)
+        }
 
 
-      val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+        "given a Valid Request with multiple ACTIVITIES and show the summary page" in new Fixture {
 
-      status(result) must be(OK)
+          val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
+          val tradingPremises = TradingPremises(None, None, Some(wdbd))
 
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select(s"input[id=activities-01]").hasAttr("checked") must be(false)
-    }
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-    "load what does your business do with fields populated if the the form is not-empty" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "activities[0]" -> "01",
+            "activities[1]" -> "02",
+            "activities[2]" -> "03"
+          )
 
-      val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
-      val businessActivities = BusinessActivities(
-        involvedInOther = Some(InvolvedInOtherYes("test")),
-        expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Fifth))
+          val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
 
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
-      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-        .thenReturn(Some(businessActivities))
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(tradingPremises)))
 
-      val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+        "given a Valid Request in EDIT Mode and show the trading premises summary with record id" in new Fixture {
 
-      status(result) must be(OK)
+          val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
+          val tradingPremises = TradingPremises(None, None, Some(wdbd))
 
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select(s"input[id=activities-01]").hasAttr("checked") must be(true)
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-    }
+          val newRequest = request.withFormUrlEncodedBody(
+            "activities[0]" -> "01",
+            "activities[1]" -> "02",
+            "activities[2]" -> "03"
+          )
 
-    "must redirect to the trading premises with recordId when no Business Activity" in new Fixture {
+          val result = whatDoesYourBusinessDoController.post(recordId1, true)(newRequest)
 
-      val tradingPremises = TradingPremises()
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(None)
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
-
-      val result = whatDoesYourBusinessDoController.get(recordId1)(request)
-      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(recordId1).url))
-
-      status(result) must be(SEE_OTHER)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId1).url))
+        }
+      }
     }
   }
 
-  "WhatDoesYourBusinessDoController post" must {
-
-    "for an Invalid Request must give a Bad Request" in new Fixture {
-
-      val tradingPremises = TradingPremises(None, None, None)
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(tradingPremises)))
-
-      val invalidRequest = request.withFormUrlEncodedBody(
-        "activities" -> ""
-      )
-
-      val result = whatDoesYourBusinessDoController.post(recordId1)(invalidRequest)
-      status(result) must be(BAD_REQUEST)
-    }
-
-
-    "for a Valid Request with SINGLE Activity must redirect to Summary Controller" in new Fixture {
-
-      val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
-      val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(tradingPremises)))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
-
-      val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
-
-      val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
-      status(result) must be(SEE_OTHER)
-    }
-
-
-    "for a Valid Request with multiple ACTIVITIES must redirect to Summary Controller" in new Fixture {
-
-      val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(tradingPremises)))
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "activities[0]" -> "01",
-        "activities[1]" -> "02",
-        "activities[2]" -> "03"
-      )
-
-      val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
-
-
-    "for a Valid Request in EDIT Mode must redirect to the trading premises summary with record id" in new Fixture {
-
-      val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
-
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(tradingPremises))))
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(tradingPremises)))
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "activities[0]" -> "01",
-        "activities[1]" -> "02",
-        "activities[2]" -> "03"
-      )
-
-      val result = whatDoesYourBusinessDoController.post(recordId1, true)(newRequest)
-
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId1).url))
+  it must {
+    "use correct services" in new Fixture {
+      WhatDoesYourBusinessDoController.authConnector must be(AMLSAuthConnector)
+      WhatDoesYourBusinessDoController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }
