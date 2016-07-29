@@ -64,8 +64,8 @@ trait RepeatingSection {
    key: MongoKey[T],
    ec: ExecutionContext
   ): Future[Seq[T]] = {
-    dataCacheConnector.fetch[Seq[T]](key()) map {
-      _.fold(Seq.empty[T]) {
+    dataCacheConnector.fetch[Seq[T]](key()) map { x =>
+      x.fold(Seq.empty[T]) {
         identity
       }
     }
