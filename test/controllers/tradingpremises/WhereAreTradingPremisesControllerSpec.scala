@@ -2,7 +2,7 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
+import models.tradingpremises.{WhatDoesYourBusinessDo, Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -82,86 +82,90 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       }
     }
 
+    "post is called" must {
+      "respond with SEE_OTHER" when {
+        "given a valid request, and redirect to the 'what does your business do' page" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "tradingName" -> "Trading Name",
+            "addressLine1" -> "Address 1",
+            "addressLine2" -> "Address 2",
+            "postcode" -> "NE98 1ZZ",
+            "isOwner" -> "true",
+            "startDate.day" -> "01",
+            "startDate.month" -> "02",
+            "startDate.year" -> "2010",
+            "isResidential" -> "true"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(RecordId1, false)(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+        }
+      }
 
 
+      "post with valid data when NOT OWNER redirect to your agent" in new Fixture {
 
-    "post with valid data For OWNER redirect to What does your business do" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "tradingName" -> "Trading Name",
+          "addressLine1" -> "Address 1",
+          "addressLine2" -> "Address 2",
+          "postcode" -> "NE98 1ZZ",
+          "isOwner" -> "false",
+          "startDate.day" -> "01",
+          "startDate.month" -> "02",
+          "startDate.year" -> "2010",
+          "isResidential" -> "true"
+        )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "tradingName" -> "Trading Name",
-        "addressLine1" -> "Address 1",
-        "addressLine2" -> "Address 2",
-        "postcode" -> "NE98 1ZZ",
-        "isOwner" -> "true",
-        "startDate.day" -> "01",
-        "startDate.month" -> "02",
-        "startDate.year" -> "2010",
-        "isResidential" -> "true"
-      )
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        val result = controller.post(RecordId1, false)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourAgentController.get(1).url))
+      }
 
-      val result = controller.post(any())(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(0).url))
-    }
+      "post with edit mode with valid data and is OWNER then redirect to Summary Controller" in new Fixture {
 
-    "post with valid data when NOT OWNER redirect to your agent" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "tradingName" -> "Trading Name",
+          "addressLine1" -> "Address 1",
+          "addressLine2" -> "Address 2",
+          "postcode" -> "NE98 1ZZ",
+          "isOwner" -> "true",
+          "startDate.day" -> "01",
+          "startDate.month" -> "02",
+          "startDate.year" -> "2010",
+          "isResidential" -> "true"
+        )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "tradingName" -> "Trading Name",
-        "addressLine1" -> "Address 1",
-        "addressLine2" -> "Address 2",
-        "postcode" -> "NE98 1ZZ",
-        "isOwner" -> "false",
-        "startDate.day" -> "01",
-        "startDate.month" -> "02",
-        "startDate.year" -> "2010",
-        "isResidential" -> "true"
-      )
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(any())(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourAgentController.get(0).url))
-    }
+        val result = controller.post(RecordId1, true)(newRequest)
 
-    "post with edit mode with valid data and is OWNER then redirect to Summary Controller" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "tradingName" -> "Trading Name",
-        "addressLine1" -> "Address 1",
-        "addressLine2" -> "Address 2",
-        "postcode" -> "NE98 1ZZ",
-        "isOwner" -> "true",
-        "startDate.day" -> "01",
-        "startDate.month" -> "02",
-        "startDate.year" -> "2010",
-        "isResidential" -> "true"
-      )
-
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val RecordId = 1
-
-      val result = controller.post(RecordId, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(
-        Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId).url))
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId1).url))
+      }
     }
   }
-
 }
+
+

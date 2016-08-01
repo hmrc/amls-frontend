@@ -36,7 +36,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
           Future.successful(BadRequest(where_are_trading_premises(f, edit, index)))
         case ValidForm(_, ytp) => {
           for {
-            _ <- updateData[TradingPremises](index) {
+            _ <- updateDataStrict[TradingPremises](index) {
               // This makes sure to save `None` for the agent section if
               // the user selects that the premises is theirs.
               case Some(tp) if ytp.isOwner =>
