@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(index: Int)(implicit request: Request[_])
+@(index: Int, msbExists: Boolean)(implicit request: Request[_])
 
 @sidebar = {
 <div class="user-attention">
@@ -28,13 +28,28 @@
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.3")</li>
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.2")</li>
-
-
     </ul>
+
+    @if(msbExists) {
+        <h3>@Messages("tradingpremises.whatyouneed.agents.sub.heading")</h3>
+        <p>@Messages("tradingpremises.whatyouneed.agents.desc")</p>
+
+        <p>@Messages("tradingpremises.whatyouneed.agents.individual.info.heading")</p>
+        <ul class="list list-bullet spacelarge">
+            <li>@Messages("tradingpremises.whatyouneed.agents.individual.info.text1")</li>
+            <li>@Messages("tradingpremises.whatyouneed.agents.individual.info.text2")</li>
+        </ul>
+        <p>@Messages("tradingpremises.whatyouneed.agents.circumstances.info.heading")</p>
+        <ul class="list list-bullet spacelarge">
+            <li>@Messages("tradingpremises.whatyouneed.agents.circumstances.info.text1")</li>
+            <li>@Messages("tradingpremises.whatyouneed.agents.circumstances.info.text1")</li>
+        </ul>
+    }
 
     <div class="form-group">
         <a class="button" href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
             @Messages("button.continue")
         </a>
     </div>
+
 }
