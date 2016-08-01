@@ -19,12 +19,12 @@ trait PersonNameController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            response =>
-              val form = (for {
-                responsiblePeople <- response
-                person <- responsiblePeople.personName
-              } yield Form2[PersonName](person)).getOrElse(EmptyForm)
-              Ok(person_name(form, edit, index))
+            case Some(ResponsiblePeople(Some(name), _, _, _, _, _, _, _, _, _))
+                => Ok(person_name(Form2[PersonName](name), edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _))
+                => Ok(person_name(EmptyForm, edit, index))
+            case _
+                => NotFound
           }
       }
     }
@@ -36,18 +36,18 @@ trait PersonNameController extends RepeatingSection with BaseController {
           Form2[PersonName](request.body) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index)))
-            case ValidForm(_, data) =>
+            case ValidForm(_, data) => {
               for {
-                _ <- updateData[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.personName(data))
-                  case _ => Some(ResponsiblePeople(Some(data)))
+                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
+                  Some(currentData.personName(data))
                 }
-              } yield {
-                  edit match {
-                    case false => Redirect(routes.PersonResidentTypeController.get(index, edit))
-                    case true =>Redirect(routes.DetailedAnswersController.get(index))
-                  }
+              } yield edit match {
+                case true => Redirect(routes.DetailedAnswersController.get(index))
+                case false => Redirect(routes.PersonResidentTypeController.get(index, edit))
               }
+            }.recoverWith {
+              case _: IndexOutOfBoundsException => Future.successful(NotFound)
+            }
           }
         }
       }
