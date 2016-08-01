@@ -36,7 +36,6 @@ trait PercentageOfCashPaymentOver15000Controller extends BaseController {
               hvd.percentageOfCashPaymentOver15000(data)
             )
           } yield Redirect(routes.SummaryController.get())
-          
       }
     }
   }

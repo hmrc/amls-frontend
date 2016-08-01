@@ -28,7 +28,6 @@ trait HowWillYouSellGoodsController extends BaseController{
       }
   }
 
-
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[HowWillYouSellGoods](request.body) match {
@@ -40,7 +39,10 @@ trait HowWillYouSellGoodsController extends BaseController{
             _ <- dataCacheConnector.save[Hvd](Hvd.key,
               hvd.howWillYouSellGoods(model)
             )
-          } yield Redirect(routes.SummaryController.get())
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.CashPaymentController.get())
+          }
 
       }
     }

@@ -2,7 +2,6 @@ package models.hvd
 
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.joda.time.LocalDate
-import org.scalatest.matchers.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.scalatestplus.play.PlaySpec
@@ -13,6 +12,8 @@ class HvdSpec extends PlaySpec with MockitoSugar{
 
   // scalastyle:off
   val DefaultCashPayment = CashPaymentYes(new LocalDate(1956, 2, 15))
+  private val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
+  private val DefaultReceiveCashPayments = ReceiveCashPayments(Some(paymentMethods))
 
   val NewCashPayment = CashPaymentNo
 
@@ -21,9 +22,12 @@ class HvdSpec extends PlaySpec with MockitoSugar{
     val completeJson = Json.obj(
       "cashPayment" ->Json.obj(
       "acceptedAnyPayment" -> true,
-      "paymentDate" ->  new LocalDate(1956, 2, 15)))
+      "paymentDate" ->  new LocalDate(1956, 2, 15)),
+      "receiveCashPayments" -> Json.obj("receivePayments" ->true,"paymentMethods" ->Json.obj("courier" ->true,"direct" ->true,"other" ->true,"details" ->"foo")))
 
-    val completeModel = Hvd(cashPayment = Some(DefaultCashPayment))
+    val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
+      None,None,None,None,
+      receiveCashPayments = Some(DefaultReceiveCashPayments))
 
 
     "Serialise as expected" in {
