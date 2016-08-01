@@ -54,9 +54,11 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                 _ <- updateDataStrict[ResponsiblePeople](index) { currentData =>
                   Some(currentData.positions(data))
                 }
-              } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.ExperienceTrainingController.get(index, edit))
+              } yield (data.personalTax, edit) match {
+                case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
+                case (false, true) => Redirect(routes.DetailedAnswersController.get(index))
+                case _ => Redirect(routes.VATRegisteredController.get(index, edit))
+
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
