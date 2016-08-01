@@ -19,18 +19,20 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-          dataCacheConnector.fetchAll map {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-              } yield {
-                (for {
-                  responsiblePeople <- getData[ResponsiblePeople](cache, index)
-                  positions <- responsiblePeople.positions
-                } yield Ok(position_within_business(Form2[Positions](positions), edit, index, businessType)))
-                  .getOrElse (Ok(position_within_business(EmptyForm, edit, index, businessType)))
-              }) getOrElse Ok(position_within_business(EmptyForm, edit, index, BusinessType.SoleProprietor))
+          dataCacheConnector.fetchAll map { optionalCache =>
+            (optionalCache map { cache =>
+              val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                              .getOrElse(BusinessType.SoleProprietor)
+
+              getData[ResponsiblePeople](cache, index) match {
+                case Some(ResponsiblePeople(_, _, _, _, Some(positions), _, _, _, _, _))
+                  => Ok(position_within_business(Form2[Positions](positions),edit, index, bt))
+                case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _))
+                  => Ok(position_within_business(EmptyForm, edit, index, bt))
+                case _
+                  => NotFound(notFoundView)
+              }
+            }).getOrElse(NotFound(notFoundView))
           }
       }
   }
@@ -47,17 +49,18 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               } yield  {
                 BadRequest(position_within_business(f, edit, index, ControllerHelper.getBusinessType(businessMatching).getOrElse(BusinessType.SoleProprietor)))
               }
-            case ValidForm(_, data) =>
+            case ValidForm(_, data) => {
               for {
-                _ <- updateData[ResponsiblePeople](index) {
-                  case Some(res) => Some(res.positions(data))
-                  case _ => Some(ResponsiblePeople(positions = Some(data)))
+                _ <- updateDataStrict[ResponsiblePeople](index) { currentData =>
+                  Some(currentData.positions(data))
                 }
-              } yield (data.personalTax, edit) match {
-                case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))
-                case (false, true) => Redirect(routes.DetailedAnswersController.get(index))
-                case _ => Redirect(routes.VATRegisteredController.get(index, edit))
+              } yield edit match {
+                case true => Redirect(routes.DetailedAnswersController.get(index))
+                case false => Redirect(routes.ExperienceTrainingController.get(index, edit))
               }
+            }.recoverWith {
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
           }
       }
     }
