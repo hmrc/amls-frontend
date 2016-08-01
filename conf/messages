@@ -445,6 +445,7 @@ aboutthebusiness.whatyouneed.line_8 = your Corporation Tax reference number
 aboutthebusiness.registeredforvat.title = Is your business registered for VAT in the UK? – About the business
 aboutthebusiness.registeredforvat.heading = Is your business registered for VAT in the UK?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
+aboutthebusiness.registeredforvat.lbl.vatNumber.hint = For example: 123456789
 aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax? – About the business
 aboutthebusiness.registeredforcorporationtax.heading = Is your business registered for Corporation Tax?
 aboutthebusiness.registeredforcorporationtax.taxReference = Corporation Tax Reference
