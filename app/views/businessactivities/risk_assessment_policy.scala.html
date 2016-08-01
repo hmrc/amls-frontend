@@ -4,23 +4,28 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("businessactivities.riskassessment.policy.tile", "summary.businessactivities")
+    @heading("businessactivities.riskassessment.policy.heading", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.riskassessment.policy.tile"),
+    title = Messages("businessactivities.riskassessment.policy.title"),
     heading = header
 ) {
 
     @form(f, controllers.businessactivities.routes.RiskAssessmentController.post(edit)) {
 
         @inlineRadioGroup(f("hasPolicy")) {
-            @legend("businessactivities.riskassessment.policy.tile", jsHidden = true)
+            @legend("businessactivities.riskassessment.policy.title", jsHidden = true)
             @radio(f("hasPolicy"), "lbl.yes", "true", target = s"#${f("riskassessments").id}-fieldset")
             @radio(f("hasPolicy"), "lbl.no", "false")
         }
 
-        @fieldset("businessactivities.riskassessment.policy.line1.text", bold = true, id = s"""${f("riskassessments").id}-fieldset""") {
+        @fieldset(
+            legend = "businessactivities.riskassessment.policy.line1.text",
+            bold = true,
+            classes = Seq("form-field-group-end"),
+            id = s"""${f("riskassessments").id}-fieldset"""
+        ) {
 
             @radioGroup(f("riskassessments")) {
                 @legend("businessactivities.paper.or.digital", true ,bold = true, "lbl.select.all")
