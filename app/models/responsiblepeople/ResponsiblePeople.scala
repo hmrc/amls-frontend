@@ -51,7 +51,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _) if !pos.personalTax => true //TODO-JOE : already passed fit and proper should only be missing if business is not MSB or TCSP
+      Some(_), _) if !pos.personalTax => true
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
