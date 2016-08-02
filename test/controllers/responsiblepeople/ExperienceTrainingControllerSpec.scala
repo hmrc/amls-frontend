@@ -51,8 +51,8 @@ class ExperienceTrainingControllerSpec extends PlaySpec with OneAppPerSuite with
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
         val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
@@ -141,8 +141,8 @@ class ExperienceTrainingControllerSpec extends PlaySpec with OneAppPerSuite with
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -192,9 +192,9 @@ class ExperienceTrainingControllerSpec extends PlaySpec with OneAppPerSuite with
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )
-
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
