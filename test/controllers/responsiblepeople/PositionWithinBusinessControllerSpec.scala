@@ -41,9 +41,18 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
     "on get()" must {
 
       "display position within the business page" in new Fixture {
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+        val businessMatching = BusinessMatching(Some(reviewDtls))
         val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          .thenReturn(Some(Seq(ResponsiblePeople())))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(businessMatching))
+
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
@@ -66,7 +75,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(None)
+          .thenReturn(Some(Seq(ResponsiblePeople())))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -90,7 +99,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(None)
+          .thenReturn(Some(Seq(ResponsiblePeople())))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -114,7 +123,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(None)
+          .thenReturn(Some(Seq(ResponsiblePeople())))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -139,7 +148,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(None)
+          .thenReturn(Some(Seq(ResponsiblePeople())))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -216,7 +225,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       val newRequest = request.withFormUrlEncodedBody("positions" -> "05")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -228,7 +237,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       val newRequest = request.withFormUrlEncodedBody("positions" -> "06")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -238,7 +247,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
     "submit with all other valid data types" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       for (i <- 1 to 4) {
         val newRequest = request.withFormUrlEncodedBody("positions" -> s"0$i")
@@ -268,15 +277,15 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
     }
 
     "fail submission on empty string" in new Fixture {
-
       val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "")
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       val result = controller.post(RecordId)(newRequest)
-      status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
+
+      status(result) must be(BAD_REQUEST)
       document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
     }
 
@@ -301,7 +310,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       val newRequest = request.withFormUrlEncodedBody("positions" -> "05")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       val result = controller.post(RecordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -313,7 +322,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       val newRequest = request.withFormUrlEncodedBody("positions" -> "01")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       val result = controller.post(RecordId, true)(newRequest)
       status(result) must be(SEE_OTHER)
