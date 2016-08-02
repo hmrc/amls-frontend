@@ -42,8 +42,8 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneAppPerS
     "get" must {
 
       "load the page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("responsiblepeople.registeredforselfassessment.title"))
@@ -63,9 +63,8 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneAppPerS
         "saRegistered" -> "true",
         "utrNumber" -> "0123456789"
       )
-
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -94,9 +93,8 @@ class RegisteredForSelfAssessmentControllerSpec extends PlaySpec with OneAppPerS
         "saRegistered" -> "true",
         "utrNumber" -> "0123456789"
       )
-
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
