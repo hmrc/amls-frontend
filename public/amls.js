@@ -74,7 +74,6 @@ $(function () {
         children
           .filter(':not(:first):not(:has(option[selected]))')
           .addClass('js-hidden');
-
         var $button = $('<a href="#">' + text + '</a>').click(function (e) {
           e.preventDefault();
           $this.find('div.js-hidden:first').fadeIn(500).removeClass('js-hidden');

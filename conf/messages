@@ -75,7 +75,6 @@ error.invalid.bm.registration.number = Enter a valid company registration number
 error.required.bm.businesstype.type = Enter your type of business.
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
 
-
 ###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
 error.required.atb.mlr.number = Enter the Money Laundering Regulation registration number.
@@ -104,7 +103,6 @@ error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or le
 error.invalid.bankdetails.account = Enter a valid account number. It must only be numbers or letters, and it can’t be more than 40 characters long. Do not enter punctuation or other characters.
 error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
 
-
 ###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
@@ -119,6 +117,7 @@ error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punc
 error.max.length.ba.employee.count = You can''t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter a number.
 error.required.ba.select.country  = Select yes or no to the question: do you have customers who live or work outside of the UK?
+error.invalid.ba.select.country = Enter at least one country.
 error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
 error.required.ba.software.package.name = Enter the name of the software package.
@@ -257,6 +256,9 @@ error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
 error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
 
+################################# Declaration #####################################
+error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ''Someone else''.
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
@@ -280,6 +282,7 @@ missing.dataItem = Unknown
 lbl.other = Other
 lbl.yes = Yes
 lbl.no = No
+lbl.or = or
 lbl.your_name = Your name
 lbl.first_name = First name
 lbl.middle_name  = Middle name, if applicable
@@ -301,7 +304,9 @@ lbl.start.date = Start date:
 lbl.end.date = End date:
 lbl.select.all = Select all that apply
 lbl.list.upto.3.countries = List up to 3 countries
+lbl.some.one.else = Someone else
 lbl.vat.reg.number = VAT registration number:
+lbl.add.another.country = Add another country
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -313,9 +318,12 @@ amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
 ############################### Progress page ###############################
-progress.title = Application progress
-progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
-progress.edit = Edit
+progress.title = Application progress – Anti-Money Laundering Supervision
+progress.heading = Application progress
+progress.lede = It usually takes around 30 minutes to complete all sections.
+progress.saved.automatically = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
+progress.link.edit = Edit
+progress.link.continue = Continue
 progress.continue = Section incomplete
 progress.start = Start this section
 progress.minutes = minutes to complete
@@ -327,45 +335,45 @@ progress.businessmatching.description = Administrative information about your bu
 progress.businessmatching.time = 5
 progress.aboutthebusiness.name = About the business
 progress.aboutthebusiness.description = Administrative information about your business and your current registration status.
-progress.aboutthebusiness.time = 5
+progress.aboutthebusiness.time = 3
 progress.businessactivities.name = Business activities
 progress.businessactivities.description = Information about how your business operates, and your anti-money laundering procedures.
-progress.businessactivities.time = 8
+progress.businessactivities.time = 7
 progress.bankdetails.name = Bank details
 progress.bankdetails.description = The bank accounts your business uses. These include personal accounts or accounts belonging to other businesses.
-progress.bankdetails.time = 5
+progress.bankdetails.time = 2
 progress.tradingpremises.name = Trading premises
 progress.tradingpremises.description = Which premises your business trades from, and details of any other businesses that trade on your behalf.
-progress.tradingpremises.time = 8
+progress.tradingpremises.time = 3
 progress.asp.name = Accountancy Service Provider
 progress.asp.description = Registration information specifically for Accountancy Service Providers.
-progress.asp.time = 5
+progress.asp.time = 2
 progress.eab.name = Estate Agent Business
-progress.eab.description = Registration information specifically for Estate Agent businesses.
+progress.eab.description = Registration information specifically for Estate Agency Businesses.
 progress.eab.time = 5
 progress.hvd.name = High Value Dealer
 progress.hvd.description = Registration information specifically for High Value Dealers.
-progress.hvd.time = 8
+progress.hvd.time = 3
 progress.msb.name = Money Service Business
 progress.msb.description = Registration information specifically for Money Service Businesses.
-progress.msb.time = 6
+progress.msb.time = 4
 progress.tcsp.name = Trust or Company Service Provider
 progress.tcsp.description = Registration information specifically for Trust or Company Service Providers.
-progress.tcsp.time = 8
+progress.tcsp.time = 3
 progress.responsiblepeople.name = Responsible people
 progress.responsiblepeople.description = Information about the people in charge of your business.
-progress.responsiblepeople.time = 10
+progress.responsiblepeople.time = 7
 progress.supervision.name = Supervision
 progress.supervision.description = Information about any previous supervision for anti-money laundering.
-progress.supervision.time = 4
+progress.supervision.time = 2
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can’t finish the registration until you’ve completed all the sections.
 progress.visuallyhidden.not.started = This section needs starting.
 progress.visuallyhidden.started = This section needs completing.
 progress.visuallyhidden.completed = This section has been completed.
-progress.visuallyhidden.approximately = This section will take approximately
-progress.visuallyhidden.edit = You can edit this section via this link
-progress.visuallyhidden.continue = You can continue this section via this link
+progress.visuallyhidden.start.approx = This section needs starting and will take approximately
+progress.visuallyhidden.edit = You can edit this section.
+progress.visuallyhidden.continue = You can continue this section.
 
 #### Confirmation page ####
 confirmation.lede = You have submitted the application.
@@ -732,6 +740,8 @@ declaration.declaration.tellhmrc = I understand that the business must tell HMRC
 declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
 declaration.declaration.confirm = I confirm that I have read and understood the
 declaration.declaration.guidance = guidance
+declaration.who.is.registering.title = Who is registering this business?
+declaration.who.is.registering.text = One person must take responsibility for the accuracy of this anti-money laundering supervision registration.
 
 responsiblepeople.whatyouneed.title = Responsible People - What you need
 responsiblepeople.whatyouneed.heading = What you need
@@ -1023,7 +1033,7 @@ msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
 msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
-msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
+msb.transactions.expected.title = How many money transfers do you expect in the next 12 months?
 
 msb.most.transactions.title = Where do you expect to send the most transactions?
 msb.most.transactions.list.countries = List up to 3 countries
@@ -1037,7 +1047,6 @@ msb.branchesoragents.heading = Do you have branches or agents in other countries
 msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
 msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
-msb.branchesoragents.add.btn = Add another country
 
 msb.summary.ipsp-name = IPSP''s name
 msb.summary.ipsp-registration-number = IPSP’s HM Revenue and Customs registration number
