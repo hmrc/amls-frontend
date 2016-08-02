@@ -5,7 +5,7 @@
 @(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching)(implicit request: Request[_])
 
 @target = @{
-s"""${f("details").id}-fieldset"""
+    s"""${f("details").id}-fieldset"""
 }
 
 @header = {
@@ -17,39 +17,42 @@ s"""${f("details").id}-fieldset"""
     heading = header
 )  {
 
-    <p>@Messages("bankdetails.confirm-activities.subtitile")</p>
+    <p>@Messages("bankdetails.confirm-activities.subtitle")</p>
 
     @bmModel.activities.map { a=>
-    <div class="panel-indent panel-border-wide panel-indent--gutter">
+    <ul class="panel-indent panel-indent--gutter panel-border-wide">
         @a.businessActivities.map {line =>
             @line match {
-                case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
-                case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
-                case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
-                case HighValueDealing => {@Messages("businessmatching.registerservices.servicename.lbl.04")}
-                case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
-                case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
-                case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
-                }
-            <br>
+                case AccountancyServices => {<li>@Messages("businessmatching.registerservices.servicename.lbl.01")</li>}
+                case BillPaymentServices => {<li>@Messages("businessmatching.registerservices.servicename.lbl.02")</li>}
+                case EstateAgentBusinessService => {<li>@Messages("businessmatching.registerservices.servicename.lbl.03")</li>}
+                case HighValueDealing => {<li>@Messages("businessmatching.registerservices.servicename.lbl.04")</li>}
+                case MoneyServiceBusiness => {<li>@Messages("businessmatching.registerservices.servicename.lbl.05")</li>}
+                case TrustAndCompanyServices => {<li>@Messages("businessmatching.registerservices.servicename.lbl.06")</li>}
+                case TelephonePaymentService => {<li>@Messages("businessmatching.registerservices.servicename.lbl.07")</li>}
+            }
         }
-    </div>
+    </ul>
     }
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
-    <div class="form-field-group">
-        @inlineRadioGroup(f("involvedInOther")) {
-            @legend("businessactivities.involved.other.legend")
-            @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("involvedInOther"), "lbl.no", "false")
-            @fieldset("businessactivities.confirm-activities.line1.text", jsHidden = true, id = target) {
-                @textarea(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
+        <div class="form-field-group">
+            @inlineRadioGroup(f("involvedInOther")) {
+                @legend("businessactivities.involved.other.legend")
+                @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("involvedInOther"), "lbl.no", "false")
+                @fieldset(
+                    legend = "businessactivities.confirm-activities.line1.text",
+                    jsHidden = true,
+                    id = target
+                ) {
+                    @textarea(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
+                }
             }
-        }
-    </div>
+        </div>
 
-    @submit(false)
+        @submit(false)
 
     }
 }

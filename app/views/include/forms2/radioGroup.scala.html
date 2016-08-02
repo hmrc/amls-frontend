@@ -3,7 +3,7 @@
   classes: Seq[String] = Seq("form-field")
 )(content: Html)(implicit lang: Lang)
 
-<fieldset class="@classes.mkString(" ") @if(f.hasErrors){form-field--error}" id="@f.id" role="group">
+<fieldset class="@classes.mkString(" ") @if(f.hasErrors){form-field--error}" id="@f.id">
     @if(f.hasErrors) {
         <span class="error-notification">@f.error</span>
     }

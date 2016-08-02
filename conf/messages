@@ -632,7 +632,7 @@ bankdetails.summary.accounttype.lbl.02 = My business’s account
 bankdetails.summary.accounttype.lbl.03 = Another business’s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
-bankdetails.confirm-activities.subtitile =You’ve told us your business does this:
+bankdetails.confirm-activities.subtitle = You’ve told us your business does this:
 
 businessactivities.whatyouneed.title = Business Activities – What you need
 businessactivities.whatyouneed.heading = What you need
