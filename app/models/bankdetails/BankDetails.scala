@@ -39,7 +39,7 @@ object BankDetails {
           case model if !model.isComplete => true
           case _ => false
         }
-        Section(messageKey, Started, controllers.bankdetails.routes.WhatYouNeedController.get(index +1 ))
+        Section(messageKey, Started, controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
     }
   }
 
