@@ -66,7 +66,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             val ba = BusinessActivities(activities)
             Future.successful {
               getData[TradingPremises](c, index) match {
-                case Some(TradingPremises(_, _, Some(wdbd),_)) =>
+                case Some(TradingPremises(_,_, _, Some(wdbd),_)) =>
                   Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
                 case _ =>
                   Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
@@ -93,7 +93,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 case Some(tp) if data.activities.contains(MoneyServiceBusiness) =>
                   Some(tp.whatDoesYourBusinessDoAtThisAddress(data))
                 case Some(tp) if !data.activities.contains(MoneyServiceBusiness) =>
-                  Some(TradingPremises(tp.yourTradingPremises, tp.yourAgent, Some(data), None))
+                  Some(TradingPremises(None,tp.yourTradingPremises, tp.yourAgent, Some(data), None))
                 case _ => Some(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(data)))
               } map {
                 _ =>  data.activities.contains(MoneyServiceBusiness) match {

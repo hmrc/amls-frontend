@@ -1,0 +1,27 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+
+@header = {
+    @heading("tradingpremises.agent.premises.title", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("tradingpremises.agent.premises.title"),
+    heading = header
+) {
+
+    @form(f, controllers.businessactivities.routes.IdentifySuspiciousActivityController.post(edit)) {
+
+        <p>@Messages("tradingpremises.agent.premises.text")</p>
+
+        <div class="form-field-group">
+            @inlineRadioGroup(f("agentPremises")) {
+                @radio(f("agentPremises"), "lbl.yes", "true")
+                @radio(f("agentPremises"), "lbl.no", "false")
+            }
+            @submit(edit)
+        </div>
+        }
+    }

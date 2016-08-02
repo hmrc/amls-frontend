@@ -73,7 +73,7 @@ object YourTradingPremises {
     }
 
   implicit def convert(data: YourTradingPremises): Option[TradingPremises] = {
-    Some(TradingPremises(Some(data)))
+    Some(TradingPremises(yourTradingPremises = Some(data)))
   }
 
 }

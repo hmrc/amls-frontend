@@ -57,7 +57,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       val ytp = YourTradingPremises(tradingName = "trading Name", address,
         true, LocalDate.now(), true)
 
-      val tradingPremises = TradingPremises(Some(ytp), None, None)
+      val tradingPremises = TradingPremises(None,Some(ytp), None, None)
 
       when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))

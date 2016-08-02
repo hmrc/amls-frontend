@@ -55,7 +55,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
-        TradingPremises(None, Some(yourAgent), None)))))
+        TradingPremises(None, None, Some(yourAgent), None)))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
@@ -93,7 +93,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
-        TradingPremises(None, Some(yourAgent), None)))))
+        TradingPremises(None, None, Some(yourAgent), None)))))
 
       val RecordId = 1
       val result = controller.post(RecordId)(validRequest)
@@ -117,7 +117,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(
-        TradingPremises(None, Some(yourAgent), None)))))
+        TradingPremises(None, None, Some(yourAgent), None)))))
 
       val RecordId = 1
       val result = controller.post(RecordId, true)(validRequest)

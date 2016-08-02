@@ -81,7 +81,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
     "load what does your business do with fields populated if the the form is not-empty" in new Fixture {
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
+      val tradingPremises = TradingPremises(None,None, None, Some(wdbd))
 
       val mockCacheMap = mock[CacheMap]
       val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")),
@@ -171,7 +171,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
     "for a Valid Request with SINGLE Activity must redirect to Summary Controller" in new Fixture {
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
+      val tradingPremises = TradingPremises(None,None, None, Some(wdbd))
       val mockCacheMap = mock[CacheMap]
 
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -199,7 +199,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
     "for a Valid Request with multiple ACTIVITIES must redirect to Summary Controller" in new Fixture {
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
+      val tradingPremises = TradingPremises(None,None, None, Some(wdbd))
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices,
         BillPaymentServices, EstateAgentBusinessService))
       val mockCacheMap = mock[CacheMap]
@@ -233,7 +233,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
     "for a Valid Request in EDIT Mode must redirect to the trading premises summary with record id" in new Fixture {
 
       val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-      val tradingPremises = TradingPremises(None, None, Some(wdbd))
+      val tradingPremises = TradingPremises(None,None, None, Some(wdbd))
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices,
         BillPaymentServices, EstateAgentBusinessService))
       val mockCacheMap = mock[CacheMap]

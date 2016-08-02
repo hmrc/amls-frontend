@@ -18,7 +18,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) map {
-          case Some(TradingPremises(_, Some(data), _, _)) =>
+          case Some(TradingPremises(_,_, Some(data), _, _)) =>
             Ok(who_is_your_agent(Form2[YourAgent](data), edit, index))
           case _ =>
             Ok(who_is_your_agent(EmptyForm, edit, index))
