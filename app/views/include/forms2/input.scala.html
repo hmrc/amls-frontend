@@ -7,7 +7,8 @@
     bold: Boolean = false,
     classes: Seq[String] = Seq.empty,
     panel: Boolean = false,
-    jsHidden: Boolean = false
+    jsHidden: Boolean = false,
+    requiredField: Boolean = true
 )(implicit lang: Lang)
 
 <div class="form-field @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}">
@@ -22,7 +23,7 @@
             <span class="error-notification">@field.error</span>
         }
         <input name="@field.name" class="form-control @classes.mkString(" ")" type="text" value="@field.value" id="@field.id"
-               @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
+               @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" } @if(requiredField) { aria-required="true" required="required" }
         >
     </label>
 </div>
