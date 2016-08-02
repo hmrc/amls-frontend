@@ -36,7 +36,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
             for {
               _ <- updateDataStrict[TradingPremises](index) {
                 case Some(tp) => Some(tp.yourAgent(data))
-                case _ => data
+                case _ => Some(TradingPremises(None, Some(data), None))
               }
             } yield edit match {
               case true =>

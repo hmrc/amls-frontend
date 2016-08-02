@@ -43,7 +43,6 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
                 Some(TradingPremises(Some(ytp), None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
               case Some(tp) =>
                 Some(TradingPremises(Some(ytp), tp.yourAgent, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
-              case _ => Some(TradingPremises(Some(ytp)))
             }
           } yield (edit, ytp.isOwner) match {
             case (true, true) =>

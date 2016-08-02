@@ -1,7 +1,7 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import models.bankdetails.{UKAccount, BankAccount, BankDetails, PersonalAccount}
+import models.bankdetails.{BankAccount, BankDetails, PersonalAccount, UKAccount}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -35,7 +35,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
 
           val result = controller.get(1, false)(request)
-//          val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("unchecked")
+          //          val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("unchecked")
 
           status(result) must be(OK)
           contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
@@ -125,7 +125,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(
               Some(PersonalAccount),
-              Some(BankAccount("AccountName", UKAccount("12341234","121212"))))))))
+              Some(BankAccount("AccountName", UKAccount("12341234", "121212"))))))))
           when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
@@ -135,6 +135,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
           redirectLocation(result) must be(Some(routes.BankAccountController.get(1, true).url))
         }
       }
+
 
       "respond with BAD_REQUEST" when {
         "there is invalid data" in new Fixture {
