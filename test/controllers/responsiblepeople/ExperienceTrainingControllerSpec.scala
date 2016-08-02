@@ -192,7 +192,7 @@ class ExperienceTrainingControllerSpec extends PlaySpec with OneAppPerSuite with
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )
-      
+
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
 
