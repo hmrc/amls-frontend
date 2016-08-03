@@ -92,8 +92,9 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       val newRequest = request.withFormUrlEncodedBody(
         "msbServices[0]" -> "01"
       )
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+    
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))

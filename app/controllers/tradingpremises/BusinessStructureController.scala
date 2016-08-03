@@ -28,13 +28,12 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
       }
   }
 
-  def redirectToPage(data: BusinessStructure) = {
+  def redirectToPage(data: BusinessStructure, edit: Boolean, index: Int) = {
     data match {
-      case SoleProprietor => Redirect(routes.SummaryController.get())
-      case LimitedLiabilityPartnership => Redirect(routes.SummaryController.get())
-      case Partnership => Redirect(routes.SummaryController.get())
-      case IncorporatedBody => Redirect(routes.SummaryController.get())
-      case UnincorporatedBody => Redirect(routes.SummaryController.get())
+      case SoleProprietor => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+      case LimitedLiabilityPartnership | IncorporatedBody => Redirect(routes.SummaryController.get())
+      case Partnership => Redirect(routes.WhatYouNeedController.get(index))
+      case UnincorporatedBody => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
     }
   }
 
@@ -50,7 +49,7 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
               case _ => Some(TradingPremises(businessStructure = Some(data)))
             }
           } yield {
-              redirectToPage(data)
+              redirectToPage(data, edit, index)
           }
       }
   }

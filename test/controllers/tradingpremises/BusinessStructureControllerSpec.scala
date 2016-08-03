@@ -90,7 +90,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.get(1, false).url)
     }
 
     "successfully submit and navigate to next page when user selects the option LimitedLiabilityPartnership" in new Fixture {
@@ -98,8 +98,12 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val newRequest = request.withFormUrlEncodedBody(
         "agentsBusinessStructure" -> "02"
       )
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val model = TradingPremises(
+        businessStructure = Some(SoleProprietor)
+      )
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -124,7 +128,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.WhatYouNeedController.get(1).url)
     }
 
     "successfully submit and navigate to next page when user selects the option IncorporatedBody" in new Fixture {
@@ -158,7 +162,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1, false).url)
     }
 
   }
