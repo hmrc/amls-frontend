@@ -43,14 +43,14 @@ GET         /trading-premises/what-you-need/:index                      controll
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/agent/:index                              controllers.tradingpremises.YourAgentController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/agent/:index                              controllers.tradingpremises.YourAgentController.post(index: Int, edit: Boolean ?= false)
-
 GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get()
 GET         /trading-premises/check-your-answers/:index                 controllers.tradingpremises.SummaryController.getIndividual(index: Int)

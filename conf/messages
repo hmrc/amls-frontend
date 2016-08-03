@@ -308,6 +308,12 @@ lbl.nonresidential = Non-Residential
 
 lbl.give.details = Please give details
 
+businessType.lbl.01 = Limited company
+businessType.lbl.02 = Sole proprietor
+businessType.lbl.03 = Partnership
+businessType.lbl.04 = Limited partnership or limited liability partnership
+businessType.lbl.05 = Unincorporated association or trust
+
 ############################### Login Page ###############################
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
@@ -511,12 +517,7 @@ tradingpremises.youragent.registeredname.subtitle = It must be identical to the 
 tradingpremises.youragent.taxtype = What type of tax does your agent pay?
 tradingpremises.youragent.taxtype.lbl.01=Self-assessment
 tradingpremises.youragent.taxtype.lbl.02=Corporation tax
-tradingpremises.youragent.businessstructure=What is your agent’s business structure?
-tradingpremises.youragent.businessstructure.lbl.01=Sole proprietor
-tradingpremises.youragent.businessstructure.lbl.02=Limited liability partnership
-tradingpremises.youragent.businessstructure.lbl.03=Partnership
-tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
-tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
+
 tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
 tradingpremises.yourtradingpremises.title=Trading premises - Where are your trading premises?
 tradingpremises.yourtradingpremises.heading=Where are your trading premises?
@@ -533,8 +534,11 @@ tradingpremises.yourtradingpremises.whose.another=Another business, acting as an
 tradingpremises.yourtradingpremises.startdate=When will you start trading from these premises?
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
-tradingpremises.msb.services.title = Money Service Business – Which activities take place at these premises?
+tradingpremises.msb.services.title = Trading premises - Which activities take place at these premises?
 tradingpremises.msb.services.heading = Which activities take place at these premises?
+
+tradingpremises.businessStructure.title = Trading premises - What is your agent’s business structure?
+tradingpremises.businessStructure.heading = What is your agent’s business structure?
 
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own

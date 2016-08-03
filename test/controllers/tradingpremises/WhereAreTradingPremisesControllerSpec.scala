@@ -57,7 +57,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       val ytp = YourTradingPremises(tradingName = "trading Name", address,
         true, LocalDate.now(), true)
 
-      val tradingPremises = TradingPremises(Some(ytp), None, None)
+      val tradingPremises = TradingPremises(None,Some(ytp), None)
 
       when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
@@ -121,7 +121,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
       val result = controller.post(any())(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourAgentController.get(0).url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(0).url))
     }
 
     "post with edit mode with valid data and is OWNER then redirect to Summary Controller" in new Fixture {
