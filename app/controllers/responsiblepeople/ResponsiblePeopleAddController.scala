@@ -25,6 +25,7 @@ trait ResponsiblePeopleAddController extends BaseController with RepeatingSectio
 }
 
 object ResponsiblePeopleAddController extends ResponsiblePeopleAddController {
+  // $COVERAGE-OFF$
   override def dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
