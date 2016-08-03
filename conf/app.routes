@@ -40,6 +40,8 @@ GET         /about-the-business/check-your-answers                      controll
 
 GET         /trading-premises/what-you-need/:index                      controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
+GET         /trading-premises/add                                       controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
+
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 

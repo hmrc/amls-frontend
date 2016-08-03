@@ -38,7 +38,7 @@ object TradingPremises {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tradingpremises"
-    val notStarted = Section(messageKey, NotStarted, controllers.tradingpremises.routes.WhatYouNeedController.get(1))
+    val notStarted = Section(messageKey, NotStarted, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
       premises =>
         if (premises.nonEmpty && (premises forall { _.isComplete })) {
