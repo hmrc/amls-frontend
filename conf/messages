@@ -137,9 +137,10 @@ error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
 error.required.tp.residential.address = Select yes or no to the question: is this a residential address?
 error.required.tp.your.business.or.other = Select one option: who uses these premises, your business or another business acting as an agent for your business?
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
-error.invalid.tp.registered.business.name = You can''t enter more than 140 characters for your agent’s registered business name.
+error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
-error.required.tp.select.business.structure = Select your agent’s business structure.
+error.required.tp.select.business.structure = Select one option: what is your agent’s business structure?
+
 
 ###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?

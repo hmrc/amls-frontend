@@ -4,7 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.tradingpremises.{BusinessStructure, TradingPremises, MsbServices}
+import models.tradingpremises._
+import play.api.libs.json.Json
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
@@ -27,6 +28,16 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
       }
   }
 
+  def redirectToPage(data: BusinessStructure) = {
+    data match {
+      case SoleProprietor => Redirect(routes.SummaryController.get())
+      case LimitedLiabilityPartnership => Redirect(routes.SummaryController.get())
+      case Partnership => Redirect(routes.SummaryController.get())
+      case IncorporatedBody => Redirect(routes.SummaryController.get())
+      case UnincorporatedBody => Redirect(routes.SummaryController.get())
+    }
+  }
+
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[BusinessStructure](request.body) match {
@@ -38,7 +49,9 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
               case Some(tp) => Some(tp.businessStructure(data))
               case _ => Some(TradingPremises(businessStructure = Some(data)))
             }
-          } yield Redirect(routes.SummaryController.get())
+          } yield {
+              redirectToPage(data)
+          }
       }
   }
 }

@@ -31,6 +31,10 @@ class BusinessStructureSpec extends PlaySpec {
       BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("11"))) must be(Failure(List(
         (Path \ "agentsBusinessStructure", List(ValidationError("error.invalid"))))))
     }
+    "Fail on missing mandatory field" in {
+      BusinessStructure.agentsBusinessStructureRule.validate(Map.empty) must be(Failure(List(
+        (Path \ "agentsBusinessStructure", List(ValidationError("error.required.tp.select.business.structure"))))))
+    }
 
     "Read JSON data successfully" in {
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "01")) must be(JsSuccess(SoleProprietor,
