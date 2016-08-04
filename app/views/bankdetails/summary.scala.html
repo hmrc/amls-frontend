@@ -18,7 +18,7 @@
             <span>@Messages("bankdetails.summary.nobank.account")</span> <br>
         }
         <br>
-        <a href="@controllers.bankdetails.routes.BankAccountAddController.get()"> @Messages("bankdetails.summary.nobank.add.account") </a>
+        <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         <br><br>
     } else {
 
@@ -26,7 +26,7 @@
             <span>@Messages("bankdetails.summary.check.info")</span> <br>
         }
         <br>
-        <a href="@controllers.bankdetails.routes.BankAccountAddController.get()"> @Messages("bankdetails.summary.add.account") </a>
+        <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.add.account") </a>
         <br><br>
         @model.zipWithIndex.map { case (x, y) =>
             <table>
