@@ -85,7 +85,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
           redirectLocation(result) must be(Some(routes.BankAccountController.get(1, false).url))
         }
 
-        "not editing and there is no data" in new Fixture {
+          "not editing and there is no bank account" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
             "bankAccountType" -> "04" // something weird going on here?
           )
@@ -98,12 +98,12 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
           val result = controller.post(1, false)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountController.get(1, false).url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
         }
 
         "editing and there is valid account type but no account details" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
-            "bankAccountType" -> "04"
+            "bankAccountType" -> "01"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
@@ -119,7 +119,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
         "editing and there is both a valid account type and valid account details" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
-            "bankAccountType" -> "04"
+            "bankAccountType" -> "01"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))

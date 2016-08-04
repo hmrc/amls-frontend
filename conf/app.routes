@@ -22,8 +22,8 @@ POST        /about-the-business/vat                                     controll
 GET         /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
 POST        /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
-GET         /about-the-business/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /about-the-business/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /about-the-business/confirming-address                      controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /about-the-business/confirming-address                      controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
 GET         /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
@@ -297,7 +297,8 @@ GET         /high-value-dealer/excise-goods                             controll
 POST        /high-value-dealer/excise-goods                             controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
 
 
-GET         /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
-POST        /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+GET         /high-value-dealer/percentage                               controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /high-value-dealer/percentage                               controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+
 GET         /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
