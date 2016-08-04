@@ -314,6 +314,8 @@ unauthorised.title = Unauthorised
 
 ############################### Status page ###############################
 status.title = Application status – Anti-Money Laundering Supervision
+status.heading = Your application status
+status.business = Your business:
 
 ############################### Progress page ###############################
 progress.title = Application progress – Anti-Money Laundering Supervision
@@ -414,6 +416,7 @@ summary.asp = Accountancy Service Provider
 summary.supervision = Supervision
 summary.msb = Money Service Business
 summary.hvd = High Value Dealer
+summary.status = Anti-money laundering supervision registration
 
 summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises

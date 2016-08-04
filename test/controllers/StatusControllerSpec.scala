@@ -25,6 +25,9 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
       val document = Jsoup.parse(contentAsString(result))
       document.title() must be(Messages("status.title"))
+      document.getElementsByClass("heading-xlarge").first().child(1).html() must be(Messages("status.heading"))
+      document.getElementsByClass("heading-secondary").first().html() must be(Messages("summary.status"))
+      document.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
 
     }
   }

@@ -8,6 +8,8 @@ import views.html.status.status
 
 trait StatusController extends BaseController{
 
+
+
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
