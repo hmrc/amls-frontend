@@ -47,9 +47,16 @@
     }
 
     <div class="form-group">
-        <a class="button" href="@controllers.tradingpremises.routes.BusinessStructureController.get(index, false)">
-            @Messages("button.continue")
-        </a>
+        @if(msbExists) {
+           <a class="button" href= "@controllers.tradingpremises.routes.WhatYouNeedController.get(index)">
+               @Messages("button.continue")
+           </a>
+        } else {
+           <a class="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
+               @Messages("button.continue")
+           </a>
+        }
+
     </div>
 
 }
