@@ -25,7 +25,7 @@ trait MSBServicesController extends RepeatingSection with BaseController {
           }
           Ok(views.html.tradingpremises.msb_services(form, index, edit))
         }
-        case None => NotFound
+        case None => NotFound(notFoundView)
       }
   }
 
@@ -42,7 +42,7 @@ trait MSBServicesController extends RepeatingSection with BaseController {
             }
           } yield Redirect(routes.SummaryController.get())
         }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound)
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
   }

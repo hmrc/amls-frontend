@@ -23,7 +23,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
         case Some(_) =>
           Ok(where_are_trading_premises(EmptyForm, edit, index))
         case _ =>
-          NotFound
+          NotFound(notFoundView)
       }
   }
 
@@ -53,7 +53,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
               Redirect(routes.YourAgentController.get(index, edit))
           }
         }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound)
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
   }

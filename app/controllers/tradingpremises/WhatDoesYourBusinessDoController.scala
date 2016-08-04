@@ -73,7 +73,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                   Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
                 case Some(TradingPremises(_, _, None, _)) =>
                   Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
-                case _ => NotFound
+                case _ => NotFound(notFoundView)
               }
             }
           }
@@ -108,7 +108,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 }
               }
             }.recoverWith{
-              case _: IndexOutOfBoundsException => Future.successful(NotFound)
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
           }
         case Left(result) => Future.successful(result)

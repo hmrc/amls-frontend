@@ -20,7 +20,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
           Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
         case Some(_) =>
           Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index))
-        case _ => NotFound
+        case _ => NotFound(notFoundView)
       }
   }
 
@@ -43,7 +43,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
             }
           }
         }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound)
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
     }
