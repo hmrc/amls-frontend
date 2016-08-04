@@ -8,7 +8,7 @@
 }
 
 @header = {
-    @heading("aboutthebusiness.registeredforvat.title", "summary.aboutbusiness")
+    @heading("aboutthebusiness.registeredforvat.heading", "summary.aboutbusiness")
 }
 
 @main(
@@ -23,7 +23,10 @@
             @radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
             @radio(f("registeredForVAT"), "lbl.no", "false")
             @fieldset("", jsHidden = true, id = target) {
-                @input(f("vrnNumber"), "aboutthebusiness.registeredforvat.lbl.vatNumber", bold = false)
+                @input(f("vrnNumber"),
+                    "aboutthebusiness.registeredforvat.lbl.vatNumber",
+                    hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
+                    bold = false)
             }
         }
 
