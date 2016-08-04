@@ -312,6 +312,9 @@ lbl.give.details = Please give details
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
+############################### Status page ###############################
+status.title = Application status – Anti-Money Laundering Supervision
+
 ############################### Progress page ###############################
 progress.title = Application progress – Anti-Money Laundering Supervision
 progress.heading = Application progress

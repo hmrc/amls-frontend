@@ -1,0 +1,21 @@
+@import include._
+
+@(implicit request: Request[_])
+@main2(
+title = Messages("status.title")
+) {
+
+@* Heading *@
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--3-3">
+        @heading("progress.heading")
+        <p class="lede">@Messages("progress.lede")</p>
+        <p>@Messages("progress.saved.automatically")</p>
+    </div>
+    <div class="grid-layout__column grid-layout__column--1-3">
+        &nbsp;
+    </div>
+</div>
+
+
+}

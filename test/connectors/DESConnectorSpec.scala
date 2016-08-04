@@ -51,17 +51,19 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   implicit val hc = HeaderCarrier()
   implicit val ac = AuthContext(
-                      LoggedInUser(
-                        "UserName",
-                        None,
-                        None,
-                        None,
-                        CredentialStrength.Weak,
-                        ConfidenceLevel.L50),
-                      Principal(
-                        None,
-                        Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
-                      None)
+    LoggedInUser(
+      "UserName",
+      None,
+      None,
+      None,
+      CredentialStrength.Weak,
+      ConfidenceLevel.L50),
+    Principal(
+      None,
+      Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
+    None,
+    None,
+    None)
 
   "subscribe" must {
 
@@ -71,7 +73,7 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         DESConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/org/TestOrgRef/$safeId"), eqTo(request), any())(any(), any(), any())
       } thenReturn Future.successful(response)
 
-      whenReady (DESConnector.subscribe(request, safeId)) {
+      whenReady(DESConnector.subscribe(request, safeId)) {
         _ mustBe response
       }
     }

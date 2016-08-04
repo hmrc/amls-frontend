@@ -25,7 +25,7 @@ trait LandingController extends BaseController {
           } getOrElse {
             // If we have no previous subscription, but we have a saved form,
             // redirect to the registration progress page
-            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+            Future.successful(Redirect(controllers.routes.StatusController.get()))
           }
         case None =>
           landingService.reviewDetails flatMap {
