@@ -33,10 +33,15 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
           for {
               result <- updateDataStrict[BankDetails](index) {
                 case Some(BankDetails(_, Some(x))) => Some(BankDetails(data, Some(x)))
-                case _ => Some(BankDetails(data, None))
+                case _ => BankAccountType.convert(data)
               }
 
-          } yield Redirect(routes.BankAccountController.get(index, edit))
+          } yield {
+            data match {
+              case Some(_) => Redirect(routes.BankAccountController.get(index))
+              case _ => Redirect(routes.SummaryController.get())
+            }
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound)
         }
