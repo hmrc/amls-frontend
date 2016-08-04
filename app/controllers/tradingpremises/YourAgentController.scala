@@ -22,7 +22,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
             Ok(who_is_your_agent(Form2[YourAgent](data), edit, index))
           case Some(TradingPremises(_, None, _, _)) =>
             Ok(who_is_your_agent(EmptyForm, edit, index))
-          case _ => NotFound
+          case _ => NotFound(notFoundView)
         }
   }
 
@@ -44,7 +44,7 @@ trait YourAgentController extends RepeatingSection with BaseController {
                 Redirect(routes.WhatDoesYourBusinessDoController.get(index))
             }
           }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound)
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
       }

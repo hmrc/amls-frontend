@@ -21,7 +21,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
         case Some(_) =>
           Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
         case _ => {
-          NotFound
+          NotFound(notFoundView)
         }
       }
   }
@@ -39,7 +39,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
             }
           } yield Redirect(routes.SummaryController.get())
         }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound)
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
     }
