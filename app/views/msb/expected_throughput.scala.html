@@ -4,7 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("msb.throughput.title", "summary.msb")
+    @heading("msb.throughput.heading", "summary.msb")
 }
 
 @main(
@@ -12,10 +12,12 @@
     heading = header
 ) {
 
+    <p>@Messages("msb.throughput.sub")</p>
+
     @form(f, controllers.msb.routes.ExpectedThroughputController.post(edit)) {
 
         @radioGroup(f("throughput")) {
-            @legend("TODO", jsHidden = true)
+            @legend("msb.throughput.heading", jsHidden = true)
             @radio(f("throughput"), "msb.throughput.lbl.01", "01")
             @radio(f("throughput"), "msb.throughput.lbl.02", "02")
             @radio(f("throughput"), "msb.throughput.lbl.03", "03")

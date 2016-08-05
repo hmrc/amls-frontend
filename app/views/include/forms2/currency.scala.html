@@ -5,10 +5,11 @@
     labelText: String = "",
     hintText: String = "",
     bold: Boolean = false,
-    classes: Seq[String] = Seq.empty
+    classes: Seq[String] = Seq.empty,
+    requiredField: Boolean = true
 )(implicit lang: Lang)
 
-<div class="form-field @if(field.hasErrors) {form-field--error}">
+<div class="form-group @if(field.hasErrors) {form-field--error}">
     <label>
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
@@ -20,7 +21,7 @@
             <span class="error-notification">@field.error</span>
         }
 
-        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-auto-complete>
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" @if(requiredField) { aria-required="true" required="required" } data-auto-complete>
             <option value=""></option>
             @models.currencies.map { currency =>
                 <option value="@currency" @if(field.value.contains(currency)) {selected} >@currency</option>

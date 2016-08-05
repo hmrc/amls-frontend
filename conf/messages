@@ -413,16 +413,29 @@ summary.msb = Money Service Business
 summary.hvd = High Value Dealer
 
 summary.checkyouranswers.title = Check your answers
-summary.checkyouranswers.businesspremises.title = Your business'' premises
+summary.checkyouranswers.businesspremises.title = Your business’ premises
 summary.checkyouranswers.businesspremises.section1 = Premises
 summary.checkyouranswers.businesspremises.section2 = Trading activities
-summary.checkyouranswers.agentspremises.title = Your agents'' premises
+summary.checkyouranswers.agentspremises.title = Your agents’ premises
 summary.checkyouranswers.agentspremises.section1 = Premises
 summary.checkyouranswers.agentspremises.section2 = Trading activities
-summary.checkyouranswers.agentspremises.section3 = Agents'' details
+summary.checkyouranswers.agentspremises.section3 = Agents’ details
 button.checkyouranswers.acceptandcomplete = Accept and complete section
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
+
+summary.businessactivities.checkyouranswers.title = Check your answers – Business activities
+summary.aboutbusiness.checkyouranswers.title = Check your answers – About the business
+summary.estateagentbusiness.checkyouranswers.title = Check your answers – Estate Agency Business
+summary.tradingpremises.checkyouranswers.title = Check your answers – Trading premises
+summary.bankdetails.checkyouranswers.title = Check your answers – Bank details
+summary.responsiblepeople.checkyouranswers.title = Check your answers – Responsible people
+summary.msb.checkyouranswers.title = Check your answers – Money Service Business
+summary.tcsp.checkyouranswers.title = Check your answers – Trust or Company Service Provider
+summary.asp.checkyouranswers.title = Check your answers – Accountancy Service Provider
+summary.supervision.checkyouranswers.title = Check your answers – Supervision
+summary.msb.checkyouranswers.title = Check your answers – Money Service Business
+summary.hvd.checkyouranswers.title = Check your answers – High Value Dealer
 
 main.sidebar.title = Automatic saving
 main.sidebar.information = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
@@ -978,7 +991,7 @@ supervision.memberofprofessionalbody.lbl.12 = International Association of Book-
 supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
 
-msb.whatyouneed.title = Money Service Business – What you need
+msb.whatyouneed.title = What you need – Money Service Business
 msb.whatyouneed.heading = What you need
 msb.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
 msb.whatyouneed.line_1 = a list of which services you provide
@@ -996,16 +1009,16 @@ msb.whatyouneed.possiblerequiredinfo.line_3 = your Intermediary Payment Service 
 msb.whatyouneed.possiblerequiredinfo.line_4 = your Intermediary Payment Service Provider’s HM Revenue and Customs registration number
 msb.whatyouneed.possiblerequiredinfo.line_5 = where you expect to send the largest amounts of money
 msb.whatyouneed.possiblerequiredinfo.line_6 = where you expect to send the greatest number of money transfers
-
-msb.services.title = Money Service Business – Which services does your business provide?
+msb.services.title = Which services does your business provide? – Money Service Business
 msb.services.heading = Which services does your business provide?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
-
-msb.throughput.title = How much throughput do you expect in the next 12 months?
+msb.throughput.title = How much throughput do you expect in the next 12 months? – Money Service Business
+msb.throughput.heading = How much throughput do you expect in the next 12 months?
+msb.throughput.sub = Throughput is the total value of the money you transmit, the currency you exchange, or the cheques you cash.
 msb.throughput.lbl.01 = £0 to £99,999
 msb.throughput.lbl.02 = £100,000 to £499,999
 msb.throughput.lbl.03 = £500,000 to £999,999
@@ -1013,49 +1026,46 @@ msb.throughput.lbl.04 = £1 million to £20 million
 msb.throughput.lbl.05 = £21 million to £100 million
 msb.throughput.lbl.06 = £101 million to £1 billion
 msb.throughput.lbl.07 = More than £1 billion
-
-
-msb.which_currencies.title = Which currencies do you expect to supply the most to your customers?
+msb.which_currencies.title = Which currencies do you expect to supply the most to your customers? – Money Service Business
+msb.which_currencies.heading = Which currencies do you expect to supply the most to your customers?
 msb.which_currencies.uptoThree = List up to 3 currencies
+msb.which_currencies.uptoThree.hint = For example: USD, EUR, CNY
 msb.which_currencies.who = Who will supply your foreign currency?
 msb.which_currencies.source.banks = Banks
 msb.which_currencies.source.which_banks = Which Banks?
 msb.which_currencies.source.wholesalers = Currency wholesalers
 msb.which_currencies.source.which_wholesalers = Which currency wholesalers?
 msb.which_currencies.source.customers = Customers selling their foreign currency
-
-
-
-msb.ipsp.title = Does your business use an Intermediary Payment Service Provider?
+msb.ipsp.title = Does your business use an Intermediary Payment Service Provider? – Money Service Business
+msb.ipsp.heading = Does your business use an Intermediary Payment Service Provider?
 msb.ipsp.text = An Intermediary Payment Service Provider is involved in the transfer of funds, but isn’t the Payment Service Provider for the payer or the payee.
 msb.ipsp.name.lbl = Intermediary Payment Service Provider’s name
-msb.ipsp.referenceNumber.lbl= Intermediary Payment Service Provider's HM Revenue and Customs registration number
-
-msb.linked.txn.title = Can your systems identify linked transactions?
-msb.psr.number.title = Has your business applied for a Payment Systems Regulator (PSR) registration number?
+msb.ipsp.referenceNumber.lbl = Intermediary Payment Service Provider’s HM Revenue and Customs registration number
+msb.linked.txn.title = Can your systems identify linked transactions? – Money Service Business
+msb.linked.txn.heading = Can your systems identify linked transactions?
+msb.psr.number.title = Has your business applied for a Payment Systems Regulator (PSR) registration number? – Money Service Business
+msb.psr.number.heading = Has your business applied for a Payment Systems Regulator (PSR) registration number?
 msb.psr.number.lbl = Registration reference number
-
-msb.send.money.title = Do you send money to other countries?
-msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
-msb.transactions.expected.title = How many money transfers do you expect in the next 12 months?
-
-msb.most.transactions.title = Where do you expect to send the most transactions?
+msb.send.money.title = Do you send money to other countries? – Money Service Business
+msb.send.money.heading = Do you send money to other countries?
+msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money? – Money Service Business
+msb.send.the.largest.amounts.of.money.heading = Where do you expect to send the largest amounts of money?
+msb.transactions.expected.title = How many money transfers do you expect in the next 12 months? – Money Service Business
+msb.transactions.expected.heading = How many money transfers do you expect in the next 12 months?
+msb.most.transactions.title = Where do you expect to send the most transactions? – Money Service Business
+msb.most.transactions.heading = Where do you expect to send the most transactions?
 msb.most.transactions.list.countries = List up to 3 countries
-
-msb.fundstransfer.title = Money Service Business – Do you transfer money without using formal banking systems?
+msb.fundstransfer.title = Do you transfer money without using formal banking systems? – Money Service Business
 msb.fundstransfer.heading = Do you transfer money without using formal banking systems?
 msb.fundstransfer.hint = For example, by using hawala, a trust-based method of moving funds.
-
-msb.branchesoragents.title = Money Service Business – Do you have branches or agents in other countries?
+msb.branchesoragents.title = Do you have branches or agents in other countries? – Money Service Business
 msb.branchesoragents.heading = Do you have branches or agents in other countries?
 msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
 msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
-
-msb.summary.ipsp-name = IPSP''s name
+msb.summary.ipsp-name = IPSP’s name
 msb.summary.ipsp-registration-number = IPSP’s HM Revenue and Customs registration number
-
-msb.ce.transactions.expected.in.12.months.title =  Money Service Business – How many currency exchange transactions do you expect in the next 12 months?
+msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months? –  Money Service Business
 msb.ce.transactions.expected.in.12.months.heading = How many currency exchange transactions do you expect in the next 12 months?
 
 hvd.whatyouneed.title = High Value Dealer – What you need
