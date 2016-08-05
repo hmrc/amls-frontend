@@ -43,8 +43,10 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
 
     "on get() display the persons page when no existing data in keystore" in new Fixture {
 
-      when(additionalExtraAddressController.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      val responsiblePeople = ResponsiblePeople()
+
+      when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = additionalExtraAddressController.get(RecordId)(request)
       status(result) must be(OK)
@@ -124,8 +126,10 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
         "timeAtAddress" -> "01"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
@@ -141,8 +145,10 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
         "timeAtAddress" -> "02"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
@@ -209,8 +215,10 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
         "timeAtAddress" -> "01"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
       status(result) must be(SEE_OTHER)
@@ -227,8 +235,10 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
         "timeAtAddress" -> "01"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
