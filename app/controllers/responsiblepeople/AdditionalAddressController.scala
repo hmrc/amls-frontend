@@ -24,13 +24,12 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            response =>
-              val form: Form2[ResponsiblePersonAddress] = (for {
-                responsiblePeople <- response
-                addressHistory <- responsiblePeople.addressHistory
-                additionalAddress <- addressHistory.additionalAddress
-              } yield Form2[ResponsiblePersonAddress](additionalAddress)).getOrElse(Form2(DefaultAddressHistory))
-              Ok(additional_address(form, edit, index))
+            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)), _, _, _, _, _, _))
+              => Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _))
+              => Ok(additional_address(Form2(DefaultAddressHistory), edit, index))
+            case _
+              => NotFound(notFoundView)
           }
       }
     }
@@ -39,25 +38,27 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request => {
-          Form2[ResponsiblePersonAddress](request.body) match {
+          (Form2[ResponsiblePersonAddress](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.responsiblepeople.additional_address(f, edit, index)))
+              Future.successful(BadRequest(additional_address(f, edit, index)))
             case ValidForm(_, data) =>
-              for {
-                _ <- doUpdate(index, data)
-              } yield (data.timeAtAddress, edit) match {
-                case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
-                case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
-                case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
-                case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
+              doUpdate(index, data).map { _ =>
+                (data.timeAtAddress, edit) match {
+                  case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
+                  case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
+                  case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
+                  case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
+                }
               }
+          }).recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
       }
     }
 
   private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateData[ResponsiblePeople](index) {
+    updateDataStrict[ResponsiblePeople](index) {
       case Some(res) => {
         Some(res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
