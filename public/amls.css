@@ -635,3 +635,11 @@ fieldset.panel-indent legend {
     background: #bfc1c3;
     color: #fff;
 }
+
+.spacelarge{
+    margin-bottom: 40px !important;
+}
+
+.status-detail{
+    margin-left: 30px;
+}
