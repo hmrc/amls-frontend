@@ -35,7 +35,7 @@ class ResponsiblePeopleAddControllerSpec extends WordSpecLike
       if (requiredCount == acc.size) {
         acc
       } else {
-        buildTestSequence(requiredCount, acc :+ ResponsiblePeople())
+        buildTestSequence(requiredCount, acc :+ ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(false)))
       }
     }
 

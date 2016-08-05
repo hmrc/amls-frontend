@@ -16,7 +16,6 @@ trait TradingPremisesAddController  extends RepeatingSection with BaseController
           Redirect(routes.WhatYouNeedController.get(idx))
         } else {
           Redirect(routes.WhereAreTradingPremisesController.get(idx, false))
-
         }
       }
   }
