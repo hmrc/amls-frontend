@@ -1,7 +1,8 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{Address, YourTradingPremises, TradingPremises}
+import org.joda.time.LocalDate
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.PropertyChecks
@@ -35,7 +36,19 @@ class TradingPremisesAddControllerSpec extends WordSpecLike
       if (requiredCount == acc.size) {
         acc
       } else {
-        buildTestSequence(requiredCount, acc :+ TradingPremises())
+        val tradingPremisesData = TradingPremises(
+          Some(YourTradingPremises(
+            "Trading Name",
+            Address(
+              "line 1", "line 2", Some("line 3"), Some("line 4"), "postcode"
+            ),
+            true,
+            new LocalDate(10,10,10),
+            false
+          ))
+        )
+
+        buildTestSequence(requiredCount, acc :+ tradingPremisesData)
       }
     }
 
