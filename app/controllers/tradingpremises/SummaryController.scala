@@ -19,7 +19,6 @@ trait SummaryController extends RepeatingSection with BaseController {
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
       }
-
   }
 
   def getIndividual(index: Int) = Authorised.async {
@@ -28,7 +27,7 @@ trait SummaryController extends RepeatingSection with BaseController {
         case Some(data) =>
           Ok(summary_2(data, index))
         case _ =>
-          Redirect(routes.SummaryController.get)
+          NotFound(notFoundView)
       }
   }
 }

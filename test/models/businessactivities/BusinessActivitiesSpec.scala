@@ -15,7 +15,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val DefaultInvolvedInOther   = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
   val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
   val DefaultTransactionRecord = TransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
-  val DefaultCustomersOutsideUK = CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB")))
+  val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
   val DefaultNCARegistered      = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
   val DefaultRiskAssessments    = RiskAssessmentPolicyYes(Set(PaperBased))
@@ -33,7 +33,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val NewBusinessTurnover       = ExpectedBusinessTurnover.Second
   val NewAMLSTurnover           = ExpectedAMLSTurnover.Second
   val NewTransactionRecord      = TransactionRecordNo
-  val NewCustomersOutsideUK     = CustomersOutsideUKNo
+  val NewCustomersOutsideUK     = CustomersOutsideUK(None)
   val NewNCARegistered          = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
   val NewRiskAssessment         = RiskAssessmentPolicyNo
@@ -56,16 +56,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "transactions" -> Seq("01", "03"),
       "digitalSoftwareName" -> DefaultSoftwareName,
       "isOutside" -> true,
-      "country_1" -> "GB",
-      "country_2" -> JsNull,
-      "country_3" -> JsNull,
-      "country_4" -> JsNull,
-      "country_5" -> JsNull,
-      "country_6" -> JsNull,
-      "country_7" -> JsNull,
-      "country_8" -> JsNull,
-      "country_9" -> JsNull,
-      "country_10" ->JsNull,
+      "countries" ->Json.arr("GB"),
       "ncaRegistered" -> true,
       "accountantForAMLSRegulations" -> true,
       "hasPolicy" -> true,
@@ -97,7 +88,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     "Serialise as expected" in {
       Json.toJson(completeModel) must be(completeJson)
     }
-
+ 
     "Deserialise as expected" in {
       completeJson.as[BusinessActivities] must be(completeModel)
     }

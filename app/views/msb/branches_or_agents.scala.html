@@ -22,7 +22,7 @@
           @radio(f("hasCountries"), "lbl.no", "false")
           @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset", data = Seq("data-toggle-new")) {
             <p class="form-hint">@Messages("msb.branchesoragents.hint")</p>
-            @addRemove("msb.branchesoragents.add.btn") {
+            @addRemove("lbl.add.another.country") {
               @for(i <- 0 until 10) {
                 @defining(
                   f(s"countries[$i]")

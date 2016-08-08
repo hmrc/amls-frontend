@@ -4,9 +4,8 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.businessmatching.{MoneyServiceBusiness, BusinessMatching}
 import views.html.tradingpremises._
-
-import scala.concurrent.Future
 
 trait WhatYouNeedController extends BaseController {
 
@@ -14,7 +13,19 @@ trait WhatYouNeedController extends BaseController {
 
   def get(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
-          Future.successful(Ok(what_you_need(index)))
+      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+        response =>
+        Ok(what_you_need(index, isMSBSelected(response)))
+      }
+  }
+
+  private def isMSBSelected(bm: Option[BusinessMatching]): Boolean = {
+    bm match {
+      case Some(matching) => matching.activities.foldLeft(false){(x, y) =>
+        y.businessActivities.contains(MoneyServiceBusiness)
+      }
+      case None => false
+    }
   }
 }
 
