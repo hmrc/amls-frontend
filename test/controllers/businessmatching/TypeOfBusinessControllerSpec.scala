@@ -22,7 +22,7 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with Moc
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new TypeOfBusinessController {
+    val controller = new AgentCompanyNameController$ {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
     }

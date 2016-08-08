@@ -145,6 +145,8 @@ error.required.tp.registered.business.name = Enter your agent’s registered bus
 error.invalid.tp.registered.business.name = You can''t enter more than 140 characters for your agent’s registered business name.
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
 error.required.tp.select.business.structure = Select your agent’s business structure.
+error.required.tp.agent.registered.company.name = Enter your agent's registered company name.
+error.invalid.tp.agent.registered.company.name = You can't enter more than 140 characters for the registered company name.
 
 ###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
@@ -554,6 +556,12 @@ tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
 tradingpremises.summary.agents = Agent’s
 tradingpremises.summary.tradingstartdate = Trading start date of
+
+
+tradingpremises.agentcompanyname.title =Trading premises What is your agent's registered company name?
+tradingpremises.agentcompanyname.heading = What is your agent's registered company name?
+tradingpremises.agentcompanyname.lbl.hint = It must be identical to the registered name on the incorporation certificate.
+
 
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
