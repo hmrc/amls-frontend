@@ -43,7 +43,7 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("businessactivities.confirm-activities.title"))
+      contentAsString(result) must include(Messages("businessactivities.involved.other.title"))
     }
 
 
