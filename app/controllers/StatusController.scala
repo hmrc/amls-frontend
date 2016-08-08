@@ -29,6 +29,11 @@ trait StatusController extends BaseController{
 
   }
 
+  def statusList() = {
+
+
+  }
+
 }
 
 object StatusController extends StatusController {
@@ -36,3 +41,5 @@ object StatusController extends StatusController {
   override private[controllers] def dataCache: DataCacheConnector = DataCacheConnector
   override protected val authConnector = AMLSAuthConnector
 }
+
+

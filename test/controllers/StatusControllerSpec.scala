@@ -27,7 +27,13 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
   "StatusController" should {
 
-    "load the status page" in new Fixture{
+    "load the status page" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+      when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -38,19 +44,19 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       document.getElementsByClass("heading-secondary").first().html() must be(Messages("summary.status"))
       document.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
 
-      document.getElementsByClass("list").first().child(0).html() must be (Messages("status.incomplete"))
-      document.getElementsByClass("list").first().child(1).html() must be (Messages("status.submitted"))
-      document.getElementsByClass("list").first().child(2).html() must be (Messages("status.feepaid"))
-      document.getElementsByClass("list").first().child(3).html() must be (Messages("status.underreview"))
-      document.getElementsByClass("list").first().child(4).html() must be (Messages("status.decisionmade"))
+      document.getElementsByClass("list").first().child(0).html() must be(Messages("status.incomplete"))
+      document.getElementsByClass("list").first().child(1).html() must be(Messages("status.submitted"))
+      document.getElementsByClass("list").first().child(2).html() must be(Messages("status.feepaid"))
+      document.getElementsByClass("list").first().child(3).html() must be(Messages("status.underreview"))
+      document.getElementsByClass("list").first().child(4).html() must be(Messages("status.decisionmade"))
 
-      document.getElementsByClass("status-detail").first().child(0).html() must be (Messages("status.incompleteheading"))
-      document.getElementsByClass("status-detail").first().child(1).html() must be (Messages("status.description"))
-      document.getElementsByClass("status-detail").first().child(2).html() must be (Messages("status.withdraw"))
+      document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.incompleteheading"))
+      document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.description"))
+      document.getElementsByClass("status-detail").first().child(2).html() must be(Messages("status.withdraw"))
 
     }
 
-    "show business name " in new Fixture{
+    "show business name " in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
@@ -66,6 +72,29 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       document.getElementsByClass("panel-indent").first().child(1).html() must be(reviewDtls.businessName)
 
 
+    }
+
+    "show correct status classes  " when {
+
+      "submission incomplete" in new Fixture {
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+          Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
+
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementsByClass("status-list").first().child(0).hasClass("current")  must be(true)
+
+
+
+
+      }
     }
   }
 
