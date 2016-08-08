@@ -122,30 +122,29 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   "emailType" must {
 
-    "successfully validate" in {
+    val validEmailAddresses = Seq("test@test.com", "blah76@blah.com", "t@t", "name@abc-def.com")
+    val invalidEmailAddresses = Seq("test@-test.com", "foo@bar,com", "foo", "test@jhfd_jkj.com", "test@blah-.com")
 
-      emailType.validate("test@test.com") must
-        be(Success("test@test.com"))
+    validEmailAddresses.foreach { testData =>
+      s"succesfully validate $testData" in {
+        emailType.validate(testData) must
+          be(Success(testData))
+      }
     }
 
-    "successfully validate 2" in {
-
-      emailType.validate("t@t") must
-        be(Success("t@t"))
+    invalidEmailAddresses.foreach { testData =>
+      s"fail to validate $testData" in {
+        emailType.validate(testData) must be(Failure(Seq(
+          Path -> Seq(ValidationError("error.invalid.rp.email"))
+        )))
+      }
     }
 
     "fail to validate an empty string" in {
-
       emailType.validate("") must
         equal(Failure(Seq(
           Path -> Seq(ValidationError("error.required.rp.email"))
         )))
-    }
-
-    "fail to validate an email with a comma instead of a dot" in {
-      emailType.validate("foo@bar,com") must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.rp.email"))
-      )))
     }
 
     "fail to validate a string longer than 100" in {
@@ -154,13 +153,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.max.length.rp.email"))
         )))
-    }
-
-    "fail to validate an email without a `@` in it" in {
-
-      emailType.validate("foo") must be(Failure(Seq(
-                Path -> Seq(ValidationError("error.invalid.rp.email"))
-              )))
     }
   }
 
