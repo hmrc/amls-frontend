@@ -33,7 +33,9 @@ object FormTypes {
 
   val vrnTypeRegex = "^[0-9]{9}$".r
   val phoneNumberRegex = "[0-9]+".r
-  val emailRegex = "^.+@[a-zA-Z0-9\\.]+$".r
+  val emailRegex = "^.+" + //Any character 1 or more times
+                    "@" + //@ symbolyeah
+                    "((?!\\-)[a-zA-Z0-9\\-]+(?<!\\-)\\.)*((?!\\-)[a-zA-Z0-9\\-]+(?<!\\-))$".r
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val monthRegex = "(0?[1-9]|1[012])".r
   val yearRegex = "((19|20)\\d\\d)".r
