@@ -1,4 +1,4 @@
-package models.tradingpremises.AgentCompanyName
+package models.tradingpremises
 
 import models.FormTypes._
 import play.api.data.mapping._

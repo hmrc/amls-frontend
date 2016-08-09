@@ -1,7 +1,7 @@
 package models.tradingpremises
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.tradingpremises.AgentCompanyName.AgentCompanyName
+import models.tradingpremises.AgentCompanyName
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 

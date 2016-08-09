@@ -1,8 +1,8 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.tradingpremises.AgentCompanyName.AgentCompanyName
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.AgentCompanyName
+import models.tradingpremises.{AgentCompanyName, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -35,7 +35,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
     "display business Types Page" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any())).thenReturn(Future.successful(None))
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
       document.title() must be (Messages("tradingpremises.agentcompanyname.title"))
@@ -46,7 +46,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any())).thenReturn(
         Future.successful(Some(TradingPremises(agentCompanyName = Some(AgentCompanyName("test"))))))
 
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
       document.title() must be (Messages("tradingpremises.agentcompanyname.title"))
@@ -65,7 +65,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post()(newRequest)
+      val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
@@ -82,7 +82,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post(true)(newRequest)
+      val result = controller.post(1,true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
@@ -91,7 +91,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
     "post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "agentCompanyName" -> "11"*40
+        "agentCompanyName" -> "11111111111"*40
       )
 
       when(controller.dataCacheConnector.fetch[TradingPremises](any())
@@ -100,14 +100,16 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post()(newRequest)
+      val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.invalid.tp.agent.registered.company.name"))
 
     }
 
+
     "post with missing mandatory field" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
+        "agentCompanyName" -> " "
       )
 
       when(controller.dataCacheConnector.fetch[TradingPremises](any())
@@ -116,7 +118,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = controller.post()(newRequest)
+      val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.required.tp.agent.registered.company.name"))
     }

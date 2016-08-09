@@ -4,13 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.tradingpremises.AgentCompanyName
-import models.tradingpremises.AgentCompanyName
-import models.tradingpremises.AgentCompanyName.AgentCompanyName
-import models.tradingpremises.TradingPremises
+import models.tradingpremises._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.tradingpremises.agent_company_name
-
+import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
@@ -26,7 +22,7 @@ trait AgentCompanyNameController extends BaseController {
             tradingPremises <- response
             agent <- tradingPremises.agentCompanyName
           } yield Form2[AgentCompanyName](agent)).getOrElse(EmptyForm)
-          Ok(agent_company_name(form, index, edit))
+          Ok(views.html.tradingpremises.agent_company_name(form, index, edit))
       }
   }
 
@@ -34,7 +30,7 @@ trait AgentCompanyNameController extends BaseController {
     implicit authContext => implicit request => {
       Form2[AgentCompanyName](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(agent_company_name(f, index,edit)))
+          Future.successful(BadRequest(views.html.tradingpremises.agent_company_name(f, index,edit)))
         case ValidForm(_, data) =>
           for {
             tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)

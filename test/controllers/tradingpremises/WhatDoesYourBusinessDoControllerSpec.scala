@@ -168,7 +168,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "given a Valid Request with multiple ACTIVITIES and show the summary page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-          val tradingPremises = TradingPremises(None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None, None,Some(wdbd))
 
           when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
@@ -192,7 +192,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "given a Valid Request in EDIT Mode and show the trading premises summary with record id" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-          val tradingPremises = TradingPremises(None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None,None, Some(wdbd))
 
           when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))

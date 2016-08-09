@@ -12,6 +12,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
 
   val yourAgent = YourAgent("STUDENT", TaxTypeSelfAssesment, SoleProprietor)
 
+  val agentCompanyName = AgentCompanyName("test")
+
   val wdbd = WhatDoesYourBusinessDo(
     Set(
       BillPaymentServices,
@@ -19,7 +21,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       MoneyServiceBusiness))
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
 
-  val completeModel = TradingPremises(Some(ytp), Some(yourAgent), Some(wdbd), Some(msbServices))
+  val completeModel = TradingPremises(Some(ytp), Some(yourAgent),Some(agentCompanyName), Some(wdbd), Some(msbServices))
   val completeJson = Json.obj("tradingName" -> "foo",
     "addressLine1" -> "1",
     "addressLine2" -> "2",
@@ -40,6 +42,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.yourAgent(yourAgent)
       newTP.yourAgent must be(Some(yourAgent))
+    }
+
+    "set the your trading premises data correctly" in {
+      val tp = TradingPremises(None, None, None)
+      val newTP = tp.agentCompanyName(agentCompanyName)
+      newTP.yourTradingPremises must be(Some(agentCompanyName))
     }
 
     "set the your trading premises data correctly" in {
