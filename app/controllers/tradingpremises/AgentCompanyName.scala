@@ -1,4 +1,4 @@
-package controllers.businessmatching
+package controllers.tradingpremises
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
@@ -14,11 +14,11 @@ import views.html.tradingpremises.agent_company_name
 
 import scala.concurrent.Future
 
-trait AgentCompanyNameController$ extends BaseController {
+trait AgentCompanyNameController extends BaseController {
 
   private[controllers] def dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get(index: Int ,edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[TradingPremises](TradingPremises.key) map {
         response =>
@@ -26,15 +26,15 @@ trait AgentCompanyNameController$ extends BaseController {
             tradingPremises <- response
             agent <- tradingPremises.agentCompanyName
           } yield Form2[AgentCompanyName](agent)).getOrElse(EmptyForm)
-          Ok(agent_company_name(form, edit))
+          Ok(agent_company_name(form, index, edit))
       }
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post(index: Int ,edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[AgentCompanyName](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(agent_company_name(f, edit)))
+          Future.successful(BadRequest(agent_company_name(f, index,edit)))
         case ValidForm(_, data) =>
           for {
             tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)
@@ -50,7 +50,7 @@ trait AgentCompanyNameController$ extends BaseController {
   }
 }
 
-object AgentCompanyNameController$ extends AgentCompanyNameController$ {
+object AgentCompanyNameController extends AgentCompanyNameController {
   // $COVERAGE-OFF$
   override private[controllers] def dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector

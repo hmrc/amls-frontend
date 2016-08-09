@@ -2,7 +2,7 @@
 @import include.{main, heading}
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], index:Int, edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading("tradingpremises.agentcompanyname.heading", "summary.tradingpremises")
@@ -13,7 +13,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.tradingpremises.routes.AgentCompanyNameController.post(edit)) {
+    @form(f, controllers.tradingpremises.routes.AgentCompanyNameController.post(index,edit)) {
 
         <div class="form-field-group">
             @input(
