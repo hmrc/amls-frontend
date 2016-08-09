@@ -80,7 +80,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "there is data - with form populated" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-          val tradingPremises = TradingPremises(None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None,None, Some(wdbd))
           val businessActivities = BusinessActivities(
             involvedInOther = Some(InvolvedInOtherYes("test")),
             expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Fifth))
@@ -148,7 +148,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "given a Valid Request with SINGLE Activity and show the summary page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices))
-          val tradingPremises = TradingPremises(None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None,None, Some(wdbd))
           val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
           when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
