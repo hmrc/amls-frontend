@@ -20,8 +20,10 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       getData[TradingPremises](index) map {
         case Some(TradingPremises(Some(data), _, _,_)) =>
           Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
-        case _ =>
+        case Some(_) =>
           Ok(where_are_trading_premises(EmptyForm, edit, index))
+        case _ =>
+          NotFound(notFoundView)
       }
   }
 
@@ -32,25 +34,27 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       Form2[YourTradingPremises](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(where_are_trading_premises(f, edit, index)))
-        case ValidForm(_, data) =>
+        case ValidForm(_, ytp) => {
           for {
-            _ <- updateData[TradingPremises](index) {
+            _ <- updateDataStrict[TradingPremises](index) {
               // This makes sure to save `None` for the agent section if
               // the user selects that the premises is theirs.
-              case Some(tp) if data.isOwner =>
-                Some(TradingPremises(Some(data), None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+              case Some(tp) if ytp.isOwner =>
+                Some(TradingPremises(Some(ytp), None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
               case Some(tp) =>
-                Some(TradingPremises(Some(data), tp.yourAgent, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
-              case _ => data
+                Some(TradingPremises(Some(ytp), tp.yourAgent, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
             }
-          } yield (edit, data.isOwner) match {
+          } yield (edit, ytp.isOwner) match {
             case (true, true) =>
               Redirect(routes.SummaryController.getIndividual(index))
             case (false, true) =>
               Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
-            case (_, _) =>
+            case (_, false) =>
               Redirect(routes.YourAgentController.get(index, edit))
           }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
       }
   }
 }

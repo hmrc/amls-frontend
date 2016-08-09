@@ -43,8 +43,10 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with 
 
     "on get() display the persons page when no existing data in keystore" in new Fixture {
 
-      when(additionalAddressController.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      val responsiblePeople = ResponsiblePeople()
+
+      when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = additionalAddressController.get(RecordId)(request)
       status(result) must be(OK)
@@ -124,8 +126,10 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with 
         "timeAtAddress" -> "01"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -144,8 +148,10 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with 
         "timeAtAddress" -> "02"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -225,8 +231,10 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with 
         "timeAtAddress" -> "01"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -246,8 +254,10 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with 
         "timeAtAddress" -> "04"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -267,8 +277,10 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with 
         "timeAtAddress" -> "03"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -288,8 +300,10 @@ class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with 
         "timeAtAddress" -> "04"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
