@@ -4,8 +4,8 @@ sealed trait SubmissionStatus {
 
 }
 
-object NotSubmitted extends SubmissionStatus
-object SubmissionSubmitted extends SubmissionStatus
-object SubmissionFeePaid extends SubmissionStatus
-object SubmissionUnderReview extends SubmissionStatus
+object NotCompleted extends SubmissionStatus
+object SubmissionReady extends SubmissionStatus
+object SubmissionFeesDue extends SubmissionStatus
+object SubmissionReadyForReview extends SubmissionStatus
 object SubmissionDecisionMade extends SubmissionStatus

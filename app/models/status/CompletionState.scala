@@ -27,12 +27,12 @@ case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionSt
     val combo = (status, statuses.get(status).get)
 
     combo match {
-      case (NotSubmitted, Incomplete) | (NotSubmitted, Current) => Messages("status.incomplete")
-      case (NotSubmitted, Complete) => Messages("status.complete")
-      case (SubmissionSubmitted, Incomplete) | (SubmissionSubmitted, Current) => Messages("status.notsubmitted")
-      case (SubmissionSubmitted, Complete) => Messages("status.submitted")
-      case (SubmissionFeePaid, _) => Messages("status.feepaid")
-      case (SubmissionUnderReview, _) => Messages("status.underreview")
+      case (NotCompleted, Incomplete) | (NotCompleted, Current) => Messages("status.incomplete")
+      case (NotCompleted, Complete) => Messages("status.complete")
+      case (SubmissionReady, Incomplete) | (SubmissionReady, Current) => Messages("status.notsubmitted")
+      case (SubmissionReady, Complete) => Messages("status.submitted")
+      case (SubmissionFeesDue, _) => Messages("status.feepaid")
+      case (SubmissionReadyForReview, _) => Messages("status.underreview")
       case (SubmissionDecisionMade, _) => Messages("status.decisionmade")
       case _ => "Not found"
     }
@@ -43,10 +43,10 @@ case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionSt
 object CompletionStateViewModel {
 
   def apply(current: SubmissionStatus): CompletionStateViewModel = {
-    val statuses = ListMap(NotSubmitted -> Complete,
-      SubmissionSubmitted -> Complete,
-      SubmissionFeePaid -> Complete,
-      SubmissionUnderReview -> Complete,
+    val statuses = ListMap(NotCompleted -> Complete,
+      SubmissionReady -> Complete,
+      SubmissionFeesDue -> Complete,
+      SubmissionReadyForReview -> Complete,
       SubmissionDecisionMade -> Complete)
 
     val updatedStatuses = statuses.span(s => s._1 != current)._1 ++ Map(current -> Current) ++ statuses.span(s => s._1 != current)._2.drop(1).map {
