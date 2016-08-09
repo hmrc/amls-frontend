@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.tradingpremises.{TradingPremises, MsbServices}
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
@@ -17,28 +17,32 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
-        response =>
-          val form = (for {
-            tp <- response
-            services <- tp.msbServices
-          } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
-
-          Ok(views.html.tradingpremises.msb_services(form, index, edit))
+        case Some(tp) => {
+          val form = tp.registeringAgentPremises match {
+            case Some(service) => Form2[RegisteringAgentPremises](service)
+            case None => EmptyForm
+          }
+          Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
+        }
+        case None => NotFound(notFoundView)
       }
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[MsbServices](request.body) match {
+      Form2[RegisteringAgentPremises](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.msb_services(f, index, edit)))
-        case ValidForm(_, data) =>
+          Future.successful(BadRequest(views.html.tradingpremises.registering_agent_premises(f, index, edit)))
+        case ValidForm(_, data) => {
           for {
-            _ <- updateData[TradingPremises](index) {
-              case Some(tp) => Some(tp.msbServices(data))
-              case _ => Some(TradingPremises(msbServices = Some(data)))
+            _ <- updateDataStrict[TradingPremises](index) {
+              case Some(tp) => Some(tp.yourAgentPremises(data))
+              case _ => Some(TradingPremises(registeringAgentPremises = Some(data)))
             }
           } yield Redirect(routes.SummaryController.get())
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
       }
   }
 }

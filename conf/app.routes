@@ -22,8 +22,8 @@ POST        /about-the-business/vat                                     controll
 GET         /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
 POST        /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
-GET         /about-the-business/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /about-the-business/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /about-the-business/confirming-address                      controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /about-the-business/confirming-address                      controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
 GET         /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
@@ -39,6 +39,8 @@ GET         /about-the-business/what-you-need                           controll
 GET         /about-the-business/check-your-answers                      controllers.aboutthebusiness.SummaryController.get()
 
 GET         /trading-premises/what-you-need/:index                      controllers.tradingpremises.WhatYouNeedController.get(index: Int)
+
+GET         /trading-premises/add                                       controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
 
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
@@ -85,6 +87,8 @@ POST        /business-matching/registration-number                      controll
 GET         /business-matching/check-your-answers                       controllers.businessmatching.SummaryController.get()
 
 GET         /bank-details/what-you-need/:index                          controllers.bankdetails.WhatYouNeedController.get(index: Int)
+
+GET         /bank-details/add                                           controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
 
 GET         /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
@@ -143,6 +147,8 @@ POST        /declaration/add-person                                     controll
 GET         /declaration/declaration                                    controllers.declaration.DeclarationController.get()
 
 GET         /confirmation                                               controllers.ConfirmationController.get()
+
+GET         /responsible-people/add                                     controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true)
 
 GET         /responsible-people/who-must-register/:index                controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
 GET         /responsible-people/what-you-need/:index                    controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
@@ -291,7 +297,8 @@ GET         /high-value-dealer/excise-goods                             controll
 POST        /high-value-dealer/excise-goods                             controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
 
 
-GET         /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
-POST        /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+GET         /high-value-dealer/percentage                               controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /high-value-dealer/percentage                               controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+
 GET         /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)

@@ -3,6 +3,7 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching._
+import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers._
@@ -28,15 +29,14 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
   "WhatYouNeedController" must {
 
-    "use correct services" in new Fixture {
-      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
-    }
-
     "load the what you need page" in new Fixture {
       when (controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any())) thenReturn(Future.successful(None))
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("tradingpremises.whatyouneed.title"))
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+      document.title() must be(Messages("tradingpremises.whatyouneed.title"))
+
+      status(result) mustBe OK
     }
 
     "load the what you need page when msb selected as an option in business matching" in new Fixture {
@@ -48,8 +48,12 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       status(result) must be(OK)
       contentAsString(result) must include(Messages("tradingpremises.whatyouneed.agents.sub.heading"))
       contentAsString(result) must include(Messages("tradingpremises.whatyouneed.agents.circumstances.info.text1"))
-
     }
   }
 
+  it must {
+    "use correct services" in new Fixture {
+      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
+    }
+  }
 }

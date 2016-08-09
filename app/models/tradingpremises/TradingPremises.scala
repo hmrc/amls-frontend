@@ -24,6 +24,9 @@ case class TradingPremises(
   def msbServices(v: MsbServices): TradingPremises =
     this.copy(msbServices = Some(v))
 
+  def yourAgentPremises(v: RegisteringAgentPremises): TradingPremises =
+    this.copy(registeringAgentPremises = Some(v))
+
   def isComplete: Boolean =
     this match {
       case TradingPremises(_,Some(x), _, Some(_),_) if x.isOwner => true
@@ -39,7 +42,7 @@ object TradingPremises {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tradingpremises"
-    val notStarted = Section(messageKey, NotStarted, controllers.tradingpremises.routes.WhatYouNeedController.get(1))
+    val notStarted = Section(messageKey, NotStarted, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
       premises =>
         if (premises.nonEmpty && (premises forall { _.isComplete })) {
