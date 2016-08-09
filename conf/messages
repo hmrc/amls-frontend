@@ -559,7 +559,7 @@ tradingpremises.summary.tradingstartdate = Trading start date of
 
 
 tradingpremises.agentcompanyname.title =Trading premises What is your agent's registered company name?
-tradingpremises.agentcompanyname.heading = What is your agent's registered company name?
+tradingpremises.agentcompanyname.heading = What is your agent’s registered company name?
 tradingpremises.agentcompanyname.lbl.hint = It must be identical to the registered name on the incorporation certificate.
 
 
