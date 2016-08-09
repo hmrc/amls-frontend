@@ -73,6 +73,7 @@
   background-repeat: no-repeat;
 }
 
+.status-list .status-list--complete,
 .progress-step__complete .progress-step--status,
 .progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
@@ -83,6 +84,7 @@
   background-size: 33%;
 }
 
+.no-svg .status-list .status-list--complete,
 .no-svg .progress-step__complete .progress-step--status,
 .no-svg .progress-step__complete:hover .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/tick.png");
@@ -631,15 +633,23 @@ fieldset.panel-indent legend {
     border-top: 3px solid #bfc1c3;
 }
 
+.status-list--end {
+  border-bottom: 3px solid #bfc1c3;
+}
+
 .status-list--upcoming {
     background: #bfc1c3;
     color: #fff;
 }
 
-.spacelarge{
-    margin-bottom: 40px !important;
-}
-
 .status-detail{
     margin-left: 30px;
+}
+
+
+.status-list .status-list--complete {
+  background-color: #28a197;
+  background-position: 96%;
+  background-size: 12%;
+  color: #fff;
 }

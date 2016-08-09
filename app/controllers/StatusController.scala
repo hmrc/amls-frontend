@@ -6,13 +6,16 @@ import models.businessmatching.BusinessMatching
 
 import scala.concurrent.Future
 import views.html.status.status
+import models.status._
+
 
 
 trait StatusController extends BaseController{
 
   private[controllers] def dataCache: DataCacheConnector
+  private[controllers] def submissionStatus: SubmissionStatus = NotSubmitted
 
-  //private val businessName: String = "Ubunchews Accountancy Services"
+
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -23,16 +26,16 @@ trait StatusController extends BaseController{
             reviewDetails <- businessMatching.reviewDetails
           } yield reviewDetails.businessName
 
-          Ok(status(businessName.getOrElse("Not Found")))
+          Ok(status(businessName.getOrElse("Not Found"),CompletionStateViewModel(submissionStatus)))
       }
 
 
   }
 
-  def statusList() = {
 
 
-  }
+
+
 
 }
 

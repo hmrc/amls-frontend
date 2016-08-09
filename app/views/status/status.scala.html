@@ -1,6 +1,20 @@
 @import include._
+@import models.status.CompletionStateViewModel
+@import models.status.SubmissionStatus
+@import models.status.CompletionState
+@import models.status.NotSubmitted
+@import models.status.SubmissionDecisionMade
+@import models.status.Current
 
-@(businessName: String)(implicit request: Request[_])
+@(businessName: String, completionState: CompletionStateViewModel)(implicit request: Request[_])
+@borderClass(entry:(SubmissionStatus,CompletionState)) = {
+@entry match{
+case (NotSubmitted,Current)=> {status-list--start}
+case (SubmissionDecisionMade,Current)=> {status-list--end}
+case (_,_) => {}
+}
+
+}
 @main2(
 title = Messages("status.title")
 ) {
@@ -18,19 +32,22 @@ title = Messages("status.title")
 
 <div class="grid-layout spacelarge">
     <div class="grid-layout__column grid-layout__column--1-3">
-        <div class="panel-indent"><div class="heading-small">@Messages("status.business")</div><div>@businessName</div></div>
+        <div class="panel-indent panel-indent--gutter"><div class="heading-small">@Messages("status.business")</div><div>@businessName</div></div>
     </div>
     <div class="grid-layout__column grid-layout__column--2-3">&nbsp;</div>
 </div>
 
-<div class="grid-layout">
+<div class="grid-layout grid-layout--stacked">
     <div class="grid-layout__column grid-layout__column--1-3">
         <ol class="list list-number status-list">
-            <li class="status-list--pending status-list--start current">@Messages("status.incomplete")</li>
-            <li class="status-list--upcoming">@Messages("status.submitted")</li>
-            <li class="status-list--upcoming">@Messages("status.feepaid")</li>
-            <li class="status-list--upcoming">@Messages("status.underreview")</li>
-            <li class="status-list--upcoming">@Messages("status.decisionmade")</li>
+
+            @completionState.statuses.map{entry=>
+
+
+                <li class="status-list--pending @{entry._2.cssClass+borderClass(entry)}">@completionState.statusTitle(entry._1)</li>
+
+
+            }
         </ol>
     </div>
     <div class="grid-layout__column grid-layout__column--2-3">

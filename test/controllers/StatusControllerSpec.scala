@@ -91,8 +91,31 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         val document = Jsoup.parse(contentAsString(result))
         document.getElementsByClass("status-list").first().child(0).hasClass("current")  must be(true)
 
+        for(index <- 1 to 4){
+          document.getElementsByClass("status-list").first().child(index).hasClass("current")  must be(false)
+        }
+
+      }
+
+      "submission submitted" in new Fixture {
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        when(controller.dataCache.fetch[BusinessMatching](any())(any(), any(), any())).thenReturn(
+          Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
 
 
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementsByClass("status-list").first().child(0).hasClass("complete")  must be(true)
+        document.getElementsByClass("status-list").first().child(1).hasClass("current")  must be(true)
+
+        for(index <- 2 to 4){
+          document.getElementsByClass("status-list").first().child(index).hasClass("incomplete")  must be(true)
+        }
 
       }
     }
