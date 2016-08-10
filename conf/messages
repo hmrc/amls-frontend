@@ -328,10 +328,13 @@ status.submitted = Submitted
 status.feepaid = Fee paid
 status.underreview = Under review
 status.decisionmade = Decision made
-status.incompleteheading = Application incomplete
-status.description = You’ve started the application form but you haven’t finished it. You have XX days to complete all sections. After XX days the information you entered will be lost, and you’ll need to start again.
-status.withdraw = If you no longer need to register, you can withdraw your application.
-status.buttontext = Return to saved application
+status.incomplete.heading = Application incomplete
+status.incomplete.description = You’ve started the application form but you haven’t finished it. You have XX days to complete all sections. After XX days the information you entered will be lost, and you’ll need to start again.
+status.incomplete.description2 = If you no longer need to register, you can withdraw your application.
+status.incomplete.buttontext = Return to saved application
+status.submissionready.heading = Application not submitted
+status.submissionready.description = You’ve completed all sections of the form, but you haven’t submitted it. You have XX days to submit the application. After XX days the information you entered will be lost, and you’ll need to start again.
+status.submissionready.buttontext = Submit application
 
 
 ############################### Progress page ###############################

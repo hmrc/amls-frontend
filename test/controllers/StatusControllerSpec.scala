@@ -62,9 +62,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       document.getElementsByClass("list").first().child(3).html() must be(Messages("status.underreview"))
       document.getElementsByClass("list").first().child(4).html() must be(Messages("status.decisionmade"))
 
-      document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.incompleteheading"))
-      document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.description"))
-      document.getElementsByClass("status-detail").first().child(2).html() must be(Messages("status.withdraw"))
+
 
     }
 
@@ -87,6 +85,8 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("panel-indent").first().child(1).html() must be(reviewDtls.businessName)
+
+
 
 
     }
@@ -117,6 +117,10 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
           document.getElementsByClass("status-list").first().child(index).hasClass("current") must be(false)
         }
 
+        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.incomplete.heading"))
+        document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.incomplete.description"))
+        document.getElementsByClass("status-detail").first().child(2).html() must be(Messages("status.incomplete.description2"))
+
       }
 
       "submission submitted" in new Fixture {
@@ -142,6 +146,9 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         for (index <- 2 to 4) {
           document.getElementsByClass("status-list").first().child(index).hasClass("status-list--upcoming") must be(true)
         }
+
+        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionready.heading"))
+        document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissionready.description"))
 
       }
     }

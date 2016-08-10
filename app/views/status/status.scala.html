@@ -4,7 +4,7 @@
 @import models.status.CompletionState
 @import models.status.NotCompleted
 @import models.status.SubmissionDecisionMade
-@import models.status.Current
+@import models.status.{Current,SubmissionReady}
 
 @(businessName: String, completionState: CompletionStateViewModel)(implicit request: Request[_])
 @borderClass(entry:(SubmissionStatus,CompletionState)) = {
@@ -45,10 +45,13 @@ title = Messages("status.title")
     </div>
     <div class="grid-layout__column grid-layout__column--2-3">
         <div class="status-detail">
-            <h2>@Messages("status.incompleteheading")</h2>
-            <p>@Messages("status.description")</p>
-            <p>@Messages("status.withdraw")</p>
-            <a href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.buttontext")</a>
+
+            @completionState.currentState match {
+                case NotCompleted => {@include.status.rightpanel_incomplete()}
+                case SubmissionReady => {@include.status.rightpanel_submissionready()}
+                case _ => {@include.status.rightpanel_incomplete()}
+            }
+
         </div>
 
     </div>
