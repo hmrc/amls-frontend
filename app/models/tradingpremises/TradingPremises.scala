@@ -6,6 +6,7 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class TradingPremises(
+                            registeringAgentPremises: Option[RegisteringAgentPremises] = None,
                             yourTradingPremises: Option[YourTradingPremises] = None,
                             yourAgent: Option[YourAgent] = None,
                             agentCompanyName: Option[AgentCompanyName] = None,
@@ -29,10 +30,13 @@ case class TradingPremises(
   def msbServices(v: MsbServices): TradingPremises =
     this.copy(msbServices = Some(v))
 
+  def yourAgentPremises(v: RegisteringAgentPremises): TradingPremises =
+    this.copy(registeringAgentPremises = Some(v))
+
   def isComplete: Boolean =
     this match {
-      case TradingPremises(Some(x), _, Some(_), Some(_),_) if x.isOwner => true
-      case TradingPremises(Some(_), Some(_),Some(_), Some(_), _) => true
+      case TradingPremises(_,Some(x), _, _,Some(_),_) if x.isOwner => true
+      case TradingPremises(_,_,Some(_), Some(_), Some(_), _) => true
       case _ => false
     }
 }
@@ -66,6 +70,7 @@ object TradingPremises {
   }
 
   implicit val reads: Reads[TradingPremises] = (
+      __.read[Option[RegisteringAgentPremises]] and
       __.read[Option[YourTradingPremises]] and
       __.read[Option[YourAgent]] and
         __.read[Option[AgentCompanyName]] and
@@ -76,6 +81,7 @@ object TradingPremises {
   implicit val writes: Writes[TradingPremises] = Writes[TradingPremises] {
     model =>
       Seq(
+        Json.toJson(model.registeringAgentPremises).asOpt[JsObject],
         Json.toJson(model.yourTradingPremises).asOpt[JsObject],
         Json.toJson(model.yourAgent).asOpt[JsObject],
         Json.toJson(model.agentCompanyName).asOpt[JsObject],

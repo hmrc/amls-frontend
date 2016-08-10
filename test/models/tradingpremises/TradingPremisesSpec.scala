@@ -21,7 +21,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       MoneyServiceBusiness))
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
 
-  val completeModel = TradingPremises(Some(ytp), Some(yourAgent),Some(agentCompanyName), Some(wdbd), Some(msbServices))
+  val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)), Some(ytp), Some(yourAgent), Some(wdbd), Some(msbServices))
   val completeJson = Json.obj("tradingName" -> "foo",
     "addressLine1" -> "1",
     "addressLine2" -> "2",
@@ -34,7 +34,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
     "agentsBusinessStructure" -> "01",
     "agentCompanyName" -> "test",
     "activities" -> Json.arr("02", "03", "05"),
-    "msbServices" ->Json.arr("01","02")
+    "msbServices" ->Json.arr("01","02"),
+    "agentPremises" -> true
   )
 
   "TradingPremises" must {
