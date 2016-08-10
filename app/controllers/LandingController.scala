@@ -18,15 +18,7 @@ trait LandingController extends BaseController {
     implicit authContext => implicit request =>
       landingService.cacheMap flatMap {
         case Some(cache) =>
-          cache.getEntry[SubscriptionResponse](SubscriptionResponse.key) map {
-            _ =>
-              // If we have a previous subscription then redirect to the confirmtaion controller
-              Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
-          } getOrElse {
-            // If we have no previous subscription, but we have a saved form,
-            // redirect to the registration progress page
-            Future.successful(Redirect(controllers.routes.StatusController.get()))
-          }
+          Future.successful(Redirect(controllers.routes.StatusController.get()))
         case None =>
           landingService.reviewDetails flatMap {
             case Some(reviewDetails) =>

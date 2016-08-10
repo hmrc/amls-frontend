@@ -43,7 +43,7 @@ class LandingControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
         }
       }
 

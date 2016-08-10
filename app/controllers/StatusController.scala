@@ -1,7 +1,7 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.DESConnector
 import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
@@ -18,7 +18,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 trait StatusController extends BaseController {
 
   private[controllers] def landingService: LandingService
-
+  private[controllers] def desConnector: DESConnector
   private[controllers] def progressService: ProgressService
 
   private def isComplete(seq: Seq[Section]): Boolean =
@@ -63,8 +63,8 @@ trait StatusController extends BaseController {
 
 object StatusController extends StatusController {
   // $COVERAGE-OFF$
-  override private[controllers] def landingService: LandingService = LandingService
-
+  override private[controllers] val landingService: LandingService = LandingService
+  override private[controllers] val desConnector :DESConnector = DESConnector
   override protected val authConnector = AMLSAuthConnector
 
   override val progressService = ProgressService
