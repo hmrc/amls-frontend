@@ -9,7 +9,7 @@ import models.registrationprogress.{Completed, Section}
 import scala.concurrent.Future
 import views.html.status.status
 import models.status._
-import services.{LandingService, ProgressService}
+import services.{AuthEnrolmentsService, LandingService, ProgressService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -20,22 +20,41 @@ trait StatusController extends BaseController {
   private[controllers] def landingService: LandingService
   private[controllers] def desConnector: DESConnector
   private[controllers] def progressService: ProgressService
+  private[controllers] def enrolmentsService: AuthEnrolmentsService
 
   private def isComplete(seq: Seq[Section]): Boolean =
     seq forall {
       _.status == Completed
     }
 
+  private def notYetSubmitted(implicit hc: HeaderCarrier,auth: AuthContext) = {
+    progressService.sections map {
+      sections =>
+        if (isComplete(sections)) SubmissionReady
+        else NotCompleted
+    }
+  }
+
   private[controllers] def submissionStatus(cacheMap: CacheMap)(implicit hc: HeaderCarrier,auth: AuthContext) = {
     cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
-      case Some(response) => Future.successful(SubmissionFeesDue)
-      case _ => {
-        progressService.sections map {
-          sections =>
-            if (isComplete(sections)) SubmissionReady
-            else NotCompleted
+      case Some(response) => {
+        auth.enrolmentsUri match {
+          case Some(uri) => {
+            enrolmentsService.amlsRegistrationNumber(uri) flatMap {
+              case Some(amlsRegNumber) => desConnector.status(amlsRegNumber) map {
+                response => response.formBundleStatus match {
+                  case "None" => SubmissionFeesDue
+                  case "Pending" => SubmissionReadyForReview
+                  case "Approved" | "Rejected" => SubmissionDecisionMade
+                }
+              }
+              case None => Future.successful(NotCompleted)
+            }
+          }
+          case None =>  notYetSubmitted
         }
       }
+      case _ => notYetSubmitted
     }
   }
 
@@ -53,11 +72,8 @@ trait StatusController extends BaseController {
               foundStatus =>
                 Ok(status(businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
             }
-
         }
-
   }
-
 
 }
 
@@ -66,9 +82,8 @@ object StatusController extends StatusController {
   override private[controllers] val landingService: LandingService = LandingService
   override private[controllers] val desConnector :DESConnector = DESConnector
   override protected val authConnector = AMLSAuthConnector
-
-  override val progressService = ProgressService
-
+  override private[controllers] val progressService = ProgressService
+  override private[controllers] val enrolmentsService = AuthEnrolmentsService
 
 }
 

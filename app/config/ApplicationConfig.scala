@@ -29,6 +29,8 @@ object ApplicationConfig extends ServicesConfig {
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
 
+  lazy val authUrl = baseUrl("auth")
+
   lazy val businessCustomerUrl = getConfigString("business-customer.url")
 
   lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty

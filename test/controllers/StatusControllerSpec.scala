@@ -15,7 +15,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{LandingService, ProgressService}
+import services.{AuthEnrolmentsService, LandingService, ProgressService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -30,6 +30,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       override val authConnector = self.authConnector
       override private[controllers] val desConnector: DESConnector = mock[DESConnector]
       override private[controllers] val progressService: ProgressService = mock[ProgressService]
+      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
     }
   }
 
