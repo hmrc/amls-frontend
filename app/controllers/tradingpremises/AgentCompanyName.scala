@@ -48,7 +48,7 @@ import scala.concurrent.Future
             )
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+            case false => Redirect(routes.SummaryController.get())
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
