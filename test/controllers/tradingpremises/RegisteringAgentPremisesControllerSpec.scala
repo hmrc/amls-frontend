@@ -32,8 +32,8 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
 
       "load the Register Agent Premises page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[RegisteringAgentPremises](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -42,43 +42,53 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         htmlValue.title mustBe Messages("tradingpremises.agent.premises.title")
       }
 
-      "load Yes when accountant For AMLS Regulations from save4later returns True" in new Fixture {
+      "load Yes when save4later returns true" in new Fixture {
 
-        val accountantForAMLSRegulations = Some(RegisteringAgentPremises(true))
-        val activities = TradingPremises()
-
-        when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(activities)))
-
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations-true").attr("checked") mustBe "checked"
-
-      }
-
-      "load No when accountant For AMLS Regulations from save4later returns No" in new Fixture {
-
-        val accountantForAMLSRegulations = Some(RegisteringAgentPremises(false))
-        val activities = TradingPremises()
-
-        when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(activities)))
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations-false").attr("checked") mustBe "checked"
+        htmlValue.getElementById("agentPremises-true").attr("checked") mustBe "checked"
 
       }
+      "load No when save4later returns false" in new Fixture {
+
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(false)
+          )
+        )
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+
+        val htmlValue = Jsoup.parse(contentAsString(result))
+        htmlValue.getElementById("agentPremises-false").attr("checked") mustBe "checked"
+
+      }
+
+      "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+        val result = controller.get(1)(request)
+        status(result) must be(NOT_FOUND)
+      }
+
     }
 
     "Post" must {
 
       "on post invalid data show error" in new Fixture {
-
         val newRequest = request.withFormUrlEncodedBody()
         when(controller.dataCacheConnector.fetch[RegisteringAgentPremises](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -86,21 +96,73 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("tradingpremises.agent.premises.heading"))
-
-      }
-
-      "on post with invalid data show error" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-          "WhatYouNeedController" -> ""
-        )
-        when(controller.dataCacheConnector.fetch[RegisteringAgentPremises](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        val result = controller.post(1)(newRequest)
-        status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("err.summary"))
-
       }
+
+      "return a redirect to the Trading Premises details page on submitting false" in new Fixture {
+
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "agentPremises" -> "false"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1,edit = false)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1,false).url)
+      }
+      "return a redirect to the 'what is your agent's business structure?' page on submitting true" in new Fixture {
+
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "agentPremises" -> "true"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1,edit = false)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.YourAgentController.get(1,false).url)
+      }
+
+      "respond with NOT_FOUND" when {
+        "the given index is out of bounds" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentPremises" -> "true"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(Some(RegisteringAgentPremises(true)), None, None, None)))))
+
+          val result = controller.post(10, false)(newRequest)
+
+          status(result) must be(NOT_FOUND)
+
+        }
+      }
+
     }
   }
 }

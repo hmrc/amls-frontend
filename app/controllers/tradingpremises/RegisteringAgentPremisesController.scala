@@ -37,9 +37,11 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
           for {
             _ <- updateDataStrict[TradingPremises](index) {
               case Some(tp) => Some(tp.yourAgentPremises(data))
-              case _ => Some(TradingPremises(registeringAgentPremises = Some(data)))
             }
-          } yield Redirect(routes.SummaryController.get())
+          } yield data.agentPremises match {
+            case true => Redirect(routes.YourAgentController.get(index,edit))
+            case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
