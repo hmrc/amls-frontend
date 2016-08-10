@@ -5,9 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.tradingpremises._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
@@ -32,11 +30,7 @@ import scala.concurrent.Future
         }
     }
 
-
-
-
-
-  def post(index: Int ,edit: Boolean = false) = Authorised.async {
+   def post(index: Int ,edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[AgentCompanyName](request.body) match {
         case f: InvalidForm =>
@@ -48,7 +42,7 @@ import scala.concurrent.Future
                 Some(TradingPremises(tp.yourTradingPremises, tp.yourAgent,Some(data), tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
             }
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.AgentCompanyNameController.get(index,edit))
             case false => Redirect(routes.SummaryController.get())
           }
         }.recoverWith {
