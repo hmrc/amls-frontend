@@ -37,6 +37,7 @@ class TradingPremisesAddControllerSpec extends WordSpecLike
         acc
       } else {
         val tradingPremisesData = TradingPremises(
+          None,
           Some(YourTradingPremises(
             "Trading Name",
             Address(

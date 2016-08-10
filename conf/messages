@@ -142,9 +142,10 @@ error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
 error.required.tp.residential.address = Select yes or no to the question: is this a residential address?
 error.required.tp.your.business.or.other = Select one option: who uses these premises, your business or another business acting as an agent for your business?
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
-error.invalid.tp.registered.business.name = You can''t enter more than 140 characters for your agent’s registered business name.
+error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
 error.required.tp.select.business.structure = Select your agent’s business structure.
+error.required.tp.agent.premises = Select yes or no to the question: Are you registering an agent’s premises?
 
 ###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
@@ -547,8 +548,13 @@ tradingpremises.yourtradingpremises.whose.another=Another business, acting as an
 tradingpremises.yourtradingpremises.startdate=When will you start trading from these premises?
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
-tradingpremises.msb.services.title = Money Service Business – Which activities take place at these premises?
+tradingpremises.msb.services.title = Trading premises – Which activities take place at these premises?
 tradingpremises.msb.services.heading = Which activities take place at these premises?
+tradingpremises.agent.premises.title = Trading premises - Are you registering an agent’s premises?
+tradingpremises.agent.premises.heading = Are you registering an agent’s premises?
+tradingpremises.agent.premises.text = An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
+
+
 
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own

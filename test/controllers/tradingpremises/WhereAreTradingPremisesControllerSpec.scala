@@ -16,7 +16,6 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-
 class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -42,7 +41,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
         val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
         val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, true, LocalDate.now(), true)
-        val tradingPremises = TradingPremises(Some(yourTradingPremises), None, None)
+        val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremises))))

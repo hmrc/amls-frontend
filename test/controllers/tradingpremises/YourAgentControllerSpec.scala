@@ -50,7 +50,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           val yourAgent = YourAgent("Agents Name", taxType, businessStructure)
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(yourAgent), None)))))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None, Some(yourAgent), None)))))
 
           val result = controller.get(RecordId1)(request)
           val document = Jsoup.parse(contentAsString(result))
@@ -104,7 +104,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           val yourAgent = YourAgent("Agents Registered Name", taxType, businessStructure)
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(yourAgent), None)))))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None, Some(yourAgent), None)))))
 
           val result = controller.post(10, false)(validRequest)
 
@@ -127,7 +127,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           val yourAgent = YourAgent("Agents Registered Name", taxType, businessStructure)
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(yourAgent), None)))))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None, Some(yourAgent), None)))))
 
           val result = controller.post(RecordId1, false)(validRequest)
 
@@ -149,7 +149,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           val yourAgent = YourAgent("Agents Registered Name", taxType, businessStructure)
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None, None)))))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None, None, None)))))
 
           val result = controller.post(RecordId1, false)(validRequest)
 
@@ -172,7 +172,7 @@ class YourAgentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           val yourAgent = YourAgent("Agents Registered Name", taxType, businessStructure)
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(yourAgent), None)))))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None, Some(yourAgent), None)))))
 
           val result = controller.post(RecordId1, true)(validRequest)
 

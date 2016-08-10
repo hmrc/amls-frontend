@@ -4,13 +4,13 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.tradingpremises.{MsbServices, TradingPremises}
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
 import scala.concurrent.Future
 
-trait MSBServicesController extends RepeatingSection with BaseController {
+trait RegisteringAgentPremisesController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
@@ -18,11 +18,11 @@ trait MSBServicesController extends RepeatingSection with BaseController {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
         case Some(tp) => {
-          val form = tp.msbServices match {
-            case Some(service) => Form2[MsbServices](service)
+          val form = tp.registeringAgentPremises match {
+            case Some(service) => Form2[RegisteringAgentPremises](service)
             case None => EmptyForm
           }
-          Ok(views.html.tradingpremises.msb_services(form, index, edit))
+          Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
         }
         case None => NotFound(notFoundView)
       }
@@ -30,16 +30,18 @@ trait MSBServicesController extends RepeatingSection with BaseController {
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[MsbServices](request.body) match {
+      Form2[RegisteringAgentPremises](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.msb_services(f, index, edit)))
+          Future.successful(BadRequest(views.html.tradingpremises.registering_agent_premises(f, index, edit)))
         case ValidForm(_, data) => {
           for {
             _ <- updateDataStrict[TradingPremises](index) {
-              case Some(tp) => Some(tp.msbServices(data))
-              case _ => Some(TradingPremises(msbServices = Some(data)))
+              case Some(tp) => Some(tp.yourAgentPremises(data))
             }
-          } yield Redirect(routes.SummaryController.get())
+          } yield data.agentPremises match {
+            case true => Redirect(routes.YourAgentController.get(index,edit))
+            case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
@@ -47,7 +49,7 @@ trait MSBServicesController extends RepeatingSection with BaseController {
   }
 }
 
-object MSBServicesController extends MSBServicesController {
+object RegisteringAgentPremisesController extends RegisteringAgentPremisesController {
   // $COVERAGE-OFF$
   override protected val authConnector: AuthConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
