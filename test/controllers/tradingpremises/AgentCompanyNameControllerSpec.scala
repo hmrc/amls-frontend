@@ -1,8 +1,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.tradingpremises.AgentCompanyName
-import models.tradingpremises.{AgentCompanyName, TradingPremises}
+import models.tradingpremises.{TaxType, AgentCompanyName, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -32,19 +31,20 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
 
     val emptyCache = CacheMap("", Map.empty)
 
-    "display business Types Page" in new Fixture {
+    "display agent company name Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
       val result = controller.get(1)(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
       document.title() must be (Messages("tradingpremises.agentcompanyname.title"))
+      document.select("input[type=text]").`val`() must be(empty)
     }
 
     "display main Summary Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(TradingPremises(agentCompanyName = Some(AgentCompanyName("test"))))))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any())).thenReturn(
+        Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
@@ -105,6 +105,39 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       contentAsString(result) must include(Messages("error.invalid.tp.agent.registered.company.name"))
 
     }
+
+    "respond with NOT_FOUND" when {
+      "there is no data at all at that index" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get(1)(request)
+
+        status(result) must be(NOT_FOUND)
+      }
+    }
+
+/*
+    "respond with NOT_FOUND" when {
+      "the given index is out of bounds" in new Fixture {
+        val validRequest = request.withFormUrlEncodedBody(
+          "agentCompanyName" -> "Agent Company Name"
+        )
+
+        //val agentCompanyNameType = AgentCompanyName.agentsRegisteredCompanyNameType
+        val acn = AgentCompanyName("Agent Company Name")
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
+
+        val result = controller.post(10, false)(validRequest)
+
+        status(result) must be(NOT_FOUND)
+
+      }
+    }*/
+
 
 
     "post with missing mandatory field" in new Fixture {
