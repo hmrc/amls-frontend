@@ -33,22 +33,28 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
 
     "display agent company name Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
       val result = controller.get(1)(request)
       status(result) must be(OK)
+
       val document = Jsoup.parse(contentAsString(result))
+
       document.title() must be (Messages("tradingpremises.agentcompanyname.title"))
       document.select("input[type=text]").`val`() must be(empty)
     }
 
     "display main Summary Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
+
       val document = Jsoup.parse(contentAsString(result))
+
       document.title() must be (Messages("tradingpremises.agentcompanyname.title"))
       document.select("input[type=text]").`val`() must be("test")
     }
@@ -59,11 +65,11 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         "agentCompanyName" -> "text"
       )
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -76,11 +82,11 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         "agentCompanyName" -> "text"
       )
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1,true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -94,11 +100,11 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         "agentCompanyName" -> "11111111111"*40
       )
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -117,27 +123,6 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       }
     }
 
-/*
-    "respond with NOT_FOUND" when {
-      "the given index is out of bounds" in new Fixture {
-        val validRequest = request.withFormUrlEncodedBody(
-          "agentCompanyName" -> "Agent Company Name"
-        )
-
-        //val agentCompanyNameType = AgentCompanyName.agentsRegisteredCompanyNameType
-        val acn = AgentCompanyName("Agent Company Name")
-
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
-
-        val result = controller.post(10, false)(validRequest)
-
-        status(result) must be(NOT_FOUND)
-
-      }
-    }*/
-
 
 
     "post with missing mandatory field" in new Fixture {
@@ -145,11 +130,11 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         "agentCompanyName" -> " "
       )
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)

@@ -32,6 +32,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
     "agentsRegisteredName" -> "STUDENT",
     "taxType" -> "01",
     "agentsBusinessStructure" -> "01",
+    "agentCompanyName" -> "test",
     "activities" -> Json.arr("02", "03", "05"),
     "msbServices" ->Json.arr("01","02")
   )
@@ -44,10 +45,10 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       newTP.yourAgent must be(Some(yourAgent))
     }
 
-    "set the your trading premises data correctly" in {
+    "set the agent company name correctly" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.agentCompanyName(agentCompanyName)
-      newTP.yourTradingPremises must be(Some(agentCompanyName))
+      newTP.agentCompanyName must be(Some(agentCompanyName))
     }
 
     "set the your trading premises data correctly" in {

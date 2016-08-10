@@ -18,6 +18,7 @@ import scala.concurrent.Future
 
     def get(index: Int, edit: Boolean = false) = Authorised.async {
       implicit authContext => implicit request =>
+
         getData[TradingPremises](index) map {
 
           case Some(tp) => {
@@ -42,10 +43,10 @@ import scala.concurrent.Future
           Future.successful(BadRequest(views.html.tradingpremises.agent_company_name(f, index,edit)))
         case ValidForm(_, data) => {
           for {
-            tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)
-            _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
-              tradingPremises.agentCompanyName(data)
-            )
+            result <- updateDataStrict[TradingPremises](index) {
+              case Some(tp) =>
+                Some(TradingPremises(tp.yourTradingPremises, tp.yourAgent,Some(data), tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+            }
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.SummaryController.get())
