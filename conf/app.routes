@@ -54,6 +54,10 @@ POST        /trading-premises/crn-name/:index                            control
 GET         /trading-premises/agent-name/:index                            controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/agent-name/:index                            controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
 
+
+GET         /trading-premises/partners/:index                            controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/partners/:index                            controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
+
 GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 

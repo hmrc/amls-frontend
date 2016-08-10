@@ -10,7 +10,7 @@ import utils.RepeatingSection
 import scala.concurrent.Future
 
 
- trait AgentNameController extends RepeatingSection with BaseController {
+ trait AgentPartnershipController extends RepeatingSection with BaseController {
 
     val dataCacheConnector: DataCacheConnector
 
@@ -20,11 +20,11 @@ import scala.concurrent.Future
         getData[TradingPremises](index) map {
 
           case Some(tp) => {
-            val form = tp.agentName match {
-              case Some(data) => Form2[AgentName](data)
+            val form = tp.agentPartnership match {
+              case Some(data) => Form2[AgentPartnership](data)
               case None => EmptyForm
             }
-            Ok(views.html.tradingpremises.agent_name(form, index, edit))
+            Ok(views.html.tradingpremises.agent_partnership(form, index, edit))
           }
           case None => NotFound(notFoundView)
         }
@@ -32,17 +32,17 @@ import scala.concurrent.Future
 
    def post(index: Int ,edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      Form2[AgentName](request.body) match {
+      Form2[AgentPartnership](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index,edit)))
+          Future.successful(BadRequest(views.html.tradingpremises.agent_partnership(f, index,edit)))
         case ValidForm(_, data) => {
           for {
             result <- updateDataStrict[TradingPremises](index) {
               case Some(tp) =>
-                Some(TradingPremises(tp.registeringAgentPremises,tp.yourTradingPremises, tp.yourAgent,Some(data),tp.agentCompanyName,tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+                Some(TradingPremises(tp.registeringAgentPremises,tp.yourTradingPremises, tp.yourAgent,tp.agentName,tp.agentCompanyName, Some(data),tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
             }
           } yield edit match {
-            case true => Redirect(routes.AgentNameController.get(index,edit))
+            case true => Redirect(routes.AgentPartnershipController.get(index,edit))
             case false => Redirect(routes.SummaryController.get())
           }
         }.recoverWith {
@@ -53,7 +53,7 @@ import scala.concurrent.Future
   }
 }
 
-object AgentNameController extends AgentNameController {
+object AgentPartnershipController extends AgentPartnershipController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
