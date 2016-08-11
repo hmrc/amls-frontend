@@ -3,6 +3,8 @@
 @import models.status.SubmissionStatus
 @import models.status.CompletionState
 @import models.status.NotCompleted
+@import models.status.SubmissionFeesDue
+@import models.status.SubmissionReadyForReview
 @import models.status.SubmissionDecisionMade
 @import models.status.{Current,SubmissionReady}
 
@@ -49,6 +51,8 @@ title = Messages("status.title")
             @completionState.currentState match {
                 case NotCompleted => {@include.status.rightpanel_incomplete()}
                 case SubmissionReady => {@include.status.rightpanel_submissionready()}
+                case SubmissionFeesDue => {@include.status.rightpanel_submissionfeesdue()}
+                case SubmissionReadyForReview => {@include.status.rightpanel_submissionreadyforreview()}
                 case _ => {@include.status.rightpanel_incomplete()}
             }
 
