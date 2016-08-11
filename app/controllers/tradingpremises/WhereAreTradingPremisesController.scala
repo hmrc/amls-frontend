@@ -37,11 +37,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
         case ValidForm(_, ytp) => {
           for {
             _ <- updateDataStrict[TradingPremises](index) {
-              // This makes sure to save `None` for the agent section if
-              // the user selects that the premises is theirs.
-              /*case Some(tp) if ytp.isOwner =>
-                Some(TradingPremises(None, Some(ytp), None, None,None,None,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))*/
-              case Some(tp) =>
+            case Some(tp) =>
                 Some(TradingPremises(tp.registeringAgentPremises, Some(ytp), tp.yourAgent,tp.agentName,tp.agentCompanyName, tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
             }
           } yield (edit) match {
