@@ -175,7 +175,6 @@ trait RepeatingSection {
   ): Future[_] =
     getData[T] map {
       data => {
-        println("******* " + index)
         if (index < 1 || data.size < index) throw new IndexOutOfBoundsException()
         putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
       }
