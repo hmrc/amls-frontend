@@ -79,7 +79,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "there is data - with form populated" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-          val tradingPremises = TradingPremises(None, None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None, None,None,None, None,Some(wdbd),None)
           val businessActivities = BusinessActivities(
             involvedInOther = Some(InvolvedInOtherYes("test")),
             expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Fifth))
@@ -147,7 +147,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "given a Valid Request with SINGLE Activity and show the summary page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices))
-          val tradingPremises = TradingPremises(None, None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None, None,None, None,None,Some(wdbd),None)
           val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
           when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -167,7 +167,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "given a Valid Request with multiple ACTIVITIES and show the summary page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-          val tradingPremises = TradingPremises(None, None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
 
           when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
@@ -191,7 +191,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         "given a Valid Request in EDIT Mode and show the trading premises summary with record id" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
-          val tradingPremises = TradingPremises(None, None, None, Some(wdbd))
+          val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
 
           when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
