@@ -5,7 +5,7 @@
 @(f: forms.Form2[_], edit: Boolean, activities: Set[BusinessActivity])(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("businessactivities.turnover.title", "summary.businessactivities")
+    @heading("businessactivities.turnover.heading", "summary.businessactivities")
 }
 
 @main(
@@ -15,7 +15,7 @@
 
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
-        <p>@Messages("bankdetails.confirm-activities.subtitile")</p>
+        <p>@Messages("businessactivities.business-turnover.panel.list")</p>
         <ul class="panel-indent panel-border-wide panel-indent--gutter">
             @activities.map {
                 case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}

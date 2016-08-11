@@ -45,6 +45,16 @@ GET         /trading-premises/add                                       controll
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
+GET         /trading-premises/crn-name/:index                            controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/crn-name/:index                            controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-premises/agent-name/:index                            controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent-name/:index                            controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
+
+
+GET         /trading-premises/partners/:index                            controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/partners/:index                            controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
+
 GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
@@ -56,6 +66,9 @@ POST        /trading-premises/agent/:index                              controll
 
 GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get()
 GET         /trading-premises/check-your-answers/:index                 controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+
+GET         /trading-premises/registering-agent-premises/:index         controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/registering-agent-premises/:index         controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /estate-agents/what-you-need                                controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)

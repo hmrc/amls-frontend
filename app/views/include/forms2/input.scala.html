@@ -8,13 +8,14 @@
     classes: Seq[String] = Seq.empty,
     panel: Boolean = false,
     jsHidden: Boolean = false,
+    labelHidden: Boolean = false,
     requiredField: Boolean = true
 )(implicit lang: Lang)
 
 <div class="form-field @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}">
     <label>
         @if(labelText.nonEmpty) {
-            <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+            <span class="form-label@if(bold){-bold} @if(labelHidden) {amls-js-hidden}">@Messages(labelText)</span>
         }
         @if(hintText.nonEmpty) {
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
