@@ -38,23 +38,27 @@ trait StatusController extends BaseController {
   private[controllers] def submissionStatus(cacheMap: CacheMap)(implicit hc: HeaderCarrier,auth: AuthContext) = {
     cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
       case Some(response) => {
-        auth.enrolmentsUri match {
-          case Some(uri) => {
-            enrolmentsService.amlsRegistrationNumber(uri) flatMap {
-              case Some(amlsRegNumber) => desConnector.status(amlsRegNumber) map {
-                response => response.formBundleStatus match {
-                  case "None" => SubmissionFeesDue
-                  case "Pending" => SubmissionReadyForReview
-                  case "Approved" | "Rejected" => SubmissionDecisionMade
-                }
-              }
-              case None => Future.successful(NotCompleted)
-            }
-          }
-          case None =>  notYetSubmitted
-        }
+        etmpStatus
       }
       case _ => notYetSubmitted
+    }
+  }
+
+  private def etmpStatus(implicit hc: HeaderCarrier,auth: AuthContext): Future[SubmissionStatus] = {
+    auth.enrolmentsUri match {
+      case Some(uri) => {
+        enrolmentsService.amlsRegistrationNumber(uri) flatMap {
+          case Some(amlsRegNumber) => desConnector.status(amlsRegNumber) map {
+            response => response.formBundleStatus match {
+              case "None" => SubmissionFeesDue
+              case "Pending" => SubmissionReadyForReview
+              case "Approved" | "Rejected" => SubmissionDecisionMade
+            }
+          }
+          case None => Future.successful(NotCompleted)
+        }
+      }
+      case None => notYetSubmitted
     }
   }
 
@@ -72,6 +76,9 @@ trait StatusController extends BaseController {
               foundStatus =>
                 Ok(status(businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
             }
+          case None => etmpStatus map {
+            es => Ok(status("TODO",CompletionStateViewModel(es)))
+          }
         }
   }
 

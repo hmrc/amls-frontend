@@ -41,7 +41,6 @@ case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionSt
   def currentState = {
     (statuses.find(_._2 == Current) map {
       pair: (SubmissionStatus,CompletionState) => {
-        println(pair._1)
         pair._1
       }
     }).getOrElse(NotCompleted)
