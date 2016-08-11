@@ -40,7 +40,6 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       status(result) must be(OK)
     }
 
-
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
 
       when(summaryController.dataCacheConnector.fetch[Seq[TradingPremises]](any())
@@ -64,8 +63,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = summaryController.getIndividual(1)(request)
-      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
-      status(result) must be(SEE_OTHER)
+      status(result) must be(NOT_FOUND)
     }
 
   }

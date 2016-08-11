@@ -57,7 +57,7 @@ class YourAnswersControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
         val document = Jsoup.parse(contentAsString(result))
         println(document)
-        document.getElementById("addResponsiblePerson").attr("href") must be (routes.PersonNameController.get(3).url)
+        document.getElementById("addResponsiblePerson").attr("href") must be (routes.ResponsiblePeopleAddController.get(false).url)
 
       }
 

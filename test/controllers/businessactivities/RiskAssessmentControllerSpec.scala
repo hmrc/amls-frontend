@@ -44,7 +44,7 @@ class RiskAssessmentControllerSpec extends PlaySpec with MockitoSugar with OneAp
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("businessactivities.riskassessment.policy.tile"))
+      contentAsString(result) must include(Messages("businessactivities.riskassessment.policy.title"))
 
     }
 

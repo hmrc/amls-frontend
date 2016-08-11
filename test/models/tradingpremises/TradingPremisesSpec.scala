@@ -12,6 +12,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
 
   val yourAgent = YourAgent("STUDENT", TaxTypeSelfAssesment, SoleProprietor)
 
+  val agentName = AgentName("test")
+
+  val agentCompanyName = AgentCompanyName("test")
+
+  val agentPartnership = AgentPartnership("test")
+
   val wdbd = WhatDoesYourBusinessDo(
     Set(
       BillPaymentServices,
@@ -19,7 +25,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       MoneyServiceBusiness))
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
 
-  val completeModel = TradingPremises(Some(ytp), Some(yourAgent), Some(wdbd), Some(msbServices))
+  val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)), Some(ytp), Some(yourAgent), Some(agentName),Some(agentCompanyName),Some(agentPartnership),Some(wdbd), Some(msbServices))
   val completeJson = Json.obj("tradingName" -> "foo",
     "addressLine1" -> "1",
     "addressLine2" -> "2",
@@ -30,8 +36,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
     "agentsRegisteredName" -> "STUDENT",
     "taxType" -> "01",
     "agentsBusinessStructure" -> "01",
+    "agentName" -> "test",
+    "agentCompanyName" -> "test",
+    "agentPartnership" -> "test",
     "activities" -> Json.arr("02", "03", "05"),
-    "msbServices" ->Json.arr("01","02")
+    "msbServices" ->Json.arr("01","02"),
+    "agentPremises" -> true
   )
 
   "TradingPremises" must {
@@ -41,6 +51,26 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       val newTP = tp.yourAgent(yourAgent)
       newTP.yourAgent must be(Some(yourAgent))
     }
+
+    "set the agent name correctly" in {
+      val tp = TradingPremises(None, None, None)
+      val newTP = tp.agentName(agentName)
+      newTP.agentName must be(Some(agentName))
+    }
+
+    "set the agent company name correctly" in {
+      val tp = TradingPremises(None, None, None)
+      val newTP = tp.agentCompanyName(agentCompanyName)
+      newTP.agentCompanyName must be(Some(agentCompanyName))
+    }
+
+
+    "set the agent partnership correctly" in {
+      val tp = TradingPremises(None, None, None)
+      val newTP = tp.agentPartnership(agentPartnership)
+      newTP.agentPartnership must be(Some(agentPartnership))
+    }
+
 
     "set the your trading premises data correctly" in {
       val tp = TradingPremises(None, None, None)

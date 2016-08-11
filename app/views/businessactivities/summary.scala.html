@@ -123,35 +123,34 @@
             </tr>
         </table>
     }
-
+    @model.customersOutsideUK.map { boa =>
     <table class="table--spaced-top">
         <tr>
             <th>@Messages("businessactivities.customer.outside.uk.title")</th>
-            <td width="12"><a href="@controllers.businessactivities.routes.CustomersOutsideUKController.get(true)">@Messages("button.edit")</a></td>
+            <td width="12"><a href="@controllers.businessactivities.routes.CustomersOutsideUKController.get(true)">Edit</a></td>
+        </tr>
+        @boa.countries.fold {
+        <tr>
+            <td colspan="2">
+                @Messages("lbl.no")
+            </td>
+        </tr>
+        } { branches =>
+        <tr>
+            <td colspan="2">
+                @Messages("lbl.yes")
+            </td>
         </tr>
         <tr>
             <td colspan="2">
-                @model.customersOutsideUK.map {
-                    case CustomersOutsideUKNo => { @Messages("lbl.no") }
-                    case CustomersOutsideUKYes(v) => { @Messages("lbl.yes") }
+                @branches.map {country =>
+                @country <br/>
                 }
             </td>
         </tr>
-        @model.customersOutsideUK.map {
-            case CustomersOutsideUKNo => { }
-            case CustomersOutsideUKYes(v) => {
-                @model.customersOutsideUK.map { ca =>
-                    @ca.toLines.filter(_.length > 1).map {country=>
-                        <tr>
-                            <td colspan="2">
-                                @country
-                            </td>
-                        </tr>
-                    }
-                }
-            }
         }
     </table>
+    }
 
     <table class="table--spaced-top">
         <tr>
@@ -222,7 +221,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.riskassessment.policy.tile")</th>
+            <th>@Messages("businessactivities.riskassessment.policy.title")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.RiskAssessmentController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>

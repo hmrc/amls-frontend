@@ -51,7 +51,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _) if !pos.personalTax => true //TODO-JOE : already passed fit and proper should only be missing if business is not MSB or TCSP
+      Some(_), _) if !pos.personalTax => true
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
@@ -64,7 +64,7 @@ object ResponsiblePeople {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
-    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.WhoMustRegisterController.get(1))
+    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
     val complete = Section(messageKey, Completed, controllers.responsiblepeople.routes.YourAnswersController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
       case model if model forall {

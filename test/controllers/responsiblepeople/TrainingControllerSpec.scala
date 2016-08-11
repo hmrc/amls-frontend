@@ -44,8 +44,8 @@ class TrainingControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSu
     "get" must {
 
       "load the page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("responsiblepeople.training.title"))

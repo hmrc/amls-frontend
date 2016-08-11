@@ -143,6 +143,4 @@ object BankAccount {
 
   }
 
-  implicit def convert(s: BankAccount): Option[BankDetails] =
-    Some(BankDetails(None, Some(s)))
 }

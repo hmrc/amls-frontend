@@ -32,8 +32,8 @@ class ContactDetailsControllerSpec extends PlaySpec with OneAppPerSuite with Moc
   "ContactDetailsController" must {
 
     "on get display the contact details page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
       val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("responsiblepeople.contact_details.title"))
@@ -64,7 +64,7 @@ class ContactDetailsControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       )
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       when(controller.dataCacheConnector.save[ContactDetails](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -162,7 +162,7 @@ class ContactDetailsControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       )
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       when(controller.dataCacheConnector.save[ContactDetails](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))

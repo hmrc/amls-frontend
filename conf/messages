@@ -60,6 +60,11 @@ error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
 error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
 
+error.not-found.title = Not Found
+error.not-found.heading = Item not found
+error.not-found.message = Please check that you have entered the correct web address.
+
+
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
@@ -69,7 +74,6 @@ error.required.bm.registration.number = Enter the company registration number.
 error.invalid.bm.registration.number = Enter a valid company registration number. It must be 8 characters long, and can only be letters and numbers.
 error.required.bm.businesstype.type = Enter your type of business.
 error.invalid.bm.business.type = Enter a valid type of business. You can’t enter more than 40 characters for the type of business.
-
 
 ###############################  About the Business ###############################
 error.required.atb.previously.registered = Select yes or no to the question: is your business currently registered for anti-money laundering supervision?
@@ -99,7 +103,6 @@ error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or le
 error.invalid.bankdetails.account = Enter a valid account number. It must only be numbers or letters, and it can’t be more than 40 characters long. Do not enter punctuation or other characters.
 error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
 
-
 ###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
@@ -114,6 +117,7 @@ error.invalid.ba.employee.count = Enter only numbers. Do not enter letters, punc
 error.max.length.ba.employee.count = You can''t enter a number larger than 99999999999
 error.required.ba.employee.count2 = Enter a number.
 error.required.ba.select.country  = Select yes or no to the question: do you have customers who live or work outside of the UK?
+error.invalid.ba.select.country = Enter at least one country.
 error.required.ba.select.transaction.record = Select yes or no to the question: do you keep records of all your transaction with customers?
 error.required.ba.atleast.one.transaction.record = Select at least one method you use to record transactions.
 error.required.ba.software.package.name = Enter the name of the software package.
@@ -138,9 +142,16 @@ error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
 error.required.tp.residential.address = Select yes or no to the question: is this a residential address?
 error.required.tp.your.business.or.other = Select one option: who uses these premises, your business or another business acting as an agent for your business?
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
-error.invalid.tp.registered.business.name = You can''t enter more than 140 characters for your agent’s registered business name.
+error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
 error.required.tp.select.business.structure = Select your agent’s business structure.
+error.required.tp.agent.premises = Select yes or no to the question: Are you registering an agent’s premises?
+error.required.tp.agent.registered.company.name = Enter your agent’s registered company name.
+error.invalid.tp.agent.registered.company.name = You can’t enter more than 140 characters for the registered company name.
+error.required.tp.agent.name = Enter your agent’s name.
+error.invalid.tp.agent.name = You can’t enter more than 140 characters for the agent’s name.
+error.required.tp.agent.partnership = Enter your agent’s partners.
+error.invalid.tp.agent.partnership = You can’t enter more than 140 characters for the agent’s partners.
 
 ###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
@@ -252,6 +263,9 @@ error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
 error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
 
+################################# Declaration #####################################
+error.required.declaration.who.is.registering = Select who is registering the business. If none of the people listed are registering the business, select ''Someone else''.
+
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
@@ -275,6 +289,7 @@ missing.dataItem = Unknown
 lbl.other = Other
 lbl.yes = Yes
 lbl.no = No
+lbl.or = or
 lbl.your_name = Your name
 lbl.first_name = First name
 lbl.middle_name  = Middle name, if applicable
@@ -296,7 +311,9 @@ lbl.start.date = Start date:
 lbl.end.date = End date:
 lbl.select.all = Select all that apply
 lbl.list.upto.3.countries = List up to 3 countries
+lbl.some.one.else = Someone else
 lbl.vat.reg.number = VAT registration number:
+lbl.add.another.country = Add another country
 
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
@@ -308,9 +325,12 @@ amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
 ############################### Progress page ###############################
-progress.title = Application progress
-progress.lede = Your information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
-progress.edit = Edit
+progress.title = Application progress – Anti-Money Laundering Supervision
+progress.heading = Application progress
+progress.lede = It usually takes around 30 minutes to complete all sections.
+progress.saved.automatically = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
+progress.link.edit = Edit
+progress.link.continue = Continue
 progress.continue = Section incomplete
 progress.start = Start this section
 progress.minutes = minutes to complete
@@ -322,45 +342,45 @@ progress.businessmatching.description = Administrative information about your bu
 progress.businessmatching.time = 5
 progress.aboutthebusiness.name = About the business
 progress.aboutthebusiness.description = Administrative information about your business and your current registration status.
-progress.aboutthebusiness.time = 5
+progress.aboutthebusiness.time = 3
 progress.businessactivities.name = Business activities
 progress.businessactivities.description = Information about how your business operates, and your anti-money laundering procedures.
-progress.businessactivities.time = 8
+progress.businessactivities.time = 7
 progress.bankdetails.name = Bank details
 progress.bankdetails.description = The bank accounts your business uses. These include personal accounts or accounts belonging to other businesses.
-progress.bankdetails.time = 5
+progress.bankdetails.time = 2
 progress.tradingpremises.name = Trading premises
 progress.tradingpremises.description = Which premises your business trades from, and details of any other businesses that trade on your behalf.
-progress.tradingpremises.time = 8
+progress.tradingpremises.time = 3
 progress.asp.name = Accountancy Service Provider
 progress.asp.description = Registration information specifically for Accountancy Service Providers.
-progress.asp.time = 5
+progress.asp.time = 2
 progress.eab.name = Estate Agent Business
-progress.eab.description = Registration information specifically for Estate Agent businesses.
+progress.eab.description = Registration information specifically for Estate Agency Businesses.
 progress.eab.time = 5
 progress.hvd.name = High Value Dealer
 progress.hvd.description = Registration information specifically for High Value Dealers.
-progress.hvd.time = 8
+progress.hvd.time = 3
 progress.msb.name = Money Service Business
 progress.msb.description = Registration information specifically for Money Service Businesses.
-progress.msb.time = 6
+progress.msb.time = 4
 progress.tcsp.name = Trust or Company Service Provider
 progress.tcsp.description = Registration information specifically for Trust or Company Service Providers.
-progress.tcsp.time = 8
+progress.tcsp.time = 3
 progress.responsiblepeople.name = Responsible people
 progress.responsiblepeople.description = Information about the people in charge of your business.
-progress.responsiblepeople.time = 10
+progress.responsiblepeople.time = 7
 progress.supervision.name = Supervision
 progress.supervision.description = Information about any previous supervision for anti-money laundering.
-progress.supervision.time = 4
+progress.supervision.time = 2
 progress.declarationavailable = All sections complete: you can now submit the registration.
 progress.declarationunavailable = You can’t finish the registration until you’ve completed all the sections.
 progress.visuallyhidden.not.started = This section needs starting.
 progress.visuallyhidden.started = This section needs completing.
 progress.visuallyhidden.completed = This section has been completed.
-progress.visuallyhidden.approximately = This section will take approximately
-progress.visuallyhidden.edit = You can edit this section via this link
-progress.visuallyhidden.continue = You can continue this section via this link
+progress.visuallyhidden.start.approx = This section needs starting and will take approximately
+progress.visuallyhidden.edit = You can edit this section.
+progress.visuallyhidden.continue = You can continue this section.
 
 #### Confirmation page ####
 confirmation.lede = You have submitted the application.
@@ -430,7 +450,7 @@ aboutyou.rolewithinbusiness.lbl.06=Partner
 aboutyou.rolewithinbusiness.lbl.07=Sole proprietor
 aboutyou.rolewithinbusiness.lbl.08=Other
 
-aboutthebusiness.whatyouneed.title = About the business - What you need
+aboutthebusiness.whatyouneed.title = What you need – About the business
 aboutthebusiness.whatyouneed.heading = What you need
 aboutthebusiness.whatyouneed.subheading = For this section you’ll need your:
 aboutthebusiness.whatyouneed.subheading_2 = Depending on your circumstances, you may also need:
@@ -438,16 +458,20 @@ aboutthebusiness.whatyouneed.line_1 = registered office or main place of busines
 aboutthebusiness.whatyouneed.line_2 = email address
 aboutthebusiness.whatyouneed.line_3 = phone number
 aboutthebusiness.whatyouneed.line_4 = postal address
-aboutthebusiness.whatyouneed.line_5 = your money Laundering Regulations registration number
+aboutthebusiness.whatyouneed.line_5 = your Money Laundering Regulations registration number
 aboutthebusiness.whatyouneed.line_6 = the date your business will start activities which need to be supervised
 aboutthebusiness.whatyouneed.line_7 = your VAT registration number
 aboutthebusiness.whatyouneed.line_8 = your Corporation Tax reference number
-aboutthebusiness.registeredforvat.title = Is your business registered for VAT in the UK?
+aboutthebusiness.registeredforvat.title = Is your business registered for VAT in the UK? – About the business
+aboutthebusiness.registeredforvat.heading = Is your business registered for VAT in the UK?
 aboutthebusiness.registeredforvat.lbl.vatNumber = VAT registration number
-aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax?
+aboutthebusiness.registeredforvat.lbl.vatNumber.hint = For example: 123456789
+aboutthebusiness.registeredforcorporationtax.title = Is your business registered for Corporation Tax? – About the business
+aboutthebusiness.registeredforcorporationtax.heading = Is your business registered for Corporation Tax?
 aboutthebusiness.registeredforcorporationtax.taxReference = Corporation Tax Reference
 aboutthebusiness.registeredforcorporationtax.taxReferenceHint = For example: 1234567890
-aboutthebusiness.contactingyou.title = Your contact details
+aboutthebusiness.contactingyou.title = Your contact details – About the business
+aboutthebusiness.contactingyou.heading = Your contact details
 aboutthebusiness.contactingyou.lbl = We may need to get in touch to discuss your registration.
 aboutthebusiness.contactingyou.email.lbl = Email address
 aboutthebusiness.contactingyou.phone.lbl = Phone number
@@ -456,7 +480,8 @@ aboutthebusiness.contactingyou.website.lbl = Website address (optional)
 aboutthebusiness.contactingyou.businessaddress = Business address:
 aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
 aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
-aboutthebusiness.correspondenceaddress.title = What’s your postal address?
+aboutthebusiness.correspondenceaddress.title = What’s your postal address? – About the business
+aboutthebusiness.correspondenceaddress.heading = What’s your postal address?
 aboutthebusiness.correspondenceaddress.p = We’ll send letters relating to anti-money laundering supervision to this address.
 aboutthebusiness.correspondenceaddress.yourName = Your name
 aboutthebusiness.correspondenceaddress.businessName = Name of the business
@@ -465,16 +490,20 @@ aboutthebusiness.correspondenceaddress.nonUkAddress = Overseas
 aboutthebusiness.correspondenceaddress.address = Address
 aboutthebusiness.correspondenceaddress.postCode = Postcode
 aboutthebusiness.correspondenceaddress.country = Country
-aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision?
+aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision? – About the business
+aboutthebusiness.registeredformlr.heading = Is your business currently registered for anti-money laundering supervision?
 aboutthebusiness.registeredformlr.lbl = This only refers to registration with HMRC
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulations registration number
 aboutthebusiness.registeredformlr.taxReferenceHint = For example: 12345678
-aboutthebusiness.confirmingyouraddress.title = Is this your registered office or main place of business?
-aboutthebusiness.registeredoffice.title = Where is your registered office or main place of business?
+aboutthebusiness.confirmingyouraddress.title = Is this your registered office? – About the business
+aboutthebusiness.confirmingyouraddress.heading = Is this your registered office?
+aboutthebusiness.registeredoffice.title = Where is your registered office or main place of business? – About the business
+aboutthebusiness.registeredoffice.heading = Where is your registered office or main place of business?
 aboutthebusiness.registeredoffice.address.lbl = Address
 aboutthebusiness.registeredoffice.postcode.lbl = Postcode
 aboutthebusiness.registeredoffice.country.lbl = Country
-aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision?
+aboutthebusiness.activity.start.date.title = When will your business start activities which need to be registered for anti-money laundering supervision? – About the business
+aboutthebusiness.activity.start.date.heading = When will your business start activities which need to be registered for anti-money laundering supervision?
 aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
 
 tradingpremises.whatyouneed.title=Trading premises - What you need
@@ -483,8 +512,16 @@ tradingpremises.whatyouneed.paragraph1.text=We need to know where you trade from
 tradingpremises.whatyouneed.requiredinfo.heading=For each of your trading premises, you''ll need to know:
 tradingpremises.whatyouneed.requiredinfo.text.1= the trading name and address
 tradingpremises.whatyouneed.requiredinfo.text.2= what the business does from these premises
-tradingpremises.whatyouneed.requiredinfo.text.3= the date you''ll start trading from these premises
-tradingpremises.whatyouneed.requiredinfo.text.4= if it''s a residential address
+tradingpremises.whatyouneed.requiredinfo.text.3= the date you’ll start trading from these premises
+tradingpremises.whatyouneed.requiredinfo.text.4= if it’s a residential address
+tradingpremises.whatyouneed.agents.sub.heading = Agents
+tradingpremises.whatyouneed.agents.desc = If you use agents, we also need to know where your agents trade from. An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
+tradingpremises.whatyouneed.agents.individual.info.heading = You’ll need the following information for each agent:
+tradingpremises.whatyouneed.agents.individual.info.text1 = your agent’s name
+tradingpremises.whatyouneed.agents.individual.info.text2 = your agent’s business structure
+tradingpremises.whatyouneed.agents.circumstances.info.heading = Depending on your agent’s circumstances, you may also need:
+tradingpremises.whatyouneed.agents.circumstances.info.text1 = your agent’s company registration number
+tradingpremises.whatyouneed.agents.circumstances.info.text2 = your agent’s date of birth
 
 tradingpremises.youragent.title=Trading premises - Who is your agent?
 tradingpremises.youragent.heading=Who is your agent?
@@ -517,13 +554,31 @@ tradingpremises.yourtradingpremises.whose.another=Another business, acting as an
 tradingpremises.yourtradingpremises.startdate=When will you start trading from these premises?
 tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
-tradingpremises.msb.services.title = Money Service Business – Which activities take place at these premises?
+tradingpremises.msb.services.title = Trading premises – Which activities take place at these premises?
 tradingpremises.msb.services.heading = Which activities take place at these premises?
+tradingpremises.agent.premises.title = Trading premises - Are you registering an agent’s premises?
+tradingpremises.agent.premises.heading = Are you registering an agent’s premises?
+tradingpremises.agent.premises.text = An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
+
+
 
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
 tradingpremises.summary.agents = Agent’s
 tradingpremises.summary.tradingstartdate = Trading start date of
+
+
+tradingpremises.agentcompanyname.title =Trading premises What is your agent’s registered company name?
+tradingpremises.agentcompanyname.heading = What is your agent’s registered company name?
+tradingpremises.agentcompanyname.lbl.hint = It must be identical to the registered name on the incorporation certificate.
+
+
+tradingpremises.agentname.title =Trading premises What is your agent’s name?
+tradingpremises.agentname.heading = What is your agent’s name?
+
+tradingpremises.agentpartnership.title =Trading premises Your agent’s partnership
+tradingpremises.agentpartnership.heading = Your agent’s partnership
+tradingpremises.agentpartnership.lbl.hint = List all your agent’s partners
 
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
@@ -629,9 +684,9 @@ bankdetails.summary.accounttype.lbl.02 = My business’s account
 bankdetails.summary.accounttype.lbl.03 = Another business’s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
-bankdetails.confirm-activities.subtitile =You’ve told us your business does this:
+bankdetails.confirm-activities.subtitle = You’ve told us your business does this:
 
-businessactivities.whatyouneed.title = Business Activities - What you need
+businessactivities.whatyouneed.title = Business Activities – What you need
 businessactivities.whatyouneed.heading = What you need
 businessactivities.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
 businessactivities.whatyouneed.line_1 = the anticipated turnover for the next 12 months
@@ -643,55 +698,70 @@ businessactivities.whatyouneed.line_5 = your franchisor’s name
 businessactivities.whatyouneed.line_6 = how you record transactions
 businessactivities.whatyouneed.line_7 = your professional advisor’s name and address
 businessactivities.whatyouneed.line_8 = your professional advisor’s HMRC agent code
-businessactivities.businessfranchise.title = Is your business a franchise?
+businessactivities.businessfranchise.title = Is your business a franchise? – What you need
+businessactivities.businessfranchise.heading = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor’s name
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor’s registration.
-businessactivities.confirm-activities.title = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
+businessactivities.confirm-activities.title = Is your business involved in any other activities, which are not covered by Money Laundering Regulations? – What you need
+businessactivities.confirm-activities.heading = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
 businessactivities.confirm-activities.lbl.details = Please give details
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
-businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity?
-businessactivities.turnover.title = How much turnover do you expect in the next 12 months, from these activities?
-businessactivities.turnover.lbl.01=£0 to £14,999
-businessactivities.turnover.lbl.02=£15,000 to £49,999
-businessactivities.turnover.lbl.03=£50,000 to £99,999
-businessactivities.turnover.lbl.04=£100,000 to £249,999
-businessactivities.turnover.lbl.05=£250,000 to £999,999
-businessactivities.turnover.lbl.06=£1 million to £10 million
-businessactivities.turnover.lbl.07=More than £10 million
-businessactivities.business-turnover.title = How much total turnover do you expect in the next 12 months?
-businessactivities.business-turnover.lbl.01=£0 to £14,999
-businessactivities.business-turnover.lbl.02=£15,000 to £49,999
-businessactivities.business-turnover.lbl.03=£50,000 to £99,999
-businessactivities.business-turnover.lbl.04=£100,000 to £249,999
-businessactivities.business-turnover.lbl.05=£250,000 to £999,999
-businessactivities.business-turnover.lbl.06=£1 million to £10 million
-businessactivities.business-turnover.lbl.07=More than £10 million
-businessactivities.keep.customer.records.title = Do you keep records of all your transactions with customers?
+businessactivities.identify-suspicious-activity.title = Does your business have written guidance for staff on how to identify and report suspicious activity? – What you need
+businessactivities.identify-suspicious-activity.heading = Does your business have written guidance for staff on how to identify and report suspicious activity?
+businessactivities.turnover.title = How much net profit do you expect in the next 12 months, from activities covered by Money Laundering Regulations? – What you need
+businessactivities.turnover.heading = How much net profit do you expect in the next 12 months, from activities covered by Money Laundering Regulations?
+businessactivities.turnover.lbl.01 = £0 to £14,999
+businessactivities.turnover.lbl.02 = £15,000 to £49,999
+businessactivities.turnover.lbl.03 = £50,000 to £99,999
+businessactivities.turnover.lbl.04 = £100,000 to £249,999
+businessactivities.turnover.lbl.05 = £250,000 to £999,999
+businessactivities.turnover.lbl.06 = £1 million to £10 million
+businessactivities.turnover.lbl.07 = More than £10 million
+businessactivities.business-turnover.title = How much total turnover do you expect in the next 12 months? – What you need
+businessactivities.business-turnover.heading = How much total turnover do you expect in the next 12 months?
+businessactivities.business-turnover.panel.list = Your activities:
+businessactivities.business-turnover.lbl.01 = £0 to £14,999
+businessactivities.business-turnover.lbl.02 = £15,000 to £49,999
+businessactivities.business-turnover.lbl.03 = £50,000 to £99,999
+businessactivities.business-turnover.lbl.04 = £100,000 to £249,999
+businessactivities.business-turnover.lbl.05 = £250,000 to £999,999
+businessactivities.business-turnover.lbl.06 = £1 million to £10 million
+businessactivities.business-turnover.lbl.07 = More than £10 million
+businessactivities.keep.customer.records.title = Do you keep records of all your transactions with customers? – What you need
+businessactivities.keep.customer.records.heading = Do you keep records of all your transactions with customers?
 businessactivities.do.keep.records = How do you record transactions?
 businessactivities.keep.customer.records.line1.text = How do you record transactions?
 businessactivities.transactiontype.lbl.01 = On paper
 businessactivities.transactiontype.lbl.02 = Digitally, on a spreadsheet
 businessactivities.transactiontype.lbl.03 = Digitally, on commercial software packages designed for recording transactions
 businessactivities.name.software.pkg.lbl = Names of the software packages
-businessactivities.ncaRegistered.title = Has your business registered online with the National Crime Agency?
+businessactivities.ncaRegistered.title = Has your business registered online with the National Crime Agency? – What you need
+businessactivities.ncaRegistered.heading = Has your business registered online with the National Crime Agency?
 businessactivities.ncaRegistered.subtitle = Before you can report suspicious activity on the National Crime Agency website, you must be registered on the website. You are not required by law to register.
-businessactivities.customer.outside.uk.title = Do you have customers who live or work outside of the UK?
+businessactivities.customer.outside.uk.title = Do you have customers who live or work outside of the UK? – What you need
+businessactivities.customer.outside.uk.heading = Do you have customers who live or work outside of the UK?
 businessactivities.hight.value.customer.lbl = Where do these customers live or work?
 businessactivities.hight.value.customer.lbl.hint = List up to 10 countries. If there are more than 10, list the countries for the customers who bring in the most revenue to your business.
 businessactivities.upto.10.countries = List up to 10 countries.
-businessactivities.accountantForAMLSRegulations.title = Does your business receive advice on Money Laundering Regulations and due diligence?
+businessactivities.accountantForAMLSRegulations.title = Does your business receive advice on Money Laundering Regulations and due diligence? – What you need
+businessactivities.accountantForAMLSRegulations.heading = Does your business receive advice on Money Laundering Regulations and due diligence?
+businessactivities.accountantForAMLSRegulations.heading = Does your business receive advice on Money Laundering Regulations and due diligence?
 businessactivities.accountantForAMLSRegulations.subtext = This only applies to guidance from a professional advisor, such as an accountant.
-businessactivities.riskassessment.policy.tile = Does your business have a documented risk assessment policy and procedure?
+businessactivities.riskassessment.policy.title = Does your business have a documented risk assessment policy and procedure? – What you need
+businessactivities.riskassessment.policy.heading = Does your business have a documented risk assessment policy and procedure?
 businessactivities.riskassessment.policy.line1.text = Is it paper-based or digital?
 businessactivities.paper.or.digital = Is it paper-based or digital?
 businessactivities.RiskAssessmentType.lbl.01 = Paper-based
 businessactivities.RiskAssessmentType.lbl.02 = Digital
-businessactivities.employees.title = People in your business
-businessactivities.employees.line1.text = Approximately how many people does your business employ?
+businessactivities.employees.title = People in your business – What you need
+businessactivities.employees.heading = People in your business
+businessactivities.employees.line1.text = Approximately how many people work in the business? Include directors.
 businessactivities.employees.line2.text = Approximately how many people work on activities covered by Money Laundering Regulations?
-businessactivities.whoisyouraccountant.title = Who is your professional advisor?
+businessactivities.whoisyouraccountant.title = Who is your professional advisor? – What you need
 businessactivities.whoisyouraccountant.heading = Who is your professional advisor?
-
+businessactivities.involved.other.title = Other activities – What you need
+businessactivities.involved.other.heading = Other activities
+businessactivities.involved.other.legend = Is your business involved in other activities, which are not covered by Money Laundering Regulations?
 businessactivities.whoisyouraccountant.name = Name
 businessactivities.whoisyouraccountant.tradingName = Trading name (if different)
 businessactivities.whoisyouraccountant.address = Address
@@ -699,8 +769,8 @@ businessactivities.whoisyouraccountant.ukAddress = This is a UK address
 businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas address
 businessactivities.whoisyouraccountant.country = Country
 businessactivities.whoisyouraccountant.postCode = Postcode
-businessactivities.whoisyouraccountant.taxMessage = Does this accountant also deal with HMRC on behalf of your business, for tax-related matters?
-businessactivities.whoisyouraccountant.reference.details = Your accountant''s HMRC Agent Reference Number
+businessactivities.whoisyouraccountant.taxMessage = Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
+businessactivities.whoisyouraccountant.reference.details = Your accountant’s HMRC Agent Reference Number
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
 
 submit.registration = Submit registration
@@ -727,6 +797,8 @@ declaration.declaration.tellhmrc = I understand that the business must tell HMRC
 declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
 declaration.declaration.confirm = I confirm that I have read and understood the
 declaration.declaration.guidance = guidance
+declaration.who.is.registering.title = Who is registering this business?
+declaration.who.is.registering.text = One person must take responsibility for the accuracy of this anti-money laundering supervision registration.
 
 responsiblepeople.whatyouneed.title = Responsible People - What you need
 responsiblepeople.whatyouneed.heading = What you need
@@ -1018,7 +1090,7 @@ msb.psr.number.lbl = Registration reference number
 
 msb.send.money.title = Do you send money to other countries?
 msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
-msb.transactions.expected.title = How many transactions do you expect in the next 12 months?
+msb.transactions.expected.title = How many money transfers do you expect in the next 12 months?
 
 msb.most.transactions.title = Where do you expect to send the most transactions?
 msb.most.transactions.list.countries = List up to 3 countries
@@ -1032,7 +1104,6 @@ msb.branchesoragents.heading = Do you have branches or agents in other countries
 msb.branchesoragents.intro = An agent is a person or a business that works on behalf of your business to provide your services.
 msb.branchesoragents.legend = Which countries?
 msb.branchesoragents.hint = List up to 10 countries
-msb.branchesoragents.add.btn = Add another country
 
 msb.summary.ipsp-name = IPSP''s name
 msb.summary.ipsp-registration-number = IPSP’s HM Revenue and Customs registration number

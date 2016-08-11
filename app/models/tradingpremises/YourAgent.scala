@@ -54,7 +54,7 @@ object YourAgent {
   }
 
   implicit def convert(data: YourAgent): Option[TradingPremises] = {
-    Some(TradingPremises(None, Some(data), None))
+    Some(TradingPremises(None, None, Some(data), None))
   }
 
 }

@@ -43,8 +43,8 @@ class PersonNameControllerSpec extends PlaySpec with OneAppPerSuite with Mockito
 
     "on get display the persons page" in new Fixture {
 
-      when(personNameController.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       val result = personNameController.get(RecordId)(request)
       status(result) must be(OK)
@@ -52,8 +52,8 @@ class PersonNameControllerSpec extends PlaySpec with OneAppPerSuite with Mockito
 
     "on get display the persons page with blank fields" in new Fixture {
 
-      when(personNameController.dataCacheConnector.fetch[ResponsiblePeople](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       val result = personNameController.get(RecordId)(request)
       status(result) must be(OK)
@@ -92,7 +92,7 @@ class PersonNameControllerSpec extends PlaySpec with OneAppPerSuite with Mockito
       )
 
       when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       when(personNameController.dataCacheConnector.save[PersonName](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))

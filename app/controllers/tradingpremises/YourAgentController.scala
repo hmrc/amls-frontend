@@ -14,28 +14,28 @@ trait YourAgentController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int = 0, edit: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) map {
-          case Some(TradingPremises(_, Some(data), _, _)) =>
+          case Some(TradingPremises(_,_,Some(data),_, _,_,_, _)) =>
             Ok(who_is_your_agent(Form2[YourAgent](data), edit, index))
-          case _ =>
+          case Some(TradingPremises(_, _, _,None,_, _,_, _)) =>
             Ok(who_is_your_agent(EmptyForm, edit, index))
+          case _ => NotFound(notFoundView)
         }
   }
 
-  def post(index: Int = 0, edit: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
         Form2[YourAgent](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(who_is_your_agent(f, edit, index)))
-          case ValidForm(_, data) =>
+          case ValidForm(_, data) => {
             for {
-              _ <- updateData[TradingPremises](index) {
+              _ <- updateDataStrict[TradingPremises](index) {
                 case Some(tp) => Some(tp.yourAgent(data))
-                case _ => data
               }
             } yield edit match {
               case true =>
@@ -43,6 +43,9 @@ trait YourAgentController extends RepeatingSection with BaseController {
               case false =>
                 Redirect(routes.WhatDoesYourBusinessDoController.get(index))
             }
+          }.recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+          }
         }
       }
   }

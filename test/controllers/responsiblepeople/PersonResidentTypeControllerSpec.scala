@@ -33,8 +33,10 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
   "PersonResidentTypeController" must {
 
     "display person a UK resident page" in new Fixture {
+      val responsiblePeople = ResponsiblePeople()
+
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
       val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("responsiblepeople.person.a.resident.title"))
@@ -49,8 +51,10 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
         "nationality" -> "GB"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -103,8 +107,10 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
         "nationality" -> "GB"
       )
 
+      val responsiblePeople = ResponsiblePeople()
+
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
