@@ -60,6 +60,7 @@ trait StatusController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext =>
+      println(("enrolmenturi: " + authContext.enrolmentsUri))
       implicit request =>
         landingService.cacheMap flatMap {
           case Some(cache) =>

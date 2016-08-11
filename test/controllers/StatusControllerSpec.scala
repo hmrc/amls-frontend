@@ -94,7 +94,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
     }
 
-    //"show correct status classes  " when {
+    "show correct status classes  " when {
 
       "submission incomplete" in new Fixture {
 
@@ -163,6 +163,10 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         val cacheMap = mock[CacheMap]
         when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
 
+        when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
           Some(BusinessMatching(Some(reviewDtls), None)))
 
@@ -229,7 +233,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("status-detail").first().child(2).html() must be(Messages("status.submissionreadyforreview.description2"))
 
       }
-    //}
+    }
   }
 
 
