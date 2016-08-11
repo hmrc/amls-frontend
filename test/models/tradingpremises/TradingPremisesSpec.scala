@@ -8,7 +8,7 @@ import play.api.libs.json.Json
 class TradingPremisesSpec extends WordSpec with MustMatchers {
 
   val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
-    true, new LocalDate(1990, 2, 24), true)
+    true, new LocalDate(1990, 2, 24))
 
   val yourAgent = YourAgent("STUDENT", TaxTypeSelfAssesment, SoleProprietor)
 
@@ -30,9 +30,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
     "addressLine1" -> "1",
     "addressLine2" -> "2",
     "postcode" -> "asdfasdf",
-    "isOwner" -> true,
-    "startDate" -> "1990-02-24",
     "isResidential" -> true,
+    "startDate" -> "1990-02-24",
     "agentsRegisteredName" -> "STUDENT",
     "taxType" -> "01",
     "agentsBusinessStructure" -> "01",

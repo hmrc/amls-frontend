@@ -539,8 +539,8 @@ tradingpremises.youragent.businessstructure.lbl.03=Partnership
 tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
 tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
 tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
-tradingpremises.yourtradingpremises.title=Trading premises - Where are your trading premises?
-tradingpremises.yourtradingpremises.heading=Where are your trading premises?
+tradingpremises.yourtradingpremises.title= Trading premises details
+tradingpremises.yourtradingpremises.heading=Trading premises details
 tradingpremises.yourtradingpremises.include.heading=Include:
 tradingpremises.yourtradingpremises.include.text.1=your own business premises
 tradingpremises.yourtradingpremises.include.text.2=other businesses’ premises, if you have a contractual agreement for them to act as your agents and offer your services
@@ -551,8 +551,7 @@ tradingpremises.yourtradingpremises.country=Country
 tradingpremises.yourtradingpremises.whose=Who uses these premises?
 tradingpremises.yourtradingpremises.whose.my=My business
 tradingpremises.yourtradingpremises.whose.another=Another business, acting as an agent for my business
-tradingpremises.yourtradingpremises.startdate=When will you start trading from these premises?
-tradingpremises.yourtradingpremises.startdate.sub=If you are already trading, give the date you started
+tradingpremises.yourtradingpremises.startdate=When will the business start trading from these premises? If it is already trading, give the date it started.
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
 tradingpremises.msb.services.title = Trading premises – Which activities take place at these premises?
 tradingpremises.msb.services.heading = Which activities take place at these premises?
@@ -568,15 +567,15 @@ tradingpremises.summary.agents = Agent’s
 tradingpremises.summary.tradingstartdate = Trading start date of
 
 
-tradingpremises.agentcompanyname.title =Trading premises What is your agent’s registered company name?
+tradingpremises.agentcompanyname.title =Trading premises - What is your agent’s registered company name?
 tradingpremises.agentcompanyname.heading = What is your agent’s registered company name?
 tradingpremises.agentcompanyname.lbl.hint = It must be identical to the registered name on the incorporation certificate.
 
 
-tradingpremises.agentname.title =Trading premises What is your agent’s name?
+tradingpremises.agentname.title =Trading premises - What is your agent’s name?
 tradingpremises.agentname.heading = What is your agent’s name?
 
-tradingpremises.agentpartnership.title =Trading premises Your agent’s partnership
+tradingpremises.agentpartnership.title =Trading premises - Your agent’s partnership
 tradingpremises.agentpartnership.heading = Your agent’s partnership
 tradingpremises.agentpartnership.lbl.hint = List all your agent’s partners
 
