@@ -33,8 +33,19 @@ object FormTypes {
 
   val vrnTypeRegex = "^[0-9]{9}$".r
   val phoneNumberRegex = "[0-9]+".r
-//  val emailRegex = "^.+@[a-zA-Z0-9\\.]+$".r
-  val  emailRegex = "^.+@[A-Z0-9._%+-]+@[A-Z0-9.-]\\.]+$".r
+  val emailRegex = ("^.+" +                    //Any character 1 or more times
+                    "@" +                     //@ symbol
+                    "(" +                     //start of DNS label group
+                      "(?!\\-)" +             //does not start with hyphen
+                      "[a-zA-Z0-9\\-]+" +     //one or more alphanumerics or hyphen
+                      "(?<!\\-)" +            //does not end with a hyphen
+                      "\\." +                 //dot
+                    ")*" +                    //zero or more dns labels followed by dot
+                    "(" +                     //start of Top level dns label (same as a DNS label but not dot after it)
+                      "(?!\\-)" +
+                      "[a-zA-Z0-9\\-]+" +
+                      "(?<!\\-)" +
+                    ")$").r
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val monthRegex = "(0?[1-9]|1[012])".r
   val yearRegex = "((19|20)\\d\\d)".r
