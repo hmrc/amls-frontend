@@ -70,6 +70,10 @@ GET         /trading-premises/check-your-answers/:index                 controll
 GET         /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
+GET         /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
+POST        /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
+
+
 GET         /estate-agents/what-you-need                                controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
