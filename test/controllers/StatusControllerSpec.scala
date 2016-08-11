@@ -163,7 +163,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         val cacheMap = mock[CacheMap]
         when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
 
-        when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority))
+        when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("foo"))))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
 
@@ -209,6 +209,10 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any())).thenReturn(
           Some(SubscriptionResponse("","",0,None,0,0,"")))
 
+        when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
+
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
 
         when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, Call("", "")))))
@@ -226,8 +230,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("status-list").first().child(3).hasClass("current") must be(true)
 
         document.getElementsByClass("status-list").first().child(4).hasClass("status-list--upcoming") must be(true)
-
-
+        
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionreadyforreview.heading"))
         document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissionreadyforreview.description"))
         document.getElementsByClass("status-detail").first().child(2).html() must be(Messages("status.submissionreadyforreview.description2"))

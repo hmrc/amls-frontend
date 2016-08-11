@@ -335,13 +335,13 @@ status.incomplete.buttontext = Return to saved application
 status.submissionready.heading = Application not submitted
 status.submissionready.description = You’ve completed all sections of the form, but you haven’t submitted it. You have XX days to submit the application. After XX days the information you entered will be lost, and you’ll need to start again.
 status.submissionready.buttontext = Submit application
-status.Submissionfeesdue.heading = Registration fee not paid
-status.Submissionfeesdue.description = You’ve submitted the application but you haven’t paid the registration fee. You must pay the fee within 30 days. Your application won’t be reviewed until the fee is paid.
-status.Submissionfeesdue.amount = £1,200
-status.Submissionfeesdue.buttontext = Pay fee
-status.Submissionreadyforreview.heading = Under review
-status.Submissionreadyforreview.description = Your application is being reviewed by HM Revenue and Customs. This process can take up to 45 days.
-status.Submissionreadyforreview.description2 = You'll receive an email asking you to sign in to this website, where you will be able to see if you have been approved or rejected.
+status.submissionfeesdue.heading = Registration fee not paid
+status.submissionfeesdue.description = You’ve submitted the application but you haven’t paid the registration fee. You must pay the fee within 30 days. Your application won’t be reviewed until the fee is paid.
+status.submissionfeesdue.amount = £1,200
+status.submissionfeesdue.buttontext = Pay fee
+status.submissionreadyforreview.heading = Under review
+status.submissionreadyforreview.description = Your application is being reviewed by HM Revenue and Customs. This process can take up to 45 days.
+status.submissionreadyforreview.description2 = You'll receive an email asking you to sign in to this website, where you will be able to see if you have been approved or rejected.
 
 
 
