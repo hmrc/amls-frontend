@@ -10,9 +10,8 @@ import utils.MappingUtils.Implicits._
 case class YourTradingPremises(
                                 tradingName: String,
                                 tradingPremisesAddress: Address,
-                                isOwner: Boolean,
-                                startDate: LocalDate,
-                                isResidential: Boolean
+                                isResidential: Boolean,
+                                startDate: LocalDate
                               )
 
 object YourTradingPremises {
@@ -27,9 +26,8 @@ object YourTradingPremises {
     (
       (__ \ "tradingName").read[String] and
         __.read[Address] and
-        (__ \ "isOwner").read[Boolean] and
-        (__ \ "startDate").read[LocalDate] and
-        (__ \ "isResidential").read[Boolean]
+        (__ \ "isResidential").read[Boolean] and
+        (__ \ "startDate").read[LocalDate]
       ) (YourTradingPremises.apply _)
   }
 
@@ -39,9 +37,8 @@ object YourTradingPremises {
     (
       (__ \ "tradingName").write[String] and
         __.write[Address] and
-        (__ \ "isOwner").write[Boolean] and
-        (__ \ "startDate").write[LocalDate] and
-        (__ \ "isResidential").write[Boolean]
+        (__ \ "isResidential").write[Boolean] and
+        (__ \ "startDate").write[LocalDate]
       ) (unlift(YourTradingPremises.unapply))
   }
 
@@ -52,9 +49,9 @@ object YourTradingPremises {
       (
         (__ \ "tradingName").read(premisesTradingNameType) ~
           __.read[Address] ~
-          (__ \ "isOwner").read[Boolean].withMessage("error.required.tp.your.business.or.other") ~
-          (__ \ "startDate").read(localDateRule) ~
-          (__ \ "isResidential").read[Boolean].withMessage("error.required.tp.residential.address")
+          (__ \ "isResidential").read[Boolean].withMessage("error.required.tp.residential.address") ~
+          (__ \ "startDate").read(localDateRule)
+
         ) (YourTradingPremises.apply _)
     }
 
@@ -66,9 +63,8 @@ object YourTradingPremises {
       (
         (__ \ "tradingName").write[String] ~
           __.write[Address] ~
-          (__ \ "isOwner").write[Boolean] ~
-          (__ \ "startDate").write(localDateWrite) ~
-          (__ \ "isResidential").write[Boolean]
+          (__ \ "isResidential").write[Boolean] ~
+          (__ \ "startDate").write(localDateWrite)
         ) (unlift(YourTradingPremises.unapply))
     }
 }

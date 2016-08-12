@@ -45,7 +45,7 @@ case class TradingPremises(
 
   def isComplete: Boolean =
     this match {
-      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_) if x.isOwner => true
+      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_) => true
       case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _) => true
       case _ => false
     }
