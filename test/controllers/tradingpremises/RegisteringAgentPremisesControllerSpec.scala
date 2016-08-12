@@ -120,7 +120,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         val result = controller.post(1,edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1,false).url)
+        redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1).url)
       }
       "return a redirect to the 'what is your agent's business structure?' page on submitting true" in new Fixture {
 
@@ -143,7 +143,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         val result = controller.post(1,edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.YourAgentController.get(1,false).url)
+        redirectLocation(result) mustBe Some(routes.YourAgentController.get(1).url)
       }
 
       "respond with NOT_FOUND" when {
@@ -156,7 +156,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(Some(RegisteringAgentPremises(true)), None, None, None)))))
 
-          val result = controller.post(10, false)(newRequest)
+          val result = controller.post(10)(newRequest)
 
           status(result) must be(NOT_FOUND)
 

@@ -5,144 +5,111 @@
 @import utils._
 
 @(model: TradingPremises, index: Int)(implicit request: Request[_], lang: Lang)
-
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.tradingpremises")
+    @heading("summary.detailedanswers.title", "summary.tradingpremises")
 }
-
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("summary.detailedanswers.title"),
     heading = header
 ) {
-
     @model.yourTradingPremises.map { yta =>
-        <table class="summary">
+        <table class="spacesummary">
+            <tbody>
+                <tr>
+                    <th colspan="3">@yta.tradingName</th>
+                </tr>
+            </tbody>
             <tr>
-                <th class="summary-title">
-                    @Messages("summary.checkyouranswers.businesspremises.section1")
-                </th>
+                <td width="40%">Address:</td>
                 <td>
+                    @yta.tradingPremisesAddress.toLines.map { l =>
+                    @l<br />
+                    }
+                </td>
+                <td class="numeric">
                     <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
                         @Messages("button.edit")
                     </a>
                 </td>
             </tr>
             <tr>
-                <td colspan="2">@yta.tradingName</td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <ul>
-                        @yta.tradingPremisesAddress.toLines.map { line =>
-                            <li>@line</li>
-                        }
-                    </ul>
+                <td width="40%">Trading start date:</td>
+                <td>
+                    @DateHelper.formatDate(yta.startDate)
+                </td>
+                <td class="numeric">
+                    <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
+                        @Messages("button.edit")
+                    </a>
                 </td>
             </tr>
-
             <tr>
-                <td colspan="2">
+                <td width="40%">Residential address:</td>
+                <td>
                     @yta.isResidential match {
                     case true => {
-                    @Messages("lbl.residential")
+                    Yes
                     }
                     case false => {
-                    @Messages("lbl.nonresidential")
+                    No
                     }
                     }
                 </td>
-            </tr>
-
-            <tr>
-                <td colspan="2">
-                    @Messages("tradingpremises.summary.tradingstartdate") @DateHelper.formatDate(yta.startDate)
-
+                <td class="numeric">
+                    <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
+                        @Messages("button.edit")
+                    </a>
                 </td>
             </tr>
-
-        </table>
-    }
-
-    @model.whatDoesYourBusinessDoAtThisAddress.map { wdbd =>
-        <table class="summary">
             <tr>
-                <th class="summary-title">
-                    @Messages("summary.checkyouranswers.businesspremises.section2")
-                </th>
+                <td width="40%">What does your business do at these premises?</td>
                 <td>
+                    @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
+                    @ba.activities.map { a =>
+                    @a.getMessage<br />
+                    }
+                    }
+                </td>
+                <td class="numeric">
                     <a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true)">
                         @Messages("button.edit")
                     </a>
                 </td>
-
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <ul>
-                        @wdbd.activities.map { a =>
-                            <li>@a.getMessage</li>
-                        }
-                    </ul>
-                </td>
             </tr>
         </table>
-        @wdbd.activities.contains(MoneyServiceBusiness) match {
-            case true => {
-                <table  class="summary">
-                    <tr>
-                        <th class="summary-title">
-                            @Messages("tradingpremises.msb.services.heading")
-                        </th>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <ul>
-                                @model.msbServices.map { a =>
-                                    @a.services.map {service=>
-                                        <li>@service.getMessage</li>
-
-                                    }
-                                }
-                            </ul>
-                        </td>
-                    </tr>
-                </table>
-            }
-            case false => {}
-        }
     }
-
-    @model.yourAgent.map { agent =>
-    <table class="summary">
-        <tr>
-            <th class="summary-title">
-                @Messages("summary.checkyouranswers.agentspremises.section3")
-            </th>
-            <td>
-                <a href="@controllers.tradingpremises.routes.YourAgentController.get(index, true)">
-                    @Messages("button.edit")
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @agent.agentsRegisteredName
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @agent.taxType.message
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @agent.businessStructure.message
-            </td>
-        </tr>
-    </table>
-    }
-
-    <a class="button" href="@controllers.tradingpremises.routes.SummaryController.get()">
-        @Messages("button.saveandreturn")
-    </a>
+    <!--@model.yourAgent.map { agent =>-->
+    <!--<table class="summary">-->
+        <!--<tr>-->
+            <!--<th class="summary-title">-->
+                <!--@Messages("summary.checkyouranswers.agentspremises.section3")-->
+            <!--</th>-->
+            <!--<td>-->
+                <!--<a href="@controllers.tradingpremises.routes.YourAgentController.get(index, true)">-->
+                    <!--@Messages("button.edit")-->
+                <!--</a>-->
+            <!--</td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td colspan="2">-->
+                <!--@agent.agentsRegisteredName-->
+            <!--</td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td colspan="2">-->
+                <!--@agent.taxType.message-->
+            <!--</td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td colspan="2">-->
+                <!--@agent.businessStructure.message-->
+            <!--</td>-->
+        <!--</tr>-->
+    <!--</table>-->
+    <!--}-->
+    <div class="form-group">
+        <a class="button" href="@controllers.tradingpremises.routes.SummaryController.get()">
+            @Messages("button.confirmandcontinue")
+        </a>
+    </div>
 }
