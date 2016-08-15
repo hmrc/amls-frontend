@@ -28,21 +28,20 @@ trait TradingPremisesAddController  extends BaseController with RepeatingSection
               displayGuidance match {
                 case true => controllers.tradingpremises.routes.WhatYouNeedController.get(idx)
                 case false => {
-                  val bm = dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key).value.get.get
-                    println("------------------"+ bm)
-                  if(isMSBSelected(bm)) {
-                    println("---------reached here---------")
+                 // val bm = dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key).value.get.get
+                  //  println("------------------"+ bm)
+
                     controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(idx)
                   }
-                  else
-                    controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(idx)
+                //  else
+                   // controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(idx)
                 }
 
               }
             }
           }
 
-  }
+
 
 
 }
