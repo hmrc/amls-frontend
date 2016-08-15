@@ -4,7 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("msb.send.money.title", "summary.msb")
+    @heading("msb.send.money.heading", "summary.msb")
 }
 
 @main(
@@ -15,7 +15,7 @@
     @form(f, controllers.msb.routes.SendMoneyToOtherCountryController.post(edit)) {
 
         @inlineRadioGroup(f("money")) {
-        @legend("TODO", jsHidden = true)
+        @legend("msb.send.money.heading", jsHidden = true)
             @radio(f("money"), "lbl.yes", "true")
             @radio(f("money"), "lbl.no", "false")
         }
