@@ -10,7 +10,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
   val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
     true, new LocalDate(1990, 2, 24))
 
-  val yourAgent = YourAgent("STUDENT", TaxTypeSelfAssesment, SoleProprietor)
+  val businessStructure = SoleProprietor
 
   val agentName = AgentName("test")
 
@@ -25,30 +25,31 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       MoneyServiceBusiness))
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
 
-  val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)), Some(ytp), Some(yourAgent), Some(agentName),Some(agentCompanyName),Some(agentPartnership),Some(wdbd), Some(msbServices))
-  val completeJson = Json.obj("tradingName" -> "foo",
+  val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)),
+    Some(ytp), Some(businessStructure), Some(agentName),Some(agentCompanyName),Some(agentPartnership),Some(wdbd), Some(msbServices))
+
+
+  val completeJson = Json.obj("agentPremises" -> true,
+    "tradingName" -> "foo",
     "addressLine1" -> "1",
     "addressLine2" -> "2",
     "postcode" -> "asdfasdf",
     "isResidential" -> true,
     "startDate" -> "1990-02-24",
-    "agentsRegisteredName" -> "STUDENT",
-    "taxType" -> "01",
-    "agentsBusinessStructure" -> "01",
-    "agentName" -> "test",
-    "agentCompanyName" -> "test",
-    "agentPartnership" -> "test",
+    "agentsBusinessStructure" ->"01",
+    "agentName" ->"test",
+    "agentCompanyName" ->"test",
+    "agentPartnership" ->"test",
     "activities" -> Json.arr("02", "03", "05"),
-    "msbServices" ->Json.arr("01","02"),
-    "agentPremises" -> true
+    "msbServices" ->Json.arr("01","02")
   )
 
   "TradingPremises" must {
 
     "set the your agent data correctly" in {
       val tp = TradingPremises(None, None, None)
-      val newTP = tp.yourAgent(yourAgent)
-      newTP.yourAgent must be(Some(yourAgent))
+      val newTP = tp.businessStructure(LimitedLiabilityPartnership)
+      newTP.businessStructure must be(Some(LimitedLiabilityPartnership))
     }
 
     "set the agent name correctly" in {
@@ -94,4 +95,3 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
     }
   }
 }
-

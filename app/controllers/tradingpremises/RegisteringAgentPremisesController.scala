@@ -46,7 +46,7 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
               case Some(tp) => Some(tp.yourAgentPremises(data))
             }
           } yield data.agentPremises match {
-            case true => Redirect(routes.YourAgentController.get(index,edit))
+            case true => Redirect(routes.BusinessStructureController.get(index,edit))
             case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
           }
         }.recoverWith {

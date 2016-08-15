@@ -38,15 +38,15 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
           for {
             _ <- updateDataStrict[TradingPremises](index) {
             case Some(tp) =>
-                Some(TradingPremises(tp.registeringAgentPremises, Some(ytp), tp.yourAgent,tp.agentName,tp.agentCompanyName, tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+                Some(TradingPremises(tp.registeringAgentPremises,
+                  Some(ytp), tp.businessStructure,tp.agentName,tp.agentCompanyName, tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+            case _ => ytp
             }
-          } yield (edit) match {
-            case (true) =>
+          } yield edit match {
+            case true =>
               Redirect(routes.SummaryController.getIndividual(index))
-            case (false) =>
+            case false =>
               Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
-            case (_) =>
-              Redirect(routes.YourAgentController.get(index, edit))
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

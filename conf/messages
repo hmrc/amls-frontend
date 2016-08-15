@@ -144,7 +144,7 @@ error.required.tp.your.business.or.other = Select one option: who uses these pre
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
 error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
 error.required.tp.select.satax.corptax = Select one option: does your agent pay self-assessment tax or corporation tax?
-error.required.tp.select.business.structure = Select your agent’s business structure.
+error.required.tp.select.business.structure = Select one option: what is your agent’s business structure?
 error.required.tp.agent.premises = Select yes or no to the question: Are you registering an agent’s premises?
 error.required.tp.agent.registered.company.name = Enter your agent’s registered company name.
 error.invalid.tp.agent.registered.company.name = You can’t enter more than 140 characters for the registered company name.
@@ -319,6 +319,12 @@ lbl.residential = Residential
 lbl.nonresidential = Non-Residential
 
 lbl.give.details = Please give details
+
+businessType.lbl.01 = Limited company
+businessType.lbl.02 = Sole proprietor
+businessType.lbl.03 = Partnership
+businessType.lbl.04 = Limited partnership or limited liability partnership
+businessType.lbl.05 = Unincorporated association or trust
 
 ############################### Login Page ###############################
 amls.Login.title= AMLS
@@ -547,12 +553,7 @@ tradingpremises.youragent.registeredname.subtitle = It must be identical to the 
 tradingpremises.youragent.taxtype = What type of tax does your agent pay?
 tradingpremises.youragent.taxtype.lbl.01=Self-assessment
 tradingpremises.youragent.taxtype.lbl.02=Corporation tax
-tradingpremises.youragent.businessstructure=What is your agent’s business structure?
-tradingpremises.youragent.businessstructure.lbl.01=Sole proprietor
-tradingpremises.youragent.businessstructure.lbl.02=Limited liability partnership
-tradingpremises.youragent.businessstructure.lbl.03=Partnership
-tradingpremises.youragent.businessstructure.lbl.04=Incorporated body
-tradingpremises.youragent.businessstructure.lbl.05=Unincorporated body
+
 tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
 tradingpremises.yourtradingpremises.title= Trading premises details
 tradingpremises.yourtradingpremises.heading=Trading premises details
@@ -568,13 +569,16 @@ tradingpremises.yourtradingpremises.whose.my=My business
 tradingpremises.yourtradingpremises.whose.another=Another business, acting as an agent for my business
 tradingpremises.yourtradingpremises.startdate=When will the business start trading from these premises? If it is already trading, give the date it started.
 tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
-tradingpremises.msb.services.title = Trading premises – Which activities take place at these premises?
+tradingpremises.msb.services.title = Trading premises - Which activities take place at these premises?
 tradingpremises.msb.services.heading = Which activities take place at these premises?
 tradingpremises.agent.premises.title = Trading premises - Are you registering an agent’s premises?
 tradingpremises.agent.premises.heading = Are you registering an agent’s premises?
 tradingpremises.agent.premises.text = An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
 
 
+
+tradingpremises.businessStructure.title = Trading premises - What is your agent’s business structure?
+tradingpremises.businessStructure.heading = What is your agent’s business structure?
 
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own

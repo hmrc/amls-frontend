@@ -180,7 +180,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         val result = controller.post(1,edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.YourAgentController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.BusinessStructureController.get(1,false).url)
       }
 
       "respond with NOT_FOUND" when {
@@ -193,7 +193,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(Some(RegisteringAgentPremises(true)), None, None, None)))))
 
-          val result = controller.post(10)(newRequest)
+          val result = controller.post(10, false)(newRequest)
 
           status(result) must be(NOT_FOUND)
 
