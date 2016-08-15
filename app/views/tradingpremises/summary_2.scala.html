@@ -47,12 +47,8 @@
                 <td width="40%">Residential address:</td>
                 <td>
                     @yta.isResidential match {
-                    case true => {
-                    Yes
-                    }
-                    case false => {
-                    No
-                    }
+                    case true => { Yes }
+                    case false => { No }
                     }
                 </td>
                 <td class="numeric">
@@ -62,7 +58,7 @@
                 </td>
             </tr>
             <tr>
-                <td width="40%">What does your business do at these premises?</td>
+                <td width="40%">Services at this address:</td>
                 <td>
                     @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
                     @ba.activities.map { a =>
@@ -72,6 +68,19 @@
                 </td>
                 <td class="numeric">
                     <a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true)">
+                        @Messages("button.edit")
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td width="40%">Who uses these premises:</td>
+                <td>
+                    @model.yourAgent.fold(Html(Messages("tradingpremises.summary.mybusiness"))) { _ =>
+                    @Messages("tradingpremises.summary.agents")
+                    }
+                </td>
+                <td class="numeric">
+                    <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
                         @Messages("button.edit")
                     </a>
                 </td>
