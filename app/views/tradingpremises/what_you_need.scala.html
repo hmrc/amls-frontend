@@ -4,13 +4,6 @@
 
 @(index: Int, msbExists: Boolean)(implicit request: Request[_])
 
-@sidebar = {
-<div class="user-attention">
-    <h3>@Messages("main.sidebar.title")</h3>
-    <p>@Messages("main.sidebar.information")</p>
-</div>
-}
-
 @header = {
     @heading("tradingpremises.whatyouneed.heading", "summary.tradingpremises")
 }
@@ -60,6 +53,9 @@
 
 }
 
-    </div>
-
+@sidebar = {
+<div class="user-attention">
+  <h2>@Messages("main.sidebar.title")</h2>
+  <p>@Messages("main.sidebar.information")</p>
+</div>
 }

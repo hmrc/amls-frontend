@@ -75,7 +75,7 @@
             <tr>
                 <td width="40%">Who uses these premises:</td>
                 <td>
-                    @model.yourAgent.fold(Html(Messages("tradingpremises.summary.mybusiness"))) { _ =>
+                    @model.businessStructure.fold(Html(Messages("tradingpremises.summary.mybusiness"))) { _ =>
                     @Messages("tradingpremises.summary.agents")
                     }
                 </td>
@@ -87,35 +87,6 @@
             </tr>
         </table>
     }
-    <!--@model.yourAgent.map { agent =>-->
-    <!--<table class="summary">-->
-        <!--<tr>-->
-            <!--<th class="summary-title">-->
-                <!--@Messages("summary.checkyouranswers.agentspremises.section3")-->
-            <!--</th>-->
-            <!--<td>-->
-                <!--<a href="@controllers.tradingpremises.routes.YourAgentController.get(index, true)">-->
-                    <!--@Messages("button.edit")-->
-                <!--</a>-->
-            <!--</td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td colspan="2">-->
-                <!--@agent.agentsRegisteredName-->
-            <!--</td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td colspan="2">-->
-                <!--@agent.taxType.message-->
-            <!--</td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td colspan="2">-->
-                <!--@agent.businessStructure.message-->
-            <!--</td>-->
-        <!--</tr>-->
-    <!--</table>-->
-    <!--}-->
     <div class="form-group">
         <a class="button" href="@controllers.tradingpremises.routes.SummaryController.get()">
             @Messages("button.confirmandcontinue")

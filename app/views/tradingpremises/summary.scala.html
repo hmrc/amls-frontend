@@ -50,7 +50,7 @@
                 <tr>
                     <td width="40%">Who uses these premises?</td>
                     <td>
-                        @tp.yourAgent.fold(Html(Messages("tradingpremises.summary.own"))) { _ =>
+                        @tp.businessStructure.fold(Html(Messages("tradingpremises.summary.own"))) { _ =>
                         @Messages("tradingpremises.summary.agents")
                         }
                     </td>
