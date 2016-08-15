@@ -67,4 +67,8 @@ object YourTradingPremises {
           (__ \ "startDate").write(localDateWrite)
         ) (unlift(YourTradingPremises.unapply))
     }
+
+  implicit def convert(data: YourTradingPremises): Option[TradingPremises] = {
+    Some(TradingPremises(yourTradingPremises = Some(data)))
+  }
 }

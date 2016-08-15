@@ -93,8 +93,8 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
         "msbServices[0]" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))

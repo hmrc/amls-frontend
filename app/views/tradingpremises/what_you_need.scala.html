@@ -4,6 +4,13 @@
 
 @(index: Int, msbExists: Boolean)(implicit request: Request[_])
 
+@sidebar = {
+<div class="user-attention">
+    <h3>@Messages("main.sidebar.title")</h3>
+    <p>@Messages("main.sidebar.information")</p>
+</div>
+}
+
 @header = {
     @heading("tradingpremises.whatyouneed.heading", "summary.tradingpremises")
 }
@@ -41,19 +48,15 @@
 
     <div class="form-group">
         @if(msbExists) {
-           <a class="button" href= "@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index)">
-        } else {
-           <a class="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
-        }
+        <a class="button" href= "@controllers.tradingpremises.routes.WhatYouNeedController.get(index)">
             @Messages("button.continue")
-          </a>
+        </a>
+        } else {
+        <a class="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
+            @Messages("button.continue")
+        </a>
+        }
+
     </div>
 
-}
-
-@sidebar = {
-<div class="user-attention">
-  <h2>@Messages("main.sidebar.title")</h2>
-  <p>@Messages("main.sidebar.information")</p>
-</div>
 }

@@ -1,14 +1,13 @@
 package models.tradingpremises
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.tradingpremises.AgentCompanyName
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class TradingPremises(
                             registeringAgentPremises: Option[RegisteringAgentPremises] = None,
                             yourTradingPremises: Option[YourTradingPremises] = None,
-                            yourAgent: Option[YourAgent] = None,
+                            businessStructure: Option[BusinessStructure] = None,
                             agentName: Option[AgentName] = None,
                             agentCompanyName: Option[AgentCompanyName] = None,
                             agentPartnership: Option[AgentPartnership] = None,
@@ -17,8 +16,8 @@ case class TradingPremises(
 
                           ) {
 
-  def yourAgent(v: YourAgent): TradingPremises =
-    this.copy(yourAgent = Some(v))
+  def businessStructure(v: BusinessStructure): TradingPremises =
+    this.copy(businessStructure = Some(v))
 
   def agentName(v: AgentName): TradingPremises =
     this.copy(agentName = Some(v))
@@ -82,7 +81,7 @@ object TradingPremises {
   implicit val reads: Reads[TradingPremises] = (
       __.read[Option[RegisteringAgentPremises]] and
       __.read[Option[YourTradingPremises]] and
-      __.read[Option[YourAgent]] and
+        __.read[Option[BusinessStructure]] and
         __.read[Option[AgentName]] and
         __.read[Option[AgentCompanyName]] and
         __.read[Option[AgentPartnership]] and
@@ -95,7 +94,7 @@ object TradingPremises {
       Seq(
         Json.toJson(model.registeringAgentPremises).asOpt[JsObject],
         Json.toJson(model.yourTradingPremises).asOpt[JsObject],
-        Json.toJson(model.yourAgent).asOpt[JsObject],
+        Json.toJson(model.businessStructure).asOpt[JsObject],
         Json.toJson(model.agentName).asOpt[JsObject],
         Json.toJson(model.agentCompanyName).asOpt[JsObject],
         Json.toJson(model.agentPartnership).asOpt[JsObject],
