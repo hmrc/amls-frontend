@@ -15,11 +15,10 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "addressLine1" -> Seq("1"),
       "addressLine2" -> Seq("2"),
       "postcode" -> Seq("asdfasdf"),
-      "isOwner" -> Seq("true"),
+      "isResidential" -> Seq("true"),
       "startDate.day" -> Seq("24"),
       "startDate.month" -> Seq("2"),
-      "startDate.year" -> Seq("1990"),
-      "isResidential" -> Seq("true")
+      "startDate.year" -> Seq("1990")
     )
 
     val json = Json.obj(
@@ -27,9 +26,8 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "addressLine1" -> "1",
       "addressLine2" -> "2",
       "postcode" -> "asdfasdf",
-      "isOwner" -> true,
-      "startDate" -> new LocalDate(1990, 2, 24),
-      "isResidential" -> true
+      "isResidential" -> true,
+      "startDate" -> new LocalDate(1990, 2, 24)
     )
 
     val model = YourTradingPremises(
@@ -42,21 +40,18 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "asdfasdf"
       ),
       true,
-      new LocalDate(1990, 2, 24),
-      true
+      new LocalDate(1990, 2, 24)
     )
 
-    "fail vaidation when isOwner and isresidential not selected" in {
+    "fail vaidation when isresidential not selected" in {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foo"),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
         "postcode" -> Seq("asdfasdf"),
-        "isOwner" -> Seq(""),
+        "isResidential" -> Seq(""),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"),
-        "isResidential" -> Seq(""))) must be (Failure(Seq(Path \ "isOwner"  -> Seq(ValidationError("error.required.tp.your.business.or.other")),
-        Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
+        "startDate.year" -> Seq("1990"))) must be (Failure(Seq(Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
       )))
     }
 
@@ -66,11 +61,10 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
         "postcode" -> Seq("asdfasdf"),
-        "isOwner" -> Seq("false"),
+        "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"),
-        "isResidential" -> Seq("true"))) must be (Failure(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
+        "startDate.year" -> Seq("1990"))) must be (Failure(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
       )))
     }
 

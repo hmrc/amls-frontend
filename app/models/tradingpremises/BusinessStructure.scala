@@ -58,7 +58,7 @@ object BusinessStructure {
   implicit val agentsBusinessStructureRule: Rule[UrlFormEncoded, BusinessStructure] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
 
-    (__ \ "agentsBusinessStructure").read[String] flatMap {
+    (__ \ "agentsBusinessStructure").read[String].withMessage("error.required.tp.select.business.structure") flatMap {
       case "01" => SoleProprietor
       case "02" => LimitedLiabilityPartnership
       case "03" => Partnership

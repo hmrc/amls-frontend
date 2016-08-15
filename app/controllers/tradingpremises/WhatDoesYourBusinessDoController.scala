@@ -96,7 +96,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 case Some(tp) if data.activities.contains(MoneyServiceBusiness) =>
                   Some(tp.whatDoesYourBusinessDoAtThisAddress(data))
                 case Some(tp) if !data.activities.contains(MoneyServiceBusiness) =>
-                  Some(TradingPremises(None,tp.yourTradingPremises, tp.yourAgent,None, None,None,Some(data), None))
+                  Some(TradingPremises(tp.registeringAgentPremises,tp.yourTradingPremises, tp.businessStructure,None, None,None,Some(data), None))
                 case _ => Some(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(data)))
               } map {
                 _ => data.activities.contains(MoneyServiceBusiness) match {

@@ -1,13 +1,6 @@
 @import include._
 @()(implicit request: Request[_])
 
-@sidebar = {
-    <div class="bevel-container">
-        <h3>@Messages("main.sidebar.title")</h3>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
-}
-
 @main(
     title = Messages("hvd.whatyouneed.title"),
     sidebar = sidebar
@@ -32,4 +25,11 @@
             @Messages("button.continue")
         </a>
     </div>
+}
+
+@sidebar = {
+<div class="user-attention">
+  <h2>@Messages("main.sidebar.title")</h2>
+  <p>@Messages("main.sidebar.information")</p>
+</div>
 }

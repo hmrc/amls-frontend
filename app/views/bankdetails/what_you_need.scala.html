@@ -1,13 +1,6 @@
 @import include._
 @(index:Int)(implicit request: Request[_])
 
-@sidebar = {
-<div class="user-attention">
-    <h3>@Messages("main.sidebar.title")</h3>
-    <p>@Messages("main.sidebar.information")</p>
-</div>
-}
-
 @header = {
     @heading("bankdetails.whatyouneed.heading", "summary.bankdetails")
 }
@@ -31,4 +24,11 @@
      <div class="form-field">
             <a class="button" href="@controllers.bankdetails.routes.BankAccountTypeController.get(index)">@Messages("button.continue")</a>
      </div>
+}
+
+@sidebar = {
+<div class="user-attention">
+  <h2>@Messages("main.sidebar.title")</h2>
+  <p>@Messages("main.sidebar.information")</p>
+</div>
 }
