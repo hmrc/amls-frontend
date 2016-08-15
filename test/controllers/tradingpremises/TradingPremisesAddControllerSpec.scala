@@ -43,9 +43,8 @@ class TradingPremisesAddControllerSpec extends WordSpecLike
             Address(
               "line 1", "line 2", Some("line 3"), Some("line 4"), "postcode"
             ),
-            true,
-            new LocalDate(10,10,10),
-            false
+            false,
+            new LocalDate(10,10,10)
           ))
         )
 

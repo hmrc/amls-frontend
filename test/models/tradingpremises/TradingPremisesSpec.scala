@@ -8,7 +8,7 @@ import play.api.libs.json.Json
 class TradingPremisesSpec extends WordSpec with MustMatchers {
 
   val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
-    true, new LocalDate(1990, 2, 24), true)
+    true, new LocalDate(1990, 2, 24))
 
   val businessStructure = SoleProprietor
 
@@ -25,21 +25,23 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       MoneyServiceBusiness))
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
 
-  val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)), Some(ytp), Some(businessStructure), Some(agentName),Some(agentCompanyName),Some(agentPartnership),Some(wdbd), Some(msbServices))
-  val completeJson = Json.obj("tradingName" -> "foo",
+  val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)),
+    Some(ytp), Some(businessStructure), Some(agentName),Some(agentCompanyName),Some(agentPartnership),Some(wdbd), Some(msbServices))
+
+
+  val completeJson = Json.obj("agentPremises" -> true,
+    "tradingName" -> "foo",
     "addressLine1" -> "1",
     "addressLine2" -> "2",
     "postcode" -> "asdfasdf",
-    "isOwner" -> true,
-    "startDate" -> "1990-02-24",
     "isResidential" -> true,
-    "agentsBusinessStructure" -> "01",
-    "agentName" -> "test",
-    "agentCompanyName" -> "test",
-    "agentPartnership" -> "test",
+    "startDate" -> "1990-02-24",
+    "agentsBusinessStructure" ->"01",
+    "agentName" ->"test",
+    "agentCompanyName" ->"test",
+    "agentPartnership" ->"test",
     "activities" -> Json.arr("02", "03", "05"),
-    "msbServices" ->Json.arr("01","02"),
-    "agentPremises" -> true
+    "msbServices" ->Json.arr("01","02")
   )
 
   "TradingPremises" must {
@@ -93,4 +95,3 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
     }
   }
 }
-

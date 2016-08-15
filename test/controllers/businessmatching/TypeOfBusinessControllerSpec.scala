@@ -39,7 +39,6 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
       document.title() must be (Messages("businessmatching.typeofbusiness.title"))
-      document.select("input[type=text]").`val`() must be("test")
     }
 
     "display main Summary Page" in new Fixture {

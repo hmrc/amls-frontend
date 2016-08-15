@@ -120,7 +120,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         val result = controller.post(1,edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1,false).url)
+        redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1).url)
       }
       "return a redirect to the 'what is your agent's business structure?' page on submitting true" in new Fixture {
 

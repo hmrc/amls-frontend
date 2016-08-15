@@ -48,13 +48,13 @@
 
     <div class="form-group">
         @if(msbExists) {
-           <a class="button" href= "@controllers.tradingpremises.routes.WhatYouNeedController.get(index)">
-               @Messages("button.continue")
-           </a>
+        <a class="button" href= "@controllers.tradingpremises.routes.WhatYouNeedController.get(index)">
+            @Messages("button.continue")
+        </a>
         } else {
-           <a class="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
-               @Messages("button.continue")
-           </a>
+        <a class="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
+            @Messages("button.continue")
+        </a>
         }
 
     </div>
