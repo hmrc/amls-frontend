@@ -108,7 +108,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
         }
 
-        "edit mode is true, and redirect to Summary Controller" in new Fixture {
+        "edit mode is true, and redirect to WhatDoesYourBusinessDo Controller" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
@@ -132,7 +132,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
-            Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId1).url))
+            Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1, true).url))
         }
       }
 

@@ -465,14 +465,16 @@ form .inline .block-label + fieldset {
   margin-top: 0;
 }
 
-form .date .form-field {
+form .date .form-field,
+form .date .form-group {
   clear: none;
   float: left;
   margin-right: 20px;
   width: 60px;
 }
 
-form .date .form-field input[type=text] {
+form .date .form-field input[type=text],
+form .date .form-group input[type=text] {
   width: 100%;
 }
 

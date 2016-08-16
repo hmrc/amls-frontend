@@ -152,6 +152,7 @@ error.required.tp.agent.name = Enter your agent’s name.
 error.invalid.tp.agent.name = You can’t enter more than 140 characters for the agent’s name.
 error.required.tp.agent.partnership = Enter your agent’s partners.
 error.invalid.tp.agent.partnership = You can’t enter more than 140 characters for the agent’s partners.
+error.required.tp.register.another.premises = Select yes or no to the question: Do you want to register another trading premises?
 
 ###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
@@ -320,8 +321,8 @@ lbl.nonresidential = Non-Residential
 
 lbl.give.details = Please give details
 
-businessType.lbl.01 = Limited company
-businessType.lbl.02 = Sole proprietor
+businessType.lbl.02 = Limited company
+businessType.lbl.01 = Sole proprietor
 businessType.lbl.03 = Partnership
 businessType.lbl.04 = Limited partnership or limited liability partnership
 businessType.lbl.05 = Unincorporated association or trust
@@ -603,6 +604,13 @@ tradingpremises.agentpartnership.title =Trading premises - Your agent’s partne
 tradingpremises.agentpartnership.heading = Your agent’s partnership
 tradingpremises.agentpartnership.lbl.hint = List all your agent’s partners
 
+
+
+tradingpremises.premises.registered.title = Premises registered
+tradingpremises.premises.registered.heading = Premises registered
+tradingpremises.have.registered.premises.text = You have registered {0} trading premises.
+tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
+
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
 estateagentbusiness.whatyouneed.subheading = For this section you’ll need:
@@ -641,8 +649,8 @@ estateagentbusiness.registered.redress.text = A redress scheme is an independent
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.businessType.title = What’s your business structure?
-businessmatching.businessType.lbl.01 = Limited company
-businessmatching.businessType.lbl.02 = Sole proprietor
+businessmatching.businessType.lbl.01 = Sole proprietor
+businessmatching.businessType.lbl.02 = Limited company
 businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust

@@ -90,7 +90,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.get(1, false).url)
+      redirectLocation(result) mustBe Some(routes.AgentNameController.get(1, false).url)
     }
 
     "successfully submit and navigate to next page when user selects the option LimitedLiabilityPartnership" in new Fixture {
@@ -111,7 +111,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.AgentCompanyNameController.get(1, false).url)
     }
 
     "successfully submit and navigate to next page when user selects the option Partnership" in new Fixture {
@@ -128,7 +128,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.WhatYouNeedController.get(1).url)
+      redirectLocation(result) mustBe Some(routes.AgentPartnershipController.get(1).url)
     }
 
     "successfully submit and navigate to next page when user selects the option IncorporatedBody" in new Fixture {
@@ -145,7 +145,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.AgentCompanyNameController.get(1).url)
     }
 
     "successfully submit and navigate to next page when user selects the option UnincorporatedBody" in new Fixture {
