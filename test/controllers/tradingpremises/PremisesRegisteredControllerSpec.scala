@@ -69,7 +69,7 @@ class PremisesRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with
 
         val result = controller.post(1)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.tradingpremises.routes.TradingPremisesAddController.get(true).url))
+        redirectLocation(result) must be(Some(controllers.tradingpremises.routes.TradingPremisesAddController.get(false).url))
       }
 
       "successfully redirect to the page on selection of 'no'" in new Fixture {
