@@ -16,9 +16,13 @@ import scala.concurrent.Future
 trait TradingPremisesAddController extends BaseController with RepeatingSection {
 
   private def isMSBSelected(implicit ac: AuthContext, hc: HeaderCarrier): Future[Boolean] = {
-    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
+    dataCacheConnector.fetchAll map {
       cache =>
-        ControllerHelper.isMSBSelected(cache)
+        val test = for {
+          c <- cache
+          businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
+        } yield businessMatching
+        ControllerHelper.isMSBSelected(test)
     }
   }
 
