@@ -20,7 +20,6 @@ trait TrainingController extends RepeatingSection with BaseController {
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, Some(training), _))
               => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index))
