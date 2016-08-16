@@ -16,16 +16,14 @@ trait LandingController extends BaseController {
   // TODO: GG Enrolment routing
   def get() = Authorised.async {
     implicit authContext => implicit request =>
+      println(authContext.enrolmentsUri.get)
       landingService.cacheMap flatMap {
         case Some(cache) =>
-          cache.getEntry[SubscriptionResponse](SubscriptionResponse.key) map {
-            _ =>
-              // If we have a previous subscription then redirect to the confirmtaion controller
-              Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
-          } getOrElse {
-            // If we have no previous subscription, but we have a saved form,
-            // redirect to the registration progress page
-            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          ApplicationConfig.statusToggle match {
+            case true =>
+              Future.successful(Redirect(controllers.routes.StatusController.get()))
+            case _ =>
+              Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
           }
         case None =>
           landingService.reviewDetails flatMap {

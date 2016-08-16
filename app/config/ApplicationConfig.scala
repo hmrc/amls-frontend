@@ -24,9 +24,12 @@ object ApplicationConfig extends ServicesConfig {
 
   lazy val loginUrl = getConfigString("login.url")
   lazy val logoutUrl = getConfigString("logout.url")
+  lazy val loginContinue = getConfigString("login.continue")
 
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
+
+  lazy val authUrl = baseUrl("auth")
 
   lazy val businessCustomerUrl = getConfigString("business-customer.url")
 
@@ -56,6 +59,12 @@ object ApplicationConfig extends ServicesConfig {
   val enrolmentToggle: Boolean = {
     val value = getConfBool("feature-toggle.gg-enrolment", false)
     Logger.info(s"[ApplicationConfig][gg-enrolment] $value")
+    value
+  }
+
+  val statusToggle: Boolean = {
+    val value = getConfBool("feature-toggle.status-review", false)
+    Logger.info(s"[ApplicationConfig][status-review] $value")
     value
   }
 }

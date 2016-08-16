@@ -10,6 +10,8 @@ GET         /unauthorised                                               controll
 
 GET         /registration-progress                                      controllers.RegistrationProgressController.get()
 
+GET         /application-status                                         controllers.StatusController.get()
+
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 

@@ -18,16 +18,16 @@ private object AppDependencies {
 
   private val playHealthVersion = "1.1.0"
   private val govukTemplateVersion = "4.0.0"
-  private val playUiVersion = "4.10.0"
-  private val httpVerbsVersion = "3.3.0"
+  private val playUiVersion = "4.15.0"
+  private val httpVerbsVersion = "3.4.0"
 
   private val frontendBootstrapVersion = "6.4.0"
-  private val playPartialsVersion = "4.2.0"
-  private val playAuthorisedFrontendVersion = "4.7.0"
-  private val playConfigVersion = "2.0.1"
+  private val playPartialsVersion = "4.4.0"
+  private val playAuthorisedFrontendVersion = "5.4.0"
+  private val playConfigVersion = "2.1.0"
   private val playJsonLoggerVersion = "2.1.1"
   private val httpCachingClientVersion = "5.3.0"
-  private val playWhitelistFilterVersion = "1.0.1"
+  private val playWhitelistFilterVersion = "1.1.0"
 
   private val metricsPlayVersion = "0.2.1"
   private val metricsGraphiteVersion = "3.0.2"
@@ -43,7 +43,6 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
-
 
     // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
