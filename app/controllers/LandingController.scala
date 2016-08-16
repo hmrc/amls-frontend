@@ -19,7 +19,12 @@ trait LandingController extends BaseController {
       println(authContext.enrolmentsUri.get)
       landingService.cacheMap flatMap {
         case Some(cache) =>
-          Future.successful(Redirect(controllers.routes.StatusController.get()))
+          ApplicationConfig.statusToggle match {
+            case true =>
+              Future.successful(Redirect(controllers.routes.StatusController.get()))
+            case _ =>
+              Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          }
         case None =>
           landingService.reviewDetails flatMap {
             case Some(reviewDetails) =>

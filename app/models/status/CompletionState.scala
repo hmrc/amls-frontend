@@ -33,7 +33,8 @@ case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionSt
       case (SubmissionReady, Complete) => Messages("status.submitted")
       case (SubmissionFeesDue, _) => Messages("status.feepaid")
       case (SubmissionReadyForReview, _) => Messages("status.underreview")
-      case (SubmissionDecisionMade, _) => Messages("status.decisionmade")
+      case (SubmissionDecisionApproved, _) => Messages("status.decisionmade")
+      case (SubmissionDecisionRejected, _) => Messages("status.decisionmade")
       case _ => "Not found"
     }
   }
@@ -55,13 +56,19 @@ object CompletionStateViewModel {
       SubmissionReady -> Complete,
       SubmissionFeesDue -> Complete,
       SubmissionReadyForReview -> Complete,
-      SubmissionDecisionMade -> Complete)
+      SubmissionDecisionApproved -> Complete,
+      SubmissionDecisionRejected -> Complete)
 
     val updatedStatuses = statuses.span(s => s._1 != current)._1 ++ Map(current -> Current) ++ statuses.span(s => s._1 != current)._2.drop(1).map {
       status => (status._1, Incomplete)
     }
 
-    CompletionStateViewModel(updatedStatuses)
+    val filterStatuses = current match{
+      case SubmissionDecisionRejected => updatedStatuses.filterNot(m => m._1 == SubmissionDecisionApproved)
+      case _ => updatedStatuses.filterNot(m => m._1 == SubmissionDecisionRejected)
+    }
+
+    CompletionStateViewModel(filterStatuses)
   }
 
 

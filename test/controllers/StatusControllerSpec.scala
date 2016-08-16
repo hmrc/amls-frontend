@@ -65,8 +65,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       document.getElementsByClass("list").first().child(3).html() must be(Messages("status.underreview"))
       document.getElementsByClass("list").first().child(4).html() must be(Messages("status.decisionmade"))
 
-
-
     }
 
     "show business name " in new Fixture {
@@ -88,9 +86,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("panel-indent").first().child(1).html() must be(reviewDtls.businessName)
-
-
-
 
     }
 
@@ -234,6 +229,86 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionreadyforreview.heading"))
         document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissionreadyforreview.description"))
         document.getElementsByClass("status-detail").first().child(2).html() must be(Messages("status.submissionreadyforreview.description2"))
+
+      }
+
+      "decision made (approved)" in new Fixture {
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val cacheMap = mock[CacheMap]
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
+          Some(BusinessMatching(Some(reviewDtls), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any())).thenReturn(
+          Some(SubscriptionResponse("","",0,None,0,0,"")))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
+
+        when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, Call("", "")))))
+        when(controller.desConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        for (index <- 0 to 3) {
+          document.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
+        }
+
+        document.getElementsByClass("status-list").first().child(4).hasClass("current") must be(true)
+
+
+        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionapproved.heading"))
+        document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissiondecisionapproved.description"))
+        document.getElementsByClass("status-detail").first().child(2).html() must be(Messages("status.submissiondecisionapproved.description2"))
+
+      }
+
+      "decision made (rejected)" in new Fixture {
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val cacheMap = mock[CacheMap]
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
+          Some(BusinessMatching(Some(reviewDtls), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any())).thenReturn(
+          Some(SubscriptionResponse("","",0,None,0,0,"")))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Rejected", None, None, None, false)
+
+        when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, Call("", "")))))
+        when(controller.desConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        for (index <- 0 to 3) {
+          document.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
+        }
+
+        document.getElementsByClass("status-list").first().child(4).hasClass("current") must be(true)
+
+        document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionrejected.heading"))
+        document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissiondecisionrejected.description"))
 
       }
     }

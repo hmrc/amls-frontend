@@ -12,6 +12,7 @@ trait BaseController extends FrontendController with Actions {
 
   protected val Authorised = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence)
   protected val ResponsiblePeopleToggle = FeatureToggle(ApplicationConfig.responsiblePeopleToggle)
+  protected val StatusToggle = FeatureToggle(ApplicationConfig.statusToggle)
   protected val HvdToggle = FeatureToggle(ApplicationConfig.hvdToggle)
 
   def notFoundView(implicit request: Request[_]) = {

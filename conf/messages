@@ -321,6 +321,7 @@ unauthorised.title = Unauthorised
 status.title = Application status – Anti-Money Laundering Supervision
 status.heading = Your application status
 status.business = Your business:
+status.referenceno = Reference number:
 status.incomplete = Incomplete
 status.complete = Completed
 status.notsubmitted = Not Submitted
@@ -342,6 +343,12 @@ status.submissionfeesdue.buttontext = Pay fee
 status.submissionreadyforreview.heading = Under review
 status.submissionreadyforreview.description = Your application is being reviewed by HM Revenue and Customs. This process can take up to 45 days.
 status.submissionreadyforreview.description2 = You'll receive an email asking you to sign in to this website, where you will be able to see if you have been approved or rejected.
+status.submissiondecisionapproved.heading = Application rejected
+status.submissiondecisionapproved.description = Your application has been successful, and your business is now registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionapproved.description2 = Your supervision lasts for 12 months, and you will need to renew your registration on XXdateXX. You’ll receive a letter around XXdateXX to remind you to renew your registration.
+status.submissiondecisionrejected.heading = Application rejected
+status.submissiondecisionrejected.description = Your application has been rejected, and your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionrejected.buttontext = Submit new application
 
 
 

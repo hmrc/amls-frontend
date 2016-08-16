@@ -8,8 +8,8 @@ import models.registrationprogress.{Completed, Section}
 
 import scala.concurrent.Future
 import views.html.status.status
-import models.status._
-import services.{AuthEnrolmentsService, LandingService, ProgressService}
+import models.status.{CompletionStateViewModel, _}
+import services.{AuthEnrolmentsService, LandingService, ProgressService, SubscriptionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -21,6 +21,8 @@ trait StatusController extends BaseController {
   private[controllers] def desConnector: DESConnector
   private[controllers] def progressService: ProgressService
   private[controllers] def enrolmentsService: AuthEnrolmentsService
+  private[controllers] def subscriptionService: SubscriptionService
+
 
   private def isComplete(seq: Seq[Section]): Boolean =
     seq forall {
@@ -52,7 +54,8 @@ trait StatusController extends BaseController {
             response => response.formBundleStatus match {
               case "None" => SubmissionFeesDue
               case "Pending" => SubmissionReadyForReview
-              case "Approved" | "Rejected" => SubmissionDecisionMade
+              case "Approved" => SubmissionDecisionApproved
+              case "Rejected" => SubmissionDecisionRejected
             }
           }
           case None => Future.successful(NotCompleted)
@@ -62,24 +65,35 @@ trait StatusController extends BaseController {
     }
   }
 
-  def get() = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        landingService.cacheMap flatMap {
-          case Some(cache) =>
-            val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
-            val businessName = for {
-              reviewDetails <- businessMatching.reviewDetails
-            } yield reviewDetails.businessName
+  def get() = StatusToggle {
+    Authorised.async {
+      implicit authContext =>
+        implicit request =>
+          landingService.cacheMap flatMap {
+            case Some(cache) =>
+              val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
+              val businessName = for {
+                reviewDetails <- businessMatching.reviewDetails
+              } yield reviewDetails.businessName
 
-            submissionStatus(cache)(hc,authContext) map {
-              foundStatus =>
-                Ok(status(businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
+              subscriptionService.getSubscription map {
+                case (mlrRegNo, total, rows) =>
+                  submissionStatus(cache)(hc, authContext) map {
+                    foundStatus =>
+                      Ok(status(mlrRegNo, businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
+                  }
+
+              }
+
+              submissionStatus(cache)(hc, authContext) map {
+                foundStatus =>
+                  Ok(status("Not Found", businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
+              }
+            case None => etmpStatus map {
+              es => Ok(status("Not Found", "TODO", CompletionStateViewModel(es)))
             }
-          case None => etmpStatus map {
-            es => Ok(status("TODO",CompletionStateViewModel(es)))
           }
-        }
+    }
   }
 
 }
@@ -91,6 +105,7 @@ object StatusController extends StatusController {
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val progressService = ProgressService
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
+  override private[controllers] val subscriptionService = SubscriptionService
 
 }
 

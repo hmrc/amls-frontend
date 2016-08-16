@@ -61,4 +61,10 @@ object ApplicationConfig extends ServicesConfig {
     Logger.info(s"[ApplicationConfig][gg-enrolment] $value")
     value
   }
+
+  val statusToggle: Boolean = {
+    val value = getConfBool("feature-toggle.status-review", false)
+    Logger.info(s"[ApplicationConfig][status-review] $value")
+    value
+  }
 }

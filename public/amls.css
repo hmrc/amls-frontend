@@ -653,3 +653,14 @@ fieldset.panel-indent legend {
   background-size: 12%;
   color: #fff;
 }
+
+.declaration {
+    background: #f8f8f8;
+    border-bottom: #dee0e2 solid 3px;
+    margin: 0;
+    padding: 20px;
+}
+
+.panel-border-wide {
+    border-left-width: 10px;
+}
