@@ -40,6 +40,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
               for {
                 _ <- updateDataStrict[ResponsiblePeople](index) {
                   case Some(rp) => Some(rp.saRegistered(data))
+
                 }
               } yield {
                 edit match {

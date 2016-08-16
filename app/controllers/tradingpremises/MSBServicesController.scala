@@ -17,7 +17,6 @@ trait MSBServicesController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
-
         case Some(tp) => {
           val form = tp.msbServices match {
             case Some(service) => Form2[MsbServices](service)
@@ -40,7 +39,7 @@ trait MSBServicesController extends RepeatingSection with BaseController {
               case Some(tp) => Some(tp.msbServices(data))
               case _ => Some(TradingPremises(msbServices = Some(data)))
             }
-          } yield Redirect(routes.SummaryController.get())
+          } yield Redirect(routes.PremisesRegisteredController.get(index))
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }

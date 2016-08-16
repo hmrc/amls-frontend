@@ -16,7 +16,6 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-
 class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -41,8 +40,8 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       "respond with OK and show the form with data when there is data" in new Fixture {
 
         val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
-        val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, true, LocalDate.now(), true)
-        val tradingPremises = TradingPremises(Some(yourTradingPremises), None, None)
+        val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, true, LocalDate.now())
+        val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremises))))
@@ -84,18 +83,17 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
     "post is called" must {
       "respond with SEE_OTHER" when {
-        "isOwner is true, edit mode is false, and redirect to the 'what does your business do' page" in new Fixture {
+        "edit mode is false, and redirect to the 'what does your business do' page" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
             "postcode" -> "NE98 1ZZ",
-            "isOwner" -> "true",
+            "isResidential" -> "true",
             "startDate.day" -> "01",
             "startDate.month" -> "02",
-            "startDate.year" -> "2010",
-            "isResidential" -> "true"
+            "startDate.year" -> "2010"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -110,45 +108,17 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
         }
 
-
-
-        "isOwner is false, edit mode is false, and redirect to the 'your agent' page" in new Fixture {
+        "edit mode is true, and redirect to WhatDoesYourBusinessDo Controller" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
             "postcode" -> "NE98 1ZZ",
-            "isOwner" -> "false",
+            "isResidential" -> "true",
             "startDate.day" -> "01",
             "startDate.month" -> "02",
-            "startDate.year" -> "2010",
-            "isResidential" -> "true"
-          )
-
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
-
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post(RecordId1, false)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourAgentController.get(1).url))
-        }
-
-        "isOwner is true, edit mode is true, and redirect to Summary Controller" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "tradingName" -> "Trading Name",
-            "addressLine1" -> "Address 1",
-            "addressLine2" -> "Address 2",
-            "postcode" -> "NE98 1ZZ",
-            "isOwner" -> "true",
-            "startDate.day" -> "01",
-            "startDate.month" -> "02",
-            "startDate.year" -> "2010",
-            "isResidential" -> "true"
+            "startDate.year" -> "2010"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -162,7 +132,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
-            Some(controllers.tradingpremises.routes.SummaryController.getIndividual(RecordId1).url))
+            Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1, true).url))
         }
       }
 
@@ -192,11 +162,10 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
             "postcode" -> "NE98 1ZZ",
-            "isOwner" -> "true",
+            "isResidential" -> "true",
             "startDate.day" -> "01",
             "startDate.month" -> "02",
-            "startDate.year" -> "2010",
-            "isResidential" -> "true"
+            "startDate.year" -> "2010"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
