@@ -12,6 +12,58 @@
     title = Messages("summary.detailedanswers.title"),
     heading = header
 ) {
+    @model.businessStructure.map {x=>
+    <table>
+        <tr>
+            <th>@Messages("tradingpremises.businessStructure.heading")</th>
+            <td width="12"><a href="@controllers.tradingpremises.routes.BusinessStructureController.get(index, true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @Messages(x.message)
+            </td>
+        </tr>
+    </table>
+    }
+    @model.agentName.map {x=>
+    <table>
+        <tr>
+            <th>@Messages("tradingpremises.agentname.heading")</th>
+            <td width="12"><a href="@controllers.tradingpremises.routes.AgentNameController.get(index, true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                 @x.agentName
+            </td>
+        </tr>
+    </table>
+    }
+    @model.agentPartnership.map {x=>
+    <table>
+        <tr>
+            <th>@Messages("tradingpremises.agentpartnership.heading")</th>
+            <td width="12"><a href="@controllers.tradingpremises.routes.AgentPartnershipController.get(index, true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                 @x.agentPartnership
+            </td>
+        </tr>
+    </table>
+    }
+    @model.agentCompanyName.map {x=>
+    <table>
+        <tr>
+            <th>@Messages("tradingpremises.agentcompanyname.heading")</th>
+            <td width="12"><a href="@controllers.tradingpremises.routes.AgentCompanyNameController.get(index, true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @x.agentCompanyName
+            </td>
+        </tr>
+    </table>
+    }
     @model.yourTradingPremises.map { yta =>
         <table class="spacesummary">
             <tbody>

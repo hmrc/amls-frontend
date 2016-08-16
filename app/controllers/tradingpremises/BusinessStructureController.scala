@@ -32,7 +32,7 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
     data match {
       case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))
       case LimitedLiabilityPartnership | IncorporatedBody => Redirect(routes.AgentCompanyNameController.get(index,edit))
-      case Partnership => Redirect(routes.AgentPartnershipController.get(index))
+      case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
       case UnincorporatedBody => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
     }
   }
