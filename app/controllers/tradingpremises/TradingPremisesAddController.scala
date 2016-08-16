@@ -3,51 +3,50 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.{MoneyServiceBusiness, BusinessMatching}
+import forms.{EmptyForm, Form2}
+import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessType, MoneyServiceBusiness}
+import models.responsiblepeople.{Positions, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
+import play.api.Logger
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{ControllerHelper, RepeatingSection}
+
+import scala.concurrent.Future
 
 
+trait TradingPremisesAddController extends BaseController with RepeatingSection {
 
-trait TradingPremisesAddController  extends BaseController with RepeatingSection {
-  def isMSBSelected(bm: Option[BusinessMatching]): Boolean = {
-    bm match {
-      case Some(matching) => matching.activities.foldLeft(false){(x, y) =>
-        y.businessActivities.contains(MoneyServiceBusiness)
-
-      }
-      case None => false
+  private def isMSBSelected(implicit ac: AuthContext, hc: HeaderCarrier): Future[Boolean] = {
+    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {x=>
+      ControllerHelper.isMSBSelected(x)
     }
+    /*dataCacheConnector.fetchAll map {
+      cache =>
+        val test = for {
+          c <- cache
+          businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
+        } yield businessMatching
+        ControllerHelper.isMSBSelected(test)
+    }*/
   }
 
-  def get(displayGuidance : Boolean = true) = Authorised.async {
+  def get(displayGuidance: Boolean = true) = Authorised.async {
     implicit authContext => implicit request =>
-          addData[TradingPremises](TradingPremises.default(None)).map { idx =>
-            Redirect {
-              displayGuidance match {
-                case true => controllers.tradingpremises.routes.WhatYouNeedController.get(idx)
-                case false => {
-                 // val bm = dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key).value.get.get
-                  //  println("------------------"+ bm)
-
-                    controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(idx)
-                  }
-                //  else
-                   // controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(idx)
-                }
-
-              }
+      isMSBSelected flatMap { x =>
+        addData[TradingPremises](TradingPremises.default(None)) map { idx =>
+          displayGuidance match {
+            case true => Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get(idx))
+            case false => x match {
+              case true => Redirect(controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(idx))
+              case false => Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(idx))
             }
           }
-
-
-
-
+        }
+    }
+  }
 }
-
-//if (isMSBSelected(Option(BusinessMatching.apply())))
-
 
 object TradingPremisesAddController extends TradingPremisesAddController {
   // $COVERAGE-OFF$
