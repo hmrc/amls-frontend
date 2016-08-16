@@ -75,7 +75,7 @@
                 <td width="40%">Address:</td>
                 <td>
                     @yta.tradingPremisesAddress.toLines.map { l =>
-                    @l<br />
+                        @l<br />
                     }
                 </td>
                 <td class="numeric">
@@ -99,8 +99,8 @@
                 <td width="40%">Residential address:</td>
                 <td>
                     @yta.isResidential match {
-                    case true => { Yes }
-                    case false => { No }
+                        case true => { Yes }
+                        case false => { No }
                     }
                 </td>
                 <td class="numeric">
@@ -114,8 +114,8 @@
                 <td>
                     @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
                     @ba.activities.map { a =>
-                    @a.getMessage<br />
-                    }
+                        @a.getMessage<br />
+                        }
                     }
                 </td>
                 <td class="numeric">
@@ -128,7 +128,7 @@
                 <td width="40%">Who uses these premises:</td>
                 <td>
                     @model.businessStructure.fold(Html(Messages("tradingpremises.summary.mybusiness"))) { _ =>
-                    @Messages("tradingpremises.summary.agents")
+                        @Messages("tradingpremises.summary.agents")
                     }
                 </td>
                 <td class="numeric">
