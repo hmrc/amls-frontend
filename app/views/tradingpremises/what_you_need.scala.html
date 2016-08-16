@@ -48,12 +48,15 @@
 
     <div class="form-group">
         @if(msbExists) {
-           <a class="button" href= "@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index)">
-        } else {
-           <a class="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
-        }
+        <a class="button" href= "@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, false)">
             @Messages("button.continue")
-          </a>
+        </a>
+        } else {
+        <a class="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
+            @Messages("button.continue")
+        </a>
+        }
+
     </div>
 
 }

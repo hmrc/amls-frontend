@@ -8,7 +8,7 @@
 }
 
 @header = {
-    @heading("msb.psr.number.title", "summary.msb")
+    @heading("msb.psr.number.heading", "summary.msb")
 }
 
 @main(
@@ -19,10 +19,10 @@
         @form(f, controllers.msb.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
         @inlineRadioGroup(f("appliedFor")) {
-            @legend("TODO", jsHidden = true)
+            @legend("msb.psr.number.heading", jsHidden = true)
             @radio(f("appliedFor"), "lbl.yes", "true", target = s"#$target")
             @radio(f("appliedFor"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("msb.psr.number.lbl", jsHidden = true, id = target) {
                 @input(f("regNumber"), "msb.psr.number.lbl", bold = false)
             }
         }

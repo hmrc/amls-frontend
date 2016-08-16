@@ -16,12 +16,6 @@
 
     @form(f, controllers.tradingpremises.routes.WhereAreTradingPremisesController.post(index, edit)) {
 
-        <p>@Messages("tradingpremises.yourtradingpremises.include.heading")</p>
-        <ul class="list-bullet form-group">
-            <li>@Messages("tradingpremises.yourtradingpremises.include.text.1")</li>
-            <li>@Messages("tradingpremises.yourtradingpremises.include.text.2")</li>
-        </ul>
-
         @input(
             field = f("tradingName"),
             labelText = "tradingpremises.yourtradingpremises.tradingname"
@@ -41,24 +35,18 @@
             classes = Seq("postcode")
         )
 
+
+        @inlineRadioGroup(f("isResidential")) {
+        @legend("tradingpremises.yourtradingpremises.isresidential", false, false)
+        @radio(f("isResidential"), "lbl.yes", "true")
+        @radio(f("isResidential"), "lbl.no", "false")
+        }
+
         @date(
             f = f,
             p = "startDate",
-            labelText = "tradingpremises.yourtradingpremises.startdate",
-            hintText = "tradingpremises.yourtradingpremises.startdate.sub"
+            labelText = "tradingpremises.yourtradingpremises.startdate"
         )
-
-        @inlineRadioGroup(f("isResidential")) {
-            @legend("tradingpremises.yourtradingpremises.isresidential", false, true)
-            @radio(f("isResidential"), "lbl.yes", "true")
-            @radio(f("isResidential"), "lbl.no", "false")
-        }
-
-        @radioGroup(f("isOwner")) {
-            @legend("tradingpremises.yourtradingpremises.whose",false, true)
-            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
-            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
-        }
 
         @submit(false)
     }

@@ -33,7 +33,7 @@ trait PremisesRegisteredController extends BaseController {
               Future.successful(BadRequest(views.html.tradingpremises.premises_registered(f, index)))
             case ValidForm(_, data) =>
                data.registerAnotherPremises match {
-                case true => Future.successful(Redirect(routes.TradingPremisesAddController.get(false )))
+                case true => Future.successful(Redirect(routes.TradingPremisesAddController.get(false)))
                 case false => Future.successful(Redirect(routes.SummaryController.get()))
               }
           }

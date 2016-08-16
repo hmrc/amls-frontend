@@ -73,7 +73,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
     }
 
     "post with valid data in edit mode" in new Fixture {
@@ -90,7 +90,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
 
       val result = controller.post(1,true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.AgentCompanyNameController.get(1,true).url))
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1,true).url))
 
     }
 

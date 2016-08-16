@@ -27,27 +27,4 @@ class TradingPremisesAddControllerSpec extends WordSpecLike
       override val authConnector = self.authConnector
     }
   }
-
-  "TradingPremisesAddController" when {
-    "get is called" should {
-      "add empty trading premises and redirect to the correct page" in new Fixture {
-
-        val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
-        val tpSeq =
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(testSeq)))
-
-        val resultF = controller.get(guidanceRequested)(request)
-
-        status(resultF) must be(SEE_OTHER)
-        redirectLocation(resultF) must be(Some(expectedRedirect.url))
-
-        verify(controller.dataCacheConnector)
-          .save[Seq[TradingPremises]](meq(TradingPremises.key), meq(testSeq :+ TradingPremises()))(any(), any(), any())
-
-        reset(controller.dataCacheConnector)
-      }
-    }
-  }
 }
