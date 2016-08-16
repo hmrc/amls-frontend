@@ -31,11 +31,7 @@
                         @ytp.tradingName
                     }
                 </th>
-                @if(msbExists) {
-                <td><a href="@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(y + 1)">@Messages("button.edit")</a></td>
-                } else {
                 <td><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
-                }
             </tr>
             <tr>
                 <td width="40%">
