@@ -3,6 +3,7 @@ package utils
 import models.businessmatching.{BusinessMatching, BusinessType, MoneyServiceBusiness}
 
 object ControllerHelper {
+
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
     matching flatMap { bm =>
       bm.reviewDetails match {
@@ -16,7 +17,6 @@ object ControllerHelper {
     bm match {
       case Some(matching) => matching.activities.foldLeft(false) { (x, y) =>
         y.businessActivities.contains(MoneyServiceBusiness)
-
       }
       case None => false
     }
