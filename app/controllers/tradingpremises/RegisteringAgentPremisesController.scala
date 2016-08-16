@@ -70,38 +70,3 @@ object RegisteringAgentPremisesController extends RegisteringAgentPremisesContro
   override protected val authConnector: AuthConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }
-
-
-//{
-//  cache =>
-//  cache.map{ c =>
-//  val bm = c.getEntry[BusinessMatching](BusinessMatching.key)
-//  val tp = c.getEntry[TradingPremises](TradingPremises.key)
-//  bm.activities.contains(MoneyServiceBusiness) match {
-//  case true => {
-//  //                getData[TradingPremises](index) map {
-//  //                  case Some(tp) => {
-//  //                    val form = tp.registeringAgentPremises match {
-//  //                      case Some(service) => Form2[RegisteringAgentPremises](service)
-//  //                      case None => EmptyForm
-//  //                    }
-//  //                    Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
-//  //                  }
-//  case None => NotFound(notFoundView)
-//  //                }
-//}
-//  case false => {
-//  //                getData[TradingPremises](index) map {
-//  //                  case Some(tp) => {
-//  //                    val form = tp.registeringAgentPremises match {
-//  //                      case Some(service) => Form2[RegisteringAgentPremises](service)
-//  //                      case None => EmptyForm
-//  //                    }
-//  //                    Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
-//  //                  }
-//  case None => NotFound(notFoundView)
-//  //                }
-//}
-//}
-//}
-//}
