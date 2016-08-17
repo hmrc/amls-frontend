@@ -41,9 +41,13 @@ import scala.concurrent.Future
               case Some(tp) =>
                 Some(TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises, tp.businessStructure,
-                  tp.agentName,tp.agentCompanyName, Some(data),tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+                  None, None, Some(data),tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+              case _=> data
             }
-          } yield Redirect(routes.WhereAreTradingPremisesController.get(index,edit))
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.getIndividual(index))
+            case false => Redirect(routes.WhereAreTradingPremisesController.get (index, edit))
+          }
 
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
