@@ -16,7 +16,6 @@ trait LandingController extends BaseController {
   // TODO: GG Enrolment routing
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      println(authContext.enrolmentsUri.get)
       landingService.cacheMap flatMap {
         case Some(cache) =>
           ApplicationConfig.statusToggle match {
