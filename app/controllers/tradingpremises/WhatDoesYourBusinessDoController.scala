@@ -102,7 +102,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 _ => data.activities.contains(MoneyServiceBusiness) match {
                   case true => Redirect(routes.MSBServicesController.get(index, edit))
                   case false => edit match {
-                    case true => Redirect(routes.PremisesRegisteredController.get(index))
+                    case true => Redirect(routes.SummaryController.getIndividual(index))
                     case false => Redirect(routes.PremisesRegisteredController.get(index))
                   }
                 }

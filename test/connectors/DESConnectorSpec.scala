@@ -1,12 +1,13 @@
 package connectors
 
-import models.{SubscriptionRequest, SubscriptionResponse}
+import models.{ReadStatusResponse, SubscriptionRequest, SubscriptionResponse}
+import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.domain.Org
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{OrgAccount, Accounts, ConfidenceLevel, CredentialStrength}
-import uk.gov.hmrc.play.frontend.auth.{LoggedInUser, Principal, AuthContext}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, ConfidenceLevel, CredentialStrength, OrgAccount}
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -17,13 +18,15 @@ import scala.concurrent.Future
 class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   object DESConnector extends DESConnector {
-    override private[connectors] val http: HttpPost = mock[HttpPost]
+    override private[connectors] val httpPost: HttpPost = mock[HttpPost]
     override private[connectors] val url: String = "amls/subscription"
+    override private[connectors] val httpGet: HttpGet = mock[HttpGet]
   }
 
   val safeId = "SAFEID"
+  val amlsRegistrationNumber = "AMLSREGNO"
 
-  val request = SubscriptionRequest(
+  val subscriptionRequest = SubscriptionRequest(
     businessMatchingSection = None,
     eabSection = None,
     tradingPremisesSection = None,
@@ -39,7 +42,7 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     supervisionSection = None
   )
 
-  val response = SubscriptionResponse(
+  val subscriptionResponse = SubscriptionResponse(
     etmpFormBundleNumber = "",
     amlsRefNo = "",
     registrationFee = 0,
@@ -49,30 +52,47 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     paymentReference = ""
   )
 
+  val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
+
   implicit val hc = HeaderCarrier()
   implicit val ac = AuthContext(
-                      LoggedInUser(
-                        "UserName",
-                        None,
-                        None,
-                        None,
-                        CredentialStrength.Weak,
-                        ConfidenceLevel.L50),
-                      Principal(
-                        None,
-                        Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
-                      None)
+    LoggedInUser(
+      "UserName",
+      None,
+      None,
+      None,
+      CredentialStrength.Weak,
+      ConfidenceLevel.L50),
+    Principal(
+      None,
+      Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
+    None,
+    None,
+    None)
 
   "subscribe" must {
 
     "successfully subscribe" in {
 
       when {
-        DESConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/org/TestOrgRef/$safeId"), eqTo(request), any())(any(), any(), any())
-      } thenReturn Future.successful(response)
+        DESConnector.httpPost.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${DESConnector.url}/org/TestOrgRef/$safeId"), eqTo(subscriptionRequest), any())(any(), any(), any())
+      } thenReturn Future.successful(subscriptionResponse)
 
-      whenReady (DESConnector.subscribe(request, safeId)) {
-        _ mustBe response
+      whenReady(DESConnector.subscribe(subscriptionRequest, safeId)) {
+        _ mustBe subscriptionResponse
+      }
+    }
+  }
+
+  "get status" must {
+
+    "return correct status" in {
+      when {
+        DESConnector.httpGet.GET[ReadStatusResponse](eqTo(s"${DESConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/status"))(any(),any())
+      } thenReturn Future.successful(readStatusResponse)
+
+      whenReady(DESConnector.status(amlsRegistrationNumber)){
+        _ mustBe readStatusResponse
       }
     }
   }

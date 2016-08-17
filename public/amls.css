@@ -77,6 +77,7 @@ a.block-link {
   background-repeat: no-repeat;
 }
 
+.status-list .status-list--complete,
 .progress-step__complete .progress-step--status,
 .progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
@@ -87,6 +88,7 @@ a.block-link {
   background-size: 33%;
 }
 
+.no-svg .status-list .status-list--complete,
 .no-svg .progress-step__complete .progress-step--status,
 .no-svg .progress-step__complete:hover .progress-step--status {
   background-image: url("/anti-money-laundering/assets/icons/tick.png");
@@ -731,4 +733,53 @@ fieldset.panel-indent legend {
 .reg-online--pay-fee .heading-xlarge {
   display: block;
   margin: 0;
+}
+
+/* status page */
+.status-list {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.status-list li {
+    line-height: 1.25;
+    list-style-position: inside;
+    padding: 18px 55px 10px 10px;
+    position: relative;
+}
+
+.status-list--start {
+    border-top: 3px solid #bfc1c3;
+}
+
+.status-list--end {
+  border-bottom: 3px solid #bfc1c3;
+}
+
+.status-list--upcoming {
+    background: #bfc1c3;
+    color: #fff;
+}
+
+.status-detail{
+    margin-left: 30px;
+}
+
+
+.status-list .status-list--complete {
+  background-color: #28a197;
+  background-position: 96%;
+  background-size: 12%;
+  color: #fff;
+}
+
+.declaration {
+    background: #f8f8f8;
+    border-bottom: #dee0e2 solid 3px;
+    margin: 0;
+    padding: 20px;
+}
+
+.panel-border-wide {
+    border-left-width: 10px;
 }

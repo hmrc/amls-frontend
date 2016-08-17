@@ -184,7 +184,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
           val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
         }
 
 
