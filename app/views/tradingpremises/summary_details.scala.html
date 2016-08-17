@@ -56,14 +56,13 @@
                         </a>
                     </td>
                 </tr>
+                @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
                 <tr>
                     <td width="40%">Services at this address:</td>
                     <td>
-                        @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
                         @ba.activities.map { a =>
                             @a.getMessage<br />
                             }
-                        }
                     </td>
                     <td class="numeric">
                         <a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true)">
@@ -71,6 +70,7 @@
                         </a>
                     </td>
                 </tr>
+                }
                 <tr>
                     <td width="40%">Who uses these premises:</td>
                     <td>
