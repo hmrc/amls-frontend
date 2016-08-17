@@ -48,10 +48,7 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
               case Some(tp) => Some(tp.businessStructure(data))
               case _ => Some(TradingPremises(businessStructure = Some(data)))
             }
-          } yield {
-            println("******" + data)
-              redirectToPage(data, edit, index)
-          }
+          } yield redirectToPage(data, edit, index)
       }
   }
 }

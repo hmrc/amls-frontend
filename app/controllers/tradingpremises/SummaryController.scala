@@ -41,7 +41,6 @@ trait SummaryController extends RepeatingSection with BaseController {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
         case Some(data) =>
-          println(data)
           Ok(summary_details(data, index))
         case _ =>
           NotFound(notFoundView)
