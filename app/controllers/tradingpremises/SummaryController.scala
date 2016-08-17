@@ -23,18 +23,9 @@ trait SummaryController extends RepeatingSection with BaseController {
             tp <- c.getEntry[Seq[TradingPremises]](TradingPremises.key)
           } yield (bm, tp)
       } map {
-        case Some(data) => Ok(summary(data._2,isMSBSelected(Some(data._1))))
+        case Some(data) => Ok(summary(data._2,false))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
-  }
-
-  private def isMSBSelected(bm: Option[BusinessMatching]): Boolean = {
-    bm match {
-      case Some(matching) => matching.activities.foldLeft(false){(x, y) =>
-        y.businessActivities.contains(MoneyServiceBusiness)
-      }
-      case None => false
-    }
   }
 
   def getIndividual(index: Int) = Authorised.async {

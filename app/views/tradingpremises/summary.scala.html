@@ -1,7 +1,7 @@
 @import include._
 @import models.tradingpremises._
 
-@(model: Seq[TradingPremises], msbExists: Boolean)(implicit request: Request[_], lang: Lang)
+@(model: Seq[TradingPremises], add: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
@@ -12,50 +12,27 @@
     heading = header
 ) {
 
-    <div class="form-group">
-        <div class="panel-indent">
-            <p>
-                @Messages("summary.linetext")
-            </p>
+    @if(add){
+        <div class="panel panel-border-wide spacelarge">
             <p>
                 <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
             </p>
         </div>
-    </div>
+    }
 
     @model.zipWithIndex.map { case (tp, y) =>
-        <table class="summary">
+        <table class="spacesummary">
+            <tbody>
             <tr>
-                <th class="summary-title" colspan="2">
-                    @tp.yourTradingPremises.map { ytp =>
-                        @ytp.tradingName
-                    }
-                </th>
-                <td><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
+                @tp.yourTradingPremises.map { ytp =>
+                    <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
+                }
+                <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
             </tr>
-            <tr>
-                <td width="40%">
-                    @tp.yourTradingPremises.map { ytp =>
-                        <ul class="no-padding">
-                            @ytp.tradingPremisesAddress.toLines.map { l =>
-                                <li>@l</li>
-                            }
-                        </ul>
-                    }
-                </td>
-                <td width="48%">
-                    @tp.whatDoesYourBusinessDoAtThisAddress.map { ba =>
-                        <ul class="no-padding">
-                            @ba.activities.map { a =>
-                                <li>@a.getMessage</li>
-                            }
-                        </ul>
-                    }
-                </td>
-
-            </tr>
+            </tbody>
         </table>
     }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+
 }
