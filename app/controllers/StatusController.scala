@@ -21,8 +21,6 @@ trait StatusController extends BaseController {
   private[controllers] def desConnector: DESConnector
   private[controllers] def progressService: ProgressService
   private[controllers] def enrolmentsService: AuthEnrolmentsService
-  private[controllers] def subscriptionService: SubscriptionService
-
 
   private def isComplete(seq: Seq[Section]): Boolean =
     seq forall {
@@ -76,11 +74,19 @@ trait StatusController extends BaseController {
                 reviewDetails <- businessMatching.reviewDetails
               } yield reviewDetails.businessName
 
-              subscriptionService.getSubscription map {
-                case (mlrRegNo, total, rows) =>
+
+              val amlsRef = authContext.enrolmentsUri match {
+                case Some(uri) => {
+                  enrolmentsService.amlsRegistrationNumber(uri)
+                }
+                case _ => Future.successful(Some(""))
+              }
+
+              amlsRef map {
+                mlrRegNumberOption =>
                   submissionStatus(cache)(hc, authContext) map {
                     foundStatus =>
-                      Ok(status(mlrRegNo, businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
+                      Ok(status(mlrRegNumberOption.getOrElse("Not Found"), businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
                   }
 
               }
@@ -90,11 +96,12 @@ trait StatusController extends BaseController {
                   Ok(status("Not Found", businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
               }
             case None => etmpStatus map {
-              es => Ok(status("Not Found", "TODO", CompletionStateViewModel(es)))
+              es => Ok(status("Not Found", "Not Found", CompletionStateViewModel(es)))
             }
           }
     }
   }
+
 
 }
 
@@ -105,7 +112,6 @@ object StatusController extends StatusController {
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val progressService = ProgressService
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
-  override private[controllers] val subscriptionService = SubscriptionService
 
 }
 
