@@ -102,7 +102,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
     }
 
     "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
@@ -135,7 +135,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       val result = controller.post(1, edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
     }
 
     "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -167,7 +167,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       val result = controller.post(1, edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
     }
 
     "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
@@ -195,7 +195,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
           val result = controller.post(1, edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
       }
     }
   }
