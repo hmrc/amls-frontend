@@ -39,7 +39,10 @@ trait MSBServicesController extends RepeatingSection with BaseController {
               case Some(tp) => Some(tp.msbServices(data))
               case _ => Some(TradingPremises(msbServices = Some(data)))
             }
-          } yield Redirect(routes.PremisesRegisteredController.get(index))
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.getIndividual(index))
+            case false => Redirect(routes.PremisesRegisteredController.get(index))
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }

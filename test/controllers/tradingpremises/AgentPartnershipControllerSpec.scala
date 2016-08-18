@@ -91,7 +91,7 @@ class AgentPartnershipControllerSpec extends PlaySpec with OneAppPerSuite with M
 
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, true).url))
+      redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
 
     }
 
