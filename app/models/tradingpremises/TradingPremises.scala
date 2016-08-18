@@ -61,7 +61,7 @@ object TradingPremises {
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
       premises =>
         if (premises.nonEmpty && (premises forall { _.isComplete })) {
-          Section(messageKey, Completed, controllers.tradingpremises.routes.SummaryController.get())
+          Section(messageKey, Completed, controllers.tradingpremises.routes.SummaryController.get(true))
         } else {
           val index = premises.indexWhere {
             case model if !model.isComplete => true

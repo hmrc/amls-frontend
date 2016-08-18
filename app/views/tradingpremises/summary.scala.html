@@ -4,11 +4,19 @@
 @(model: Seq[TradingPremises], add: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.tradingpremises")
+    @if(add){
+        @heading("summary.youranswers.title", "summary.tradingpremises")
+    } else {
+        @heading("summary.checkyouranswers.title", "summary.tradingpremises")
+    }
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    @if(add){
+        title = Messages("summary.youranswers.title"),
+    } else {
+        title = Messages("summary.checkyouranswers.title"),
+    }
     heading = header
 ) {
 
@@ -32,7 +40,5 @@
             </tbody>
         </table>
     }
-
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
-
 }

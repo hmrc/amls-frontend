@@ -13,7 +13,7 @@ trait SummaryController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get = Authorised.async {
+  def get(edit:Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchAll map {
         cache =>
@@ -23,7 +23,7 @@ trait SummaryController extends RepeatingSection with BaseController {
             tp <- c.getEntry[Seq[TradingPremises]](TradingPremises.key)
           } yield (bm, tp)
       } map {
-        case Some(data) => Ok(summary(data._2,false))
+        case Some(data) => Ok(summary(data._2,edit))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
