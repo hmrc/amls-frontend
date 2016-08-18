@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
 import models.tradingpremises.TradingPremises
+import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.RepeatingSection
 import views.html.tradingpremises._

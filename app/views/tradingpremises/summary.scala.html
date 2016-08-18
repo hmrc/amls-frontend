@@ -12,11 +12,7 @@
 }
 
 @main(
-    @if(add){
-        title = Messages("summary.youranswers.title"),
-    } else {
-        title = Messages("summary.checkyouranswers.title"),
-    }
+    title = if(add) Messages("summary.youranswers.title") else Messages("summary.checkyouranswers.title"),
     heading = header
 ) {
 
