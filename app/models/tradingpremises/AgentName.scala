@@ -24,7 +24,7 @@ object AgentName {
   implicit val mongoKey = new MongoKey[AgentName] {
     override def apply(): String = "agent-name"
   }
-  implicit val formats = Json.format[AgentName]
+  implicit val format = Json.format[AgentName]
 
   implicit val formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._

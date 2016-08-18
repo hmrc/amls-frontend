@@ -1,0 +1,35 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], index: Int)(implicit request: Request[_])
+
+@header = {
+    @heading("bankdetails.account.registered.heading", "summary.bankdetails")
+}
+
+@main(
+    title = Messages("bankdetails.bank.account.registered.title"),
+    heading = header
+) {
+
+    @form(f, controllers.bankdetails.routes.BankAccountRegisteredController.post(index)) {
+<div class="panel-indent panel-border-wide">
+    @if(index <= 1){
+    <p>@Messages("bankdetails.have.registered.account.text", index) </p>
+    } else {
+    <p>@Messages("bankdetails.have.registered.accounts.text", index) </p>
+    }
+</div>
+<br>
+<br>
+
+        @inlineRadioGroup(f("registerAnotherBank")) {
+            @legend("bankdetails.want.to.register.another.account")
+            @radio(f("registerAnotherBank"), "lbl.yes", "true")
+            @radio(f("registerAnotherBank"), "lbl.no", "false")
+        }
+
+        @submit()
+    }
+}
+
