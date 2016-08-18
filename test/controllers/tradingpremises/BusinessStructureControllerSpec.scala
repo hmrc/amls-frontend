@@ -153,8 +153,11 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val newRequest = request.withFormUrlEncodedBody(
         "agentsBusinessStructure" -> "05"
       )
+      val model = TradingPremises(
+        businessStructure = Some(SoleProprietor)
+      )
       when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
