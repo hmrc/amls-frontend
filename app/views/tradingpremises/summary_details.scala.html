@@ -1,0 +1,146 @@
+@import include._
+@import models.tradingpremises._
+@import models.businessmatching.MoneyServiceBusiness
+@import forms2._
+@import utils._
+
+@(model: TradingPremises, index: Int)(implicit request: Request[_], lang: Lang)
+@header = {
+    @heading("summary.detailedanswers.title", "summary.tradingpremises")
+}
+@main(
+    title = Messages("summary.detailedanswers.title"),
+    heading = header
+) {
+    @model.yourTradingPremises.map { yta =>
+        <table class="spacesummary">
+            <tbody>
+                <tr>
+                    <th colspan="3">@yta.tradingName</th>
+                </tr>
+                <tr>
+                    <td width="40%">Address:</td>
+                    <td>
+                        @yta.tradingPremisesAddress.toLines.map { l =>
+                            @l<br />
+                        }
+                    </td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
+                            @Messages("button.edit")
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">Trading start date:</td>
+                    <td>
+                        @DateHelper.formatDate(yta.startDate)
+                    </td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
+                            @Messages("button.edit")
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">Residential address:</td>
+                    <td>
+                        @yta.isResidential match {
+                            case true => { Yes }
+                            case false => { No }
+                        }
+                    </td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true)">
+                            @Messages("button.edit")
+                        </a>
+                    </td>
+                </tr>
+                @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
+                <tr>
+                    <td width="40%">Services at this address:</td>
+                    <td>
+                        @ba.activities.map { a =>
+                            @a.getMessage<br />
+                            }
+                    </td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true)">
+                            @Messages("button.edit")
+                        </a>
+                    </td>
+                </tr>
+                }
+                @model.msbServices.map{ msb =>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.msb.services.heading")</td>
+                    <td>
+                        @msb.services.map{ s=>
+                            @s<br />
+                        }
+                    </td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true)">
+                            @Messages("button.edit")
+                        </a>
+                    </td>
+                </tr>
+                }
+                <tr>
+                    <td width="40%">Who uses these premises:</td>
+                    <td>
+                        @model.businessStructure.fold(Html(Messages("tradingpremises.summary.mybusiness"))) { _ =>
+                            @Messages("tradingpremises.summary.agents")
+                        }
+                    </td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true)">
+                            @Messages("button.edit")
+                        </a>
+                    </td>
+                </tr>
+                @model.businessStructure.map {x=>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.businessStructure.heading")</td>
+                    <td>@Messages(x.message)</td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.BusinessStructureController.get(index, true)">@Messages("button.edit")</a>
+                    </td>
+                </tr>
+                }
+                @model.agentName.map {x=>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.agentname.heading")</td>
+                    <td>@x.agentName</td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.AgentNameController.get(index, true)">@Messages("button.edit")</a>
+                    </td>
+                </tr>
+                }
+                @model.agentPartnership.map {x=>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.agentpartnership.heading")</td>
+                    <td>@x.agentPartnership</td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.AgentPartnershipController.get(index, true)">@Messages("button.edit")</a>
+                    </td>
+                </tr>
+                }
+                @model.agentCompanyName.map {x=>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.agentcompanyname.heading")</td>
+                    <td>@x.agentCompanyName</td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.AgentCompanyNameController.get(index, true)">@Messages("button.edit")</a>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <div class="form-group">
+        <a class="button" href="@controllers.tradingpremises.routes.SummaryController.get()">
+            @Messages("button.confirmandcontinue")
+        </a>
+    </div>
+}

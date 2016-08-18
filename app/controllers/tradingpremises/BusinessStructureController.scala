@@ -32,8 +32,11 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
     data match {
       case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))
       case LimitedLiabilityPartnership | IncorporatedBody => Redirect(routes.AgentCompanyNameController.get(index,edit))
-      case Partnership => Redirect(routes.AgentPartnershipController.get(index))
-      case UnincorporatedBody => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+      case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
+      case UnincorporatedBody => edit match {
+        case true => Redirect(routes.SummaryController.getIndividual(index))
+        case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+      }
     }
   }
 
@@ -45,14 +48,18 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
         case ValidForm(_, data) =>
           for {
             _ <- updateData[TradingPremises](index) {
-              case Some(tp) => Some(tp.businessStructure(data))
+              case Some(tp) => Some(resetAgentValues(tp.businessStructure(data), data))
               case _ => Some(TradingPremises(businessStructure = Some(data)))
             }
-          } yield {
-              redirectToPage(data, edit, index)
-          }
+          } yield redirectToPage(data, edit, index)
       }
   }
+
+  private def resetAgentValues(tp:TradingPremises, data:BusinessStructure):TradingPremises = data match {
+    case UnincorporatedBody => tp.copy(agentName=None,agentCompanyName=None,agentPartnership=None)
+    case _ => tp.businessStructure(data)
+  }
+
 }
 
 object BusinessStructureController extends BusinessStructureController {

@@ -25,10 +25,8 @@ case class TradingPremises(
   def agentCompanyName(v: AgentCompanyName): TradingPremises =
     this.copy(agentCompanyName = Some(v))
 
-
   def agentPartnership(v: AgentPartnership): TradingPremises =
     this.copy(agentPartnership = Some(v))
-
 
   def yourTradingPremises(v: YourTradingPremises): TradingPremises =
     this.copy(yourTradingPremises = Some(v))

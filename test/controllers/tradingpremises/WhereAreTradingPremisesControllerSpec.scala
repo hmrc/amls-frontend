@@ -132,7 +132,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
-            Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1, true).url))
+            Some(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url))
         }
       }
 
