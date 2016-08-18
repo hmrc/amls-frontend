@@ -148,7 +148,7 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       redirectLocation(result) mustBe Some(routes.AgentCompanyNameController.get(1).url)
     }
 
-    "successfully submit and navigate to next page when user selects the option UnincorporatedBody" in new Fixture {
+    "successfully submit and navigate to next page when user selects the option UnincorporatedBody without edit" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "agentsBusinessStructure" -> "05"
@@ -163,6 +163,22 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1, false).url)
+    }
+    "successfully submit and navigate to next page when user selects the option UnincorporatedBody with edit" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "agentsBusinessStructure" -> "05"
+      )
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(1,edit = true)(newRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
     }
 
   }

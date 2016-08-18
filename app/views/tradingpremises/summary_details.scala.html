@@ -71,6 +71,21 @@
                     </td>
                 </tr>
                 }
+                @model.msbServices.map{ msb =>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.msb.services.heading")</td>
+                    <td>
+                        @msb.services.map{ s=>
+                            @s<br />
+                        }
+                    </td>
+                    <td class="numeric">
+                        <a href="@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true)">
+                            @Messages("button.edit")
+                        </a>
+                    </td>
+                </tr>
+                }
                 <tr>
                     <td width="40%">Who uses these premises:</td>
                     <td>
