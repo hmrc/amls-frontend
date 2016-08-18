@@ -85,7 +85,7 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
         }
         "blahblah given valid data in edit mode" in new Fixture {
 
@@ -104,7 +104,7 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
         }
       }
 

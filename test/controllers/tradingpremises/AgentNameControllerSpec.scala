@@ -143,11 +143,4 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
     }
   }
 
-    "Json Validation" must {
-      "Successfully read/write Json data" in {
-        AgentName.format.reads(AgentName.format.writes(
-          AgentName("test"))) must be(JsSuccess(AgentCompanyName("test"), JsPath \ "agentName"))
-      }
-
-  }
 }

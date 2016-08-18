@@ -751,7 +751,7 @@ bankdetails.confirm-activities.subtitle = You’ve told us your business does th
 bankdetails.bank.account.registered.title = Bank account registered
 bankdetails.account.registered.heading = Bank account registered
 bankdetails.have.registered.account.text = You have registered {0} bank account.
-bankdetails.have.registered.account.text = You have registered {0} bank accounts.
+bankdetails.have.registered.accounts.text = You have registered {0} bank accounts.
 bankdetails.want.to.register.another.account = Do you want to register another bank account?
 
 

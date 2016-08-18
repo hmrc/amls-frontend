@@ -142,10 +142,5 @@ class AgentPartnershipControllerSpec extends PlaySpec with OneAppPerSuite with M
       contentAsString(result) must include(Messages("error.required.tp.agent.partnership"))
     }
   }
-  "Json Validation" must {
-    "Successfully read/write Json data" in {
-      AgentPartnership.format.reads(AgentPartnership.format.writes(
-        AgentPartnership("test"))) must be(JsSuccess(AgentPartnership("test"), JsPath \ "agentPartnership"))
-    }
-  }
+
 }
