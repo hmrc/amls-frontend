@@ -156,8 +156,8 @@ class BusinessStructureControllerSpec extends PlaySpec with ScalaFutures with Mo
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
