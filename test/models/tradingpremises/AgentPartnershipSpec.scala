@@ -3,6 +3,7 @@ package models.tradingpremises
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsPath, JsSuccess}
 
 class AgentPartnershipSpec extends PlaySpec {
 
@@ -27,6 +28,11 @@ class AgentPartnershipSpec extends PlaySpec {
       AgentPartnership.formWrites.writes(AgentPartnership("sometext")) must be(Map("agentPartnership" -> Seq("sometext")))
     }
 
-
+  }
+  "Json Validation" must {
+    "Successfully read/write Json data" in {
+      AgentPartnership.format.reads(AgentPartnership.format.writes(
+        AgentPartnership("test"))) must be(JsSuccess(AgentPartnership("test"), JsPath \ "agentPartnership"))
+    }
   }
 }
