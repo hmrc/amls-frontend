@@ -85,6 +85,25 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
+        }
+        "given valid data when NOT in edit mode" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "accountName" -> "test",
+            "isUK" -> "false",
+            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
+            "isIBAN" -> "false"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
+          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, false)(newRequest)
+
+          status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
         }
         "blahblah given valid data in edit mode" in new Fixture {
@@ -104,12 +123,12 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
       }
 
       "respond with NOT_FOUND" when {
-        "given valid data in edit mode" in new Fixture {
+        "given an index out of bounds in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "accountName" -> "test",
