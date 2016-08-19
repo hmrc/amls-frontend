@@ -67,7 +67,7 @@ GET         /trading-premises/agent/:index                              controll
 POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get()
-GET         /trading-premises/check-your-answers/:index                 controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+GET         /trading-premises/trading-premise-details/:index                 controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
 GET         /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
@@ -108,6 +108,10 @@ GET         /business-matching/check-your-answers                       controll
 GET         /bank-details/what-you-need/:index                          controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
 GET         /bank-details/add                                           controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
+
+GET         /bank-details/account-registered/:index                     controllers.bankdetails.BankAccountRegisteredController.get(index:Int)
+POST        /bank-details/account-registered/:index                     controllers.bankdetails.BankAccountRegisteredController.post(index:Int)
+
 
 GET         /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)

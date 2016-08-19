@@ -40,9 +40,14 @@ import scala.concurrent.Future
             result <- updateDataStrict[TradingPremises](index) {
               case Some(tp) =>
                 Some(TradingPremises(tp.registeringAgentPremises,
-                  tp.yourTradingPremises, tp.businessStructure,tp.agentName,Some(data),tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+                  tp.yourTradingPremises,
+                  tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
+              case _=> data
             }
-          } yield Redirect(routes.WhereAreTradingPremisesController.get(index,edit))
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.getIndividual(index))
+            case false => Redirect (routes.WhereAreTradingPremisesController.get (index, edit) )
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }

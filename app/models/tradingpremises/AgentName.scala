@@ -24,7 +24,7 @@ object AgentName {
   implicit val mongoKey = new MongoKey[AgentName] {
     override def apply(): String = "agent-name"
   }
-  implicit val formats = Json.format[AgentName]
+  implicit val format = Json.format[AgentName]
 
   implicit val formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
@@ -33,6 +33,10 @@ object AgentName {
 
   implicit val formWrites: Write[AgentName, UrlFormEncoded] = Write {
     case AgentName(crn) => Map("agentName" -> Seq(crn))
+  }
+
+  implicit def convert(data: AgentName): Option[TradingPremises] = {
+    Some(TradingPremises(agentName = Some(data)))
   }
 
 }

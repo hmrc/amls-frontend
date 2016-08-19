@@ -6,60 +6,63 @@
 @header = {
     @heading("summary.checkyouranswers.title", "summary.tradingpremises")
 }
-
 @main(
     title = Messages("summary.checkyouranswers.title"),
     heading = header
 ) {
-
-    <div class="form-group">
-        <div class="panel-indent">
-            <p>
-                @Messages("summary.linetext")
-            </p>
-            <p>
-                <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
-            </p>
-        </div>
-    </div>
-
     @model.zipWithIndex.map { case (tp, y) =>
-        <table class="summary">
-            <tr>
-                <th class="summary-title" colspan="2">
-                    @tp.yourTradingPremises.map { ytp =>
+        <table class="spacesummary">
+            <tbody>
+                <tr>
+                    <th>
+                        @tp.yourTradingPremises.map { ytp =>
                         @ytp.tradingName
-                    }
-                </th>
-                @if(msbExists) {
-                <td><a href="@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(y + 1)">@Messages("button.edit")</a></td>
-                } else {
-                <td><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
-                }
-            </tr>
-            <tr>
-                <td width="40%">
-                    @tp.yourTradingPremises.map { ytp =>
-                        <ul class="no-padding">
+                        }
+                    </th>
+                    <td class="numeric">
+                    <a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.summary.address")</td>
+                    <td>
+                        @tp.yourTradingPremises.map { ytp =>
                             @ytp.tradingPremisesAddress.toLines.map { l =>
-                                <li>@l</li>
+                                @l<br />
                             }
-                        </ul>
-                    }
-                </td>
-                <td width="48%">
-                    @tp.whatDoesYourBusinessDoAtThisAddress.map { ba =>
-                        <ul class="no-padding">
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.summary.tradingstartdate")</td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.summary.residential")</td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.summary.who-uses")</td>
+                    <td>
+                        @tp.businessStructure.fold(Html(Messages("tradingpremises.summary.own"))) { _ =>
+                        @Messages("tradingpremises.summary.agents")
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">@Messages("tradingpremises.summary.services")</td>
+                    <td>
+                        @tp.whatDoesYourBusinessDoAtThisAddress.map { ba =>
                             @ba.activities.map { a =>
-                                <li>@a.getMessage</li>
+                            @a.getMessage<br />
                             }
-                        </ul>
-                    }
-                </td>
-
-            </tr>
+                        }
+                    </td>
+                </tr>
+            </tbody>
         </table>
     }
-
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

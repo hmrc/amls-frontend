@@ -102,6 +102,7 @@ error.invalid.bankdetails.iban =  Enter a valid IBAN number. It must only be num
 error.max.length.bankdetails.iban = You can’t enter more than 34 numbers or letters for the IBAN number.
 error.invalid.bankdetails.account = Enter a valid account number. It must only be numbers or letters, and it can’t be more than 40 characters long. Do not enter punctuation or other characters.
 error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or letters for the account number.
+error.required.bankdetails.register.another.bank = Select yes or no to the question: do you want to register another bank account?
 
 ###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
@@ -321,8 +322,8 @@ lbl.nonresidential = Non-Residential
 
 lbl.give.details = Please give details
 
-businessType.lbl.01 = Limited company
-businessType.lbl.02 = Sole proprietor
+businessType.lbl.02 = Limited company
+businessType.lbl.01 = Sole proprietor
 businessType.lbl.03 = Partnership
 businessType.lbl.04 = Limited partnership or limited liability partnership
 businessType.lbl.05 = Unincorporated association or trust
@@ -469,6 +470,8 @@ summary.status = Anti-money laundering supervision registration
 
 summary.checkyouranswers.title = Check your answers
 summary.checkyouranswers.businesspremises.title = Your business’ premises
+summary.detailedanswers.title = Detailed answers
+summary.checkyouranswers.businesspremises.title = Your business'' premises
 summary.checkyouranswers.businesspremises.section1 = Premises
 summary.checkyouranswers.businesspremises.section2 = Trading activities
 summary.checkyouranswers.agentspremises.title = Your agents’ premises
@@ -617,8 +620,13 @@ tradingpremises.businessStructure.heading = What is your agent’s business stru
 
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
+tradingpremises.summary.mybusiness = My Business
 tradingpremises.summary.agents = Agent’s
-tradingpremises.summary.tradingstartdate = Trading start date of
+tradingpremises.summary.tradingstartdate = When will you start trading from these premises?
+tradingpremises.summary.address = Address:
+tradingpremises.summary.residential = Is this a residential address?
+tradingpremises.summary.who-uses = Who uses these premises?
+tradingpremises.summary.services = What does your business do at these premises?
 
 
 tradingpremises.agentcompanyname.title =Trading premises - What is your agent’s registered company name?
@@ -678,8 +686,8 @@ estateagentbusiness.registered.redress.text = A redress scheme is an independent
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.businessType.title = What’s your business structure?
-businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.02 = Sole proprietor
+businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
@@ -746,6 +754,15 @@ bankdetails.summary.accounttype.lbl.03 = Another business’s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
 bankdetails.confirm-activities.subtitle = You’ve told us your business does this:
+
+
+bankdetails.bank.account.registered.title = Bank account registered
+bankdetails.account.registered.heading = Bank account registered
+bankdetails.have.registered.account.text = You have registered {0} bank account.
+bankdetails.have.registered.accounts.text = You have registered {0} bank accounts.
+bankdetails.want.to.register.another.account = Do you want to register another bank account?
+
+
 
 businessactivities.whatyouneed.title = Business Activities – What you need
 businessactivities.whatyouneed.heading = What you need
