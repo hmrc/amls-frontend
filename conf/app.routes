@@ -67,7 +67,7 @@ GET         /trading-premises/agent/:index                              controll
 POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
-GET         /trading-premises/your-answers                              controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
+GET         /trading-premises/your-answers                              controllers.tradingpremises.SummaryController.answers()
 GET         /trading-premises/trading-premise-details/:index            controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
 GET         /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)

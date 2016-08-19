@@ -3,9 +3,8 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
-import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.RepeatingSection
 import views.html.tradingpremises._
@@ -28,6 +27,8 @@ trait SummaryController extends RepeatingSection with BaseController {
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
+
+  def answers = get(true)
 
   def getIndividual(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
