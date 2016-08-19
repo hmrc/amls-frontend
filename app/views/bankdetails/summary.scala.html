@@ -13,72 +13,66 @@
     heading = header
 ) {
 
-    @if(model.isEmpty) {
-        @fieldset("", jsHidden = false, id = "ttt") {
-            <span>@Messages("bankdetails.summary.nobank.account")</span> <br>
-        }
-        <br>
-        <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
-        <br><br>
-    } else {
-
-        @fieldset("", jsHidden = false, id = "ttt") {
-            <span>@Messages("bankdetails.summary.check.info")</span> <br>
-        }
-        <br>
-        <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.add.account") </a>
-        <br><br>
         @model.zipWithIndex.map { case (x, y) =>
             <table>
-                <tr>
-                    <th class="summary-title" colspan="3">@x.bankAccount.map {z => @z.accountName}</th>
-                    <td><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
-                </tr>
                 <tr>
                     @x.bankAccount.map {bankAccount =>
                         @bankAccount.account match {
                             case f:UKAccount => {
-                                <td width="25%">
-                                    @f.accountNumber
-                                </td>
-                                <td width="25%">
-                                    @f.sortCode
-                                </td>
-                                <td>
-                                    @Messages("lbl.uk")
+                                <td width="75%">
+                                    @bankAccount.accountName
+                                    <br>
+                                    @Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode
+                                    <br>
+                                    @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
+                                    <br>
+                                    @Messages("lbl.uk") @Messages("bankdetails.summary.bankaccount")
+                                    <br>
+                                    @x.bankAccountType.map {
+                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                    }
                                 </td>
                             }
                             case f:NonUKAccountNumber => {
-                                <td width="25%">
-                                    @f.accountNumber
-                                </td>
-                                <td width="25%">&nbsp;</td>
-                                <td>
-                                    @Messages("lbl.overseas")
+                                <td width="75%">
+                                    @bankAccount.accountName
+                                    <br>
+                                    @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
+                                    <br>
+                                    @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
+                                    <br>
+                                    @x.bankAccountType.map {
+                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                    }
                                 </td>
                             }
                             case f:NonUKIBANNumber => {
-                                <td width="25%">
-                                    @f.IBANNumber
-                                </td>
-                                <td width="25%">&nbsp;</td>
-                                <td>
-                                    @Messages("lbl.overseas")
-                                </td>
+                                    <td width="75%">
+                                        @bankAccount.accountName
+                                        <br>
+                                        @Messages("bankdetails.bankaccount.iban"): @f.IBANNumber
+                                        <br>
+                                        @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
+                                        <br>
+                                        @x.bankAccountType.map {
+                                        case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                        case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                        case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                        }
+                                    </td>
                             }
                         }
                     }
-                   <td>
-                       @x.bankAccountType.map {
-                           case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                           case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                           case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                       }
-                   </td>
+                    <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
+
                 </tr>
 
             </table>
         }
-    }
+
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
