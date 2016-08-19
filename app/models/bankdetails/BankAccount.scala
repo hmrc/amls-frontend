@@ -98,7 +98,7 @@ case class UKAccount(
     val pair1 = sortCode.substring(0,2)
     val pair2 = sortCode.substring(2,4)
     val pair3 = sortCode.substring(4,6)
-    pair1+"-"+pair2+"-"+pair3
+    pair1 + "-" + pair2 + "-" + pair3
   }
 }
 
