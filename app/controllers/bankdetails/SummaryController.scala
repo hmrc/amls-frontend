@@ -12,10 +12,10 @@ trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
-  def get = Authorised.async {
+  def get(complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetch[Seq[BankDetails]](BankDetails.key) map {
-        case Some(data) => Ok(views.html.bankdetails.summary(data))
+        case Some(data) => Ok(views.html.bankdetails.summary(data, complete))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }

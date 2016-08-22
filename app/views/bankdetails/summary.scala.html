@@ -2,7 +2,7 @@
 @import models.bankdetails._
 @import forms2._
 
-@(model: Seq[BankDetails])(implicit request: Request[_], lang: Lang)
+@(model: Seq[BankDetails], complete: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.bankdetails")
@@ -12,6 +12,11 @@
     title = Messages("summary.checkyouranswers.title"),
     heading = header
 ) {
+
+@if(complete) {
+<a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
+<br><br>
+}
 
         @model.zipWithIndex.map { case (x, y) =>
             <table>
