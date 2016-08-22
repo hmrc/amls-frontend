@@ -2,7 +2,7 @@
 @()(implicit request: Request[_])
 
 @header = {
-    @heading("asp.whatyouneed.title", "summary.asp")
+    @heading("asp.whatyouneed.heading", "summary.asp")
 }
 
 @main(
@@ -13,14 +13,14 @@
 
     <p>@Messages("asp.whatyouneed.subheading")</p>
 
-    <ul class="list list-bullet spacelarge">
+    <ul class="list list-bullet">
         <li>@Messages("asp.whatyouneed.line_1")</li>
         <li>@Messages("asp.whatyouneed.line_2")</li>
         <li>@Messages("asp.whatyouneed.line_3")</li>
     </ul>
 
     <div class="form-group">
-        <a class="button" href="@controllers.asp.routes.ServicesOfBusinessController.get()">@Messages("button.continue")</a>
+        <a class="button" role="button" href="@controllers.asp.routes.ServicesOfBusinessController.get()">@Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.asp")</span></a>
     </div>
 
 }
