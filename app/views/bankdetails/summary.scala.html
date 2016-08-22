@@ -13,9 +13,12 @@
     heading = header
 ) {
 
-@if(complete) {
-<a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
-<br><br>
+<div class="panel-indent">
+    @if(complete) {
+    <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
+</div>
+    <br><br>
+
 }
 
         @model.zipWithIndex.map { case (x, y) =>
