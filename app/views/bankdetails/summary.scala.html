@@ -5,21 +5,22 @@
 @(model: Seq[BankDetails], complete: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.bankdetails")
+    @heading(if(complete) "summary.youranswers.title" else "summary.checkyouranswers.title", "summary.bankdetails")
 }
 
+
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = if(complete) "summary.youranswers.title" else "summary.checkyouranswers.title",
     heading = header
 ) {
 
-<div class="panel-indent">
     @if(complete) {
-    <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
-</div>
-    <br><br>
+        <div class="panel-indent">
+            <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
+        </div>
+        <br><br>
+    }
 
-}
 
         @model.zipWithIndex.map { case (x, y) =>
             <table>
@@ -82,5 +83,9 @@
             </table>
         }
 
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+    @if(complete) {
+        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.confirmandcontinue")</a>
+    } else {
+        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+    }
 }
