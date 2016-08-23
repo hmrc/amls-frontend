@@ -272,7 +272,8 @@ error.required.declaration.who.is.registering = Select who is registering the bu
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
 
-amls.title=Anti-Money Laundering Supervision
+gov.title = GOV.UK
+amls.title = Anti-money laundering supervision
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
@@ -333,7 +334,7 @@ amls.Login.title= AMLS
 unauthorised.title = Unauthorised
 
 ############################### Status page ###############################
-status.title = Application status – Anti-Money Laundering Supervision
+status.title = Your application status – Anti-money laundering supervision - GOV.UK
 status.heading = Your application status
 status.business = Your business:
 status.referenceno = Reference number:
@@ -368,7 +369,7 @@ status.submissiondecisionrejected.buttontext = Submit new application
 
 
 ############################### Progress page ###############################
-progress.title = Application progress – Anti-Money Laundering Supervision
+progress.title = Application progress – Anti-money laundering supervision - GOV.UK
 progress.heading = Application progress
 progress.lede = It usually takes around 30 minutes to complete all sections.
 progress.saved.automatically = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
