@@ -1,12 +1,15 @@
 @import include._
 @()(implicit request: Request[_])
 
+@header = {
+    @heading("hvd.whatyouneed.heading", "summary.hvd")
+}
+
 @main(
     title = Messages("hvd.whatyouneed.title"),
+    heading = header,
     sidebar = sidebar
 ) {
-
-    @heading("hvd.whatyouneed.heading", "summary.hvd")
 
     <p>@Messages("msb.whatyouneed.requiredinfo.heading")</p>
 
