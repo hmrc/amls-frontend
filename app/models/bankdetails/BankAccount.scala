@@ -93,7 +93,14 @@ object Account {
 case class UKAccount(
                       accountNumber: String,
                       sortCode: String
-                    ) extends Account
+                    ) extends Account {
+  def displaySortCode:String = {
+    val pair1 = sortCode.substring(0,2)
+    val pair2 = sortCode.substring(2,4)
+    val pair3 = sortCode.substring(4,6)
+    pair1 + "-" + pair2 + "-" + pair3
+  }
+}
 
 
 sealed trait NonUKAccount extends Account
