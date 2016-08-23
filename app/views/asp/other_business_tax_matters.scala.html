@@ -17,11 +17,10 @@ s"""${f("agentRegNo").id}-fieldset"""
     heading = header
 ) {
 
-    <p>@Messages("asp.other.business.tax.matters.lbl")</p>
-
     @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
         @inlineRadioGroup(f("otherBusinessTaxMatters")) {
+            @legend("asp.other.business.tax.matters.lbl")
             @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
             @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
             @fieldset("asp.other.business.tax.matters.agentrefno.lbl", jsHidden = true, id = target) {
