@@ -9,6 +9,8 @@ POST        /subscribe                                                  controll
 GET         /unauthorised                                               controllers.AmlsController.unauthorised
 
 GET         /registration-progress                                      controllers.RegistrationProgressController.get()
+GET         /update-your-information                                    controllers.RegistrationAmendmentController.get()
+
 
 GET         /application-status                                         controllers.StatusController.get()
 
