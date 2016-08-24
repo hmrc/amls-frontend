@@ -9,14 +9,14 @@ import views.html.registrationamendment.registration_amendment
 
 trait RegistrationAmendmentController extends BaseController {
 
-  private[controllers] def service: ProgressService
+  private[controllers] def progressService: ProgressService
 
   private def declarationAvailable(seq: Seq[Section]): Boolean =
     seq forall { _.status == Completed }
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      service.sections map {
+      progressService.sections map {
         sections =>
           Ok(registration_amendment(sections, declarationAvailable(sections)))
       }
@@ -26,5 +26,5 @@ trait RegistrationAmendmentController extends BaseController {
 object RegistrationAmendmentController extends RegistrationAmendmentController {
   // $COVERAGE-OFF$
   override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override private[controllers] val service = ProgressService
+  override private[controllers] val progressService = ProgressService
 }
