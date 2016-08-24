@@ -19,11 +19,10 @@ trait SummaryController extends RepeatingSection with BaseController {
         cache =>
           for {
             c: CacheMap <- cache
-            bm <- c.getEntry[BusinessMatching](BusinessMatching.key)
             tp <- c.getEntry[Seq[TradingPremises]](TradingPremises.key)
-          } yield (bm, tp)
+          } yield tp
       } map {
-        case Some(data) => Ok(summary(data._2,edit))
+        case Some(data) => Ok(summary(data,edit))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }

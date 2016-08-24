@@ -136,7 +136,31 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         contentAsString(result) must include(Messages("err.summary"))
       }
 
-      "return a redirect to the Trading Premises details page on submitting false" in new Fixture {
+      "redirect to the Trading Premises details page on submitting false and edit true" in new Fixture {
+
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "agentPremises" -> "false"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1,edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+      }
+
+      "redirect to the Trading Premises details page on submitting false and edit false" in new Fixture {
 
         val model = TradingPremises(
           registeringAgentPremises = Some(
@@ -159,7 +183,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1).url)
       }
-      "return a redirect to the 'what is your agent's business structure?' page on submitting true" in new Fixture {
+      "redirect to the 'what is your agent's business structure?' page on submitting true" in new Fixture {
 
         val model = TradingPremises(
           registeringAgentPremises = Some(
