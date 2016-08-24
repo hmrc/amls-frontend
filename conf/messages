@@ -425,6 +425,14 @@ progress.visuallyhidden.start.approx = This section needs starting and will take
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
 
+#### Amendment page ####
+amendment.title = Update your information - Your application - Anti-money laundering registration - GOV.UK
+amendment.heading = Update your information
+amendment.section-heading = Your registration
+amendment.text.1 = If something has changed in your business which is relevant to Money Laundering Regulations, you must amend and re-submit your application for anti-money laudering supervision.
+amendment.text.2 = There will be an additional fee to pay if you increase the number of responsible people or trading premises.
+
+
 #### Confirmation page ####
 confirmation.lede = You have submitted the application.
 confirmation.thankyou = Thank you for registering online.

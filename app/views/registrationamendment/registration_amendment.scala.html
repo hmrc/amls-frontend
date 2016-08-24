@@ -6,15 +6,15 @@
 @(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_])
 
 @main2(
-    title = Messages("progress.title")
+    title = Messages("amendment.title")
 ) {
 
     @* Heading *@
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @heading("Blah Blah Blah Amendments")
-            <p class="lede">@Messages("progress.lede")</p>
-            <p>@Messages("progress.saved.automatically")</p>
+            @heading("amendment.heading", "amendment.section-heading")
+            <p>@Messages("amendment.text.1")</p>
+            <p>@Messages("amendment.text.2")</p>
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             &nbsp;

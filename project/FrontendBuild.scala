@@ -25,7 +25,7 @@ private object AppDependencies {
   private val playAuthorisedFrontendVersion = "5.4.0"
   private val playConfigVersion = "2.1.0"
   private val playJsonLoggerVersion = "2.1.1"
-  private val httpCachingClientVersion = "5.3.0"
+  private val httpCachingClientVersion = "5.6.0"
   private val playWhitelistFilterVersion = "1.1.0"
 
   private val metricsPlayVersion = "0.2.1"
