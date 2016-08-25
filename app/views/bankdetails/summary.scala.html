@@ -14,7 +14,16 @@
     heading = header
 ) {
 
-    @if(complete) {
+    @if(model.isEmpty){
+        <div class="panel-indent">
+            @Messages("bankdetails.summary.nobank.account")
+            <br><br>
+            <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
+        </div>
+        <br><br>
+    }
+
+    @if(complete && !model.isEmpty) {
         <div class="panel-indent">
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>
