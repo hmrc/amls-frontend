@@ -19,7 +19,7 @@
                     <th colspan="3">@yta.tradingName</th>
                 </tr>
                 <tr>
-                    <td width="40%">Address:</td>
+                    <td width="40%">@Messages("tradingpremises.summary.address")</td>
                     <td>
                         @yta.tradingPremisesAddress.toLines.map { l =>
                             @l<br />
@@ -32,7 +32,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td width="40%">Trading start date:</td>
+                    <td width="40%">@Messages("tradingpremises.summary.tradingstartdate")</td>
                     <td>
                         @DateHelper.formatDate(yta.startDate)
                     </td>
@@ -43,7 +43,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td width="40%">Residential address:</td>
+                    <td width="40%">@Messages("tradingpremises.summary.residential")</td>
                     <td>
                         @yta.isResidential match {
                             case true => { Yes }
@@ -58,7 +58,7 @@
                 </tr>
                 @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
                 <tr>
-                    <td width="40%">Services at this address:</td>
+                    <td width="40%">@Messages("tradingpremises.summary.services")</td>
                     <td>
                         @ba.activities.map { a =>
                             @a.getMessage<br />
@@ -76,18 +76,18 @@
                     <td width="40%">@Messages("tradingpremises.msb.services.heading")</td>
                     <td>
                         @msb.services.map{ s=>
-                            @s<br />
+                            @s.getMessage<br />
                         }
                     </td>
                     <td class="numeric">
-                        <a href="@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true)">
+                        <a href="@controllers.tradingpremises.routes.MSBServicesController.get(index, true)">
                             @Messages("button.edit")
                         </a>
                     </td>
                 </tr>
                 }
                 <tr>
-                    <td width="40%">Who uses these premises:</td>
+                    <td width="40%">@Messages("tradingpremises.summary.who-uses")</td>
                     <td>
                         @model.businessStructure.fold(Html(Messages("tradingpremises.summary.mybusiness"))) { _ =>
                             @Messages("tradingpremises.summary.agents")
