@@ -35,19 +35,15 @@
             <div class="application-submit">
                 <form method="get" action="@controllers.declaration.routes.WhoIsRegisteringController.get.url">
                     @fieldset(
-                        legend = "progress.submit",
+                        legend = "amendment.sidebar.heading",
                         jsHidden = false,
                         panel = false,
                         bold = true
                     ) {
                         <p>
-                            @if(declarationAvailable) {
-                                @Messages("progress.declarationavailable")
-                            } else {
-                                @Messages("progress.declarationunavailable")
-                            }
+                            @Messages("amendment.sidebar.text")
                         </p>
-                        <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>@Messages("progress.submit")</button>
+                        <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>@Messages("amendment.sidebar.button.text")</button>
                     }
                 </form>
             </div>
