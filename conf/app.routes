@@ -120,6 +120,7 @@ POST        /bank-details/accounts/:index                               controll
 GET         /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
+GET         /bank-details/your-answers                                  controllers.bankdetails.SummaryController.get(complete: Boolean ?= true)
 GET         /bank-details/check-your-answers                            controllers.bankdetails.SummaryController.get(complete: Boolean ?= false)
 
 GET         /business-activities/what-you-need                          controllers.businessactivities.WhatYouNeedController.get()

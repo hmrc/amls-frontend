@@ -39,7 +39,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
             }
           } yield {
             if(edit) {
-              Redirect(routes.SummaryController.get())
+              Redirect(routes.SummaryController.get(false))
             } else {
               Redirect(routes.BankAccountRegisteredController.get(index))
             }
