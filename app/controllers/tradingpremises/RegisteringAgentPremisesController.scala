@@ -47,7 +47,10 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
             }
           } yield data.agentPremises match {
             case true => Redirect(routes.BusinessStructureController.get(index,edit))
-            case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+            case false => edit match {
+              case true => Redirect(routes.SummaryController.getIndividual(index))
+              case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+            }
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

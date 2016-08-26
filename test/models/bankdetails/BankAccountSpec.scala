@@ -10,6 +10,16 @@ import play.api.libs.json.{JsSuccess, JsPath, Json}
 
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
+
+  "displaySortCode" must {
+    "return the sort code formatted for display" in {
+
+      val account = UKAccount("12341234","123456")
+
+      account.displaySortCode must be("12-34-56")
+    }
+  }
+
   "For the Account" must {
 
     "Form Rule validation is successful for UKAccount" in {

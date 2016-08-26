@@ -82,7 +82,7 @@ class BankAccountRegisteredControllerSpec extends PlaySpec with OneAppPerSuite w
 
         val result = controller.post(1)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.bankdetails.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.bankdetails.routes.SummaryController.get(false).url))
       }
     }
 

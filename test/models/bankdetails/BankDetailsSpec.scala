@@ -1,10 +1,15 @@
 package models.bankdetails
 
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import org.mockito.Mockito._
+import org.mockito.Matchers.{any, eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.CacheMap
 
-class BankDetailsSpec extends PlaySpec with MockitoSugar{
+
+class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
   val accountType = PersonalAccount
 
@@ -15,7 +20,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
 
 
     "Serialise as expected" in {
-      Json.toJson[BankDetails](completeModel) must be (completeJson)
+      Json.toJson[BankDetails](completeModel) must be(completeJson)
     }
 
     "Deserialise as expected" in {
@@ -28,7 +33,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
     val accountTypeModel = BankDetails(Some(accountType), None)
 
     "serialise as expected with bankAccountType" in {
-      Json.toJson[BankDetails](accountTypeModel) must be (accontTypeJson)
+      Json.toJson[BankDetails](accountTypeModel) must be(accontTypeJson)
     }
 
     "Deserialise as expected with bankAccountType" in {
@@ -38,7 +43,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
 
   "None" when {
 
-    val initial:Option[BankDetails] = None
+    val initial: Option[BankDetails] = None
 
     "merged with bankDetails" must {
       "return bank details with correct data set" in {
@@ -57,7 +62,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
 
     "Merge with existing data set" must {
       "return merger result with new data" in {
-        val accountTypeNew  = BelongsToBusiness
+        val accountTypeNew = BelongsToBusiness
         val result = initial.bankAccountType(accountTypeNew)
 
         result must be(BankDetails(Some(accountTypeNew), None))
@@ -72,7 +77,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
 
     "must Merge with existing data set" must {
       "and return merger result with new data" in {
-        val accountTypeNew  = BelongsToBusiness
+        val accountTypeNew = BelongsToBusiness
         val result = bankDetails.bankAccountType(accountTypeNew)
 
         result must be(BankDetails(Some(accountTypeNew), Some(bankAccount)))
@@ -87,7 +92,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
 
     "Merge with existing data set" must {
       "return merger result with new data" in {
-        val accountTypeNew  = BelongsToBusiness
+        val accountTypeNew = BelongsToBusiness
         val result = bankDetails.bankAccountType(accountTypeNew)
 
         result must be(BankDetails(Some(accountTypeNew), Some(bankAccount)))
@@ -95,4 +100,56 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar{
     }
   }
 
+  "isComplete" must {
+    "return true when BankDetails contains complete data" in {
+      val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
+      val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
+
+      bankDetails.isComplete must be(true)
+    }
+
+    "return false when BankDetails contains incomplete data" in {
+      val bankDetails = BankDetails(Some(accountType), None)
+
+      bankDetails.isComplete must be(false)
+    }
+  }
+
+  "Section" must {
+    val cache = mock[CacheMap]
+
+    "return a NotStarted Section when model is empty" in {
+      val notStartedSection = Section("bankdetails", NotStarted, controllers.bankdetails.routes.BankAccountAddController.get(true))
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn None
+
+      BankDetails.section(cache) must be(notStartedSection)
+
+    }
+
+    "return a Completed Section when model is complete" in {
+
+      val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
+      val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
+      val complete = Seq(bankDetails)
+      val completedSection = Section("bankdetails", Completed, controllers.bankdetails.routes.SummaryController.get(true))
+
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(complete)
+
+      BankDetails.section(cache) must be(completedSection)
+
+    }
+
+    "return a Started Section when model is incomplete" in {
+
+      val bankDetails = BankDetails(Some(accountType), None)
+      val incompleteTcsp = Seq(bankDetails)
+      val startedSection = Section("bankdetails", Started, controllers.bankdetails.routes.WhatYouNeedController.get(1))
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incompleteTcsp)
+
+      BankDetails.section(cache) must be(startedSection)
+    }
+  }
 }
