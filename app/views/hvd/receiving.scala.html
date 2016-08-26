@@ -33,8 +33,8 @@
             @checkbox(f("paymentMethods.direct"), "hvd.receiving.option.02", "true")
             @checkbox(f("paymentMethods.other"), "hvd.receiving.option.03", "true", target = "#receive-payments-other")
 
-            @fieldset("hvd.receiving.give.details", panel = false, id = "receive-payments-other") {
-                @input(f("paymentMethods.details"))
+            @fieldset("hvd.receiving.give.details", panel = false, id = "receive-payments-other", classes = Seq("visuallyhidden-legend")) {
+                @input(f("paymentMethods.details"), labelText = "hvd.receiving.give.details")
             }
         }
 
