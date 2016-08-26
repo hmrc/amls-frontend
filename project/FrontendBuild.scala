@@ -21,8 +21,8 @@ private object AppDependencies {
   private val playUiVersion = "4.15.0"
 
   private val frontendBootstrapVersion = "6.7.0"
-  private val playPartialsVersion = "4.4.0"
-  private val playAuthorisedFrontendVersion = "5.4.0"
+  private val playPartialsVersion = "4.5.0"
+  private val playAuthorisedFrontendVersion = "5.5.0"
   private val playConfigVersion = "2.1.0"
   private val playJsonLoggerVersion = "2.1.1"
   private val httpCachingClientVersion = "5.6.0"
@@ -33,7 +33,6 @@ private object AppDependencies {
 
   private val validationVersion = "1.1"
 
-
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
   val compile = Seq(
@@ -42,7 +41,6 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
 
-    // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "play-authorised-frontend" % playAuthorisedFrontendVersion,
@@ -63,7 +61,6 @@ private object AppDependencies {
     val scope: String
     val dependencies: Seq[ModuleID]
   }
-
 
   private val scalatestVersion = "2.2.5"
   private val scalatestPlusPlayVersion = "1.2.0"
@@ -104,5 +101,3 @@ private object AppDependencies {
 
   def apply() = compile ++ Test() ++It()
 }
-
-
