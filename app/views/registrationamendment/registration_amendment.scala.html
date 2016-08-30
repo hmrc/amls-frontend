@@ -24,9 +24,9 @@
     <div class="grid-layout grid-layout--stacked">
 
         @* Main section *@
-        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps" role="menu">
-            @sections.map { case Section(name, status, call) =>
-                @section(name, status, call)
+        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend" role="menu">
+            @sections.map { case Section(name, status, hasChanged, call) =>
+                @section(name, status, hasChanged, call)
             }
         </ul>
 

@@ -434,6 +434,8 @@ amendment.text.2 = There will be an additional fee to pay if you increase the nu
 amendment.sidebar.heading = Re-submit application
 amendment.sidebar.text = You don't need to re-submit your application until you've made changes to it.
 amendment.sidebar.button.text = Re-submit application
+amendment.view-and-amend = View and amend your information
+
 
 
 #### Confirmation page ####
