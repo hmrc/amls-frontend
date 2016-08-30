@@ -169,7 +169,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
 
     "return `NotStarted` section when there is no section in s4l" in {
       implicit val cache = CacheMap("", Map.empty)
-      EstateAgentBusiness.section mustBe Section("eab", NotStarted, controllers.estateagentbusiness.routes.WhatYouNeedController.get)
+      EstateAgentBusiness.section mustBe Section("eab", NotStarted, false,  controllers.estateagentbusiness.routes.WhatYouNeedController.get)
     }
 
     "return `Started` section when there is a section which isn't completed" in {
@@ -178,7 +178,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
       when {
         cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
       } thenReturn Some(incompleteModel)
-      EstateAgentBusiness.section mustBe Section("eab", Started, controllers.estateagentbusiness.routes.WhatYouNeedController.get)
+      EstateAgentBusiness.section mustBe Section("eab", Started, false, controllers.estateagentbusiness.routes.WhatYouNeedController.get)
     }
 
     "return `Completed` section when there is a section which is completed" in {

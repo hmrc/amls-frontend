@@ -67,7 +67,7 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
 
       "return a NotStarted Section when model is empty" in {
 
-        val notStartedSection = Section("asp", NotStarted, controllers.asp.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("asp", NotStarted, false,  controllers.asp.routes.WhatYouNeedController.get())
 
         when(cache.getEntry[Asp]("asp")) thenReturn None
 
@@ -78,7 +78,7 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Asp]
-        val completedSection = Section("asp", Completed, controllers.asp.routes.SummaryController.get())
+        val completedSection = Section("asp", Completed, false,  controllers.asp.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Asp]("asp")) thenReturn Some(complete)
@@ -90,7 +90,7 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
       "return a Started Section when model is incomplete" in {
 
         val incompleteTcsp = mock[Asp]
-        val startedSection = Section("asp", Started, controllers.asp.routes.WhatYouNeedController.get())
+        val startedSection = Section("asp", Started, false,  controllers.asp.routes.WhatYouNeedController.get())
 
         when(incompleteTcsp.isComplete) thenReturn false
         when(cache.getEntry[Asp]("asp")) thenReturn Some(incompleteTcsp)
