@@ -128,6 +128,7 @@ error.required.ba.option.risk.assessment = Select yes or no to the question: Doe
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
 error.required.ba.business.use.accountant = Select yes or no to the question: Does your business receive advice on Money Laundering Regulations and due diligence?
 error.required.ba.suspicious.activity = Select yes or no to the question:Does your business have written guidance for staff on how to identify and report suspicious activity?
+error.required.ba.tax.matters = Select yes or no to the question: Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
