@@ -32,6 +32,16 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     Some("address 4"),
     "NE77 0QQ")
 
+  val completeModel = AboutTheBusiness(
+    previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
+    activityStartDate = Some(activityStartDate),
+    vatRegistered = Some(regForVAT),
+    corporationTaxRegistered = Some(regForCorpTax),
+    contactingYou = Some(contactingYou),
+    registeredOffice = Some(regOfficeOrMainPlaceUK),
+    correspondenceAddress = Some(uKCorrespondenceAddress)
+  )
+
   "AboutTheBusiness" must {
     val completeJson = Json.obj(
       "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
@@ -59,18 +69,9 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "correspondenceAddressLine3" -> "address 3",
       "correspondenceAddressLine4" -> "address 4",
       "correspondencePostCode" -> "NE77 0QQ"
-        )
+        ),
+      "hasChanged" -> false
       )
-
-    val completeModel = AboutTheBusiness(
-      previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
-      activityStartDate = Some(activityStartDate),
-      vatRegistered = Some(regForVAT),
-      corporationTaxRegistered = Some(regForCorpTax),
-      contactingYou = Some(contactingYou),
-      registeredOffice = Some(regOfficeOrMainPlaceUK),
-      correspondenceAddress = Some(uKCorrespondenceAddress)
-    )
 
     "Serialise as expected" in {
       Json.toJson(completeModel) must
@@ -88,7 +89,9 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     val partialJson = Json.obj(
       "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
       "prevMLRRegNo" -> "12345678"
-    ))
+      ),
+      "hasChanged" -> false
+    )
 
     val partialModel = AboutTheBusiness(Some(previouslyRegistered), None)
 
@@ -110,35 +113,35 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "Merged with previously registered with MLR" must {
       "return AboutTheBusiness with correct previously registered for MLR option" in {
         val result = initial.previouslyRegistered(previouslyRegistered)
-        result must be (AboutTheBusiness(Some(previouslyRegistered), None))
+        result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, None, None, None, None, true))
       }
     }
 
     "Merged with RegisteredForVAT" must {
       "return AboutTheBusiness with correct VAT Registered option" in {
         val result = initial.vatRegistered(regForVAT)
-        result must be (AboutTheBusiness(None, None, Some(regForVAT), None, None, None))
+        result must be (AboutTheBusiness(None, None, Some(regForVAT), None, None, None, None, true))
       }
     }
 
     "Merged with CorporationTaxRegistered" must {
       "return AboutTheBusiness with correct corporation tax registered option" in {
         val result = initial.corporationTaxRegistered(regForCorpTax)
-        result must be (AboutTheBusiness(None, None, None, Some(regForCorpTax), None, None, None))
+        result must be (AboutTheBusiness(None, None, None, Some(regForCorpTax), None, None, None, true))
       }
     }
 
     "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
       "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
         val result = initial.registeredOffice(regOfficeOrMainPlaceUK)
-        result must be (AboutTheBusiness(None, None, None, None, None, Some(regOfficeOrMainPlaceUK)))
+        result must be (AboutTheBusiness(None, None, None, None, None, Some(regOfficeOrMainPlaceUK), None, true))
       }
     }
 
     "Merged with UKCorrespondenceAddress" must {
       "return AboutTheBusiness with correct UKCorrespondenceAddress" in {
         val result = initial.correspondenceAddress(uKCorrespondenceAddress)
-        result must be (AboutTheBusiness(None, None, None, None, None, None, Some(uKCorrespondenceAddress)))
+        result must be (AboutTheBusiness(None, None, None, None, None, None, Some(uKCorrespondenceAddress), true))
       }
     }
   }
@@ -154,7 +157,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
         "return AboutTheBusiness with correct previously registered status" in {
           val newPreviouslyRegistered = PreviouslyRegisteredYes("22222222")
           val result = initial.previouslyRegistered(newPreviouslyRegistered)
-          result must be (AboutTheBusiness(Some(newPreviouslyRegistered), None))
+          result must be (AboutTheBusiness(Some(newPreviouslyRegistered), None, None, None, None, None, None, true ))
         }
       }
 
@@ -162,7 +165,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
         "return AboutTheBusiness with correct VAT registration number" in {
           val newregForVAT = VATRegisteredYes("012345678")
           val result = initial.vatRegistered(newregForVAT)
-          result must be (AboutTheBusiness(Some(previouslyRegistered), None, Some(newregForVAT)))
+          result must be (AboutTheBusiness(Some(previouslyRegistered), None, Some(newregForVAT), None, None, None, None, true))
         }
       }
 
@@ -170,7 +173,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
         "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
           val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, Country("United Kingdom", "GB"))
           val result = initial.registeredOffice(newregOffice)
-          result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, None, None, Some(newregOffice)))
+          result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, None, None, Some(newregOffice), None, true))
         }
       }
     }
@@ -185,7 +188,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "return AboutTheBusiness with correct previously registered status" in {
             val newPreviouslyRegistered = PreviouslyRegisteredYes("22222222")
             val result = initial.previouslyRegistered(newPreviouslyRegistered)
-            result must be(AboutTheBusiness(Some(newPreviouslyRegistered), Some(activityStartDate), Some(regForVAT), None, None,  Some(regOfficeOrMainPlaceUK)))
+            result must be(AboutTheBusiness(Some(newPreviouslyRegistered), Some(activityStartDate), Some(regForVAT), None, None,  Some(regOfficeOrMainPlaceUK), None, true))
           }
         }
 
@@ -193,7 +196,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "Merged with previously registered with MLR" in {
             val newregForVAT = VATRegisteredYes("012345678")
             val result = initial.vatRegistered(newregForVAT)
-            result must be(AboutTheBusiness(None, Some(activityStartDate), Some(newregForVAT), None, None, Some(regOfficeOrMainPlaceUK)))
+            result must be(AboutTheBusiness(None, Some(activityStartDate), Some(newregForVAT), None, None, Some(regOfficeOrMainPlaceUK), None, true))
           }
         }
 
@@ -201,8 +204,30 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
           "return AboutTheBusiness with correct registered office detailes" in {
             val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, Country("United Kingdom", "GB"))
             val result = initial.registeredOffice(newregOffice)
-            result must be(AboutTheBusiness(None, Some(activityStartDate), Some(regForVAT), None, None, Some(newregOffice)))
+            result must be(AboutTheBusiness(None, Some(activityStartDate), Some(regForVAT), None, None, Some(newregOffice), None, true))
           }
+        }
+      }
+    }
+  }
+
+  "AboutTheBusiness" when {
+
+
+    "previouslyRegistered value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.previouslyRegistered(completeModel.previouslyRegistered.get)
+          res must be (completeModel)
+          res.hasChanged must be (false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.previouslyRegistered(PreviouslyRegisteredNo)
+          res.hasChanged must be (true)
+          res.previouslyRegistered must be (Some(PreviouslyRegisteredNo))
         }
       }
     }
