@@ -22,8 +22,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
     "Accountant's name",
     Some("Accountant's trading name"),
-    UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE" ),
-    AccountantDoesAlsoDealWithTax("11Character")
+    UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE" )
   )
   val DefaultIdentifySuspiciousActivity  = IdentifySuspiciousActivity(true)
   val DefaultTaxMatters = TaxMatters(true)
@@ -43,8 +42,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
   val NewWhoIsYourAccountant = WhoIsYourAccountant(
     "newName",
     Some("newTradingName"),
-    UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "NE27 0QQ"),
-    AccountantDoesAlsoDealWithTax("refer")
+    UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "NE27 0QQ")
   )
   val NewTaxMatters = TaxMatters(true)
 
@@ -88,8 +86,6 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "accountantsAddressLine3" -> "address3",
       "accountantsAddressLine4" -> "address4",
       "accountantsAddressPostCode" -> "POSTCODE",
-      "doesAccountantAlsoDealWithTax" -> true,
-      "accountantsReference" -> "11Character",
       "manageYourTaxAffairs" -> true,
       "hasWrittenGuidance" -> true
     )
