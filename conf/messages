@@ -849,7 +849,6 @@ businessactivities.whoisyouraccountant.ukAddress = This is a UK address
 businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas address
 businessactivities.whoisyouraccountant.country = Country
 businessactivities.whoisyouraccountant.postCode = Postcode
-businessactivities.whoisyouraccountant.taxMessage = Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.whoisyouraccountant.reference.details = Your accountant’s HMRC Agent Reference Number
 businessactivities.tax.matters.title = Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)? - Business activities
 businessactivities.tax.matters.heading = Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
