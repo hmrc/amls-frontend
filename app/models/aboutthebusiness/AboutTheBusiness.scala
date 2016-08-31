@@ -8,7 +8,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class AboutTheBusiness(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
-                             activityStartDate: Option[ActivityStartDate] = None,
+                              activityStartDate:Option[ActivityStartDate] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              corporationTaxRegistered: Option[CorporationTaxRegistered] = None,
                              contactingYou: Option[ContactingYou] = None,
@@ -18,29 +18,29 @@ case class AboutTheBusiness(
                            ) {
 
   def previouslyRegistered(v: PreviouslyRegistered): AboutTheBusiness = {
-    this.copy(previouslyRegistered = Some(v), hasChanged = this.previouslyRegistered != Some(v))
+    this.copy(previouslyRegistered = Some(v), hasChanged = hasChanged || this.previouslyRegistered != Some(v))
   }
 
   def activityStartDate(v: ActivityStartDate): AboutTheBusiness =
-    this.copy(activityStartDate = Some(v), hasChanged = this.activityStartDate != Some(v))
+    this.copy(activityStartDate = Some(v), hasChanged = hasChanged || this.activityStartDate != Some(v))
 
   def vatRegistered(v: VATRegistered): AboutTheBusiness =
-    this.copy(vatRegistered = Some(v), hasChanged = this.vatRegistered != Some(v))
+    this.copy(vatRegistered = Some(v), hasChanged = hasChanged || this.vatRegistered != Some(v))
 
   def corporationTaxRegistered(c: CorporationTaxRegistered): AboutTheBusiness =
-    this.copy(corporationTaxRegistered = Some(c), hasChanged = this.corporationTaxRegistered != Some(c))
+    this.copy(corporationTaxRegistered = Some(c), hasChanged = hasChanged || this.corporationTaxRegistered != Some(c))
 
   def registeredOffice(v: RegisteredOffice): AboutTheBusiness =
-    this.copy(registeredOffice = Some(v), hasChanged = this.registeredOffice != Some(v))
+    this.copy(registeredOffice = Some(v), hasChanged = hasChanged || this.registeredOffice != Some(v))
 
   def contactingYou(v: ContactingYou): AboutTheBusiness =
-    this.copy(contactingYou = Some(v), hasChanged = this.contactingYou != Some(v))
+    this.copy(contactingYou = Some(v), hasChanged = hasChanged || this.contactingYou != Some(v))
 
   def correspondenceAddress(v: CorrespondenceAddress): AboutTheBusiness =
-    this.copy(correspondenceAddress = Some(v), hasChanged = this.correspondenceAddress != Some(v))
+    this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || this.correspondenceAddress != Some(v))
 
   def correspondenceAddress(v: Option[CorrespondenceAddress]): AboutTheBusiness =
-    this.copy(correspondenceAddress = v, hasChanged = this.correspondenceAddress != v )
+    this.copy(correspondenceAddress = v, hasChanged = hasChanged || this.correspondenceAddress != v )
 
   def isComplete: Boolean =
     this match {
