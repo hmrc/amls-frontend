@@ -305,5 +305,23 @@
         }
     }
 
+    @model.taxMatters.map {x=>
+    <table class="table--spaced-top">
+        <tr>
+            <th>@Messages("businessactivities.tax.matters.title")</th>
+            <td width="12"><a href="@controllers.businessactivities.routes.TaxMattersController.get(true)">@Messages("button.edit")</a></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                @x.manageYourTaxAffairs match {
+                    case true =>  { @Messages("lbl.yes") }
+                    case false =>  { @Messages("lbl.no") }
+                }
+            </td>
+        </tr>
+    </table>
+
+    }
+
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
