@@ -42,36 +42,36 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     correspondenceAddress = Some(uKCorrespondenceAddress)
   )
 
-  "AboutTheBusiness" must {
+  "AboutTheBusiness Serialisation" must {
     val completeJson = Json.obj(
       "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
-      "prevMLRRegNo" -> "12345678"),
+        "prevMLRRegNo" -> "12345678"),
       "activityStartDate" -> Json.obj(
-      "startDate" -> "1990-02-24"),
+        "startDate" -> "1990-02-24"),
       "vatRegistered" -> Json.obj("registeredForVAT" -> true,
-      "vrnNumber" -> "123456789"),
+        "vrnNumber" -> "123456789"),
       "corporationTaxRegistered" -> Json.obj("registeredForCorporationTax" -> true,
-      "corporationTaxReference" -> "1234567890"),
-        "contactingYou" -> Json.obj(
+        "corporationTaxReference" -> "1234567890"),
+      "contactingYou" -> Json.obj(
         "phoneNumber" -> "1234567890",
         "email" -> "test@test.com"),
-        "registeredOffice" -> Json.obj(
-      "addressLine1" -> "38B",
-      "addressLine2" -> "Longbenton",
-      "addressLine3" -> JsNull,
-      "addressLine4" -> JsNull,
-      "postCode" -> "NE7 7DX"),
+      "registeredOffice" -> Json.obj(
+        "addressLine1" -> "38B",
+        "addressLine2" -> "Longbenton",
+        "addressLine3" -> JsNull,
+        "addressLine4" -> JsNull,
+        "postCode" -> "NE7 7DX"),
       "correspondenceAddress" -> Json.obj(
-      "yourName" -> "Name",
-      "businessName" -> "Business Name",
-      "correspondenceAddressLine1" -> "address 1",
-      "correspondenceAddressLine2" -> "address 2",
-      "correspondenceAddressLine3" -> "address 3",
-      "correspondenceAddressLine4" -> "address 4",
-      "correspondencePostCode" -> "NE77 0QQ"
-        ),
+        "yourName" -> "Name",
+        "businessName" -> "Business Name",
+        "correspondenceAddressLine1" -> "address 1",
+        "correspondenceAddressLine2" -> "address 2",
+        "correspondenceAddressLine3" -> "address 3",
+        "correspondenceAddressLine4" -> "address 4",
+        "correspondencePostCode" -> "NE77 0QQ"
+      ),
       "hasChanged" -> false
-      )
+    )
 
     "Serialise as expected" in {
       Json.toJson(completeModel) must
@@ -106,7 +106,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     }
   }
 
-  "None" when {
+  "'None'" when {
 
     val initial: Option[AboutTheBusiness] = None
 
@@ -147,73 +147,18 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
   }
 
 
-  "AboutTheBusiness" when {
-
-    "previouslyRegistered already set" when {
-
-      val initial = AboutTheBusiness(Some(previouslyRegistered), None)
-
-      "Merged with previously registered with MLR" must {
-        "return AboutTheBusiness with correct previously registered status" in {
-          val newPreviouslyRegistered = PreviouslyRegisteredYes("22222222")
-          val result = initial.previouslyRegistered(newPreviouslyRegistered)
-          result must be (AboutTheBusiness(Some(newPreviouslyRegistered), None, None, None, None, None, None, true ))
-        }
-      }
-
-      "Merged with RegisteredForVAT" must {
-        "return AboutTheBusiness with correct VAT registration number" in {
-          val newregForVAT = VATRegisteredYes("012345678")
-          val result = initial.vatRegistered(newregForVAT)
-          result must be (AboutTheBusiness(Some(previouslyRegistered), None, Some(newregForVAT), None, None, None, None, true))
-        }
-      }
-
-      "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
-        "return AboutTheBusiness with correct registeredOfficeOrMainPlaceOfBusiness" in {
-          val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, Country("United Kingdom", "GB"))
-          val result = initial.registeredOffice(newregOffice)
-          result must be (AboutTheBusiness(Some(previouslyRegistered), None, None, None, None, Some(newregOffice), None, true))
-        }
-      }
-    }
-
-    "AboutTheBusiness" when {
-
-      "regForVAT and regOfficeOrMainPlaceUK already set" when {
-
-        val initial = AboutTheBusiness(None, Some(activityStartDate), Some(regForVAT), None, None, Some(regOfficeOrMainPlaceUK))
-
-        "return AboutTheBusiness with correct VAT registration number" must {
-          "return AboutTheBusiness with correct previously registered status" in {
-            val newPreviouslyRegistered = PreviouslyRegisteredYes("22222222")
-            val result = initial.previouslyRegistered(newPreviouslyRegistered)
-            result must be(AboutTheBusiness(Some(newPreviouslyRegistered), Some(activityStartDate), Some(regForVAT), None, None,  Some(regOfficeOrMainPlaceUK), None, true))
-          }
-        }
-
-        "Merged with RegisteredForVAT" must {
-          "Merged with previously registered with MLR" in {
-            val newregForVAT = VATRegisteredYes("012345678")
-            val result = initial.vatRegistered(newregForVAT)
-            result must be(AboutTheBusiness(None, Some(activityStartDate), Some(newregForVAT), None, None, Some(regOfficeOrMainPlaceUK), None, true))
-          }
-        }
-
-        "Merged with RegisteredOfficeOrMainPlaceOfBusiness" must {
-          "return AboutTheBusiness with correct registered office detailes" in {
-            val newregOffice = RegisteredOfficeNonUK("38B", "Longbenton", None, None, Country("United Kingdom", "GB"))
-            val result = initial.registeredOffice(newregOffice)
-            result must be(AboutTheBusiness(None, Some(activityStartDate), Some(regForVAT), None, None, Some(newregOffice), None, true))
-          }
-        }
-      }
-    }
-  }
-
-  "AboutTheBusiness" when {
+  /*
+  previouslyRegistered: Opti
+  activityStartDate: Option[
+  vatRegistered: Option[VATR
+  corporationTaxRegistered:
+  contactingYou: Option[Cont
+  registeredOffice: Option[R
+  correspondenceAddress: Opt
+   */
 
 
+  "AboutTheBusiness class" when {
     "previouslyRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
@@ -231,5 +176,114 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
         }
       }
     }
+
+    "activityStartDate value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.activityStartDate(completeModel.activityStartDate.get)
+          res must be (completeModel)
+          res.hasChanged must be (false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & activityStartDate Properties" in {
+          val res = completeModel.activityStartDate(ActivityStartDate(new LocalDate(1344, 12, 1)))
+          res.hasChanged must be (true)
+          res.activityStartDate must be (Some(ActivityStartDate(new LocalDate(1344, 12, 1))))
+        }
+      }
+    }
+
+    "vatRegistered value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.vatRegistered(completeModel.vatRegistered.get)
+          res must be (completeModel)
+          res.hasChanged must be (false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & vatRegistered Properties" in {
+          val res = completeModel.vatRegistered(VATRegisteredNo)
+          res.hasChanged must be (true)
+          res.vatRegistered must be (Some(VATRegisteredNo))
+        }
+      }
+    }
+
+    "corporationTaxRegistered value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.corporationTaxRegistered(completeModel.corporationTaxRegistered.get)
+          res must be (completeModel)
+          res.hasChanged must be (false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & corporationTaxRegistered Properties" in {
+          val res = completeModel.corporationTaxRegistered(CorporationTaxRegisteredYes("3333333333"))
+          res.hasChanged must be (true)
+          res.corporationTaxRegistered must be (Some(CorporationTaxRegisteredYes("3333333333")))
+        }
+      }
+    }
+
+    "contactingYou value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.contactingYou(completeModel.contactingYou.get)
+          res must be (completeModel)
+          res.hasChanged must be (false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & contactingYou Properties" in {
+          val res = completeModel.contactingYou(ContactingYou("9876655564", "new@testvalue.com"))
+          res.hasChanged must be (true)
+          res.contactingYou must be (Some(ContactingYou("9876655564", "new@testvalue.com")))
+        }
+      }
+    }
+
+    "registeredOffice value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.registeredOffice(completeModel.registeredOffice.get)
+          res must be (completeModel)
+          res.hasChanged must be (false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & registeredOffice Properties" in {
+          val res = completeModel.registeredOffice(RegisteredOfficeUK("Line 1 New", "Line 2 New", None, None, "NEW CODE"))
+          res.hasChanged must be (true)
+          res.registeredOffice must be (Some(RegisteredOfficeUK("Line 1 New", "Line 2 New", None, None, "NEW CODE")))
+        }
+      }
+    }
+
+    "correspondenceAddress value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.correspondenceAddress(completeModel.correspondenceAddress.get)
+          res must be (completeModel)
+          res.hasChanged must be (false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & correspondenceAddress Properties" in {
+          val res = completeModel.correspondenceAddress(UKCorrespondenceAddress("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE"))
+          res.hasChanged must be (true)
+          res.correspondenceAddress must be (Some(UKCorrespondenceAddress("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")))
+        }
+      }
+    }
+
   }
 }
