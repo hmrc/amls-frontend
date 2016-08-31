@@ -1,6 +1,5 @@
 package controllers
 
-
 import config.AMLSAuthConnector
 import models.registrationprogress.{Completed, Section}
 import services.ProgressService
@@ -17,6 +16,7 @@ trait RegistrationProgressController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
+      
       service.sections map {
         sections =>
           Ok(registration_progress(sections, declarationAvailable(sections)))

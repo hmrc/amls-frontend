@@ -58,11 +58,11 @@ object AboutTheBusiness {
     val notStarted = Section(messageKey, NotStarted, false, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
     cache.getEntry[AboutTheBusiness](key).fold(notStarted) {
       case model if model.isComplete =>
-        Section(messageKey, Completed, false, controllers.aboutthebusiness.routes.SummaryController.get())
+        Section(messageKey, Completed, model.hasChanged, controllers.aboutthebusiness.routes.SummaryController.get())
       case AboutTheBusiness(None, None, None, None, None, _, None, _) =>
         notStarted
-      case _ =>
-        Section(messageKey, Started, false, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
+      case model =>
+        Section(messageKey, Started, model.hasChanged, controllers.aboutthebusiness.routes.WhatYouNeedController.get())
     }
   }
 
