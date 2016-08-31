@@ -15,7 +15,8 @@ case class BusinessActivities(
                                identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None,
                                riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
                                howManyEmployees: Option[HowManyEmployees] = None,
-                               whoIsYourAccountant: Option[WhoIsYourAccountant] = None
+                               whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
+                               taxMatters: Option[TaxMatters] = None
                              ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
@@ -54,11 +55,14 @@ case class BusinessActivities(
   def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
     this.copy(whoIsYourAccountant = Some(p))
 
+  def taxMatters(p: TaxMatters): BusinessActivities =
+    this.copy(taxMatters = Some(p))
+
   def isComplete: Boolean =
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
-      Some(_), Some(x), Some(_), Some(_), Some(_), _
+      Some(_), Some(x), Some(_), Some(_), Some(_), _, Some(_)
       ) => true
       case _ => false
     }
@@ -96,7 +100,8 @@ object BusinessActivities {
       __.read[Option[IdentifySuspiciousActivity]] and
       __.read[Option[RiskAssessmentPolicy]] and
       __.read[Option[HowManyEmployees]] and
-      __.read[Option[WhoIsYourAccountant]]
+      __.read[Option[WhoIsYourAccountant]] and
+      __.read[Option[TaxMatters]]
     ) (BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
@@ -113,7 +118,8 @@ object BusinessActivities {
         Json.toJson(model.identifySuspiciousActivity).asOpt[JsObject],
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject],
-        Json.toJson(model.whoIsYourAccountant).asOpt[JsObject]
+        Json.toJson(model.whoIsYourAccountant).asOpt[JsObject],
+        Json.toJson(model.taxMatters).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }

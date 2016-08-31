@@ -851,6 +851,8 @@ businessactivities.whoisyouraccountant.country = Country
 businessactivities.whoisyouraccountant.postCode = Postcode
 businessactivities.whoisyouraccountant.taxMessage = Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.whoisyouraccountant.reference.details = Your accountant’s HMRC Agent Reference Number
+businessactivities.tax.matters.title = Does this professional adviser also manage your tax affairs with HM Revenue and Customs (HMRC)? - Business activities
+businessactivities.tax.matters.heading = Does this professional adviser also manage your tax affairs with HM Revenue and Customs (HMRC)?
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
 
 submit.registration = Submit registration
