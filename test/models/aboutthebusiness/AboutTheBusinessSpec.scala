@@ -42,37 +42,37 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     correspondenceAddress = Some(uKCorrespondenceAddress)
   )
 
-  "AboutTheBusiness Serialisation" must {
-    val completeJson = Json.obj(
-      "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
-        "prevMLRRegNo" -> "12345678"),
-      "activityStartDate" -> Json.obj(
-        "startDate" -> "1990-02-24"),
-      "vatRegistered" -> Json.obj("registeredForVAT" -> true,
-        "vrnNumber" -> "123456789"),
-      "corporationTaxRegistered" -> Json.obj("registeredForCorporationTax" -> true,
-        "corporationTaxReference" -> "1234567890"),
-      "contactingYou" -> Json.obj(
-        "phoneNumber" -> "1234567890",
-        "email" -> "test@test.com"),
-      "registeredOffice" -> Json.obj(
-        "addressLine1" -> "38B",
-        "addressLine2" -> "Longbenton",
-        "addressLine3" -> JsNull,
-        "addressLine4" -> JsNull,
-        "postCode" -> "NE7 7DX"),
-      "correspondenceAddress" -> Json.obj(
-        "yourName" -> "Name",
-        "businessName" -> "Business Name",
-        "correspondenceAddressLine1" -> "address 1",
-        "correspondenceAddressLine2" -> "address 2",
-        "correspondenceAddressLine3" -> "address 3",
-        "correspondenceAddressLine4" -> "address 4",
-        "correspondencePostCode" -> "NE77 0QQ"
-      ),
-      "hasChanged" -> false
-    )
+  val completeJson = Json.obj(
+    "previouslyRegistered" -> Json.obj("previouslyRegistered" -> true,
+      "prevMLRRegNo" -> "12345678"),
+    "activityStartDate" -> Json.obj(
+      "startDate" -> "1990-02-24"),
+    "vatRegistered" -> Json.obj("registeredForVAT" -> true,
+      "vrnNumber" -> "123456789"),
+    "corporationTaxRegistered" -> Json.obj("registeredForCorporationTax" -> true,
+      "corporationTaxReference" -> "1234567890"),
+    "contactingYou" -> Json.obj(
+      "phoneNumber" -> "1234567890",
+      "email" -> "test@test.com"),
+    "registeredOffice" -> Json.obj(
+      "addressLine1" -> "38B",
+      "addressLine2" -> "Longbenton",
+      "addressLine3" -> JsNull,
+      "addressLine4" -> JsNull,
+      "postCode" -> "NE7 7DX"),
+    "correspondenceAddress" -> Json.obj(
+      "yourName" -> "Name",
+      "businessName" -> "Business Name",
+      "correspondenceAddressLine1" -> "address 1",
+      "correspondenceAddressLine2" -> "address 2",
+      "correspondenceAddressLine3" -> "address 3",
+      "correspondenceAddressLine4" -> "address 4",
+      "correspondencePostCode" -> "NE77 0QQ"
+    ),
+    "hasChanged" -> false
+  )
 
+  "AboutTheBusiness Serialisation" must {
     "Serialise as expected" in {
       Json.toJson(completeModel) must
         be(completeJson)
@@ -81,6 +81,15 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "Deserialise as expected" in {
       completeJson.as[AboutTheBusiness] must
         be(completeModel)
+    }
+  }
+
+  it when {
+    "hasChanged is missing from the Json" must {
+      "Deserialise correctly" in {
+        (completeJson - "hasChanged").as[AboutTheBusiness] must
+          be (completeModel)
+      }
     }
   }
 
@@ -145,18 +154,6 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       }
     }
   }
-
-
-  /*
-  previouslyRegistered: Opti
-  activityStartDate: Option[
-  vatRegistered: Option[VATR
-  corporationTaxRegistered:
-  contactingYou: Option[Cont
-  registeredOffice: Option[R
-  correspondenceAddress: Opt
-   */
-
 
   "AboutTheBusiness class" when {
     "previouslyRegistered value is set" which {

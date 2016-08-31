@@ -1,8 +1,10 @@
 package models.aboutthebusiness
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.libs.json.Json
+import play.api.libs.json.{Reads, Json}
+
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 
 case class AboutTheBusiness(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
@@ -66,7 +68,25 @@ object AboutTheBusiness {
 
   val key = "about-the-business"
 
-  implicit val format =  Json.format[AboutTheBusiness]
+  implicit val format = Json.writes[AboutTheBusiness]
+
+  implicit val jsonReads : Reads[AboutTheBusiness] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json.Reads._
+    import play.api.libs.json._
+
+    (
+      (__ \ "previouslyRegistered").readNullable[PreviouslyRegistered] and
+      (__ \ "activityStartDate").readNullable[ActivityStartDate] and
+      (__ \ "vatRegistered").readNullable[VATRegistered] and
+      (__ \ "corporationTaxRegistered").readNullable[CorporationTaxRegistered] and
+      (__ \ "contactingYou").readNullable[ContactingYou] and
+      (__ \ "registeredOffice").readNullable[RegisteredOffice] and
+      (__ \ "correspondenceAddress").readNullable[CorrespondenceAddress] and
+      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
+      ).apply(AboutTheBusiness.apply _)
+
+  }
 
   implicit def default(aboutTheBusiness: Option[AboutTheBusiness]): AboutTheBusiness =
     aboutTheBusiness.getOrElse(AboutTheBusiness())
