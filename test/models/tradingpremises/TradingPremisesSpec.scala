@@ -93,5 +93,24 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
       completeJson.as[TradingPremises] must
         be(completeModel)
     }
+
+    "isComplete" must {
+      "return true when tradingPremises contains complete data" in {
+
+        completeModel.isComplete must be(true)
+      }
+
+      "return false when tradingPremises contains incomplete data" in {
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), None)
+
+          tradingPremises.isComplete must be(false)
+      }
+
+      "return false when tradingPremises no data" in {
+        val tradingPremises = TradingPremises(None, None)
+
+        tradingPremises.isComplete must be(true)
+      }
+    }
   }
 }
