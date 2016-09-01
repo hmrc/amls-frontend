@@ -14,7 +14,7 @@
 
     <table>
         <tr>
-            <th>@Messages("businessactivities.confirm-activities.title")</th>
+            <th>@Messages("businessactivities.confirm-activities.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.InvolvedInOtherController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -40,7 +40,7 @@
     @model.expectedBusinessTurnover.map { turnover =>
         <table class="table--spaced-top">
             <tr>
-                <th>@Messages("businessactivities.business-turnover.title")</th>
+                <th>@Messages("businessactivities.business-turnover.heading")</th>
                 <td width="12"><a href="@controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -61,7 +61,7 @@
     @model.expectedAMLSTurnover.map { turnover =>
         <table class="table--spaced-top">
             <tr>
-                <th>@Messages("businessactivities.turnover.title")</th>
+                <th>@Messages("businessactivities.turnover.heading")</th>
                 <td width="12"><a href="@controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -82,7 +82,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.businessfranchise.title")</th>
+            <th>@Messages("businessactivities.businessfranchise.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.BusinessFranchiseController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -108,7 +108,7 @@
     @model.howManyEmployees.map { employees =>
         <table class="table--spaced-top">
             <tr>
-                <th>@Messages("businessactivities.employees.title")</th>
+                <th>@Messages("businessactivities.employees.heading")</th>
                 <td width="12"><a href="@controllers.businessactivities.routes.HowManyEmployeesController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -126,7 +126,7 @@
     @model.customersOutsideUK.map { boa =>
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.customer.outside.uk.title")</th>
+            <th>@Messages("businessactivities.customer.outside.uk.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.CustomersOutsideUKController.get(true)">Edit</a></td>
         </tr>
         @boa.countries.fold {
@@ -154,7 +154,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.keep.customer.records.title")</th>
+            <th>@Messages("businessactivities.keep.customer.records.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.TransactionRecordController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -187,7 +187,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.identify-suspicious-activity.title")</th>
+            <th>@Messages("businessactivities.identify-suspicious-activity.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.IdentifySuspiciousActivityController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -204,7 +204,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.ncaRegistered.title")</th>
+            <th>@Messages("businessactivities.ncaRegistered.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.NCARegisteredController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -221,7 +221,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.riskassessment.policy.title")</th>
+            <th>@Messages("businessactivities.riskassessment.policy.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.RiskAssessmentController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -249,30 +249,29 @@
             }
         }
     </table>
-
+@model.accountantForAMLSRegulations.map{x=>
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("businessactivities.accountantForAMLSRegulations.title")</th>
+            <th>@Messages("businessactivities.accountantForAMLSRegulations.heading")</th>
             <td width="12"><a href="@controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
             <td colspan="2">
-                @model.accountantForAMLSRegulations.map {x=>
-                    @x.accountantForAMLSRegulations match {
-                        case true =>  { @Messages("lbl.yes") }
-                        case false =>  { @Messages("lbl.no") }
-                    }
+                @x.accountantForAMLSRegulations match {
+                    case true =>  { @Messages("lbl.yes") }
+                    case false =>  { @Messages("lbl.no") }
                 }
             </td>
         </tr>
     </table>
+}
 
     @model.accountantForAMLSRegulations.map {x=>
         @x.accountantForAMLSRegulations match {
             case true => {
             <table class="table--spaced-top">
                 <tr>
-                    <th>@Messages("businessactivities.whoisyouraccountant.title")</th>
+                    <th>@Messages("businessactivities.whoisyouraccountant.heading")</th>
                     <td width="12"><a href="@controllers.businessactivities.routes.WhoIsYourAccountantController.get(true)">@Messages("button.edit")</a></td>
                 </tr>
                 @model.whoIsYourAccountant.map {accountant=>
