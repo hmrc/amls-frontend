@@ -33,7 +33,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "NE77 0QQ")
 
   val completeModel = AboutTheBusiness(
-    previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
+    previouslyRegistered = Some(previouslyRegistered),
     activityStartDate = Some(activityStartDate),
     vatRegistered = Some(regForVAT),
     corporationTaxRegistered = Some(regForCorpTax),
@@ -159,7 +159,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "previouslyRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.previouslyRegistered(completeModel.previouslyRegistered.get)
+          val res = completeModel.previouslyRegistered(previouslyRegistered)
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -177,7 +177,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "activityStartDate value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.activityStartDate(completeModel.activityStartDate.get)
+          val res = completeModel.activityStartDate(activityStartDate)
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -195,7 +195,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "vatRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.vatRegistered(completeModel.vatRegistered.get)
+          val res = completeModel.vatRegistered(regForVAT)
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -213,7 +213,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "corporationTaxRegistered value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.corporationTaxRegistered(completeModel.corporationTaxRegistered.get)
+          val res = completeModel.corporationTaxRegistered(regForCorpTax)
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -231,7 +231,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "contactingYou value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.contactingYou(completeModel.contactingYou.get)
+          val res = completeModel.contactingYou(contactingYou)
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -249,7 +249,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "registeredOffice value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.registeredOffice(completeModel.registeredOffice.get)
+          val res = completeModel.registeredOffice(regOfficeOrMainPlaceUK)
           res must be (completeModel)
           res.hasChanged must be (false)
         }
@@ -267,7 +267,7 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
     "correspondenceAddress value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.correspondenceAddress(completeModel.correspondenceAddress.get)
+          val res = completeModel.correspondenceAddress(uKCorrespondenceAddress)
           res must be (completeModel)
           res.hasChanged must be (false)
         }

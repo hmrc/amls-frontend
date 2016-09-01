@@ -163,7 +163,7 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
     "services value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.services(completeModel.services.get)
+          val res = completeModel.services(DefaultValues.DefaultServices)
           res must be(completeModel)
           res.hasChanged must be(false)
         }
@@ -181,7 +181,7 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
     "otherBusinessTaxMatters value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.otherBusinessTaxMatters(completeModel.otherBusinessTaxMatters.get)
+          val res = completeModel.otherBusinessTaxMatters(DefaultValues.DefaultOtherBusinessTax)
           res must be(completeModel)
           res.hasChanged must be(false)
         }
