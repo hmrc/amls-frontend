@@ -20,10 +20,6 @@
                         <th class="summary-title">
                             @personDetails.fullName
                         </th>
-                    }.getOrElse{
-                        <td>
-                            @Messages("missing.personName")
-                        </td>
                     }
                     <td>
                         <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit")

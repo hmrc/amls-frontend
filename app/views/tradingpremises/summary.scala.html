@@ -25,14 +25,16 @@
 
     @model.zipWithIndex.map { case (tp, y) =>
         <table class="spacesummary">
-            <tbody>
-            <tr>
-                @tp.yourTradingPremises.map { ytp =>
-                    <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
-                }
-                <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
-            </tr>
-            </tbody>
+
+            @tp.yourTradingPremises.map { ytp =>
+                <tbody>
+                <tr>
+                        <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
+                    <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
+                </tr>
+                </tbody>
+            }
+
         </table>
     }
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
