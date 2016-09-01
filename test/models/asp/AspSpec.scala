@@ -30,7 +30,8 @@ trait AspValues {
     "otherBusinessTaxMatters" -> Json.obj(
       "otherBusinessTaxMatters" -> true,
       "agentRegNo" -> "123456789"
-    )
+    ),
+    "hasChanged" -> false
   )
   val completeModel = Asp(
     Some(DefaultValues.DefaultServices),
@@ -41,8 +42,30 @@ trait AspValues {
 
 class AspSpec extends PlaySpec with MockitoSugar with AspValues {
 
-  "Asp" must {
+  "None" when {
 
+    val initial: Option[Asp] = None
+
+    "Merged with other business tax matters" must {
+      "return Asp with correct other business tax matters" in {
+        val result = initial.otherBusinessTaxMatters(NewValues.NewOtherBusinessTax)
+        result must be(Asp(otherBusinessTaxMatters = Some(NewValues.NewOtherBusinessTax), hasChanged = true))
+      }
+    }
+
+    "Merged with services" must {
+      "return Asp with correct services" in {
+        val result = initial.services(NewValues.NewServices)
+        result must be(Asp(services = Some(NewValues.NewServices), hasChanged = true))
+      }
+    }
+  }
+
+  "Asp" must {
+    "correctly show if the model is incomplete" in {
+      val incompleteModel = completeModel.copy(otherBusinessTaxMatters = None)
+      incompleteModel.isComplete must be(false)
+    }
 
     "have a default function that" must {
 
@@ -124,61 +147,43 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
         }
       }
     }
-
-    "None" when {
-
-      val initial: Option[Asp] = None
-
-      "correctly show if the model is incomplete" in {
-
-        val incompleteModel = completeModel.copy(otherBusinessTaxMatters = None)
-        incompleteModel.isComplete must be(false)
-      }
-
-      "Merged with other business tax matters" must {
-        "return Asp with correct other business tax matters" in {
-
-          val result = initial.otherBusinessTaxMatters(NewValues.NewOtherBusinessTax)
-          result must be(Asp(otherBusinessTaxMatters = Some(NewValues.NewOtherBusinessTax)))
-
-        }
-
-        "Merged with services does your business provide" must {
-          "return Asp with correct services does your business provide" in {
-
-            val result = initial.services(NewValues.NewServices)
-            result must be(Asp(services = Some(NewValues.NewServices)))
-
-          }
-        }
-
-      }
-    }
-
-    "Asp:merge with completeModel" when {
-
-      "model is complete" when {
-
-        "Merged with other business tax matters" must {
-          "return Asp with correct Company Service Providers" in {
-
-            val result = completeModel.otherBusinessTaxMatters(NewValues.NewOtherBusinessTax)
-            result.otherBusinessTaxMatters must be(Some(NewValues.NewOtherBusinessTax))
-
-          }
-        }
-
-        "Merged with services does your business provide" must {
-          "return Asp with correct services does your business provide" in {
-
-            val result = completeModel.services(NewValues.NewServices)
-            result.services must be(Some(NewValues.NewServices))
-
-          }
-        }
-      }
-    }
-
   }
 
+  "ASP class" when {
+    "services value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.services(completeModel.services.get)
+          res must be(completeModel)
+          res.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.services(ServicesOfBusiness(Set(BookKeeping)))
+          res.hasChanged must be(true)
+          res.services must be(Some(ServicesOfBusiness(Set(BookKeeping))))
+        }
+      }
+    }
+
+    "otherBusinessTaxMatters value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.otherBusinessTaxMatters(completeModel.otherBusinessTaxMatters.get)
+          res must be(completeModel)
+          res.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.otherBusinessTaxMatters(OtherBusinessTaxMattersYes("1452325"))
+          res.hasChanged must be(true)
+          res.otherBusinessTaxMatters must be(Some(OtherBusinessTaxMattersYes("1452325")))
+        }
+      }
+    }
+  }
 }

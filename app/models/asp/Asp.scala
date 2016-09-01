@@ -6,18 +6,18 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Asp(
               services: Option[ServicesOfBusiness] = None,
-              otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None
-
+              otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None,
+              hasChanged : Boolean = false
               ) {
 
   def services(p: ServicesOfBusiness): Asp =
-    this.copy(services = Some(p))
+    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p))
 
   def otherBusinessTaxMatters(p: OtherBusinessTaxMatters): Asp =
-    this.copy(otherBusinessTaxMatters = Some(p))
+    this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p))
 
   def isComplete: Boolean = this match {
-      case Asp(Some(_), Some(_)) => true
+      case Asp(Some(_), Some(_), _) => true
       case _ => false
   }
 }
