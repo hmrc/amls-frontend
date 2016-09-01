@@ -66,8 +66,9 @@ POST        /trading-premises/msb-activities/:index                     controll
 GET         /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get()
-GET         /trading-premises/trading-premise-details/:index                 controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
+GET         /trading-premises/your-answers                              controllers.tradingpremises.SummaryController.answers()
+GET         /trading-premises/trading-premise-details/:index            controllers.tradingpremises.SummaryController.getIndividual(index: Int)
 
 GET         /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
@@ -119,7 +120,8 @@ POST        /bank-details/accounts/:index                               controll
 GET         /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
-GET         /bank-details/check-your-answers                            controllers.bankdetails.SummaryController.get()
+GET         /bank-details/your-answers                                  controllers.bankdetails.SummaryController.get(complete: Boolean = true)
+GET         /bank-details/check-your-answers                            controllers.bankdetails.SummaryController.get(complete: Boolean = false)
 
 GET         /business-activities/what-you-need                          controllers.businessactivities.WhatYouNeedController.get()
 

@@ -482,6 +482,7 @@ summary.hvd = High Value Dealer
 summary.status = Anti-money laundering supervision registration
 
 summary.checkyouranswers.title = Check your answers
+summary.youranswers.title = Your answers
 summary.checkyouranswers.businesspremises.title = Your business’ premises
 summary.detailedanswers.title = Detailed answers
 summary.checkyouranswers.businesspremises.title = Your business'' premises
@@ -499,7 +500,7 @@ summary.businessactivities.checkyouranswers.title = Check your answers – Busin
 summary.aboutbusiness.checkyouranswers.title = Check your answers – About the business
 summary.estateagentbusiness.checkyouranswers.title = Check your answers – Estate Agency Business
 summary.tradingpremises.checkyouranswers.title = Check your answers – Trading premises
-summary.bankdetails.checkyouranswers.title = Check your answers – Bank details
+summary.bankdetails.checkyouranswers.title = Bank details - Check your answers
 summary.responsiblepeople.checkyouranswers.title = Check your answers – Responsible people
 summary.msb.checkyouranswers.title = Check your answers – Money Service Business
 summary.tcsp.checkyouranswers.title = Check your answers – Trust or Company Service Provider
@@ -635,11 +636,11 @@ tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
 tradingpremises.summary.mybusiness = My Business
 tradingpremises.summary.agents = Agent’s
-tradingpremises.summary.tradingstartdate = When will you start trading from these premises?
+tradingpremises.summary.tradingstartdate = Trading start date:
 tradingpremises.summary.address = Address:
-tradingpremises.summary.residential = Is this a residential address?
+tradingpremises.summary.residential = Residential address:
 tradingpremises.summary.who-uses = Who uses these premises?
-tradingpremises.summary.services = What does your business do at these premises?
+tradingpremises.summary.services = Services at this address:
 
 
 tradingpremises.agentcompanyname.title =Trading premises - What is your agent’s registered company name?

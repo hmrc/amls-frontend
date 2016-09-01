@@ -98,7 +98,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
           val result = controller.post(1, false)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
         }
 
         "editing and there is valid account type but no account details" in new Fixture {

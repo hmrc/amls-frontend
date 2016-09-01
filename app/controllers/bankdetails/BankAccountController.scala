@@ -37,7 +37,13 @@ trait BankAccountController extends RepeatingSection with BaseController {
               case Some(BankDetails(Some(x), _)) => Some(BankDetails(Some(x), Some(data)))
               case _ => Some(BankDetails(None, Some(data)))
             }
-          } yield Redirect(routes.BankAccountRegisteredController.get(index))
+          } yield {
+            if(edit) {
+              Redirect(routes.SummaryController.get(false))
+            } else {
+              Redirect(routes.BankAccountRegisteredController.get(index))
+            }
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
