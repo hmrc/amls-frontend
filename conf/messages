@@ -105,7 +105,7 @@ error.amx.length.bankdetails.account = You can’t enter more than 40 numbers or
 error.required.bankdetails.register.another.bank = Select yes or no to the question: do you want to register another bank account?
 
 ###############################  Business Activities ###############################
-error.required.ba.involved.in.other = Select yes or no to the question: Is your business involved in any other activities?
+error.required.ba.involved.in.other = Select yes or no to the question: is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
 error.invalid.ba.involved.in.other.text = You can''t enter more than 255 characters
 error.required.ba.business.turnover = Select how much total turnover you expect in the next 12 months.
@@ -124,11 +124,11 @@ error.required.ba.atleast.one.transaction.record = Select at least one method yo
 error.required.ba.software.package.name = Enter the name of the software package.
 error.max.length.ba.software.package.name = You can''t enter more than 40 characters for the names of the software packages.
 error.required.ba.select.nca = Select yes or no to the question: has your business registered online with the National Crime Agency?
-error.required.ba.option.risk.assessment = Select yes or no to the question: Does your business have a documented risk assessment policy and procedure?
+error.required.ba.option.risk.assessment = Select yes or no to the question: does your business have a documented risk assessment policy and procedure?
 error.required.ba.risk.assessment.format = Select at least one format for your formal risk assessment policy and procedure.
-error.required.ba.business.use.accountant = Select yes or no to the question: Does your business receive advice on Money Laundering Regulations and due diligence?
-error.required.ba.suspicious.activity = Select yes or no to the question:Does your business have written guidance for staff on how to identify and report suspicious activity?
-error.required.ba.tax.matters = Select yes or no to the question: Does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
+error.required.ba.business.use.accountant = Select yes or no to the question: does your business receive advice on Money Laundering Regulations and due diligence?
+error.required.ba.suspicious.activity = Select yes or no to the question: does your business have written guidance for staff on how to identify and report suspicious activity?
+error.required.ba.tax.matters = Select yes or no to the question: does this professional advisor also manage your tax affairs with HM Revenue and Customs (HMRC)?
 
 ###############################  Trading premises ###############################
 error.required.tp.activity.your.business.do = Select at least one activity that your business does at these premises.
@@ -154,7 +154,7 @@ error.required.tp.agent.name = Enter your agent’s name.
 error.invalid.tp.agent.name = You can’t enter more than 140 characters for the agent’s name.
 error.required.tp.agent.partnership = Enter your agent’s partners.
 error.invalid.tp.agent.partnership = You can’t enter more than 140 characters for the agent’s partners.
-error.required.tp.register.another.premises = Select yes or no to the question: Do you want to register another trading premises?
+error.required.tp.register.another.premises = Select yes or no to the question: do you want to register another trading premises?
 
 ###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
