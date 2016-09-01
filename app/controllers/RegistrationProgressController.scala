@@ -30,6 +30,7 @@ trait RegistrationProgressController extends BaseController {
         }.getOrElse(Ok(registration_progress(Seq.empty[Section], false)))
       }
   }
+  
 }
 
 object RegistrationProgressController extends RegistrationProgressController {

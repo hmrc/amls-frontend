@@ -46,7 +46,13 @@ object Asp {
     override def apply(): String = "asp"
   }
 
-  implicit val format = Json.format[Asp]
+  implicit val jsonWrites = Json.writes[Asp]
+
+  implicit val jsonReads : Reads[Asp] = {
+    (__ \ "services").readNullable[ServicesOfBusiness] and
+    (__ \ "otherBusinessTaxMatters").readNullable[OtherBusinessTaxMatters] and
+    (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+  }.apply(Asp.apply _)
 
   implicit def default(details: Option[Asp]): Asp =
     details.getOrElse(Asp())

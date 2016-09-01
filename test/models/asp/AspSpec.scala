@@ -1,5 +1,6 @@
 package models.asp
 
+import models.aboutthebusiness.AboutTheBusiness
 import models.registrationprogress.{Completed, Started, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
@@ -129,22 +130,31 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
         completeModel.isComplete must be(true)
       }
     }
+  }
 
-    "Complete Model" when {
+  "Asp Serialisation" must {
 
-      "correctly show if the model is complete" in {
-        completeModel.isComplete must be(true)
+    "correctly show if the model is complete" in {
+      completeModel.isComplete must be(true)
+    }
+
+    "correctly convert between json formats" when {
+
+      "Serialise as expected" in {
+        Json.toJson(completeModel) must be(completeJson)
       }
 
-      "correctly convert between json formats" when {
+      "Deserialise as expected" in {
+        completeJson.as[Asp] must be(completeModel)
+      }
+    }
+  }
 
-        "Serialise as expected" in {
-          Json.toJson(completeModel) must be(completeJson)
-        }
-
-        "Deserialise as expected" in {
-          completeJson.as[Asp] must be(completeModel)
-        }
+  it when {
+    "hasChanged field is missing from the Json" must {
+      "Deserialise correctly" in {
+        (completeJson - "hasChanged").as[Asp] must
+          be (completeModel)
       }
     }
   }
