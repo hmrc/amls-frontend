@@ -4,8 +4,11 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.SubscriptionResponse
 import models.registrationprogress.{Completed, Section}
+import play.api.mvc.Request
 import services.ProgressService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -20,6 +23,14 @@ trait RegistrationProgressController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
+     if (AmendmentsToggle.feature) {
+       getWithAmendments
+     } else {
+       getWithoutAmendments
+     }
+  }
+
+  def getWithAmendments(implicit hc : HeaderCarrier, ac : AuthContext, r : Request[_]) =
       dataCache.fetchAll map { cacheMapO =>
         cacheMapO.map { cacheMap : CacheMap =>
           val sections = service.sections(cacheMap)
@@ -29,8 +40,13 @@ trait RegistrationProgressController extends BaseController {
           }
         }.getOrElse(Ok(registration_progress(Seq.empty[Section], false)))
       }
-  }
-  
+
+  def getWithoutAmendments(implicit hc : HeaderCarrier, ac : AuthContext, r : Request[_]) =
+      service.sections map {
+        sections =>
+          Ok(registration_progress(sections, declarationAvailable(sections)))
+      }
+
 }
 
 object RegistrationProgressController extends RegistrationProgressController {

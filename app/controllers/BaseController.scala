@@ -14,6 +14,7 @@ trait BaseController extends FrontendController with Actions {
   protected val ResponsiblePeopleToggle = FeatureToggle(ApplicationConfig.responsiblePeopleToggle)
   protected val StatusToggle = FeatureToggle(ApplicationConfig.statusToggle)
   protected val HvdToggle = FeatureToggle(ApplicationConfig.hvdToggle)
+  protected val AmendmentsToggle = FeatureToggle(ApplicationConfig.amendmentsToggle)
 
   def notFoundView(implicit request: Request[_]) = {
     views.html.error(Messages("error.not-found.title"),

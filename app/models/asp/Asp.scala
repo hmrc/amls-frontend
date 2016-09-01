@@ -33,9 +33,9 @@ object Asp {
     cache.getEntry[Asp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, false, controllers.asp.routes.SummaryController.get())
+          Section(messageKey, Completed, model.hasChanged, controllers.asp.routes.SummaryController.get())
         } else {
-          Section(messageKey, Started, false, controllers.asp.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, model.hasChanged, controllers.asp.routes.WhatYouNeedController.get())
         }
     }
   }

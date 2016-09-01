@@ -67,4 +67,11 @@ object ApplicationConfig extends ServicesConfig {
     Logger.info(s"[ApplicationConfig][status-review] $value")
     value
   }
+
+  val amendmentsToggle: Boolean = {
+    val value = getConfBool("feature-toggle.amendments", false)
+    Logger.info(s"[ApplicationConfig][amendments] $value")
+    value
+  }
+
 }
