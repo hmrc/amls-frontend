@@ -409,6 +409,7 @@ select {
 .amls-error-summary {
   background-color: #fff;
   border: 5px solid #b10e1e;
+  margin-top: 24px;
 }
 
 .amls-error-summary li {
