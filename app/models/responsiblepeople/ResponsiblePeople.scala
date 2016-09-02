@@ -65,15 +65,15 @@ object ResponsiblePeople {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
-    val notStarted = Section(messageKey, NotStarted, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
-    val complete = Section(messageKey, Completed, controllers.responsiblepeople.routes.YourAnswersController.get())
+    val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
+    val complete = Section(messageKey, Completed, false, controllers.responsiblepeople.routes.YourAnswersController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
       case model if model forall {
         _.isComplete
       } => complete
       case model => {
         val index = model.indexWhere { m => !m.isComplete }
-        Section(messageKey, Started, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+        Section(messageKey, Started, false, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
       }
     }
   }

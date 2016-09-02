@@ -5,6 +5,7 @@ import connectors.DESConnector
 import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
+import play.api.Logger
 
 import scala.concurrent.Future
 import views.html.status.status
@@ -45,10 +46,14 @@ trait StatusController extends BaseController {
   }
 
   private def etmpStatus(implicit hc: HeaderCarrier,auth: AuthContext): Future[SubmissionStatus] = {
+    val loggingPrefix = "[StatusController][etmpStatus]"
+    Logger.debug(loggingPrefix)
     auth.enrolmentsUri match {
       case Some(uri) => {
+        Logger.debug(s"$loggingPrefix enrolments URI : $uri")
         enrolmentsService.amlsRegistrationNumber(uri) flatMap {
           case Some(amlsRegNumber) => desConnector.status(amlsRegNumber) map {
+            Logger.debug(s"$loggingPrefix AMLS Registration Number : $amlsRegNumber")
             response => response.formBundleStatus match {
               case "None" => SubmissionFeesDue
               case "Pending" => SubmissionReadyForReview
@@ -67,6 +72,7 @@ trait StatusController extends BaseController {
     Authorised.async {
       implicit authContext =>
         implicit request =>
+          val loggingPrefix = "[StatusController][Get]"
           landingService.cacheMap flatMap {
             case Some(cache) =>
               val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
