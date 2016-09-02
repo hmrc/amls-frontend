@@ -28,7 +28,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
         "professionalBody" -> "details",
         "penalisedUnderEstateAgentsAct" -> true,
         "penalisedUnderEstateAgentsActDetails" -> "test",
-        "hasChanged" -> false
+        "hasChanged" -> true
       )
 
       val completeModel = EstateAgentBusiness(
@@ -36,17 +36,15 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
         redressScheme =  Some(redressSchemeOther),
         professionalBody = Some(professionalBody),
         penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct),
-        hasChanged = false
+        hasChanged = true
       )
 
       "Serialise as expected" in {
-
         Json.toJson(completeModel) must
           be(completeJson)
       }
 
       "Deserialise as expected" in {
-
         completeJson.as[EstateAgentBusiness] must
           be(completeModel)
       }
@@ -107,7 +105,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
       "return EstateAgentBusiness with correct business services" in {
         val newServices = Services(Set(Commercial, Auction, Residential))
         val result = initial.services(newServices)
-        result must be (EstateAgentBusiness(Some(newServices),  Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct)))
+        result must be (EstateAgentBusiness(Some(newServices),  Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct), hasChanged = true))
       }
     }
 

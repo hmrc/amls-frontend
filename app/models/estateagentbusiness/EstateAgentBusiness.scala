@@ -35,12 +35,11 @@ object EstateAgentBusiness {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "eab"
     val notStarted = Section(messageKey, NotStarted, false, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
-    val complete = Section(messageKey, Completed, false, controllers.estateagentbusiness.routes.SummaryController.get(true))
 
     cache.getEntry[EstateAgentBusiness](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          val complete = Section(messageKey, Completed, model.hasChanged, controllers.estateagentbusiness.routes.SummaryController.get(true))
+          Section(messageKey, Completed, model.hasChanged, controllers.estateagentbusiness.routes.SummaryController.get(true))
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
         }
