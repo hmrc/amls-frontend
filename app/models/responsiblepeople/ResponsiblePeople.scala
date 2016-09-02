@@ -56,6 +56,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
       Some(_), _) => true
+    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None) => true
     case _ => false
   }
 }

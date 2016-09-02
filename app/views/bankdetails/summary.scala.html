@@ -29,67 +29,66 @@
         </div>
         <br><br>
     }
-
-
         @model.zipWithIndex.map { case (x, y) =>
+            @x.bankAccount.map {bankAccount =>
             <table>
                 <tr>
-                    @x.bankAccount.map {bankAccount =>
-                        @bankAccount.account match {
-                            case f:UKAccount => {
-                                <td width="75%">
-                                    @bankAccount.accountName
-                                    <br>
-                                    @Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode
-                                    <br>
-                                    @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
-                                    <br>
-                                    @Messages("lbl.uk") @Messages("bankdetails.summary.bankaccount")
-                                    <br>
-                                    @x.bankAccountType.map {
-                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                    }
-                                </td>
+                @bankAccount.account match {
+                    case f:UKAccount => {
+                        <td width="75%">
+                            @bankAccount.accountName
+                            <br>
+                            @Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode
+                            <br>
+                            @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
+                            <br>
+                            @Messages("lbl.uk") @Messages("bankdetails.summary.bankaccount")
+                            <br>
+                            @x.bankAccountType.map {
+                            case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                            case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                            case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                             }
-                            case f:NonUKAccountNumber => {
-                                <td width="75%">
-                                    @bankAccount.accountName
-                                    <br>
-                                    @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
-                                    <br>
-                                    @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
-                                    <br>
-                                    @x.bankAccountType.map {
-                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                    }
-                                </td>
-                            }
-                            case f:NonUKIBANNumber => {
-                                    <td width="75%">
-                                        @bankAccount.accountName
-                                        <br>
-                                        @Messages("bankdetails.bankaccount.iban"): @f.IBANNumber
-                                        <br>
-                                        @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
-                                        <br>
-                                        @x.bankAccountType.map {
-                                        case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                        case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                        case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                        }
-                                    </td>
-                            }
-                        }
+                        </td>
                     }
-                    <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
+                    case f:NonUKAccountNumber => {
+                        <td width="75%">
+                            @bankAccount.accountName
+                            <br>
+                            @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
+                            <br>
+                            @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
+                            <br>
+                            @x.bankAccountType.map {
+                            case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                            case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                            case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                            }
+                        </td>
+                    }
+                    case f:NonUKIBANNumber => {
+                            <td width="75%">
+                                @bankAccount.accountName
+                                <br>
+                                @Messages("bankdetails.bankaccount.iban"): @f.IBANNumber
+                                <br>
+                                @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
+                                <br>
+                                @x.bankAccountType.map {
+                                case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                }
+                            </td>
+                    }
+                }
+                <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
 
                 </tr>
 
-            </table>
+             </table>
+            }
+
         }
 
     @if(complete) {

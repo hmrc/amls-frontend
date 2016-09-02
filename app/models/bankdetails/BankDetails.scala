@@ -18,6 +18,7 @@ case class BankDetails (
   def isComplete: Boolean =
     this match {
       case BankDetails(Some(_), Some(_)) => true
+      case BankDetails(None, None) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
