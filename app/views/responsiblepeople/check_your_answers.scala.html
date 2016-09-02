@@ -15,20 +15,18 @@
     <table>
         <tbody>
             @model.zipWithIndex.map { case (responsiblePerson, idx)=>
-                <tr>
-                    @responsiblePerson.personName.map { personDetails =>
-                        <th class="summary-title">
-                            @personDetails.fullName
-                        </th>
-                    }.getOrElse{
-                        <td>
-                            @Messages("missing.personName")
-                        </td>
-                    }
+
+                @responsiblePerson.personName.map { personDetails =>
+                 <tr>
+                    <th class="summary-title">
+                        @personDetails.fullName
+                    </th>
                     <td>
                         <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit")
                     </td>
                 </tr>
+                }
+
             }
         </tbody>
     </table>

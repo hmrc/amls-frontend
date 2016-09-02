@@ -113,6 +113,12 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       bankDetails.isComplete must be(false)
     }
+
+    "return false when BankDetails no data" in {
+      val bankDetails = BankDetails(None, None)
+
+      bankDetails.isComplete must be(true)
+    }
   }
 
   "Section" must {

@@ -19,7 +19,7 @@ trait PremisesRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
-          case Some(data) => Ok(views.html.tradingpremises.premises_registered(EmptyForm, data.size))
+          case Some(data) => Ok(views.html.tradingpremises.premises_registered(EmptyForm, data.count(_.yourTradingPremises.isDefined)))
           case _ => Ok(views.html.tradingpremises.premises_registered(EmptyForm, index))
         }
     }
