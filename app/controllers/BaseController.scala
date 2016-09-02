@@ -10,11 +10,11 @@ import utils.{FeatureToggle, JsonMapping}
 
 trait BaseController extends FrontendController with Actions {
 
-  protected val Authorised = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence)
-  protected val ResponsiblePeopleToggle = FeatureToggle(ApplicationConfig.responsiblePeopleToggle)
-  protected val StatusToggle = FeatureToggle(ApplicationConfig.statusToggle)
-  protected val HvdToggle = FeatureToggle(ApplicationConfig.hvdToggle)
-  protected val AmendmentsToggle = FeatureToggle(ApplicationConfig.amendmentsToggle)
+  protected def Authorised = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence)
+  protected def ResponsiblePeopleToggle = FeatureToggle(ApplicationConfig.responsiblePeopleToggle)
+  protected def StatusToggle = FeatureToggle(ApplicationConfig.statusToggle)
+  protected def HvdToggle = FeatureToggle(ApplicationConfig.hvdToggle)
+  protected def AmendmentsToggle = FeatureToggle(ApplicationConfig.amendmentsToggle)
 
   def notFoundView(implicit request: Request[_]) = {
     views.html.error(Messages("error.not-found.title"),

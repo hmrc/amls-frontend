@@ -5,11 +5,11 @@ import uk.gov.hmrc.play.config.ServicesConfig
 import play.api.Play.current
 
 trait ApplicationConfig {
-  val hvdToggle : Boolean
-  val responsiblePeopleToggle : Boolean
-  val enrolmentToggle : Boolean
-  val statusToggle : Boolean
-  val amendmentsToggle : Boolean
+  def hvdToggle : Boolean
+  def responsiblePeopleToggle : Boolean
+  def enrolmentToggle : Boolean
+  def statusToggle : Boolean
+  def amendmentsToggle : Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -52,31 +52,31 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFee = getConfigInt("amounts.people")
 
-  val hvdToggle: Boolean = {
+  def hvdToggle: Boolean = {
     val value = getConfBool("feature-toggle.hvd", false)
     Logger.info("s[ApplicationConfig][hvd]")
     value
   }
 
-  val responsiblePeopleToggle: Boolean = {
+  def responsiblePeopleToggle: Boolean = {
     val value = getConfBool("feature-toggle.responsible-people", false)
     Logger.info(s"[ApplicationConfig][responsible-people] $value")
     value
   }
 
-  val enrolmentToggle: Boolean = {
+  def enrolmentToggle: Boolean = {
     val value = getConfBool("feature-toggle.gg-enrolment", false)
     Logger.info(s"[ApplicationConfig][gg-enrolment] $value")
     value
   }
 
-  val statusToggle: Boolean = {
+  def statusToggle: Boolean = {
     val value = getConfBool("feature-toggle.status-review", false)
     Logger.info(s"[ApplicationConfig][status-review] $value")
     value
   }
 
-  val amendmentsToggle: Boolean = {
+  def amendmentsToggle: Boolean = {
     val value = getConfBool("feature-toggle.amendments", false)
     Logger.info(s"[ApplicationConfig][amendments] $value")
     value

@@ -13,10 +13,11 @@ import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+
 trait RegistrationProgressController extends BaseController {
 
-  protected def service: ProgressService
-  protected def dataCache : DataCacheConnector
+  protected[controllers] def service: ProgressService
+  protected[controllers] def dataCache : DataCacheConnector
 
   private def declarationAvailable(seq: Seq[Section]): Boolean =
     seq forall { _.status == Completed }
@@ -51,7 +52,7 @@ trait RegistrationProgressController extends BaseController {
 
 object RegistrationProgressController extends RegistrationProgressController {
   // $COVERAGE-OFF$
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override protected val service = ProgressService
-  override protected val dataCache = DataCacheConnector
+  override protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector
+  override protected[controllers] val service = ProgressService
+  override protected[controllers] val dataCache = DataCacheConnector
 }
