@@ -4,34 +4,39 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @target = @{
-s"""${f("paymentDate").id}-fieldset"""
+    s"""${f("paymentDate").id}-fieldset"""
+}
+
+@header = {
+    @heading("hvd.cash.payment.heading", "summary.hvd")
 }
 
 @main(
-title = Messages("hvd.cash.payment.title")
+    title = Messages("hvd.cash.payment.title"),
+    heading = header
 )  {
-
-    @heading("hvd.cash.payment.heading", "summary.hvd")
 
     @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
 
-        <p>@Messages("hvd.cash.payment.convert.currency.text")</p>
-
         <div class="form-field-group">
-        @inlineRadioGroup(f("acceptedAnyPayment")) {
-            @radio(f("acceptedAnyPayment"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("acceptedAnyPayment"), "lbl.no", "false")
-            @fieldset("hvd.cash.payment.data.text", jsHidden = true, id = target) {
-                @date(
-                    f = f,
-                    p = "paymentDate",
-                    labelText = "hvd.cash.payment.data.text",
-                    hintText = "hvd.cash.payment.date.example",
-                    false
-                )
+            @inlineRadioGroup(f("acceptedAnyPayment")) {
+            @legend("hvd.cash.payment.convert.currency.text")
+                @radio(f("acceptedAnyPayment"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("acceptedAnyPayment"), "lbl.no", "false")
+                @fieldset(
+                    legend = "hvd.cash.payment.data.text",
+                    jsHidden = true,
+                    id = target) {
+                    @date(
+                        f = f,
+                        p = "paymentDate",
+                        labelText = "hvd.cash.payment.data.text",
+                        hintText = "hvd.cash.payment.date.example",
+                        false
+                    )
+                }
             }
         </div>
-        }
         @submit(edit)
    }
 }

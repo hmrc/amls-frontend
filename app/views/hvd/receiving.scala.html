@@ -4,39 +4,40 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @target = @{
-  f("paymentMethods").id
+    f("paymentMethods").id
 }
 
 @header = {
-  @heading("hvd.receiving.heading", "summary.hvd")
+    @heading("hvd.receiving.heading", "summary.hvd")
 }
 
 @main(
-  title = Messages("hvd.receiving.title"),
-  heading = header
+    title = Messages("hvd.receiving.title"),
+    heading = header
 ) {
 
-  @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
+    @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
 
-    <p>@Messages("hvd.receiving.convert.currency.text")</p>
+        @inlineRadioGroup(f("receivePayments")) {
+            @legend("hvd.receiving.convert.currency.text")
+            @radio(f("receivePayments"), "lbl.yes", "true", target = s"#$target")
+            @radio(f("receivePayments"), "lbl.no", "false")
+        }
 
-    @inlineRadioGroup(f("receivePayments")) {
-      @radio(f("receivePayments"), "lbl.yes", "true", target = s"#$target")
-      @radio(f("receivePayments"), "lbl.no", "false")
+        @radioGroup(f("paymentMethods"), classes = Seq("form-field form-field-group-end panel-indent")) {
+            @legend(
+                legend = "hvd.receiving.expect.to.receive",
+                bold = true,
+                hint = "lbl.select.all")
+            @checkbox(f("paymentMethods.courier"), "hvd.receiving.option.01", "true")
+            @checkbox(f("paymentMethods.direct"), "hvd.receiving.option.02", "true")
+            @checkbox(f("paymentMethods.other"), "hvd.receiving.option.03", "true", target = "#receive-payments-other")
+
+            @fieldset("hvd.receiving.give.details", panel = false, id = "receive-payments-other", classes = Seq("visuallyhidden-legend")) {
+                @input(f("paymentMethods.details"), labelText = "hvd.receiving.give.details")
+            }
+        }
+
+        @submit(edit)
     }
-
-    @* @fieldset("hvd.receiving.expect.to.receive", id = target, classes = Seq("form-field-group-end"), bold = true, hint = "lbl.select.all") { *@
-    @radioGroup(f("paymentMethods"), classes = Seq("form-fieldform-field-group-end panel-indent")) {
-      @legend("hvd.receiving.expect.to.receive")
-      @checkbox(f("paymentMethods.courier"), "hvd.receiving.option.01", "true")
-      @checkbox(f("paymentMethods.direct"), "hvd.receiving.option.02", "true")
-      @checkbox(f("paymentMethods.other"), "hvd.receiving.option.03", "true", target = "#receive-payments-other")
-
-      @fieldset("hvd.receiving.give.details", panel = false, id = "receive-payments-other") {
-        @input(f("paymentMethods.details"))
-      }
-    }
-
-    @submit(edit)
-  }
 }

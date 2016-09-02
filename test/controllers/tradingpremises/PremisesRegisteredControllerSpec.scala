@@ -2,7 +2,8 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePeople
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -44,9 +45,11 @@ class PremisesRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with
       }
 
       "load the Premises Registered page1" in new Fixture {
+        val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
+          true, new LocalDate(1990, 2, 24))
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(None,None), TradingPremises(None,None)))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None,Some(ytp)), TradingPremises(None,Some(ytp))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)

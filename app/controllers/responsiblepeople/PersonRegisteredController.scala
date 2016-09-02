@@ -19,7 +19,7 @@ trait PersonRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-          case Some(data) => Ok(person_registered(EmptyForm, data.size))
+          case Some(data) => Ok(person_registered(EmptyForm, data.count(_.personName.isDefined)))
           case _ => Ok(person_registered(EmptyForm, index))
         }
     }
