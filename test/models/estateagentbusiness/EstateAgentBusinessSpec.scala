@@ -27,10 +27,17 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
         "penalised" -> true,
         "professionalBody" -> "details",
         "penalisedUnderEstateAgentsAct" -> true,
-        "penalisedUnderEstateAgentsActDetails" -> "test"
+        "penalisedUnderEstateAgentsActDetails" -> "test",
+        "hasChanged" -> false
       )
 
-      val completeModel = EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct))
+      val completeModel = EstateAgentBusiness(
+        services = Some(services),
+        redressScheme =  Some(redressSchemeOther),
+        professionalBody = Some(professionalBody),
+        penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct),
+        hasChanged = false
+      )
 
       "Serialise as expected" in {
 
