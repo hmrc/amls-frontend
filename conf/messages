@@ -754,7 +754,7 @@ bankdetails.summary.accounttype.lbl.02 = My business’s account
 bankdetails.summary.accounttype.lbl.03 = Another business’s account
 bankdetails.summary.nobank.account = You currently have no bank accounts registered
 bankdetails.summary.nobank.add.account = Add a bank account
-bankdetails.confirm-activities.subtitle = You’ve told us your business does this:
+bankdetails.confirm-activities.subtitle = You’ve told us your business type is
 
 
 bankdetails.bank.account.registered.title = Bank account registered
@@ -840,7 +840,8 @@ businessactivities.whoisyouraccountant.title = Who is your professional advisor?
 businessactivities.whoisyouraccountant.heading = Who is your professional advisor?
 businessactivities.involved.other.title = Other activities – What you need
 businessactivities.involved.other.heading = Other activities
-businessactivities.involved.other.legend = Is your business involved in other activities, which are not covered by Money Laundering Regulations?
+businessactivities.involved.other.legend = Is your business involved in other activities?
+businessactivities.involved.other.hint = For example: you would select ''yes'' if your business was a newsagents shop which sent money overseas. The shop would be classed as a Money Service Business. The other activities would be the newsagents part of the business.
 businessactivities.whoisyouraccountant.name = Name
 businessactivities.whoisyouraccountant.tradingName = Trading name (if different)
 businessactivities.whoisyouraccountant.address = Address
