@@ -15,50 +15,51 @@ case class BusinessActivities(
                                identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None,
                                riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
                                howManyEmployees: Option[HowManyEmployees] = None,
-                               whoIsYourAccountant: Option[WhoIsYourAccountant] = None
+                               whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
+                               hasChanged : Boolean = false
                              ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
-    this.copy(businessFranchise = Some(p))
+    this.copy(businessFranchise = Some(p), hasChanged = hasChanged || !this.businessFranchise.contains(p))
 
   def expectedAMLSTurnover(p: ExpectedAMLSTurnover): BusinessActivities =
-    this.copy(expectedAMLSTurnover = Some(p))
+    this.copy(expectedAMLSTurnover = Some(p), hasChanged = hasChanged || !this.expectedAMLSTurnover.contains(p))
 
   def expectedBusinessTurnover(p: ExpectedBusinessTurnover): BusinessActivities =
-    this.copy(expectedBusinessTurnover = Some(p))
+    this.copy(expectedBusinessTurnover = Some(p), hasChanged = hasChanged || !this.expectedBusinessTurnover.contains(p))
 
   def involvedInOther(p: InvolvedInOther): BusinessActivities =
-    this.copy(involvedInOther = Some(p))
+    this.copy(involvedInOther = Some(p), hasChanged = hasChanged || !this.involvedInOther.contains(p))
 
   def identifySuspiciousActivity(p: IdentifySuspiciousActivity): BusinessActivities =
-    this.copy(identifySuspiciousActivity = Some(p))
+    this.copy(identifySuspiciousActivity = Some(p), hasChanged = hasChanged || !this.identifySuspiciousActivity.contains(p))
 
   def transactionRecord(p: TransactionRecord): BusinessActivities =
-    this.copy(transactionRecord = Some(p))
+    this.copy(transactionRecord = Some(p), hasChanged = hasChanged || !this.transactionRecord.contains(p))
 
   def customersOutsideUK(p: CustomersOutsideUK): BusinessActivities =
-    this.copy(customersOutsideUK = Some(p))
+    this.copy(customersOutsideUK = Some(p), hasChanged = hasChanged || !this.customersOutsideUK.contains(p))
 
   def ncaRegistered(p: NCARegistered): BusinessActivities =
-    this.copy(ncaRegistered = Some(p))
+    this.copy(ncaRegistered = Some(p), hasChanged = hasChanged || !this.ncaRegistered.contains(p))
 
   def accountantForAMLSRegulations(p: AccountantForAMLSRegulations): BusinessActivities =
-    this.copy(accountantForAMLSRegulations = Some(p))
+    this.copy(accountantForAMLSRegulations = Some(p), hasChanged = hasChanged || !this.accountantForAMLSRegulations.contains(p))
 
-  def riskAssessmentspolicy(p: RiskAssessmentPolicy): BusinessActivities =
-    this.copy(riskAssessmentPolicy = Some(p))
+  def riskAssessmentPolicy(p: RiskAssessmentPolicy): BusinessActivities =
+    this.copy(riskAssessmentPolicy = Some(p), hasChanged = hasChanged || !this.riskAssessmentPolicy.contains(p))
 
-  def employees(p: HowManyEmployees): BusinessActivities =
-    this.copy(howManyEmployees = Some(p))
+  def howManyEmployees(p: HowManyEmployees): BusinessActivities =
+    this.copy(howManyEmployees = Some(p), hasChanged = hasChanged || !this.howManyEmployees.contains(p))
 
   def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
-    this.copy(whoIsYourAccountant = Some(p))
+    this.copy(whoIsYourAccountant = Some(p), hasChanged = hasChanged || !this.whoIsYourAccountant.contains(p))
 
   def isComplete: Boolean =
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
-      Some(_), Some(x), Some(_), Some(_), Some(_), _
+      Some(_), Some(_), Some(_), Some(_), Some(_), _, _
       ) => true
       case _ => false
     }
@@ -72,9 +73,9 @@ object BusinessActivities {
     cache.getEntry[BusinessActivities](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, false, controllers.businessactivities.routes.SummaryController.get())
+          Section(messageKey, Completed, model.hasChanged, controllers.businessactivities.routes.SummaryController.get())
         } else {
-          Section(messageKey, Started, false, controllers.businessactivities.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, model.hasChanged, controllers.businessactivities.routes.WhatYouNeedController.get())
         }
     }
   }
@@ -96,7 +97,8 @@ object BusinessActivities {
       __.read[Option[IdentifySuspiciousActivity]] and
       __.read[Option[RiskAssessmentPolicy]] and
       __.read[Option[HowManyEmployees]] and
-      __.read[Option[WhoIsYourAccountant]]
+      __.read[Option[WhoIsYourAccountant]] and
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
@@ -113,7 +115,8 @@ object BusinessActivities {
         Json.toJson(model.identifySuspiciousActivity).asOpt[JsObject],
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject],
-        Json.toJson(model.whoIsYourAccountant).asOpt[JsObject]
+        Json.toJson(model.whoIsYourAccountant).asOpt[JsObject],
+        Json.toJson(model.hasChanged).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       }
