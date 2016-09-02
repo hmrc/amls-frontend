@@ -783,3 +783,22 @@ fieldset.panel-indent legend {
 .panel-border-wide {
     border-left-width: 10px;
 }
+
+/* -- What you need: column source order is different on this page -- */
+.what-you-need > .grid-layout__column--1-3 {
+  float: right;
+}
+
+.what-you-need > .grid-layout__column--2-3 {
+  float: left;
+}
+
+@media screen and (max-width: 640px) {
+  .what-you-need > .grid-layout__column--1-3 {
+    margin: 0 15px 15px;
+  }
+
+  .declaration p {
+    margin: 0;
+  }
+}
