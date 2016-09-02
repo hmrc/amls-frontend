@@ -2,7 +2,7 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching)(implicit request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_])
 
 @target = @{
     s"""${f("details").id}-fieldset"""
@@ -17,29 +17,17 @@
     heading = header
 )  {
 
-    <p>@Messages("bankdetails.confirm-activities.subtitle")</p>
 
-    @bmModel.activities.map { a=>
-    <ul class="panel-indent panel-indent--gutter panel-border-wide">
-        @a.businessActivities.map {line =>
-            @line match {
-                case AccountancyServices => {<li>@Messages("businessmatching.registerservices.servicename.lbl.01")</li>}
-                case BillPaymentServices => {<li>@Messages("businessmatching.registerservices.servicename.lbl.02")</li>}
-                case EstateAgentBusinessService => {<li>@Messages("businessmatching.registerservices.servicename.lbl.03")</li>}
-                case HighValueDealing => {<li>@Messages("businessmatching.registerservices.servicename.lbl.04")</li>}
-                case MoneyServiceBusiness => {<li>@Messages("businessmatching.registerservices.servicename.lbl.05")</li>}
-                case TrustAndCompanyServices => {<li>@Messages("businessmatching.registerservices.servicename.lbl.06")</li>}
-                case TelephonePaymentService => {<li>@Messages("businessmatching.registerservices.servicename.lbl.07")</li>}
-            }
-        }
-    </ul>
-    }
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
         <div class="form-field-group">
+            @Messages("bankdetails.confirm-activities.subtitle") @businessTypes @Messages("businessactivities.involved.other.legend")
             @inlineRadioGroup(f("involvedInOther")) {
-                @legend("businessactivities.involved.other.legend")
+                 <span class="form-hint">
+                    @Messages("businessactivities.involved.other.hint")
+                </span>
+
                 @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("involvedInOther"), "lbl.no", "false")
                 @fieldset(
