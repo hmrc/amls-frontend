@@ -1,7 +1,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.{PersonName, PreviousName, ResponsiblePeople}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -46,6 +47,19 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,None), ResponsiblePeople(None,None)))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("responsiblepeople.have.registered.person.text", 0))
+      }
+
+      "load the Person Registered page 2" in new Fixture {
+        val previousName = PreviousName(Some("Matt"), Some("Mc"), Some("Fly"), new LocalDate(1990, 2, 24))
+        val personName = PersonName("John", Some("Envy"), "Doe", Some(previousName), Some("name"))
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(personName),None), ResponsiblePeople(Some(personName),None)))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
