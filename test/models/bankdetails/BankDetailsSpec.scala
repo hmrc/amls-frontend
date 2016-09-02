@@ -125,7 +125,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
     val cache = mock[CacheMap]
 
     "return a NotStarted Section when model is empty" in {
-      val notStartedSection = Section("bankdetails", NotStarted, controllers.bankdetails.routes.BankAccountAddController.get(true))
+      val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn None
 
@@ -138,7 +138,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
       val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
       val complete = Seq(bankDetails)
-      val completedSection = Section("bankdetails", Completed, controllers.bankdetails.routes.SummaryController.get(true))
+      val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
 
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(complete)
@@ -151,7 +151,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       val bankDetails = BankDetails(Some(accountType), None)
       val incompleteTcsp = Seq(bankDetails)
-      val startedSection = Section("bankdetails", Started, controllers.bankdetails.routes.WhatYouNeedController.get(1))
+      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incompleteTcsp)
 

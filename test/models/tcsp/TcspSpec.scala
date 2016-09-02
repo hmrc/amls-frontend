@@ -86,7 +86,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
       "return a NotStarted Section when model is empty" in {
 
-        val notStartedSection = Section("tcsp", NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("tcsp", NotStarted, false,  controllers.tcsp.routes.WhatYouNeedController.get())
 
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn None
 
@@ -97,7 +97,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Tcsp]
-        val completedSection = Section("tcsp", Completed, controllers.tcsp.routes.SummaryController.get())
+        val completedSection = Section("tcsp", Completed, false,  controllers.tcsp.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
@@ -109,7 +109,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "return a Started Section when model is incomplete" in {
 
         val incompleteTcsp = mock[Tcsp]
-        val startedSection = Section("tcsp", Started, controllers.tcsp.routes.WhatYouNeedController.get())
+        val startedSection = Section("tcsp", Started, false,  controllers.tcsp.routes.WhatYouNeedController.get())
 
         when(incompleteTcsp.isComplete) thenReturn false
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(incompleteTcsp)

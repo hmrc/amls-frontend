@@ -40,13 +40,13 @@ object BusinessMatching {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessmatching"
     val incomplete =
-      Section(messageKey, NotStarted, controllers.businessmatching.routes.RegisterServicesController.get())
+      Section(messageKey, NotStarted, false, controllers.businessmatching.routes.RegisterServicesController.get())
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.businessmatching.routes.SummaryController.get())
+          Section(messageKey, Completed, false, controllers.businessmatching.routes.SummaryController.get())
         } else {
-          Section(messageKey, Started, controllers.businessmatching.routes.RegisterServicesController.get())
+          Section(messageKey, Started, false, controllers.businessmatching.routes.RegisterServicesController.get())
         }
     }
   }

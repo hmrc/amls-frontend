@@ -38,6 +38,11 @@ a.block-link {
   margin-top: 0;
 }
 
+.progress-steps__amend li:first-child {
+  display: none;
+  visibility: hidden;
+}
+
 /* -- Progress Step: assets (tick & chevrons) -- */
 .progress-step--status,
 .no-svg .progress-step--status {
@@ -55,15 +60,18 @@ a.block-link {
 .progress-step:focus .progress-step--status,
 .progress-step:hover .progress-step--status,
 .progress-step__started:focus .progress-step--status,
-.progress-step__started:hover .progress-step--status {
+.progress-step__started:hover .progress-step--status,
+.progress-steps__amend .progress-step_changed {
   background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
 }
+
 
 .no-svg .progress-step__started .progress-step--status,
 .no-svg .progress-step:focus .progress-step--status,
 .no-svg .progress-step:hover .progress-step--status,
 .no-svg .progress-step__started:focus .progress-step--status,
-.no-svg .progress-step__started:hover .progress-step--status {
+.no-svg .progress-step__started:hover .progress-step--status,
+.no-svg .progress-steps__amend .progress-step_changed {
   background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
 }
 
@@ -162,7 +170,8 @@ a.progress-step,
 .progress-step:focus .progress-step--status,
 .progress-step:hover .progress-step--status,
 .progress-step__started:focus .progress-step--status,
-.progress-step__started:hover .progress-step--status {
+.progress-step__started:hover .progress-step--status,
+.progress-steps__amend .progress-step_changed{
   color: #fff;
 }
 
@@ -185,27 +194,29 @@ a.progress-step,
   border-bottom-color: #f9641a;
 }
 
-.progress-step__started .progress-step--status {
+.progress-step__started .progress-step--status .progress-steps__amend {
   display: flex;
 }
 
-.progress-step__started .progress-step--status-time {
+.progress-step__started .progress-step--status-time .progress-steps__amend {
   align-self: center;
   flex: 1;
   padding-bottom: 15px; /* add bottom padding to help centre it for the flex browsers */
 }
 
-.progress-step__started .progress-step--status-time .font-xsmall {
+.progress-step__started .progress-step--status-time .font-xsmall .progress-steps__amend {
   margin: 0;
 }
 
 /* -- Progress Step: completed -- */
 .progress-step__complete .progress-step--status,
 .progress-step__complete:focus .progress-step--status,
-.progress-step__complete:hover .progress-step--status {
+.progress-step__complete:hover .progress-step--status,
+.progress-steps__amend .progress-step_changed{
   background-color: #28a197;
   border-bottom-color: #088277;
 }
+
 
 @media screen and (max-width: 480px) {
   .progress-step--status,
@@ -782,6 +793,17 @@ fieldset.panel-indent legend {
 
 .panel-border-wide {
     border-left-width: 10px;
+}
+
+
+.progress-steps__amend .progress-step--status {
+    display:flex
+}
+
+.progress-steps__amend .progress-step--status-time {
+    align-self: center;
+    flex: 1;
+    padding-bottom: 15px;
 }
 
 /* -- What you need: column source order is different on this page -- */

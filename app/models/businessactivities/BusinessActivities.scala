@@ -68,13 +68,13 @@ object BusinessActivities {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessactivities"
-    val notStarted = Section(messageKey, NotStarted, controllers.businessactivities.routes.WhatYouNeedController.get())
+    val notStarted = Section(messageKey, NotStarted, false, controllers.businessactivities.routes.WhatYouNeedController.get())
     cache.getEntry[BusinessActivities](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.businessactivities.routes.SummaryController.get())
+          Section(messageKey, Completed, false, controllers.businessactivities.routes.SummaryController.get())
         } else {
-          Section(messageKey, Started, controllers.businessactivities.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, false, controllers.businessactivities.routes.WhatYouNeedController.get())
         }
     }
   }
