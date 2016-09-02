@@ -1,7 +1,7 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.DESConnector
+import connectors.{DESConnector, KeystoreConnector}
 import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
@@ -18,8 +18,11 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 trait StatusController extends BaseController {
 
   private[controllers] def landingService: LandingService
+
   private[controllers] def desConnector: DESConnector
+
   private[controllers] def progressService: ProgressService
+
   private[controllers] def enrolmentsService: AuthEnrolmentsService
 
   private def isComplete(seq: Seq[Section]): Boolean =
@@ -27,7 +30,7 @@ trait StatusController extends BaseController {
       _.status == Completed
     }
 
-  private def notYetSubmitted(implicit hc: HeaderCarrier,auth: AuthContext) = {
+  private def notYetSubmitted(implicit hc: HeaderCarrier, auth: AuthContext) = {
     progressService.sections map {
       sections =>
         if (isComplete(sections)) SubmissionReady
@@ -35,31 +38,17 @@ trait StatusController extends BaseController {
     }
   }
 
-  private[controllers] def submissionStatus(cacheMap: CacheMap)(implicit hc: HeaderCarrier,auth: AuthContext) = {
-    cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
-      case Some(response) => {
-        etmpStatus
-      }
-      case _ => notYetSubmitted
-    }
-  }
 
-  private def etmpStatus(implicit hc: HeaderCarrier,auth: AuthContext): Future[SubmissionStatus] = {
-    auth.enrolmentsUri match {
-      case Some(uri) => {
-        enrolmentsService.amlsRegistrationNumber(uri) flatMap {
-          case Some(amlsRegNumber) => desConnector.status(amlsRegNumber) map {
-            response => response.formBundleStatus match {
-              case "None" => SubmissionFeesDue
-              case "Pending" => SubmissionReadyForReview
-              case "Approved" => SubmissionDecisionApproved
-              case "Rejected" => SubmissionDecisionRejected
-            }
-          }
-          case None => Future.successful(NotCompleted)
+  private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext): Future[SubmissionStatus] = {
+    {
+      desConnector.status(amlsRefNumber) map {
+        response => response.formBundleStatus match {
+          case "Pending" => SubmissionReadyForReview
+          case "Approved" => SubmissionDecisionApproved
+          case "Rejected" => SubmissionDecisionRejected
         }
       }
-      case None => notYetSubmitted
+
     }
   }
 
@@ -67,48 +56,55 @@ trait StatusController extends BaseController {
     Authorised.async {
       implicit authContext =>
         implicit request =>
-          landingService.cacheMap flatMap {
-            case Some(cache) =>
-              val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
-              val businessName = for {
-                reviewDetails <- businessMatching.reviewDetails
-              } yield reviewDetails.businessName
+          val amlsRef = authContext.enrolmentsUri match {
+            case Some(uri) => {
+              enrolmentsService.amlsRegistrationNumber(uri)
+            }
+            case _ => Future.successful(None)
+          }
 
-
-              val amlsRef = authContext.enrolmentsUri match {
-                case Some(uri) => {
-                  enrolmentsService.amlsRegistrationNumber(uri)
-                }
-                case _ => Future.successful(Some(""))
+          val businessName = landingService.cacheMap map {
+            cacheOption => cacheOption match {
+              case Some(cache) => {
+                val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
+                for {
+                  reviewDetails <- businessMatching.reviewDetails
+                } yield reviewDetails.businessName
               }
-
-              amlsRef map {
-                mlrRegNumberOption =>
-                  submissionStatus(cache)(hc, authContext) map {
-                    foundStatus =>
-                      Ok(status(mlrRegNumberOption.getOrElse("Not Found"), businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
-                  }
-
+              case None => {
+                //should go and refresh the cache
+                None
               }
-
-              submissionStatus(cache)(hc, authContext) map {
-                foundStatus =>
-                  Ok(status("Not Found", businessName.getOrElse("Not Found"), CompletionStateViewModel(foundStatus)))
-              }
-            case None => etmpStatus map {
-              es => Ok(status("Not Found", "Not Found", CompletionStateViewModel(es)))
             }
           }
+
+          {
+            for {
+              amlsRefOption <- amlsRef
+              businessNameOption <- businessName
+            } yield {
+              amlsRefOption match {
+                case Some(mlrRegNumber) =>
+                  etmpStatus(mlrRegNumber)(hc, authContext) map {
+                    foundStatus =>
+                      Ok(status(mlrRegNumber, businessNameOption.getOrElse(""), CompletionStateViewModel(foundStatus)))
+                  }
+                case None => notYetSubmitted(hc, authContext) map {
+                  foundStatus =>
+                    Ok(status("Not Found", businessNameOption.getOrElse(""), CompletionStateViewModel(foundStatus)))
+                }
+              }
+            }
+          }.flatMap(identity)
+
     }
   }
-
-
 }
 
 object StatusController extends StatusController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService: LandingService = LandingService
-  override private[controllers] val desConnector :DESConnector = DESConnector
+  override private[controllers] val desConnector: DESConnector = DESConnector
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val progressService = ProgressService
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
