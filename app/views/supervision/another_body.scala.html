@@ -8,7 +8,7 @@
 }
 
 @header = {
-    @heading("supervision.another_body.title", "summary.supervision")
+    @heading("supervision.another_body.heading", "summary.supervision")
 }
 
 @main(
@@ -22,9 +22,11 @@
 
         @inlineRadioGroup(f("anotherBody")) {
 
+            @legend("supervision.another_body.heading", jsHidden = true)
             @radio(f("anotherBody"), "lbl.yes", "true", target = s"#$target")
             @radio(f("anotherBody"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
+
+            @fieldset("supervision.another_body.lbl.supervisor", jsHidden = true, classes = Seq("visuallyhidden-legend"), id = target) {
                 @input(f("supervisorName"), "supervision.another_body.lbl.supervisor", bold = false)
 
                 @date(

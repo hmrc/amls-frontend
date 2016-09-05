@@ -5,11 +5,11 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @target = @{
-s"""${f("professionalBody").id}-fieldset"""
+    s"""${f("professionalBody").id}-fieldset"""
 }
 
 @header = {
-    @heading("supervision.penalisedbyprofessional.title", "summary.supervision")
+    @heading("supervision.penalisedbyprofessional.heading", "summary.supervision")
 }
 
 @main(
@@ -28,12 +28,15 @@ s"""${f("professionalBody").id}-fieldset"""
             <li>@Messages("supervision.penalisedbyprofessional.line_4")</li>
         </ul>
 
+        <p>@Messages("supervision.penalisedbyprofessional.details")</p>
+
         <div class="form-group">
             @inlineRadioGroup(f("penalised")) {
-                @legend("TODO", jsHidden = true)
+                @legend("supervision.penalisedbyprofessional.heading", jsHidden = true)
                 @radio(f("penalised"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("penalised"), "lbl.no", "false")
-                @fieldset("TODO", jsHidden = true, id = target) {
+
+                @fieldset("supervision.penalisedbyprofessional.details.lbl", jsHidden = true, id = target) {
                     @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false)
                 }
             }
