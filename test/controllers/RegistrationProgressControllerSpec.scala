@@ -67,7 +67,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
-        Jsoup.parse(contentAsString(responseF)).title must be ("Application progress – Anti-Money Laundering Supervision")
+        Jsoup.parse(contentAsString(responseF)).title must be ("Application progress – Anti-money laundering supervision - GOV.UK")
       }
     }
   }
@@ -85,7 +85,7 @@ class RegistrationProgressControllerWithoutAmendmentsSpec extends WordSpec with 
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
-        Jsoup.parse(contentAsString(responseF)).title must be ("Application progress – Anti-Money Laundering Supervision")
+        Jsoup.parse(contentAsString(responseF)).title must be ("Application progress – Anti-money laundering supervision - GOV.UK")
       }
     }
   }
