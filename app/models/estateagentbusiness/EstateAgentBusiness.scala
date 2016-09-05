@@ -11,16 +11,16 @@ case class EstateAgentBusiness(
                                 hasChanged : Boolean = false
                               ) {
   def services(p: Services): EstateAgentBusiness =
-    this.copy(services = Some(p), hasChanged  = hasChanged || this.services.contains(p))
+    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p))
 
   def redressScheme(p: RedressScheme): EstateAgentBusiness =
-    this.copy(redressScheme = Some(p), hasChanged = hasChanged || this.redressScheme.contains(p))
+    this.copy(redressScheme = Some(p), hasChanged = hasChanged || !this.redressScheme.contains(p))
 
   def professionalBody(p: ProfessionalBody): EstateAgentBusiness =
-    this.copy(professionalBody = Some(p), hasChanged = hasChanged || this.professionalBody.contains(p))
+    this.copy(professionalBody = Some(p), hasChanged = hasChanged || !this.professionalBody.contains(p))
 
   def penalisedUnderEstateAgentsAct(p: PenalisedUnderEstateAgentsAct): EstateAgentBusiness =
-    this.copy(penalisedUnderEstateAgentsAct = Some(p), hasChanged = hasChanged || this.penalisedUnderEstateAgentsAct.contains(p))
+    this.copy(penalisedUnderEstateAgentsAct = Some(p), hasChanged = hasChanged || !this.penalisedUnderEstateAgentsAct.contains(p))
 
   def isComplete: Boolean =
     this match {
@@ -52,26 +52,14 @@ object EstateAgentBusiness {
   val key = "estate-agent-business"
 
   implicit val reads: Reads[EstateAgentBusiness] = (
-    __.read[Option[Services]] and
-    __.read[Option[RedressScheme]] and
-      __.read[Option[ProfessionalBody]] and
-      __.read[Option[PenalisedUnderEstateAgentsAct]] and
+    (__ \ "services").readNullable[Services] and
+    (__ \ "redressScheme").readNullable[RedressScheme] and
+    (__ \ "professionalBody").readNullable[ProfessionalBody] and
+    (__ \ "penalisedUnderEstateAgentsAct").readNullable[PenalisedUnderEstateAgentsAct] and
       (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
-    ) (EstateAgentBusiness.apply _)
+    ) apply EstateAgentBusiness.apply _
 
-  implicit val writes: Writes[EstateAgentBusiness] =
-    Writes[EstateAgentBusiness] {
-      model =>
-        Seq(
-          Json.toJson(model.services).asOpt[JsObject],
-          Json.toJson(model.redressScheme).asOpt[JsObject],
-          Json.toJson(model.professionalBody).asOpt[JsObject],
-          Json.toJson(model.penalisedUnderEstateAgentsAct).asOpt[JsObject],
-          Json.toJson(model.hasChanged).asOpt[JsObject]
-        ).flatten.fold(Json.obj()) {
-          _ ++ _
-        }
-    }
+  implicit val writes: Writes[EstateAgentBusiness] = Json.writes[EstateAgentBusiness]
 
   implicit def default(aboutYou: Option[EstateAgentBusiness]): EstateAgentBusiness =
     aboutYou.getOrElse(EstateAgentBusiness())
