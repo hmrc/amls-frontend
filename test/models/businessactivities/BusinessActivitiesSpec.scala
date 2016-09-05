@@ -124,62 +124,62 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     }
   }
 
-  "None" must {
+  "BusinessActivities with all values set as None" must {
 
     val initial: Option[BusinessActivities] = None
 
-    "Merged with InvolvedInOther" in {
+    "return BusinessActivities with InvolvedInOther set and indicate that changes have been made" in {
       val result = initial.involvedInOther(NewInvolvedInOther)
       result must be (BusinessActivities(Some(NewInvolvedInOther), hasChanged = true))
     }
 
-    "Merged with ExcpectedBusinessTurnover" in {
+    "return BusinessActivities with ExcpectedBusinessTurnover set and indicate that changes have been made" in {
       val result = initial.expectedBusinessTurnover(NewBusinessTurnover)
       result must be (BusinessActivities(None, Some(NewBusinessTurnover), hasChanged = true))
     }
 
-    "Merged with ExpectedAMLSTurnover" in {
+    "return BusinessActivities with ExpectedAMLSTurnover set and indicate that changes have been made" in {
       val result = initial.expectedAMLSTurnover(NewAMLSTurnover)
       result must be (BusinessActivities(None, None, Some(NewAMLSTurnover), hasChanged = true))
     }
 
-    "Merged with BusinessFranchise" in {
+    "return BusinessActivities with BusinessFranchise set and indicate that changes have been made" in {
       val result = initial.businessFranchise(NewBusinessFranchise)
       result must be (BusinessActivities(None, None, None, Some(NewBusinessFranchise), hasChanged = true))
     }
 
-    "Merged with TransactionRecord" in {
+    "return BusinessActivities with TransactionRecord set and indicate that changes have been made" in {
       val result = initial.transactionRecord(NewTransactionRecord)
       result must be (BusinessActivities(None, None, None, None, Some(NewTransactionRecord), hasChanged = true))
     }
 
-    "Merged with CustomersOutsideUK" in {
+    "return BusinessActivities with CustomersOutsideUK set and indicate that changes have been made" in {
       val result = initial.customersOutsideUK(NewCustomersOutsideUK)
       result must be (BusinessActivities(None, None, None, None, None, Some(NewCustomersOutsideUK), hasChanged = true))
     }
 
-    "Merged with ncaRegistered" in {
+    "return BusinessActivities with ncaRegistered set and indicate that changes have been made" in {
       val result = initial.ncaRegistered(NewNCARegistered)
       result must be (BusinessActivities(None, None, None, None, None, None, Some(NewNCARegistered), hasChanged = true))
     }
 
-    "Merged with accountantForAMLSRegulations" in {
+    "return BusinessActivities with accountantForAMLSRegulations set and indicate that changes have been made" in {
       val result = initial.accountantForAMLSRegulations(NewAccountantForAMLSRegulations)
       result must be (BusinessActivities(None, None, None, None, None, None, None, Some(NewAccountantForAMLSRegulations), hasChanged = true))
     }
 
 
-    "Merged with RiskAssesment" in {
+    "return BusinessActivities with RiskAssesment set and indicate that changes have been made" in {
       val result = initial.riskAssessmentPolicy(NewRiskAssessment)
       result must be (BusinessActivities(riskAssessmentPolicy = Some(NewRiskAssessment), hasChanged = true))
     }
 
-    "Merged with IdentifySuspiciousActivity" in {
+    "return BusinessActivities with IdentifySuspiciousActivity set and indicate that changes have been made" in {
       val result = initial.identifySuspiciousActivity(NewIdentifySuspiciousActivity)
       result must be (BusinessActivities(identifySuspiciousActivity = Some(NewIdentifySuspiciousActivity), hasChanged = true))
     }
 
-    "Merged with WhoIsYourAccountant" in {
+    "return BusinessActivities with WhoIsYourAccountant set and indicate that changes have been made" in {
       val result = initial.whoIsYourAccountant(NewWhoIsYourAccountant)
       result must be (BusinessActivities(whoIsYourAccountant = Some(NewWhoIsYourAccountant), hasChanged = true))
     }
