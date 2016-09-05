@@ -16,7 +16,7 @@
 
         <div class="form-field-group">
             @radioGroup(f("products")) {
-                @legend("", true, bold = true, "lbl.select.all")
+                @legend("lbl.select.all", bold = false)
                 @checkbox(f("products[]"), "hvd.products.option.01", "01")
                 @checkbox(f("products[]"), "hvd.products.option.02", "02")
                 @checkbox(f("products[]"), "hvd.products.option.03", "03")
@@ -29,11 +29,10 @@
                 @checkbox(f("products[]"), "hvd.products.option.10", "10")
                 @checkbox(f("products[]"), "hvd.products.option.11", "11")
                 @checkbox(f("products[]"), "hvd.products.option.12", "12", target = s"#${f("otherDetails").id}-fieldset")
-                @fieldset("TODO", jsHidden = true, id = s"""${f("otherDetails").id}-fieldset""") {
+                @fieldset("lbl.give.details", jsHidden = true, id = s"""${f("otherDetails").id}-fieldset""") {
                     @input(f("otherDetails"), "lbl.give.details", bold = false)
                 }
             }
-        <br>
         </div>
         @submit()
     }
