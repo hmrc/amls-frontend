@@ -1,6 +1,6 @@
 package utils
 
-import models.businessmatching.{BusinessMatching, BusinessType, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessType, MoneyServiceBusiness}
 
 object ControllerHelper {
 
@@ -10,6 +10,13 @@ object ControllerHelper {
         case Some(review) => review.businessType
         case _ => None
       }
+    }
+  }
+
+  def getBusinessActivity(matching: Option[BusinessMatching]): Option[BusinessActivities] = {
+    matching match {
+      case Some(data) => data.activities
+      case None => None
     }
   }
 
