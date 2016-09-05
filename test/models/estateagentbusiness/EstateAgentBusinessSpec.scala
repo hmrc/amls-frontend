@@ -61,7 +61,6 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
         Json.toJson(completeModel) must
           be(completeJson)
       }
-
       "Deserialise as expected" in {
         (completeJson  - "hasChanged").as[EstateAgentBusiness] must
           be(completeModel)
@@ -84,77 +83,62 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
     }
   }
 
-  "None" must {
+  "EstateAgentBusiness with all values set as None" must {
     val initial: Option[EstateAgentBusiness] = None
 
-    "Merged with services" must {
-      "return EstateAgentBusiness with correct business services" in {
-        val result = initial.services(services)
-        result must be (EstateAgentBusiness(Some(services), None, hasChanged = true))
-      }
+    "return EstateAgentBusiness with correct business services when set and indicate changes have been made" in {
+      val result = initial.services(services)
+      result must be (EstateAgentBusiness(Some(services), None, hasChanged = true))
     }
 
-    "Merged with RedressScheme" must {
-      "return EstateAgentBusiness with correct redressScheme" in {
-        val result = initial.redressScheme(redressSchemeOther)
-        result must be (EstateAgentBusiness(None,Some(redressSchemeOther), None, hasChanged = true))
-      }
-    }
-    "Merged with professionalBody" must {
-      "return EstateAgentBusiness with correct professionalBody" in {
-        val result = initial.professionalBody(professionalBody)
-        result must be (EstateAgentBusiness(None, None, Some(professionalBody), None, hasChanged = true))
-      }
+    "return EstateAgentBusiness with correct redressScheme when set and indicate changes have been made" in {
+      val result = initial.redressScheme(redressSchemeOther)
+      result must be (EstateAgentBusiness(None,Some(redressSchemeOther), None, hasChanged = true))
     }
 
-    "Merged with penalisedUnderEAAct" must {
-      "return EstateAgentBusiness with correct penalisedUnderEAAct" in {
-        val result = initial.penalisedUnderEstateAgentsAct(penalisedUnderEAAct)
-        result must be (EstateAgentBusiness(None, None, None, Some(penalisedUnderEAAct), hasChanged = true))
-      }
+    "return EstateAgentBusiness with correct professionalBody when set and indicate changes have been made" in {
+      val result = initial.professionalBody(professionalBody)
+      result must be (EstateAgentBusiness(None, None, Some(professionalBody), None, hasChanged = true))
+    }
+
+    "return EstateAgentBusiness with correct penalisedUnderEAAct when set and indicate changes have been made" in {
+      val result = initial.penalisedUnderEstateAgentsAct(penalisedUnderEAAct)
+      result must be (EstateAgentBusiness(None, None, None, Some(penalisedUnderEAAct), hasChanged = true))
     }
   }
 
-  "Merge to the model" must {
+  "EstateAgentBusiness with existing values" must {
 
     val initial = EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct))
 
-    "Merged with services" must {
-      "return EstateAgentBusiness with correct business services" in {
+    "return EstateAgentBusiness with correct business services when set and indicate changes have been made" in {
         val result = initial.services(newServices)
         result must be (EstateAgentBusiness(Some(newServices),  Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct), hasChanged = true))
       }
-    }
 
-    "Merged with redressScheme" must {
-      "return EstateAgentBusiness with correct redressScheme" in {
+    "return EstateAgentBusiness with correct redressScheme when set and indicate changes have been made" in {
         val result = initial.redressScheme(newRedressScheme)
         result must be (EstateAgentBusiness(Some(services),  Some(newRedressScheme), Some(professionalBody), Some(penalisedUnderEAAct), hasChanged = true))
       }
-    }
 
-    "Merged with professionalBody" must {
-      "return EstateAgentBusiness with correct professionalBody" in {
+      "return EstateAgentBusiness with correct professionalBody when set and indicate changes have been made" in {
         val result = initial.professionalBody(newProfessionalBody)
         result must be (EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(newProfessionalBody), Some(penalisedUnderEAAct), hasChanged = true))
       }
-    }
 
-    "Merged with penalisedUnderEAAct" must {
-      "return EstateAgentBusiness with correct penalisedUnderEAAct" in {
+      "return EstateAgentBusiness with correct penalisedUnderEAAct when set and indicate changes have been made" in {
         val result = initial.penalisedUnderEstateAgentsAct(newPenalisedEAAct)
         result must be (EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(professionalBody), Some(newPenalisedEAAct), hasChanged = true))
       }
-    }
   }
 
   "isComplete" must {
 
-    "return true when all internal properties are `Some`" in {
+    "equal true when all properties do not equal None" in {
       completeModel.isComplete mustEqual true
     }
 
-    "return true when there is no redress scheme and no Residential service" in {
+    "equal true when redress scheme and Residential service equal None" in {
       val model = EstateAgentBusiness(
         services = Some(Services(Set.empty)),
         redressScheme = None,
@@ -165,14 +149,14 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
       model.isComplete mustEqual true
     }
 
-    "return false when properties are `None`" in {
+    "equal false when all properties equal `None`" in {
       incompleteModel.isComplete mustEqual false
     }
   }
 
   "section" must {
 
-    "return `NotStarted` section when there is no section in s4l" in {
+    "return `NotStarted` section when there is no section in Save4Later" in {
       implicit val cache = CacheMap("", Map.empty)
       EstateAgentBusiness.section mustBe Section("eab", NotStarted, false,  controllers.estateagentbusiness.routes.WhatYouNeedController.get)
     }
