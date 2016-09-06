@@ -93,5 +93,43 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
         }
       }
     }
+
+    "isComplete" must {
+
+      "equal true when all properties do not equal None" in {
+        businessMatching.isComplete mustEqual true
+      }
+
+      "equal false when all properties equal `None`" in {
+        BusinessMatching().isComplete mustEqual false
+      }
+    }
+
+//    "section" must {
+//
+//      "return `NotStarted` section when there is no section in Save4Later" in {
+//        implicit val cache = CacheMap("", Map.empty)
+//        EstateAgentBusiness.section mustBe Section("eab", NotStarted, false,  controllers.estateagentbusiness.routes.WhatYouNeedController.get)
+//      }
+//
+//      "return `Started` section when there is a section which isn't completed" in {
+//        implicit val cache = mock[CacheMap]
+//        implicit val ac = mock[AuthContext]
+//        when {
+//          cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
+//        } thenReturn Some(incompleteModel)
+//        EstateAgentBusiness.section mustBe Section("eab", Started, false, controllers.estateagentbusiness.routes.WhatYouNeedController.get)
+//      }
+//
+//      "return `Completed` section when there is a section which is completed" in {
+//        implicit val cache = mock[CacheMap]
+//        implicit val ac = mock[AuthContext]
+//        when {
+//          cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
+//        } thenReturn Some(completeModel)
+//        EstateAgentBusiness.section mustBe Section("eab", Completed, false, controllers.estateagentbusiness.routes.SummaryController.get(true))
+//
+//      }
+//    }
   }
 }
