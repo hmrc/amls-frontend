@@ -161,6 +161,9 @@ POST        /business-activities/employees                              controll
 GET         /business-activities/accountant-details                     controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant-details                     controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 
+GET         /business-activities/tax-matters                            controllers.businessactivities.TaxMattersController.get(edit: Boolean ?= false)
+POST        /business-activities/tax-matters                            controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)
+
 GET         /business-activities/check-your-answers                     controllers.businessactivities.SummaryController.get()
 
 GET         /declaration/who-is-registering                             controllers.declaration.WhoIsRegisteringController.get()
