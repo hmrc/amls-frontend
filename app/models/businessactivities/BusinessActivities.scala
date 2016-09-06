@@ -16,7 +16,7 @@ case class BusinessActivities(
                                riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
                                howManyEmployees: Option[HowManyEmployees] = None,
                                whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
-                               hasChanged : Boolean = false
+                               hasChanged: Boolean = false
                              ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
@@ -55,11 +55,12 @@ case class BusinessActivities(
   def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
     this.copy(whoIsYourAccountant = Some(p), hasChanged = hasChanged || !this.whoIsYourAccountant.contains(p))
 
+
   def isComplete: Boolean =
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
-      Some(_), Some(_), Some(_), Some(_), Some(_), _, _
+      Some(_), _, Some(_), Some(_), Some(_), _, _
       ) => true
       case _ => false
     }
