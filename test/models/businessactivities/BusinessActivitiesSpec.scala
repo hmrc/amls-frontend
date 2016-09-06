@@ -7,87 +7,94 @@ import play.api.libs.json.{JsNull, Json}
 
 class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
-  val DefaultFranchiseName     = "DEFAULT FRANCHISE NAME"
-  val DefaultSoftwareName      = "DEFAULT SOFTWARE"
-  val DefaultBusinessTurnover  = ExpectedBusinessTurnover.First
-  val DefaultAMLSTurnover      = ExpectedAMLSTurnover.First
+  val DefaultFranchiseName = "DEFAULT FRANCHISE NAME"
+  val DefaultSoftwareName = "DEFAULT SOFTWARE"
+  val DefaultBusinessTurnover = ExpectedBusinessTurnover.First
+  val DefaultAMLSTurnover = ExpectedAMLSTurnover.First
   val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
-  val DefaultInvolvedInOther   = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
+  val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
   val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
   val DefaultTransactionRecord = TransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
   val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-  val DefaultNCARegistered      = NCARegistered(true)
+  val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
-  val DefaultRiskAssessments    = RiskAssessmentPolicyYes(Set(PaperBased))
-  val DefaultWhoIsYourAccountant = WhoIsYourAccountant("Accountant's name", Some("Accountant's trading name"),
-                                                          UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE" ),
-                                                        AccountantDoesAlsoDealWithTax("11Character"))
-  val DefaultIdentifySuspiciousActivity  = IdentifySuspiciousActivity(true)
+  val DefaultRiskAssessments = RiskAssessmentPolicyYes(Set(PaperBased))
+  val DefaultHowManyEmployees = HowManyEmployees("5","4")
+  val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
+    "Accountant's name",
+    Some("Accountant's trading name"),
+    UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE")
+  )
+  val DefaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
+  val DefaultTaxMatters = TaxMatters(false)
 
-
-
-  val NewFranchiseName          = "NEW FRANCHISE NAME"
-  val NewBusinessFranchise      = BusinessFranchiseYes(NewFranchiseName)
+  val NewFranchiseName = "NEW FRANCHISE NAME"
+  val NewBusinessFranchise = BusinessFranchiseYes(NewFranchiseName)
   val NewInvolvedInOtherDetails = "NEW INVOLVED"
-  val NewInvolvedInOther         = InvolvedInOtherYes(NewInvolvedInOtherDetails)
-  val NewBusinessTurnover       = ExpectedBusinessTurnover.Second
-  val NewAMLSTurnover           = ExpectedAMLSTurnover.Second
-  val NewTransactionRecord      = TransactionRecordNo
-  val NewCustomersOutsideUK     = CustomersOutsideUK(None)
-  val NewNCARegistered          = NCARegistered(false)
+  val NewInvolvedInOther = InvolvedInOtherYes(NewInvolvedInOtherDetails)
+  val NewBusinessTurnover = ExpectedBusinessTurnover.Second
+  val NewAMLSTurnover = ExpectedAMLSTurnover.Second
+  val NewTransactionRecord = TransactionRecordNo
+  val NewCustomersOutsideUK = CustomersOutsideUK(None)
+  val NewNCARegistered = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
-  val NewRiskAssessment         = RiskAssessmentPolicyNo
-  val NewIdentifySuspiciousActivity  = IdentifySuspiciousActivity(true)
-  val NewWhoIsYourAccountant = WhoIsYourAccountant("newName", Some("newTradingName"),
-    UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "NE27 0QQ"),
-    AccountantDoesAlsoDealWithTax("refer"))
+  val NewRiskAssessment = RiskAssessmentPolicyNo
+  val NewHowManyEmployees = HowManyEmployees("2","3")
+  val NewIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
+  val NewWhoIsYourAccountant = WhoIsYourAccountant(
+    "newName",
+    Some("newTradingName"),
+    UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "NE27 0QQ")
+  )
+  val NewTaxMatters = TaxMatters(true)
 
-    val completeJson = Json.obj(
-      "involvedInOther" -> true,
-      "details" -> DefaultInvolvedInOtherDetails,
-      "expectedBusinessTurnover" -> "01",
-      "expectedAMLSTurnover" -> "01",
-      "businessFranchise" -> true,
-      "franchiseName" -> DefaultFranchiseName,
-      "isRecorded" -> true,
-      "transactions" -> Seq("01", "03"),
-      "digitalSoftwareName" -> DefaultSoftwareName,
-      "isOutside" -> true,
-      "countries" ->Json.arr("GB"),
-      "ncaRegistered" -> true,
-      "accountantForAMLSRegulations" -> true,
-      "hasWrittenGuidance" -> true,
-      "hasPolicy" -> true,
-      "riskassessments" -> Seq("01"),
-      "employeeCount" -> "5",
-      "employeeCountAMLSSupervision" -> "4",
-      "accountantsName" -> "Accountant's name",
-      "accountantsTradingName" -> "Accountant's trading name",
-      "accountantsAddressLine1" -> "address1",
-      "accountantsAddressLine2" -> "address2",
-      "accountantsAddressLine3" -> "address3",
-      "accountantsAddressLine4" -> "address4",
-      "accountantsAddressPostCode" -> "POSTCODE",
-      "doesAccountantAlsoDealWithTax" -> true,
-      "accountantsReference" -> "11Character"
-    )
+  val completeModel = BusinessActivities(
+    involvedInOther = Some(DefaultInvolvedInOther),
+    expectedBusinessTurnover = Some(DefaultBusinessTurnover),
+    expectedAMLSTurnover = Some(DefaultAMLSTurnover),
+    businessFranchise = Some(DefaultBusinessFranchise),
+    transactionRecord = Some(DefaultTransactionRecord),
+    customersOutsideUK = Some(DefaultCustomersOutsideUK),
+    ncaRegistered = Some(DefaultNCARegistered),
+    accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
+    riskAssessmentPolicy = Some(DefaultRiskAssessments),
+    howManyEmployees = Some(DefaultHowManyEmployees),
+    identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
+    whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
+    taxMatters = Some(DefaultTaxMatters)
+  )
 
-    val completeModel = BusinessActivities(involvedInOther = Some(DefaultInvolvedInOther),
-                                           expectedBusinessTurnover = Some(DefaultBusinessTurnover),
-                                           expectedAMLSTurnover = Some(DefaultAMLSTurnover) ,
-                                           businessFranchise = Some(DefaultBusinessFranchise),
-                                           transactionRecord = Some(DefaultTransactionRecord),
-                                           customersOutsideUK = Some(DefaultCustomersOutsideUK),
-                                           ncaRegistered = Some(DefaultNCARegistered),
-                                           accountantForAMLSRegulations = Some(DefaultAccountantForAMLSRegulations),
-                                           identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)), // add test
-                                           riskAssessmentPolicy = Some(DefaultRiskAssessments),
-                                           howManyEmployees = Some(HowManyEmployees("5", "4")), // add test
-                                           whoIsYourAccountant = Some(DefaultWhoIsYourAccountant)
-                                          )
+  val completeJson = Json.obj(
+    "involvedInOther" -> true,
+    "details" -> DefaultInvolvedInOtherDetails,
+    "expectedBusinessTurnover" -> "01",
+    "expectedAMLSTurnover" -> "01",
+    "businessFranchise" -> true,
+    "franchiseName" -> DefaultFranchiseName,
+    "isRecorded" -> true,
+    "transactions" -> Seq("01", "03"),
+    "digitalSoftwareName" -> DefaultSoftwareName,
+    "isOutside" -> true,
+    "countries" -> Json.arr("GB"),
+    "ncaRegistered" -> true,
+    "accountantForAMLSRegulations" -> true,
+    "hasWrittenGuidance" -> true,
+    "hasPolicy" -> true,
+    "riskassessments" -> Seq("01"),
+    "employeeCount" -> "5",
+    "employeeCountAMLSSupervision" -> "4",
+    "accountantsName" -> "Accountant's name",
+    "accountantsTradingName" -> "Accountant's trading name",
+    "accountantsAddressLine1" -> "address1",
+    "accountantsAddressLine2" -> "address2",
+    "accountantsAddressLine3" -> "address3",
+    "accountantsAddressLine4" -> "address4",
+    "accountantsAddressPostCode" -> "POSTCODE",
+    "manageYourTaxAffairs" -> false,
+    "hasWrittenGuidance" -> true
+  )
 
-      val partialModel = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
-
+  val partialModel = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
 
   "BusinessActivities" must {
     "Serialise as expected" in {
@@ -112,7 +119,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     val partialJson = Json.obj(
       "businessFranchise" -> true,
-      "franchiseName"     -> DefaultFranchiseName
+      "franchiseName" -> DefaultFranchiseName
     )
 
     "Serialise as expected" in {
@@ -130,64 +137,67 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "return BusinessActivities with InvolvedInOther set and indicate that changes have been made" in {
       val result = initial.involvedInOther(NewInvolvedInOther)
-      result must be (BusinessActivities(Some(NewInvolvedInOther), hasChanged = true))
+      result must be(BusinessActivities(Some(NewInvolvedInOther), hasChanged = true))
     }
 
     "return BusinessActivities with ExcpectedBusinessTurnover set and indicate that changes have been made" in {
       val result = initial.expectedBusinessTurnover(NewBusinessTurnover)
-      result must be (BusinessActivities(None, Some(NewBusinessTurnover), hasChanged = true))
+      result must be(BusinessActivities(None, Some(NewBusinessTurnover), hasChanged = true))
     }
 
     "return BusinessActivities with ExpectedAMLSTurnover set and indicate that changes have been made" in {
       val result = initial.expectedAMLSTurnover(NewAMLSTurnover)
-      result must be (BusinessActivities(None, None, Some(NewAMLSTurnover), hasChanged = true))
+      result must be(BusinessActivities(None, None, Some(NewAMLSTurnover), hasChanged = true))
     }
 
     "return BusinessActivities with BusinessFranchise set and indicate that changes have been made" in {
       val result = initial.businessFranchise(NewBusinessFranchise)
-      result must be (BusinessActivities(None, None, None, Some(NewBusinessFranchise), hasChanged = true))
+      result must be(BusinessActivities(None, None, None, Some(NewBusinessFranchise), hasChanged = true))
     }
 
     "return BusinessActivities with TransactionRecord set and indicate that changes have been made" in {
       val result = initial.transactionRecord(NewTransactionRecord)
-      result must be (BusinessActivities(None, None, None, None, Some(NewTransactionRecord), hasChanged = true))
+      result must be(BusinessActivities(None, None, None, None, Some(NewTransactionRecord), hasChanged = true))
     }
 
     "return BusinessActivities with CustomersOutsideUK set and indicate that changes have been made" in {
       val result = initial.customersOutsideUK(NewCustomersOutsideUK)
-      result must be (BusinessActivities(None, None, None, None, None, Some(NewCustomersOutsideUK), hasChanged = true))
+      result must be(BusinessActivities(None, None, None, None, None, Some(NewCustomersOutsideUK), hasChanged = true))
     }
 
     "return BusinessActivities with ncaRegistered set and indicate that changes have been made" in {
       val result = initial.ncaRegistered(NewNCARegistered)
-      result must be (BusinessActivities(None, None, None, None, None, None, Some(NewNCARegistered), hasChanged = true))
+      result must be(BusinessActivities(None, None, None, None, None, None, Some(NewNCARegistered), hasChanged = true))
     }
 
     "return BusinessActivities with accountantForAMLSRegulations set and indicate that changes have been made" in {
       val result = initial.accountantForAMLSRegulations(NewAccountantForAMLSRegulations)
-      result must be (BusinessActivities(None, None, None, None, None, None, None, Some(NewAccountantForAMLSRegulations), hasChanged = true))
+      result must be(BusinessActivities(None, None, None, None, None, None, None, Some(NewAccountantForAMLSRegulations), hasChanged = true))
     }
 
 
     "return BusinessActivities with RiskAssesment set and indicate that changes have been made" in {
       val result = initial.riskAssessmentPolicy(NewRiskAssessment)
-      result must be (BusinessActivities(riskAssessmentPolicy = Some(NewRiskAssessment), hasChanged = true))
+      result must be(BusinessActivities(riskAssessmentPolicy = Some(NewRiskAssessment), hasChanged = true))
     }
 
     "return BusinessActivities with IdentifySuspiciousActivity set and indicate that changes have been made" in {
       val result = initial.identifySuspiciousActivity(NewIdentifySuspiciousActivity)
-      result must be (BusinessActivities(identifySuspiciousActivity = Some(NewIdentifySuspiciousActivity), hasChanged = true))
+      result must be(BusinessActivities(identifySuspiciousActivity = Some(NewIdentifySuspiciousActivity), hasChanged = true))
     }
 
     "return BusinessActivities with WhoIsYourAccountant set and indicate that changes have been made" in {
       val result = initial.whoIsYourAccountant(NewWhoIsYourAccountant)
-      result must be (BusinessActivities(whoIsYourAccountant = Some(NewWhoIsYourAccountant), hasChanged = true))
+      result must be(BusinessActivities(whoIsYourAccountant = Some(NewWhoIsYourAccountant), hasChanged = true))
     }
 
+    "return BusinessActivities with TaxMatters set and indicate that changes have been made" in {
+      val result = initial.taxMatters(NewTaxMatters)
+      result must be(BusinessActivities(taxMatters = Some(NewTaxMatters), hasChanged = true))
+    }
   }
 
-
-  "ASP class" when {
+  "BusinessActivities class" when {
     "involvedInOther value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
@@ -364,6 +374,23 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
           val res = completeModel.whoIsYourAccountant(NewWhoIsYourAccountant)
           res.hasChanged must be(true)
           res.whoIsYourAccountant must be(Some(NewWhoIsYourAccountant))
+        }
+      }
+    }
+    "taxMatters value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.taxMatters(DefaultTaxMatters)
+          res must be(completeModel)
+          res.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.taxMatters(NewTaxMatters)
+          res.hasChanged must be(true)
+          res.taxMatters must be(Some(NewTaxMatters))
         }
       }
     }

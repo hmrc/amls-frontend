@@ -16,7 +16,8 @@ case class BusinessActivities(
                                riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
                                howManyEmployees: Option[HowManyEmployees] = None,
                                whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
-                               hasChanged : Boolean = false
+                               taxMatters: Option[TaxMatters] = None,
+                               hasChanged: Boolean = false
                              ) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
@@ -55,11 +56,15 @@ case class BusinessActivities(
   def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
     this.copy(whoIsYourAccountant = Some(p), hasChanged = hasChanged || !this.whoIsYourAccountant.contains(p))
 
+  def taxMatters(p: TaxMatters): BusinessActivities =
+    this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p))
+
+
   def isComplete: Boolean =
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
-      Some(_), Some(_), Some(_), Some(_), Some(_), _, _
+      Some(_), _, Some(_), Some(_), Some(_), _, _, _
       ) => true
       case _ => false
     }
@@ -98,6 +103,7 @@ object BusinessActivities {
       __.read[Option[RiskAssessmentPolicy]] and
       __.read[Option[HowManyEmployees]] and
       __.read[Option[WhoIsYourAccountant]] and
+      __.read[Option[TaxMatters]] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessActivities.apply _)
 
@@ -116,6 +122,7 @@ object BusinessActivities {
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject],
         Json.toJson(model.whoIsYourAccountant).asOpt[JsObject],
+        Json.toJson(model.taxMatters).asOpt[JsObject],
         Json.toJson(model.hasChanged).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _

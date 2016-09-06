@@ -33,7 +33,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneAppPerS
   "IdentifySuspiciousActivityController" must {
 
     "use correct services" in new Fixture {
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
+      IdentifySuspiciousActivityController.dataCacheConnector must be(DataCacheConnector)
     }
 
     "on get, display the Identify suspicious activity page" in new Fixture {
