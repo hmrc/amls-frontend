@@ -323,6 +323,13 @@ lbl.nonresidential = Non-Residential
 
 lbl.give.details = Please give details
 
+legend.address = Address
+lbl.address.line1 = Address line 1
+lbl.address.line2 = Address line 2
+lbl.address.line3 = Town / City
+lbl.address.line4 = County
+lbl.address.postcode = Postcode
+
 businessType.lbl.02 = Limited company
 businessType.lbl.01 = Sole proprietor
 businessType.lbl.03 = Partnership
@@ -575,14 +582,14 @@ aboutthebusiness.activity.start.date.title = When will your business start activ
 aboutthebusiness.activity.start.date.heading = When will your business start activities which need to be registered for anti-money laundering supervision?
 aboutthebusiness.activity.start.date.text = If your business is already involved in these activities, give the date it started.
 
-tradingpremises.whatyouneed.title=Trading premises - What you need
-tradingpremises.whatyouneed.heading=What you need
-tradingpremises.whatyouneed.paragraph1.text=We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
-tradingpremises.whatyouneed.requiredinfo.heading=For each of your trading premises, you''ll need to know:
-tradingpremises.whatyouneed.requiredinfo.text.1= the trading name and address
-tradingpremises.whatyouneed.requiredinfo.text.2= what the business does from these premises
-tradingpremises.whatyouneed.requiredinfo.text.3= the date you’ll start trading from these premises
-tradingpremises.whatyouneed.requiredinfo.text.4= if it’s a residential address
+tradingpremises.whatyouneed.title = What you need - Trading premises
+tradingpremises.whatyouneed.heading = What you need
+tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
+tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises, you’ll need to know:
+tradingpremises.whatyouneed.requiredinfo.text.1 = the trading name and address
+tradingpremises.whatyouneed.requiredinfo.text.2 = what the business does from these premises
+tradingpremises.whatyouneed.requiredinfo.text.3 = the date you’ll start trading from these premises
+tradingpremises.whatyouneed.requiredinfo.text.4 = if it’s a residential address
 tradingpremises.whatyouneed.agents.sub.heading = Agents
 tradingpremises.whatyouneed.agents.desc = If you use agents, we also need to know where your agents trade from. An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
 tradingpremises.whatyouneed.agents.individual.info.heading = You’ll need the following information for each agent:
@@ -592,40 +599,41 @@ tradingpremises.whatyouneed.agents.circumstances.info.heading = Depending on you
 tradingpremises.whatyouneed.agents.circumstances.info.text1 = your agent’s company registration number
 tradingpremises.whatyouneed.agents.circumstances.info.text2 = your agent’s date of birth
 
-tradingpremises.youragent.title=Trading premises - Who is your agent?
-tradingpremises.youragent.heading=Who is your agent?
-tradingpremises.youragent.paragraph1.text=An agent is an individual or business that works on behalf of your business to offer your services.
-tradingpremises.youragent.requiredinfo.heading=For each of your trading premises, you’ll need:
+tradingpremises.youragent.title = Who is your agent? - Trading premises
+tradingpremises.youragent.heading = Who is your agent?
+tradingpremises.youragent.paragraph1.text = An agent is an individual or business that works on behalf of your business to offer your services.
+tradingpremises.youragent.requiredinfo.heading = For each of your trading premises, you’ll need:
 tradingpremises.youragent.registeredname = What is your agent’s registered business name?
 tradingpremises.youragent.registeredname.subtitle = It must be identical to the name on the incorporation certificate.
 tradingpremises.youragent.taxtype = What type of tax does your agent pay?
-tradingpremises.youragent.taxtype.lbl.01=Self-assessment
-tradingpremises.youragent.taxtype.lbl.02=Corporation tax
+tradingpremises.youragent.taxtype.lbl.01 = Self-assessment
+tradingpremises.youragent.taxtype.lbl.02 = Corporation tax
 
 tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
-tradingpremises.yourtradingpremises.title= Trading premises details
-tradingpremises.yourtradingpremises.heading=Trading premises details
-tradingpremises.yourtradingpremises.include.heading=Include:
-tradingpremises.yourtradingpremises.include.text.1=your own business premises
-tradingpremises.yourtradingpremises.include.text.2=other businesses’ premises, if you have a contractual agreement for them to act as your agents and offer your services
-tradingpremises.yourtradingpremises.tradingname=Trading name
-tradingpremises.yourtradingpremises.address=Address
-tradingpremises.yourtradingpremises.postcode=Postcode
-tradingpremises.yourtradingpremises.country=Country
-tradingpremises.yourtradingpremises.whose=Who uses these premises?
-tradingpremises.yourtradingpremises.whose.my=My business
-tradingpremises.yourtradingpremises.whose.another=Another business, acting as an agent for my business
-tradingpremises.yourtradingpremises.startdate=When will the business start trading from these premises? If it is already trading, give the date it started.
-tradingpremises.yourtradingpremises.isresidential=Is this a residential address?
-tradingpremises.msb.services.title = Trading premises - Which activities take place at these premises?
+
+tradingpremises.yourtradingpremises.title = Trading premises details - Trading premises
+tradingpremises.yourtradingpremises.heading = Trading premises details
+tradingpremises.yourtradingpremises.include.heading = Include:
+tradingpremises.yourtradingpremises.include.text.1 = your own business premises
+tradingpremises.yourtradingpremises.include.text.2 = other businesses’ premises, if you have a contractual agreement for them to act as your agents and offer your services
+tradingpremises.yourtradingpremises.tradingname = Trading name
+tradingpremises.yourtradingpremises.address = Address
+tradingpremises.yourtradingpremises.postcode = Postcode
+tradingpremises.yourtradingpremises.country = Country
+tradingpremises.yourtradingpremises.whose = Who uses these premises?
+tradingpremises.yourtradingpremises.whose.my = My business
+tradingpremises.yourtradingpremises.whose.another = Another business, acting as an agent for my business
+tradingpremises.yourtradingpremises.startdate = When will the business start trading from these premises? If it is already trading, give the date it started.
+tradingpremises.yourtradingpremises.isresidential = Is this a residential address?
+
+tradingpremises.msb.services.title = Which activities take place at these premises? - Trading premises
 tradingpremises.msb.services.heading = Which activities take place at these premises?
-tradingpremises.agent.premises.title = Trading premises - Are you registering an agent’s premises?
+
+tradingpremises.agent.premises.title = Are you registering an agent’s premises? - Trading premises
 tradingpremises.agent.premises.heading = Are you registering an agent’s premises?
 tradingpremises.agent.premises.text = An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
 
-
-
-tradingpremises.businessStructure.title = Trading premises - What is your agent’s business structure?
+tradingpremises.businessStructure.title = What is your agent’s business structure? - Trading premises
 tradingpremises.businessStructure.heading = What is your agent’s business structure?
 
 tradingpremises.summary.addanother = Add another premises
@@ -638,22 +646,18 @@ tradingpremises.summary.residential = Residential address:
 tradingpremises.summary.who-uses = Who uses these premises?
 tradingpremises.summary.services = Services at this address:
 
-
-tradingpremises.agentcompanyname.title =Trading premises - What is your agent’s registered company name?
+tradingpremises.agentcompanyname.title = What is your agent’s registered company name? - Trading premises
 tradingpremises.agentcompanyname.heading = What is your agent’s registered company name?
 tradingpremises.agentcompanyname.lbl.hint = It must be identical to the registered name on the incorporation certificate.
 
-
-tradingpremises.agentname.title =Trading premises - What is your agent’s name?
+tradingpremises.agentname.title = What is your agent’s name? - Trading premises
 tradingpremises.agentname.heading = What is your agent’s name?
 
-tradingpremises.agentpartnership.title =Trading premises - Your agent’s partnership
+tradingpremises.agentpartnership.title = Your agent’s partnership - Trading premises
 tradingpremises.agentpartnership.heading = Your agent’s partnership
 tradingpremises.agentpartnership.lbl.hint = List all your agent’s partners
 
-
-
-tradingpremises.premises.registered.title = Premises registered
+tradingpremises.premises.registered.title = Premises registered - Trading premises
 tradingpremises.premises.registered.heading = Premises registered
 tradingpremises.have.registered.premises.text = You have registered {0} trading premises.
 tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
