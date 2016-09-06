@@ -64,7 +64,7 @@ case class BusinessActivities(
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
-      Some(_), Some(x), Some(_), Some(_), Some(_), _, Some(_), _
+      Some(_), _, Some(_), Some(_), Some(_), _, _, _
       ) => true
       case _ => false
     }
