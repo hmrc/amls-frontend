@@ -10,7 +10,7 @@ trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
 
-  def get = Authorised.async {
+  def get(completed: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetch[Supervision](Supervision.key) map {
         case Some(data) =>
