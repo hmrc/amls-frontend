@@ -1,3 +1,5 @@
 @()(implicit request: Request[_])
 <p>@Messages("status.submissionready.description")</p>
-<a href="@controllers.declaration.DeclarationController.get()" class="button" type="submit">@Messages("status.submissionready.buttontext")</a>
+<p>@Messages("status.submissionready.description2")</p>
+<p>@Messages("status.submissionready.description3")</p>
+<a href="@controllers.declaration.routes.DeclarationController.get()" class="button" type="submit">@Messages("status.submissionready.buttontext")</a>

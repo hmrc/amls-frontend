@@ -71,10 +71,6 @@ trait StatusController extends BaseController {
                   reviewDetails <- businessMatching.reviewDetails
                 } yield reviewDetails.businessName
               }
-              case None => {
-                //should go and refresh the cache
-                None
-              }
             }
           }
 
@@ -108,7 +104,7 @@ object StatusController extends StatusController {
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val progressService = ProgressService
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
-
+  // $COVERAGE-ON$
 }
 
 

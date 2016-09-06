@@ -37,7 +37,8 @@ trait AuthEnrolmentsService {
 }
 
 object AuthEnrolmentsService extends AuthEnrolmentsService {
-
+  // $COVERAGE-OFF$
   override private[services] val authConnector = AuthConnector
+  // $COVERAGE-ON$
 
 }
