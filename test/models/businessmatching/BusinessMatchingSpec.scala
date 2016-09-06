@@ -13,7 +13,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
     val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
     val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB"))
-    val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0001234567890")
+    val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")
     val TypeOfBusinessModel = TypeOfBusiness("test")
     val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
 
@@ -31,7 +31,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
           "country" -> "GB"
         ),
         "businessName" -> "BusinessName",
-        "businessType" -> "Sole Trader",
+        "businessType" -> "Unincorporated Body",
         "safeId" -> "XE0001234567890"
       ),
       "typeOfBusiness" -> Json.obj(
@@ -96,8 +96,9 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
     "isComplete" must {
 
-      "equal true when all properties do not equal None" in {
-        businessMatching.isComplete mustEqual true
+      "equal true when all properties do not equal None and businessType includes UnincorporatedBody" in {
+        val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")
+        businessMatching.reviewDetails(ReviewDetailsModel).isComplete mustEqual true
       }
 
       "equal false when all properties equal `None`" in {
