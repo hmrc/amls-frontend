@@ -17,54 +17,46 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
     val TypeOfBusinessModel = TypeOfBusiness("test")
     val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
 
+    val jsonBusinessMatching = Json.obj(
+      "activities" -> Json.obj(
+          "businessActivities" -> Seq("05", "06", "07")
+      ),
+      "reviewDetails" -> Json.obj(
+        "businessAddress" -> Json.obj(
+          "line_1" -> "line1",
+          "line_2" -> "line2",
+          "line_3" -> "line3",
+          "line_4" -> "line4",
+          "postcode" -> "NE77 0QQ",
+          "country" -> "GB"
+        ),
+        "businessName" -> "BusinessName",
+        "businessType" -> "Sole Trader",
+        "safeId" -> "XE0001234567890"
+      ),
+      "typeOfBusiness" -> Json.obj(
+        "typeOfBusiness" -> "test"
+      ),
+      "companyRegistrationNumber" -> Json.obj(
+        "companyRegistrationNumber" -> "12345678"
+      ),
+      "hasChanged" -> false
+    )
+
+    val businessMatching = BusinessMatching(
+      Some(ReviewDetailsModel),
+      Some(BusinessActivitiesModel),
+      Some(TypeOfBusinessModel),
+      Some(CompanyRegistrationNumberModel),
+      hasChanged = false)
+
     "JSON validation" must {
 
       "READ the JSON successfully and return the domain Object" in {
-
-        val businessMatching = BusinessMatching(
-          Some(ReviewDetailsModel),
-          Some(BusinessActivitiesModel),
-          Some(TypeOfBusinessModel),
-          Some(CompanyRegistrationNumberModel))
-
-        val jsonBusinessMatching = Json.obj("businessActivities" -> Seq("05", "06", "07"),
-          "businessName" -> "BusinessName",
-          "businessType" -> "Sole Trader",
-          "businessAddress" -> Json.obj("line_1" -> "line1",
-            "line_2" -> "line2",
-            "line_3" -> "line3",
-            "line_4" -> "line4",
-            "postcode" -> "NE77 0QQ",
-            "country" -> "GB"),
-          "safeId" -> "XE0001234567890",
-          "typeOfBusiness" -> "test",
-          "companyRegistrationNumber" -> "12345678"
-        )
-
         Json.fromJson[BusinessMatching](jsonBusinessMatching) must be(JsSuccess(businessMatching))
       }
 
       "WRITE the JSON successfully from the domain Object" in {
-
-        val businessMatching = BusinessMatching(
-          Some(ReviewDetailsModel),
-          Some(BusinessActivitiesModel),
-          Some(TypeOfBusinessModel),
-          Some(CompanyRegistrationNumberModel))
-
-        val jsonBusinessMatching = Json.obj("businessActivities" -> Seq("05", "06", "07"),
-          "businessName" -> "BusinessName",
-          "businessType" -> "Sole Trader",
-          "businessAddress" -> Json.obj("line_1" -> "line1",
-            "line_2" -> "line2",
-            "line_3" -> "line3",
-            "line_4" -> "line4",
-            "postcode" -> "NE77 0QQ",
-            "country" -> "GB"),
-          "safeId" -> "XE0001234567890",
-          "typeOfBusiness" -> "test",
-          "companyRegistrationNumber" -> "12345678")
-
         Json.toJson(businessMatching) must be(jsonBusinessMatching)
       }
     }
@@ -76,28 +68,28 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "Merged with BusinessActivities" must {
         "return BusinessMatching with correct BusinessActivities" in {
           val result = initial.activities(BusinessActivitiesModel)
-          result must be(BusinessMatching(None, Some(BusinessActivitiesModel), None))
+          result must be(BusinessMatching(None, Some(BusinessActivitiesModel), None, hasChanged = true))
         }
       }
 
       "Merged with ReviewDetails" must {
         "return BusinessMatching with correct reviewDetails" in {
           val result = initial.reviewDetails(ReviewDetailsModel)
-          result must be(BusinessMatching(Some(ReviewDetailsModel), None, None))
+          result must be(BusinessMatching(Some(ReviewDetailsModel), None, None, hasChanged = true))
         }
       }
 
       "Merged with TypeOfBusiness" must {
         "return BusinessMatching with correct TypeOfBusiness" in {
           val result = initial.typeOfBusiness(TypeOfBusinessModel)
-          result must be(BusinessMatching(None, None, Some(TypeOfBusinessModel), None))
+          result must be(BusinessMatching(None, None, Some(TypeOfBusinessModel), None, hasChanged = true))
         }
       }
 
       "Merged with CompanyRegistrationNumberModel" must {
         "return BusinessMatching with correct CompanyRegistrationNumberModel" in {
           val result = initial.companyRegistrationNumber(CompanyRegistrationNumberModel)
-          result must be(BusinessMatching(None, None, None, Some(CompanyRegistrationNumberModel)))
+          result must be(BusinessMatching(None, None, None, Some(CompanyRegistrationNumberModel), hasChanged = true))
         }
       }
     }
