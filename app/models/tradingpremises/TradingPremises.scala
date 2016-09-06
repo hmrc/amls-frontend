@@ -44,6 +44,7 @@ case class TradingPremises(
     this match {
       case TradingPremises(_,Some(x), _, _,_,_,Some(_),_) => true
       case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _) => true
+      case TradingPremises(None, None, None, None, None, None, None, None) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
@@ -55,17 +56,17 @@ object TradingPremises {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tradingpremises"
-    val notStarted = Section(messageKey, NotStarted, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+    val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
       premises =>
         if (premises.nonEmpty && (premises forall { _.isComplete })) {
-          Section(messageKey, Completed, controllers.tradingpremises.routes.SummaryController.answers())
+          Section(messageKey, Completed, false, controllers.tradingpremises.routes.SummaryController.answers())
         } else {
           val index = premises.indexWhere {
             case model if !model.isComplete => true
             case _ => false
           }
-          Section(messageKey, Started, controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
+          Section(messageKey, Started, false, controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
         }
     }
   }

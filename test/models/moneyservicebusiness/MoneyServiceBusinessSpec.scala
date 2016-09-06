@@ -39,7 +39,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
       "model is empty" should {
         "return a NotStarted Section" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn None
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, NotStarted, controllers.msb.routes.WhatYouNeedController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, NotStarted, false,  controllers.msb.routes.WhatYouNeedController.get()))
         }
       }
 
@@ -47,14 +47,14 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
         "return a NotStarted Section" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(MoneyServiceBusiness(Some(MsbServices(
             Set(ChequeCashingScrapMetal)))))
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Started, controllers.msb.routes.WhatYouNeedController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Started, false,  controllers.msb.routes.WhatYouNeedController.get()))
         }
       }
 
       "model is complete" should {
         "return a Completed Section" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeModel)
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, controllers.msb.routes.SummaryController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get()))
         }
       }
     }
