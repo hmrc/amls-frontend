@@ -90,7 +90,7 @@ POST        /estate-agents/services                                     controll
 GET         /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
 POST        /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/check-your-answers                           controllers.estateagentbusiness.SummaryController.get()
+GET         /estate-agents/check-your-answers                           controllers.estateagentbusiness.SummaryController.get(completed: Boolean ?= false)
 
 GET         /business-matching/business-type                            controllers.businessmatching.BusinessTypeController.get()
 POST        /business-matching/business-type                            controllers.businessmatching.BusinessTypeController.post()
@@ -258,7 +258,7 @@ POST        /supervision/professional-body                              controll
 GET         /supervision/penalised                                      controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /supervision/penalised                                      controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /supervision/check-your-answers                             controllers.supervision.SummaryController.get()
+GET         /supervision/check-your-answers                             controllers.supervision.SummaryController.get(completed: Boolean ?= false)
 
 GET         /money-service-business/what-you-need                       controllers.msb.WhatYouNeedController.get()
 GET         /money-service-business/services                            controllers.msb.ServicesController.get(edit: Boolean ?= false)
