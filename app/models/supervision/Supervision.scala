@@ -49,7 +49,18 @@ object Supervision {
     override def apply(): String = "supervision"
   }
 
-  implicit val formats = Json.format[Supervision]
+  implicit val reads: Reads[Supervision] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      (__ \ "anotherBody").readNullable[AnotherBody] and
+        (__ \ "professionalBodyMember").readNullable[ProfessionalBodyMember] and
+        (__ \ "professionalBody").readNullable[ProfessionalBody] and
+        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
+      ) apply Supervision.apply _
+  }
+
+  implicit val writes: Writes[Supervision] = Json.writes[Supervision]
 
   implicit def default(supervision: Option[Supervision]): Supervision =
     supervision.getOrElse(Supervision())
