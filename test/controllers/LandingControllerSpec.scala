@@ -75,6 +75,61 @@ class LandingControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         }
 
       }
+
+      "an enrolment exists and"  when {
+        "there is data in S4L and" when {
+          "data has changed and" when{
+            "there is a subscription response" should{
+              "redirect to status controller" in new Fixture {
+                1 must be(2)
+              }
+            }
+            "there is no subscription response" should{
+              "refresh from API5 and redirect to status controller" in new Fixture{
+                1 must be(2)
+              }
+
+            }
+
+          }
+          "data has not changed" should{
+            "refresh from API5 and redirect to status controller" in new Fixture {
+              1 must be(2)
+            }
+          }
+        }
+
+        "there is no data in S4L" should {
+          "refresh from API5 and redirect to status controller" in new Fixture {
+            1 must be(2)
+          }
+        }
+      }
+
+      "an enrolment does not exist" when {
+        "there is data in S4L " should {
+          "redirect to status controller" in new Fixture {
+            1 must be(2)
+          }
+        }
+
+        "there is no data in S4L" when {
+          "there is data in keystore " should{
+            "copy keystore data to S4L and redirect to business type controler" in new Fixture {
+              1 must be(2)
+            }
+          }
+          "there is no data in keystore" should{
+            "redirect to business customer" in new Fixture {
+              1 must be(2)
+            }
+
+          }
+
+        }
+
+      }
+
     }
   }
 }
