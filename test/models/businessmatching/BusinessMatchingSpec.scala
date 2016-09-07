@@ -23,29 +23,20 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
     val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
 
     val jsonBusinessMatching = Json.obj(
-      "activities" -> Json.obj(
-          "businessActivities" -> Seq("05", "06", "07")
+      "businessActivities" -> Seq("05", "06", "07"),
+      "businessName" -> "BusinessName",
+      "businessType" -> "Unincorporated Body",
+      "businessAddress" -> Json.obj(
+        "line_1" -> "line1",
+        "line_2" -> "line2",
+        "line_3" -> "line3",
+        "line_4" -> "line4",
+        "postcode" -> "NE77 0QQ",
+        "country" -> "GB"
       ),
-      "reviewDetails" -> Json.obj(
-        "businessAddress" -> Json.obj(
-          "line_1" -> "line1",
-          "line_2" -> "line2",
-          "line_3" -> "line3",
-          "line_4" -> "line4",
-          "postcode" -> "NE77 0QQ",
-          "country" -> "GB"
-        ),
-        "businessName" -> "BusinessName",
-        "businessType" -> "Unincorporated Body",
-        "safeId" -> "XE0001234567890"
-      ),
-      "typeOfBusiness" -> Json.obj(
-        "typeOfBusiness" -> "test"
-      ),
-      "companyRegistrationNumber" -> Json.obj(
-        "companyRegistrationNumber" -> "12345678"
-      ),
-      "hasChanged" -> false
+      "safeId" -> "XE0001234567890",
+      "typeOfBusiness" -> "test",
+      "companyRegistrationNumber" -> "12345678"
     )
 
     val businessMatching = BusinessMatching(
@@ -58,7 +49,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
     "JSON validation" must {
 
       "READ the JSON successfully and return the domain Object" in {
-        Json.fromJson[BusinessMatching](jsonBusinessMatching) must be(JsSuccess(businessMatching))
+        Json.fromJson[BusinessMatching](jsonBusinessMatching - "hasChanged") must be(JsSuccess(businessMatching))
       }
 
       "WRITE the JSON successfully from the domain Object" in {

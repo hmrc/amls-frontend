@@ -56,15 +56,27 @@ object BusinessMatching {
 
   val key = "business-matching"
 
-  implicit val reads: Reads[BusinessMatching] = (
-    (__ \ "reviewDetails").readNullable[ReviewDetails] and
-      (__ \ "activities").readNullable[BusinessActivities] and
-      (__ \ "typeOfBusiness").readNullable[TypeOfBusiness] and
-      (__ \ "companyRegistrationNumber").readNullable[CompanyRegistrationNumber] and
-      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
-    ) apply BusinessMatching.apply _
+    implicit val reads: Reads[BusinessMatching] = (
+        __.read[Option[ReviewDetails]] and
+        __.read[Option[BusinessActivities]] and
+        __.read[Option[TypeOfBusiness]] and
+        __.read[Option[CompanyRegistrationNumber]] and
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+      ) (BusinessMatching.apply _)
 
-  implicit val writes: Writes[BusinessMatching] = Json.writes[BusinessMatching]
+  implicit val writes: Writes[BusinessMatching] =
+    Writes[BusinessMatching] {
+      model =>
+        Seq(
+          Json.toJson(model.reviewDetails).asOpt[JsObject],
+          Json.toJson(model.activities).asOpt[JsObject],
+          Json.toJson(model.typeOfBusiness).asOpt[JsObject],
+          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject],
+          Json.toJson(model.hasChanged).asOpt[JsObject]
+        ).flatten.fold(Json.obj()) {
+          _ ++ _
+        }
+    }
 
   implicit def default(businessMatching: Option[BusinessMatching]): BusinessMatching =
     businessMatching.getOrElse(BusinessMatching())
