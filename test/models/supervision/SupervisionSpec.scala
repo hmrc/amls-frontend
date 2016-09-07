@@ -140,7 +140,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
         }
 
         "Deserialise as expected" in {
-          completeJson.as[Supervision] must be(completeModel)
+          (completeJson - "hasChanged").as[Supervision] must be(completeModel)
         }
       }
     }
