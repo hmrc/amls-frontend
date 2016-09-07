@@ -2,8 +2,13 @@ package models.businessmatching
 
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 
 class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
@@ -96,41 +101,78 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
     "isComplete" must {
 
-      "equal true when all properties do not equal None and businessType includes UnincorporatedBody" in {
-        val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")
-        businessMatching.reviewDetails(ReviewDetailsModel).isComplete mustEqual true
+      "equal true" when {
+        "reviewDetails and activites are set" in {
+          businessMatching.copy(typeOfBusiness = None, companyRegistrationNumber = None).isComplete mustBe true
+        }
+        "reviewDetails, activites and typeOfBusiness are set and BusinessType contains UnincorporatedBody" in {
+          businessMatching.copy(companyRegistrationNumber = None).isComplete mustBe true
+        }
+        "reviewDetails, activites and crn are set and BusinessType contains LimitedCompany" in {
+          val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0001234567890")
+          businessMatching.copy(typeOfBusiness = None, reviewDetails = Some(ReviewDetailsModel)).isComplete mustBe true
+        }
+        "reviewDetails, activites and crn are set and BusinessType contains LPrLLP" in {
+          val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0001234567890")
+          businessMatching.copy(typeOfBusiness = None, reviewDetails = Some(ReviewDetailsModel)).isComplete mustBe true
+        }
       }
 
-      "equal false when all properties equal `None`" in {
-        BusinessMatching().isComplete mustEqual false
+      "equal false" when {
+        "no properties are set" in {
+          BusinessMatching().isComplete mustBe false
+        }
+        "reviewDetails and activites are not set" in {
+          businessMatching.copy(reviewDetails = None,activities = None).isComplete mustBe false
+        }
+        "reviewDetails is not set and activites is set" in {
+          businessMatching.copy(reviewDetails = None).isComplete mustBe false
+        }
+        "reviewDetails is set and activites is not" in {
+          businessMatching.copy(activities = None).isComplete mustBe false
+        }
+        "reviewDetails and activites are set, type is set and UnincorporatedBody is not set" in {
+          val testModel = businessMatching.copy(
+            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0001234567890")),
+            companyRegistrationNumber = None
+          )
+          testModel.isComplete mustBe false
+        }
+        "reviewDetails and activites are set, crn is set, LimitedCompany and UnincorporatedBody are not set" in {
+          val testModel = businessMatching.copy(
+            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")),
+            typeOfBusiness = None
+          )
+          testModel.isComplete mustBe false
+        }
       }
+
     }
 
-//    "section" must {
-//
-//      "return `NotStarted` section when there is no section in Save4Later" in {
-//        implicit val cache = CacheMap("", Map.empty)
-//        EstateAgentBusiness.section mustBe Section("eab", NotStarted, false,  controllers.estateagentbusiness.routes.WhatYouNeedController.get)
-//      }
-//
-//      "return `Started` section when there is a section which isn't completed" in {
-//        implicit val cache = mock[CacheMap]
-//        implicit val ac = mock[AuthContext]
-//        when {
-//          cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
-//        } thenReturn Some(incompleteModel)
-//        EstateAgentBusiness.section mustBe Section("eab", Started, false, controllers.estateagentbusiness.routes.WhatYouNeedController.get)
-//      }
-//
-//      "return `Completed` section when there is a section which is completed" in {
-//        implicit val cache = mock[CacheMap]
-//        implicit val ac = mock[AuthContext]
-//        when {
-//          cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
-//        } thenReturn Some(completeModel)
-//        EstateAgentBusiness.section mustBe Section("eab", Completed, false, controllers.estateagentbusiness.routes.SummaryController.get(true))
-//
-//      }
-//    }
+    "section" must {
+
+      "return `NotStarted` section when there is no section in Save4Later" in {
+        implicit val cache = CacheMap("", Map.empty)
+        BusinessMatching.section mustBe Section("businessmatching", NotStarted, false,  controllers.businessmatching.routes.RegisterServicesController.get())
+      }
+
+      "return `Started` section when there is a section which isn't completed" in {
+        implicit val cache = mock[CacheMap]
+        implicit val ac = mock[AuthContext]
+        when {
+          cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
+        } thenReturn Some(BusinessMatching())
+        BusinessMatching.section mustBe Section("businessmatching", Started, false, controllers.businessmatching.routes.RegisterServicesController.get())
+      }
+
+      "return `Completed` section when there is a section which is completed" in {
+        implicit val cache = mock[CacheMap]
+        implicit val ac = mock[AuthContext]
+        when {
+          cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
+        } thenReturn Some(businessMatching)
+        BusinessMatching.section mustBe Section("businessmatching", Completed, false, controllers.businessmatching.routes.SummaryController.get(true))
+      }
+    }
   }
 }

@@ -104,7 +104,7 @@ POST        /business-matching/activities                               controll
 GET         /business-matching/registration-number                      controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
 POST        /business-matching/registration-number                      controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
 
-GET         /business-matching/check-your-answers                       controllers.businessmatching.SummaryController.get()
+GET         /business-matching/check-your-answers                       controllers.businessmatching.SummaryController.get(completed: Boolean ?= false)
 
 GET         /bank-details/what-you-need/:index                          controllers.bankdetails.WhatYouNeedController.get(index: Int)
 

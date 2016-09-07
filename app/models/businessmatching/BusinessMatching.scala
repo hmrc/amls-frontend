@@ -44,7 +44,7 @@ object BusinessMatching {
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.businessmatching.routes.SummaryController.get())
+          Section(messageKey, Completed, model.hasChanged, controllers.businessmatching.routes.SummaryController.get(true))
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.businessmatching.routes.RegisterServicesController.get())
         }
