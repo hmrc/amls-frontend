@@ -56,12 +56,7 @@ trait StatusController extends BaseController {
     Authorised.async {
       implicit authContext =>
         implicit request =>
-          val amlsRef = authContext.enrolmentsUri match {
-            case Some(uri) => {
-              enrolmentsService.amlsRegistrationNumber(uri)
-            }
-            case _ => Future.successful(None)
-          }
+          val amlsRef = enrolmentsService.amlsRegistrationNumber
 
           val businessName = landingService.cacheMap map {
             cacheOption => cacheOption match {
@@ -71,6 +66,7 @@ trait StatusController extends BaseController {
                   reviewDetails <- businessMatching.reviewDetails
                 } yield reviewDetails.businessName
               }
+              case None => None
             }
           }
 
@@ -83,11 +79,11 @@ trait StatusController extends BaseController {
                 case Some(mlrRegNumber) =>
                   etmpStatus(mlrRegNumber)(hc, authContext) map {
                     foundStatus =>
-                      Ok(status(mlrRegNumber, businessNameOption.getOrElse(""), CompletionStateViewModel(foundStatus)))
+                      Ok(status(mlrRegNumber, businessNameOption, CompletionStateViewModel(foundStatus)))
                   }
                 case None => notYetSubmitted(hc, authContext) map {
                   foundStatus =>
-                    Ok(status("Not Found", businessNameOption.getOrElse(""), CompletionStateViewModel(foundStatus)))
+                    Ok(status("Not Found", businessNameOption, CompletionStateViewModel(foundStatus)))
                 }
               }
             }

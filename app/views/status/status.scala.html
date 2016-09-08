@@ -8,7 +8,7 @@
 @import models.status.SubmissionDecisionRejected
 @import models.status.{Current,SubmissionReady}
 
-@(regNo: String, businessName: String, completionState: CompletionStateViewModel)(implicit request: Request[_])
+@(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel)(implicit request: Request[_])
 @borderClass(entry:(SubmissionStatus,CompletionState)) = {
     @entry match{
         case (NotCompleted,Current)=> {status-list--start}
@@ -44,15 +44,22 @@ case _ => {Messages("status.incomplete.heading")}
 
 <div class="grid-layout">
     <div class="grid-layout__column grid-layout__column--2-3">
+        @(businessName,completionState.currentState) match {
+        case (Some(bn),SubmissionDecisionApproved) => {
         <div class="panel-indent panel-indent--gutter panel-border-wide">
-            <p class="heading-small">@Messages("status.business")</p><p>@businessName</p>
-
-            @completionState.currentState match {
-            case SubmissionDecisionApproved
-                => {<p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>}
-            case _ => {}
-            }
-        </div>
+            <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+            <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
+        </div>}
+        case (Some(bn),_) =>{
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
+            <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+        </div>}
+        case (None,SubmissionDecisionApproved) => {
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
+            <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
+        </div>}
+        case _ => {}
+        }
     </div>
 
 </div>
