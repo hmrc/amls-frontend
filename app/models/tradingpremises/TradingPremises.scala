@@ -64,9 +64,9 @@ object TradingPremises {
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
       _.filterNot(_ == TradingPremises()) match {
         case Nil => notStarted
-        case premises if (premises.nonEmpty && (premises forall {
+        case premises if premises.nonEmpty && premises.forall {
           _.isComplete
-        })) => complete
+        } => complete
         case premises => {
           val index = premises.indexWhere {
             case model if !model.isComplete => true
