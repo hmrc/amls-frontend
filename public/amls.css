@@ -461,7 +461,10 @@ form input[type="text"].form-control,
 form input[type="tel"].form-control,
 form input[type="number"].form-control {
   border: 2px solid #6f777b;
-  width: 50%;
+}
+
+.form-date .form-group-year {
+  width: 70px;
 }
 
 form .form-label-bold {
