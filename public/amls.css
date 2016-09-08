@@ -457,7 +457,9 @@ select {
 }
 
 /* These are all prefixed with `form` to override some stuff (apparently) */
-form input[type=text].form-control {
+form input[type="text"].form-control,
+form input[type="tel"].form-control,
+form input[type="number"].form-control {
   border: 2px solid #6f777b;
   width: 50%;
 }
@@ -486,8 +488,10 @@ form .date .form-group {
   width: 60px;
 }
 
-form .date .form-field input[type=text],
-form .date .form-group input[type=text] {
+form .date .form-field input[type="text"],
+form .date .form-group input[type="text"],
+form .date .form-field input[type="number"],
+form .date .form-group input[type="number"] {
   width: 100%;
 }
 
@@ -817,7 +821,7 @@ fieldset.panel-indent legend {
 
 @media screen and (max-width: 640px) {
   .what-you-need > .grid-layout__column--1-3 {
-    margin: 0 15px 15px;
+    margin: 0 auto 15px;
   }
 
   .declaration p {
