@@ -82,12 +82,14 @@ trait StatusController extends BaseController {
               amlsRefOption match {
                 case Some(mlrRegNumber) =>
                   etmpStatus(mlrRegNumber)(hc, authContext) map {
-                    foundStatus =>
+                    foundStatus => {
                       Ok(status(mlrRegNumber, businessNameOption.getOrElse(""), CompletionStateViewModel(foundStatus)))
+                    }
                   }
                 case None => notYetSubmitted(hc, authContext) map {
-                  foundStatus =>
+                  foundStatus => {
                     Ok(status("Not Found", businessNameOption.getOrElse(""), CompletionStateViewModel(foundStatus)))
+                  }
                 }
               }
             }
