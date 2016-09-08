@@ -104,7 +104,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         ResponsiblePeople.section(mockCacheMap).status must be (models.registrationprogress.Completed)
       }
     }
-
   }
 
   "None" when {
