@@ -4,21 +4,23 @@ import connectors.AuthConnector
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience{
 
   object AuthEnrolmentsService extends AuthEnrolmentsService {
     override private[services] val authConnector: AuthConnector = mock[AuthConnector]
   }
 
-  implicit val hc = HeaderCarrier()
+  implicit val hc = mock[HeaderCarrier]
+  implicit val ac = mock[AuthContext]
 
   private val amlsRegistrationNumber = "XXML00000100105"
 
@@ -31,8 +33,8 @@ class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFut
     "return an AMLS regsitration number" in {
 
       when(AuthEnrolmentsService.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
-
-      whenReady(AuthEnrolmentsService.amlsRegistrationNumber("")){
+      when(ac.enrolmentsUri).thenReturn(Some("uri"))
+      whenReady(AuthEnrolmentsService.amlsRegistrationNumber){
         number => number.get mustEqual(amlsRegistrationNumber)
       }
 

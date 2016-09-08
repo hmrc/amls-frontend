@@ -49,7 +49,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         Some(BusinessMatching(Some(reviewDtls), None)))
 
       when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", NotStarted, false, Call("", "")))))
-
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
 
@@ -75,7 +75,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
       when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(
         Some(BusinessMatching(Some(reviewDtls), None)))
-
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
       when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", NotStarted, false, Call("", "")))))
 
 
@@ -98,7 +98,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         val cacheMap = mock[CacheMap]
         when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
-
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
           Some(BusinessMatching(Some(reviewDtls), None)))
 
@@ -131,7 +131,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
           Some(BusinessMatching(Some(reviewDtls), None)))
-
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
         when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
 
         val result = controller.get()(request)
@@ -163,7 +163,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
           Some(BusinessMatching(Some(reviewDtls), None)))
 
 
-        when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
 
         when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
 
@@ -205,7 +205,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any())).thenReturn(
           Some(SubscriptionResponse("","",0,None,0,0,"")))
 
-        when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
 
         when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
 
@@ -246,7 +246,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any())).thenReturn(
           Some(SubscriptionResponse("","",0,None,0,0,"")))
 
-        when(controller.enrolmentsService.amlsRegistrationNumber(any())(any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
 
         when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority.copy(enrolments = Some("bar"))))
 
