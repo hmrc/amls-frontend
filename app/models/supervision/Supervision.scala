@@ -34,7 +34,7 @@ object Supervision {
     cache.getEntry[Supervision](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.supervision.routes.SummaryController.get(true))
+          Section(messageKey, Completed, model.hasChanged, controllers.supervision.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.supervision.routes.WhatYouNeedController.get())
         }
