@@ -85,7 +85,7 @@
 }
 
 @hmrcGovUkTemplate(
-    Some(title),
+    Some(title) + " - " @Messages("amls.title") " - " @Messages("gov.title"),
     bodyClasses
 )(
     head,
