@@ -9,13 +9,18 @@
     panel: Boolean = false,
     jsHidden: Boolean = false,
     labelHidden: Boolean = false,
-    requiredField: Boolean = true
+    requiredField: Boolean = true,
+    attrType: String = "",
+    attrMin: String = "",
+    attrMax: String = "",
+    attrPattern: String = "",
+    attrDescribedBy: String = ""
 )(implicit lang: Lang)
 
 <div class="form-group @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}">
     <label>
         @if(labelText.nonEmpty) {
-            <span class="form-label@if(bold){-bold} @if(labelHidden) {amls-js-hidden}">@Messages(labelText)</span>
+            <span class="form-label@if(bold){-bold} @if(labelHidden) {visuallyhidden}">@Messages(labelText)</span>
         }
         @if(hintText.nonEmpty) {
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
@@ -23,8 +28,15 @@
         @if(field.hasErrors) {
             <span class="error-notification">@field.error</span>
         }
-        <input name="@field.name" class="form-control @classes.mkString(" ")" type="text" value="@field.value" id="@field.id"
-               @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" } @if(requiredField) { aria-required="true" required="required" }
-        >
+        <input name="@field.name" class="form-control @classes.mkString(" ")"
+            value="@field.value" id="@field.id"
+            @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
+            @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
+            @if(requiredField) { aria-required="true" required="required" }
+            @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
+            @if(attrMin.nonEmpty) { min="@attrMin" }
+            @if(attrMax.nonEmpty) { max="@attrMax" }
+            @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
+        />
     </label>
 </div>
