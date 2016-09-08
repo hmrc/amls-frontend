@@ -61,7 +61,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     howManyEmployees = Some(DefaultHowManyEmployees),
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
-    taxMatters = Some(DefaultTaxMatters)
+    taxMatters = Some(DefaultTaxMatters),
+    hasChanged = false
   )
 
   val completeJson = Json.obj(
@@ -91,18 +92,30 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     "accountantsAddressLine4" -> "address4",
     "accountantsAddressPostCode" -> "POSTCODE",
     "manageYourTaxAffairs" -> false,
-    "hasWrittenGuidance" -> true
+    "hasWrittenGuidance" -> true,
+    "hasChanged" -> false
   )
 
   val partialModel = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
 
-  "BusinessActivities" must {
+  "BusinessActivities Serialisation" must {
     "Serialise as expected" in {
-      Json.toJson(completeModel) must be(completeJson)
+      Json.toJson(completeModel) must
+        be(completeJson)
     }
 
     "Deserialise as expected" in {
-      completeJson.as[BusinessActivities] must be(completeModel)
+      completeJson.as[BusinessActivities] must
+        be(completeModel)
+    }
+  }
+
+  it when {
+    "hasChanged is missing from the Json" must {
+      "Deserialise correctly" in {
+        (completeJson - "hasChanged").as[BusinessActivities] must
+          be (completeModel)
+      }
     }
   }
 
@@ -119,7 +132,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     val partialJson = Json.obj(
       "businessFranchise" -> true,
-      "franchiseName" -> DefaultFranchiseName
+      "franchiseName" -> DefaultFranchiseName,
+      "hasChanged" -> false
     )
 
     "Serialise as expected" in {

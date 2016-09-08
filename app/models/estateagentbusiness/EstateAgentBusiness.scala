@@ -39,7 +39,7 @@ object EstateAgentBusiness {
     cache.getEntry[EstateAgentBusiness](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.estateagentbusiness.routes.SummaryController.get(true))
+          Section(messageKey, Completed, model.hasChanged, controllers.estateagentbusiness.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.estateagentbusiness.routes.WhatYouNeedController.get())
         }
@@ -52,14 +52,25 @@ object EstateAgentBusiness {
   val key = "estate-agent-business"
 
   implicit val reads: Reads[EstateAgentBusiness] = (
-    (__ \ "services").readNullable[Services] and
-    (__ \ "redressScheme").readNullable[RedressScheme] and
-    (__ \ "professionalBody").readNullable[ProfessionalBody] and
-    (__ \ "penalisedUnderEstateAgentsAct").readNullable[PenalisedUnderEstateAgentsAct] and
-      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
-    ) apply EstateAgentBusiness.apply _
+    __.read[Option[Services]] and
+      __.read[Option[RedressScheme]] and
+      __.read[Option[ProfessionalBody]] and
+      __.read[Option[PenalisedUnderEstateAgentsAct]] and
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+    ) (EstateAgentBusiness.apply _)
 
-  implicit val writes: Writes[EstateAgentBusiness] = Json.writes[EstateAgentBusiness]
+  implicit val writes: Writes[EstateAgentBusiness] =
+    Writes[EstateAgentBusiness] {
+      model =>
+        Seq(
+          Json.toJson(model.services).asOpt[JsObject],
+          Json.toJson(model.redressScheme).asOpt[JsObject],
+          Json.toJson(model.professionalBody).asOpt[JsObject],
+          Json.toJson(model.penalisedUnderEstateAgentsAct).asOpt[JsObject]
+        ).flatten.fold(Json.obj()) {
+          _ ++ _
+        } + ("hasChanged" -> JsBoolean(model.hasChanged))
+    }
 
   implicit def default(aboutYou: Option[EstateAgentBusiness]): EstateAgentBusiness =
     aboutYou.getOrElse(EstateAgentBusiness())

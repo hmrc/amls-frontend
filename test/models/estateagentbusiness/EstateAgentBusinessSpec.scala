@@ -22,22 +22,14 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
   val newRedressScheme = OmbudsmanServices
 
   val completeJson = Json.obj(
-    "services" -> Json.obj(
-      "services" -> Seq("01", "02", "03")
-    ),
-    "redressScheme" -> Json.obj(
-      "isRedress" -> true,
-      "propertyRedressScheme" -> "04",
-      "propertyRedressSchemeOther" -> "test"
-    ),
-    "penalisedUnderEstateAgentsAct" -> Json.obj(
-      "penalisedUnderEstateAgentsAct" -> true,
-      "penalisedUnderEstateAgentsActDetails" -> "test"
-    ),
-    "professionalBody" -> Json.obj(
-      "penalised" -> true,
-      "professionalBody" -> "details"
-    ),
+    "services" -> Seq("01", "02","03"),
+    "isRedress" -> true,
+    "propertyRedressScheme" -> "04",
+    "propertyRedressSchemeOther" -> "test",
+    "penalised" -> true,
+    "professionalBody" -> "details",
+    "penalisedUnderEstateAgentsAct" -> true,
+    "penalisedUnderEstateAgentsActDetails" -> "test",
     "hasChanged" -> false
   )
 
@@ -45,25 +37,21 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
     services = Some(services),
     redressScheme =  Some(redressSchemeOther),
     professionalBody = Some(professionalBody),
-    penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct)
-  )
+    penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct))
 
   val incompleteModel = EstateAgentBusiness(
     services = None,
     redressScheme = None,
     professionalBody = None,
-    penalisedUnderEstateAgentsAct = None
-  )
+    penalisedUnderEstateAgentsAct = None)
 
   "EstateAgentBusiness" must {
     "validate complete json" must {
       "Serialise as expected" in {
-        Json.toJson(completeModel) must
-          be(completeJson)
+        Json.toJson(completeModel) must be(completeJson)
       }
       "Deserialise as expected" in {
-        (completeJson  - "hasChanged").as[EstateAgentBusiness] must
-          be(completeModel)
+        (completeJson  - "hasChanged").as[EstateAgentBusiness] must be(completeModel)
       }
     }
   }
@@ -176,7 +164,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar {
       when {
         cache.getEntry[EstateAgentBusiness](eqTo(EstateAgentBusiness.key))(any())
       } thenReturn Some(completeModel)
-      EstateAgentBusiness.section mustBe Section("eab", Completed, false, controllers.estateagentbusiness.routes.SummaryController.get(true))
+      EstateAgentBusiness.section mustBe Section("eab", Completed, false, controllers.estateagentbusiness.routes.SummaryController.get())
 
     }
   }
