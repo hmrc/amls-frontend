@@ -499,7 +499,7 @@ form .inline .block-label {
   clear: both;
 }
 
-.visuallyhidden-legend legend {
+.visuallyhidden-legend > legend {
   border: 0;
   clip: rect(0 0 0 0);
   clip: rect(0, 0, 0, 0);
