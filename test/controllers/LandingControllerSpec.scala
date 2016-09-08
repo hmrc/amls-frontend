@@ -29,6 +29,7 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
   trait Fixture extends AuthorisedFixture {
     self =>
     val controller = new LandingController {
+      override val enrolmentsService = mock[AuthEnrolmentsService]
       override val landingService = mock[LandingService]
       override val authConnector = self.authConnector
       override val enrolmentsService = mock[AuthEnrolmentsService]
@@ -42,6 +43,7 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
       "the landing service has a saved form and " when {
         "the form has not been submitted" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
@@ -52,6 +54,7 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", 1.00, None, 1.00, 1.00, "")))
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
@@ -71,6 +74,7 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
@@ -79,12 +83,24 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
         "the landing service has no valid review details" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
         }
 
+        "the user has an AMLS enrolment" in new Fixture {
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
+          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+        }
+
       }
+
+
     }
   }
 }
