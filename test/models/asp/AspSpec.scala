@@ -151,7 +151,6 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
   it when {
     "hasChanged field is missing from the Json" must {
       "Deserialise correctly" in {
-        println(completeJson - "hasChanged")
         (completeJson - "hasChanged").as[Asp] must
           be (completeModel)
       }
