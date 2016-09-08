@@ -122,11 +122,10 @@ object BusinessActivities {
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject],
         Json.toJson(model.whoIsYourAccountant).asOpt[JsObject],
-        Json.toJson(model.taxMatters).asOpt[JsObject],
-        Json.toJson(model.hasChanged).asOpt[JsObject]
+        Json.toJson(model.taxMatters).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
-      }
+      } + ("hasChanged" -> JsBoolean(model.hasChanged))
   }
 
   implicit def default(businessActivities: Option[BusinessActivities]): BusinessActivities =

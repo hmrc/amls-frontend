@@ -44,7 +44,7 @@ object BusinessMatching {
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.businessmatching.routes.SummaryController.get(true))
+          Section(messageKey, Completed, model.hasChanged, controllers.businessmatching.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.businessmatching.routes.RegisterServicesController.get())
         }
@@ -71,11 +71,10 @@ object BusinessMatching {
           Json.toJson(model.reviewDetails).asOpt[JsObject],
           Json.toJson(model.activities).asOpt[JsObject],
           Json.toJson(model.typeOfBusiness).asOpt[JsObject],
-          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject],
-          Json.toJson(model.hasChanged).asOpt[JsObject]
+          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
-        }
+        } + ("hasChanged" -> JsBoolean(model.hasChanged))
     }
 
   implicit def default(businessMatching: Option[BusinessMatching]): BusinessMatching =

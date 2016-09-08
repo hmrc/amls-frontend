@@ -36,7 +36,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       ),
       "safeId" -> "XE0001234567890",
       "typeOfBusiness" -> "test",
-      "companyRegistrationNumber" -> "12345678"
+      "companyRegistrationNumber" -> "12345678",
+      "hasChanged" -> false
     )
 
     val businessMatching = BusinessMatching(
@@ -162,7 +163,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(businessMatching)
-        BusinessMatching.section mustBe Section("businessmatching", Completed, false, controllers.businessmatching.routes.SummaryController.get(true))
+        BusinessMatching.section mustBe Section("businessmatching", Completed, false, controllers.businessmatching.routes.SummaryController.get())
       }
     }
   }
