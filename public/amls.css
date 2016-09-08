@@ -463,6 +463,11 @@ form input[type="number"].form-control {
   border: 2px solid #6f777b;
 }
 
+form input[type="text"].form-control,
+form input[type="tel"].form-control {
+  width: 50%;
+}
+
 .form-date .form-group-year {
   width: 70px;
 }
@@ -633,12 +638,9 @@ table.summary td {
   }
   form input[type="text"].form-control,
   form input[type="tel"].form-control,
-  form input[type="number"].form-control {
-    width: 50%;
-  }
-  .form-group-day input[type="number"].form-control,
-  .form-group-month input[type="number"].form-control,
-  .form-group-year input[type="number"].form-control {
+  form .form-group-day input[type="number"].form-control,
+  form .form-group-month input[type="number"].form-control,
+  form .form-group-year input[type="number"].form-control {
     width: 100%;
   }
 }
