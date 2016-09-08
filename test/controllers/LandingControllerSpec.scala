@@ -32,7 +32,6 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override val landingService = mock[LandingService]
       override val authConnector = self.authConnector
-      override val enrolmentsService = mock[AuthEnrolmentsService]
     }
   }
 
@@ -125,12 +124,12 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
   }
 
   def setUpMocksForNoEnrolment(controller : LandingController) = {
-    when(controller.enrolmentsService.amlsRegistrationNumber(any())(any[HeaderCarrier], any[ExecutionContext]))
+    when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.successful(None))
   }
 
   def setUpMocksForAnEnrolmentExists(controller : LandingController) = {
-    when(controller.enrolmentsService.amlsRegistrationNumber(any())(any[HeaderCarrier], any[ExecutionContext]))
+    when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.successful(Some("TESTREGNO")))
   }
 

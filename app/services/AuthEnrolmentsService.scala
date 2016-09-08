@@ -37,11 +37,7 @@ trait AuthEnrolmentsService {
         }
       case None => Future.successful(None)
     }
-
-
-
   }
-
 }
 
 object AuthEnrolmentsService extends AuthEnrolmentsService {
