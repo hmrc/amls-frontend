@@ -32,7 +32,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
     "show an empty form on get with no data in store" in new Fixture {
       when(cache.fetch[Seq[TradingPremises]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -92,19 +92,20 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       val newRequest = request.withFormUrlEncodedBody(
         "msbServices[0]" -> "01"
       )
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(1,edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
     }
 
-    "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
+    "return a redirect to the 'detailed answers' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
 
       val currentModel = TradingPremises(
         msbServices = Some(MsbServices(
@@ -125,19 +126,19 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
         "msbServices[3]" -> "04"
       )
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(1, edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
     }
 
-    "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
+    "return a redirect to the 'detailed answers' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
       val currentModel = TradingPremises(
         msbServices = Some(MsbServices(
@@ -157,16 +158,16 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
         "msbServices[3]" -> "04"
       )
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(1, edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
     }
 
     "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
@@ -179,28 +180,22 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
             ))
           )
 
-          val newModel = currentModel.copy(
-            msbServices = Some(MsbServices(
-              Set(TransmittingMoney, CurrencyExchange, model)
-            ))
-          )
-
           val newRequest = request.withFormUrlEncodedBody(
             "msbServices[1]" -> "01",
             "msbServices[2]" -> "02",
             "msbServices[3]" -> id
           )
 
-          when(controller.dataCacheConnector.fetch[TradingPremises](any())
-            (any(), any(), any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises(msbServices = None)))))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
           val result = controller.post(1, edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
       }
     }
   }

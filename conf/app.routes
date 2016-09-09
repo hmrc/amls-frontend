@@ -10,6 +10,8 @@ GET         /unauthorised                                               controll
 
 GET         /registration-progress                                      controllers.RegistrationProgressController.get()
 
+GET         /application-status                                         controllers.StatusController.get()
+
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
@@ -22,8 +24,8 @@ POST        /about-the-business/vat                                     controll
 GET         /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
 POST        /about-the-business/corporation-tax                         controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
-GET         /about-the-business/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /about-the-business/confirming-address                        controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /about-the-business/confirming-address                      controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /about-the-business/confirming-address                      controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
 GET         /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
@@ -40,11 +42,20 @@ GET         /about-the-business/check-your-answers                      controll
 
 GET         /trading-premises/what-you-need/:index                      controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
+GET         /trading-premises/add                                       controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
+
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/agent/:index                              controllers.tradingpremises.YourAgentController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/agent/:index                              controllers.tradingpremises.YourAgentController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/crn-name/:index                            controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/crn-name/:index                            controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-premises/agent-name/:index                            controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent-name/:index                            controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
+
+
+GET         /trading-premises/partners/:index                            controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/partners/:index                            controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/what-does-your-business-do/:index         controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
@@ -52,8 +63,19 @@ POST        /trading-premises/what-does-your-business-do/:index         controll
 GET         /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get()
-GET         /trading-premises/check-your-answers/:index                 controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+GET         /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-premises/check-your-answers                        controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
+GET         /trading-premises/your-answers                              controllers.tradingpremises.SummaryController.answers()
+GET         /trading-premises/trading-premise-details/:index            controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+
+GET         /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/who-uses/:index                           controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
+POST        /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
+
 
 GET         /estate-agents/what-you-need                                controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
@@ -86,13 +108,20 @@ GET         /business-matching/check-your-answers                       controll
 
 GET         /bank-details/what-you-need/:index                          controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
+GET         /bank-details/add                                           controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
+
+GET         /bank-details/account-registered/:index                     controllers.bankdetails.BankAccountRegisteredController.get(index:Int)
+POST        /bank-details/account-registered/:index                     controllers.bankdetails.BankAccountRegisteredController.post(index:Int)
+
+
 GET         /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
 
-GET         /bank-details/check-your-answers                            controllers.bankdetails.SummaryController.get()
+GET         /bank-details/your-answers                                  controllers.bankdetails.SummaryController.get(complete: Boolean = true)
+GET         /bank-details/check-your-answers                            controllers.bankdetails.SummaryController.get(complete: Boolean = false)
 
 GET         /business-activities/what-you-need                          controllers.businessactivities.WhatYouNeedController.get()
 
@@ -132,6 +161,9 @@ POST        /business-activities/employees                              controll
 GET         /business-activities/accountant-details                     controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /business-activities/accountant-details                     controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 
+GET         /business-activities/tax-matters                            controllers.businessactivities.TaxMattersController.get(edit: Boolean ?= false)
+POST        /business-activities/tax-matters                            controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)
+
 GET         /business-activities/check-your-answers                     controllers.businessactivities.SummaryController.get()
 
 GET         /declaration/who-is-registering                             controllers.declaration.WhoIsRegisteringController.get()
@@ -143,6 +175,8 @@ POST        /declaration/add-person                                     controll
 GET         /declaration/declaration                                    controllers.declaration.DeclarationController.get()
 
 GET         /confirmation                                               controllers.ConfirmationController.get()
+
+GET         /responsible-people/add                                     controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true)
 
 GET         /responsible-people/who-must-register/:index                controllers.responsiblepeople.WhoMustRegisterController.get(index:Int)
 GET         /responsible-people/what-you-need/:index                    controllers.responsiblepeople.WhatYouNeedController.get(index:Int)
@@ -291,7 +325,8 @@ GET         /high-value-dealer/excise-goods                             controll
 POST        /high-value-dealer/excise-goods                             controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
 
 
-GET         /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
-POST        /high-value-dealer/percentage                             controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+GET         /high-value-dealer/percentage                               controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /high-value-dealer/percentage                               controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+
 GET         /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)

@@ -6,6 +6,9 @@ import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.CacheMap
+import org.mockito.Mockito._
+import org.mockito.Matchers.{any, eq => meq}
 
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
@@ -31,6 +34,42 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "implicitly return an empty Model if not present" in {
       val responsiblePeople = ResponsiblePeople.default(None)
       responsiblePeople must be(ResponsiblePeople())
+    }
+  }
+
+  it when {
+    "the section has not been started" must {
+      "direct the user to the add controller with what you need guidance requested" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(None)
+
+        ResponsiblePeople.section(mockCacheMap).call must be (controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
+      }
+    }
+
+    "the section is complete" must {
+      "direct the user to the summary page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(CompleteResponsiblePeople)))
+
+        ResponsiblePeople.section(mockCacheMap).call must be (controllers.responsiblepeople.routes.YourAnswersController.get())
+      }
+    }
+
+    "the section is partially complete" must {
+      "direct the user to the start of the the journey at the correct index for the incomplete item" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(CompleteResponsiblePeople, CompleteResponsiblePeople, InCompleteResponsiblePeople)))
+
+        ResponsiblePeople.section(mockCacheMap).call must be (controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
+
+      }
     }
   }
 
@@ -117,8 +156,13 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       CompleteResponsiblePeople.isComplete must be(true)
     }
 
-    "the model is not complete" in {
+    "the model is has no data" in {
       val initial = ResponsiblePeople()
+      initial.isComplete must be(true)
+    }
+
+    "the model is not complete" in {
+      val initial = ResponsiblePeople(Some(DefaultValues.personName))
       initial.isComplete must be(false)
     }
 
@@ -360,6 +404,13 @@ trait ResponsiblePeopleValues {
     Some(DefaultValues.experienceTraining),
     Some(DefaultValues.training),
     Some(true)
+  )
+
+  val InCompleteResponsiblePeople = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.personResidenceType),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory)
   )
 
   val CompleteJson = Json.obj(

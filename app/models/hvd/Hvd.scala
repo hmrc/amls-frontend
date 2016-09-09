@@ -52,12 +52,12 @@ object Hvd {
   val key = "hvd"
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, controllers.hvd.routes.WhatYouNeedController.get())
+    val notStarted = Section(key, NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get())
     cache.getEntry[Hvd](key).fold(notStarted) {
       case model if model.isComplete =>
-        Section(key, Completed, controllers.hvd.routes.SummaryController.get())
+        Section(key, Completed, false, controllers.hvd.routes.SummaryController.get())
       case _ =>
-        Section(key, Started, controllers.hvd.routes.WhatYouNeedController.get())
+        Section(key, Started, false, controllers.hvd.routes.WhatYouNeedController.get())
     }
   }
 

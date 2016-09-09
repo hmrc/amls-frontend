@@ -1,0 +1,32 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+@import models.aboutthebusiness._
+
+@(f: Form2[_],index: Int, edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@header = {
+    @heading("tradingpremises.businessStructure.heading", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("tradingpremises.businessStructure.title"),
+    heading = header
+) {
+
+    @form(f, controllers.tradingpremises.routes.BusinessStructureController.post(index, edit)) {
+
+        <div class="form-field-group">
+        @radioGroup(f("agentsBusinessStructure")) {
+            @legend("tradingpremises.businessStructure.heading", jsHidden = true)
+            @radio(f("agentsBusinessStructure"), "businessType.lbl.02", "02")
+            @radio(f("agentsBusinessStructure"), "businessType.lbl.01", "01")
+            @radio(f("agentsBusinessStructure"), "businessType.lbl.03", "03")
+            @radio(f("agentsBusinessStructure"), "businessType.lbl.04", "04")
+            @radio(f("agentsBusinessStructure"), "businessType.lbl.05", "05")
+        }
+        </div>
+
+        @submit(false)
+    }
+}

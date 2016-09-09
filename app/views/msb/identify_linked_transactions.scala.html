@@ -4,7 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("msb.linked.txn.title", "summary.msb")
+    @heading("msb.linked.txn.heading", "summary.msb")
 }
 
 @main(
@@ -15,7 +15,7 @@
     @form(f, controllers.msb.routes.IdentifyLinkedTransactionsController.post(edit)) {
 
         @inlineRadioGroup(f("linkedTxn")) {
-        @legend("TODO", jsHidden = true)
+        @legend("msb.linked.txn.heading", jsHidden = true)
             @radio(f("linkedTxn"), "lbl.yes", "true")
             @radio(f("linkedTxn"), "lbl.no", "false")
         }

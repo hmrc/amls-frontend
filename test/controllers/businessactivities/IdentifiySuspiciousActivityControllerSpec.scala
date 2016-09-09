@@ -2,7 +2,7 @@ package controllers.businessactivities
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessactivities.{IdentifySuspiciousActivity, BusinessActivities, BusinessFranchiseYes}
+import models.businessactivities.{BusinessActivities, BusinessFranchiseYes, IdentifySuspiciousActivity}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -13,6 +13,8 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -31,7 +33,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneAppPerS
   "IdentifySuspiciousActivityController" must {
 
     "use correct services" in new Fixture {
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
+      IdentifySuspiciousActivityController.dataCacheConnector must be(DataCacheConnector)
     }
 
     "on get, display the Identify suspicious activity page" in new Fixture {
@@ -58,7 +60,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneAppPerS
 
     }
 
-    "on post with valid data" ignore new Fixture {
+    "on post with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "hasWrittenGuidance" -> "true"
@@ -68,11 +70,11 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneAppPerS
       (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(???))
+      (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
+      redirectLocation(result) must be(Some(routes.NCARegisteredController.get(false).url))
     }
 
     "on post with invalid data" in new Fixture {
@@ -88,7 +90,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneAppPerS
     }
 
     //ignored until summary page is available to redirect to
-    "on post with valid data in edit mode" ignore new Fixture {
+    "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "hasWrittenGuidance" -> "true"
@@ -98,7 +100,7 @@ class IdentifiySuspiciousActivityControllerSpec extends PlaySpec with OneAppPerS
        (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(???))
+       (any(), any(), any())).thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

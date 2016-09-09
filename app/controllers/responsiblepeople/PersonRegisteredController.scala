@@ -19,7 +19,7 @@ trait PersonRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-          case Some(data) => Ok(person_registered(EmptyForm, data.size))
+          case Some(data) => Ok(person_registered(EmptyForm, data.count(_.personName.isDefined)))
           case _ => Ok(person_registered(EmptyForm, index))
         }
     }
@@ -34,7 +34,7 @@ trait PersonRegisteredController extends BaseController {
               Future.successful(BadRequest(person_registered(f, index)))
             case ValidForm(_, data) =>
                data.registerAnotherPerson match {
-                case true => Future.successful(Redirect(routes.PersonNameController.get(index + 1, false)))
+                case true => Future.successful(Redirect(routes.ResponsiblePeopleAddController.get(false)))
                 case false => Future.successful(Redirect(routes.CheckYourAnswersController.get()))
               }
           }

@@ -1,7 +1,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.{PersonName, PreviousName, ResponsiblePeople}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -50,6 +51,19 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
+        contentAsString(result) must include(Messages("responsiblepeople.have.registered.person.text", 0))
+      }
+
+      "load the Person Registered page 2" in new Fixture {
+        val previousName = PreviousName(Some("Matt"), Some("Mc"), Some("Fly"), new LocalDate(1990, 2, 24))
+        val personName = PersonName("John", Some("Envy"), "Doe", Some(previousName), Some("name"))
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(personName),None), ResponsiblePeople(Some(personName),None)))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+
         contentAsString(result) must include(Messages("responsiblepeople.have.registered.people.text", 2))
       }
     }
@@ -68,7 +82,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
 
         val result = controller.post(1)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNameController.get(2).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false).url))
       }
 
       "successfully redirect to the page on selection of 'no'" in new Fixture {

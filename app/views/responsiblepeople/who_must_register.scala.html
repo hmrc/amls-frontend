@@ -1,31 +1,33 @@
 @import include._
 @(index: Int)(implicit request: Request[_])
 
-@sidebar = {
-<div class="user-attention">
-    <h3>@Messages("main.sidebar.title")</h3>
-    <p>@Messages("main.sidebar.information")</p>
-</div>
-}
-
 @header = {
     @heading("responsiblepeople.whomustregister.heading", "summary.responsiblepeople")
 }
 
-@main(
+@whatyouneed(
     title = Messages("responsiblepeople.whomustregister.title"),
     heading = header,
     sidebar = sidebar
 ) {
 
-    <ul class="list list-bullet spacelarge">
+    <ul class="list list-bullet">
         <li>@Messages("responsiblepeople.whomustregister.line_1")</li>
         <li>@Messages("responsiblepeople.whomustregister.line_2")</li>
         <li>@Messages("responsiblepeople.whomustregister.line_3")</li>
     </ul>
 
     <div class="form-group">
-        <a id="who-must-register-continue" class="button" href="@controllers.responsiblepeople.routes.WhatYouNeedController.get(index)">@Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.responsiblepeople")</span></a>
+        <a id="who-must-register-continue" class="button" role="button" href="@controllers.responsiblepeople.routes.WhatYouNeedController.get(index)">
+          @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.responsiblepeople")</span>
+        </a>
     </div>
 
+}
+
+@sidebar = {
+    <div class="user-attention">
+        <h2>@Messages("main.sidebar.title")</h2>
+        <p>@Messages("main.sidebar.information")</p>
+    </div>
 }
