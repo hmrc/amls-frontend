@@ -146,7 +146,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
   it when {
 
-    "the section consistes of just 1 empty Trading premises" must {
+    "the section consists of just 1 empty Trading premises" must {
       "return a result indicating NotStarted" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -179,5 +179,23 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
       }
     }
 
+  }
+
+  "anyChanged" must {
+    val originalBankDetails = Seq(TradingPremises(None, None, hasChanged = false))
+    val originalBankDetailsChanged = Seq(TradingPremises(None, None, hasChanged = true))
+
+    "return false" when {
+      "no BankDetails within the sequence have changed" in {
+        val res = TradingPremises.anyChanged(originalBankDetails)
+        res must be(false)
+      }
+    }
+    "return true" when {
+      "at least one BankDetails within the sequence has changed" in {
+        val res = TradingPremises.anyChanged(originalBankDetailsChanged)
+        res must be(true)
+      }
+    }
   }
 }

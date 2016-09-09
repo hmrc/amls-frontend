@@ -56,28 +56,30 @@ object TradingPremises {
 
   val key = "trading-premises"
 
+  def anyChanged(newModel: Seq[TradingPremises]): Boolean = {
+    newModel exists { _.hasChanged }
+  }
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tradingpremises"
     val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
-    val complete = Section(messageKey, Completed, false, controllers.tradingpremises.routes.SummaryController.answers())
 
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
       _.filterNot(_ == TradingPremises()) match {
         case Nil => notStarted
         case premises if premises.nonEmpty && premises.forall {
           _.isComplete
-        } => complete
+        } => Section(messageKey, Completed, anyChanged(premises), controllers.tradingpremises.routes.SummaryController.answers())
         case premises => {
           val index = premises.indexWhere {
             case model if !model.isComplete => true
             case _ => false
           }
-          Section(messageKey, Started, false, controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
+          Section(messageKey, Started, anyChanged(premises), controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
         }
       }
     }
   }
-
 
   implicit val mongoKey = new MongoKey[TradingPremises] {
     override def apply(): String = "trading-premises"
