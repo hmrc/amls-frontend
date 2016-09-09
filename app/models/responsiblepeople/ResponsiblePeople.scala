@@ -64,19 +64,22 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
 
 object ResponsiblePeople {
 
+  def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean = {
+    newModel exists { _.hasChanged }
+  }
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
-    val complete = Section(messageKey, Completed, false, controllers.responsiblepeople.routes.YourAnswersController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
       _.filterNot(_ == ResponsiblePeople()) match {
         case Nil => notStarted
         case model if model forall {
           _.isComplete
-        } => complete
+        } => Section(messageKey, Completed, anyChanged(model), controllers.responsiblepeople.routes.YourAnswersController.get())
         case model => {
           val index = model.indexWhere { m => !m.isComplete }
-          Section(messageKey, Started, false, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+          Section(messageKey, Started, anyChanged(model), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
         }
       }
     }
@@ -106,7 +109,7 @@ object ResponsiblePeople {
       (__ \ "experienceTraining").readNullable[ExperienceTraining] and
       (__ \ "training").readNullable[Training] and
       (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
-        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
+      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
       ) apply ResponsiblePeople.apply _
   }
 

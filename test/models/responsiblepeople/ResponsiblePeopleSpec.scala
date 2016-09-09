@@ -201,75 +201,175 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
   }
 
-  "Merge with existing model" when {
+  "ResponsiblePeople class" when {
+    "personName value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.personName(DefaultValues.personName)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with add personName" must {
-      "return ResponsiblePeople with correct personName" in {
-        val result = CompleteResponsiblePeople.personName(NewValues.personName)
-        result must be (CompleteResponsiblePeople.copy(personName = Some(NewValues.personName), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.personName(NewValues.personName)
+          result must be(CompleteResponsiblePeople.copy(personName = Some(NewValues.personName), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "personResidenceType value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.personResidenceType(DefaultValues.personResidenceType)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with PersonResidenceType" must {
-      "return ResponsiblePeople with correct PersonResidenceType" in {
-        val result = CompleteResponsiblePeople.personResidenceType(NewValues.personResidenceType)
-        result must be (CompleteResponsiblePeople.copy(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.personResidenceType(NewValues.personResidenceType)
+          result must be(CompleteResponsiblePeople.copy(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "contactDetails value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.contactDetails(DefaultValues.contactDetails)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with ContactDetails" must {
-      "return ResponsiblePeople with correct ContactDetails" in {
-        val result = CompleteResponsiblePeople.contactDetails(NewValues.contactDetails)
-        result must be (CompleteResponsiblePeople.copy(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.contactDetails(NewValues.contactDetails)
+          result must be(CompleteResponsiblePeople.copy(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "addressHistory value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.addressHistory(DefaultValues.addressHistory)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with AddressHistory" must {
-      "return ResponsiblePeople with correct AddressHistory" in {
-        val result = CompleteResponsiblePeople.addressHistory(NewValues.addressHistory)
-        result must be (CompleteResponsiblePeople.copy(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.addressHistory(NewValues.addressHistory)
+          result must be(CompleteResponsiblePeople.copy(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "positions value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.positions(DefaultValues.positions)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with Positions" must {
-      "return ResponsiblePeople with correct Positions" in {
-        val result = CompleteResponsiblePeople.positions(NewValues.positions)
-        result must be (CompleteResponsiblePeople.copy(positions = Some(NewValues.positions), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.positions(NewValues.positions)
+          result must be(CompleteResponsiblePeople.copy(positions = Some(NewValues.positions), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "saRegistered value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.saRegistered(DefaultValues.saRegistered)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with SaRegistered" must {
-      "return ResponsiblePeople with correct SaRegistered" in {
-        val result = CompleteResponsiblePeople.saRegistered(NewValues.saRegistered)
-        result must be (CompleteResponsiblePeople.copy(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.saRegistered(NewValues.saRegistered)
+          result must be(CompleteResponsiblePeople.copy(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "vatRegistered value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.vatRegistered(DefaultValues.vatRegistered)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with VatRegistered" must {
-      "return ResponsiblePeople with correct VatRegistered" in {
-        val result = CompleteResponsiblePeople.vatRegistered(NewValues.vatRegistered)
-        result must be (CompleteResponsiblePeople.copy(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.vatRegistered(NewValues.vatRegistered)
+          result must be(CompleteResponsiblePeople.copy(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "experienceTraining value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.experienceTraining(DefaultValues.experienceTraining)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with experienceTraining" must {
-      "return ResponsiblePeople with correct experienceTraining" in {
-        val result = CompleteResponsiblePeople.experienceTraining(NewValues.experienceTraining)
-        result must be (CompleteResponsiblePeople.copy(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.experienceTraining(NewValues.experienceTraining)
+          result must be(CompleteResponsiblePeople.copy(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "training value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.training(DefaultValues.training)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with Training" must {
-      "return ResponsiblePeople with correct Training" in {
-        val result = CompleteResponsiblePeople.training(NewValues.training)
-        result must be (CompleteResponsiblePeople.copy(training = Some(NewValues.training), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.training(NewValues.training)
+          result must be(CompleteResponsiblePeople.copy(training = Some(NewValues.training), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
+    "hasAlreadyPassedFitAndProper value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.hasAlreadyPassedFitAndProper(true)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
 
-    "Merged with hasAlreadyPassedFitAndProper" must {
-      "return ResponsiblePeople with correct FitAndProper Value" in {
-        val result = CompleteResponsiblePeople.hasAlreadyPassedFitAndProper(false)
-        result must be (CompleteResponsiblePeople.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.hasAlreadyPassedFitAndProper(false)
+          result must be(CompleteResponsiblePeople.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
+          result.hasChanged must be(true)
+        }
       }
     }
   }
