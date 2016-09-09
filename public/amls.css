@@ -829,14 +829,13 @@ fieldset.panel-indent legend {
   }
 }
 
-<<<<<<< HEAD
+
 
 /* Bits from Gov Elements */
 .notice {
-  margin: 40px 0;
   position: relative;
+  margin: 40px 0;
 }
-
 
 .notice .icon {
   position: absolute;
