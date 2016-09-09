@@ -40,25 +40,18 @@ trait LandingController extends BaseController {
           for {
             reviewDetails <- landingService.reviewDetails
             amlsRef <- amlsReferenceNumber
-          } yield{
-            testOot("amls reference: " + amlsRef)
-            testOot(s"review details $reviewDetails")
-            (reviewDetails, amlsRef) match {
-            case (Some(rd), None) => {
-              testOot(s"caliing updatereviewdetails $rd")
-              testOot(s"$landingService")
+          } yield (reviewDetails, amlsRef) match {
+            case (Some(rd), None) =>
               landingService.updateReviewDetails(rd) map {
                 x => {
-                  testOot(s"review details again : $rd")
-                  testOot(s"mapping updatereviewdetails $x")
                   Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
                 }
-              }}
+              }
             case (None, None) =>
               Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
             case (_, Some(amlsReference)) if ApplicationConfig.statusToggle =>
               Future.successful(Redirect(controllers.routes.StatusController.get()))
-          }}
+          }
         }.flatMap(identity)
       }
   }
@@ -72,33 +65,22 @@ trait LandingController extends BaseController {
     true
   }
 
-  private def testOot(message: String)(implicit request: Request[_]) = {
-    val c = request.headers.get("test-context").getOrElse("No Test Context")
-    println(s"[$c] $message")
-
-  }
-
   def getWithAmendments(implicit authContext: AuthContext, request : Request[_]) = {
     enrolmentsService.amlsRegistrationNumber flatMap  {
-      case Some(_) => landingService.cacheMap.map { cm => //enrolment exists
-        testOot("enrolment Exists")
-        cm match {
+      case Some(_) => landingService.cacheMap.map { //enrolment exists
           case Some(cacheMap) => {
             //there is data in S4l
             if (dataHasChanged(cacheMap)) {
-              testOot("data changed")
               cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
                 case Some(_) => refreshAndRedirect()
                 case _ => Redirect(controllers.routes.StatusController.get())
               }
             } else {
-              testOot("data not changed")
               //DataHasNotChanged
               refreshAndRedirect()
             }
           }
           case _ => refreshAndRedirect()
-        }
       }
 
       case _ => getWithoutAmendments //no enrolment exists

@@ -202,9 +202,10 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
               val result = controller.get()(request.withHeaders("test-context" ->"ESCS"))
 
-              verify(controller.landingService, atLeastOnce()).refreshCache
               status(result) must be (SEE_OTHER)
               redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+
+              verify(controller.landingService).refreshCache
             }
 
 
@@ -232,9 +233,9 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
             val result = controller.get()(request)
 
-            verify(controller.landingService, atLeastOnce()).refreshCache
             status(result) must be (SEE_OTHER)
             redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+            verify(controller.landingService, atLeastOnce()).refreshCache
           }
         }
       }
@@ -246,9 +247,9 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
           val result = controller.get()(request)
 
-          verify(controller.landingService, atLeastOnce()).refreshCache
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+          verify(controller.landingService, atLeastOnce()).refreshCache
         }
       }
     }
@@ -279,12 +280,11 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
             val result = controller.get()(request)
 
-            Mockito.verify(controller.landingService, only())
-              .updateReviewDetails(any[ReviewDetails])(any[HeaderCarrier], any[ExecutionContext], any[AuthContext])
-
             status(result) must be (SEE_OTHER)
             redirectLocation(result) must be (Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
 
+            Mockito.verify(controller.landingService, times(1))
+              .updateReviewDetails(any[ReviewDetails])(any[HeaderCarrier], any[ExecutionContext], any[AuthContext])
           }
         }
 
