@@ -11,18 +11,13 @@ case class BankDetails (
                         ){
 
   def bankAccountType(v: Option[BankAccountType]): BankDetails = {
-    println(s"******* bankAccountType $v - $hasChanged")
     v match {
       case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty)
       case _ => this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v))
     }
   }
-
   def bankAccount(v: BankAccount): BankDetails = {
-    println(s"******* bankAccount $v - $hasChanged")
-    val thing = this.copy(bankAccount = Some(v), hasChanged = hasChanged || !this.bankAccount.contains(v))
-    println(s"********* $thing")
-    thing
+    this.copy(bankAccount = Some(v), hasChanged = hasChanged || !this.bankAccount.contains(v))
   }
   def isComplete: Boolean =
     this match {
@@ -37,10 +32,6 @@ object BankDetails {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  def anyChanged2(oldModel: Seq[BankDetails], newModel: Seq[BankDetails]): Boolean = {
-    !(oldModel equals newModel)
-  }
-
   def anyChanged(newModel: Seq[BankDetails]): Boolean = {
     newModel exists { _.hasChanged }
   }
@@ -49,22 +40,16 @@ object BankDetails {
     val messageKey = "bankdetails"
     val notStarted = Section(messageKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
 
-    val originalSeq = cache.getEntry[Seq[BankDetails]](key)
-//    val hasOriginalSeqChanged = anyChanged2(originalSeq, )
-
-      originalSeq.fold(notStarted) {
+    cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
       case model: Seq[BankDetails] if model.isEmpty => {
-        println(s"******* ${anyChanged(model)} 1 *********")
         Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
       }
       case model if model forall {
         _.isComplete
       } => {
-        println(s"******* ${anyChanged(model)} 2 *********")
         Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
       }
       case model => {
-        println(s"******* ${anyChanged(model)} 3 *********")
         val index = model.indexWhere {
           case m if !m.isComplete => true
           case _ => false

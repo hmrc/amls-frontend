@@ -158,17 +158,13 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
     "return false" when {
       "no BankDetails within the sequence have changed" in {
-        val res = BankDetails.anyChanged2(originalBankDetails, originalBankDetails)
+        val res = BankDetails.anyChanged(originalBankDetails)
         res must be(false)
       }
     }
     "return true" when {
       "at least one BankDetails within the sequence has changed" in {
-        val res = BankDetails.anyChanged2(originalBankDetails, originalBankDetailsChanged)
-        res must be(true)
-      }
-      "at least one BankDetails has been added to the sequence" in {
-        val res = BankDetails.anyChanged2(originalBankDetails, addedNewBankDetails)
+        val res = BankDetails.anyChanged(originalBankDetailsChanged)
         res must be(true)
       }
     }
