@@ -11,7 +11,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class Hvd (cashPayment: Option[CashPayment] = None,
                 products: Option[Products] = None,
                 exciseGoods:  Option[ExciseGoods] = None,
-		            howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
+                howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
                 percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
                 receiveCashPayments: Option[ReceiveCashPayments] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None,
