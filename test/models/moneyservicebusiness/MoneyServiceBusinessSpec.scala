@@ -117,9 +117,11 @@ trait MoneyServiceBusinessTestData {
       "msbServices" -> Json.arr("01", "03")
     ),
     "throughput" -> Json.obj("throughput" -> "02"),
-    "businessUseAnIPSP" -> Json.obj("useAnIPSP" -> true,
+    "businessUseAnIPSP" -> Json.obj(
+      "useAnIPSP" -> true,
       "name" -> "name",
-      "referenceNumber" -> "123456789123456"),
+      "referenceNumber" -> "123456789123456"
+    ),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
     "whichCurrencies" -> Json.obj(
       "currencies" -> Json.arr("USD", "GBP", "EUR"),
@@ -129,8 +131,10 @@ trait MoneyServiceBusinessTestData {
       "wholesalerNames" -> "Wholesaler Names",
       "customerMoneySource" -> "Yes"
     ),
-    "businessAppliedForPSRNumber" -> Json.obj("appliedFor" -> true,
-      "regNumber" -> "123456"),
+    "businessAppliedForPSRNumber" -> Json.obj(
+      "appliedFor" -> true,
+      "regNumber" -> "123456"
+    ),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
     "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
@@ -138,7 +142,8 @@ trait MoneyServiceBusinessTestData {
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
     "mostTransactions" -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
     "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB"),
-    "ceTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963")
+    "ceTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963"),
+    "hasChanged" -> false
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())

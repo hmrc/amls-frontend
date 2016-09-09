@@ -96,7 +96,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends PlaySpec with OneAppPerS
       val outgoingModel = incomingModel.copy(
         businessAppliedForPSRNumber = Some(
           BusinessAppliedForPSRNumberYes("123789")
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -122,7 +122,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends PlaySpec with OneAppPerS
       val outgoingModel = incomingModel.copy(
         businessAppliedForPSRNumber = Some(
           BusinessAppliedForPSRNumberYes("123789")
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))

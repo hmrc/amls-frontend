@@ -158,4 +158,45 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       BankDetails.section(cache) must be(startedSection)
     }
   }
+
+  it when {
+    val completeModel = BankDetails(Some(PersonalAccount), Some(BankAccount("ACCOUNTNAME", UKAccount("ACCOUNTNUMBER", "SORTCODE"))))
+    val incompleteModel = BankDetails(Some(PersonalAccount), None)
+
+    "the section consistes of just 1 empty Bank details" must {
+      "return a result indicating NotStarted" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(BankDetails())))
+
+        BankDetails.section(mockCacheMap).status must be (models.registrationprogress.NotStarted)
+      }
+    }
+
+    "the section consists of a partially complete model followed by a completely empty one" must {
+
+
+      "return a result indicating partial completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(incompleteModel, BankDetails())))
+
+        BankDetails.section(mockCacheMap).status must be (models.registrationprogress.Started)
+      }
+    }
+
+    "the section consists of a complete model followed by an empty one" must {
+      "return a result indicating completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(completeModel, BankDetails())))
+
+        BankDetails.section(mockCacheMap).status must be (models.registrationprogress.Completed)
+      }
+    }
+
+  }
 }

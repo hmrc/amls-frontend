@@ -1,11 +1,17 @@
 package models.tradingpremises
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.responsiblepeople.ResponsiblePeople
 import org.joda.time.LocalDate
+import org.mockito.Matchers._
+import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
+import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.CacheMap
 
-class TradingPremisesSpec extends WordSpec with MustMatchers {
+class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
   val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
     true, new LocalDate(1990, 2, 24))
@@ -27,6 +33,9 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
 
   val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)),
     Some(ytp), Some(businessStructure), Some(agentName),Some(agentCompanyName),Some(agentPartnership),Some(wdbd), Some(msbServices))
+
+  val incompleteModel = TradingPremises(Some(RegisteringAgentPremises(true)),
+    Some(ytp), Some(businessStructure), Some(agentName),None, None, None, None)
 
 
   val completeJson = Json.obj("agentPremises" -> true,
@@ -112,5 +121,42 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
         tradingPremises.isComplete must be(true)
       }
     }
+  }
+
+  it when {
+
+    "the section consistes of just 1 empty Trading premises" must {
+      "return a result indicating NotStarted" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises())))
+
+        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.NotStarted)
+      }
+    }
+
+    "the section consists of a partially complete model followed by a completely empty one" must {
+      "return a result indicating partial completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(incompleteModel, TradingPremises())))
+
+        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.Started)
+      }
+    }
+
+    "the section consists of a complete model followed by an empty one" must {
+      "return a result indicating completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(completeModel, TradingPremises())))
+
+        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.Completed)
+      }
+    }
+
   }
 }

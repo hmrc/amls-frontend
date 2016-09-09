@@ -89,7 +89,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val model = MoneyServiceBusiness(
         msbServices = Some(MsbServices(
           Set(TransmittingMoney)
-        ))
+        )), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -119,7 +119,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val newModel = currentModel.copy(
         msbServices = Some(MsbServices(
           Set(TransmittingMoney, CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-        ))
+        )), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -152,7 +152,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val newModel = currentModel.copy(
         msbServices = Some(MsbServices(
           Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-        ))
+        )), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -192,7 +192,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
           val newModel = currentModel.copy(
             msbServices = Some(MsbServices(
               Set(TransmittingMoney, CurrencyExchange, model)
-            ))
+            )), hasChanged = true
           )
 
           val newRequest = request.withFormUrlEncodedBody(
