@@ -1,8 +1,8 @@
 package models.bankdetails
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import org.mockito.Mockito._
 import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
@@ -11,92 +11,79 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
+  val cache = mock[CacheMap]
+  val emptyBankDetails: Option[BankDetails] = None
+
   val accountType = PersonalAccount
+  val accountTypePartialModel = BankDetails(Some(accountType), None)
+  val accountTypeJson = Json.obj("bankAccountType" -> "01", "hasChanged" -> false)
+  val accountTypeNew = BelongsToBusiness
+
+  val bankAccount = BankAccount("My Account", UKAccount("111111", "11-11-11"))
+  val bankAccountPartialModel = BankDetails(None, Some(bankAccount))
+  val bankAccountJson = Json.obj(
+    "accountName" -> "My Account",
+    "isUK" -> true,
+    "accountNumber" -> "111111",
+    "sortCode" -> "11-11-11",
+    "hasChanged" -> false)
+  val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
+
+  val completeModel = BankDetails(Some(accountType), Some(bankAccount))
+  val completeJson = Json.obj(
+    "bankAccountType" -> "01",
+    "accountName" -> "My Account",
+    "isUK" -> true,
+    "accountNumber" -> "111111",
+    "sortCode" -> "11-11-11",
+    "hasChanged" -> false)
+  val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
+  val completeJsonChanged = Json.obj(
+    "bankAccountType" -> "01",
+    "accountName" -> "My Account",
+    "isUK" -> true,
+    "accountNumber" -> "111111",
+    "sortCode" -> "11-11-11",
+    "hasChanged" -> true)
+
 
   "BankDetails with complete model" must {
-
-    val completeJson = Json.obj("bankAccountType" -> "01")
-    val completeModel = BankDetails(Some(accountType), None)
-
-
     "Serialise as expected" in {
       Json.toJson[BankDetails](completeModel) must be(completeJson)
     }
-
-    "Deserialise as expected" in {
+    "deserialise as expected" in {
       completeJson.as[BankDetails] must be(completeModel)
     }
-  }
-
-  "Bank details with partially complete model" must {
-    val accontTypeJson = Json.obj("bankAccountType" -> "01")
-    val accountTypeModel = BankDetails(Some(accountType), None)
-
-    "serialise as expected with bankAccountType" in {
-      Json.toJson[BankDetails](accountTypeModel) must be(accontTypeJson)
-    }
-
-    "Deserialise as expected with bankAccountType" in {
-      accontTypeJson.as[BankDetails] must be(accountTypeModel)
+    "deserialise correctly when hasChanged field is missing from the Json" in {
+      (completeJson - "hasChanged").as[BankDetails] must
+        be(completeModel)
     }
   }
 
-  "None" when {
-
-    val initial: Option[BankDetails] = None
-
-    "merged with bankDetails" must {
-      "return bank details with correct data set" in {
-        val accountTypeNew = BelongsToOtherBusiness
-        val result = initial.bankAccountType(accountTypeNew)
-
-        result must be(BankDetails(Some(accountTypeNew), None))
-
-      }
+  "BankDetails with complete model which has the hasChanged flag set as true" must {
+    "Serialise as expected" in {
+      Json.toJson[BankDetails](completeModelChanged)(BankDetails.writes) must be(completeJsonChanged)
+      Json.toJson[BankDetails](completeModelChanged) must be(completeJsonChanged)
+    }
+    "deserialise as expected" in {
+      completeJsonChanged.as[BankDetails] must be(completeModelChanged)
     }
   }
 
-  "BankDetails with data" must {
-
-    val initial = BankDetails(Some(accountType), None)
-
-    "Merge with existing data set" must {
-      "return merger result with new data" in {
-        val accountTypeNew = BelongsToBusiness
-        val result = initial.bankAccountType(accountTypeNew)
-
-        result must be(BankDetails(Some(accountTypeNew), None))
-      }
+  "Bank details with partially complete model containing only accountType" must {
+    "serialise as expected" in {
+      Json.toJson[BankDetails](accountTypePartialModel) must be(accountTypeJson)
+    }
+    "Deserialise as expected" in {
+      accountTypeJson.as[BankDetails] must be(accountTypePartialModel)
     }
   }
-
-  "BankDetails with only Bank Details" must {
-
-    val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
-    val bankDetails = BankDetails(None, Some(bankAccount))
-
-    "must Merge with existing data set" must {
-      "and return merger result with new data" in {
-        val accountTypeNew = BelongsToBusiness
-        val result = bankDetails.bankAccountType(accountTypeNew)
-
-        result must be(BankDetails(Some(accountTypeNew), Some(bankAccount)))
-      }
+  "Bank details with partially complete model containing only bankAccount" must {
+    "serialise as expected" in {
+      Json.toJson[BankDetails](bankAccountPartialModel) must be(bankAccountJson)
     }
-  }
-
-  "BankDetails with Bank Account Type and Bank Details" must {
-
-    val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
-    val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
-
-    "Merge with existing data set" must {
-      "return merger result with new data" in {
-        val accountTypeNew = BelongsToBusiness
-        val result = bankDetails.bankAccountType(accountTypeNew)
-
-        result must be(BankDetails(Some(accountTypeNew), Some(bankAccount)))
-      }
+    "Deserialise as expected" in {
+      bankAccountJson.as[BankDetails] must be(bankAccountPartialModel)
     }
   }
 
@@ -122,38 +109,43 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
   }
 
   "Section" must {
-    val cache = mock[CacheMap]
-
-    "return a NotStarted Section when model is empty" in {
+    "return a NotStarted Section when there is no data at all" in {
       val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn None
 
       BankDetails.section(cache) must be(notStartedSection)
-
     }
-
-    "return a Completed Section when model is complete" in {
-
-      val bankAccount = BankAccount("My Account", UKAccount("123456", "78-90-12"))
-      val bankDetails = BankDetails(Some(accountType), Some(bankAccount))
-      val complete = Seq(bankDetails)
+    "return a Completed Section when model is complete and has not changed" in {
+      val complete = Seq(completeModel)
       val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
-
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(complete)
 
       BankDetails.section(cache) must be(completedSection)
-
     }
+    "return a Completed Section when model is complete and has changed" in {
+      val completeChangedModel = BankDetails(Some(accountType), Some(bankAccount),true)
 
+      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(Seq(completeChangedModel))
+
+      BankDetails.section(cache) must be(completedSection)
+    }
+    "return a Completed Section when model is empty (no bank details)" in {
+      val complete = Seq()
+      val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(complete)
+
+      BankDetails.section(cache) must be(completedSection)
+    }
     "return a Started Section when model is incomplete" in {
-
-      val bankDetails = BankDetails(Some(accountType), None)
-      val incompleteTcsp = Seq(bankDetails)
+      val incomplete = Seq(accountTypePartialModel)
       val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
 
-      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incompleteTcsp)
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incomplete)
 
       BankDetails.section(cache) must be(startedSection)
     }
@@ -170,7 +162,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
           .thenReturn(Some(Seq(BankDetails())))
 
-        BankDetails.section(mockCacheMap).status must be (models.registrationprogress.NotStarted)
+        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
       }
     }
 
@@ -183,7 +175,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
           .thenReturn(Some(Seq(incompleteModel, BankDetails())))
 
-        BankDetails.section(mockCacheMap).status must be (models.registrationprogress.Started)
+        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Started)
       }
     }
 
@@ -194,9 +186,66 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
           .thenReturn(Some(Seq(completeModel, BankDetails())))
 
-        BankDetails.section(mockCacheMap).status must be (models.registrationprogress.Completed)
+        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Completed)
+      }
+    }
+  }
+
+  "anyChanged" must {
+    val originalBankDetails = Seq(BankDetails(Some(accountType), Some(bankAccount), false))
+    val originalBankDetailsChanged = Seq(BankDetails(Some(accountType), Some(bankAccountNew), true))
+    val addedNewBankDetails = Seq(BankDetails(Some(accountType), Some(bankAccount), false), BankDetails(Some(accountType), Some(bankAccountNew), false))
+
+    "return false" when {
+      "no BankDetails within the sequence have changed" in {
+        val res = BankDetails.anyChanged(originalBankDetails)
+        res must be(false)
+      }
+    }
+    "return true" when {
+      "at least one BankDetails within the sequence has changed" in {
+        val res = BankDetails.anyChanged(originalBankDetailsChanged)
+        res must be(true)
+      }
+    }
+  }
+
+  "BankDetails class" when {
+    "bankAccountType value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.bankAccountType(Some(accountType))
+          res must be(completeModel)
+          res.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.bankAccountType(Some(accountTypeNew))
+          res.hasChanged must be(true)
+          BankDetails.anyChanged(Seq(res)) must be(true)
+          res.bankAccountType must be(Some(accountTypeNew))
+        }
       }
     }
 
+    "bankAccount value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.bankAccount(bankAccount)
+          res must be(completeModel)
+          res.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.bankAccount(bankAccountNew)
+          res.hasChanged must be(true)
+          res.bankAccount must be(Some(bankAccountNew))
+        }
+      }
+    }
   }
 }
