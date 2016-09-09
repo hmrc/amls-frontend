@@ -99,7 +99,7 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPerSu
       val outgoingModel = incomingModel.copy(
         transactionsInNext12Months = Some(
           TransactionsInNext12Months("12345678963")
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -124,7 +124,7 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPerSu
       val outgoingModel = incomingModel.copy(
         transactionsInNext12Months = Some(
           TransactionsInNext12Months("12345678963")
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
