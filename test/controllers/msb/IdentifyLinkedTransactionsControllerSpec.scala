@@ -95,7 +95,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val outgoingModel = incomingModel.copy(
         identifyLinkedTransactions = Some(
           IdentifyLinkedTransactions(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
@@ -133,7 +133,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val outgoingModel = incomingModel.copy(
         identifyLinkedTransactions = Some(
           IdentifyLinkedTransactions(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
@@ -170,7 +170,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val outgoingModel = incomingModel.copy(
         identifyLinkedTransactions = Some(
           IdentifyLinkedTransactions(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
