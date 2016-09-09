@@ -371,7 +371,7 @@ div.grid-layout {
   background-color: #28a197;
   color: #fff;
   margin: 40px 0;
-  padding: 20px 40px 20px 40px;
+  padding: 20px 40px;
   text-align: center;
 }
 
@@ -630,27 +630,11 @@ table.summary td {
   }
 }
 
-/* icons */
-.icon {
-  display: inline-block;
-  height: 25px;
-  margin-right: 10px;
-  width: 25px;
-}
 
-.notice {
-  display: block;
-  height: 0;
-  padding-left: 38px;
-  position: relative;
-  top: -43px;
-}
 
-.icon-important {
-  display: inline-block;
-  padding-bottom: 1px;
-  padding-right: 1px;
-}
+
+
+
 
 .icon-confirmed {
   /* we're using the same tick as the progress page,
@@ -661,9 +645,6 @@ table.summary td {
   width: 55px;
 }
 
-.notice-important {
-  padding-left: 55px;
-}
 
 .touchevents .date-of-birth {
   display: block;
@@ -826,5 +807,45 @@ fieldset.panel-indent legend {
 
   .declaration p {
     margin: 0;
+  }
+}
+
+
+/* Bits from Gov Elements */
+.notice {
+  margin: 40px 0;
+  position: relative;
+}
+
+
+.notice .icon {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -17px;
+}
+
+.notice strong {
+  display: block;
+  padding-left: 65px;
+  margin-left: -15px;
+}
+
+.icon {
+  display: inline-block;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+
+.icon-important {
+  width: 35px;
+  height: 35px;
+  background-image: url("/anti-money-laundering/assets/images/icon-important.png");
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  .icon-important {
+    background-image: url("/anti-money-laundering/assets/images/icon-important-2x.png");
+    background-size: 100%;
   }
 }
