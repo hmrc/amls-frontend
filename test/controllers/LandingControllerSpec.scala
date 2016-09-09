@@ -8,6 +8,7 @@ import models.businesscustomer.{Address, ReviewDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq}
+import org.mockito.Mockito
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.MustMatchers
 import org.scalatest.fixture.WordSpec
@@ -197,7 +198,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
           "there is a subscription response" should {
             "refresh from API5 and redirect to status controller" in new Fixture {
               setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(true, false))
+              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(true, true))
 
               val result = controller.get()(request.withHeaders("test-context" ->"ESCS"))
 
@@ -213,7 +214,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
           "there is no subscription response" should {
             "redirect to status controller without refreshing API5" in new Fixture {
               setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(true, true))
+              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(true, false))
 
               val result = controller.get()(request)
 
@@ -278,8 +279,8 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
             val result = controller.get()(request)
 
-            verify(controller.landingService, atLeastOnce())
-              .updateReviewDetails(meq(reviewDetails))(any[HeaderCarrier], any[ExecutionContext], any[AuthContext])
+            Mockito.verify(controller.landingService, only())
+              .updateReviewDetails(any[ReviewDetails])(any[HeaderCarrier], any[ExecutionContext], any[AuthContext])
 
             status(result) must be (SEE_OTHER)
             redirectLocation(result) must be (Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
