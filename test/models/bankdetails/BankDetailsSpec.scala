@@ -133,14 +133,6 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       BankDetails.section(cache) must be(completedSection)
     }
-    "return a Completed Section when model is empty (no bank details)" in {
-      val complete = Seq()
-      val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
-
-      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(complete)
-
-      BankDetails.section(cache) must be(completedSection)
-    }
     "return a Started Section when model is incomplete" in {
       val incomplete = Seq(accountTypePartialModel)
       val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
