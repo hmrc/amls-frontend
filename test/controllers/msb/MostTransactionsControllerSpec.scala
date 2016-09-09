@@ -95,7 +95,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        )
+        ), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -123,7 +123,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        )
+        ), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -160,7 +160,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        )
+        ), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -194,7 +194,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        )
+        ), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -222,7 +222,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        )
+        ), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(

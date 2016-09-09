@@ -54,24 +54,30 @@ object TradingPremises {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
+  val key = "trading-premises"
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tradingpremises"
     val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+    val complete = Section(messageKey, Completed, false, controllers.tradingpremises.routes.SummaryController.answers())
+
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
-      premises =>
-        if (premises.nonEmpty && (premises forall { _.isComplete })) {
-          Section(messageKey, Completed, false, controllers.tradingpremises.routes.SummaryController.answers())
-        } else {
+      _.filterNot(_ == TradingPremises()) match {
+        case Nil => notStarted
+        case premises if premises.nonEmpty && premises.forall {
+          _.isComplete
+        } => complete
+        case premises => {
           val index = premises.indexWhere {
             case model if !model.isComplete => true
             case _ => false
           }
           Section(messageKey, Started, false, controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
         }
+      }
     }
   }
 
-  val key = "trading-premises"
 
   implicit val mongoKey = new MongoKey[TradingPremises] {
     override def apply(): String = "trading-premises"
