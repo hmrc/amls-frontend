@@ -10,12 +10,20 @@ case class BankDetails (
                          hasChanged: Boolean = false
                         ){
 
-  def bankAccountType(v: BankAccountType): BankDetails =
-    this.copy(bankAccountType = Some(v), hasChanged = hasChanged || !this.bankAccountType.contains(v))
+  def bankAccountType(v: Option[BankAccountType]): BankDetails = {
+    println(s"******* bankAccountType $v - $hasChanged")
+    v match {
+      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty)
+      case _ => this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v))
+    }
+  }
 
-  def bankAccount(v: BankAccount): BankDetails =
-    this.copy(bankAccount = Some(v), hasChanged = hasChanged || !this.bankAccount.contains(v))
-
+  def bankAccount(v: BankAccount): BankDetails = {
+    println(s"******* bankAccount $v - $hasChanged")
+    val thing = this.copy(bankAccount = Some(v), hasChanged = hasChanged || !this.bankAccount.contains(v))
+    println(s"********* $thing")
+    thing
+  }
   def isComplete: Boolean =
     this match {
       case BankDetails(Some(_), Some(_), _) => true
@@ -29,23 +37,40 @@ object BankDetails {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  def anyChanged(model: Seq[BankDetails]): Boolean = model exists { _.hasChanged }
+  def anyChanged2(oldModel: Seq[BankDetails], newModel: Seq[BankDetails]): Boolean = {
+    !(oldModel equals newModel)
+  }
+
+  def anyChanged(newModel: Seq[BankDetails]): Boolean = {
+    newModel exists { _.hasChanged }
+  }
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "bankdetails"
     val notStarted = Section(messageKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
 
-    cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
-      case model: Seq[BankDetails] if model.isEmpty =>
+    val originalSeq = cache.getEntry[Seq[BankDetails]](key)
+//    val hasOriginalSeqChanged = anyChanged2(originalSeq, )
+
+      originalSeq.fold(notStarted) {
+      case model: Seq[BankDetails] if model.isEmpty => {
+        println(s"******* ${anyChanged(model)} 1 *********")
         Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
-      case model if model forall { _.isComplete } =>
+      }
+      case model if model forall {
+        _.isComplete
+      } => {
+        println(s"******* ${anyChanged(model)} 2 *********")
         Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
-      case model =>
+      }
+      case model => {
+        println(s"******* ${anyChanged(model)} 3 *********")
         val index = model.indexWhere {
           case m if !m.isComplete => true
           case _ => false
         }
         Section(messageKey, Started, anyChanged(model), controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
+      }
     }
   }
 
@@ -65,11 +90,10 @@ object BankDetails {
     model =>
       Seq(
         Json.toJson(model.bankAccountType).asOpt[JsObject],
-        Json.toJson(model.bankAccount).asOpt[JsObject],
-        Json.toJson(model.hasChanged).asOpt[JsObject]
+        Json.toJson(model.bankAccount).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
-      }
+      } + ("hasChanged" -> JsBoolean(model.hasChanged))
   }
 
   implicit def default(details: Option[BankDetails]): BankDetails =

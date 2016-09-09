@@ -32,8 +32,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
         case ValidForm(_, data) => {
           for {
               result <- updateDataStrict[BankDetails](index) {
-                case Some(BankDetails(_, Some(x),_)) => Some(BankDetails(data, Some(x)))
-                case _ => BankAccountType.convert(data)
+                _.map {_.bankAccountType(data)}
               }
 
           } yield {

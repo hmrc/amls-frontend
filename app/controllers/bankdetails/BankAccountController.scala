@@ -34,8 +34,8 @@ trait BankAccountController extends RepeatingSection with BaseController {
         case ValidForm(_, data) => {
           for {
             result <- updateDataStrict[BankDetails](index) {
-              case Some(BankDetails(Some(x), _,_)) => Some(BankDetails(Some(x), Some(data)))
-              case _ => Some(BankDetails(None, Some(data)))
+              println("*********** for comprehension bit")
+              _.map {_.bankAccount(data)}
             }
           } yield {
             if(edit) {

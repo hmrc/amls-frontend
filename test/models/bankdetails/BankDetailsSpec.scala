@@ -16,7 +16,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
   val accountType = PersonalAccount
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeJson = Json.obj("bankAccountType" -> "01")
+  val accountTypeJson = Json.obj("bankAccountType" -> "01", "hasChanged" -> false)
   val accountTypeNew = BelongsToBusiness
 
   val bankAccount = BankAccount("My Account", UKAccount("111111", "11-11-11"))
@@ -25,7 +25,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
     "accountName" -> "My Account",
     "isUK" -> true,
     "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11")
+    "sortCode" -> "11-11-11",
+    "hasChanged" -> false)
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
 
   val completeModel = BankDetails(Some(accountType), Some(bankAccount))
@@ -34,7 +35,16 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
     "accountName" -> "My Account",
     "isUK" -> true,
     "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11")
+    "sortCode" -> "11-11-11",
+    "hasChanged" -> false)
+  val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
+  val completeJsonChanged = Json.obj(
+    "bankAccountType" -> "01",
+    "accountName" -> "My Account",
+    "isUK" -> true,
+    "accountNumber" -> "111111",
+    "sortCode" -> "11-11-11",
+    "hasChanged" -> true)
 
 
   "BankDetails with complete model" must {
@@ -49,6 +59,17 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
         be(completeModel)
     }
   }
+
+  "BankDetails with complete model which has the hasChanged flag set as true" must {
+    "Serialise as expected" in {
+      Json.toJson[BankDetails](completeModelChanged)(BankDetails.writes) must be(completeJsonChanged)
+      Json.toJson[BankDetails](completeModelChanged) must be(completeJsonChanged)
+    }
+    "deserialise as expected" in {
+      completeJsonChanged.as[BankDetails] must be(completeModelChanged)
+    }
+  }
+
   "Bank details with partially complete model containing only accountType" must {
     "serialise as expected" in {
       Json.toJson[BankDetails](accountTypePartialModel) must be(accountTypeJson)
@@ -95,11 +116,20 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       BankDetails.section(cache) must be(notStartedSection)
     }
-    "return a Completed Section when model is complete" in {
+    "return a Completed Section when model is complete and has not changed" in {
       val complete = Seq(completeModel)
       val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(complete)
+
+      BankDetails.section(cache) must be(completedSection)
+    }
+    "return a Completed Section when model is complete and has changed" in {
+      val completeChangedModel = BankDetails(Some(accountType), Some(bankAccount),true)
+
+      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(Seq(completeChangedModel))
 
       BankDetails.section(cache) must be(completedSection)
     }
@@ -122,15 +152,23 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
   }
 
   "anyChanged" must {
+    val originalBankDetails = Seq(BankDetails(Some(accountType), Some(bankAccount), false))
+    val originalBankDetailsChanged = Seq(BankDetails(Some(accountType), Some(bankAccountNew), true))
+    val addedNewBankDetails = Seq(BankDetails(Some(accountType), Some(bankAccount), false), BankDetails(Some(accountType), Some(bankAccountNew), false))
+
     "return false" when {
-      "no BankDetails in the sequence have changed" in {
-        val res = BankDetails.anyChanged(Seq(BankDetails(Some(accountType), Some(bankAccount),false)))
+      "no BankDetails within the sequence have changed" in {
+        val res = BankDetails.anyChanged2(originalBankDetails, originalBankDetails)
         res must be(false)
       }
     }
     "return true" when {
-      "at least one BankDetails in the sequence has changed" in {
-        val res = BankDetails.anyChanged(Seq(BankDetails(Some(accountType), Some(bankAccount),true)))
+      "at least one BankDetails within the sequence has changed" in {
+        val res = BankDetails.anyChanged2(originalBankDetails, originalBankDetailsChanged)
+        res must be(true)
+      }
+      "at least one BankDetails has been added to the sequence" in {
+        val res = BankDetails.anyChanged2(originalBankDetails, addedNewBankDetails)
         res must be(true)
       }
     }
@@ -140,7 +178,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
     "bankAccountType value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.bankAccountType(accountType)
+          val res = completeModel.bankAccountType(Some(accountType))
           res must be(completeModel)
           res.hasChanged must be(false)
         }
@@ -148,8 +186,9 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.bankAccountType(accountTypeNew)
+          val res = completeModel.bankAccountType(Some(accountTypeNew))
           res.hasChanged must be(true)
+          BankDetails.anyChanged(Seq(res)) must be(true)
           res.bankAccountType must be(Some(accountTypeNew))
         }
       }

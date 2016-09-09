@@ -176,6 +176,8 @@ trait RepeatingSection {
     getData[T] map {
       data => {
         if (index < 1 || data.size < index) throw new IndexOutOfBoundsException()
+        val transformedData = fn(data.lift(index - 1))
+        println("********** transformed data "+transformedData)
         putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
       }
     }
@@ -188,7 +190,8 @@ trait RepeatingSection {
    formats: Format[T],
    key: MongoKey[T],
    ec: ExecutionContext
-  ): Future[_] =
-    dataCacheConnector.save[Seq[T]](key(), data)
+  ): Future[_] ={
+  println(s"***********put data - $data")
+    dataCacheConnector.save[Seq[T]](key(), data)}
 }
 
