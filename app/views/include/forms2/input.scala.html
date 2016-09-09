@@ -10,6 +10,7 @@
     jsHidden: Boolean = false,
     labelHidden: Boolean = false,
     requiredField: Boolean = true,
+    parentDateAttr: String = "",
     attrType: String = "",
     attrMin: String = "",
     attrMax: String = "",
@@ -17,7 +18,7 @@
     attrDescribedBy: String = ""
 )(implicit lang: Lang)
 
-<div class="form-group @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}">
+<div class="form-group @if(field.hasErrors) {form-field--error} @if(parentDateAttr) {form-group-@parentDateAttr} @if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden}">
     <label>
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold} @if(labelHidden) {visuallyhidden}">@Messages(labelText)</span>
