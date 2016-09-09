@@ -21,9 +21,19 @@ class HvdSpec extends PlaySpec with MockitoSugar{
 
     val completeJson = Json.obj(
       "cashPayment" ->Json.obj(
-      "acceptedAnyPayment" -> true,
-      "paymentDate" ->  new LocalDate(1956, 2, 15)),
-      "receiveCashPayments" -> Json.obj("receivePayments" ->true,"paymentMethods" ->Json.obj("courier" ->true,"direct" ->true,"other" ->true,"details" ->"foo")))
+        "acceptedAnyPayment" -> true,
+        "paymentDate" ->  new LocalDate(1956, 2, 15)
+      ),
+      "receiveCashPayments" -> Json.obj(
+        "receivePayments" -> true,
+        "paymentMethods" -> Json.obj(
+          "courier" -> true,
+          "direct" -> true,
+          "other" -> true,
+          "details" -> "foo")
+      ),
+      "hasChanged" -> false
+    )
 
     val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
       None,None,None,None,
@@ -40,9 +50,12 @@ class HvdSpec extends PlaySpec with MockitoSugar{
 
     "Update how will you sell goods correctly" in {
       val sut = Hvd(cashPayment = Some(DefaultCashPayment), howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail))))
-
-      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (Hvd(cashPayment = Some(DefaultCashPayment),
-                                                                                howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale)))))
+      val expectedModel = Hvd(
+        cashPayment = Some(DefaultCashPayment),
+        howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))),
+        hasChanged = true
+      )
+      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (expectedModel)
     }
   }
   

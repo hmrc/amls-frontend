@@ -80,7 +80,8 @@ class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with One
     "return a redirect to the 'Linked Transactions' page on valid submission" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(None))
+        branchesOrAgents = Some(BranchesOrAgents(None)),
+        hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -102,7 +103,8 @@ class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with One
     "return a redirect to the 'Summary page' page on valid submission when edit flag is set" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(None))
+        branchesOrAgents = Some(BranchesOrAgents(None)),
+        hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(

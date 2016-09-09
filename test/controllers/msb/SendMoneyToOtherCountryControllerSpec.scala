@@ -76,7 +76,8 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
       val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+        hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -106,7 +107,8 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
       )
 
       val outgoingModel = incomingModel.copy(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+        hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -130,7 +132,8 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
     val incomingModel = MoneyServiceBusiness()
 
     val outgoingModel = incomingModel.copy(
-      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+      hasChanged = true
     )
 
     when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -153,7 +156,8 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
     val incomingModel = MoneyServiceBusiness()
 
     val outgoingModel = incomingModel.copy(
-      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+      hasChanged = true
     )
 
     when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -178,7 +182,7 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
         Set(
           CurrencyExchange
         )
-      ))
+      )), hasChanged = true
     )
 
     val outgoingModel = incomingModel.copy(
@@ -205,7 +209,8 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
     val incomingModel = MoneyServiceBusiness()
 
     val outgoingModel = incomingModel.copy(
-      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+      hasChanged = true
     )
 
     when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
