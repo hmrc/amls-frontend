@@ -71,6 +71,39 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
       }
     }
+
+    "the section consistes of just 1 empty Responsible Person" must {
+        "return a result indicating NotStarted" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+            .thenReturn(Some(Seq(ResponsiblePeople())))
+
+          ResponsiblePeople.section(mockCacheMap).status must be (models.registrationprogress.NotStarted)
+        }
+      }
+
+    "the section consists of a partially complete model followed by a completely empty one" must {
+      "return a result indicating partial completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(InCompleteResponsiblePeople, ResponsiblePeople())))
+
+        ResponsiblePeople.section(mockCacheMap).status must be (models.registrationprogress.Started)
+      }
+    }
+
+    "the section consists of a complete model followed by an empty one" must {
+      "return a result indicating completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(CompleteResponsiblePeople, ResponsiblePeople())))
+
+        ResponsiblePeople.section(mockCacheMap).status must be (models.registrationprogress.Completed)
+      }
+    }
   }
 
   "None" when {
