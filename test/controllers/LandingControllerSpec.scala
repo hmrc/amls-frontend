@@ -1,8 +1,18 @@
 package controllers
 
 import config.ApplicationConfig
+import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
+import models.bankdetails.BankDetails
+import models.businessactivities.BusinessActivities
+import models.businessmatching.BusinessMatching
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
+import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
+import models.tcsp.Tcsp
+import models.tradingpremises.TradingPremises
 import models.{Country, SubscriptionResponse}
 import models.businesscustomer.{Address, ReviewDetails}
 import org.mockito.Matchers._
@@ -15,6 +25,8 @@ import org.scalatest.fixture.WordSpec
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import play.api.libs.json.{JsValue, Json}
+
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -164,13 +176,31 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
   def buildTestCacheMap(hasChanged : Boolean, includesResponse : Boolean) : CacheMap = {
     val result = mock[CacheMap]
+    val testASP = Asp(hasChanged = hasChanged)
+    val testAboutTheBusiness = AboutTheBusiness(hasChanged = hasChanged)
+    //val testBankDetails = BankDetails(hasChanged = hasChanged)
+    val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)
+    val testBusinessMatching = BusinessMatching(hasChanged = hasChanged)
+    val testEstateAgentBusiness = EstateAgentBusiness(hasChanged = hasChanged)
+    //val testMoneyServiceBusiness = MoneyServiceBusiness(hasChanged = hasChanged)
+    //val testResponsiblePeople = ResponsiblePeople(hasChanged = hasChanged)
+    val testSupervision = Supervision(hasChanged = hasChanged)
+    val testTcsp = Tcsp(hasChanged = hasChanged)
+    //val testTradingPremises = TradingPremises(hasChanged = hasChanged)
+    //val testHvd = Hvd(hasChanged = hasChanged)
 
-    if (hasChanged) {
-      val testASP = Asp(hasChanged = true)
-
-      when(result.getEntry[Asp](Asp.key))
-       .thenReturn(Some(testASP))
-    }
+    when(result.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
+    when(result.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusiness))
+    //when(result.getEntry[BankDetails](BankDetails.key)).thenReturn(Some(testBankDetails))
+    when(result.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
+    when(result.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
+    when(result.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
+    //when(result.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
+    //when(result.getEntry[ResponsiblePeople](ResponsiblePeople.key)).thenReturn(Some(testResponsiblePeople))
+    when(result.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
+    when(result.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
+    //when(result.getEntry[TradingPremises](TradingPremises.key)).thenReturn(Some(testTradingPremises))
+    //when(result.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
 
     if (includesResponse) {
       val testResponse = SubscriptionResponse(
