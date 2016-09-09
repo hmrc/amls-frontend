@@ -285,7 +285,7 @@ button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
 button.delete = Delete
-button.payfee = Pay fee
+button.payfee = Pay registration fee
 
 missing.personName = Name Unknown
 missing.dataItem = Unknown
@@ -445,18 +445,19 @@ amendment.view-and-amend = View and amend your information
 
 
 #### Confirmation page ####
-confirmation.lede = You have submitted the application.
+confirmation.lede = You’ve submitted your application.
 confirmation.thankyou = Thank you for registering online.
-confirmation.thankyou.p = You now have 30 days to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
-confirmation.fee = Your registration fee:
+confirmation.thankyou.p = You now need to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
+confirmation.notice = You must make a note of this reference number and registration fee. You will need them to make the payment.
+confirmation.fee = Your fee:
 confirmation.breakdown = How your registration fee has been calculated:
-confirmation.sidebar.code = Reference number: {0}
+confirmation.sidebar.code = Your reference:
 confirmation.sidebar.lede = You have registered for anti-money laundering supervision, pending payment.
 confirmation.sidebar.contact = Quote this code if you need to contact HM Revenue and Customs about your registration.
 confirmation.quantity = Quantity
 confirmation.feeperitem = Fee per item
 confirmation.totalfee = Total fee
-confirmation.registrationfee = Registration fee
+confirmation.registrationfee = Total registration fee
 confirmation.submission = Application submission
 confirmation.tradingpremises = Trading premises
 confirmation.responsiblepeople = Responsible people
