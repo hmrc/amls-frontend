@@ -18,7 +18,7 @@ case class BankDetails (
   def isComplete: Boolean =
     this match {
       case BankDetails(Some(_), Some(_)) => true
-      case BankDetails(None, None) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case BankDetails(None, None) => true
       case _ => false
     }
 }
@@ -35,14 +35,17 @@ object BankDetails {
     val complete = Section(messageKey, Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
 
     cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
-      case model if model.isEmpty => complete
-      case model if model forall { _.isComplete } => complete
-      case model =>
-        val index = model.indexWhere {
-          case model if !model.isComplete => true
-          case _ => false
-        }
-        Section(messageKey, Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
+      _.filterNot(_ == BankDetails()) match {
+        case Nil => notStarted
+        case model if model.isEmpty => complete
+        case model if model forall { _.isComplete } => complete
+        case model =>
+          val index = model.indexWhere {
+            case model if !model.isComplete => true
+            case _ => false
+          }
+          Section(messageKey, Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
+      }
     }
   }
 
