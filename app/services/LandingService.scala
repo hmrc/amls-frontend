@@ -35,6 +35,10 @@ trait LandingService {
   ): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
 
+  def refreshCache = {
+    ///
+  }
+
   def reviewDetails
   (implicit
    hc: HeaderCarrier,
