@@ -9,7 +9,7 @@
 }
 
 @header = {
-    @heading("declaration.addperson.title", "submit.registration")
+    @heading("declaration.addperson.heading", "submit.registration")
 }
 
 @main(
@@ -44,7 +44,7 @@
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("declaration.addperson.lbl.08", jsHidden = true, id = target) {
                 @input(f("roleWithinBusinessOther"), "lbl.pleasespecify", bold = false)
             }
 

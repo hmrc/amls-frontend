@@ -5,7 +5,7 @@
 @(f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("declaration.who.is.registering.title", "submit.registration")
+    @heading("declaration.who.is.registering.heading", "submit.registration")
 }
 
 @main(
@@ -19,7 +19,7 @@
         </p>
 
         @radioGroup(f("person")) {
-            @legend("", jsHidden = false)
+            @legend("declaration.who.is.registering.title", jsHidden = true)
 
             @model.map { people =>
                 @people.personName.map { obj =>

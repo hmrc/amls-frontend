@@ -5,7 +5,7 @@
 @(name: String)(implicit request: Request[_])
 
 @header = {
-    @heading("declaration.declaration.submit", "submit.registration")
+    @heading("declaration.declaration.heading", "submit.registration")
 }
 
 @main(
@@ -24,11 +24,11 @@
 
     <div class="form-group">
         <ul class="list list-bullet">
-            <l>@Messages("declaration.declaration.correctinformation")</li>
+            <li>@Messages("declaration.declaration.correctinformation")</li>
             <li>@Messages("declaration.declaration.tellhmrc")</li>
             <li>@Messages("declaration.declaration.noncompliance")</li>
             <li>@Messages("declaration.declaration.confirm")
-                <a href="">@Messages("declaration.declaration.guidance")</a>
+                <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("declaration.declaration.guidance")</a>
             </li>
         </ul>
     </div>
