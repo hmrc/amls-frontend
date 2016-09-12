@@ -78,16 +78,16 @@ trait LandingController extends BaseController {
     Seq(
     cacheMap.getEntry[Asp](Asp.key).fold(false){_.hasChanged},
     cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key).fold(false){_.hasChanged},
-    //cacheMap.getEntry[BankDetails](BankDetails.key).fold(false){_.hasChanged},
+    cacheMap.getEntry[BankDetails](BankDetails.key).fold(false){_.hasChanged},
     cacheMap.getEntry[BusinessActivities](BusinessActivities.key).fold(false){_.hasChanged},
     cacheMap.getEntry[BusinessMatching](BusinessMatching.key).fold(false){_.hasChanged},
     cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key).fold(false){_.hasChanged},
-    //cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false){_.hasChanged},
-    //cacheMap.getEntry[ResponsiblePeople](ResponsiblePeople.key).fold(false){_.hasChanged},
+    cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false){_.hasChanged},
+    cacheMap.getEntry[ResponsiblePeople](ResponsiblePeople.key).fold(false){_.hasChanged},
     cacheMap.getEntry[Supervision](Supervision.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[Tcsp](Tcsp.key).fold(false){_.hasChanged}
-    //cacheMap.getEntry[TradingPremises](TradingPremises.key).fold(false){_.hasChanged},
-    //cacheMap.getEntry[Hvd](Hvd.key).fold(false){_.hasChanged}
+    cacheMap.getEntry[Tcsp](Tcsp.key).fold(false){_.hasChanged},
+    cacheMap.getEntry[TradingPremises](TradingPremises.key).fold(false){_.hasChanged},
+    cacheMap.getEntry[Hvd](Hvd.key).fold(false){_.hasChanged}
     ).exists(identity)
   }
 
