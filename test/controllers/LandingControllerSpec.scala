@@ -224,6 +224,34 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
   "Landing Controller" when {
     "an enrolment exists and" when {
       "there is data in S4L and" when {
+        "The Save 4 Later data does not contain any sections" should {
+          "data has not changed" should {
+            "refresh from API5 and redirect to status controller" in new Fixture {
+              setUpMocksForAnEnrolmentExists(controller)
+              val emptyCacheMap = mock[CacheMap]
+              when(emptyCacheMap.getEntry[Asp](Asp.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[BankDetails](BankDetails.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[ResponsiblePeople](ResponsiblePeople.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[Supervision](Supervision.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[TradingPremises](TradingPremises.key)).thenReturn(None)
+              when(emptyCacheMap.getEntry[Hvd](Hvd.key)).thenReturn(None)
+              setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
+
+              val result = controller.get()(request)
+
+              status(result) must be (SEE_OTHER)
+              redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
+              verify(controller.landingService, atLeastOnce()).refreshCache
+            }
+          }
+        }
+
         "data has changed and" when {
           "there is a subscription response" should {
             "refresh from API5 and redirect to status controller" in new Fixture {
