@@ -70,7 +70,6 @@ trait DESConnector {
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
-
   }
 }
 

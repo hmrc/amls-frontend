@@ -36,7 +36,8 @@ trait LandingService {
     cacheConnector.fetchAll
 
   def refreshCache = {
-    ///
+    /// refresh S4L from API 5 call
+
   }
 
   def reviewDetails

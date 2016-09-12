@@ -24,9 +24,9 @@ trait FitAndProperController extends RepeatingSection with BaseController {
 
 
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, Some(alreadyPassed), _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, Some(alreadyPassed), _, _, _))
               => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
               => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index))
             case _
               => NotFound(notFoundView)
