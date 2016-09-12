@@ -1,33 +1,55 @@
 package models.tradingpremises
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.responsiblepeople.ResponsiblePeople
 import org.joda.time.LocalDate
+import org.mockito.Matchers._
+import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
+import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.CacheMap
 
-class TradingPremisesSpec extends WordSpec with MustMatchers {
+class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
-  val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
-    true, new LocalDate(1990, 2, 24))
+  val ytp = YourTradingPremises(
+    "foo",
+    Address(
+      "1",
+      "2",
+      None,
+      None,
+      "asdfasdf"
+    ),
+    true,
+    new LocalDate(1990, 2, 24)
+  )
 
   val businessStructure = SoleProprietor
-
   val agentName = AgentName("test")
-
   val agentCompanyName = AgentCompanyName("test")
-
   val agentPartnership = AgentPartnership("test")
-
   val wdbd = WhatDoesYourBusinessDo(
     Set(
       BillPaymentServices,
       EstateAgentBusinessService,
-      MoneyServiceBusiness))
+      MoneyServiceBusiness)
+  )
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val completeModel = TradingPremises(
+    Some(RegisteringAgentPremises(true)),
+    Some(ytp),
+    Some(businessStructure),
+    Some(agentName),
+    Some(agentCompanyName),
+    Some(agentPartnership),
+    Some(wdbd),
+    Some(msbServices)
+  )
 
-  val completeModel = TradingPremises(Some(RegisteringAgentPremises(true)),
-    Some(ytp), Some(businessStructure), Some(agentName),Some(agentCompanyName),Some(agentPartnership),Some(wdbd), Some(msbServices))
-
+  val incompleteModel = TradingPremises(Some(RegisteringAgentPremises(true)),
+    Some(ytp), Some(businessStructure), Some(agentName),None, None, None, None)
 
   val completeJson = Json.obj("agentPremises" -> true,
     "tradingName" -> "foo",
@@ -41,47 +63,58 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
     "agentCompanyName" ->"test",
     "agentPartnership" ->"test",
     "activities" -> Json.arr("02", "03", "05"),
-    "msbServices" ->Json.arr("01","02")
+    "msbServices" ->Json.arr("01","02"),
+    "hasChanged" -> false
   )
 
   "TradingPremises" must {
 
-    "set the your agent data correctly" in {
+    "return a tp model with the given 'your agent' data" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.businessStructure(LimitedLiabilityPartnership)
-      newTP.businessStructure must be(Some(LimitedLiabilityPartnership))
+      newTP must be(tp.copy(businessStructure = Some(LimitedLiabilityPartnership), hasChanged = true))
     }
 
-    "set the agent name correctly" in {
+    "return a tp model with the given 'agent name' data" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.agentName(agentName)
-      newTP.agentName must be(Some(agentName))
+      newTP must be(tp.copy(agentName = Some(agentName), hasChanged = true))
     }
 
-    "set the agent company name correctly" in {
+    "return a tp model with the given 'agent company name' data" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.agentCompanyName(agentCompanyName)
-      newTP.agentCompanyName must be(Some(agentCompanyName))
+      newTP must be (tp.copy(agentCompanyName = Some(agentCompanyName), hasChanged = true))
     }
 
-
-    "set the agent partnership correctly" in {
+    "return a tp model with the given 'agent partnership' data" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.agentPartnership(agentPartnership)
-      newTP.agentPartnership must be(Some(agentPartnership))
+      newTP must be(tp.copy(agentPartnership = Some(agentPartnership), hasChanged = true))
     }
 
-
-    "set the your trading premises data correctly" in {
+    "return a tp model with the given 'your trading premises' data" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.yourTradingPremises(ytp)
-      newTP.yourTradingPremises must be(Some(ytp))
+      newTP must be(tp.copy(yourTradingPremises = Some(ytp), hasChanged = true))
     }
 
-    "set what does your business do data correctly" in {
+    "return a tp model with the given 'what does your business do' data" in {
       val tp = TradingPremises(None, None, None)
       val newTP = tp.whatDoesYourBusinessDoAtThisAddress(wdbd)
-      newTP.whatDoesYourBusinessDoAtThisAddress must be(Some(wdbd))
+      newTP must be(tp.copy(whatDoesYourBusinessDoAtThisAddress = Some(wdbd), hasChanged = true))
+    }
+
+    "return a tp model with the given 'agent premises' data" in {
+      val tp = TradingPremises()
+      val newTP = tp.registeringAgentPremises(RegisteringAgentPremises(true))
+      newTP must be(tp.copy(registeringAgentPremises = Some(RegisteringAgentPremises(true)), hasChanged = true))
+    }
+
+    "return a tp model with the given 'msb' data" in {
+      val tp = TradingPremises(None, None, None)
+      val newTP = tp.msbServices(msbServices)
+      newTP must be(tp.copy(msbServices = Some(msbServices), hasChanged = true))
     }
 
     "Serialise as expected" in {
@@ -96,20 +129,72 @@ class TradingPremisesSpec extends WordSpec with MustMatchers {
 
     "isComplete" must {
       "return true when tradingPremises contains complete data" in {
-
         completeModel.isComplete must be(true)
       }
 
       "return false when tradingPremises contains incomplete data" in {
         val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), None)
-
-          tradingPremises.isComplete must be(false)
+        tradingPremises.isComplete must be(false)
       }
 
       "return false when tradingPremises no data" in {
         val tradingPremises = TradingPremises(None, None)
-
         tradingPremises.isComplete must be(true)
+      }
+    }
+  }
+
+  it when {
+
+    "the section consists of just 1 empty Trading premises" must {
+      "return a result indicating NotStarted" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises())))
+
+        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.NotStarted)
+      }
+    }
+
+    "the section consists of a partially complete model followed by a completely empty one" must {
+      "return a result indicating partial completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(incompleteModel, TradingPremises())))
+
+        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.Started)
+      }
+    }
+
+    "the section consists of a complete model followed by an empty one" must {
+      "return a result indicating completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(completeModel, TradingPremises())))
+
+        TradingPremises.section(mockCacheMap).status must be (models.registrationprogress.Completed)
+      }
+    }
+
+  }
+
+  "anyChanged" must {
+    val originalBankDetails = Seq(TradingPremises(None, None, hasChanged = false))
+    val originalBankDetailsChanged = Seq(TradingPremises(None, None, hasChanged = true))
+
+    "return false" when {
+      "no BankDetails within the sequence have changed" in {
+        val res = TradingPremises.anyChanged(originalBankDetails)
+        res must be(false)
+      }
+    }
+    "return true" when {
+      "at least one BankDetails within the sequence has changed" in {
+        val res = TradingPremises.anyChanged(originalBankDetailsChanged)
+        res must be(true)
       }
     }
   }

@@ -26,9 +26,9 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
         implicit authContext => implicit request =>
 
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _))
               => Ok(current_address(Form2[ResponsiblePersonAddress](currentAddress), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
               => Ok(current_address(Form2(DefaultAddressHistory), edit, index))
             case _
               => NotFound(notFoundView)

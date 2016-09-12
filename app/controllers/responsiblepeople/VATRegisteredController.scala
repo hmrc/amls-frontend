@@ -19,8 +19,8 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_,_,_,_,_,_,Some(vat),_,_,_)) => Ok(vat_registered(Form2[VATRegistered](vat), edit,index))
-            case Some(ResponsiblePeople(_,_,_,_,_,_,_,_,_,_)) => Ok(vat_registered(EmptyForm, edit,index))
+            case Some(ResponsiblePeople(_,_,_,_,_,_,Some(vat),_,_,_,_)) => Ok(vat_registered(Form2[VATRegistered](vat), edit,index))
+            case Some(ResponsiblePeople(_,_,_,_,_,_,_,_,_,_,_)) => Ok(vat_registered(EmptyForm, edit,index))
             case _ => NotFound(notFoundView)
           }
       }
