@@ -436,7 +436,10 @@ trait ResponsiblePeopleValues {
     Some(DefaultValues.vatRegistered),
     Some(DefaultValues.experienceTraining),
     Some(DefaultValues.training),
-    Some(true)
+    Some(true),
+    false,
+    Some(1),
+    Some("test")
   )
 
   val InCompleteResponsiblePeople = ResponsiblePeople(
@@ -509,7 +512,9 @@ trait ResponsiblePeopleValues {
       "information" -> "test"
     ),
     "hasAlreadyPassedFitAndProper" -> true,
-    "hasChanged" -> false
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "test"
   )
 
   /** Make sure Responsible People model is complete */

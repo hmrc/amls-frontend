@@ -1,6 +1,6 @@
 package services
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.{DESConnector, DataCacheConnector, KeystoreConnector}
 import models.aboutthebusiness.AboutTheBusiness
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
@@ -14,6 +14,7 @@ trait LandingService {
 
   private[services] def cacheConnector: DataCacheConnector
   private[services] def keyStore: KeystoreConnector
+  private[controllers] def desConnector: DESConnector
 
   @deprecated("fetch the cacheMap itself instead", "")
   def hasSavedForm
@@ -36,7 +37,12 @@ trait LandingService {
     cacheConnector.fetchAll
 
   def refreshCache = {
-    /// refresh S4L from API 5 call
+    desConnector.status(amlsRefNumber) map {
+      response => response.formBundleStatus match {
+        case "Pending" => SubmissionReadyForReview
+        case "Approved" => SubmissionDecisionApproved
+        case "Rejected" => SubmissionDecisionRejected
+      }
 
   }
 
