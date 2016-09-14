@@ -6,18 +6,18 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Asp(
               services: Option[ServicesOfBusiness] = None,
-              otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None
-
+              otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None,
+              hasChanged : Boolean = false
               ) {
 
   def services(p: ServicesOfBusiness): Asp =
-    this.copy(services = Some(p))
+    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p))
 
   def otherBusinessTaxMatters(p: OtherBusinessTaxMatters): Asp =
-    this.copy(otherBusinessTaxMatters = Some(p))
+    this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p))
 
   def isComplete: Boolean = this match {
-      case Asp(Some(_), Some(_)) => true
+      case Asp(Some(_), Some(_), _) => true
       case _ => false
   }
 }
@@ -29,13 +29,13 @@ object Asp {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "asp"
-    val notStarted = Section(messageKey, NotStarted, controllers.asp.routes.WhatYouNeedController.get())
+    val notStarted = Section(messageKey, NotStarted, false, controllers.asp.routes.WhatYouNeedController.get())
     cache.getEntry[Asp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.asp.routes.SummaryController.get())
+          Section(messageKey, Completed, model.hasChanged, controllers.asp.routes.SummaryController.get())
         } else {
-          Section(messageKey, Started, controllers.asp.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, model.hasChanged, controllers.asp.routes.WhatYouNeedController.get())
         }
     }
   }
@@ -46,7 +46,13 @@ object Asp {
     override def apply(): String = "asp"
   }
 
-  implicit val format = Json.format[Asp]
+  implicit val jsonWrites = Json.writes[Asp]
+
+  implicit val jsonReads : Reads[Asp] = {
+    (__ \ "services").readNullable[ServicesOfBusiness] and
+    (__ \ "otherBusinessTaxMatters").readNullable[OtherBusinessTaxMatters] and
+    (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+  }.apply(Asp.apply _)
 
   implicit def default(details: Option[Asp]): Asp =
     details.getOrElse(Asp())

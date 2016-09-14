@@ -156,8 +156,13 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
       CompleteResponsiblePeople.isComplete must be(true)
     }
 
-    "the model is not complete" in {
+    "the model is has no data" in {
       val initial = ResponsiblePeople()
+      initial.isComplete must be(true)
+    }
+
+    "the model is not complete" in {
+      val initial = ResponsiblePeople(Some(DefaultValues.personName))
       initial.isComplete must be(false)
     }
 

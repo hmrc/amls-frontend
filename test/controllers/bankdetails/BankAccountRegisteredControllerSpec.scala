@@ -1,7 +1,7 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import models.bankdetails.BankDetails
+import models.bankdetails.{BankDetails, PersonalAccount}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -43,9 +43,10 @@ class BankAccountRegisteredControllerSpec extends PlaySpec with OneAppPerSuite w
       }
 
       "load the Bank account Registered page1" in new Fixture {
+        val accountType = PersonalAccount
 
         when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(BankDetails(None,None), BankDetails(None,None)))))
+          .thenReturn(Future.successful(Some(Seq(BankDetails(Some(accountType),None), BankDetails(Some(accountType),None)))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)

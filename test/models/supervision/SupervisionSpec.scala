@@ -84,7 +84,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
 
       "return a NotStarted Section when model is empty" in {
 
-        val notStartedSection = Section("supervision", NotStarted, controllers.supervision.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get())
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn None
 
@@ -95,7 +95,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Supervision]
-        val completedSection = Section("supervision", Completed, controllers.supervision.routes.SummaryController.get())
+        val completedSection = Section("supervision", Completed, false,  controllers.supervision.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(complete)
@@ -107,7 +107,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
       "return a Started Section when model is incomplete" in {
 
         val incomplete = mock[Supervision]
-        val startedSection = Section("supervision", Started, controllers.supervision.routes.WhatYouNeedController.get())
+        val startedSection = Section("supervision", Started, false,  controllers.supervision.routes.WhatYouNeedController.get())
 
         when(incomplete.isComplete) thenReturn false
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(incomplete)

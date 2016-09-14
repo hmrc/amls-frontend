@@ -28,13 +28,13 @@ object Tcsp {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"
-    val notStarted = Section(messageKey, NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
+    val notStarted = Section(messageKey, NotStarted, false, controllers.tcsp.routes.WhatYouNeedController.get())
     cache.getEntry[Tcsp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, controllers.tcsp.routes.SummaryController.get())
+          Section(messageKey, Completed, false, controllers.tcsp.routes.SummaryController.get())
         } else {
-          Section(messageKey, Started, controllers.tcsp.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, false, controllers.tcsp.routes.WhatYouNeedController.get())
         }
     }
   }
