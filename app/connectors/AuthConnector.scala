@@ -21,9 +21,8 @@ trait AuthConnector {
 }
 
 object AuthConnector extends AuthConnector {
+  // $COVERAGE-OFF$
   override private[connectors] val authUrl = ApplicationConfig.authUrl
   override private[connectors] val httpGet = WSHttp
-
+  // $COVERAGE-ON$
 }
-
-

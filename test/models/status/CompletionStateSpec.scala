@@ -33,17 +33,6 @@ class CompletionStateSpec  extends PlaySpec with MockitoSugar{
       }
     }
 
-    "return updated statuses when submission fee paid" in {
-      val model = CompletionStateViewModel(SubmissionFeesDue)
-      model.statuses.get(SubmissionFeesDue).get must be(Current)
-
-      model.statuses.span(s => s._1 != SubmissionFeesDue)._1 map {
-        entry => entry._2 must be(Complete)
-      }
-      model.statuses.span(s => s._1 != SubmissionFeesDue)._2.drop(1) map {
-        entry => entry._2 must be(Incomplete)
-      }
-    }
   }
 
 }

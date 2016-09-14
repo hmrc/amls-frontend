@@ -44,7 +44,6 @@ trait AspValues {
 class AspSpec extends PlaySpec with MockitoSugar with AspValues {
 
   "None" when {
-
     val initial: Option[Asp] = None
 
     "Merged with other business tax matters" must {
@@ -69,7 +68,6 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
     }
 
     "have a default function that" must {
-
       "correctly provides a default value when none is provided" in {
         Asp.default(None) must be(Asp())
       }

@@ -14,69 +14,80 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None,
-                             hasAlreadyPassedFitAndProper: Option[Boolean] = None
+                             hasAlreadyPassedFitAndProper: Option[Boolean] = None,
+                             hasChanged: Boolean = false,
+                             lineId: Option[Int] = None,
+                             status: Option[String] = None
                           ) {
 
-  def personName(pn: PersonName): ResponsiblePeople =
-    this.copy(personName = Some(pn))
+  def personName(p: PersonName): ResponsiblePeople =
+    this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p))
 
-  def personResidenceType(pr: PersonResidenceType): ResponsiblePeople =
-    this.copy(personResidenceType = Some(pr))
+  def personResidenceType(p: PersonResidenceType): ResponsiblePeople =
+    this.copy(personResidenceType = Some(p), hasChanged = hasChanged || !this.personResidenceType.contains(p))
 
-  def contactDetails(cd: ContactDetails): ResponsiblePeople =
-    this.copy(contactDetails = Some(cd))
+  def contactDetails(p: ContactDetails): ResponsiblePeople =
+    this.copy(contactDetails = Some(p), hasChanged = hasChanged || !this.contactDetails.contains(p))
 
-  def saRegistered(sa: SaRegistered): ResponsiblePeople =
-    this.copy(saRegistered = Some(sa))
+  def saRegistered(p: SaRegistered): ResponsiblePeople =
+    this.copy(saRegistered = Some(p), hasChanged = hasChanged || !this.saRegistered.contains(p))
 
-  def addressHistory(hist: ResponsiblePersonAddressHistory): ResponsiblePeople =
-    this.copy(addressHistory = Some(hist))
+  def addressHistory(p: ResponsiblePersonAddressHistory): ResponsiblePeople =
+    this.copy(addressHistory = Some(p), hasChanged = hasChanged || !this.addressHistory.contains(p))
 
-  def positions(pos: Positions): ResponsiblePeople =
-    this.copy(positions = Some(pos))
+  def positions(p: Positions): ResponsiblePeople =
+    this.copy(positions = Some(p), hasChanged = hasChanged || !this.positions.contains(p))
 
-  def vatRegistered(v: VATRegistered): ResponsiblePeople =
-    this.copy(vatRegistered = Some(v))
+  def vatRegistered(p: VATRegistered): ResponsiblePeople =
+    this.copy(vatRegistered = Some(p), hasChanged = hasChanged || !this.vatRegistered.contains(p))
 
-  def experienceTraining(et: ExperienceTraining): ResponsiblePeople =
-    this.copy(experienceTraining = Some(et))
+  def experienceTraining(p: ExperienceTraining): ResponsiblePeople =
+    this.copy(experienceTraining = Some(p), hasChanged = hasChanged || !this.experienceTraining.contains(p))
 
-  def training(t: Training): ResponsiblePeople =
-    this.copy(training = Some(t))
+  def training(p: Training): ResponsiblePeople =
+    this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p))
 
-  def hasAlreadyPassedFitAndProper(value : Boolean) : ResponsiblePeople =
-    this.copy(hasAlreadyPassedFitAndProper = Some(value))
+  def hasAlreadyPassedFitAndProper(p: Boolean) : ResponsiblePeople =
+    this.copy(hasAlreadyPassedFitAndProper = Some(p), hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.contains(p))
 
   def isComplete: Boolean = this match {
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _) if !pos.personalTax => true
+      Some(_), _, _, _, _) if !pos.personalTax => true
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
-      Some(_), _) => true
-    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None) => true
+      Some(_), _, _, _, _) => true
+    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
     case _ => false
   }
 }
 
 object ResponsiblePeople {
 
+  def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean = {
+    newModel exists { _.hasChanged }
+  }
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
-    val complete = Section(messageKey, Completed, false, controllers.responsiblepeople.routes.YourAnswersController.get())
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
-      case model if model forall {
-        _.isComplete
-      } => complete
-      case model => {
-        val index = model.indexWhere { m => !m.isComplete }
-        Section(messageKey, Started, false, controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+      _.filterNot(_ == ResponsiblePeople()) match {
+        case Nil => notStarted
+        case model if model forall {
+          _.isComplete
+        } => Section(messageKey, Completed, anyChanged(model), controllers.responsiblepeople.routes.YourAnswersController.get())
+        case model => {
+          val index = model.indexWhere { m => !m.isComplete }
+          Section(messageKey, Started, anyChanged(model), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+        }
       }
     }
   }
+
+  import play.api.libs.json._
 
   val key = "responsible-people"
 
@@ -84,7 +95,27 @@ object ResponsiblePeople {
     override def apply(): String = key
   }
 
-  implicit val format = Json.format[ResponsiblePeople]
+  implicit val writes: Writes[ResponsiblePeople] = Json.writes[ResponsiblePeople]
+
+  implicit val reads: Reads[ResponsiblePeople] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      (__ \ "personName").readNullable[PersonName] and
+      (__ \ "personResidenceType").readNullable[PersonResidenceType] and
+      (__ \ "contactDetails").readNullable[ContactDetails] and
+      (__ \ "addressHistory").readNullable[ResponsiblePersonAddressHistory] and
+      (__ \ "positions").readNullable[Positions] and
+      (__ \ "saRegistered").readNullable[SaRegistered] and
+      (__ \ "vatRegistered").readNullable[VATRegistered] and
+      (__ \ "experienceTraining").readNullable[ExperienceTraining] and
+      (__ \ "training").readNullable[Training] and
+      (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
+      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
+        (__ \ "lineId").readNullable[Int] and
+      (__ \ "status").readNullable[String]
+      ) apply ResponsiblePeople.apply _
+  }
 
   implicit def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())

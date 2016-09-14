@@ -94,7 +94,7 @@ class FundsTransferControllerSpec extends PlaySpec with OneAppPerSuite with Mock
       val outgoingModel = incomingModel.copy(
         fundsTransfer = Some(
           FundsTransfer(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -119,7 +119,7 @@ class FundsTransferControllerSpec extends PlaySpec with OneAppPerSuite with Mock
       val outgoingModel = incomingModel.copy(
         fundsTransfer = Some(
           FundsTransfer(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))

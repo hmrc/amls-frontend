@@ -26,9 +26,9 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
         implicit authContext => implicit request =>
 
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _))
               => Ok(current_address(Form2[ResponsiblePersonAddress](currentAddress), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
               => Ok(current_address(Form2(DefaultAddressHistory), edit, index))
             case _
               => NotFound(notFoundView)
@@ -62,21 +62,14 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
   private def doUpdate
   (index: Int, data: ResponsiblePersonAddress)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) {
-      case Some(res) => {
-        Some(res.addressHistory(
+    updateDataStrict[ResponsiblePeople](index) { res =>
+        res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
             case (Some(a), ThreeYearsPlus) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
             case (Some(a), _) => a.currentAddress(data)
             case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
           })
-        )
       }
-      case _ =>
-        Some(ResponsiblePeople(
-          addressHistory = Some(ResponsiblePersonAddressHistory(
-            currentAddress = Some(data)))))
-    }
   }
 }
 
