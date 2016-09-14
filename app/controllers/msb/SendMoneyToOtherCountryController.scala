@@ -4,9 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{CurrencyExchange, MoneyServiceBusiness, MsbService, SendMoneyToOtherCountry}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
+import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
 import play.api.mvc.Result
-import play.mvc.Results.Redirect
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb.send_money_to_other_country
 
@@ -55,21 +55,27 @@ trait SendMoneyToOtherCountryController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(send_money_to_other_country(f, edit)))
         case ValidForm(_, data) =>
-          for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.sendMoneyToOtherCountry(data)
-            )
-          } yield {
 
-            val services = msb.msbServices.map(_.services).getOrElse(Set.empty)
-
-            edit match {
-              case true =>
-                editRouting(data.money, services, msb)
-              case false =>
-                standardRouting(data.money, services)
-            }
+          dataCacheConnector.fetchAll flatMap {
+            optMap =>
+              val result = for {
+                cache <- optMap
+                msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
+              } yield {
+                dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                  msb.sendMoneyToOtherCountry(data)
+                ) map {
+                  _ =>
+                    if (edit) {
+                      editRouting(data.money, services.services, msb)
+                    } else {
+                      standardRouting(data.money, services.services)
+                    }
+                }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       }
     }
