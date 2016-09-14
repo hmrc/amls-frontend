@@ -34,9 +34,4 @@ object AgentPartnership {
   implicit val formWrites: Write[AgentPartnership, UrlFormEncoded] = Write {
     case AgentPartnership(ap) => Map("agentPartnership" -> Seq(ap))
   }
-
-  def convert(data: AgentPartnership): Option[TradingPremises] = {
-    Some(TradingPremises(agentPartnership = Some(data)))
-  }
-
 }
