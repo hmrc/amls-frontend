@@ -1,10 +1,11 @@
-package controllers.msb
+package controllers.businessmatching
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.moneyservicebusiness.{BusinessAppliedForPSRNumber, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessAppliedForPSRNumber
 import views.html.businessmatching.business_applied_for_psr_number
 
 import scala.concurrent.Future
@@ -15,11 +16,11 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
         response =>
           val form: Form2[BusinessAppliedForPSRNumber] = (for {
-            msb <- response
-            number <- msb.businessAppliedForPSRNumber
+            ba <- response
+            number <- ba.businessAppliedForPSRNumber
           } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
           Ok(business_applied_for_psr_number(form, edit))
       }
@@ -32,13 +33,12 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
           Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
         case ValidForm(_, data) =>
           for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.businessAppliedForPSRNumber(data)
+            ba <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+              ba.businessAppliedForPSRNumber(data)
             )
           } yield edit match {
-            case true if msb.businessUseAnIPSP.isDefined => Redirect(routes.SummaryController.get())
-            case _ => Redirect(routes.BusinessUseAnIPSPController.get(edit))
+            case _ => Redirect(routes.SummaryController.get())
           }
       }
     }
