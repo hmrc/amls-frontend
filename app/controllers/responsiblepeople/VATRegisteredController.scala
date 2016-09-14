@@ -35,8 +35,8 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(vat_registered(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.vatRegistered(data))
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.vatRegistered(data)
                 }
               } yield Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
             }.recoverWith {

@@ -62,8 +62,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
   private def doUpdate
   (index: Int, data: ResponsiblePersonAddress)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) {
-      case Some(res) => {
+    updateDataStrict[ResponsiblePeople](index) { res =>
         Some(res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
             case (Some(a), ThreeYearsPlus) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
@@ -72,11 +71,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
           })
         )
       }
-      case _ =>
-        Some(ResponsiblePeople(
-          addressHistory = Some(ResponsiblePersonAddressHistory(
-            currentAddress = Some(data)))))
-    }
+
   }
 }
 

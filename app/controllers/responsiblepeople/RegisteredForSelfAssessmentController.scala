@@ -38,8 +38,8 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
               Future.successful(BadRequest(registered_for_self_assessment(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.saRegistered(data))
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.saRegistered(data)
 
                 }
               } yield {

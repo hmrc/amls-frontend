@@ -57,22 +57,15 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
     }
 
   private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) {
-      case Some(res) => {
-        Some(res.addressHistory(
+    updateDataStrict[ResponsiblePeople](index) { res =>
+        res.addressHistory(
           res.addressHistory match {
             case Some(a) => a.additionalExtraAddress(data)
             case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
-          })
+          }
         )
-      }
-      case _ =>
-        Some(ResponsiblePeople(
-          addressHistory = Some(ResponsiblePersonAddressHistory(
-            additionalExtraAddress = Some(data)))))
     }
   }
-
 }
 
 object AdditionalExtraAddressController extends AdditionalExtraAddressController {
