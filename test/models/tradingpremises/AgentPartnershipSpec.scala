@@ -35,4 +35,10 @@ class AgentPartnershipSpec extends PlaySpec {
         AgentPartnership("test"))) must be(JsSuccess(AgentPartnership("test"), JsPath \ "agentPartnership"))
     }
   }
+
+  "convert" must {
+    "return a TradingPremises containing only the AgentPartnership" in {
+      AgentPartnership.convert(AgentPartnership("sometext")) must be(Some(TradingPremises(agentPartnership=Some(AgentPartnership("sometext")))))
+    }
+  }
 }

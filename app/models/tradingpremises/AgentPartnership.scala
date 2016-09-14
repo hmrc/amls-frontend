@@ -35,7 +35,7 @@ object AgentPartnership {
     case AgentPartnership(ap) => Map("agentPartnership" -> Seq(ap))
   }
 
-  implicit def convert(data: AgentPartnership): Option[TradingPremises] = {
+  def convert(data: AgentPartnership): Option[TradingPremises] = {
     Some(TradingPremises(agentPartnership = Some(data)))
   }
 
