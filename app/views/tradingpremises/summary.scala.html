@@ -5,13 +5,13 @@
 
 @header = {
     @if(add){
-        @heading("summary.tradingpremises.youranswers.header", "summary.tradingpremises")
+        @heading("summary.youranswers.heading", "summary.tradingpremises")
     } else {
-        @heading("summary.tradingpremises.checkyouranswers.header", "summary.tradingpremises")
+        @heading("summary.checkyouranswers.heading", "summary.tradingpremises")
     }
 }
 @main(
-    title = if(add) Messages("summary.youranswers.title") else Messages("summary.checkyouranswers.title"),
+    title = if(add) Messages("summary.tradingpremises.youranswers.title") else Messages("summary.tradingpremises.checkyouranswers.title"),
     heading = header
 ) {
 

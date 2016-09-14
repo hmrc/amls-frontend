@@ -5,7 +5,7 @@
 @(model: Seq[BankDetails], complete: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading(if(complete) "summary.youranswers.header" else "summary.checkyouranswers.header", "summary.bankdetails")
+    @heading(if(complete) "summary.youranswers.heading" else "summary.checkyouranswers.heading", "summary.bankdetails")
 }
 
 @main(
