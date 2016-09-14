@@ -137,7 +137,6 @@ trait RepeatingSection {
         cacheMap => {
           cacheMap.getEntry[Seq[T]](key()).map {
             data => {
-              if (index < 1 || data.size < index) throw new IndexOutOfBoundsException()
               putData(data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
             }
           }
