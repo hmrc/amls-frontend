@@ -54,12 +54,12 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _, _,Some(_),Some(_)) if !pos.personalTax => true
+      Some(_), _, _, _, _) if !pos.personalTax => true
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
-      Some(_), _, _, Some(_),Some(_)) => true
-    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _,None,None) => true
+      Some(_), _, _, _, _) => true
+    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
     case _ => false
   }
 }
