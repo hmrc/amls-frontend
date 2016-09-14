@@ -101,7 +101,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPer
       val outgoingModel = incomingModel.copy(
         ceTransactionsInNext12Months = Some(
           CETransactionsInNext12Months("12345678963")
-        )
+        ), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody (
@@ -126,7 +126,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPer
       val outgoingModel = incomingModel.copy(
         ceTransactionsInNext12Months = Some(
           CETransactionsInNext12Months("12345678963")
-        )
+        ), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody (

@@ -138,6 +138,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.getElementsByClass("declaration").first().child(0).html() must be(Messages("status.hassomethingchanged"))
         document.getElementsByClass("status-list").first().child(0).hasClass("status-list--complete") must be(true)
         document.getElementsByClass("status-list").first().child(1).hasClass("current") must be(true)
 

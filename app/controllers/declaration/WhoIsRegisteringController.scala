@@ -73,7 +73,6 @@ trait WhoIsRegisteringController extends BaseController {
                 dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
                   case "-1" => {
-                    dataCacheConnector.save[AddPerson](AddPerson.key, AddPerson("", None, "", BeneficialShareholder))
                     Redirect(routes.AddPersonController.get())
                   }
                   case _ => {

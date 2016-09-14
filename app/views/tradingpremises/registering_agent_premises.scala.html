@@ -18,6 +18,7 @@
 
         <div class="form-field-group">
             @inlineRadioGroup(f("agentPremises")) {
+                @legend("tradingpremises.agent.premises.heading", jsHidden = true)
                 @radio(f("agentPremises"), "lbl.yes", "true")
                 @radio(f("agentPremises"), "lbl.no", "false")
             }
