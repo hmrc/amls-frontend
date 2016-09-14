@@ -36,11 +36,9 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
           Future.successful(BadRequest(where_are_trading_premises(f, edit, index)))
         case ValidForm(_, ytp) => {
           for {
-            _ <- updateDataStrict[TradingPremises](index) {
-            case Some(tp) =>
-                Some(TradingPremises(tp.registeringAgentPremises,
-                  Some(ytp), tp.businessStructure,tp.agentName,tp.agentCompanyName, tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
-            case _ => ytp
+            _ <- updateDataStrict[TradingPremises](index) { tp =>
+                TradingPremises(tp.registeringAgentPremises,
+                  Some(ytp), tp.businessStructure,tp.agentName,tp.agentCompanyName, tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices)
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))

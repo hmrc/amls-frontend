@@ -77,6 +77,24 @@ class AgentPartnershipControllerSpec extends PlaySpec with OneAppPerSuite with M
       redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
     }
 
+
+
+    "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "agentPartnership" -> "text"
+      )
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(50)(newRequest)
+      status(result) must be(NOT_FOUND)
+    }
+
     "post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(

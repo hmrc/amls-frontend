@@ -42,8 +42,8 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
           Future.successful(BadRequest(views.html.tradingpremises.registering_agent_premises(f, index, edit)))
         case ValidForm(_, data) => {
           for {
-            _ <- updateDataStrict[TradingPremises](index) {
-              case Some(tp) => Some(resetAgentValues(tp.registeringAgentPremises(data), data))
+            _ <- updateDataStrict[TradingPremises](index) { tp =>
+              resetAgentValues(tp.registeringAgentPremises(data), data)
             }
           } yield data.agentPremises match {
             case true => Redirect(routes.BusinessStructureController.get(index,edit))
