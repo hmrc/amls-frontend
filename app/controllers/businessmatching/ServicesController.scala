@@ -17,13 +17,12 @@ trait ServicesController extends BaseController {
     implicit authContext => implicit request =>
       cache.fetch[BusinessMatching](BusinessMatching.key) map {
         response =>
-
           val form = (for {
-            msb <- response
-            services <- msb.msbServices
+            bm <- response
+            services <- bm.msbServices
           } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.services(form, edit))
+          Ok(views.html.businessmatching.services(form, edit))
       }
   }
 
@@ -31,17 +30,17 @@ trait ServicesController extends BaseController {
     implicit authContext => implicit request =>
       Form2[MsbServices](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.services(f, edit)))
+          Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
         case ValidForm(_, data) =>
           for {
-            msb <- cache.fetch[BusinessMatching](BusinessMatching.key)
+            bm <- cache.fetch[BusinessMatching](BusinessMatching.key)
              _ <- cache.save[BusinessMatching](BusinessMatching.key,
-              msb.msbServices(data)
+              bm.msbServices(data)
             )
           } yield data.services.contains(TransmittingMoney) match {
             case true =>
               Redirect(routes.SummaryController.get())
-            case true =>
+            case false =>
               Redirect(routes.SummaryController.get())
           }
       }

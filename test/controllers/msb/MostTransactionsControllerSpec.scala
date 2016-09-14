@@ -2,6 +2,8 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.Country
+import models.businessmatching._
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -21,7 +23,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
     self =>
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
-
+    val cacheMap = mock[CacheMap]
     val controller = new MostTransactionsController {
       override val cache: DataCacheConnector = self.cache
       override protected def authConnector: AuthConnector = self.authConnector
@@ -82,13 +84,14 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
 
     "on valid submission (no edit) (CE)" in new Fixture {
 
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
+      val msbServices = Some(
+        MsbServices(
           Set(
             CurrencyExchange
           )
-        ))
+        )
       )
+      val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
@@ -102,8 +105,14 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
         "mostTransactionsCountries[]" -> "GB"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(incomingModel)))
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -144,12 +153,15 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
 
     "return a redirect to the summary page on valid submission where the next page data exists (edit) (CE)" in new Fixture {
 
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
+      val msbServices = Some(
+        MsbServices(
           Set(
             CurrencyExchange
           )
-        )),
+        )
+      )
+
+      val incomingModel = MoneyServiceBusiness(
         ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
           ""
         ))
@@ -167,8 +179,14 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
         "mostTransactionsCountries[]" -> "GB"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(None)
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -180,14 +198,14 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
     }
 
     "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
-
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
+      val msbServices = Some(
+        MsbServices(
           Set(
             CurrencyExchange
           )
-        ))
+        )
       )
+      val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
         mostTransactions = Some(
@@ -201,9 +219,12 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
         "mostTransactionsCountries[0]" -> "GB"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(incomingModel)))
-
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 

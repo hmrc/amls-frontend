@@ -39,10 +39,19 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "companyRegistrationNumber" -> "12345678",
       "hasChanged" -> false
     )
+    val msbServices = MsbServices(
+      Set(
+        TransmittingMoney,
+        CurrencyExchange,
+        ChequeCashingNotScrapMetal,
+        ChequeCashingScrapMetal
+      )
+    )
 
     val businessMatching = BusinessMatching(
       Some(ReviewDetailsModel),
       Some(BusinessActivitiesModel),
+      Some(msbServices),
       Some(TypeOfBusinessModel),
       Some(CompanyRegistrationNumberModel),
       hasChanged = false)
@@ -79,14 +88,14 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "Merged with TypeOfBusiness" must {
         "return BusinessMatching with correct TypeOfBusiness" in {
           val result = initial.typeOfBusiness(TypeOfBusinessModel)
-          result must be(BusinessMatching(None, None, Some(TypeOfBusinessModel), None, hasChanged = true))
+          result must be(BusinessMatching(None, None, None, Some(TypeOfBusinessModel), None, hasChanged = true))
         }
       }
 
       "Merged with CompanyRegistrationNumberModel" must {
         "return BusinessMatching with correct CompanyRegistrationNumberModel" in {
           val result = initial.companyRegistrationNumber(CompanyRegistrationNumberModel)
-          result must be(BusinessMatching(None, None, None, Some(CompanyRegistrationNumberModel), hasChanged = true))
+          result must be(BusinessMatching(None, None, None, None, Some(CompanyRegistrationNumberModel), hasChanged = true))
         }
       }
     }
@@ -115,7 +124,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
           BusinessMatching().isComplete mustBe false
         }
         "reviewDetails and activites are not set" in {
-          businessMatching.copy(reviewDetails = None,activities = None).isComplete mustBe false
+          businessMatching.copy(reviewDetails = None, activities = None).isComplete mustBe false
         }
         "reviewDetails is not set and activites is set" in {
           businessMatching.copy(reviewDetails = None).isComplete mustBe false
@@ -145,7 +154,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
       "return `NotStarted` section when there is no section in Save4Later" in {
         implicit val cache = CacheMap("", Map.empty)
-        BusinessMatching.section mustBe Section("businessmatching", NotStarted, false,  controllers.businessmatching.routes.RegisterServicesController.get())
+        BusinessMatching.section mustBe Section("businessmatching", NotStarted, false, controllers.businessmatching.routes.RegisterServicesController.get())
       }
 
       "return `Started` section when there is a section which isn't completed" in {

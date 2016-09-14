@@ -55,7 +55,6 @@ trait SendMoneyToOtherCountryController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(send_money_to_other_country(f, edit)))
         case ValidForm(_, data) =>
-
           dataCacheConnector.fetchAll flatMap {
             optMap =>
               val result = for {

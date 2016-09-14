@@ -1,6 +1,8 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
+import models.businessmatching._
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -18,7 +20,7 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
 
   trait Fixture extends AuthorisedFixture {
     self =>
-
+    val cacheMap = mock[CacheMap]
     val controller = new SendMoneyToOtherCountryController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
@@ -55,8 +57,20 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      val msbServices = Some(MsbServices(
+        Set(
+          TransmittingMoney,
+          CurrencyExchange
+        )
+      ))
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(None)
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -79,9 +93,21 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
         hasChanged = true
       )
+      val msbServices = Some(MsbServices(
+        Set(
+          TransmittingMoney,
+          CurrencyExchange
+        )
+      ))
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -96,23 +122,29 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
       val newRequest = request.withFormUrlEncodedBody (
         "money" -> "false"
       )
+      val msbServices = Some(MsbServices(
+        Set(
+          TransmittingMoney,
+          CurrencyExchange
+        )
+      ))
 
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
-          Set(
-            TransmittingMoney,
-            CurrencyExchange
-          )
-        ))
-      )
+      val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
         hasChanged = true
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -135,9 +167,21 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
       hasChanged = true
     )
+    val msbServices = Some(
+      MsbServices(
+        Set(
+          TransmittingMoney
+        )
+      )
+    )
+    when(controller.dataCacheConnector.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
 
-    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+    when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      .thenReturn(Some(incomingModel))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
     when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -159,9 +203,21 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       hasChanged = true
     )
+    val msbServices = Some(
+      MsbServices(
+        Set(
+          TransmittingMoney
+        )
+      )
+    )
+    when(controller.dataCacheConnector.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
 
-    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+    when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      .thenReturn(Some(incomingModel))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
     when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -176,21 +232,28 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
     val newRequest = request.withFormUrlEncodedBody (
       "money" -> "false"
     )
-
-    val incomingModel = MoneyServiceBusiness(
-      msbServices = Some(MsbServices(
+    val msbServices = Some(
+      MsbServices(
         Set(
           CurrencyExchange
         )
-      )), hasChanged = true
+      )
+    )
+    val incomingModel = MoneyServiceBusiness(
+       hasChanged = true
     )
 
     val outgoingModel = incomingModel.copy(
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
     )
+    when(controller.dataCacheConnector.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
 
-    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+    when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      .thenReturn(Some(incomingModel))
 
     when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -207,20 +270,31 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
     )
 
     val incomingModel = MoneyServiceBusiness()
-
+    val msbServices = Some(
+      MsbServices(
+        Set(
+          TransmittingMoney
+        )
+      )
+    )
     val outgoingModel = incomingModel.copy(
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
       hasChanged = true
     )
 
-    when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-      (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+    when(controller.dataCacheConnector.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+    when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      .thenReturn(Some(incomingModel))
 
     when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
     val result = controller.post(true)(newRequest)
-    status(result) must be(SEE_OTHER)
     redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
   }
 }
