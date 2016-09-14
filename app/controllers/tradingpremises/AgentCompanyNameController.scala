@@ -42,7 +42,7 @@ import scala.concurrent.Future
                 Some(TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises,
                   tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
-              case _=> data
+              case _=> Some(TradingPremises(agentCompanyName = Some(data)))
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
