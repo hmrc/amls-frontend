@@ -445,6 +445,8 @@ amendment.view-and-amend = View and amend your information
 
 
 #### Confirmation page ####
+confirmation.title = You’ve submitted your application - Registration
+confirmation.heading = You’ve submitted your application
 confirmation.lede = You’ve submitted your application.
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now need to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
