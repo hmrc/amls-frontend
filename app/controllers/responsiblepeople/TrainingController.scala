@@ -21,9 +21,9 @@ trait TrainingController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, Some(training), _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, Some(training), _, _,_,_))
               => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_))
               => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index))
             case _
               => NotFound(notFoundView)
@@ -40,11 +40,8 @@ trait TrainingController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.responsiblepeople.training(f, edit, index)))
             case ValidForm(_, data) =>{
               for {
-                cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) {(_, rpOpt) =>
-                  rpOpt match {
-                    case Some(rp) => Some(rp.training(data))
-                    case _ => Some(ResponsiblePeople(training = Some(data)))
-                  }
+                cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) {(_, rp) =>
+                  rp.training(data)
                 }
               } yield identifyRoutingTarget(index, edit, cacheMap)
             }.recoverWith {

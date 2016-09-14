@@ -33,8 +33,8 @@ trait BankAccountController extends RepeatingSection with BaseController {
           Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-            result <- updateDataStrict[BankDetails](index) {
-              _.map {_.bankAccount(data)}
+            result <- updateDataStrict[BankDetails](index) { bd =>
+              bd.bankAccount(data)
             }
           } yield {
             if(edit) {

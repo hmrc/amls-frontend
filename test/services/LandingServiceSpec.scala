@@ -1,60 +1,127 @@
 package services
 
-import connectors.{DataCacheConnector, KeystoreConnector}
-import models.Country
+import connectors.{DESConnector, DataCacheConnector, KeystoreConnector}
+import models.{Country, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
+import models.asp.Asp
+import models.bankdetails.BankDetails
+import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
+import models.declaration.{AddPerson, BeneficialShareholder}
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.MoneyServiceBusiness
+import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
+import models.tcsp.Tcsp
+import models.tradingpremises.TradingPremises
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
+import org.specs2.execute.ResultExecution.ExecutableResult
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
-  object LandingService extends LandingService {
+  object TestLandingService extends LandingService {
     override private[services] val cacheConnector = mock[DataCacheConnector]
     override private[services] val keyStore = mock[KeystoreConnector]
+    override private[services] val desConnector = mock[DESConnector]
   }
 
   implicit val hc = mock[HeaderCarrier]
   implicit val ac = mock[AuthContext]
+  implicit val ec = mock[ExecutionContext]
 
   "hasSavedFrom" must {
 
     "return true if a cache exists" in {
       when {
-        LandingService.cacheConnector.fetchAll(any(), any())
+        TestLandingService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-      whenReady (LandingService.hasSavedForm) {
+      whenReady (TestLandingService.hasSavedForm) {
         _ mustEqual true
       }
     }
 
     "return false if a cache does not exist" in {
       when {
-        LandingService.cacheConnector.fetchAll(any(), any())
+        TestLandingService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(None)
-      whenReady (LandingService.hasSavedForm) {
+      whenReady (TestLandingService.hasSavedForm) {
         _ mustEqual false
       }
     }
+  }
+
+  "refreshCache" must {
+
+    val cacheMap = CacheMap("", Map.empty)
+    val viewResponse = ViewResponse(
+      etmpFormBundleNumber = "FORMBUNDLENUMBER",
+      businessMatchingSection = None,
+      eabSection = None,
+      tradingPremisesSection = None,
+      aboutTheBusinessSection = None,
+      bankDetailsSection = Seq(None),
+      aboutYouSection = AddPerson("FirstName", None, "LastName", BeneficialShareholder ),
+      businessActivitiesSection = None,
+      responsiblePeopleSection = None,
+      tcspSection = None,
+      aspSection = None,
+      msbSection = None,
+      hvdSection = None,
+      supervisionSection = None
+    )
+
+    def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section : T) = {
+      when {
+        mock.save[T](eqTo(key), eqTo(section))(any(), any(), any())
+      } thenReturn Future.successful(result)
+    }
+
+    "return a cachMap of the saved sections" in {
+      when {
+        TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+      } thenReturn Future.successful(viewResponse)
+
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, viewResponse.eabSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, BankDetails.key, viewResponse.bankDetailsSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, AddPerson.key, viewResponse.aboutYouSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessActivities.key, viewResponse.businessActivitiesSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, ResponsiblePeople.key, viewResponse.responsiblePeopleSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Tcsp.key, viewResponse.tcspSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Asp.key, viewResponse.aspSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, viewResponse.msbSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Hvd.key, viewResponse.hvdSection)
+      setUpMockView(TestLandingService.cacheConnector, cacheMap, Supervision.key, viewResponse.supervisionSection)
+
+      whenReady(TestLandingService.refreshCache("regNo")){
+        _ mustEqual cacheMap
+      }
+    }
+
   }
 
   "reviewDetails" must {
 
     "pass through from the keystore connector" in {
       when {
-        LandingService.keyStore.optionalReviewDetails(any(), any())
+        TestLandingService.keyStore.optionalReviewDetails(any(), any())
       } thenReturn Future.successful(None)
-      whenReady (LandingService.reviewDetails) {
+      whenReady (TestLandingService.reviewDetails) {
         _ mustEqual None
       }
     }
@@ -79,36 +146,36 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     "save BusinessMatching and AboutTheBusiness when both succeed" in {
       when {
-        LandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.successful(cacheMap)
       when {
-        LandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
+        TestLandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
       } thenReturn Future.successful(cacheMap)
-      whenReady (LandingService.updateReviewDetails(reviewDetails)) {
+      whenReady (TestLandingService.updateReviewDetails(reviewDetails)) {
         _ mustEqual cacheMap
       }
     }
 
     "pass back a failed future when updating BusinessMatching fails" in {
       when {
-        LandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.failed(new Exception(""))
       when {
-        LandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
+        TestLandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
       } thenReturn Future.successful(cacheMap)
-      whenReady (LandingService.updateReviewDetails(reviewDetails).failed) {
+      whenReady (TestLandingService.updateReviewDetails(reviewDetails).failed) {
         _ mustBe an[Exception]
       }
     }
 
     "pass back a failed future when updating AboutTheBusiness fails" in {
       when {
-        LandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.successful(cacheMap)
       when {
-        LandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
+        TestLandingService.cacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
       } thenReturn Future.failed(new Exception)
-      whenReady (LandingService.updateReviewDetails(reviewDetails).failed) {
+      whenReady (TestLandingService.updateReviewDetails(reviewDetails).failed) {
         _ mustBe an[Exception]
       }
     }

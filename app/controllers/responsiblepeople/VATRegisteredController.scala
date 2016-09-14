@@ -19,8 +19,8 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_,_,_,_,_,_,Some(vat),_,_,_,_)) => Ok(vat_registered(Form2[VATRegistered](vat), edit,index))
-            case Some(ResponsiblePeople(_,_,_,_,_,_,_,_,_,_,_)) => Ok(vat_registered(EmptyForm, edit,index))
+            case Some(ResponsiblePeople(_,_,_,_,_,_,Some(vat),_,_,_,_,_,_)) => Ok(vat_registered(Form2[VATRegistered](vat), edit,index))
+            case Some(ResponsiblePeople(_,_,_,_,_,_,_,_,_,_,_,_,_)) => Ok(vat_registered(EmptyForm, edit,index))
             case _ => NotFound(notFoundView)
           }
       }
@@ -35,8 +35,8 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(vat_registered(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.vatRegistered(data))
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.vatRegistered(data)
                 }
               } yield Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit))
             }.recoverWith {

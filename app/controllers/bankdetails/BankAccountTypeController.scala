@@ -3,7 +3,7 @@ package controllers.bankdetails
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccountType, BankDetails}
 import utils.RepeatingSection
 
@@ -11,12 +11,12 @@ import scala.concurrent.Future
 
 trait BankAccountTypeController extends RepeatingSection with BaseController {
 
-  val dataCacheConnector : DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
-  def get(index:Int, edit: Boolean = false) = Authorised.async {
+  def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[BankDetails](index) map {
-        case Some(BankDetails(Some(data), _,_)) =>
+        case Some(BankDetails(Some(data), _, _)) =>
           Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
         case Some(_) =>
           Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index))
@@ -24,17 +24,16 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
       }
   }
 
-  def post(index:Int, edit: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[Option[BankAccountType]](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-              result <- updateDataStrict[BankDetails](index) {
-                _.map {_.bankAccountType(data)}
-              }
-
+            result <- updateDataStrict[BankDetails](index) { bd =>
+              bd.bankAccountType(data)
+            }
           } yield {
             data match {
               case Some(_) => Redirect(routes.BankAccountController.get(index, edit))
@@ -51,6 +50,6 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
 
 object BankAccountTypeController extends BankAccountTypeController {
   // $COVERAGE-OFF$
-    override val authConnector = AMLSAuthConnector
-    override val dataCacheConnector = DataCacheConnector
+  override val authConnector = AMLSAuthConnector
+  override val dataCacheConnector = DataCacheConnector
 }
