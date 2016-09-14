@@ -4,6 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean, index: Int)(implicit request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("responsiblepeople.person.a.resident.heading", "summary.responsiblepeople")
 }
 
