@@ -35,7 +35,8 @@ a.block-link {
     margin-top: 12px;
 }
 
-.progress-steps li:first-child {
+.progress-steps li:first-child,
+.progress-steps__amend li:first-child + li {
     margin-top: 0;
 }
 
