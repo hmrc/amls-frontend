@@ -1,7 +1,7 @@
 package controllers
 
-import connectors.DataCacheConnector
-import models.SubscriptionResponse
+import connectors.{DESConnector, DataCacheConnector}
+import models.{ReadStatusResponse, SubscriptionResponse}
 import models.confirmation.Currency
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -14,7 +14,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
-
+import models.status.NotCompleted
+import org.joda.time.LocalDateTime
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
@@ -23,6 +25,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
     self =>
     val controller = new ConfirmationController {
       override private[controllers] val subscriptionService: SubscriptionService = mock[SubscriptionService]
+      override private[controllers] val desConnector: DESConnector = mock[DESConnector]
       override protected def authConnector: AuthConnector = self.authConnector
       override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
     }
@@ -42,7 +45,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
     when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    when(controller.subscriptionService.getSubscriptionData(any()))
+    when(controller.subscriptionService.getSubscription(any(),any(),any()))
       .thenReturn(Future.successful(("", Currency(0), Seq())))
   }
 
@@ -50,8 +53,10 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
     "notify user of progress if application has not already been submitted" in new Fixture {
 
-      when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-        .thenReturn(None)
+      val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
+
+      when(controller.desConnector.status(any())(any(),any(),any(),any()))
+        .thenReturn(Future.successful(readStatusResponse))
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -60,8 +65,10 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
     "notify user of amendment if application has already been submitted but not approved" in new Fixture {
 
-      when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-        .thenReturn(Some(response))
+      val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+
+      when(controller.desConnector.status(any())(any(),any(),any(),any()))
+        .thenReturn(Future.successful(readStatusResponse))
 
       val result = controller.get()(request)
       status(result) mustBe OK

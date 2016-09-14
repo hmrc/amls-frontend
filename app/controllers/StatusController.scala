@@ -9,6 +9,7 @@ import models.registrationprogress.{Completed, Section}
 import scala.concurrent.Future
 import views.html.status.status
 import models.status.{CompletionStateViewModel, _}
+import play.api.mvc.{Action, AnyContent}
 import services.{AuthEnrolmentsService, LandingService, ProgressService, SubscriptionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -52,7 +53,7 @@ trait StatusController extends BaseController {
     }
   }
 
-  def get() = StatusToggle {
+  def get(): Action[AnyContent] = StatusToggle {
     Authorised.async {
       implicit authContext =>
         implicit request =>

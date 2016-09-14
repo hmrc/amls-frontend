@@ -137,27 +137,23 @@ trait SubscriptionService extends DataCacheService {
   ): Future[(String, Currency, Seq[BreakdownRow])] =
     cacheConnector.fetchAll flatMap {
       option =>
-        getSubscriptionData(option)
+        (for {
+          cache <- option
+          subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+        } yield {
+          val subQuantity = subscriptionQuantity(subscription)
+          val mlrRegNo = subscription.amlsRefNo
+          val total = subscription.totalFees
+          val rows = Seq(
+            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+          ) ++ responsiblePeopleRows(people, subscription) ++
+            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee))
+          Future.successful((mlrRegNo, Currency.fromBD(total), rows))
+          // TODO
+        }) getOrElse Future.failed(new Exception("TODO"))
     }
-
-  def getSubscriptionData(cacheMap:Option[CacheMap]): Future[(String, Currency, Seq[BreakdownRow])] = {
-    (for {
-      cache <- cacheMap
-      subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
-      premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-      people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-    } yield {
-      val subQuantity = subscriptionQuantity(subscription)
-      val mlrRegNo = subscription.amlsRefNo
-      val total = subscription.totalFees
-      val rows = Seq(
-        BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-      ) ++ responsiblePeopleRows(people, subscription) ++
-        Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee))
-      Future.successful((mlrRegNo, Currency.fromBD(total), rows))
-      // TODO
-    }) getOrElse Future.failed(new Exception("TODO"))
-  }
 }
 
 object SubscriptionService extends SubscriptionService {
