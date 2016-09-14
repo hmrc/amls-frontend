@@ -51,8 +51,8 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               }
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.positions(data))
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.positions(data)
                 }
               } yield (data.personalTax, edit) match {
                 case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))

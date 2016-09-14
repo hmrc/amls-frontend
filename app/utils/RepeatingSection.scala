@@ -124,7 +124,7 @@ trait RepeatingSection {
 
   protected def fetchAllAndUpdateStrict[T]
   (index: Int)
-  (fn: (CacheMap, Option[T]) => Option[T])
+  (fn: (CacheMap, T) => T)
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
@@ -138,7 +138,7 @@ trait RepeatingSection {
           cacheMap.getEntry[Seq[T]](key()).map {
             data => {
               if (index < 1 || data.size < index) throw new IndexOutOfBoundsException()
-              putData(data.patch(index - 1, fn(cacheMap, data.lift(index - 1)).toSeq, 1))
+              putData(data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
             }
           }
           cacheMap

@@ -63,8 +63,8 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
                   Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index)))
                 case ValidForm(_, data) => {
                   for {
-                    result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                      Some(currentData.experienceTraining(data))
+                    result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                      rp.experienceTraining(data)
                     }
                   } yield edit match {
                     case true => Redirect(routes.DetailedAnswersController.get(index))

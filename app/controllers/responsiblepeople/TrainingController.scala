@@ -40,11 +40,8 @@ trait TrainingController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.responsiblepeople.training(f, edit, index)))
             case ValidForm(_, data) =>{
               for {
-                cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) {(_, rpOpt) =>
-                  rpOpt match {
-                    case Some(rp) => Some(rp.training(data))
-                    case _ => Some(ResponsiblePeople(training = Some(data)))
-                  }
+                cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) {(_, rp) =>
+                  rp.training(data)
                 }
               } yield identifyRoutingTarget(index, edit, cacheMap)
             }.recoverWith {

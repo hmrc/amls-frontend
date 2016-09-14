@@ -41,8 +41,8 @@ trait PersonNameController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.personName(data))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.personName(data)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))

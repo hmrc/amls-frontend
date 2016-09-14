@@ -43,8 +43,8 @@ trait FitAndProperController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index)))
             case ValidForm(_, data) =>{
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.hasAlreadyPassedFitAndProper(data))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.hasAlreadyPassedFitAndProper(data)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))

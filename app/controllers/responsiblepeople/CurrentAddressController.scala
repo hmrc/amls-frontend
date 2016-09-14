@@ -63,15 +63,13 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
   (index: Int, data: ResponsiblePersonAddress)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
-        Some(res.addressHistory(
+        res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
             case (Some(a), ThreeYearsPlus) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
             case (Some(a), _) => a.currentAddress(data)
             case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
           })
-        )
       }
-
   }
 }
 

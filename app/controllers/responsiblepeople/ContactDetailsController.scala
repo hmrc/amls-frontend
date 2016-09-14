@@ -39,8 +39,8 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.responsiblepeople.contact_details(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.contactDetails(data))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.contactDetails(data)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))

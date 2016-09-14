@@ -39,8 +39,8 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
               Future.successful(BadRequest(person_residence_type(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.personResidenceType(data))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.personResidenceType(data)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
