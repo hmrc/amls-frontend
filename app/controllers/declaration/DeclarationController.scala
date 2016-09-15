@@ -6,6 +6,7 @@ import controllers.BaseController
 import models.SubscriptionResponse
 import models.declaration.AddPerson
 import models.status._
+import play.api.i18n.Messages
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -26,9 +27,9 @@ trait DeclarationController extends BaseController {
           cache.getEntry[AddPerson](AddPerson.key) match {
             case Some(addPerson) =>
               val name = s"${addPerson.firstName} ${addPerson.middleName mkString} ${addPerson.lastName}"
-              etmpStatus(subscription.paymentReference)(hc, authcontext) flatMap {
-                case SubmissionReadyForReview => Future.successful(Ok(views.html.declaration.declare(name)))
-                case _ => Future.successful(Ok(views.html.declaration.declare(name)))
+              etmpStatus(subscription.amlsRefNo)(hc, authcontext) flatMap {
+                case SubmissionReadyForReview => Future.successful(Ok(views.html.declaration.declare(Messages("submit.amendment.registration"), name)))
+                case _ => Future.successful(Ok(views.html.declaration.declare(Messages("submit.registration"), name)))
               }
             case _ =>
               Future.successful(Redirect(routes.AddPersonController.get()))

@@ -10,6 +10,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -39,7 +40,8 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       paymentReference = ""
     )
 
-    val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
 
 
   }
@@ -64,15 +66,12 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
     }
 
-    "load the declaration page if name and business matching is found" in new Fixture {
+    "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
 
       val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
 
       when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
         .thenReturn(Some(response))
-
-      when(declarationController.desConnector.status(any())(any(),any(),any(),any()))
-        .thenReturn(Future.successful(readStatusResponse))
 
       when(declarationController.dataCacheConnector.fetchAll(any(),any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -80,13 +79,40 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         when(mockCacheMap.getEntry[AddPerson](AddPerson.key))
         .thenReturn(Some(addPerson))
 
+      when(declarationController.desConnector.status(any())(any(),any(),any(),any()))
+        .thenReturn(Future.successful(notCompletedReadStatusResponse))
+
       val result = declarationController.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(addPerson.firstName)
       contentAsString(result) must include(addPerson.middleName mkString)
       contentAsString(result) must include(addPerson.lastName)
+      contentAsString(result) must include(Messages("submit.registration"))
     }
 
+    "load the declaration page for amendments if name and business matching is found" in new Fixture {
+
+      val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
+
+      when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+        .thenReturn(Some(response))
+
+      when(declarationController.dataCacheConnector.fetchAll(any(),any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[AddPerson](AddPerson.key))
+        .thenReturn(Some(addPerson))
+
+      when(declarationController.desConnector.status(any())(any(),any(),any(),any()))
+        .thenReturn(Future.successful(pendingReadStatusResponse))
+
+      val result = declarationController.get()(request)
+      status(result) must be(OK)
+      contentAsString(result) must include(addPerson.firstName)
+      contentAsString(result) must include(addPerson.middleName mkString)
+      contentAsString(result) must include(addPerson.lastName)
+      contentAsString(result) must include(Messages("submit.amendment.registration"))
+    }
 
   }
 

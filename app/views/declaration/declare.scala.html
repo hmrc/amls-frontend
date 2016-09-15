@@ -2,10 +2,10 @@
 @import include._
 @import include.forms2._
 
-@(name: String)(implicit request: Request[_])
+@(title: String, name: String)(implicit request: Request[_])
 
 @header = {
-    @heading("declaration.declaration.submit", "submit.registration")
+    @heading("declaration.declaration.submit", title)
 }
 
 @main(
