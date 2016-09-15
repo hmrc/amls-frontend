@@ -11,7 +11,6 @@ case class MoneyServiceBusiness(
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
                                  whichCurrencies: Option[WhichCurrencies] = None,
-                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                                  fundsTransfer: Option[FundsTransfer] = None,
                                  branchesOrAgents: Option[BranchesOrAgents] = None,
@@ -40,9 +39,6 @@ case class MoneyServiceBusiness(
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
     this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p))
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
-    this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
-
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
     this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p))
 
@@ -65,7 +61,6 @@ case class MoneyServiceBusiness(
 
   private def mtComplete(mtFlag: Boolean): Boolean =
     if (mtFlag) {
-      this.businessAppliedForPSRNumber.isDefined &&
         this.businessUseAnIPSP.isDefined &&
         this.fundsTransfer.isDefined &&
         this.transactionsInNext12Months.isDefined &&
@@ -120,7 +115,6 @@ object MoneyServiceBusiness {
         (__ \ "businessUseAnIPSP").readNullable[BusinessUseAnIPSP] and
         (__ \ "identifyLinkedTransactions").readNullable[IdentifyLinkedTransactions] and
         (__ \ "whichCurrencies").readNullable[WhichCurrencies] and
-        (__ \ "businessAppliedForPSRNumber").readNullable[BusinessAppliedForPSRNumber] and
         (__ \ "sendMoneyToOtherCountry").readNullable[SendMoneyToOtherCountry] and
         (__ \ "fundsTransfer").readNullable[FundsTransfer] and
         (__ \ "branchesOrAgents").readNullable[BranchesOrAgents] and

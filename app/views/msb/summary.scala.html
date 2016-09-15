@@ -87,32 +87,7 @@
         }
 
         @if(services.services.contains(TransmittingMoney)) {
-            @model.businessAppliedForPSRNumber.map { psr =>
-                <table class="summary">
-                    <tr>
-                        <th>@Messages("msb.psr.number.title")</th>
-                        <th class="edit" width="12"><a href="@controllers.msb.routes.BusinessAppliedForPSRNumberController.get(true)">Edit</a></th>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @psr match {
-                                case BusinessAppliedForPSRNumberNo => {
-                                    @Messages("lbl.no")
-                                }
-                                case BusinessAppliedForPSRNumberYes(number) => {
-                                    @Messages("lbl.yes")
-                                    </td>
-                                    <tr>
-                                        <td colspan="2">
-                                            @Messages("msb.psr.number.lbl") : @number
-                                }
-                            }
-                        </td>
-                    </tr>
-                </table>
-            }
-
-            @model.businessUseAnIPSP.map { ipsp =>
+           @model.businessUseAnIPSP.map { ipsp =>
                 <table class="summary">
                     <tr>
                         <th>@Messages("msb.ipsp.title")</th>

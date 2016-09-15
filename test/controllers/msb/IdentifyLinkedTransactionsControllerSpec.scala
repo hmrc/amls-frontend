@@ -30,7 +30,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
     }
   }
 
-  val completedMT = Some(BusinessAppliedForPSRNumberNo)
+  val completedMT = Some(BusinessUseAnIPSPNo)
   val completedCE = Some(CETransactionsInNext12Months("10"))
 
   val emptyCache = CacheMap("", Map.empty)
@@ -252,7 +252,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
         )
       )
       val incomingModel = MoneyServiceBusiness(
-        businessAppliedForPSRNumber = completedMT,
+        businessUseAnIPSP = completedMT,
         ceTransactionsInNext12Months = completedCE
       )
 

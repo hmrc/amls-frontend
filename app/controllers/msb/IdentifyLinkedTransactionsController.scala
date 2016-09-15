@@ -49,7 +49,7 @@ trait IdentifyLinkedTransactionsController extends BaseController {
     }
 
   private def mtRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
-    if (msb.businessAppliedForPSRNumber.isDefined) {
+    if (msb.businessUseAnIPSP.isDefined) {
       editRouting(services - TransmittingMoney, msb)
     } else {
       Redirect(routes.BusinessUseAnIPSPController.get(true))
