@@ -31,7 +31,7 @@ trait IdentifyLinkedTransactionsController extends BaseController {
   private def standardRouting(services: Set[MsbService]): Result =
     services match {
       case s if s contains TransmittingMoney =>
-        Redirect(routes.BusinessAppliedForPSRNumberController.get())
+        Redirect(routes.BusinessUseAnIPSPController.get())
       case s if s contains CurrencyExchange =>
         Redirect(routes.CETransactionsInNext12MonthsController.get())
       case _ =>
@@ -52,7 +52,7 @@ trait IdentifyLinkedTransactionsController extends BaseController {
     if (msb.businessAppliedForPSRNumber.isDefined) {
       editRouting(services - TransmittingMoney, msb)
     } else {
-      Redirect(routes.BusinessAppliedForPSRNumberController.get(true))
+      Redirect(routes.BusinessUseAnIPSPController.get(true))
     }
 
   private def ceRouting(msb: MoneyServiceBusiness): Result =

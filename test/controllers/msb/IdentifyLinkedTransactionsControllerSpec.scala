@@ -113,7 +113,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessAppliedForPSRNumberController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessUseAnIPSPController.get().url))
     }
 
     "Navigate to next page if they have selected CE as a service" in new Fixture {
@@ -339,7 +339,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessAppliedForPSRNumberController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessUseAnIPSPController.get(true).url))
     }
 
     "Navigate to CE section in edit mode when CE data is not in the store" in new Fixture {
