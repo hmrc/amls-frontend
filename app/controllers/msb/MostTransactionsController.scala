@@ -62,10 +62,9 @@ trait MostTransactionsController extends BaseController {
                   msb.mostTransactions(data)
                 ) map {
                   _ =>
-                    if (edit) {
-                      standardRouting(services.services)
-                    } else {
-                      editRouting(services.services, msb)
+                    edit match {
+                      case false => standardRouting(services.services)
+                      case true => editRouting(services.services, msb)
                     }
                 }
               }

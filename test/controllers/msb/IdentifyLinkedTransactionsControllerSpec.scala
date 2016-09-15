@@ -164,7 +164,6 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val msbServices = Some(
         MsbServices(
           Set(
-            CurrencyExchange,
             ChequeCashingNotScrapMetal,
             ChequeCashingScrapMetal
           )

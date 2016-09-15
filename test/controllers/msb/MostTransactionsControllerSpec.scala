@@ -134,13 +134,24 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
           )
         ), hasChanged = true
       )
-
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            ChequeCashingScrapMetal
+          )
+        )
+      )
       val newRequest = request.withFormUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
@@ -163,11 +174,14 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
 
       val incomingModel = MoneyServiceBusiness(
         ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
-          ""
+          "1223131"
         ))
       )
 
       val outgoingModel = MoneyServiceBusiness(
+        ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
+          "1223131"
+        )),
         mostTransactions = Some(
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
@@ -183,7 +197,7 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(None)
+        .thenReturn(Some(incomingModel))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
@@ -249,10 +263,19 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       val newRequest = request.withFormUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
-
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            ChequeCashingScrapMetal
+          )
+        )
+      )
+      when(cache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
       when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 

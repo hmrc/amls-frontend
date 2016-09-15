@@ -15,7 +15,14 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
   "BusinessMatchingSpec" must {
 
     import play.api.libs.json._
-
+    val msbServices = MsbServices(
+      Set(
+        TransmittingMoney,
+        CurrencyExchange,
+        ChequeCashingNotScrapMetal,
+        ChequeCashingScrapMetal
+      )
+    )
     val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
     val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB"))
     val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")
@@ -24,6 +31,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
 
     val jsonBusinessMatching = Json.obj(
       "businessActivities" -> Seq("05", "06", "07"),
+      "msbServices"-> Seq("01","02","03","04"),
       "businessName" -> "BusinessName",
       "businessType" -> "Unincorporated Body",
       "businessAddress" -> Json.obj(
@@ -39,14 +47,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "companyRegistrationNumber" -> "12345678",
       "hasChanged" -> false
     )
-    val msbServices = MsbServices(
-      Set(
-        TransmittingMoney,
-        CurrencyExchange,
-        ChequeCashingNotScrapMetal,
-        ChequeCashingScrapMetal
-      )
-    )
+
 
     val businessMatching = BusinessMatching(
       Some(ReviewDetailsModel),

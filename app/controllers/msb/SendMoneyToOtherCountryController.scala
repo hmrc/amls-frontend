@@ -16,16 +16,16 @@ trait SendMoneyToOtherCountryController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit:Boolean = false) = Authorised.async {
-   implicit authContext => implicit request =>
-     dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-       response =>
-         val form: Form2[SendMoneyToOtherCountry] = (for {
-           msb <- response
-           money <- msb.sendMoneyToOtherCountry
-         } yield Form2[SendMoneyToOtherCountry](money)).getOrElse(EmptyForm)
-         Ok(send_money_to_other_country(form, edit))
-     }
+  def get(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        response =>
+          val form: Form2[SendMoneyToOtherCountry] = (for {
+            msb <- response
+            money <- msb.sendMoneyToOtherCountry
+          } yield Form2[SendMoneyToOtherCountry](money)).getOrElse(EmptyForm)
+          Ok(send_money_to_other_country(form, edit))
+      }
   }
 
   private def standardRouting(next: Boolean, services: Set[MsbService]): Result =
@@ -44,7 +44,7 @@ trait SendMoneyToOtherCountryController extends BaseController {
         Redirect(routes.SendTheLargestAmountsOfMoneyController.get(true))
       case (false, s)
         if (s contains CurrencyExchange) && !msb.sendTheLargestAmountsOfMoney.isDefined =>
-          Redirect(routes.CETransactionsInNext12MonthsController.get(true))
+        Redirect(routes.CETransactionsInNext12MonthsController.get(true))
       case _ =>
         Redirect(routes.SummaryController.get())
     }
@@ -84,5 +84,6 @@ trait SendMoneyToOtherCountryController extends BaseController {
 object SendMoneyToOtherCountryController extends SendMoneyToOtherCountryController {
   // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
