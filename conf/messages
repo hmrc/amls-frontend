@@ -461,6 +461,7 @@ confirmation.sidebar.lede = You have registered for anti-money laundering superv
 confirmation.sidebar.contact = Quote this code if you need to contact HM Revenue and Customs about your registration.
 confirmation.quantity = Quantity
 confirmation.feeperitem = Fee per item
+confirmation.total = Total
 confirmation.totalfee = Total fee
 confirmation.registrationfee = Total registration fee
 confirmation.submission = Application submission
