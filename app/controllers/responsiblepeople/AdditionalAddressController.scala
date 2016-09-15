@@ -24,9 +24,9 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)), _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _)), _, _, _, _, _, _, _,_,_))
               => Ok(additional_address(Form2[ResponsiblePersonAddress](additionalAddress), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_))
               => Ok(additional_address(Form2(DefaultAddressHistory), edit, index))
             case _
               => NotFound(notFoundView)
@@ -58,23 +58,15 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
     }
 
   private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) {
-      case Some(res) => {
-        Some(res.addressHistory(
+    updateDataStrict[ResponsiblePeople](index) { res =>
+        res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
             case (Some(a), ThreeYearsPlus) => a.additionalAddress(data).removeAdditionalExtraAddress
             case (Some(a), _) => a.additionalAddress(data)
             case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
           })
-        )
       }
-      case _ =>
-        Some(ResponsiblePeople(
-          addressHistory = Some(ResponsiblePersonAddressHistory(
-            additionalAddress = Some(data)))))
-    }
   }
-
 }
 
 object AdditionalAddressController extends AdditionalAddressController {

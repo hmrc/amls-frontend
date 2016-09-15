@@ -9,6 +9,7 @@ s"""${f("mlrRefNumber").id}-fieldset"""
 }
 
 @header = {
+    @errorSummary(f)
     @heading("tcsp.servicesOfAnotherTcsp.title", "summary.tcsp")
 }
 
@@ -20,6 +21,9 @@ s"""${f("mlrRefNumber").id}-fieldset"""
     @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
         @inlineRadioGroup(f("servicesOfAnotherTCSP")) {
+               <span class="form-hint">
+                    @Messages("tcsp.servicesOfAnotherTcsp.other.hint")
+                </span>
             @radio(f("servicesOfAnotherTCSP"), "lbl.yes", "true", target = s"#$target")
             @radio(f("servicesOfAnotherTCSP"), "lbl.no", "false")
             @fieldset("TODO", jsHidden = true, id = target) {

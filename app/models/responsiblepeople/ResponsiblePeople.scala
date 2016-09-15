@@ -15,7 +15,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None,
                              hasAlreadyPassedFitAndProper: Option[Boolean] = None,
-                             hasChanged: Boolean = false
+                             hasChanged: Boolean = false,
+                             lineId: Option[Int] = None,
+                             status: Option[String] = None
                           ) {
 
   def personName(p: PersonName): ResponsiblePeople =
@@ -52,12 +54,12 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _, _) if !pos.personalTax => true
+      Some(_), _, _, _, _) if !pos.personalTax => true
     case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
-      Some(_), _, _) => true
-    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _) => true
+      Some(_), _, _, _, _) => true
+    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
     case _ => false
   }
 }
@@ -109,7 +111,9 @@ object ResponsiblePeople {
       (__ \ "experienceTraining").readNullable[ExperienceTraining] and
       (__ \ "training").readNullable[Training] and
       (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
-      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
+      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
+        (__ \ "lineId").readNullable[Int] and
+      (__ \ "status").readNullable[String]
       ) apply ResponsiblePeople.apply _
   }
 

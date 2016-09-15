@@ -25,9 +25,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                               .getOrElse(BusinessType.SoleProprietor)
 
               getData[ResponsiblePeople](cache, index) match {
-                case Some(ResponsiblePeople(_, _, _, _, Some(positions), _, _, _, _, _, _))
+                case Some(ResponsiblePeople(_, _, _, _, Some(positions), _, _, _, _, _, _,_,_))
                   => Ok(position_within_business(Form2[Positions](positions),edit, index, bt))
-                case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+                case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_))
                   => Ok(position_within_business(EmptyForm, edit, index, bt))
                 case _
                   => NotFound(notFoundView)
@@ -51,8 +51,8 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               }
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.positions(data))
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.positions(data)
                 }
               } yield (data.personalTax, edit) match {
                 case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))

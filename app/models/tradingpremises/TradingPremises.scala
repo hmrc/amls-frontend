@@ -13,7 +13,9 @@ case class TradingPremises(
                             agentPartnership: Option[AgentPartnership] = None,
                             whatDoesYourBusinessDoAtThisAddress : Option[WhatDoesYourBusinessDo] = None,
                             msbServices: Option[MsbServices] = None,
-                            hasChanged: Boolean = false
+                            hasChanged: Boolean = false,
+                            lineId: Option[Int] = None,
+                            status: Option[String] = None
                           ) {
 
   def businessStructure(p: BusinessStructure): TradingPremises =
@@ -42,9 +44,9 @@ case class TradingPremises(
 
   def isComplete: Boolean =
     this match {
-      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_) => true
-      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_) => true
-      case TradingPremises(None, None, None, None, None, None, None, None,_) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_) => true
+      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_) => true
+      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
@@ -94,7 +96,9 @@ object TradingPremises {
         __.read[Option[AgentPartnership]] and
       __.read[Option[WhatDoesYourBusinessDo]] and
       __.read[Option[MsbServices]] and
-        (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+        (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      __.read[Option[Int]] and
+      __.read[Option[String]]
     ) (TradingPremises.apply _)
 
   implicit val writes: Writes[TradingPremises] = Writes[TradingPremises] {
