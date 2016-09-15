@@ -96,17 +96,17 @@
         <!-- original table-based solution -->
         <table class="summary">
             <tr>
-                <th>@Messages("msb.services.heading")</th>
+                <th>@Messages("businessmatching.services.heading")</th>
                 <th class="edit" width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">Edit</a></th>
             </tr>
             @services.services.map { svc =>
             <tr>
                 <td colspan="2">
                     @svc match {
-                    case TransmittingMoney => {@Messages("msb.services.list.lbl.01")}
-                    case CurrencyExchange => {@Messages("msb.services.list.lbl.02")}
-                    case ChequeCashingNotScrapMetal => {@Messages("msb.services.list.lbl.03")}
-                    case ChequeCashingScrapMetal => {@Messages("msb.services.list.lbl.04")}
+                    case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
+                    case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
+                    case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
+                    case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
                     }
                 </td>
             </tr>
