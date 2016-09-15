@@ -358,7 +358,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
         )
       )
       val incomingModel = MoneyServiceBusiness(
-        businessAppliedForPSRNumber = completedMT
+        businessUseAnIPSP = completedMT
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))

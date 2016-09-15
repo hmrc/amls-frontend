@@ -113,7 +113,6 @@ trait MoneyServiceBusinessTestData {
       Some(BankMoneySource("bank names")),
       Some(WholesalerMoneySource("Wholesaler Names")),
       true)),
-    businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
     branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
@@ -141,10 +140,6 @@ trait MoneyServiceBusinessTestData {
       "wholesalerMoneySource" -> "Yes",
       "wholesalerNames" -> "Wholesaler Names",
       "customerMoneySource" -> "Yes"
-    ),
-    "businessAppliedForPSRNumber" -> Json.obj(
-      "appliedFor" -> true,
-      "regNumber" -> "123456"
     ),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
