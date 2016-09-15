@@ -75,6 +75,7 @@ trait MostTransactionsController extends BaseController {
 }
 
 object MostTransactionsController extends MostTransactionsController {
+  // $COVERAGE-OFF$
   override val cache: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

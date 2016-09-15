@@ -298,7 +298,7 @@ class SendMoneyToOtherCountryControllerSpec extends PlaySpec with OneAppPerSuite
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
-    "throw exception when Businessmatching returns none" in new Fixture {
+    "throw exception when Msb services in Business Matching returns none" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "money" -> "false"

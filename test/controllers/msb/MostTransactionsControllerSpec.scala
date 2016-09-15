@@ -6,6 +6,7 @@ import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -283,6 +284,37 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+    }
+  }
+
+  "throw exception when Msb services in Business Matching returns none" in new Fixture {
+
+    val newRequest = request.withFormUrlEncodedBody(
+      "mostTransactionsCountries[]" -> "GB"
+    )
+
+    val incomingModel = MoneyServiceBusiness()
+
+    val outgoingModel = incomingModel.copy(
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+      hasChanged = true
+    )
+
+    when(cache.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(None)
+
+    when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      .thenReturn(Some(incomingModel))
+
+    when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+      (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+
+    a[Exception] must be thrownBy {
+      ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
     }
   }
 }
