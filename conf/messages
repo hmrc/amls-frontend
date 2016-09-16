@@ -430,6 +430,7 @@ progress.visuallyhidden.completed = This section has been completed.
 progress.visuallyhidden.start.approx = This section needs starting and will take approximately
 progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
+progress.visuallyhidden.view.amend = You can view and amend your information.
 
 #### Amendment page ####
 amendment.title = Update your information - Your application - Anti-money laundering registration - GOV.UK
