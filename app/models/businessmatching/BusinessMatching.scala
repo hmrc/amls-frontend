@@ -11,6 +11,7 @@ case class BusinessMatching(
                              msbServices : Option[MsbServices] = None,
                              typeOfBusiness: Option[TypeOfBusiness] = None,
                              companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
+                             businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                              hasChanged: Boolean = false
                            ) {
 
@@ -29,13 +30,18 @@ case class BusinessMatching(
   def companyRegistrationNumber(p: CompanyRegistrationNumber): BusinessMatching =
     this.copy(companyRegistrationNumber = Some(p), hasChanged = hasChanged || !this.companyRegistrationNumber.contains(p))
 
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching =
+    this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
+
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(_),_, Some(_), _, _)
-        if x.businessType.fold(false) { _ == UnincorporatedBody } => true
-      case BusinessMatching(Some(x), Some(_),_, _, Some(_), _)
+      case BusinessMatching(Some(x), Some(_), _,Some(_), _, _, _)
+        if x.businessType.fold(false) {
+          _ == UnincorporatedBody
+        } => true
+      case BusinessMatching(Some(x), _,Some(_), _, Some(_), _, _)
         if x.businessType.fold(false) { y => y == LimitedCompany || y == LPrLLP } => true
-      case BusinessMatching(Some(_), Some(_),_, None, None, _) => true
+      case BusinessMatching(Some(_),Some(_),_, None, None, _, _) => true
       case _ => false
     }
 }
@@ -66,6 +72,7 @@ object BusinessMatching {
         __.read[Option[MsbServices]] and
         __.read[Option[TypeOfBusiness]] and
         __.read[Option[CompanyRegistrationNumber]] and
+          __.read[Option[BusinessAppliedForPSRNumber]] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
       ) (BusinessMatching.apply _)
 
@@ -77,7 +84,8 @@ object BusinessMatching {
           Json.toJson(model.activities).asOpt[JsObject],
           Json.toJson(model.msbServices).asOpt[JsObject],
           Json.toJson(model.typeOfBusiness).asOpt[JsObject],
-          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject]
+          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject],
+          Json.toJson(model.businessAppliedForPSRNumber).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
         } + ("hasChanged" -> JsBoolean(model.hasChanged))

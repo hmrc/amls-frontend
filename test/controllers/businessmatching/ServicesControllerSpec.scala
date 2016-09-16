@@ -88,7 +88,9 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val model = BusinessMatching(
         msbServices = Some(MsbServices(
           Set(TransmittingMoney)
-        )), hasChanged = true
+        )),
+        businessAppliedForPSRNumber = None,
+        hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -98,13 +100,13 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(model))(any(), any(), any()))
+      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
     }
 
     "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
@@ -131,13 +133,13 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(currentModel)))
 
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(newModel))(any(), any(), any()))
+      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
     }
 
     "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -163,7 +165,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(currentModel)))
 
-      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(newModel))(any(), any(), any()))
+      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
@@ -197,13 +199,13 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
           when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(currentModel)))
 
-          when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(newModel))(any(), any(), any()))
+          when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
           val result = controller.post(edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
       }
     }
   }

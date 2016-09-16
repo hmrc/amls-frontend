@@ -28,6 +28,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
     val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")
     val TypeOfBusinessModel = TypeOfBusiness("test")
     val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
+    val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
 
     val jsonBusinessMatching = Json.obj(
       "businessActivities" -> Seq("05", "06", "07"),
@@ -45,6 +46,9 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       "safeId" -> "XE0001234567890",
       "typeOfBusiness" -> "test",
       "companyRegistrationNumber" -> "12345678",
+      "appliedFor" -> true,
+      "regNumber" -> "123456"
+      ,
       "hasChanged" -> false
     )
 
@@ -55,6 +59,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       Some(msbServices),
       Some(TypeOfBusinessModel),
       Some(CompanyRegistrationNumberModel),
+      Some(BusinessAppliedForPSRNumberModel),
       hasChanged = false)
 
     "JSON validation" must {
@@ -97,6 +102,13 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
         "return BusinessMatching with correct CompanyRegistrationNumberModel" in {
           val result = initial.companyRegistrationNumber(CompanyRegistrationNumberModel)
           result must be(BusinessMatching(None, None, None, None, Some(CompanyRegistrationNumberModel), hasChanged = true))
+        }
+      }
+
+      "Merged with BusinessAppliedForPSRNumberModel" must {
+        "return BusinessMatching with correct BusinessAppliedForPSRNumberModel" in {
+          val result = initial.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberModel)
+          result must be(BusinessMatching(None, None, None, None, None,Some(BusinessAppliedForPSRNumberModel), hasChanged = true))
         }
       }
     }
