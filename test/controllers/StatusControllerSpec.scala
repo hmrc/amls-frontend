@@ -1,6 +1,6 @@
 package controllers
 
-import connectors.{DESConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.{Country, ReadStatusResponse, SubscriptionResponse}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -29,7 +29,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
     val controller = new StatusController {
       override private[controllers] val landingService: LandingService = mock[LandingService]
       override val authConnector = self.authConnector
-      override private[controllers] val desConnector: DESConnector = mock[DESConnector]
+      override private[controllers] val desConnector: AmlsConnector = mock[AmlsConnector]
       override private[controllers] val progressService: ProgressService = mock[ProgressService]
       override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
     }

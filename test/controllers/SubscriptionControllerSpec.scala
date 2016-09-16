@@ -4,7 +4,7 @@ import models.SubscriptionResponse
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsString
 import play.api.test.Helpers._
-import services.SubscriptionService
+import services.SubmissionService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HttpResponse
 import utils.AuthorisedFixture
@@ -18,7 +18,7 @@ class SubscriptionControllerSpec extends PlaySpec with OneAppPerSuite {
   trait Fixture extends AuthorisedFixture {
     self =>
     val controller = new SubscriptionController {
-      override private[controllers] val subscriptionService: SubscriptionService = mock[SubscriptionService]
+      override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
       override protected def authConnector: AuthConnector = self.authConnector
     }
   }

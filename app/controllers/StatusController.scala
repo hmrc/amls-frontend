@@ -1,7 +1,7 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.{DESConnector, KeystoreConnector}
+import connectors.{AmlsConnector, KeystoreConnector}
 import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
@@ -9,7 +9,7 @@ import models.registrationprogress.{Completed, Section}
 import scala.concurrent.Future
 import views.html.status.status
 import models.status.{CompletionStateViewModel, _}
-import services.{AuthEnrolmentsService, LandingService, ProgressService, SubscriptionService}
+import services.{AuthEnrolmentsService, LandingService, ProgressService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -19,7 +19,7 @@ trait StatusController extends BaseController {
 
   private[controllers] def landingService: LandingService
 
-  private[controllers] def desConnector: DESConnector
+  private[controllers] def desConnector: AmlsConnector
 
   private[controllers] def progressService: ProgressService
 
@@ -96,7 +96,7 @@ trait StatusController extends BaseController {
 object StatusController extends StatusController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService: LandingService = LandingService
-  override private[controllers] val desConnector: DESConnector = DESConnector
+  override private[controllers] val desConnector: AmlsConnector = AmlsConnector
   override protected val authConnector = AMLSAuthConnector
   override private[controllers] val progressService = ProgressService
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
