@@ -19,9 +19,9 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, _, _, Some(person), _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, Some(person), _, _, _, _, _,_,_))
             => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_))
             => Ok(registered_for_self_assessment(EmptyForm, edit, index))
             case _
             => NotFound(notFoundView)
@@ -38,9 +38,8 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
               Future.successful(BadRequest(registered_for_self_assessment(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.saRegistered(data))
-
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.saRegistered(data)
                 }
               } yield {
                 edit match {

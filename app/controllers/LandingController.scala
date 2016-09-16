@@ -16,12 +16,12 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
 import play.api.libs.json.{JsBoolean, JsObject}
-import play.api.mvc.{Request, Call}
+import play.api.mvc.{Call, Request}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -69,8 +69,8 @@ trait LandingController extends BaseController {
       }
   }
 
-  private def refreshAndRedirect() = {
-    landingService.refreshCache
+  private def refreshAndRedirect(amlsRegistrationNumber :String)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+    landingService.refreshCache(amlsRegistrationNumber)
     Redirect(controllers.routes.StatusController.get())
   }
 
@@ -95,19 +95,19 @@ trait LandingController extends BaseController {
 
   def getWithAmendments(implicit authContext: AuthContext, request : Request[_]) = {
     enrolmentsService.amlsRegistrationNumber flatMap  {
-      case Some(_) => landingService.cacheMap.map { //enrolment exists
+      case Some(amlsRegistrationNumber) => landingService.cacheMap.map { //enrolment exists
           case Some(cacheMap) => {
             //there is data in S4l
             if (dataHasChanged(cacheMap)) {
               cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
-                case Some(_) => refreshAndRedirect()
+                case Some(_) => refreshAndRedirect(amlsRegistrationNumber)
                 case _ => Redirect(controllers.routes.StatusController.get())
               }
             } else { //DataHasNotChanged
-              refreshAndRedirect()
+              refreshAndRedirect(amlsRegistrationNumber)
             }
           }
-          case _ => refreshAndRedirect()
+          case _ => refreshAndRedirect(amlsRegistrationNumber)
       }
 
       case _ => getWithoutAmendments //no enrolment exists

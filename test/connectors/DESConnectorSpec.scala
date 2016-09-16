@@ -1,6 +1,7 @@
 package connectors
 
-import models.{ReadStatusResponse, SubscriptionRequest, SubscriptionResponse}
+import models.declaration.{AddPerson, BeneficialShareholder, RoleWithinBusiness}
+import models.{ReadStatusResponse, SubscriptionRequest, SubscriptionResponse, ViewResponse}
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -33,6 +34,24 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     aboutTheBusinessSection = None,
     bankDetailsSection = None,
     aboutYouSection = None,
+    businessActivitiesSection = None,
+    responsiblePeopleSection = None,
+    tcspSection = None,
+    aspSection = None,
+    msbSection = None,
+    hvdSection = None,
+    supervisionSection = None
+  )
+
+
+  val viewResponse = ViewResponse(
+    etmpFormBundleNumber = "FORMBUNDLENUMBER",
+    businessMatchingSection = None,
+    eabSection = None,
+    tradingPremisesSection = None,
+    aboutTheBusinessSection = None,
+    bankDetailsSection = Seq(None),
+    aboutYouSection = AddPerson("FirstName", None, "LastName", BeneficialShareholder ),
     businessActivitiesSection = None,
     responsiblePeopleSection = None,
     tcspSection = None,
@@ -93,6 +112,19 @@ class DESConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
       whenReady(DESConnector.status(amlsRegistrationNumber)){
         _ mustBe readStatusResponse
+      }
+    }
+  }
+
+  "get view" must {
+
+    "a view response" in {
+      when {
+        DESConnector.httpGet.GET[ViewResponse](eqTo(s"${DESConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any())
+      } thenReturn Future.successful(viewResponse)
+
+      whenReady(DESConnector.view(amlsRegistrationNumber)){
+        _ mustBe viewResponse
       }
     }
   }
