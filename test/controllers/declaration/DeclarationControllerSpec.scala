@@ -13,7 +13,9 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
+import services.AuthEnrolmentsService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
@@ -26,6 +28,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       override val authConnector = self.authConnector
       override val dataCacheConnector = mock[DataCacheConnector]
       override val desConnector = mock[DESConnector]
+      override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
     val mockCacheMap = mock[CacheMap]
@@ -43,6 +46,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
 
+    val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
 
   }
 
@@ -55,11 +59,14 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
     "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
 
-      when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-        .thenReturn(Some(response))
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(declarationController.dataCacheConnector.fetchAll(any(),any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(declarationController.desConnector.status(any())(any(),any(),any(),any()))
+        .thenReturn(Future.successful(notCompletedReadStatusResponse))
+
+      when(declarationController.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("")))
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
@@ -68,16 +75,11 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
     "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-        .thenReturn(Some(response))
-
-      when(declarationController.dataCacheConnector.fetchAll(any(),any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(mockCacheMap.getEntry[AddPerson](AddPerson.key))
-        .thenReturn(Some(addPerson))
+      when(declarationController.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("")))
 
       when(declarationController.desConnector.status(any())(any(),any(),any(),any()))
         .thenReturn(Future.successful(notCompletedReadStatusResponse))
@@ -92,16 +94,11 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
     "load the declaration page for amendments if name and business matching is found" in new Fixture {
 
-      val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-        .thenReturn(Some(response))
-
-      when(declarationController.dataCacheConnector.fetchAll(any(),any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(mockCacheMap.getEntry[AddPerson](AddPerson.key))
-        .thenReturn(Some(addPerson))
+      when(declarationController.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("")))
 
       when(declarationController.desConnector.status(any())(any(),any(),any(),any()))
         .thenReturn(Future.successful(pendingReadStatusResponse))
@@ -112,6 +109,24 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       contentAsString(result) must include(addPerson.middleName mkString)
       contentAsString(result) must include(addPerson.lastName)
       contentAsString(result) must include(Messages("submit.amendment.registration"))
+    }
+
+    "report error if retrieval of amlsRegNo fails" in new Fixture {
+      when(declarationController.dataCacheConnector.fetch[AddPerson](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+      when(declarationController.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(declarationController.desConnector.status(any())(any(),any(),any(),any()))
+        .thenReturn(Future.successful(pendingReadStatusResponse))
+
+      val result = declarationController.get()(request)
+      status(result) must be(OK)
+      contentAsString(result) must include(addPerson.firstName)
+      contentAsString(result) must include(addPerson.middleName mkString)
+      contentAsString(result) must include(addPerson.lastName)
+      contentAsString(result) must include(Messages("submit.registration"))
     }
 
   }
