@@ -30,8 +30,9 @@ case class BusinessMatching(
   def companyRegistrationNumber(p: CompanyRegistrationNumber): BusinessMatching =
     this.copy(companyRegistrationNumber = Some(p), hasChanged = hasChanged || !this.companyRegistrationNumber.contains(p))
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching =
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching = {
     this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
+  }
 
   def isComplete: Boolean =
     this match {

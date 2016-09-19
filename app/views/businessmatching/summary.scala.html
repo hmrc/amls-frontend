@@ -1,6 +1,6 @@
 @import include._
 @import models.businessmatching._
-
+@import config.{ApplicationConfig => appConfig}
 @(model: BusinessMatching)(implicit request: Request[_])
 
 @header = {
@@ -90,29 +90,78 @@
             </tr>
             }
         </table>
+
+
+        @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
+            @model.msbServices.map { services =>
+                <!-- original table-based solution -->
+                <table class="summary">
+                    <tr>
+                        <th>@Messages("businessmatching.services.heading")</th>
+                        <th class="edit" width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">Edit</a></th>
+                    </tr>
+                    @services.services.map { svc =>
+                    <tr>
+                        <td colspan="2">
+                            @svc match {
+                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
+                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
+                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
+                            case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
+                            }
+                        </td>
+                    </tr>
+                    }
+                </table>
+
+
+                @if(services.services.contains(TransmittingMoney)) {
+                    @model.businessAppliedForPSRNumber.map { psr =>
+                        <table class="summary">
+                            <tr>
+                                <th>@Messages("businessmatching.psr.number.title")</th>
+                                <th class="edit" width="12"><a href="@controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true)">Edit</a></th>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    @psr match {
+                                        case BusinessAppliedForPSRNumberNo => {
+                                            @Messages("lbl.no")
+                                            }
+                                        case BusinessAppliedForPSRNumberYes(number) => {
+                                        @Messages("lbl.yes")
+                                </td>
+                            <tr>
+                                <td colspan="2">
+                                    @Messages("businessmatching.psr.number.lbl") : @number
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    }
+                }
+            }
+        }
+    }
+    @model.businessAppliedForPSRNumber.map { psr =>
+        @psr match {
+            case BusinessAppliedForPSRNumberNo => {
+                <div class="form-group">
+                    <a class="button" href="@appConfig.logoutUrl">
+                        @Messages("button.logout")
+                    </a>
+                </div>
+            }
+            case BusinessAppliedForPSRNumberYes(number) => {
+                <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("businessmatching.button.confirm.start")</a>
+            }
+        }
+    }
+    @if(model.businessAppliedForPSRNumber.isEmpty) {
+        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("businessmatching.button.confirm.start")</a>
     }
 
-    @model.msbServices.map { services =>
-        <!-- original table-based solution -->
-        <table class="summary">
-            <tr>
-                <th>@Messages("businessmatching.services.heading")</th>
-                <th class="edit" width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">Edit</a></th>
-            </tr>
-            @services.services.map { svc =>
-            <tr>
-                <td colspan="2">
-                    @svc match {
-                    case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
-                    case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
-                    case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
-                    case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
-                    }
-                </td>
-            </tr>
-            }
-        </table>
-    }
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("businessmatching.button.confirm.start")</a>
+
 
 }

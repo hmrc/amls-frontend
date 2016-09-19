@@ -34,10 +34,10 @@ trait RegisterServicesController extends BaseController {
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
             _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
-              businessMatching.copy(activities = Some(data), msbServices = None)
+              businessMatching.activities(data)
             )
           } yield data.businessActivities.contains(MoneyServiceBusiness) match {
-            case true => Redirect(routes.ServicesController.get(true))
+            case true => Redirect(routes.ServicesController.get(false))
             case false => Redirect(routes.SummaryController.get())
           }
       }

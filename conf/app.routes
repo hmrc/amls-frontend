@@ -112,6 +112,8 @@ POST        /business-matching/psr-registration                         controll
 
 GET         /business-matching/check-your-answers                       controllers.businessmatching.SummaryController.get()
 
+GET         /business-matching/no-psr                                   controllers.businessmatching.CannotContinueWithTheApplicationController.get()
+
 GET         /bank-details/what-you-need/:index                          controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
 GET         /bank-details/add                                           controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)

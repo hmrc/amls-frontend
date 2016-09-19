@@ -4,8 +4,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessAppliedForPSRNumber
+import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessMatching, BusinessAppliedForPSRNumber}
 import views.html.businessmatching.business_applied_for_psr_number
 
 import scala.concurrent.Future
@@ -19,8 +18,8 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
       dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
         response =>
           val form: Form2[BusinessAppliedForPSRNumber] = (for {
-            ba <- response
-            number <- ba.businessAppliedForPSRNumber
+            bm <- response
+            number <- bm.businessAppliedForPSRNumber
           } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
           Ok(business_applied_for_psr_number(form, edit))
       }
@@ -33,11 +32,13 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
           Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
         case ValidForm(_, data) =>
           for {
-            ba <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
             _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
-              ba.businessAppliedForPSRNumber(data)
+              bm.businessAppliedForPSRNumber(data)
             )
-          } yield edit match {
+          }
+          yield data match {
+            case BusinessAppliedForPSRNumberNo => Redirect(routes.CannotContinueWithTheApplicationController.get())
             case _ => Redirect(routes.SummaryController.get())
           }
       }

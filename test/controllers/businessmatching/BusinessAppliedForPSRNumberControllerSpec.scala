@@ -99,5 +99,22 @@ class BusinessAppliedForPSRNumberControllerSpec extends PlaySpec with OneAppPerS
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
+
+    "on post with valid data when user selects option No" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "appliedFor" -> "false"
+      )
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.CannotContinueWithTheApplicationController.get().url))
+    }
   }
 }
