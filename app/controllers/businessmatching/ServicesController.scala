@@ -35,12 +35,14 @@ trait ServicesController extends BaseController {
           for {
             bm <- cache.fetch[BusinessMatching](BusinessMatching.key)
              _ <- cache.save[BusinessMatching](BusinessMatching.key,
-                  bm.msbServices(data))
-          } yield edit match {
-            case false =>
-              Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
-            case true =>
-              Redirect(routes.SummaryController.get())
+               data.services.contains(TransmittingMoney) match {
+                 case true => bm.msbServices(data)
+                 case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
+               }
+             )
+          } yield data.services.contains(TransmittingMoney) match {
+            case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
+            case false => Redirect(routes.SummaryController.get())
           }
       }
   }
