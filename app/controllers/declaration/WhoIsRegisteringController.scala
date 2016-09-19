@@ -1,17 +1,25 @@
 package controllers.declaration
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.{DESConnector, DataCacheConnector}
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
+import models.status._
+import services.AuthEnrolmentsService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.declaration.who_is_registering
+
+import scala.concurrent.Future
 
 trait WhoIsRegisteringController extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+  private[controllers] def desConnector: DESConnector
+  def dataCacheConnector: DataCacheConnector
+  def authEnrolmentsService: AuthEnrolmentsService
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -64,7 +72,7 @@ trait WhoIsRegisteringController extends BaseController {
             case None => BadRequest(who_is_registering(f, Seq.empty))
           }
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll map {
+          dataCacheConnector.fetchAll flatMap {
             optionalCache =>
               (for {
                 cache <- optionalCache
@@ -73,24 +81,52 @@ trait WhoIsRegisteringController extends BaseController {
                 dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
                   case "-1" => {
-                    Redirect(routes.AddPersonController.get())
+                    Future.successful(Redirect(routes.AddPersonController.get()))
                   }
                   case _ => {
                     getAddPerson(data, responsiblePeople) map { addPerson =>
                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
-                    Redirect(routes.DeclarationController.get())
+                    redirectToDeclarationPage
                   }
                 }
-              }) getOrElse Redirect(routes.DeclarationController.get())
+              }) getOrElse redirectToDeclarationPage
           }
       }
     }
   }
+
+  private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext) = {
+    getAMLSRegNo flatMap {
+      case Some(amlsRegNo) => etmpStatus(amlsRegNo)(hc, auth) flatMap {
+        case SubmissionReadyForReview =>
+          Future.successful(Redirect(routes.DeclarationController.getWithAmendment()))
+        case _ => Future.successful(Redirect(routes.DeclarationController.get()))
+      }
+      case None => Future.successful(Redirect(routes.DeclarationController.get()))
+    }
+  }
+
+  private def getAMLSRegNo(implicit hc: HeaderCarrier, auth: AuthContext): Future[Option[String]] =
+    authEnrolmentsService.amlsRegistrationNumber
+
+  private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext): Future[SubmissionStatus] = {
+    desConnector.status(amlsRefNumber) map {
+      response => response.formBundleStatus match {
+        case "Pending" => SubmissionReadyForReview
+        case "Approved" => SubmissionDecisionApproved
+        case "Rejected" => SubmissionDecisionRejected
+        case _ => NotCompleted
+      }
+    }
+  }
+
 }
 
 object WhoIsRegisteringController extends WhoIsRegisteringController {
   // $COVERAGE-OFF$
+  override private[controllers] val desConnector: DESConnector = DESConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
+  override val authEnrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
 }
