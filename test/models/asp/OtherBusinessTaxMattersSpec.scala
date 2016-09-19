@@ -16,63 +16,10 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
     }
 
     "successfully validate given an `Yes` value" in {
-
-      val data = Map(
-        "otherBusinessTaxMatters" -> Seq("true"),
-        "agentRegNo" -> Seq("123456782fv")
-      )
-
-      OtherBusinessTaxMatters.formRule.validate(data) must
-        be(Success(OtherBusinessTaxMattersYes("123456782fv")))
+      OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq("true"))) must
+        be(Success(OtherBusinessTaxMattersYes))
     }
 
-    "fail when mandatory fields are missing" in {
-
-      OtherBusinessTaxMatters.formRule.validate(Map.empty) must
-        be(Failure(Seq(
-          (Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters"))
-        )))
-
-    }
-
-    "fail to validate given an `Yes` with no value" in {
-
-      val data = Map(
-        "otherBusinessTaxMatters" -> Seq("true"),
-        "agentRegNo" -> Seq("")
-      )
-
-      OtherBusinessTaxMatters.formRule.validate(data) must
-        be(Failure(Seq(
-          (Path \ "agentRegNo") -> Seq(ValidationError("error.required.asp.agentRegNo"))
-        )))
-    }
-
-    "fail to validate given an `Yes` with more than max length value" in {
-
-      val data = Map(
-        "otherBusinessTaxMatters" -> Seq("true"),
-        "agentRegNo" -> Seq("123qed1258963")
-      )
-
-      OtherBusinessTaxMatters.formRule.validate(data) must
-        be(Failure(Seq(
-          (Path \ "agentRegNo") -> Seq(ValidationError("error.invalid.length.asp.agentRegNo"))
-        )))
-    }
-
-    "fail to validate given an `Yes` with invalid value" in {
-
-      val data = Map(
-        "otherBusinessTaxMatters" -> Seq("true"),
-        "agentRegNo" -> Seq("123qe")
-      )
-
-      OtherBusinessTaxMatters.formRule.validate(data) must
-        be(Failure(Seq(
-          (Path \ "agentRegNo") -> Seq(ValidationError("error.invalid.asp.agentRegNo"))
-        )))
-    }
 
     "write correct data from enum value" in {
 
@@ -83,8 +30,8 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
 
     "write correct data from `yes` value" in {
 
-      OtherBusinessTaxMatters.formWrites.writes(OtherBusinessTaxMattersYes("123456782fv")) must
-        be(Map("otherBusinessTaxMatters" -> Seq("true"), "agentRegNo" -> Seq("123456782fv")))
+      OtherBusinessTaxMatters.formWrites.writes(OtherBusinessTaxMattersYes) must
+        be(Map("otherBusinessTaxMatters" -> Seq("true")))
 
     }
 
@@ -100,16 +47,8 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an `Yes` value" in {
 
-      Json.fromJson[OtherBusinessTaxMatters](Json.obj("otherBusinessTaxMatters" -> true, "agentRegNo" -> "123456782fv")) must
-        be(JsSuccess(OtherBusinessTaxMattersYes("123456782fv"), JsPath \ "otherBusinessTaxMatters" \ "agentRegNo"))
-    }
-
-    "fail to validate when given an empty `Yes` value" in {
-
-      val json = Json.obj("otherBusinessTaxMatters" -> true)
-
-      Json.fromJson[OtherBusinessTaxMatters](json) must
-        be(JsError((JsPath \ "otherBusinessTaxMatters" \ "agentRegNo") -> ValidationError("error.path.missing")))
+      Json.fromJson[OtherBusinessTaxMatters](Json.obj("otherBusinessTaxMatters" -> true)) must
+        be(JsSuccess(OtherBusinessTaxMattersYes, JsPath \ "otherBusinessTaxMatters"))
     }
 
     "write the correct value" in {
@@ -117,12 +56,16 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
       Json.toJson(OtherBusinessTaxMattersNo) must
         be(Json.obj("otherBusinessTaxMatters" -> false))
 
-      Json.toJson(OtherBusinessTaxMattersYes("123456782fv")) must
-        be(Json.obj(
-          "otherBusinessTaxMatters" -> true,
-          "agentRegNo" -> "123456782fv"
-        ))
+      Json.toJson(OtherBusinessTaxMattersYes)must
+        be(Json.obj("otherBusinessTaxMatters" -> true))
     }
+
+
+    }
+    val model: Asp = Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes))
+    val test: Option[String] = model.otherBusinessTaxMatters.map {
+      case OtherBusinessTaxMattersNo => "lbl.no"
+      case OtherBusinessTaxMattersYes => "lbl.yes"
   }
 
 }
