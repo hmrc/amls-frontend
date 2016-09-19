@@ -75,5 +75,17 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       contentString must include("UK Bank Account")
       contentString must include("Personal")
     }
+
+    "show no bank account text" when {
+      "no bank account is selected" in new Fixture {
+        val model = BankDetails(None, None)
+
+        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(model))))
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("bankdetails.summary.nobank.account"))
+      }
+    }
   }
 }
