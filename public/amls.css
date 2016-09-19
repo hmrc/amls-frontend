@@ -529,17 +529,14 @@ form .inline .block-label {
 }
 
 /* summary styles */
-.summary-title {
+table.summary-title {
   width: 88%;
-}
-
-.summary {
-  font-size: 16px;
-  margin-bottom: 20px;
 }
 
 table.summary {
   table-layout: fixed;
+  font-size: 16px;
+  margin-bottom: 20px;
 }
 
 table.summary th {
@@ -554,7 +551,7 @@ table.summary td {
   word-break: break-all;
 }
 
-.summary ul li {
+table.summary ul li {
   font-size: 16px;
   margin-bottom: 0;
 }
@@ -874,6 +871,12 @@ fieldset.panel-indent legend {
   -webkit-appearance: textfield;
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+/* Temp override */
+
+.details__inner li {
+  padding-bottom: 20px;
 }
 
 
