@@ -36,10 +36,10 @@ trait ServicesController extends BaseController {
             bm <- cache.fetch[BusinessMatching](BusinessMatching.key)
              _ <- cache.save[BusinessMatching](BusinessMatching.key,
                   bm.msbServices(data))
-          } yield data.services.contains(TransmittingMoney) match {
-            case true =>
-              Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
+          } yield edit match {
             case false =>
+              Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
+            case true =>
               Redirect(routes.SummaryController.get())
           }
       }
