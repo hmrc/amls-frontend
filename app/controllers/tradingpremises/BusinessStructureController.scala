@@ -47,9 +47,8 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
           Future.successful(BadRequest(views.html.tradingpremises.business_structure(f, index, edit)))
         case ValidForm(_, data) =>
           for {
-            _ <- updateData[TradingPremises](index) {
-              case Some(tp) => Some(resetAgentValues(tp.businessStructure(data), data))
-              case _ => Some(TradingPremises(businessStructure = Some(data)))
+            _ <- updateDataStrict[TradingPremises](index) { tp =>
+              resetAgentValues(tp.businessStructure(data), data)
             }
           } yield redirectToPage(data, edit, index)
       }

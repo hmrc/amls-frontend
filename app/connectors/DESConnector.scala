@@ -1,7 +1,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.{ReadStatusResponse, SubscriptionRequest, SubscriptionResponse}
+import models.{ReadStatusResponse, SubscriptionRequest, SubscriptionResponse, ViewResponse}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
@@ -70,8 +70,35 @@ trait DESConnector {
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
+  }
+
+  def view(amlsRegistrationNumber : String)
+          (implicit
+           headerCarrier: HeaderCarrier,
+           ec: ExecutionContext,
+           reqW: Writes[ViewResponse],
+           ac: AuthContext
+          ) : Future[ViewResponse] = {
+    val accounts = ac.principal.accounts
+    val (accountType, accountId) = accounts.ct orElse accounts.sa orElse accounts.org match {
+      case Some(OrgAccount(_, Org(ref))) => ("org", ref )
+      case Some(SaAccount(_, SaUtr(ref))) => ("sa", ref )
+      case Some(CtAccount(_, CtUtr(ref))) => ("ct", ref )
+      case _ => throw new IllegalArgumentException("authcontext does not contain any of the expected account types")
+    }
+
+    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
+    val prefix = "[DESConnector][view]"
+    Logger.debug(s"$prefix - Request : ${amlsRegistrationNumber}")
+
+    httpGet.GET[ViewResponse](getUrl) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        response
+    }
 
   }
+
 }
 
 object DESConnector extends DESConnector {

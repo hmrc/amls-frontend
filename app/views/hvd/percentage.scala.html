@@ -4,6 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("hvd.percentage.heading", "summary.hvd")
 }
 
@@ -14,8 +15,10 @@
 
     @form(f, controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 
+        <p>@Messages("hvd.percentage.text")</p>
+
         @radioGroup(f("percentage")) {
-            @legend("hvd.percentage.text")
+            @legend("TODO", jsHidden = true)
             @radio(f("percentage"), "hvd.percentage.lbl.01", "01")
             @radio(f("percentage"), "hvd.percentage.lbl.02", "02")
             @radio(f("percentage"), "hvd.percentage.lbl.03", "03")

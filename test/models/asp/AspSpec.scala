@@ -12,7 +12,7 @@ trait AspValues {
 
   object DefaultValues {
 
-    val DefaultOtherBusinessTax = OtherBusinessTaxMattersYes("123456789")
+    val DefaultOtherBusinessTax = OtherBusinessTaxMattersYes
 
     val DefaultServices = ServicesOfBusiness(Set(Accountancy, Auditing, FinancialOrTaxAdvice))
   }
@@ -25,6 +25,15 @@ trait AspValues {
   }
 
   val completeJson = Json.obj(
+    "services" -> Json.obj(
+      "services" -> Seq("01", "04", "05")
+    ),
+    "otherBusinessTaxMatters" -> Json.obj(
+      "otherBusinessTaxMatters" -> true
+    ),
+    "hasChanged" -> false
+  )
+  val completeJsonWithReg = Json.obj(
     "services" -> Json.obj(
       "services" -> Seq("01", "04", "05")
     ),
@@ -44,7 +53,6 @@ trait AspValues {
 class AspSpec extends PlaySpec with MockitoSugar with AspValues {
 
   "None" when {
-
     val initial: Option[Asp] = None
 
     "Merged with other business tax matters" must {
@@ -69,7 +77,6 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
     }
 
     "have a default function that" must {
-
       "correctly provides a default value when none is provided" in {
         Asp.default(None) must be(Asp())
       }
@@ -144,6 +151,10 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
         Json.toJson(completeModel) must be(completeJson)
       }
 
+      "deserialise as expected when a reg number is present" in {
+        completeJsonWithReg.as[Asp] must be(completeModel)
+      }
+
       "Deserialise as expected" in {
         completeJson.as[Asp] must be(completeModel)
       }
@@ -189,9 +200,9 @@ class AspSpec extends PlaySpec with MockitoSugar with AspValues {
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.otherBusinessTaxMatters(OtherBusinessTaxMattersYes("1452325"))
+          val res = completeModel.otherBusinessTaxMatters(OtherBusinessTaxMattersNo)
           res.hasChanged must be(true)
-          res.otherBusinessTaxMatters must be(Some(OtherBusinessTaxMattersYes("1452325")))
+          res.otherBusinessTaxMatters must be(Some(OtherBusinessTaxMattersNo))
         }
       }
     }

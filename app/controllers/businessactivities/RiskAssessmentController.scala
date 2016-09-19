@@ -42,7 +42,7 @@ trait RiskAssessmentController extends BaseController {
                 businessActivity <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               } yield {
                 dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
-                  businessActivity.riskAssessmentspolicy(data))
+                  businessActivity.riskAssessmentPolicy(data))
                 edit match {
                   case true => Redirect(routes.SummaryController.get())
                   case false => bmBusinessActivity.businessActivities.contains(AccountancyServices) match {

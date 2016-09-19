@@ -15,7 +15,7 @@ case class ReadStatusResponse(
 
 object ReadStatusResponse {
 
-  val dateTimeFormat = ISODateTimeFormat.dateTime.withZoneUTC
+  val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
 
   implicit val readsJodaLocalDateTime = Reads[LocalDateTime](js =>
     js.validate[String].map[LocalDateTime](dtString =>

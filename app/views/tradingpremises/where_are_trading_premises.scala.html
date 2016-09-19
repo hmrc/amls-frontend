@@ -6,6 +6,7 @@
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @header = {
+    @errorSummary(f)
     @heading("tradingpremises.yourtradingpremises.heading", "summary.tradingpremises")
 }
 
@@ -21,30 +22,31 @@
             labelText = "tradingpremises.yourtradingpremises.tradingname"
         )
 
-        <fieldset>
-            @legend("tradingpremises.yourtradingpremises.address", false, false)
-            @input(f("addressLine1"))
-            @input(f("addressLine2"))
-            @input(f("addressLine3"))
-            @input(f("addressLine4"))
-        </fieldset>
-
-        @input(
-            field = f("postcode"),
-            labelText = "tradingpremises.yourtradingpremises.postcode",
-            classes = Seq("postcode")
-        )
-
+        @fieldset(
+            legend = "legend.address",
+            panel = false
+        ) {
+            @input(f("addressLine1"), "lbl.address.line1", labelHidden = true)
+            @input(f("addressLine2"), "lbl.address.line2", labelHidden = true)
+            @input(f("addressLine3"), "lbl.address.line3", labelHidden = true, requiredField = false)
+            @input(f("addressLine4"), "lbl.address.line4", labelHidden = true, requiredField = false)
+            @input(
+                field = f("postcode"),
+                labelText = "lbl.address.postcode",
+                classes = Seq("postcode")
+            )
+        }
 
         @inlineRadioGroup(f("isResidential")) {
-        @legend("tradingpremises.yourtradingpremises.isresidential", false, false)
-        @radio(f("isResidential"), "lbl.yes", "true")
-        @radio(f("isResidential"), "lbl.no", "false")
+            @legend("tradingpremises.yourtradingpremises.isresidential", false, false)
+            @radio(f("isResidential"), "lbl.yes", "true")
+            @radio(f("isResidential"), "lbl.no", "false")
         }
 
         @date(
             f = f,
             p = "startDate",
+            hintId = "dob",
             labelText = "tradingpremises.yourtradingpremises.startdate"
         )
 

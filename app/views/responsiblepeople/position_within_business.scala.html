@@ -5,6 +5,7 @@
 @(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType)(implicit lang: Lang, request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("responsiblepeople.position_within_business.title", "summary.responsiblepeople")
 }
 
@@ -13,9 +14,9 @@
     heading = header
 ) {
 
-    <div class="form-group">
-        <div class="icon-important"></div>
-        <span class="notice notice-important">@Messages("responsiblepeople.position_within_business.important")</span>
+    <div class="notice">
+        <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
+        <strong class="bold-small">@Messages("responsiblepeople.position_within_business.important")</strong>
     </div>
 
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit)) {

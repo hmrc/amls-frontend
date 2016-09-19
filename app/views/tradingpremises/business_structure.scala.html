@@ -6,6 +6,7 @@
 @(f: Form2[_],index: Int, edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
+    @errorSummary(f)
     @heading("tradingpremises.businessStructure.heading", "summary.tradingpremises")
 }
 
@@ -18,7 +19,7 @@
 
         <div class="form-field-group">
         @radioGroup(f("agentsBusinessStructure")) {
-            @legend("tradingpremises.businessStructure.title", jsHidden = true)
+            @legend("tradingpremises.businessStructure.heading", jsHidden = true)
             @radio(f("agentsBusinessStructure"), "businessType.lbl.02", "02")
             @radio(f("agentsBusinessStructure"), "businessType.lbl.01", "01")
             @radio(f("agentsBusinessStructure"), "businessType.lbl.03", "03")

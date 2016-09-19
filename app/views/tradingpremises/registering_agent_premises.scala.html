@@ -4,6 +4,7 @@
 @(f: forms.Form2[_], index: Int, edit: Boolean)(implicit request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading(Messages("tradingpremises.agent.premises.heading"), "summary.tradingpremises")
 }
 
@@ -18,6 +19,7 @@
 
         <div class="form-field-group">
             @inlineRadioGroup(f("agentPremises")) {
+                @legend("tradingpremises.agent.premises.heading", jsHidden = true)
                 @radio(f("agentPremises"), "lbl.yes", "true")
                 @radio(f("agentPremises"), "lbl.no", "false")
             }

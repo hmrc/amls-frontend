@@ -37,8 +37,12 @@ trait RegistrationProgressController extends BaseController {
         cacheMapO.map { cacheMap: CacheMap =>
           val sections = service.sections(cacheMap)
           cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
-            case Some(_) => Ok(registration_amendment(sections, declarationAvailable(sections)))
-            case None => Ok(registration_progress(sections, declarationAvailable(sections)))
+            case Some(_) => {
+              Ok(registration_amendment(sections, declarationAvailable(sections)))
+            }
+            case None => {
+              Ok(registration_progress(sections, declarationAvailable(sections)))
+            }
           }
         }.getOrElse(Ok(registration_progress(Seq.empty[Section], false)))
     }
@@ -46,8 +50,9 @@ trait RegistrationProgressController extends BaseController {
 
   def getWithoutAmendments(implicit hc : HeaderCarrier, ac : AuthContext, r : Request[_]) =
       service.sections map {
-        sections =>
+        sections => {
           Ok(registration_progress(sections, declarationAvailable(sections)))
+        }
       }
 
 }

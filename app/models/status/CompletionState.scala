@@ -31,7 +31,6 @@ case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionSt
       case (NotCompleted, Complete) => Messages("status.complete")
       case (SubmissionReady, Incomplete) | (SubmissionReady, Current) => Messages("status.notsubmitted")
       case (SubmissionReady, Complete) => Messages("status.submitted")
-      case (SubmissionFeesDue, _) => Messages("status.feepaid")
       case (SubmissionReadyForReview, _) => Messages("status.underreview")
       case (SubmissionDecisionApproved, _) => Messages("status.decisionmade")
       case (SubmissionDecisionRejected, _) => Messages("status.decisionmade")
@@ -54,7 +53,6 @@ object CompletionStateViewModel {
   def apply(current: SubmissionStatus): CompletionStateViewModel = {
     val statuses = ListMap(NotCompleted -> Complete,
       SubmissionReady -> Complete,
-      SubmissionFeesDue -> Complete,
       SubmissionReadyForReview -> Complete,
       SubmissionDecisionApproved -> Complete,
       SubmissionDecisionRejected -> Complete)

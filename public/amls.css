@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2015 HM Revenue & Customs
  *
@@ -16,44 +17,45 @@
 
 
 a.block-link {
-  display: block;
+    display: block;
 }
 
 /* -- application progress page -- */
 .grid-layout {
-  table-layout: fixed;
+    table-layout: fixed;
 }
 
 /* -- Progress Step -- */
 .progress-steps {
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 }
 
 .progress-steps li {
-  margin-bottom: 0;
-  margin-top: 12px;
+    margin-bottom: 0;
+    margin-top: 12px;
 }
 
-.progress-steps li:first-child {
-  margin-top: 0;
+.progress-steps li:first-child,
+.progress-steps__amend li:first-child + li {
+    margin-top: 0;
 }
 
 .progress-steps__amend li:first-child {
-  display: none;
-  visibility: hidden;
+    display: none;
+    visibility: hidden;
 }
 
 /* -- Progress Step: assets (tick & chevrons) -- */
 .progress-step--status,
 .no-svg .progress-step--status {
-  background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
-  background-position: 90%;
-  background-repeat: no-repeat;
-  background-size: 33%;
+    background-image: url("/anti-money-laundering/assets/icons/chevron.svg");
+    background-position: 90%;
+    background-repeat: no-repeat;
+    background-size: 33%;
 }
 
 .no-svg .progress-step--status {
-  background-image: url("/anti-money-laundering/assets/icons/chevron.png");
+    background-image: url("/anti-money-laundering/assets/icons/chevron.png");
 }
 
 .progress-step__started .progress-step--status,
@@ -62,9 +64,8 @@ a.block-link {
 .progress-step__started:focus .progress-step--status,
 .progress-step__started:hover .progress-step--status,
 .progress-steps__amend .progress-step_changed {
-  background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
+    background-image: url("/anti-money-laundering/assets/icons/chevron-white.svg");
 }
-
 
 .no-svg .progress-step__started .progress-step--status,
 .no-svg .progress-step:focus .progress-step--status,
@@ -72,7 +73,7 @@ a.block-link {
 .no-svg .progress-step__started:focus .progress-step--status,
 .no-svg .progress-step__started:hover .progress-step--status,
 .no-svg .progress-steps__amend .progress-step_changed {
-  background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
+    background-image: url("/anti-money-laundering/assets/icons/chevron-white.png");
 }
 
 .no-svg .progress-step--status,
@@ -82,7 +83,7 @@ a.block-link {
 .no-svg .progress-step__started:focus .progress-step--status,
 .no-svg .progress-step__started:hover .progress-step--status,
 .no-svg .progress-step__completed {
-  background-repeat: no-repeat;
+    background-repeat: no-repeat;
 }
 
 .status-list .status-list--complete,
@@ -90,80 +91,83 @@ a.block-link {
 .progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
 .no-svg .progress-step__complete .progress-step--status {
-  background-image: url("/anti-money-laundering/assets/icons/tick.svg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 33%;
+    background-image: url("/anti-money-laundering/assets/icons/tick.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 33%;
 }
 
 .no-svg .status-list .status-list--complete,
 .no-svg .progress-step__complete .progress-step--status,
 .no-svg .progress-step__complete:hover .progress-step--status {
-  background-image: url("/anti-money-laundering/assets/icons/tick.png");
+    background-image: url("/anti-money-laundering/assets/icons/tick.png");
 }
 
 /* qualified attribute selector required here, otherwise
    all text colour takes on regular anchor colour  */
 a.progress-step {
-  background-color: #dee0e2;
-  color: #0b0c0c;
-  display: block; /* for IE8 */
-  display: flex; /* for everything else */
-  margin-bottom: 0;
-  padding: 0;
-  overflow: hidden; /* fix for firefox focus bug */
-  position: relative;
-  text-decoration: none;
-  transition: .25s ease-in;
-  transition-property: background-color, outline;
+    background-color: #dee0e2;
+    color: #0b0c0c;
+    display: block;
+ /* for IE8 */
+    display: flex;
+ /* for everything else */
+    margin-bottom: 0;
+    padding: 0;
+    overflow: hidden;
+ /* fix for firefox focus bug */
+    position: relative;
+    text-decoration: none;
+    transition: .25s ease-in;
+    transition-property: background-color, outline;
 }
 
 /* give the whole step component a focus outline */
 .progress-step:focus {
-  outline: 3px solid #ffbf47;
+    outline: 3px solid #ffbf47;
 }
 
 /* mimic the anchor colours inside this block-level component */
 .progress-step__edit {
-  color: #005ea5;
+    color: #005ea5;
 }
 
 .progress-step__edit:focus,
 .progress-step__edit:hover {
-  color: #2e8aca;
+    color: #2e8aca;
 }
 
 a.progress-step,
 .progress-step--status,
 .progress-step--details {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* `display:block` fixes a layout issue in IE & Firefox */
 .progress-step--status,
 .progress-step--details {
-  display: block;
+    display: block;
 }
 
 /* -- Progress Step: details -- */
 .progress-step--details {
-  background-color: #f8f8f8;
-  border-bottom: 3px solid #dee0e2;
-  padding: 5px 10px 15px;
+    background-color: #f8f8f8;
+    border-bottom: 3px solid #dee0e2;
+    padding: 5px 10px 15px;
 }
 
 .progress-step--details p {
-  margin: 0;
-  padding-bottom: 10px;
+    margin: 0;
+    padding-bottom: 10px;
 }
 
 /* -- Progress Step: status -- */
 .progress-step--status {
-  border-bottom: 3px solid #cdcdcd;
-  color: #364747;
-  padding: 5px 10px;
-  position: relative;
-  transition: .25s ease-in;
+    border-bottom: 3px solid #cdcdcd;
+    color: #364747;
+    padding: 5px 10px;
+    position: relative;
+    transition: .25s ease-in;
 }
 
 .progress-step__started .progress-step--status,
@@ -171,12 +175,12 @@ a.progress-step,
 .progress-step:hover .progress-step--status,
 .progress-step__started:focus .progress-step--status,
 .progress-step__started:hover .progress-step--status,
-.progress-steps__amend .progress-step_changed{
-  color: #fff;
+.progress-steps__amend .progress-step_changed {
+    color: #fff;
 }
 
 .progress-step--status-time {
-  padding: 15px 0 0;
+    padding: 15px 0 0;
 }
 
 /* -- Progress Step: not started -- */
@@ -184,73 +188,73 @@ a.progress-step,
 .progress-step:hover .progress-step--status,
 .progress-step__started:focus .progress-step--status,
 .progress-step__started:hover .progress-step--status {
-  background-color: #006435;
-  border-bottom-color: #01552e;
+    background-color: #006435;
+    border-bottom-color: #01552e;
 }
 
 /* -- Progress Step: started -- */
 .progress-step__started .progress-step--status {
-  background-color: #f47738;
-  border-bottom-color: #f9641a;
+    background-color: #f47738;
+    border-bottom-color: #f9641a;
 }
 
 .progress-step__started .progress-step--status .progress-steps__amend {
-  display: flex;
+    display: flex;
 }
 
 .progress-step__started .progress-step--status-time .progress-steps__amend {
-  align-self: center;
-  flex: 1;
-  padding-bottom: 15px; /* add bottom padding to help centre it for the flex browsers */
+    align-self: center;
+    flex: 1;
+    padding-bottom: 15px;
+ /* add bottom padding to help centre it for the flex browsers */
 }
 
 .progress-step__started .progress-step--status-time .font-xsmall .progress-steps__amend {
-  margin: 0;
+    margin: 0;
 }
 
 /* -- Progress Step: completed -- */
 .progress-step__complete .progress-step--status,
 .progress-step__complete:focus .progress-step--status,
 .progress-step__complete:hover .progress-step--status,
-.progress-steps__amend .progress-step_changed{
-  background-color: #28a197;
-  border-bottom-color: #088277;
+.progress-steps__amend .progress-step_changed {
+    background-color: #28a197;
+    border-bottom-color: #088277;
 }
 
-
 @media screen and (max-width: 480px) {
-  .progress-step--status,
+    .progress-step--status,
   .no-svg .progress-step--status {
-    background-position: 90% 90%;
-  }
+        background-position: 90% 90%;
+    }
 }
 
 @media screen and (max-width: 640px) {
 
-  .progress-step {
-    margin: 0 -0.78947em 12px;
-  }
+    .progress-step {
+        margin: 0 -0.78947em 12px;
+    }
 
-  .progress-step .grid-layout__column--1-3 {
-    float: left;
-    width: 33.33333%;
-  }
+    .progress-step .grid-layout__column--1-3 {
+        float: left;
+        width: 33.33333%;
+    }
 
-  .progress-step .grid-layout__column--2-3 {
-    float: left;
-    width: 66.66667%;
-  }
+    .progress-step .grid-layout__column--2-3 {
+        float: left;
+        width: 66.66667%;
+    }
 
-  .progress-step--status {
-    background-size: 20%;
-  }
+    .progress-step--status {
+        background-size: 20%;
+    }
 }
 
 @media screen and (min-width: 641px) and (max-width: 767px) {
-  .progress-step--status {
-    background-position: 90% 90%;
-    background-size: 25%;
-  }
+    .progress-step--status {
+        background-position: 90% 90%;
+        background-size: 25%;
+    }
 }
 
 /* -- TODO: fix this – IE10+ needs a chevron kick
@@ -266,14 +270,15 @@ a.progress-step,
   (-ms-high-contrast: none),
   (-ms-high-contrast: active) {
   /* IE10+ hacks here */
-  .progress-step--status {
-    background-position: 140%;
-    background-size: 66%;
-  }
-  .progress-step--status__completed {
-    background-position: 50%;
-    background-size: 50%;
-  }
+    .progress-step--status {
+        background-position: 140%;
+        background-size: 66%;
+    }
+
+    .progress-step--status__completed {
+        background-position: 50%;
+        background-size: 50%;
+    }
 }
 
 /* Having to specify these widths for IE8 until a better fix appears.
@@ -371,7 +376,7 @@ div.grid-layout {
   background-color: #28a197;
   color: #fff;
   margin: 40px 0;
-  padding: 20px 40px 20px 40px;
+  padding: 20px 40px;
   text-align: center;
 }
 
@@ -405,44 +410,44 @@ th.numeric {
 /* postcode */
 /* TODO, determine if there's a class in Assets Frontend for this */
 form input[type=text].form-control.postcode {
-  width: 20%;
+    width: 20%;
 }
 
 /* select box for countries */
 select {
-  border: 2px solid #6f777b;
-  margin: 0;
-  padding: 4px;
-  width: 50%;
+    border: 2px solid #6f777b;
+    margin: 0;
+    padding: 4px;
+    width: 50%;
 }
 
 /* form errors */
 .amls-error-summary {
-  background-color: #fff;
-  border: 5px solid #b10e1e;
+    background-color: #fff;
+    border: 5px solid #b10e1e;
 }
 
 .amls-error-summary li {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .amls-error-summary li > a {
-  color: #b10e1e;
+    color: #b10e1e;
 }
 
 .form-field--error {
-  border-left-width: 5px;
-  border-color: #b10e1e;
+    border-left-width: 5px;
+    border-color: #b10e1e;
 }
 
 .form-field--error span.error-notification {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 /* forms */
 .form-group {
-  padding-top: 0;
-  padding-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 /* Add some space under the last fieldset in a .panel-indent,
@@ -457,9 +462,19 @@ select {
 }
 
 /* These are all prefixed with `form` to override some stuff (apparently) */
-form input[type=text].form-control {
+form input[type="text"].form-control,
+form input[type="tel"].form-control,
+form input[type="number"].form-control {
   border: 2px solid #6f777b;
+}
+
+form input[type="text"].form-control,
+form input[type="tel"].form-control {
   width: 50%;
+}
+
+.form-date .form-group-year {
+  width: 70px;
 }
 
 form .form-label-bold {
@@ -486,8 +501,10 @@ form .date .form-group {
   width: 60px;
 }
 
-form .date .form-field input[type=text],
-form .date .form-group input[type=text] {
+form .date .form-field input[type="text"],
+form .date .form-group input[type="text"],
+form .date .form-field input[type="number"],
+form .date .form-group input[type="number"] {
   width: 100%;
 }
 
@@ -512,17 +529,14 @@ form .inline .block-label {
 }
 
 /* summary styles */
-.summary-title {
+table.summary-title {
   width: 88%;
-}
-
-.summary {
-  font-size: 16px;
-  margin-bottom: 20px;
 }
 
 table.summary {
   table-layout: fixed;
+  font-size: 16px;
+  margin-bottom: 20px;
 }
 
 table.summary th {
@@ -537,7 +551,7 @@ table.summary td {
   word-break: break-all;
 }
 
-.summary ul li {
+table.summary ul li {
   font-size: 16px;
   margin-bottom: 0;
 }
@@ -624,96 +638,84 @@ table.summary td {
   .check-your-answers--header .heading-xsmall {
     font-size: 14px;
   }
+  form input[type="text"].form-control,
+  form input[type="tel"].form-control,
+  form .form-group-day input[type="number"].form-control,
+  form .form-group-month input[type="number"].form-control,
+  form .form-group-year input[type="number"].form-control {
+    width: 100%;
+  }
 }
 
-/* icons */
-.icon {
-  display: inline-block;
-  height: 25px;
-  margin-right: 10px;
-  width: 25px;
-}
 
-.notice {
-  display: block;
-  height: 0;
-  padding-left: 38px;
-  position: relative;
-  top: -43px;
-}
 
-.icon-important {
-  display: inline-block;
-  padding-bottom: 1px;
-  padding-right: 1px;
-}
+
+
+
 
 .icon-confirmed {
   /* we're using the same tick as the progress page,
      which is HUGE, so we need to resize it */
-  background-size: cover;
+background-size: cover;
   height: 55px;
   margin: -15px 0 -15px -15px;
   width: 55px;
 }
 
-.notice-important {
-  padding-left: 55px;
-}
 
 .touchevents .date-of-birth {
-  display: block;
+display: block;
 }
 
 .summary-table a:link,
 .summary-table a:visited,
 .summary-table a:hover {
-  color: #005ea5;
+color: #005ea5;
 }
 
 .summary-table a:link,
 .summary-table a:visited {
-  text-decoration: none;
+text-decoration: none;
 }
 
 .summary-table a:hover {
-  text-decoration: underline;
+text-decoration: underline;
 }
 
 .summary-table .first-section {
-  border-top: 1px solid #bfc1c3;
+border-top: 1px solid #bfc1c3;
 }
 
 .summary-table th {
-  font-size: 24px;
-  padding-bottom: 10px;
-  padding-top: 15px;
+font-size: 24px;
+padding-bottom: 10px;
+padding-top: 15px;
 }
 
 .login-name {
-  float: right;
-  font-size: 16px;
-  margin-top: 10px;
-  margin: 0;
-  padding: 10px 0 10px 0;
-  text-align: right;
+float: right;
+font-size: 16px;
+margin-top: 10px;
+margin: 0;
+padding: 10px 0 10px 0;
+text-align: right;
 }
 
 .heading-secondary {
-  font-weight: 400;
-  line-height: 1.25;
-  margin-top: 0;
-  padding-bottom: 0;
-  padding-top: 9px;
+font-weight: 400;
+line-height: 1.25;
+margin-top: 0;
+padding-bottom: 0;
+padding-top: 9px;
 }
 
 .locked,
 .heading-secondary {
-  color: #6f777b;
+color: #6f777b;
 }
 
 .panel-border-wide {
-  border-left-width: 10px;
+border-left-width: 10px;
 }
 
 /* style the selects as close to inputs as possible,
@@ -824,3 +826,57 @@ fieldset.panel-indent legend {
     margin: 0;
   }
 }
+
+
+
+/* Bits from Gov Elements */
+.notice {
+  position: relative;
+  margin: 40px 0;
+}
+
+.notice .icon {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -17px;
+}
+
+.notice strong {
+  display: block;
+  padding-left: 65px;
+  margin-left: -15px;
+}
+
+.icon {
+  display: inline-block;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+
+.icon-important {
+  width: 35px;
+  height: 35px;
+  background-image: url("/anti-money-laundering/assets/images/icon-important.png");
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  .icon-important {
+    background-image: url("/anti-money-laundering/assets/images/icon-important-2x.png");
+    background-size: 100%;
+  }
+}
+
+.form-control {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Temp override */
+
+.details__inner li {
+  padding-bottom: 20px;
+}
+
+
