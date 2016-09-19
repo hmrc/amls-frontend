@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import play.Logger
 import play.api.libs.json.Json
 import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
@@ -50,17 +51,20 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def hasAlreadyPassedFitAndProper(p: Boolean) : ResponsiblePeople =
     this.copy(hasAlreadyPassedFitAndProper = Some(p), hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.contains(p))
 
-  def isComplete: Boolean = this match {
-    case ResponsiblePeople(
+  def isComplete: Boolean = {
+    Logger.debug(s"[ResponsiblePeople][isComplete] $this")
+    this match {
+      case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
       Some(_), _, _, _, _) if !pos.personalTax => true
-    case ResponsiblePeople(
+      case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
       Some(_), _, _, _, _) => true
-    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
-    case _ => false
+      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
+      case _ => false
+    }
   }
 }
 
