@@ -5,7 +5,7 @@
 
 @header = {
     @errorSummary(f)
-    @heading("supervision.memberofprofessionalbody.title", "summary.supervision")
+    @heading("supervision.memberofprofessionalbody.heading", "summary.supervision")
 }
 
 @main(
@@ -16,14 +16,13 @@
     @form(f, controllers.supervision.routes.ProfessionalBodyMemberController.post(edit)) {
 
         @inlineRadioGroup(f("isAMember")) {
-            @legend("TODO", jsHidden = true)
+            @legend("supervision.memberofprofessionalbody.heading", jsHidden = true)
             @radio(f("isAMember"), "lbl.yes", "true", target = s"#${f("businessType").id}-fieldset")
             @radio(f("isAMember"), "lbl.no", "false")
         }
 
-        @fieldset("TODO", jsHidden = true, id = s"""${f("businessType").id}-fieldset""") {
+        @fieldset("lbl.select.all", classes = Seq("form-field-group-end"), id = s"""${f("businessType").id}-fieldset""") {
 
-            <p>@Messages("lbl.select.all")</p>
             @radioGroup(f("businessType")) {
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
@@ -39,12 +38,13 @@
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#${f("specifyOtherBusiness").id}-fieldset")
-                @fieldset("TODO", jsHidden = true, id = s"""${f("specifyOtherBusiness").id}-fieldset""") {
+
+                @fieldset("lbl.pleasespecify", jsHidden = true, id = s"""${f("specifyOtherBusiness").id}-fieldset""") {
                     @input(f("specifyOtherBusiness"), "lbl.pleasespecify", bold = false)
                 }
             }
         }
-        <br>
+
         @submit(edit)
     }
 }
