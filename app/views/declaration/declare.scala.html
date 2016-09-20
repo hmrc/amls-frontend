@@ -2,14 +2,14 @@
 @import include._
 @import include.forms2._
 
-@(title: String, name: String)(implicit request: Request[_])
+@(content: (String,String), name: String)(implicit request: Request[_])
 
 @header = {
-    @heading("declaration.declaration.submit", title)
+    @heading("declaration.declaration.submit", content._2)
 }
 
 @main(
-    title = Messages("declaration.declaration.title"),
+    title = Messages(content._1),
     heading = header
 ) {
 
