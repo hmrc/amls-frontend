@@ -27,11 +27,6 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
   "Get" must {
 
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
-
     "load the summary page when section data is available" in new Fixture {
 
       val model = BankDetails(None, None)
@@ -103,6 +98,18 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       val result = controller.remove(1)(request)
 
 
+    }
+
+    "show no bank account text" when {
+      "no bank account is selected" in new Fixture {
+        val model = BankDetails(None, None)
+
+        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(model))))
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("bankdetails.summary.nobank.account"))
+      }
     }
   }
 }
