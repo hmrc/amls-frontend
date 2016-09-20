@@ -8,7 +8,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,
                              activities: Option[BusinessActivities] = None,
-                             msbServices : Option[MsbServices] = None,
+                             msbServices: Option[MsbServices] = None,
                              typeOfBusiness: Option[TypeOfBusiness] = None,
                              companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
                              businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
@@ -35,7 +35,7 @@ case class BusinessMatching(
   }
 
   def msbComplete(activities: BusinessActivities): Boolean = {
-    if(activities.businessActivities.contains(MoneyServiceBusiness)) {
+    if (activities.businessActivities.contains(MoneyServiceBusiness)) {
       this.msbServices.isDefined && this.msbServices.fold(false)(x => x.services.contains(TransmittingMoney) match {
         case true => this.businessAppliedForPSRNumber.isDefined
         case false => true
@@ -44,15 +44,21 @@ case class BusinessMatching(
       true
     }
   }
+
+  def isbusinessTypeComplete(businessType: Option[BusinessType]): Boolean = {
+    businessType.fold(true) {
+      case LimitedCompany | LPrLLP => this.companyRegistrationNumber.isDefined
+      case UnincorporatedBody => this.typeOfBusiness.isDefined
+      case _ => true
+    }
+  }
+
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(activity), _,Some(_), _, _, _)
-        if x.businessType.fold(false) {
-          _ == UnincorporatedBody
-        } && msbComplete(activity) => true
-      case BusinessMatching(Some(x), Some(activity), _, _, Some(_), _, _)
-        if x.businessType.fold(false) { y => y == LimitedCompany || y == LPrLLP } && msbComplete(activity) => true
-      case BusinessMatching(Some(_),Some(activity),_, None, None, _, _)  if msbComplete(activity) => true
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _)
+        if {
+          isbusinessTypeComplete(x.businessType) && msbComplete(activity)
+        } => true
       case _ => false
     }
 }
@@ -77,15 +83,15 @@ object BusinessMatching {
 
   val key = "business-matching"
 
-    implicit val reads: Reads[BusinessMatching] = (
-        __.read[Option[ReviewDetails]] and
-        __.read[Option[BusinessActivities]] and
-        __.read[Option[MsbServices]] and
-        __.read[Option[TypeOfBusiness]] and
-        __.read[Option[CompanyRegistrationNumber]] and
-          __.read[Option[BusinessAppliedForPSRNumber]] and
+  implicit val reads: Reads[BusinessMatching] = (
+    __.read[Option[ReviewDetails]] and
+      __.read[Option[BusinessActivities]] and
+      __.read[Option[MsbServices]] and
+      __.read[Option[TypeOfBusiness]] and
+      __.read[Option[CompanyRegistrationNumber]] and
+      __.read[Option[BusinessAppliedForPSRNumber]] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
-      ) (BusinessMatching.apply _)
+    ) (BusinessMatching.apply _)
 
   implicit val writes: Writes[BusinessMatching] =
     Writes[BusinessMatching] {
