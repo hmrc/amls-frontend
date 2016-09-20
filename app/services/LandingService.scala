@@ -1,6 +1,6 @@
 package services
 
-import connectors.{DESConnector, DataCacheConnector, KeystoreConnector}
+import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -27,7 +27,7 @@ trait LandingService {
 
   private[services] def cacheConnector: DataCacheConnector
   private[services] def keyStore: KeystoreConnector
-  private[services] def desConnector: DESConnector
+  private[services] def desConnector: AmlsConnector
 
   @deprecated("fetch the cacheMap itself instead", "")
   def hasSavedForm
@@ -116,6 +116,6 @@ object LandingService extends LandingService {
   // $COVERAGE-OFF$
   override private[services] def cacheConnector = DataCacheConnector
   override private[services] def keyStore = KeystoreConnector
-  override private[services] def desConnector = DESConnector
+  override private[services] def desConnector = AmlsConnector
   // $COVERAGE-ON$
 }
