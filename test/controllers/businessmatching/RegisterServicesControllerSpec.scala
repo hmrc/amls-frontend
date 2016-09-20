@@ -146,7 +146,7 @@ class RegisterServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.ServicesController.get(true).url))
+      redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
     }
 
 

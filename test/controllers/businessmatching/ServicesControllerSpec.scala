@@ -106,7 +106,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(false).url)
     }
 
     "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {

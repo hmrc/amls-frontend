@@ -1216,6 +1216,14 @@ msb.summary.ipsp-registration-number = IPSP’s HM Revenue and Customs registrat
 msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months? –  Money Service Business
 msb.ce.transactions.expected.in.12.months.heading = How many currency exchange transactions do you expect in the next 12 months?
 
+msb.services.title = Which services does your business provide?
+msb.services.heading = Which services does your business provide?
+msb.services.list.heading = Select all that apply
+msb.services.list.lbl.01 = Transmitting money
+msb.services.list.lbl.02 = Currency exchange
+msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
 hvd.whatyouneed.title = What you need - High Value Dealer - Anti-money laundering supervision - GOV.UK
 hvd.whatyouneed.heading = What you need
 hvd.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
