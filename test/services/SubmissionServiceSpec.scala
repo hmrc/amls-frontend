@@ -1,6 +1,7 @@
 package services
 
-import connectors.{DESConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector}
+import exceptions.NoEnrolmentException
 import models.SubscriptionResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
@@ -14,30 +15,33 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{OrgAccount, Accounts}
-import uk.gov.hmrc.play.frontend.auth.{Principal, AuthContext}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
-class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience {
 
   trait Fixture {
 
-    object SubscriptionService extends SubscriptionService {
+    object SubmissionService extends SubmissionService {
       override private[services] val cacheConnector = mock[DataCacheConnector]
-      override private[services] val desConnector = mock[DESConnector]
+      override private[services] val amlsConnector = mock[AmlsConnector]
       override private[services] val ggService = mock[GovernmentGatewayService]
+      override private[services] val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
     implicit val authContext = mock[AuthContext]
     val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
-    when {authContext.principal}.thenReturn(principle)
+    when {
+      authContext.principal
+    }.thenReturn(principle)
 
     implicit val headerCarrier = HeaderCarrier()
 
@@ -54,6 +58,7 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
     )
 
     val safeId = "safeId"
+    val amlsRegistrationNumber = "amlsRegNo"
     val businessType = SoleProprietor
 
     val reviewDetails = mock[ReviewDetails]
@@ -90,29 +95,71 @@ class SubscriptionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutur
     } thenReturn Some(mock[Seq[BankDetails]])
   }
 
-  "SubscriptionService" must {
+  "SubmissionService" must {
 
     "successfully subscribe and enrol" in new Fixture {
 
       when {
-        SubscriptionService.cacheConnector.fetchAll(any(), any())
+        SubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
 
       when {
-        SubscriptionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
+        SubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
-        SubscriptionService.desConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+        SubmissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
       } thenReturn Future.successful(subscriptionResponse)
 
       when {
-        SubscriptionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId))(any(), any())
+        SubmissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId))(any(), any())
       } thenReturn Future.successful(enrolmentResponse)
 
-      whenReady (SubscriptionService.subscribe) {
+      whenReady(SubmissionService.subscribe) {
         result =>
-          result must equal (subscriptionResponse)
+          result must equal(subscriptionResponse)
+      }
+    }
+
+    "successfully submit amendment" in new Fixture {
+
+      when {
+        SubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        SubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        SubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+      } thenReturn Future.successful(subscriptionResponse)
+
+      when {
+        SubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+
+      whenReady(SubmissionService.update) {
+        result =>
+          result must equal(subscriptionResponse)
+      }
+    }
+
+    "return failed future when no enrolment" in new Fixture {
+
+      when {
+        SubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        SubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      }.thenReturn(Future.successful(None))
+
+
+      whenReady(SubmissionService.update.failed) {
+        result =>
+          result mustBe a[NoEnrolmentException]
       }
     }
   }
