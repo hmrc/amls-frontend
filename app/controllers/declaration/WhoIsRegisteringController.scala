@@ -7,6 +7,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
 import models.status._
+import play.api.mvc.{Action, AnyContent, Result}
 import services.AuthEnrolmentsService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -23,7 +24,7 @@ trait WhoIsRegisteringController extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchAll map {
+      dataCacheConnector.fetchAll flatMap {
         optionalCache =>
           (for {
             cache <- optionalCache
@@ -31,9 +32,23 @@ trait WhoIsRegisteringController extends BaseController {
           } yield {
             (for {
               whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
-            } yield Ok(who_is_registering(Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople)))
-              .getOrElse(Ok(who_is_registering(EmptyForm, responsiblePeople)))
-          }) getOrElse Ok(who_is_registering(EmptyForm, Seq.empty))
+            } yield {
+              isAmendment map {
+                case true => Ok(who_is_registering(Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople))
+                case false => Ok(who_is_registering(Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople))
+              }
+            }) getOrElse {
+              isAmendment map {
+                case true => Ok(who_is_registering(EmptyForm, responsiblePeople))
+                case false => Ok(who_is_registering(EmptyForm, responsiblePeople))
+              }
+            }
+          }) getOrElse {
+            isAmendment map {
+              case true => Ok(who_is_registering(EmptyForm, Seq.empty))
+              case false => Ok(who_is_registering(EmptyForm, Seq.empty))
+            }
+          }
       }
   }
 
@@ -96,17 +111,22 @@ trait WhoIsRegisteringController extends BaseController {
     }
   }
 
-  private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext) = {
+  private def isAmendment(implicit hc: HeaderCarrier, auth: AuthContext) = {
     getAMLSRegNo flatMap {
       case Some(amlsRegNo) => etmpStatus(amlsRegNo)(hc, auth) flatMap {
         case SubmissionReadyForReview =>
-          Future.successful(Redirect(routes.DeclarationController.getWithAmendment()))
-        case _ => Future.successful(Redirect(routes.DeclarationController.get()))
+          Future.successful(true)
+        case _ => Future.successful(false)
       }
-      case None => Future.successful(Redirect(routes.DeclarationController.get()))
+      case None => Future.successful(false)
     }
   }
 
+  private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] = isAmendment map {
+    case true => Redirect(routes.DeclarationController.getWithAmendment())
+    case false => Redirect(routes.DeclarationController.get())
+  }
+  
   private def getAMLSRegNo(implicit hc: HeaderCarrier, auth: AuthContext): Future[Option[String]] =
     authEnrolmentsService.amlsRegistrationNumber
 
