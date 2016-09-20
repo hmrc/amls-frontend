@@ -15,14 +15,13 @@ trait SummaryController extends BaseController {
   def get(complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetch[Seq[BankDetails]](BankDetails.key) map {
-        case Some(data) => Ok(views.html.bankdetails.summary(data, complete, noBankAccount(data)))
+        case Some(data) => Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(data)))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
-  private def noBankAccount(bankDetails: Seq[BankDetails]): Boolean = {
-    val data = bankDetails.filter(x => x.bankAccount.isDefined)
-    data.isEmpty
+  private def hasBankAccount(bankDetails: Seq[BankDetails]): Boolean = {
+    bankDetails.exists(_.bankAccount.isDefined)
   }
 }
 

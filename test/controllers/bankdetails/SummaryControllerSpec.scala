@@ -27,11 +27,6 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
   "Get" must {
 
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
-
     "load the summary page when section data is available" in new Fixture {
 
       val model = BankDetails(None, None)
