@@ -46,7 +46,8 @@ object BankDetails {
       _.filterNot(_ == BankDetails()) match {
         case Nil => notStarted
         case model if model.isEmpty => Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
-        case model if model forall { _.isComplete } => Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
+        case model if model forall { _.isComplete } => Section(messageKey, Completed, anyChanged(model),
+          controllers.bankdetails.routes.SummaryController.get(true))
         case model =>
           val index = model.indexWhere {
             case model if !model.isComplete => true
