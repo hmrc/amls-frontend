@@ -34,15 +34,25 @@ case class BusinessMatching(
     this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
   }
 
+  def msbComplete(activities: BusinessActivities): Boolean = {
+    if(activities.businessActivities.contains(MoneyServiceBusiness)) {
+      this.msbServices.isDefined && this.msbServices.fold(false)(x => x.services.contains(TransmittingMoney) match {
+        case true => this.businessAppliedForPSRNumber.isDefined
+        case false => true
+      })
+    } else {
+      true
+    }
+  }
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(_), _,Some(_), _, _, _)
+      case BusinessMatching(Some(x), Some(activity), _,Some(_), _, _, _)
         if x.businessType.fold(false) {
           _ == UnincorporatedBody
-        } => true
-      case BusinessMatching(Some(x), _,Some(_), _, Some(_), _, _)
-        if x.businessType.fold(false) { y => y == LimitedCompany || y == LPrLLP } => true
-      case BusinessMatching(Some(_),Some(_),_, None, None, _, _) => true
+        } && msbComplete(activity) => true
+      case BusinessMatching(Some(x), Some(activity), _, _, Some(_), _, _)
+        if x.businessType.fold(false) { y => y == LimitedCompany || y == LPrLLP } && msbComplete(activity) => true
+      case BusinessMatching(Some(_),Some(activity),_, None, None, _, _)  if msbComplete(activity) => true
       case _ => false
     }
 }

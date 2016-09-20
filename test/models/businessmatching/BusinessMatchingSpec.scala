@@ -24,6 +24,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
       )
     )
     val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+    val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
     val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB"))
     val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0001234567890")
     val TypeOfBusinessModel = TypeOfBusiness("test")
@@ -130,6 +131,34 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
           val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0001234567890")
           businessMatching.copy(typeOfBusiness = None, reviewDetails = Some(ReviewDetailsModel)).isComplete mustBe true
         }
+
+        "business activity selected as MSB and msb services model is defined" in {
+
+          val businessMatching = BusinessMatching(
+            Some(ReviewDetailsModel),
+            Some(BusinessActivitiesModel),
+            Some(msbServices),
+            Some(TypeOfBusinessModel),
+            Some(CompanyRegistrationNumberModel),
+            Some(BusinessAppliedForPSRNumberModel),
+            hasChanged = false)
+
+          businessMatching.isComplete must be (true)
+        }
+
+        "business activity selected as option other then MSB" in {
+
+          val businessMatching = BusinessMatching(
+            Some(ReviewDetailsModel),
+            Some(BusinessActivitiesWithouMSB),
+            None,
+            Some(TypeOfBusinessModel),
+            Some(CompanyRegistrationNumberModel),
+            None,
+            hasChanged = false)
+
+          businessMatching.isComplete must be (true)
+        }
       }
 
       "equal false" when {
@@ -159,8 +188,35 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar {
           )
           testModel.isComplete mustBe false
         }
-      }
 
+        "business activity selected as MSB and msb services model is not defined" in {
+
+          val businessMatching = BusinessMatching(
+            Some(ReviewDetailsModel),
+            Some(BusinessActivitiesModel),
+            None,
+            Some(TypeOfBusinessModel),
+            Some(CompanyRegistrationNumberModel),
+            Some(BusinessAppliedForPSRNumberModel),
+            hasChanged = false)
+
+          businessMatching.isComplete must be (false)
+        }
+
+        "business activity selected as MSB and msb services model is defined and psr is not defined" in {
+
+          val businessMatching = BusinessMatching(
+            Some(ReviewDetailsModel),
+            Some(BusinessActivitiesModel),
+            Some(msbServices),
+            Some(TypeOfBusinessModel),
+            Some(CompanyRegistrationNumberModel),
+            None,
+            hasChanged = false)
+
+          businessMatching.isComplete must be (false)
+        }
+      }
     }
 
     "section" must {
