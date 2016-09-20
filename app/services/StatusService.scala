@@ -35,7 +35,9 @@ trait StatusService {
 
     progressService.sections map {
       sections =>
-        if (isComplete(sections)) SubmissionReady
+        if (isComplete(sections)) {
+          SubmissionReady
+        }
         else NotCompleted
     }
   }
