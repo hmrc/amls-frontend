@@ -1,10 +1,12 @@
 package controllers
 
+import connectors.AmlsConnector
 import models.SubscriptionResponse
+import models.status.{SubmissionReady, SubmissionReadyForReview}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsString
 import play.api.test.Helpers._
-import services.SubmissionService
+import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HttpResponse
 import utils.AuthorisedFixture
@@ -13,13 +15,14 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class SubscriptionControllerSpec extends PlaySpec with OneAppPerSuite {
+class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
 
   trait Fixture extends AuthorisedFixture {
     self =>
-    val controller = new SubscriptionController {
+    val controller = new SubmissionController {
       override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
       override protected def authConnector: AuthConnector = self.authConnector
+      override private[controllers] val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -33,13 +36,29 @@ class SubscriptionControllerSpec extends PlaySpec with OneAppPerSuite {
     paymentReference = ""
   )
 
-  "SubscriptionController" must {
+  "SubmissionController" must {
 
-    "post must return the response from the service correctly" in new Fixture {
+    "post must return the response from the service correctly when Submission Ready" in new Fixture {
 
       when {
         controller.subscriptionService.subscribe(any(), any(), any())
       } thenReturn Future.successful(response)
+
+      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReady))
+
+      val result = controller.post()(request)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+    }
+
+    "post must return the response from the service correctly when Submission Ready for review" in new Fixture {
+
+      when {
+        controller.subscriptionService.update(any(), any(), any())
+      } thenReturn Future.successful(response)
+
+      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       val result = controller.post()(request)
 

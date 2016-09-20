@@ -70,8 +70,9 @@ trait LandingController extends BaseController {
   }
 
   private def refreshAndRedirect(amlsRegistrationNumber :String)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-    landingService.refreshCache(amlsRegistrationNumber)
-    Redirect(controllers.routes.StatusController.get())
+    landingService.refreshCache(amlsRegistrationNumber) map {
+      cache =>  Redirect(controllers.routes.StatusController.get())
+    }
   }
 
   private def dataHasChanged(cacheMap : CacheMap) = {
@@ -95,13 +96,13 @@ trait LandingController extends BaseController {
 
   def getWithAmendments(implicit authContext: AuthContext, request : Request[_]) = {
     enrolmentsService.amlsRegistrationNumber flatMap  {
-      case Some(amlsRegistrationNumber) => landingService.cacheMap.map { //enrolment exists
+      case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap { //enrolment exists
           case Some(cacheMap) => {
             //there is data in S4l
             if (dataHasChanged(cacheMap)) {
               cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
                 case Some(_) => refreshAndRedirect(amlsRegistrationNumber)
-                case _ => Redirect(controllers.routes.StatusController.get())
+                case _ => Future.successful(Redirect(controllers.routes.StatusController.get()))
               }
             } else { //DataHasNotChanged
               refreshAndRedirect(amlsRegistrationNumber)

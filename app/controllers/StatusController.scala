@@ -9,7 +9,7 @@ import models.registrationprogress.{Completed, Section}
 import scala.concurrent.Future
 import views.html.status.status
 import models.status.{CompletionStateViewModel, _}
-import services.{AuthEnrolmentsService, LandingService, ProgressService, SubmissionService}
+import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -19,45 +19,15 @@ trait StatusController extends BaseController {
 
   private[controllers] def landingService: LandingService
 
-  private[controllers] def desConnector: AmlsConnector
-
-  private[controllers] def progressService: ProgressService
+  private[controllers] def statusService: StatusService
 
   private[controllers] def enrolmentsService: AuthEnrolmentsService
 
-  private def isComplete(seq: Seq[Section]): Boolean =
-    seq forall {
-      _.status == Completed
-    }
-
-  private def notYetSubmitted(implicit hc: HeaderCarrier, auth: AuthContext) = {
-    progressService.sections map {
-      sections =>
-        if (isComplete(sections)) SubmissionReady
-        else NotCompleted
-    }
-  }
-
-
-  private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext): Future[SubmissionStatus] = {
-    {
-      desConnector.status(amlsRefNumber) map {
-        response => response.formBundleStatus match {
-          case "Pending" => SubmissionReadyForReview
-          case "Approved" => SubmissionDecisionApproved
-          case "Rejected" => SubmissionDecisionRejected
-        }
-      }
-
-    }
-  }
 
   def get() = StatusToggle {
     Authorised.async {
       implicit authContext =>
         implicit request =>
-          val amlsRef = enrolmentsService.amlsRegistrationNumber
-
           val businessName = landingService.cacheMap map {
             cacheOption => cacheOption match {
               case Some(cache) => {
@@ -69,25 +39,11 @@ trait StatusController extends BaseController {
               case None => None
             }
           }
-
-          {
-            for {
-              amlsRefOption <- amlsRef
-              businessNameOption <- businessName
-            } yield {
-              amlsRefOption match {
-                case Some(mlrRegNumber) =>
-                  etmpStatus(mlrRegNumber)(hc, authContext) map {
-                    foundStatus =>
-                      Ok(status(mlrRegNumber, businessNameOption, CompletionStateViewModel(foundStatus)))
-                  }
-                case None => notYetSubmitted(hc, authContext) map {
-                  foundStatus =>
-                    Ok(status("Not Found", businessNameOption, CompletionStateViewModel(foundStatus)))
-                }
-              }
-            }
-          }.flatMap(identity)
+          for {
+            mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
+            submissionStatus <- statusService.getStatus
+            businessNameOption <- businessName
+          } yield Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus)))
 
     }
   }
@@ -96,11 +52,11 @@ trait StatusController extends BaseController {
 object StatusController extends StatusController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService: LandingService = LandingService
-  override private[controllers] val desConnector: AmlsConnector = AmlsConnector
+  override private[controllers] val statusService: StatusService = StatusService
   override protected val authConnector = AMLSAuthConnector
-  override private[controllers] val progressService = ProgressService
-  override private[controllers] val enrolmentsService = AuthEnrolmentsService
+  override private[controllers] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
   // $COVERAGE-ON$
+
 }
 
 
