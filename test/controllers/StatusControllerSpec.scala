@@ -274,5 +274,53 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
     }
   }
 
+  "show the correct content to edit submission" when {
+    "application has not yet been submitted" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+      val cacheMap = mock[CacheMap]
+      when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+
+      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
+        Some(BusinessMatching(Some(reviewDtls), None)))
+
+      when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+
+      document.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
+      document.getElementsByClass("statusblock").first().html() must include(Messages("status.submissionready.changelink1"))
+
+    }
+
+    "application is in review" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+      val cacheMap = mock[CacheMap]
+      when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+
+      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
+        Some(BusinessMatching(Some(reviewDtls), None)))
+
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("XAML00000567890")))
+      val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+      when(controller.desConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+
+      document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
+      document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
+
+    }
+  }
 
 }
