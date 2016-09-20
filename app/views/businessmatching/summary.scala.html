@@ -95,10 +95,10 @@
         @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
             @model.msbServices.map { services =>
                 <!-- original table-based solution -->
-                <table class="summary">
+                <table class="table--spaced-top">
                     <tr>
                         <th>@Messages("businessmatching.services.heading")</th>
-                        <td class="edit" width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">@Messages("button.edit")</a></td>
+                        <td width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     @services.services.map { svc =>
                     <tr>
@@ -117,10 +117,10 @@
 
                 @if(services.services.contains(TransmittingMoney)) {
                     @model.businessAppliedForPSRNumber.map { psr =>
-                        <table class="summary">
+                        <table class="table--spaced-top">
                             <tr>
                                 <th>@Messages("businessmatching.psr.number.title")</th>
-                                <td class="edit" width="12"><a href="@controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true)">@Messages("button.edit")</a></td>
+                                <td width="12"><a href="@controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true)">@Messages("button.edit")</a></td>
                             </tr>
                             <tr>
                                 <td colspan="2">
