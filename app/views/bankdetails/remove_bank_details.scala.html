@@ -19,11 +19,6 @@
         </div>
         <br>
         <br>
-        <!--<div class="form-field">
-            <a class="button" role="button" href="@controllers.bankdetails.routes.RemoveBankDetailsController.remove(index, complete)">
-                @Messages("bankdetails.remove.bank.account.btn")
-            </a>
-        </div>-->
-    @submit(false)
+        @submit(false, Some(Messages("bankdetails.remove.bank.account.btn")))
     }
 }
