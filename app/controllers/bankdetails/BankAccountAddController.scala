@@ -4,11 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.bankdetails.BankDetails
-import models.estateagentbusiness.EstateAgentBusiness
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-
-import scala.concurrent.Future
 
 trait BankAccountAddController extends RepeatingSection with BaseController {
   def get(displayGuidance : Boolean = true) = Authorised.async {

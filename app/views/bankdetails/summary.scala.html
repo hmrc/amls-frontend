@@ -83,7 +83,7 @@
                     }
                 }
                 <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
-                    <td class="numeric"><a href="@controllers.bankdetails.routes.SummaryController.remove(y+1, complete)">@Messages("button.remove")</a></td>
+                    <td class="numeric"><a href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, bankAccount.accountName, complete)">@Messages("button.remove")</a></td>
 
                 </tr>
 
