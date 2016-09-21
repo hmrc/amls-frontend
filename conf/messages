@@ -371,7 +371,7 @@ status.submissiondecisionapproved.description2 = Your business is now registered
 status.submissiondecisionrejected.heading = Application rejected
 status.submissiondecisionrejected.description = Your application has been rejected.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
-
+status.amendment.edit = update your information
 
 ############################### Progress page ###############################
 progress.title = Application progress – Anti-money laundering supervision - GOV.UK
