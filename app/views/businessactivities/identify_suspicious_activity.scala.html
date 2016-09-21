@@ -4,6 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("businessactivities.identify-suspicious-activity.heading", "summary.businessactivities")
 }
 
