@@ -1,14 +1,14 @@
 package controllers.declaration
 
 import config.AMLSAuthConnector
-import connectors.{DESConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
 import models.status._
-import play.api.mvc.{Action, AnyContent, Result}
-import services.AuthEnrolmentsService
+import play.api.mvc.{Action, AnyContent, Request, Result}
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -18,9 +18,9 @@ import scala.concurrent.Future
 
 trait WhoIsRegisteringController extends BaseController {
 
-  private[controllers] def desConnector: DESConnector
+  private[controllers] def amlsConnector: AmlsConnector
   def dataCacheConnector: DataCacheConnector
-  def authEnrolmentsService: AuthEnrolmentsService
+  def statusService: StatusService
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -32,23 +32,9 @@ trait WhoIsRegisteringController extends BaseController {
           } yield {
             (for {
               whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
-            } yield {
-              isAmendment map {
-                case true => Ok(who_is_registering(Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople))
-                case false => Ok(who_is_registering(Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople))
-              }
-            }) getOrElse {
-              isAmendment map {
-                case true => Ok(who_is_registering(EmptyForm, responsiblePeople))
-                case false => Ok(who_is_registering(EmptyForm, responsiblePeople))
-              }
-            }
-          }) getOrElse {
-            isAmendment map {
-              case true => Ok(who_is_registering(EmptyForm, Seq.empty))
-              case false => Ok(who_is_registering(EmptyForm, Seq.empty))
-            }
-          }
+            } yield whoIsRegisteringView(Ok, Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople))
+              .getOrElse(whoIsRegisteringView(Ok, EmptyForm, responsiblePeople))
+          }) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
 
@@ -78,13 +64,13 @@ trait WhoIsRegisteringController extends BaseController {
     }
   }
 
-  def post = Authorised.async {
+  def post: Action[AnyContent] = Authorised.async {
     implicit authContext => implicit request => {
       Form2[WhoIsRegistering](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-            case Some(data) => BadRequest(who_is_registering(f, data))
-            case None => BadRequest(who_is_registering(f, Seq.empty))
+          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
+            case Some(data) => whoIsRegisteringView(BadRequest, f, data)
+            case None => whoIsRegisteringView(BadRequest, f, Seq.empty)
           }
         case ValidForm(_, data) =>
           dataCacheConnector.fetchAll flatMap {
@@ -111,42 +97,25 @@ trait WhoIsRegisteringController extends BaseController {
     }
   }
 
-  private def isAmendment(implicit hc: HeaderCarrier, auth: AuthContext) = {
-    getAMLSRegNo flatMap {
-      case Some(amlsRegNo) => etmpStatus(amlsRegNo)(hc, auth) flatMap {
-        case SubmissionReadyForReview =>
-          Future.successful(true)
-        case _ => Future.successful(false)
-      }
-      case None => Future.successful(false)
+  private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePeople])
+                                  (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview => status(who_is_registering("submit.amendment.application", form, rp))
+      case _ => status(who_is_registering("submit.registration", form, rp))
     }
-  }
 
-  private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] = isAmendment map {
-    case true => Redirect(routes.DeclarationController.getWithAmendment())
-    case false => Redirect(routes.DeclarationController.get())
-  }
-  
-  private def getAMLSRegNo(implicit hc: HeaderCarrier, auth: AuthContext): Future[Option[String]] =
-    authEnrolmentsService.amlsRegistrationNumber
-
-  private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext): Future[SubmissionStatus] = {
-    desConnector.status(amlsRefNumber) map {
-      response => response.formBundleStatus match {
-        case "Pending" => SubmissionReadyForReview
-        case "Approved" => SubmissionDecisionApproved
-        case "Rejected" => SubmissionDecisionRejected
-        case _ => NotCompleted
-      }
+  private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
+      case _ => Redirect(routes.DeclarationController.get())
     }
-  }
 
 }
 
 object WhoIsRegisteringController extends WhoIsRegisteringController {
   // $COVERAGE-OFF$
-  override private[controllers] val desConnector: DESConnector = DESConnector
+  override private[controllers] val amlsConnector: AmlsConnector = AmlsConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val authEnrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
+  override val statusService: StatusService = StatusService
 }

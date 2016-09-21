@@ -11,7 +11,7 @@ trait DeclarationController extends BaseController {
   def dataCacheConnector: DataCacheConnector
 
   def get() = declarationView(("declaration.declaration.title","submit.registration"))
-  def getWithAmendment() = declarationView("declaration.declaration.amendment.title","submit.amendment.registration")
+  def getWithAmendment() = declarationView(("declaration.declaration.amendment.title","submit.amendment.application"))
 
   private def declarationView(headings: (String,String)) = Authorised.async {
     implicit authcontext => implicit request =>

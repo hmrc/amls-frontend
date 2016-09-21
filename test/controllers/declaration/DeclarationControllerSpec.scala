@@ -86,7 +86,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       contentAsString(result) must include(addPerson.firstName)
       contentAsString(result) must include(addPerson.middleName mkString)
       contentAsString(result) must include(addPerson.lastName)
-      contentAsString(result) must include(Messages("submit.amendment.registration"))
+      contentAsString(result) must include(Messages("submit.amendment.application"))
     }
 
     "report error if retrieval of amlsRegNo fails" in new Fixture {

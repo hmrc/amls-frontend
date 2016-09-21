@@ -1,9 +1,10 @@
 package controllers.declaration
 
-import connectors.{DESConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
 import models.declaration.{AddPerson, WhoIsRegistering}
 import models.responsiblepeople._
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -12,7 +13,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.AuthEnrolmentsService
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -27,8 +28,8 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
     val controller = new  WhoIsRegisteringController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
-      override val desConnector = mock[DESConnector]
-      override val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override val amlsConnector = mock[AmlsConnector]
+      override val statusService: StatusService = mock[StatusService]
     }
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
@@ -49,23 +50,55 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
     "Get Option:" must {
 
-      "load the who is registering page" in new Fixture {
+      "load the who is registering page" when {
+        "status is pending" in new Fixture {
 
-        val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[CacheMap]
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
-        when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
-          .thenReturn(None)
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
-        val result = controller.get()(request)
-        status(result) must be(OK)
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(rp)))
 
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("declaration.who.is.registering.title")
-        htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+          when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val htmlValue = Jsoup.parse(contentAsString(result))
+          htmlValue.title mustBe Messages("declaration.who.is.registering.title")
+          htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+          contentAsString(result) must include(Messages("submit.amendment.application"))
+        }
+        "status is pre-submission" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(rp)))
+
+          when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
+            .thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          val htmlValue = Jsoup.parse(contentAsString(result))
+          htmlValue.title mustBe Messages("declaration.who.is.registering.title")
+          htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+          contentAsString(result) must include(Messages("submit.registration"))
+        }
       }
 
       "load WhoIsRegistering page with pre-populated data from save4later" in new Fixture {
@@ -76,7 +109,12 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          .thenReturn(Some(Seq(rp)))
+
         when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
           .thenReturn(whoIsRegistering)
 
@@ -95,7 +133,12 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          .thenReturn(Some(Seq(rp)))
+        
         when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
           .thenReturn(whoIsRegistering)
 
@@ -137,11 +180,8 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
         when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
-        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some("")))
-
-        when(controller.desConnector.status(any())(any(),any(),any(),any()))
-          .thenReturn(Future.successful(notCompletedReadStatusResponse))
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(NotCompleted))
 
         val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
 
@@ -163,64 +203,66 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
       "on post invalid data show error" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = request.withFormUrlEncodedBody()
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq.empty)))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq.empty)))
 
-        when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
-        val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("declaration.who.is.registering.text"))
+          when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("declaration.who.is.registering.text"))
+          contentAsString(result) must include(Messages("submit.registration"))
+
+        }
+
+      "redirect to the declaration page" when {
+        "status is pending" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
+        }
+        "status is pre-submission" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+        }
       }
-
-      "redirect to the declaration page for amendments if status of amlsRegNo is pending" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
-        val mockCacheMap = mock[CacheMap]
-
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-
-        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some("")))
-
-        when(controller.desConnector.status(any())(any(),any(),any(),any()))
-          .thenReturn(Future.successful(pendingReadStatusResponse))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
-      }
-      "redirect to the declaration page if amlsRegNo is None" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
-        val mockCacheMap = mock[CacheMap]
-
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-
-        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
-      }
-
     }
   }
 }
