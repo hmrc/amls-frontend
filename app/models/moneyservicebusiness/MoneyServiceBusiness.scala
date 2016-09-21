@@ -1,18 +1,18 @@
 package models.moneyservicebusiness
 
+import models.businessmatching.{CurrencyExchange, TransmittingMoney, BusinessMatching}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.ControllerHelper
 
 case class MoneyServiceBusiness(
-                                 msbServices : Option[MsbServices] = None,
-                                 throughput : Option[ExpectedThroughput] = None,
+                                 throughput: Option[ExpectedThroughput] = None,
                                  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
                                  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
-                                 whichCurrencies : Option[WhichCurrencies] = None,
-                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+                                 whichCurrencies: Option[WhichCurrencies] = None,
                                  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
-                                 fundsTransfer : Option[FundsTransfer] = None,
+                                 fundsTransfer: Option[FundsTransfer] = None,
                                  branchesOrAgents: Option[BranchesOrAgents] = None,
                                  sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
                                  mostTransactions: Option[MostTransactions] = None,
@@ -20,9 +20,6 @@ case class MoneyServiceBusiness(
                                  ceTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None,
                                  hasChanged: Boolean = false
                                ) {
-
-  def msbServices(p: MsbServices): MoneyServiceBusiness =
-    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p))
 
   def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
     this.copy(throughput = Some(p), hasChanged = hasChanged || !this.throughput.contains(p))
@@ -42,9 +39,6 @@ case class MoneyServiceBusiness(
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
     this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p))
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): MoneyServiceBusiness =
-    this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
-
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
     this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p))
 
@@ -54,21 +48,19 @@ case class MoneyServiceBusiness(
   def mostTransactions(p: MostTransactions): MoneyServiceBusiness =
     this.copy(mostTransactions = Some(p), hasChanged = hasChanged || !this.mostTransactions.contains(p))
 
-   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
+  def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(transactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p))
 
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p))
 
   private def allComplete: Boolean =
-    this.msbServices.isDefined &&
     this.throughput.isDefined &&
-    this.branchesOrAgents.isDefined &&
-    this.identifyLinkedTransactions.isDefined
+      this.branchesOrAgents.isDefined &&
+      this.identifyLinkedTransactions.isDefined
 
-  private def mtComplete: Boolean =
-    if (this.msbServices.exists(_.services contains TransmittingMoney)) {
-      this.businessAppliedForPSRNumber.isDefined &&
+  private def mtComplete(mtFlag: Boolean): Boolean =
+    if (mtFlag) {
         this.businessUseAnIPSP.isDefined &&
         this.fundsTransfer.isDefined &&
         this.transactionsInNext12Months.isDefined &&
@@ -84,16 +76,16 @@ case class MoneyServiceBusiness(
       true
     }
 
-  private def ceComplete: Boolean =
-    if (this.msbServices.exists(_.services contains CurrencyExchange)) {
+  private def ceComplete(ceFlag: Boolean): Boolean =
+    if (ceFlag) {
       this.ceTransactionsInNext12Months.isDefined &&
-      this.whichCurrencies.isDefined
+        this.whichCurrencies.isDefined
     } else {
       true
     }
 
-  def isComplete: Boolean =
-    allComplete && mtComplete && ceComplete
+  def isComplete(mtFlag: Boolean, ceFlag: Boolean): Boolean =
+    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag)
 }
 
 object MoneyServiceBusiness {
@@ -103,9 +95,11 @@ object MoneyServiceBusiness {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = key
     val notStarted = Section(messageKey, NotStarted, false, controllers.msb.routes.WhatYouNeedController.get())
+
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
+        val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
+        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange))) {
           Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get())
@@ -117,12 +111,10 @@ object MoneyServiceBusiness {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
-      (__ \ "msbServices").readNullable[MsbServices] and
-        (__ \ "throughput").readNullable[ExpectedThroughput] and
+      (__ \ "throughput").readNullable[ExpectedThroughput] and
         (__ \ "businessUseAnIPSP").readNullable[BusinessUseAnIPSP] and
         (__ \ "identifyLinkedTransactions").readNullable[IdentifyLinkedTransactions] and
         (__ \ "whichCurrencies").readNullable[WhichCurrencies] and
-        (__ \ "businessAppliedForPSRNumber").readNullable[BusinessAppliedForPSRNumber] and
         (__ \ "sendMoneyToOtherCountry").readNullable[SendMoneyToOtherCountry] and
         (__ \ "fundsTransfer").readNullable[FundsTransfer] and
         (__ \ "branchesOrAgents").readNullable[BranchesOrAgents] and
@@ -130,13 +122,15 @@ object MoneyServiceBusiness {
         (__ \ "mostTransactions").readNullable[MostTransactions] and
         (__ \ "transactionsInNext12Months").readNullable[TransactionsInNext12Months] and
         (__ \ "ceTransactionsInNext12Months").readNullable[CETransactionsInNext12Months] and
-        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
+        (__ \ "hasChanged").readNullable[Boolean].map {
+          _.getOrElse(false)
+        }
       ) apply MoneyServiceBusiness.apply _
   }
 
   implicit val writes: Writes[MoneyServiceBusiness] = Json.writes[MoneyServiceBusiness]
 
-  implicit def default(value : Option[MoneyServiceBusiness]) :  MoneyServiceBusiness = {
+  implicit def default(value: Option[MoneyServiceBusiness]): MoneyServiceBusiness = {
     value.getOrElse(MoneyServiceBusiness())
   }
 }
