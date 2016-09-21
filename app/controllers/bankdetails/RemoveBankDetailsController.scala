@@ -15,13 +15,11 @@ trait RemoveBankDetailsController extends RepeatingSection with BaseController {
 
   def get(index: Int, accountName: String, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      println("----------------------"+index+"--------------------"+complete)
       Future.successful(Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, accountName, complete)))
   }
 
   def remove(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      println("--------------remove--------"+index+"--------------------"+complete)
       removeDataStrict[BankDetails](index) map { _ =>
         Redirect(routes.SummaryController.get(complete))
       }
