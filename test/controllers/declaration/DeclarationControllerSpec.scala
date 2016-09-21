@@ -28,7 +28,6 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     }
 
     val mockCacheMap = mock[CacheMap]
-
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
       amlsRefNo = "",
@@ -38,12 +37,9 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       totalFees = 0,
       paymentReference = ""
     )
-
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
-
     val addPerson = AddPerson("John", Some("Envy"), "Doe", InternalAccountant)
-
   }
 
   "Declaration get" must {
@@ -60,6 +56,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
+
       redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
     }
 
@@ -70,6 +67,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
+
       contentAsString(result) must include(addPerson.firstName)
       contentAsString(result) must include(addPerson.middleName mkString)
       contentAsString(result) must include(addPerson.lastName)
@@ -83,6 +81,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       val result = declarationController.getWithAmendment()(request)
       status(result) must be(OK)
+
       contentAsString(result) must include(addPerson.firstName)
       contentAsString(result) must include(addPerson.middleName mkString)
       contentAsString(result) must include(addPerson.lastName)
@@ -96,6 +95,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       val result = declarationController.get()(request)
       status(result) must be(OK)
+
       contentAsString(result) must include(addPerson.firstName)
       contentAsString(result) must include(addPerson.middleName mkString)
       contentAsString(result) must include(addPerson.lastName)

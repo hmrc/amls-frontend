@@ -13,25 +13,25 @@
     heading = header
 ) {
 
-    <div class="form-group">
-        <span class="icon-important"></span>
-        <span class="notice">@Messages("declaration.declaration.fullname") @name</span>
+    <div class="notice spacelarge">
+        <i class="icon icon-important">
+            <span class="visuallyhidden">Warning</span>
+        </i>
+        <strong class="bold-small">@Messages("declaration.declaration.fullname") @name</strong>
     </div>
 
-    <div class="form-group">
+    <p>
         <p>@Messages("declaration.declaration.declare")</p>
-    </div>
+    </p>
 
-    <div class="form-group">
         <ul class="list list-bullet">
-            <l>@Messages("declaration.declaration.correctinformation")</li>
+            <li>@Messages("declaration.declaration.correctinformation")</li>
             <li>@Messages("declaration.declaration.tellhmrc")</li>
             <li>@Messages("declaration.declaration.noncompliance")</li>
             <li>@Messages("declaration.declaration.confirm")
                 <a href="">@Messages("declaration.declaration.guidance")</a>
             </li>
         </ul>
-    </div>
 
     @form(EmptyForm, controllers.routes.SubmissionController.post()) {
         <div class="form-group">
