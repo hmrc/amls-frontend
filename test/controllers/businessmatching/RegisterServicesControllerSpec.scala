@@ -128,6 +128,27 @@ class RegisterServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
+    "on post with valid data when option msb selected navigate to msb services page" in new Fixture {
+
+      val businessActivities = BusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
+      val bm = BusinessMatching(None, Some(businessActivities))
+
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "businessActivities[0]" -> "04",
+        "businessActivities[1]" -> "05")
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
+
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
+    }
+
 
     "fail submission when no check boxes were selected" in new Fixture {
 

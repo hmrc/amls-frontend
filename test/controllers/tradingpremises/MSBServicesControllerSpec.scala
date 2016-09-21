@@ -172,7 +172,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
     "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
-      Seq((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
+      Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
         case (model, id) =>
           val currentModel = TradingPremises(
             msbServices = Some(MsbServices(

@@ -4,7 +4,7 @@ GET         /assets/*file                                               controll
 
 GET         /                                                           controllers.LandingController.get()
 
-POST        /subscribe                                                  controllers.SubscriptionController.post()
+POST        /subscribe                                                  controllers.SubmissionController.post()
 
 GET         /unauthorised                                               controllers.AmlsController.unauthorised
 
@@ -104,7 +104,15 @@ POST        /business-matching/activities                               controll
 GET         /business-matching/registration-number                      controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
 POST        /business-matching/registration-number                      controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
 
+GET         /business-matching/services                                 controllers.businessmatching.ServicesController.get(edit: Boolean ?= false)
+POST        /business-matching/services                                 controllers.businessmatching.ServicesController.post(edit: Boolean ?= false)
+
+GET         /business-matching/psr-registration                         controllers.businessmatching.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
+POST        /business-matching/psr-registration                         controllers.businessmatching.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
+
 GET         /business-matching/check-your-answers                       controllers.businessmatching.SummaryController.get()
+
+GET         /business-matching/no-psr                                   controllers.businessmatching.CannotContinueWithTheApplicationController.get()
 
 GET         /bank-details/what-you-need/:index                          controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
@@ -264,8 +272,6 @@ POST        /supervision/penalised                                      controll
 GET         /supervision/check-your-answers                             controllers.supervision.SummaryController.get()
 
 GET         /money-service-business/what-you-need                       controllers.msb.WhatYouNeedController.get()
-GET         /money-service-business/services                            controllers.msb.ServicesController.get(edit: Boolean ?= false)
-POST        /money-service-business/services                            controllers.msb.ServicesController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/check-your-answers                  controllers.msb.SummaryController.get()
 
@@ -280,9 +286,6 @@ POST        /money-service-business/payment-service-provider            controll
 
 GET         /money-service-business/transactions                        controllers.msb.IdentifyLinkedTransactionsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transactions                        controllers.msb.IdentifyLinkedTransactionsController.post(edit: Boolean ?= false)
-
-GET         /money-service-business/psr-registration                    controllers.msb.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
-POST        /money-service-business/psr-registration                    controllers.msb.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/send-money                          controllers.msb.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
 POST        /money-service-business/send-money                          controllers.msb.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
