@@ -282,6 +282,9 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any()))
         .thenReturn(Future.successful(None))
 
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
       val result = controller.get()(request)
       status(result) must be(OK)
 
