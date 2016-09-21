@@ -42,7 +42,7 @@ class BusinessUseAnIPSPControllerSpec  extends PlaySpec with OneAppPerSuite {
     "on get display the Business Use An IPSP page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(None, None, Some(BusinessUseAnIPSPYes("test", "123456789123456"))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(None, Some(BusinessUseAnIPSPYes("test", "123456789123456"))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)

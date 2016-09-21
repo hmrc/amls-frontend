@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.moneyservicebusiness.{CurrencyExchange, TransmittingMoney, FundsTransfer, MoneyServiceBusiness}
+import models.moneyservicebusiness.{FundsTransfer, MoneyServiceBusiness}
 import views.html.msb._
 
 import scala.concurrent.Future

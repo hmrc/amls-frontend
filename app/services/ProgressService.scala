@@ -38,7 +38,7 @@ trait ProgressService {
         case HighValueDealing if ApplicationConfig.hvdToggle =>
           m + Hvd.section
         case MoneyServiceBusiness =>
-          m + Msb.section
+          bm.msbServices.fold(m)(x => m + Msb.section)
         case TrustAndCompanyServices =>
           m + Tcsp.section + Supervision.section
         case _ => m
