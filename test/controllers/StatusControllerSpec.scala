@@ -1,10 +1,9 @@
 package controllers
 
-import connectors.{DESConnector, DataCacheConnector}
-import models.{Country, ReadStatusResponse, SubscriptionResponse}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.registrationprogress.{Completed, NotStarted, Section}
+import models.status._
+import models.{Country, ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers
@@ -13,11 +12,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
-import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, LandingService, ProgressService}
+import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -29,9 +26,8 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
     val controller = new StatusController {
       override private[controllers] val landingService: LandingService = mock[LandingService]
       override val authConnector = self.authConnector
-      override private[controllers] val desConnector: DESConnector = mock[DESConnector]
-      override private[controllers] val progressService: ProgressService = mock[ProgressService]
       override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override private[controllers] val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -48,7 +44,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
         Some(BusinessMatching(Some(reviewDtls), None)))
 
-      when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", NotStarted, false, Call("", "")))))
+      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
       when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -76,8 +72,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(
         Some(BusinessMatching(Some(reviewDtls), None)))
       when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
-      when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", NotStarted, false, Call("", "")))))
-
+      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -102,7 +97,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
           Some(BusinessMatching(Some(reviewDtls), None)))
 
-        when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", NotStarted, false, Call("", "")))))
+        when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
 
 
         val result = controller.get()(request)
@@ -132,7 +127,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
           Some(BusinessMatching(Some(reviewDtls), None)))
         when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
-        when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+        when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -170,8 +165,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
 
-        when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-        when(controller.desConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
+        when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -212,8 +206,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
 
-        when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-        when(controller.desConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
+        when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -253,8 +246,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Rejected", None, None, None, false)
 
-        when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
-        when(controller.desConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
+        when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 
         val result = controller.get()(request)
         status(result) must be(OK)

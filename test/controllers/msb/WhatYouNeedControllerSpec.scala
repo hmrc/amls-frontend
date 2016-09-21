@@ -1,6 +1,5 @@
 package controllers.msb
 
-import config.AMLSAuthConnector
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -19,10 +18,6 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
   }
 
   "WhatYouNeedController" must {
-
-      "use correct services" in new Fixture {
-        WhatYouNeedController.authConnector must be(AMLSAuthConnector)
-      }
 
     "get" must {
 

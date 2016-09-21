@@ -8,13 +8,18 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,
                              activities: Option[BusinessActivities] = None,
+                             msbServices: Option[MsbServices] = None,
                              typeOfBusiness: Option[TypeOfBusiness] = None,
                              companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
+                             businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                              hasChanged: Boolean = false
                            ) {
 
   def activities(p: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p))
+
+  def msbServices(p: MsbServices): BusinessMatching =
+    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p))
 
   def reviewDetails(p: ReviewDetails): BusinessMatching =
     this.copy(reviewDetails = Some(p), hasChanged = hasChanged || !this.reviewDetails.contains(p))
@@ -25,13 +30,35 @@ case class BusinessMatching(
   def companyRegistrationNumber(p: CompanyRegistrationNumber): BusinessMatching =
     this.copy(companyRegistrationNumber = Some(p), hasChanged = hasChanged || !this.companyRegistrationNumber.contains(p))
 
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching = {
+    this.copy(businessAppliedForPSRNumber = Some(p), hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p))
+  }
+
+  def msbComplete(activities: BusinessActivities): Boolean = {
+    if (activities.businessActivities.contains(MoneyServiceBusiness)) {
+      this.msbServices.isDefined && this.msbServices.fold(false)(x => x.services.contains(TransmittingMoney) match {
+        case true => this.businessAppliedForPSRNumber.isDefined
+        case false => true
+      })
+    } else {
+      true
+    }
+  }
+
+  def isbusinessTypeComplete(businessType: Option[BusinessType]): Boolean = {
+    businessType.fold(true) {
+      case LimitedCompany | LPrLLP => this.companyRegistrationNumber.isDefined
+      case UnincorporatedBody => this.typeOfBusiness.isDefined
+      case _ => true
+    }
+  }
+
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(_), Some(_), _, _)
-        if x.businessType.fold(false) { _ == UnincorporatedBody } => true
-      case BusinessMatching(Some(x), Some(_), _, Some(_), _)
-        if x.businessType.fold(false) { y => y == LimitedCompany || y == LPrLLP } => true
-      case BusinessMatching(Some(_), Some(_), None, None, _) => true
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _)
+        if {
+          isbusinessTypeComplete(x.businessType) && msbComplete(activity)
+        } => true
       case _ => false
     }
 }
@@ -56,13 +83,15 @@ object BusinessMatching {
 
   val key = "business-matching"
 
-    implicit val reads: Reads[BusinessMatching] = (
-        __.read[Option[ReviewDetails]] and
-        __.read[Option[BusinessActivities]] and
-        __.read[Option[TypeOfBusiness]] and
-        __.read[Option[CompanyRegistrationNumber]] and
+  implicit val reads: Reads[BusinessMatching] = (
+    __.read[Option[ReviewDetails]] and
+      __.read[Option[BusinessActivities]] and
+      __.read[Option[MsbServices]] and
+      __.read[Option[TypeOfBusiness]] and
+      __.read[Option[CompanyRegistrationNumber]] and
+      __.read[Option[BusinessAppliedForPSRNumber]] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
-      ) (BusinessMatching.apply _)
+    ) (BusinessMatching.apply _)
 
   implicit val writes: Writes[BusinessMatching] =
     Writes[BusinessMatching] {
@@ -70,8 +99,10 @@ object BusinessMatching {
         Seq(
           Json.toJson(model.reviewDetails).asOpt[JsObject],
           Json.toJson(model.activities).asOpt[JsObject],
+          Json.toJson(model.msbServices).asOpt[JsObject],
           Json.toJson(model.typeOfBusiness).asOpt[JsObject],
-          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject]
+          Json.toJson(model.companyRegistrationNumber).asOpt[JsObject],
+          Json.toJson(model.businessAppliedForPSRNumber).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
         } + ("hasChanged" -> JsBoolean(model.hasChanged))

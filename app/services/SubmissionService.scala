@@ -1,7 +1,8 @@
 package services
 
 import config.ApplicationConfig
-import connectors.{DESConnector, DataCacheConnector, GovernmentGatewayConnector}
+import connectors.{AmlsConnector, DataCacheConnector, GovernmentGatewayConnector}
+import exceptions.NoEnrolmentException
 import models.asp.Asp
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -23,11 +24,15 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse, NotFoundException}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait SubscriptionService extends DataCacheService {
+trait SubmissionService extends DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
-  private[services] def desConnector: DESConnector
+
+  private[services] def amlsConnector: AmlsConnector
+
   private[services] def ggService: GovernmentGatewayService
+
+  private[services] def authEnrolmentsService: AuthEnrolmentsService
 
   private object Submission {
     val message = "confirmation.submission"
@@ -70,14 +75,14 @@ trait SubscriptionService extends DataCacheService {
       bt <- rd.businessType
     } yield bt
 
-  private def subscribe
-  (cache: CacheMap, safeId: String)
+  private def createSubscriptionRequest
+  (cache: CacheMap)
   (implicit
    ac: AuthContext,
    hc: HeaderCarrier,
    ec: ExecutionContext
-  ): Future[SubscriptionResponse] = {
-    val request = SubscriptionRequest(
+  ): SubscriptionRequest = {
+    SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
       tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
@@ -86,14 +91,13 @@ trait SubscriptionService extends DataCacheService {
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
       responsiblePeopleSection = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key),
-      tcspSection =  cache.getEntry[Tcsp](Tcsp.key),
+      tcspSection = cache.getEntry[Tcsp](Tcsp.key),
       aspSection = cache.getEntry[Asp](Asp.key),
       msbSection = cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key),
       hvdSection = cache.getEntry[Hvd](Hvd.key),
       supervisionSection = cache.getEntry[Supervision](Supervision.key)
     )
 
-    desConnector.subscribe(request, safeId)
   }
 
   def subscribe
@@ -105,12 +109,27 @@ trait SubscriptionService extends DataCacheService {
     for {
       cache <- getCache
       safeId <- safeId(cache)
-      subscription <- subscribe(cache, safeId)
+      subscription <- amlsConnector.subscribe(createSubscriptionRequest(cache), safeId)
       _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
       _ <- ggService.enrol(
         safeId = safeId,
         mlrRefNo = subscription.amlsRefNo
       )
+    } yield subscription
+  }
+
+  def update
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[SubscriptionResponse] = {
+    for {
+      cache <- getCache
+      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      subscription <- amlsConnector.update(createSubscriptionRequest(cache), regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")))
+      _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
+
     } yield subscription
   }
 
@@ -156,7 +175,7 @@ trait SubscriptionService extends DataCacheService {
     }
 }
 
-object SubscriptionService extends SubscriptionService {
+object SubmissionService extends SubmissionService {
 
   object MockGGService extends GovernmentGatewayService {
 
@@ -173,7 +192,8 @@ object SubscriptionService extends SubscriptionService {
   }
 
   override private[services] val cacheConnector = DataCacheConnector
-  override private[services] val desConnector = DESConnector
+  override private[services] val amlsConnector = AmlsConnector
+  override private[services] val authEnrolmentsService = AuthEnrolmentsService
   override private[services] val ggService = {
     if (ApplicationConfig.enrolmentToggle) {
       GovernmentGatewayService
