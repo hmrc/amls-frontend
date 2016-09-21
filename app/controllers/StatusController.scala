@@ -18,33 +18,27 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 trait StatusController extends BaseController {
 
   private[controllers] def landingService: LandingService
-
   private[controllers] def statusService: StatusService
-
   private[controllers] def enrolmentsService: AuthEnrolmentsService
-
 
   def get() = StatusToggle {
     Authorised.async {
       implicit authContext =>
         implicit request =>
           val businessName = landingService.cacheMap map {
-            cacheOption => cacheOption match {
-              case Some(cache) => {
-                val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
-                for {
-                  reviewDetails <- businessMatching.reviewDetails
-                } yield reviewDetails.businessName
-              }
-              case None => None
+            case Some(cache) => {
+              val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
+              for {
+                reviewDetails <- businessMatching.reviewDetails
+              } yield reviewDetails.businessName
             }
+            case None => None
           }
           for {
             mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
             submissionStatus <- statusService.getStatus
             businessNameOption <- businessName
           } yield Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus)))
-
     }
   }
 }

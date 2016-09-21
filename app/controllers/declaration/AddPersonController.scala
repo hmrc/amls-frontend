@@ -4,21 +4,26 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.declaration.AddPerson
+import models.declaration.{AddPerson, WhoIsRegistering}
+import models.status.SubmissionReadyForReview
+import play.api.mvc.{AnyContent, Request, Result}
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
 trait AddPersonController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  val statusService: StatusService
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[AddPerson](AddPerson.key) map {
+      dataCacheConnector.fetch[AddPerson](AddPerson.key) flatMap {
         case Some(addPerson) =>
-          Ok(views.html.declaration.add_person(Form2[AddPerson](addPerson)))
+          addPersonView(Ok,Form2[AddPerson](addPerson))
         case _ =>
-          Ok(views.html.declaration.add_person(EmptyForm))
+          addPersonView(Ok,EmptyForm)
       }
   }
 
@@ -27,14 +32,24 @@ trait AddPersonController extends BaseController {
     implicit authContext => implicit request => {
       Form2[AddPerson](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.declaration.add_person(f)))
+          addPersonView(BadRequest,f)
         case ValidForm(_, data) =>
-          for {
-            _ <- dataCacheConnector.save[AddPerson](AddPerson.key, data)
-          } yield Redirect(routes.DeclarationController.get())
+          dataCacheConnector.save[AddPerson](AddPerson.key, data) flatMap { _ =>
+            statusService.getStatus map {
+              case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
+              case _ => Redirect(routes.DeclarationController.get())
+            }
+          }
       }
     }
   }
+
+  private def addPersonView(status: Status, form: Form2[AddPerson])
+                                  (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview => status(views.html.declaration.add_person("submit.amendment.application", form))
+      case _ => status(views.html.declaration.add_person("submit.registration", form))
+    }
 
 }
 
@@ -42,4 +57,5 @@ object AddPersonController extends AddPersonController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
+  override val statusService: StatusService = StatusService
 }

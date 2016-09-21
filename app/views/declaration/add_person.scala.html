@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_])(implicit request: Request[_], lang: Lang)
+@(headingSecondary: String, f: Form2[_])(implicit request: Request[_], lang: Lang)
 
 @target = @{
     s"""${f("other").id}-fieldset"""
@@ -10,7 +10,7 @@
 
 @header = {
     @errorSummary(f)
-    @heading("declaration.addperson.title", "submit.registration")
+    @heading("declaration.addperson.title", headingSecondary)
 }
 
 @main(
