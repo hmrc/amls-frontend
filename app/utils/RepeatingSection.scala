@@ -1,5 +1,6 @@
 package utils
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader
 import connectors.DataCacheConnector
 import play.api.libs.json.Format
 import typeclasses.MongoKey
@@ -175,6 +176,21 @@ trait RepeatingSection {
     getData[T] map {
       data => {
         putData(data.patch(index - 1, Seq(fn(data(index - 1))), 1))
+      }
+    }
+
+  protected def removeDataStrict[T]
+  (index: Int)
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Future[_] =
+    getData[T] map {
+      data => {
+        putData(data.patch(index - 1, Nil, 1))
       }
     }
 

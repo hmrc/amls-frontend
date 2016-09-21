@@ -1,15 +1,17 @@
 package controllers.bankdetails
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.bankdetails._
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -20,7 +22,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     self =>
 
     val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
+      override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
   }
@@ -31,7 +33,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
       val model = BankDetails(None, None)
 
-      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
       val result = controller.get()(request)
 
@@ -39,7 +41,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     }
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
-      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -54,7 +56,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         Some(BankAccount("Account Name", UKAccount("12341234","121212")))
       )
 
-      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
       val result = controller.get()(request)
@@ -72,6 +74,8 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     }
 
     "remove bank account from summary" in new Fixture {
+
+      val emptyCache = CacheMap("", Map.empty)
 
       val accountType1 = PersonalAccount
       val bankAccount1 = BankAccount("My Account1", UKAccount("111111", "11-11-11"))
@@ -92,11 +96,17 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
       val bankAccounts = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
 
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(bankAccounts)))
 
-      val result = controller.remove(1)(request)
+      when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
+      val result = controller.remove(1)(request)
+      status(result) must be(SEE_OTHER)
+     // redirectLocation(result) must be ("dgdfdfgfd")
+
+      verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(), meq(Seq(completeModel2,completeModel3,completeModel4)))(any(), any(), any())
 
     }
 
@@ -104,7 +114,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       "no bank account is selected" in new Fixture {
         val model = BankDetails(None, None)
 
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(model))))
         val result = controller.get()(request)
         status(result) must be(OK)

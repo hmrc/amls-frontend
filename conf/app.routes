@@ -122,6 +122,8 @@ POST        /bank-details/account-details/:index                        controll
 
 GET         /bank-details/your-answers                                  controllers.bankdetails.SummaryController.get(complete: Boolean = true)
 GET         /bank-details/check-your-answers                            controllers.bankdetails.SummaryController.get(complete: Boolean = false)
+GET         /bank-details/your-answers/:index                           controllers.bankdetails.SummaryController.remove(index: Int, complete: Boolean = true)
+GET         /bank-details/check-your-answers/:index                     controllers.bankdetails.SummaryController.remove(index: Int, complete: Boolean = false)
 
 GET         /business-activities/what-you-need                          controllers.businessactivities.WhatYouNeedController.get()
 

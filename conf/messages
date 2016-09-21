@@ -280,6 +280,7 @@ button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Edit
+button.remove = Remove
 button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
