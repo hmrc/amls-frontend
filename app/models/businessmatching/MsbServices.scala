@@ -1,4 +1,4 @@
-package models.moneyservicebusiness
+package models.businessmatching
 
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
