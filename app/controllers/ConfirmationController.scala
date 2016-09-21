@@ -1,11 +1,11 @@
 package controllers
 
 import config.AMLSAuthConnector
-import services.SubscriptionService
+import services.SubmissionService
 
 trait ConfirmationController extends BaseController {
 
-  private[controllers] def subscriptionService: SubscriptionService
+  private[controllers] def subscriptionService: SubmissionService
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -19,5 +19,5 @@ trait ConfirmationController extends BaseController {
 object ConfirmationController extends ConfirmationController {
   // $COVERAGE-OFF$
   override protected val authConnector = AMLSAuthConnector
-  override private[controllers] val subscriptionService = SubscriptionService
+  override private[controllers] val subscriptionService = SubmissionService
 }

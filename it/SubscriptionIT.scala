@@ -1,4 +1,4 @@
-import connectors.DESConnector
+import connectors.AmlsConnector
 import models.SubscriptionRequest
 import models.estateagentbusiness._
 import org.scalatest.time.{Seconds, Span}

@@ -134,6 +134,8 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
       override val authConnector = self.authConnector
       override val enrolmentsService = mock[AuthEnrolmentsService]
     }
+
+    when(controller.landingService.refreshCache(any())(any(),any(),any())).thenReturn(Future.successful(mock[CacheMap]))
   }
 
   def setUpMocksForNoEnrolment(controller : LandingController) = {
@@ -247,7 +249,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
               status(result) must be (SEE_OTHER)
               redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
-              verify(controller.landingService, atLeastOnce()).refreshCache
+              verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
             }
           }
         }
@@ -263,7 +265,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
               status(result) must be (SEE_OTHER)
               redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
 
-              verify(controller.landingService).refreshCache
+              verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
             }
 
 
@@ -277,7 +279,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
               val result = controller.get()(request)
 
-              verify(controller.landingService, never()).refreshCache
+              verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
               status(result) must be (SEE_OTHER)
               redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
             }
@@ -293,7 +295,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
             status(result) must be (SEE_OTHER)
             redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
-            verify(controller.landingService, atLeastOnce()).refreshCache
+            verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
           }
         }
       }
@@ -307,7 +309,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
-          verify(controller.landingService, atLeastOnce()).refreshCache
+          verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
         }
       }
     }
@@ -320,7 +322,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
           val result = controller.get()(request)
 
-          verify(controller.landingService, never()).refreshCache
+          verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
         }

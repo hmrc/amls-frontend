@@ -40,7 +40,7 @@
         @model.throughput.map{ throughput =>
             <table class="summary">
                 <tr>
-                    <th>@Messages("msb.throughput.title")</th>
+                    <th>@Messages("msb.throughput.heading")</th>
                     <th class="edit" width="12"><a href="@controllers.msb.routes.ExpectedThroughputController.get(true)">Edit</a></th>
                 </tr>
 
@@ -92,7 +92,7 @@
         @model.identifyLinkedTransactions.map { ilt =>
             <table class="summary">
                 <tr>
-                    <th>@Messages("msb.linked.txn.title")</th>
+                    <th>@Messages("msb.linked.txn.heading")</th>
                     <th class="edit" width="12"><a href="@controllers.msb.routes.IdentifyLinkedTransactionsController.get(true)">Edit</a></th>
                 </tr>
                 <tr>
@@ -110,7 +110,7 @@
             @model.businessAppliedForPSRNumber.map { psr =>
                 <table class="summary">
                     <tr>
-                        <th>@Messages("msb.psr.number.title")</th>
+                        <th>@Messages("msb.psr.number.heading")</th>
                         <th class="edit" width="12"><a href="@controllers.msb.routes.BusinessAppliedForPSRNumberController.get(true)">Edit</a></th>
                     </tr>
                     <tr>
@@ -135,7 +135,7 @@
             @model.businessUseAnIPSP.map { ipsp =>
                 <table class="summary">
                     <tr>
-                        <th>@Messages("msb.ipsp.title")</th>
+                        <th>@Messages("msb.ipsp.heading")</th>
                         <th class="edit" width="12"><a href="@controllers.msb.routes.BusinessUseAnIPSPController.get(true)">Edit</a></th>
                     </tr>
                     @ipsp match {
@@ -187,7 +187,7 @@
             @model.transactionsInNext12Months.map{ trans =>
                 <table class="summary">
                     <tr>
-                        <th>@Messages("msb.transactions.expected.title")</th>
+                        <th>@Messages("msb.transactions.expected.heading")</th>
                         <th class="edit" width="12"><a href="@controllers.msb.routes.TransactionsInNext12MonthsController.get(true)">Edit</a></th>
                     </tr>
                     <tr>
@@ -201,7 +201,7 @@
             @model.sendMoneyToOtherCountry.map{ otherCountries =>
                 <table class="summary">
                     <tr>
-                        <th>@Messages("msb.send.money.title")</th>
+                        <th>@Messages("msb.send.money.heading")</th>
                         <th class="edit" width="12"><a href="@controllers.msb.routes.SendMoneyToOtherCountryController.get(true)">Edit</a></th>
                     </tr>
                     <tr>
@@ -218,7 +218,7 @@
                     @model.sendTheLargestAmountsOfMoney.map { lom =>
                         <table class="summary">
                             <tr>
-                                <th>@Messages("msb.send.the.largest.amounts.of.money.title")</th>
+                                <th>@Messages("msb.send.the.largest.amounts.of.money.heading")</th>
                                 <th class="edit" width="12"><a href="@controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true)">Edit</a></th>
                             </tr>
                             @lom.countryList.map { country =>
@@ -234,7 +234,7 @@
                     @model.mostTransactions.map { mt =>
                         <table class="summary">
                             <tr>
-                                <th>@Messages("msb.most.transactions.title")</th>
+                                <th>@Messages("msb.most.transactions.heading")</th>
                                 <th class="edit" width="12"><a href="@controllers.msb.routes.MostTransactionsController.get(true)">Edit</a></th>
                             </tr>
                             @mt.countries.map { country =>
@@ -254,7 +254,7 @@
             @model.ceTransactionsInNext12Months.map{ trans =>
                 <table class="summary">
                     <tr>
-                        <th>@Messages("msb.ce.transactions.expected.in.12.months.title")</th>
+                        <th>@Messages("msb.ce.transactions.expected.in.12.months.heading")</th>
                         <th class="edit" width="12"><a href="@controllers.msb.routes.CETransactionsInNext12MonthsController.get(true)">Edit</a></th>
                     </tr>
                     <tr>
@@ -268,7 +268,7 @@
             @model.whichCurrencies.map { wc =>
                 <table class="summary">
                     <tr>
-                        <th>@Messages("msb.which_currencies.title")</th>
+                        <th>@Messages("msb.which_currencies.heading")</th>
                         <th class="edit" width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">Edit</a></th>
                     </tr>
                     @wc.currencies.map { cur =>

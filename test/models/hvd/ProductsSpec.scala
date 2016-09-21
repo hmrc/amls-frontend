@@ -95,6 +95,24 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
         Json.fromJson[Products](json) must
           be(JsSuccess(Products(Set(Clothing, Jewellery, Alcohol, Caravans, Gold, Tobacco)), JsPath \ "products"))
       }
+      "successfully validate given all values" in {
+        val json =  Json.obj(
+          "products" -> Seq("01","02","03","04","05","06","07","08","09","10","11"))
+
+        Json.fromJson[Products](json) must
+          be(JsSuccess(Products(Set(
+            MobilePhones,
+            Clothing,
+            Jewellery,
+            ScrapMetals,
+            Alcohol,
+            Caravans,
+            Gold,
+            Tobacco,
+            Antiques,
+            Cars,
+            OtherMotorVehicles)), JsPath \ "products"))
+      }
 
       "successfully validate given values with option other details" in {
         val json =  Json.obj(

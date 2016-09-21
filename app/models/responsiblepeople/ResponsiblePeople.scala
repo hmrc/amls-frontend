@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import play.Logger
 import play.api.libs.json.Json
 import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
@@ -15,7 +16,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None,
                              hasAlreadyPassedFitAndProper: Option[Boolean] = None,
-                             hasChanged: Boolean = false
+                             hasChanged: Boolean = false,
+                             lineId: Option[Int] = None,
+                             status: Option[String] = None
                           ) {
 
   def personName(p: PersonName): ResponsiblePeople =
@@ -48,17 +51,20 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def hasAlreadyPassedFitAndProper(p: Boolean) : ResponsiblePeople =
     this.copy(hasAlreadyPassedFitAndProper = Some(p), hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.contains(p))
 
-  def isComplete: Boolean = this match {
-    case ResponsiblePeople(
+  def isComplete: Boolean = {
+    Logger.debug(s"[ResponsiblePeople][isComplete] $this")
+    this match {
+      case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _, _) if !pos.personalTax => true
-    case ResponsiblePeople(
+      Some(_), _, _, _, _) if !pos.personalTax => true
+      case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
-      Some(_), _, _) => true
-    case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _) => true
-    case _ => false
+      Some(_), _, _, _, _) => true
+      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
+      case _ => false
+    }
   }
 }
 
@@ -109,7 +115,9 @@ object ResponsiblePeople {
       (__ \ "experienceTraining").readNullable[ExperienceTraining] and
       (__ \ "training").readNullable[Training] and
       (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
-      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
+      (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
+        (__ \ "lineId").readNullable[Int] and
+      (__ \ "status").readNullable[String]
       ) apply ResponsiblePeople.apply _
   }
 

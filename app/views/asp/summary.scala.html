@@ -43,20 +43,14 @@
             <td colspan="2">
                 @model.otherBusinessTaxMatters.map {
                     case OtherBusinessTaxMattersNo => { @Messages("lbl.no") }
-                    case OtherBusinessTaxMattersYes(v) => { @Messages("lbl.yes") }
+                    case OtherBusinessTaxMattersYes => { @Messages("lbl.yes") }
                 }
             </td>
         </tr>
 
         @model.otherBusinessTaxMatters.map {
             case OtherBusinessTaxMattersNo => { }
-            case OtherBusinessTaxMattersYes(v) => {
-            <tr>
-                <td colspan="2">
-                    @Messages("asp.summary.registration.number")@v
-                </td>
-            </tr>
-            }
+            case OtherBusinessTaxMattersYes => { }
         }
     </table>
 
