@@ -47,8 +47,9 @@ trait AddPersonController extends BaseController {
   private def addPersonView(status: Status, form: Form2[AddPerson])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview => status(views.html.declaration.add_person("submit.amendment.application", form))
-      case _ => status(views.html.declaration.add_person("submit.registration", form))
+      case SubmissionReadyForReview =>
+        status(views.html.declaration.add_person(("declaration.addperson.amendment.title","submit.amendment.application"), form))
+      case _ => status(views.html.declaration.add_person(("declaration.addperson.title","submit.registration"), form))
     }
 
 }

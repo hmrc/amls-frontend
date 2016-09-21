@@ -71,8 +71,9 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           status(result) must be(OK)
 
           val htmlValue = Jsoup.parse(contentAsString(result))
-          htmlValue.title mustBe Messages("declaration.who.is.registering.title")
+          htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title")
           htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+
           contentAsString(result) must include(Messages("submit.amendment.application"))
         }
         "status is pre-submission" in new Fixture {
@@ -97,6 +98,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           val htmlValue = Jsoup.parse(contentAsString(result))
           htmlValue.title mustBe Messages("declaration.who.is.registering.title")
           htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+
           contentAsString(result) must include(Messages("submit.registration"))
         }
       }

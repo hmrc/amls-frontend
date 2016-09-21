@@ -100,8 +100,8 @@ trait WhoIsRegisteringController extends BaseController {
   private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePeople])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview => status(who_is_registering("submit.amendment.application", form, rp))
-      case _ => status(who_is_registering("submit.registration", form, rp))
+      case SubmissionReadyForReview => status(who_is_registering(("declaration.who.is.registering.amendment.title","submit.amendment.application"), form, rp))
+      case _ => status(who_is_registering(("declaration.who.is.registering.title","submit.registration"), form, rp))
     }
 
   private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =

@@ -55,8 +55,10 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
         val result = addPersonController.get()(request)
         status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be (Messages("declaration.addperson.title"))
+        document.title() must be (Messages("declaration.addperson.amendment.title"))
+
         contentAsString(result) must include(Messages("submit.amendment.application"))
       }
       "status is pre-submission" in new Fixture {
@@ -69,8 +71,10 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
         val result = addPersonController.get()(request)
         status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
         document.title() must be (Messages("declaration.addperson.title"))
+
         contentAsString(result) must include(Messages("submit.registration"))
       }
     }
