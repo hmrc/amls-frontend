@@ -154,26 +154,55 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
     "Post" must {
 
-      "successfully redirect next page when user selects the option 'Someone else'" in new Fixture {
+      "successfully redirect next page when user selects the option 'Someone else'" when {
+        "status is pending" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("person" -> "-1")
+          val newRequest = request.withFormUrlEncodedBody("person" -> "-1")
 
-        val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[CacheMap]
 
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
-        when(controller.dataCacheConnector.save[AddPerson](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
 
-        when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[AddPerson](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.AddPersonController.get().url))
+          when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AddPersonController.getWithAmendment().url))
+        }
+        "status is pre-submission" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody("person" -> "-1")
+
+          val mockCacheMap = mock[CacheMap]
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+
+          when(controller.dataCacheConnector.save[AddPerson](any(), any())
+            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+          when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AddPersonController.get().url))
+        }
       }
 
 
