@@ -5,22 +5,22 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @header = {
-    @heading("businessmatching.services.heading", "summary.businessmatching")
+    @heading("msb.services.heading", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("businessmatching.services.title"),
+    title = Messages("msb.services.title"),
     heading = header
 ) {
 
     @form(f, controllers.businessmatching.routes.ServicesController.post(edit)) {
 
       @radioGroup(f("msbServices")) {
-          @legend("businessmatching.services.list.heading")
-          @checkbox(f("msbServices[]"), "businessmatching.services.list.lbl.01", "01")
-          @checkbox(f("msbServices[]"), "businessmatching.services.list.lbl.02", "02")
-          @checkbox(f("msbServices[]"), "businessmatching.services.list.lbl.03", "03")
-          @checkbox(f("msbServices[]"), "businessmatching.services.list.lbl.04", "04")
+          @legend("msb.services.list.heading")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
+          @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
       }
 
       @submit(edit)
