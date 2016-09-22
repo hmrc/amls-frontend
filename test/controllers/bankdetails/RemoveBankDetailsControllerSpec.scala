@@ -28,13 +28,13 @@ class RemoveBankDetailsControllerSpec extends PlaySpec with OneAppPerSuite with 
 
   "Get" must {
 
-    "load the summary page when section data is available" in new Fixture {
+    "load the remove bank account page when section data is available" in new Fixture {
       val result = controller.get(1,"",false)(request)
 
       status(result) must be(OK)
     }
 
-    "show bank account details on the Check your Answers page" in new Fixture {
+    "show bank account details on the remove bank account page" in new Fixture {
 
       val result = controller.get(1,"account Name",true) (request)
 
