@@ -38,6 +38,8 @@ trait WhoIsRegisteringController extends BaseController {
       }
   }
 
+  def getWithAmendment = get
+
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
     val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
@@ -82,7 +84,7 @@ trait WhoIsRegisteringController extends BaseController {
                 dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
                   case "-1" => {
-                    Future.successful(Redirect(routes.AddPersonController.get()))
+                    redirectToAddPersonPage
                   }
                   case _ => {
                     getAddPerson(data, responsiblePeople) map { addPerson =>
@@ -108,6 +110,12 @@ trait WhoIsRegisteringController extends BaseController {
     statusService.getStatus map {
       case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
       case _ => Redirect(routes.DeclarationController.get())
+    }
+
+  private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview => Redirect(routes.AddPersonController.getWithAmendment())
+      case _ => Redirect(routes.AddPersonController.get())
     }
 
 }

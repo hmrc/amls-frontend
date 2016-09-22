@@ -27,6 +27,7 @@ trait AddPersonController extends BaseController {
       }
   }
 
+  def getWithAmendment() = get()
 
   def post() = Authorised.async {
     implicit authContext => implicit request => {
