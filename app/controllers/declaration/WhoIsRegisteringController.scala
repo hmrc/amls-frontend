@@ -1,7 +1,7 @@
 package controllers.declaration
 
 import config.AMLSAuthConnector
-import connectors.{DESConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
@@ -17,7 +17,7 @@ import scala.concurrent.Future
 
 trait WhoIsRegisteringController extends BaseController {
 
-  private[controllers] def desConnector: DESConnector
+  private[controllers] def amlsConnector: AmlsConnector
   def dataCacheConnector: DataCacheConnector
   def authEnrolmentsService: AuthEnrolmentsService
 
@@ -111,7 +111,7 @@ trait WhoIsRegisteringController extends BaseController {
     authEnrolmentsService.amlsRegistrationNumber
 
   private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext): Future[SubmissionStatus] = {
-    desConnector.status(amlsRefNumber) map {
+    amlsConnector.status(amlsRefNumber) map {
       response => response.formBundleStatus match {
         case "Pending" => SubmissionReadyForReview
         case "Approved" => SubmissionDecisionApproved
@@ -125,7 +125,7 @@ trait WhoIsRegisteringController extends BaseController {
 
 object WhoIsRegisteringController extends WhoIsRegisteringController {
   // $COVERAGE-OFF$
-  override private[controllers] val desConnector: DESConnector = DESConnector
+  override private[controllers] val amlsConnector: AmlsConnector = AmlsConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
   override val authEnrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
