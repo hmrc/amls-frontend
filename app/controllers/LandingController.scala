@@ -40,33 +40,33 @@ trait LandingController extends BaseController {
   }
 
   def getWithoutAmendments(implicit authContext: AuthContext, request: Request[_]) = {
-      val amlsReferenceNumber = enrolmentsService.amlsRegistrationNumber
-      landingService.cacheMap flatMap {
-        case Some(cache) =>
-          ApplicationConfig.statusToggle match {
-            case true =>
-              Future.successful(Redirect(controllers.routes.StatusController.get()))
-            case _ =>
-              Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-          }
-        case None => {
-          for {
-            reviewDetails <- landingService.reviewDetails
-            amlsRef <- amlsReferenceNumber
-          } yield (reviewDetails, amlsRef) match {
-            case (Some(rd), None) =>
-              landingService.updateReviewDetails(rd) map {
-                x => {
-                  Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
-                }
+    val amlsReferenceNumber = enrolmentsService.amlsRegistrationNumber
+    landingService.cacheMap flatMap {
+      case Some(cache) =>
+        ApplicationConfig.statusToggle match {
+          case true =>
+            Future.successful(Redirect(controllers.routes.StatusController.get()))
+          case _ =>
+            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+        }
+      case None => {
+        for {
+          reviewDetails <- landingService.reviewDetails
+          amlsRef <- amlsReferenceNumber
+        } yield (reviewDetails, amlsRef) match {
+          case (Some(rd), None) =>
+            landingService.updateReviewDetails(rd) map {
+              x => {
+                Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
               }
-            case (None, None) =>
-              Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
-            case (_, Some(amlsReference)) if ApplicationConfig.statusToggle =>
-              Future.successful(Redirect(controllers.routes.StatusController.get()))
-          }
-        }.flatMap(identity)
-      }
+            }
+          case (None, None) =>
+            Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
+          case (_, Some(amlsReference)) if ApplicationConfig.statusToggle =>
+            Future.successful(Redirect(controllers.routes.StatusController.get()))
+        }
+      }.flatMap(identity)
+    }
   }
 
   private def refreshAndRedirect(amlsRegistrationNumber :String)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
@@ -77,18 +77,18 @@ trait LandingController extends BaseController {
 
   private def dataHasChanged(cacheMap : CacheMap) = {
     Seq(
-    cacheMap.getEntry[Asp](Asp.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[BankDetails](BankDetails.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[BusinessActivities](BusinessActivities.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[BusinessMatching](BusinessMatching.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[ResponsiblePeople](ResponsiblePeople.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[Supervision](Supervision.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[Tcsp](Tcsp.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[TradingPremises](TradingPremises.key).fold(false){_.hasChanged},
-    cacheMap.getEntry[Hvd](Hvd.key).fold(false){_.hasChanged}
+      cacheMap.getEntry[Asp](Asp.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[BankDetails](BankDetails.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[BusinessActivities](BusinessActivities.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[BusinessMatching](BusinessMatching.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[ResponsiblePeople](ResponsiblePeople.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[Supervision](Supervision.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[Tcsp](Tcsp.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[TradingPremises](TradingPremises.key).fold(false){_.hasChanged},
+      cacheMap.getEntry[Hvd](Hvd.key).fold(false){_.hasChanged}
     ).exists(identity)
   }
 
@@ -97,18 +97,18 @@ trait LandingController extends BaseController {
   def getWithAmendments(implicit authContext: AuthContext, request : Request[_]) = {
     enrolmentsService.amlsRegistrationNumber flatMap  {
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap { //enrolment exists
-          case Some(cacheMap) => {
-            //there is data in S4l
-            if (dataHasChanged(cacheMap)) {
-              cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
-                case Some(_) => refreshAndRedirect(amlsRegistrationNumber)
-                case _ => Future.successful(Redirect(controllers.routes.StatusController.get()))
-              }
-            } else { //DataHasNotChanged
-              refreshAndRedirect(amlsRegistrationNumber)
+        case Some(cacheMap) => {
+          //there is data in S4l
+          if (dataHasChanged(cacheMap)) {
+            cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
+              case Some(_) => refreshAndRedirect(amlsRegistrationNumber)
+              case _ => Future.successful(Redirect(controllers.routes.StatusController.get()))
             }
+          } else { //DataHasNotChanged
+            refreshAndRedirect(amlsRegistrationNumber)
           }
-          case _ => refreshAndRedirect(amlsRegistrationNumber)
+        }
+        case _ => refreshAndRedirect(amlsRegistrationNumber)
       }
 
       case _ => getWithoutAmendments //no enrolment exists

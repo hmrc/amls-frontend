@@ -2,7 +2,7 @@
 @import models.bankdetails._
 @import forms2._
 
-@(model: Seq[BankDetails], complete: Boolean)(implicit request: Request[_], lang: Lang)
+@(model: Seq[BankDetails], complete: Boolean, hasBankAccount : Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading(if(complete) "summary.youranswers.title" else "summary.checkyouranswers.title", "summary.bankdetails")
@@ -14,7 +14,7 @@
     heading = header
 ) {
 
-    @if(model.isEmpty){
+    @if(!hasBankAccount){
         <div class="panel-indent">
             @Messages("bankdetails.summary.nobank.account")
             <br><br>
@@ -23,7 +23,7 @@
         <br><br>
     }
 
-    @if(complete && !model.isEmpty) {
+    @if(complete && hasBankAccount) {
         <div class="panel-indent">
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>

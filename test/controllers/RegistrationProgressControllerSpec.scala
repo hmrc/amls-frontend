@@ -10,7 +10,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, OneAppPerSuite}
 import play.api.mvc.Call
 import play.api.test.FakeApplication
-import services.{ProgressService}
+import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
@@ -29,6 +29,7 @@ trait Fixture extends AuthorisedFixture {
     override val authConnector = self.authConnector
     override protected[controllers] val service: ProgressService = mock[ProgressService]
     override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+    override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
   }
 
   protected val mockCacheMap = mock[CacheMap]
@@ -49,10 +50,10 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   "RegistrationProgressController" when {
-    "there has already been a submission" must {
+    "the user is enrolled into the AMLS Account" must {
       "show the update your information page" in new Fixture {
-        when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-          .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(Some("AMLSREFNO")))
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
@@ -141,10 +142,10 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
       }
     }
 
-    "there has not already been a submission" must {
+    "the user is not enrolled into the AMLS Account" must {
       "show the registration progress page" in new Fixture {
-        when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-          .thenReturn(None)
+        when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(None))
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)

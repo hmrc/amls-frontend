@@ -4,11 +4,11 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.businessmatching.{BusinessMatching, BusinessActivities}
+import models.businessmatching.{MoneyServiceBusiness, BusinessMatching, BusinessActivities}
 import scala.concurrent.Future
 import views.html.businessmatching._
 
-trait RegisterServicesController  extends BaseController {
+trait RegisterServicesController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
@@ -28,16 +28,21 @@ trait RegisterServicesController  extends BaseController {
     implicit authContext => implicit request =>
       import play.api.data.mapping.forms.Rules._
       Form2[BusinessActivities](request.body) match {
-        case invalidForm : InvalidForm =>
+        case invalidForm: InvalidForm =>
           Future.successful(BadRequest(register_services(invalidForm, edit)))
         case ValidForm(_, data) =>
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
             _ <- dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
-              businessMatching.activities(data)
+              data.businessActivities.contains(MoneyServiceBusiness) match {
+                case false => businessMatching.copy(activities = Some(data), msbServices = None)
+                case true =>businessMatching.activities(data)
+              }
             )
-          } yield Redirect(routes.SummaryController.get())
-
+          } yield data.businessActivities.contains(MoneyServiceBusiness) match {
+            case true => Redirect(routes.ServicesController.get(false))
+            case false => Redirect(routes.SummaryController.get())
+          }
       }
   }
 }

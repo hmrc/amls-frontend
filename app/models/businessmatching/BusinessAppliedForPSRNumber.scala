@@ -1,4 +1,4 @@
-package models.moneyservicebusiness
+package models.businessmatching
 
 import models.FormTypes._
 import play.api.data.mapping._
