@@ -33,16 +33,6 @@ trait Fixture extends AuthorisedFixture {
   }
 
   protected val mockCacheMap = mock[CacheMap]
-
-  when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-  when(controller.service.sections(mockCacheMap))
-    .thenReturn(Seq.empty[Section])
-
-
-  when(controller.service.sections(any[HeaderCarrier], any[AuthContext], any[ExecutionContext]))
-    .thenReturn(Future.successful(Seq.empty[Section]))
 }
 
 class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite with MockitoSugar{
@@ -55,6 +45,12 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
         when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(Some("AMLSREFNO")))
 
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.service.sections(mockCacheMap))
+          .thenReturn(Seq.empty[Section])
+
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
         Jsoup.parse(contentAsString(responseF)).title must be ("Update your information - Your application - Anti-money laundering registration - GOV.UK")
@@ -64,8 +60,11 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
     "all sections are complete and" when {
       "a section has changed" must {
         "enable the submission button" in new Fixture{
-          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.service.sections(mockCacheMap))
             .thenReturn(Seq(
@@ -84,8 +83,11 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
 
       "no section has changed" must {
         "disable the submission button" in new Fixture{
-          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.service.sections(mockCacheMap))
             .thenReturn(Seq(
@@ -105,8 +107,11 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
     "some sections are not complete and" when {
       "a section has changed" must {
         "disable the submission button" in new Fixture {
-          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.service.sections(mockCacheMap))
             .thenReturn(Seq(
@@ -124,8 +129,11 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
 
       "no section has changed" must {
         "disable the submission button" in new Fixture {
-          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.service.sections(mockCacheMap))
             .thenReturn(Seq(
@@ -144,6 +152,13 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
 
     "the user is not enrolled into the AMLS Account" must {
       "show the registration progress page" in new Fixture {
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.service.sections(mockCacheMap))
+          .thenReturn(Seq.empty[Section])
+
         when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(None))
 
@@ -162,8 +177,11 @@ class RegistrationProgressControllerWithoutAmendmentsSpec extends WordSpec with 
   "RegistrationProgressController" when {
     "there has already been a submission" must {
       "show the registration progress page" in new Fixture {
-        when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-          .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+        when(controller.service.sections(any[HeaderCarrier], any[AuthContext], any[ExecutionContext]))
+          .thenReturn(Future.successful(Seq(
+            Section("TESTSECTION1", Completed, false, mock[Call]),
+            Section("TESTSECTION2", Completed, false, mock[Call])
+          )))
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
