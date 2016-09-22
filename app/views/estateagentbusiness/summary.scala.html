@@ -15,7 +15,7 @@
     @model.services.map { a =>
         <table>
             <tr>
-                <th>@Messages("estateagentbusiness.servicess.title")</th>
+                <th>@Messages("estateagentbusiness.servicess.heading")</th>
                 <td width="12"><a href="@controllers.estateagentbusiness.routes.BusinessServicesController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             @a.services.map { line =>
@@ -42,7 +42,7 @@
         @if(a.services.contains(Residential)) {
         <table class="table--spaced-top">
             <tr>
-                <th>@Messages("estateagentbusiness.registered.redress.title")</th>
+                <th>@Messages("estateagentbusiness.registered.redress.heading")</th>
                 <td width="12"><a href="@controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             @model.redressScheme.map { a =>
@@ -64,7 +64,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("estateagentbusiness.penalisedbyprofessional.title")</th>
+            <th>@Messages("estateagentbusiness.penalisedbyprofessional.heading")</th>
             <td width="12"><a href="@controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -90,7 +90,7 @@
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("estateagentbusiness.penalisedunderestateagentsact.title")</th>
+            <th>@Messages("estateagentbusiness.penalisedunderestateagentsact.heading")</th>
             <td width="12"><a href="@controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
