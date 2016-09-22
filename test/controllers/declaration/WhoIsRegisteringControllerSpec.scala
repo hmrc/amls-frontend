@@ -1,8 +1,10 @@
 package controllers.declaration
 
-import connectors.DataCacheConnector
+import connectors.{DESConnector, DataCacheConnector}
+import models.ReadStatusResponse
 import models.declaration.{AddPerson, WhoIsRegistering}
 import models.responsiblepeople._
+import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -10,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.AuthEnrolmentsService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -24,7 +27,13 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
     val controller = new  WhoIsRegisteringController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val desConnector = mock[DESConnector]
+      override val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
+
+    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -125,6 +134,15 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
       "successfully redirect next page when user selects one of the responsible person from the options" in new Fixture {
 
+        when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("")))
+
+        when(controller.desConnector.status(any())(any(),any(),any(),any()))
+          .thenReturn(Future.successful(notCompletedReadStatusResponse))
+
         val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
 
         val mockCacheMap = mock[CacheMap]
@@ -158,6 +176,51 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
         contentAsString(result) must include(Messages("declaration.who.is.registering.text"))
 
       }
+
+      "redirect to the declaration page for amendments if status of amlsRegNo is pending" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("")))
+
+        when(controller.desConnector.status(any())(any(),any(),any(),any()))
+          .thenReturn(Future.successful(pendingReadStatusResponse))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
+      }
+      "redirect to the declaration page if amlsRegNo is None" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+      }
+
     }
   }
 }
