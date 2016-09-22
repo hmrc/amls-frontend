@@ -14,5 +14,7 @@ case class AmendVariationResponse(
                                  )
 
 object AmendVariationResponse {
+
+  val key = "AmendVariationResponse"
   implicit val format = Json.format[AmendVariationResponse]
 }

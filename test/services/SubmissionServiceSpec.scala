@@ -2,7 +2,7 @@ package services
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
-import models.SubscriptionResponse
+import models.{AmendVariationResponse, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
 import models.businesscustomer.ReviewDetails
@@ -55,6 +55,17 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       premiseFee = 0,
       totalFees = 0,
       paymentReference = ""
+    )
+
+    val amendmentResponse = AmendVariationResponse(
+      processingDate = "",
+      etmpFormBundleNumber = "",
+      registrationFee = 0,
+      fpFee = Some(0),
+      premiseFee = 0,
+      totalFees = 0,
+      paymentReference = Some(""),
+      difference = Some(0)
     )
 
     val safeId = "safeId"
@@ -133,7 +144,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       when {
         SubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
-      } thenReturn Future.successful(subscriptionResponse)
+      } thenReturn Future.successful(amendmentResponse)
 
       when {
         SubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())

@@ -9,7 +9,7 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
-import models.{SubscriptionRequest, SubscriptionResponse}
+import models.{AmendVariationResponse, SubscriptionRequest, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -123,12 +123,12 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[SubscriptionResponse] = {
+  ): Future[AmendVariationResponse] = {
     for {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
       subscription <- amlsConnector.update(createSubscriptionRequest(cache), regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")))
-      _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
+      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, subscription)
 
     } yield subscription
   }

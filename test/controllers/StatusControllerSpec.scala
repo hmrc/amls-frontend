@@ -278,7 +278,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
         Some(BusinessMatching(Some(reviewDtls), None)))
 
-      when(controller.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
       when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -303,7 +302,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
       when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("XAML00000567890")))
       val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
-      when(controller.desConnector.status(any())(any(),any(),any(),any())).thenReturn(Future.successful(readStatusResponse))
       val result = controller.get()(request)
       status(result) must be(OK)
 
