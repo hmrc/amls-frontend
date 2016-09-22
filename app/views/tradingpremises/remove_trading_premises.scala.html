@@ -19,16 +19,16 @@
         </div>
         <br>
         <br>
-
+    @if(showDateField) {
         @date(
             f = f,
             p = "endDate",
             labelText = "tradingpremises.remove.trading.premises.enddate.lbl",
             hintText = "",
             true,
-            hintId = "",
-            jsHidden = showDateField
+            hintId = ""
         )
+    }
 
         @submit(false, Some(Messages("tradingpremises.remove.trading.premises.btn")))
     }
