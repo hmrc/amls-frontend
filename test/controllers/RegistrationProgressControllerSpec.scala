@@ -2,12 +2,13 @@ package controllers
 
 import connectors.{DataCacheConnector}
 import models.SubscriptionResponse
-import models.registrationprogress.Section
+import models.registrationprogress.{NotStarted, Completed, Section}
 import org.jsoup.Jsoup
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, OneAppPerSuite}
+import play.api.mvc.Call
 import play.api.test.FakeApplication
 import services.{ProgressService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -50,13 +51,93 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
   "RegistrationProgressController" when {
     "there has already been a submission" must {
       "show the update your information page" in new Fixture {
-
         when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
           .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
         Jsoup.parse(contentAsString(responseF)).title must be ("Update your information - Your application - Anti-money laundering registration - GOV.UK")
+      }
+    }
+
+    "all sections are complete and" when {
+      "a section has changed" must {
+        "enable the submission button" in new Fixture{
+          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", Completed, false, mock[Call]),
+              Section("TESTSECTION2", Completed, true, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (false)
+        }
+      }
+
+
+      "no section has changed" must {
+        "disable the submission button" in new Fixture{
+          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", Completed, false, mock[Call]),
+              Section("TESTSECTION2", Completed, false, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (true)
+        }
+      }
+    }
+
+    "some sections are not complete and" when {
+      "a section has changed" must {
+        "disable the submission button" in new Fixture {
+          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", NotStarted, false, mock[Call]),
+              Section("TESTSECTION2", Completed, true, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (true)
+        }
+      }
+
+      "no section has changed" must {
+        "disable the submission button" in new Fixture {
+          when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+            .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", NotStarted, false, mock[Call]),
+              Section("TESTSECTION2", Completed, false, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (true)
+        }
       }
     }
 
