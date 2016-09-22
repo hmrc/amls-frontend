@@ -1,6 +1,7 @@
 package models.businessactivities
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.Logger
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessActivities(
@@ -60,7 +61,8 @@ case class BusinessActivities(
     this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p))
 
 
-  def isComplete: Boolean =
+  def isComplete: Boolean = {
+    Logger.debug(s"Testing isComplete for : $this")
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
@@ -68,6 +70,7 @@ case class BusinessActivities(
       ) => true
       case _ => false
     }
+  }
 }
 
 object BusinessActivities {

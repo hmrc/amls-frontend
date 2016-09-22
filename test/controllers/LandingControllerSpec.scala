@@ -134,6 +134,8 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
       override val authConnector = self.authConnector
       override val enrolmentsService = mock[AuthEnrolmentsService]
     }
+
+    when(controller.landingService.refreshCache(any())(any(),any(),any())).thenReturn(Future.successful(mock[CacheMap]))
   }
 
   def setUpMocksForNoEnrolment(controller : LandingController) = {
