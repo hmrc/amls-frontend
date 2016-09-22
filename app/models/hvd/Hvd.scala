@@ -2,6 +2,7 @@ package models.hvd
 
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.Logger
 import play.api.data.mapping.{To, Write}
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json.{Json, Reads, Writes}
@@ -39,13 +40,15 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Hvd =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
-  def isComplete: Boolean =
+  def isComplete: Boolean = {
+    Logger.debug(s"[Hvd][isComplete] $this")
     this match {
       case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), _)
         if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
       case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
       case _ => false
     }
+  }
 }
 
 object Hvd {

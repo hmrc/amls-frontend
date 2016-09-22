@@ -627,7 +627,7 @@ table.summary ul li {
   vertical-align: middle;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 640px) {sbt compile
   .check-your-answers .grid-layout--stacked .grid-layout__column {
       display: table-cell;
   }

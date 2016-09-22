@@ -1,6 +1,6 @@
 package services
 
-import connectors.{DESConnector, DataCacheConnector, KeystoreConnector}
+import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
 import models.{Country, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -35,7 +35,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   object TestLandingService extends LandingService {
     override private[services] val cacheConnector = mock[DataCacheConnector]
     override private[services] val keyStore = mock[KeystoreConnector]
-    override private[services] val desConnector = mock[DESConnector]
+    override private[services] val desConnector = mock[AmlsConnector]
   }
 
   implicit val hc = mock[HeaderCarrier]
