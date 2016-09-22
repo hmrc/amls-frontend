@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.declaration.{AddPerson, WhoIsRegistering}
+import models.declaration.AddPerson
 import models.status.SubmissionReadyForReview
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
@@ -37,7 +37,7 @@ trait AddPersonController extends BaseController {
         case ValidForm(_, data) =>
           dataCacheConnector.save[AddPerson](AddPerson.key, data) flatMap { _ =>
             statusService.getStatus map {
-              case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
+              case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
               case _ => Redirect(routes.DeclarationController.get())
             }
           }
@@ -48,7 +48,7 @@ trait AddPersonController extends BaseController {
   private def addPersonView(status: Status, form: Form2[AddPerson])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview =>
+      case SubmissionReadyForReview if AmendmentsToggle.feature =>
         status(views.html.declaration.add_person(("declaration.addperson.amendment.title","submit.amendment.application"), form))
       case _ => status(views.html.declaration.add_person(("declaration.addperson.title","submit.registration"), form))
     }

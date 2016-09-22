@@ -13,6 +13,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -218,6 +219,68 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
     }
 
+  }
+
+}
+
+class AddPersonControllerWithoutAmendmentSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+
+  val userId = s"user-${UUID.randomUUID()}"
+  val mockDataCacheConnector = mock[DataCacheConnector]
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val addPersonController = new AddPersonController {
+      override val dataCacheConnector = mockDataCacheConnector
+      override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
+    }
+  }
+
+  val emptyCache = CacheMap("", Map.empty)
+
+  "AddPersonController" must {
+    "on get display the persons page" when {
+      "status is pending" in new Fixture {
+
+        when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(addPersonController.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = addPersonController.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.title() must be (Messages("declaration.addperson.title"))
+
+        contentAsString(result) must include(Messages("submit.registration"))
+      }
+    }
+    "must pass on post with all the mandatory parameters supplied" when {
+      "status is pending" in new Fixture {
+
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "firstName" -> "John",
+          "lastName" -> "Doe",
+          "roleWithinBusiness" -> "01"
+        )
+
+        when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        when(addPersonController.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = addPersonController.post()(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+      }
+    }
   }
 
 }
