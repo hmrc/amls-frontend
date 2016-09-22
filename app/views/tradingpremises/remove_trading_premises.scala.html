@@ -1,0 +1,35 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+
+@(f: forms.Form2[_],index: Int, complete: Boolean, tradingName:String, showDateField:Boolean)(implicit request: Request[_], lang: Lang)
+
+@header = {
+    @heading("tradingpremises.remove.trading.premises.heading", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("tradingpremises.remove.trading.premises.title"),
+    heading = header
+) {
+
+    @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete, tradingName, showDateField)) {
+        <div class="panel-indent panel-border-wide">
+            <p>@Messages("tradingpremises.remove.trading.premises.text", tradingName)</p>
+        </div>
+        <br>
+        <br>
+
+        @date(
+            f = f,
+            p = "endDate",
+            labelText = "tradingpremises.remove.trading.premises.enddate.lbl",
+            hintText = "",
+            true,
+            hintId = "",
+            jsHidden = showDateField
+        )
+
+        @submit(false, Some(Messages("tradingpremises.remove.trading.premises.btn")))
+    }
+}

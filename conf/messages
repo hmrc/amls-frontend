@@ -667,6 +667,12 @@ tradingpremises.premises.registered.heading = Premises registered
 tradingpremises.have.registered.premises.text = You have registered {0} trading premises.
 tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
 
+tradingpremises.remove.trading.premises.title = Trading premises - Remove trading premises
+tradingpremises.remove.trading.premises.heading = Remove trading premises
+tradingpremises.remove.trading.premises.text = This will permanently remove {0} from your list of trading premises.
+tradingpremises.remove.trading.premises.enddate.lbl = When did you stop trading from these premises?
+tradingpremises.remove.trading.premises.btn = Remove trading premises
+
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
 estateagentbusiness.whatyouneed.subheading = For this section you’ll need:

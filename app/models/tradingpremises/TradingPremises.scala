@@ -15,7 +15,8 @@ case class TradingPremises(
                             msbServices: Option[MsbServices] = None,
                             hasChanged: Boolean = false,
                             lineId: Option[Int] = None,
-                            status: Option[String] = None
+                            status: Option[String] = None,
+                            endDate:Option[ActivityEndDate] = None
                           ) {
 
   def businessStructure(p: BusinessStructure): TradingPremises =
@@ -44,9 +45,9 @@ case class TradingPremises(
 
   def isComplete: Boolean =
     this match {
-      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_) => true
-      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_) => true
-      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_,_) => true
+      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_,_) => true
+      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
@@ -98,7 +99,8 @@ object TradingPremises {
       __.read[Option[MsbServices]] and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       __.read[Option[Int]] and
-      __.read[Option[String]]
+      __.read[Option[String]] and
+    __.read[Option[ActivityEndDate]]
     ) (TradingPremises.apply _)
 
   implicit val writes: Writes[TradingPremises] = Writes[TradingPremises] {
@@ -111,7 +113,10 @@ object TradingPremises {
         Json.toJson(model.agentCompanyName).asOpt[JsObject],
         Json.toJson(model.agentPartnership).asOpt[JsObject],
         Json.toJson(model.whatDoesYourBusinessDoAtThisAddress).asOpt[JsObject],
-        Json.toJson(model.msbServices).asOpt[JsObject]
+        Json.toJson(model.msbServices).asOpt[JsObject],
+        Json.toJson(model.lineId).asOpt[JsObject],
+        Json.toJson(model.status).asOpt[JsObject],
+        Json.toJson(model.endDate).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       } + ("hasChanged" -> JsBoolean(model.hasChanged))

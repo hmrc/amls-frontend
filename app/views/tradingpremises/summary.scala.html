@@ -29,8 +29,10 @@
             @tp.yourTradingPremises.map { ytp =>
                 <tbody>
                 <tr>
-                        <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
+                    <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
                     <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
+                    <td>@Messages("lbl.or")</td>
+                    <td class="numeric"><a href="@controllers.tradingpremises.routes.RemoveTradingPremisesController.get(y + 1, add, ytp.tradingName, tp.lineId.isDefined)">@Messages("button.remove")</a></td>
                 </tr>
                 </tbody>
             }
