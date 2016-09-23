@@ -18,11 +18,7 @@ trait AddPersonController extends BaseController {
   val statusService: StatusService
 
   def get() = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[AddPerson](AddPerson.key) flatMap {
-        case Some(addPerson) =>
-          addPersonView(Ok,Form2[AddPerson](addPerson))
-        case _ =>
+    implicit authContext => implicit request => {
           addPersonView(Ok,EmptyForm)
       }
   }
