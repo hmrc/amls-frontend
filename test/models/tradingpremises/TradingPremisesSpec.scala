@@ -132,7 +132,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
     "deserialise correctly when hasChanged field is missing from the Json" in {
       (completeJson - "hasChanged").as[TradingPremises] must
-        be(TradingPremises(None))
+        be(completeModel)
     }
 
     "Deserialise as expected" in {
