@@ -4,11 +4,11 @@
 @(model: Seq[ResponsiblePeople])(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.heading", "summary.responsiblepeople")
+    @heading("title.cya", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("summary.responsiblepeople.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 

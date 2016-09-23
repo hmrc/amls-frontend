@@ -5,11 +5,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("bankdetails.accounttype.heading", "summary.bankdetails")
+    @heading("bankdetails.accounttype.title", "summary.bankdetails")
 }
 
 @main(
-    title = Messages("bankdetails.accounttype.title"),
+    title = Messages("bankdetails.accounttype.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
 

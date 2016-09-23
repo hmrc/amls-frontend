@@ -6,11 +6,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("aboutthebusiness.correspondenceaddress.heading", "summary.aboutbusiness")
+    @heading("aboutthebusiness.correspondenceaddress.title", "summary.aboutbusiness")
 }
 
 @main(
-    title = Messages("aboutthebusiness.correspondenceaddress.title"),
+    title = Messages("aboutthebusiness.correspondenceaddress.title") + " - " + Messages("summary.aboutbusiness"),
     heading = header
 ) {
 

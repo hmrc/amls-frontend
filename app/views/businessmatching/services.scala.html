@@ -5,11 +5,11 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @header = {
-    @heading("msb.services.heading", "summary.businessmatching")
+    @heading("msb.services.title", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("msb.services.title"),
+    title = Messages("msb.services.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
 

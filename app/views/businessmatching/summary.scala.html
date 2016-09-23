@@ -4,11 +4,11 @@
 @(model: BusinessMatching)(implicit request: Request[_])
 
 @header = {
-    @heading("summary.checkyouranswers.heading", "summary.businessmatching")
+    @heading("title.cya", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("summary.businessmatching.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
 
@@ -35,7 +35,7 @@
                 case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
                     <table class="table--spaced-top">
                         <tr>
-                            <th>@Messages("businessmatching.registrationnumber.heading")</th>
+                            <th>@Messages("businessmatching.registrationnumber.title")</th>
                             <td width="12"><a href="@controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true)">@Messages("button.edit")</a></td>
                         </tr>
                         <tr>
@@ -50,7 +50,7 @@
                 case BusinessType.UnincorporatedBody => {
                     <table class="table--spaced-top">
                         <tr>
-                            <th>@Messages("businessmatching.typeofbusiness.heading")</th>
+                            <th>@Messages("businessmatching.typeofbusiness.title")</th>
                             <td width="12"><a href="@controllers.businessmatching.routes.TypeOfBusinessController.get(true)">@Messages("button.edit")</a></td>
                         </tr>
                         <tr>
@@ -71,7 +71,7 @@
     @model.activities.map { activity =>
         <table class="table--spaced-top">
             <tr>
-                <th>@Messages("businessmatching.registerservices.heading")</th>
+                <th>@Messages("businessmatching.registerservices.title")</th>
                 <td width="12"><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             @activity.businessActivities.map { line =>
@@ -97,17 +97,17 @@
                 <!-- original table-based solution -->
                 <table class="table--spaced-top">
                     <tr>
-                        <th>@Messages("businessmatching.services.heading")</th>
+                        <th>@Messages("title.services")</th>
                         <td width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     @services.services.map { svc =>
                     <tr>
                         <td colspan="2">
                             @svc match {
-                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
-                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
-                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
+                            case TransmittingMoney => {@Messages("services.list.lbl.01")}
+                            case CurrencyExchange => {@Messages("services.list.lbl.02")}
+                            case ChequeCashingNotScrapMetal => {@Messages("services.list.lbl.03")}
+                            case ChequeCashingScrapMetal => {@Messages("services.list.lbl.04")}
                             }
                         </td>
                     </tr>

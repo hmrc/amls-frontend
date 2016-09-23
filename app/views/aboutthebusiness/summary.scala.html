@@ -5,17 +5,17 @@
 @(model: AboutTheBusiness)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.heading", "summary.aboutbusiness")
+    @heading("title.cya", "summary.aboutbusiness")
 }
 
 @main(
-    title = Messages("summary.aboutbusiness.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.aboutbusiness"),
     heading = header
 ) {
 
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("aboutthebusiness.registeredformlr.heading")</th>
+            <th>@Messages("aboutthebusiness.registeredformlr.title")</th>
             <td width="12"><a href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -42,7 +42,7 @@
     @model.activityStartDate.map { activityStartDate =>
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("aboutthebusiness.activity.start.date.heading")</th>
+            <th>@Messages("aboutthebusiness.activity.start.date.title")</th>
             <td width="12"><a href="@controllers.aboutthebusiness.routes.ActivityStartDateController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -56,7 +56,7 @@
     @model.vatRegistered.map { vatRegistered =>
     <table class="table--spaced-top">
         <tr>
-            <th>@Messages("aboutthebusiness.registeredforvat.heading")</th>
+            <th>@Messages("aboutthebusiness.registeredforvat.title")</th>
             <td width="12"><a href="@controllers.aboutthebusiness.routes.VATRegisteredController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -84,7 +84,7 @@
     @model.corporationTaxRegistered.map { ctRegistered =>
     <table class="table--spaced-top ">
         <tr>
-            <th>@Messages("aboutthebusiness.registeredforcorporationtax.heading")</th>
+            <th>@Messages("aboutthebusiness.registeredforcorporationtax.title")</th>
             <td width="12"><a href="@controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true)">@Messages("button.edit")</a></td>
         </tr>
         <tr>
@@ -112,7 +112,7 @@
     @model.registeredOffice.map { a =>
         <table>
             <tr>
-                <th>@Messages("aboutthebusiness.registeredoffice.heading")</th>
+                <th>@Messages("aboutthebusiness.registeredoffice.title")</th>
                 <td width="12"><a href="@controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>
@@ -128,7 +128,7 @@
     @model.contactingYou.map { c =>
         <table class="table--spaced-top">
             <tr>
-                <th class="">@Messages("aboutthebusiness.contactingyou.heading")</th>
+                <th class="">@Messages("aboutthebusiness.contactingyou.title")</th>
                 <td width="12"><a href="@controllers.aboutthebusiness.routes.ContactingYouController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             <tr>

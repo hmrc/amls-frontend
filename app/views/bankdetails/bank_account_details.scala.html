@@ -16,11 +16,11 @@ s"""${f("IBANNumber").id}-fieldset"""
 
 @header = {
     @errorSummary(f)
-    @heading("bankdetails.accountdetails.heading", "summary.bankdetails")
+    @heading("bankdetails.accountdetails.title", "summary.bankdetails")
 }
 
 @main(
-    title = Messages("bankdetails.accountdetails.title"),
+    title = Messages("bankdetails.accountdetails.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
 

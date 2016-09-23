@@ -4,11 +4,11 @@
 @(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
 
 @header = {
-    @heading("responsiblepeople.your_answers.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.your_answers.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.your_answers.title"),
+    title = Messages("responsiblepeople.your_answers.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
