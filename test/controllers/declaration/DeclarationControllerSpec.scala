@@ -3,6 +3,7 @@ package controllers.declaration
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.declaration.{AddPerson, InternalAccountant}
+import models.status.NotCompleted
 import models.{ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers._
@@ -50,12 +51,15 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     "use the correct services" in new Fixture {
       DeclarationController.authConnector must be(AMLSAuthConnector)
       DeclarationController.dataCacheConnector must be(DataCacheConnector)
+      DeclarationController.statusService must be (StatusService)
     }
 
     "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
 
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(declarationController.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(NotCompleted))
 
       val result = declarationController.get()(request)
       status(result) must be(SEE_OTHER)
@@ -82,7 +86,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       when(declarationController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      val result = declarationController.getWithAmendment()(request)
+     val result = declarationController.getWithAmendment()(request)
       status(result) must be(OK)
 
       contentAsString(result) must include(addPerson.firstName)
