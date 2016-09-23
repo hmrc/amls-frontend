@@ -29,12 +29,8 @@ trait WhoIsRegisteringController extends BaseController {
           (for {
             cache <- optionalCache
             responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-          } yield {
-            (for {
-              whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
-            } yield whoIsRegisteringView(Ok, Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople))
-              .getOrElse(whoIsRegisteringView(Ok, EmptyForm, responsiblePeople))
-          }) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
+          } yield whoIsRegisteringView(Ok, EmptyForm, responsiblePeople)
+          ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
 
