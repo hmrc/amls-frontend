@@ -56,7 +56,6 @@ case class TradingPremises(
 
 object TradingPremises {
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   val key = "trading-premises"

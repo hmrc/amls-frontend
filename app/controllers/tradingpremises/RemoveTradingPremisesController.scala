@@ -16,16 +16,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
 
   def get(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[TradingPremises](index) map {
-        response =>
-          for {
-            tp <- response
-            yourPremises <- tp.yourTradingPremises
-          } yield yourPremises {
-            Future.successful(Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete, yourPremises.tradingName, tp.lineId.isDefined)))
-          }
-      }
-
+      Future.successful(Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete, tradingName, showDateField)))
   }
 
   def remove(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
