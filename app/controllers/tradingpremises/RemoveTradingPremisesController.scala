@@ -14,12 +14,12 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, complete: Boolean = false, tradingName: String, showDateField:Boolean = false) = Authorised.async {
+  def get(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete, tradingName, showDateField)))
   }
 
-  def remove(index: Int, complete: Boolean = false, tradingName: String, showDateField:Boolean = false) = Authorised.async {
+  def remove(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       showDateField match {
         case true =>
@@ -32,7 +32,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
                   tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data))
                 }
               } yield Redirect(routes.SummaryController.get(complete))
-            }
+          }
         case false => removeDataStrict[TradingPremises](index) map { _ =>
           Redirect(routes.SummaryController.get(complete))
         }

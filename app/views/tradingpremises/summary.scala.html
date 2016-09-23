@@ -23,6 +23,15 @@
         </div>
     }
 
+    @if(model.isEmpty){
+        <div class="panel panel-border-wide spacelarge">
+            <p> @Messages("tradingpremises.summary.no.trading.premises") </p>
+            <p>
+                <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
+            </p>
+        </div>
+    }
+
     @model.zipWithIndex.map { case (tp, y) =>
         <table class="spacesummary">
 
@@ -30,9 +39,9 @@
                 <tbody>
                 <tr>
                     <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
-                    <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
-                    <td>@Messages("lbl.or")</td>
-                    <td class="numeric"><a href="@controllers.tradingpremises.routes.RemoveTradingPremisesController.get(y + 1, add, ytp.tradingName, tp.lineId.isDefined)">@Messages("button.remove")</a></td>
+                    <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a>
+                    @Messages("lbl.or")
+                    <a href="@controllers.tradingpremises.routes.RemoveTradingPremisesController.get(y + 1, add, ytp.tradingName, tp.lineId.isDefined)">@Messages("button.remove")</a></td>
                 </tr>
                 </tbody>
             }

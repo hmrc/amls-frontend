@@ -45,26 +45,34 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
     Some(agentCompanyName),
     Some(agentPartnership),
     Some(wdbd),
-    Some(msbServices)
+    Some(msbServices),
+    false,
+    Some(123456),
+    Some("Added"),
+    Some(ActivityEndDate(new LocalDate(1999,1,1)))
+
   )
 
   val incompleteModel = TradingPremises(Some(RegisteringAgentPremises(true)),
     Some(ytp), Some(businessStructure), Some(agentName),None, None, None, None)
 
-  val completeJson = Json.obj("agentPremises" -> true,
-    "tradingName" -> "foo",
-    "addressLine1" -> "1",
-    "addressLine2" -> "2",
-    "postcode" -> "asdfasdf",
-    "isResidential" -> true,
-    "startDate" -> "1990-02-24",
-    "agentsBusinessStructure" ->"01",
-    "agentName" ->"test",
-    "agentCompanyName" ->"test",
-    "agentPartnership" ->"test",
-    "activities" -> Json.arr("02", "03", "05"),
-    "msbServices" ->Json.arr("01","02"),
-    "hasChanged" -> false
+  val completeJson = Json.obj("registeringAgentPremises"-> Json.obj("agentPremises"->true),
+    "yourTradingPremises"-> Json.obj("tradingName" -> "foo",
+      "addressLine1" ->"1",
+      "addressLine2" ->"2",
+      "postcode" ->"asdfasdf",
+      "isResidential" ->true,
+      "startDate" ->"1990-02-24"),
+    "businessStructure" -> Json.obj("agentsBusinessStructure" ->"01"),
+    "agentName" -> Json.obj("agentName" ->"test"),
+    "agentCompanyName" -> Json.obj("agentCompanyName" ->"test"),
+    "agentPartnership" -> Json.obj("agentPartnership" ->"test"),
+    "whatDoesYourBusinessDoAtThisAddress" ->Json.obj("activities" -> Json.arr("02","03","05")),
+    "msbServices" -> Json.obj("msbServices"-> Json.arr("01","02")),
+    "hasChanged" ->false,
+    "lineId" ->123456,
+    "status" ->"Added",
+    "endDate"-> Json.obj("endDate" ->"1999-01-01")
   )
 
   "TradingPremises" must {
@@ -122,9 +130,15 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
         be(completeJson)
     }
 
+    "deserialise correctly when hasChanged field is missing from the Json" in {
+      (completeJson - "hasChanged").as[TradingPremises] must
+        be(TradingPremises(None))
+    }
+
     "Deserialise as expected" in {
       completeJson.as[TradingPremises] must
         be(completeModel)
+      TradingPremises.writes.writes(completeModel) must be(completeJson)
     }
 
     "isComplete" must {

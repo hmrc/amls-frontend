@@ -651,6 +651,7 @@ tradingpremises.summary.address = Address:
 tradingpremises.summary.residential = Residential address:
 tradingpremises.summary.who-uses = Who uses these premises?
 tradingpremises.summary.services = Services at this address:
+tradingpremises.summary.no.trading.premises = You currently have no trading premises registered
 
 tradingpremises.agentcompanyname.title = What is your agent’s registered company name? - Trading premises
 tradingpremises.agentcompanyname.heading = What is your agent’s registered company name?
