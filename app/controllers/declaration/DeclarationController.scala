@@ -21,7 +21,7 @@ trait DeclarationController extends BaseController {
   def get(): Action[AnyContent] = declarationView(("declaration.declaration.title","submit.registration"))
   def getWithAmendment() = AmendmentsToggle.feature match {
     case true => declarationView(("declaration.declaration.amendment.title","submit.amendment.application"))
-    case false => Redirect(routes.DeclarationController.get())
+    case false => declarationView(("declaration.declaration.title","submit.registration"))
   }
 
   private def declarationView(headings: (String,String)) = Authorised.async {

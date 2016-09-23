@@ -13,6 +13,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -26,6 +27,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector
       override val dataCacheConnector = mock[DataCacheConnector]
+      override val statusService = mock[StatusService]
     }
 
     val mockCacheMap = mock[CacheMap]
@@ -118,6 +120,7 @@ class DeclarationControllerAmendmentSpec extends PlaySpec with OneAppPerSuite wi
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector
       override val dataCacheConnector = mock[DataCacheConnector]
+      override val statusService = mock[StatusService]
     }
 
     val mockCacheMap = mock[CacheMap]
