@@ -15,7 +15,7 @@
     heading = header
 ) {
 
-    @if(add){
+    @if(add && !model.isEmpty){
         <div class="panel panel-border-wide spacelarge">
             <p>
                 <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>

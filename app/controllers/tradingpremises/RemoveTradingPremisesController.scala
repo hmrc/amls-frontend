@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, Form2, InvalidForm, EmptyForm}
-import models.tradingpremises.{ActivityEndDate, TradingPremises}
+import models.tradingpremises.{BusinessStructure, ActivityEndDate, TradingPremises}
 import utils.{StatusConstants, RepeatingSection}
 import views.html.tradingpremises.remove_trading_premises
 
@@ -16,7 +16,16 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
 
   def get(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete, tradingName, showDateField)))
+      getData[TradingPremises](index) map {
+        response =>
+          for {
+            tp <- response
+            yourPremises <- tp.yourTradingPremises
+          } yield yourPremises {
+            Future.successful(Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete, yourPremises.tradingName, tp.lineId.isDefined)))
+          }
+      }
+
   }
 
   def remove(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
