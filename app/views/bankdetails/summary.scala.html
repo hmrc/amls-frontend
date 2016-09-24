@@ -1,5 +1,6 @@
 @import include._
 @import models.bankdetails._
+@import utils.StatusConstants
 @import forms2._
 
 @(model: Seq[BankDetails], complete: Boolean, hasBankAccount : Boolean)(implicit request: Request[_], lang: Lang)
@@ -31,46 +32,32 @@
     }
         @model.zipWithIndex.map { case (x, y) =>
             @x.bankAccount.map {bankAccount =>
-            <table>
-                <tr>
-                @bankAccount.account match {
-                    case f:UKAccount => {
-                        <td width="75%">
-                            @bankAccount.accountName
-                            <br>
-                            @Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode
-                            <br>
-                            @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
-                            <br>
-                            @Messages("lbl.uk") @Messages("bankdetails.summary.bankaccount")
-                            <br>
-                            @x.bankAccountType.map {
-                            case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                            case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                            case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                            }
-                        </td>
-                    }
-                    case f:NonUKAccountNumber => {
-                        <td width="75%">
-                            @bankAccount.accountName
-                            <br>
-                            @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
-                            <br>
-                            @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
-                            <br>
-                            @x.bankAccountType.map {
-                            case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                            case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                            case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                            }
-                        </td>
-                    }
-                    case f:NonUKIBANNumber => {
+                @if(!x.status.contains(StatusConstants.Deleted)){
+                <table>
+                    <tr>
+                    @bankAccount.account match {
+                        case f:UKAccount => {
                             <td width="75%">
                                 @bankAccount.accountName
                                 <br>
-                                @Messages("bankdetails.bankaccount.iban"): @f.IBANNumber
+                                @Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode
+                                <br>
+                                @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
+                                <br>
+                                @Messages("lbl.uk") @Messages("bankdetails.summary.bankaccount")
+                                <br>
+                                @x.bankAccountType.map {
+                                case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                }
+                            </td>
+                        }
+                        case f:NonUKAccountNumber => {
+                            <td width="75%">
+                                @bankAccount.accountName
+                                <br>
+                                @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
                                 <br>
                                 @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
                                 <br>
@@ -80,6 +67,21 @@
                                 case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                                 }
                             </td>
+                        }
+                        case f:NonUKIBANNumber => {
+                                <td width="75%">
+                                    @bankAccount.accountName
+                                    <br>
+                                    @Messages("bankdetails.bankaccount.iban"): @f.IBANNumber
+                                    <br>
+                                    @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
+                                    <br>
+                                    @x.bankAccountType.map {
+                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                    }
+                                </td>
                     }
                 }
                 <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
@@ -88,7 +90,9 @@
 
                 </tr>
 
+
              </table>
+                }
             }
 
         }

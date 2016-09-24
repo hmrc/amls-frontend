@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.bankdetails.BankDetails
+import utils.StatusConstants
 
 trait SummaryController extends BaseController {
 
@@ -12,7 +13,11 @@ trait SummaryController extends BaseController {
   def get(complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCache.fetch[Seq[BankDetails]](BankDetails.key) map {
-        case Some(data) => Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(data)))
+        case Some(data) =>{
+          val bandDtls = data.filterNot(_.status.contains(StatusConstants.Deleted))
+          println("********bank***********"+bandDtls)
+            Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bandDtls)))
+        }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
