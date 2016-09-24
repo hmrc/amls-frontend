@@ -28,7 +28,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
     }
   }
 
-  "Get" must {
+  "RemoveTradingPremisesController" must {
 
     val address = Address("1", "2",None,None,"asdfasdf")
     val year =1990
@@ -100,14 +100,27 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
     val emptyCache = CacheMap("", Map.empty)
 
     "successfully load remove trading premises page" in new Fixture {
-
-      val result = controller.get(1,false,"trading Name") (request)
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
+      val result = controller.get(1,false,"tradingName1") (request)
 
       val contentString = contentAsString(result)
 
       val document = Jsoup.parse(contentString)
       document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
     }
+
+    "respond with NOT_FOUND" when {
+      "there is no data at all at that index" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get(1,false,"trading Name")(request)
+
+        status(result) must be(NOT_FOUND)
+      }
+    }
+
 
     "remove trading premises and redirect to summary before submission" in new Fixture {
 
@@ -162,7 +175,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(tradingPremisesList)))
 
-      val result = controller.remove(1, true,"", true)(newRequest)
+      val result = controller.remove(1, true,"trading Name", true)(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 

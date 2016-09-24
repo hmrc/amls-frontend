@@ -16,7 +16,11 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
 
   def get(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete, tradingName, showDateField)))
+      getData[TradingPremises](index) map {
+        case Some(tp) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
+          tp.yourTradingPremises.fold("")(_.tradingName), tp.lineId.isDefined))
+        case None => NotFound(notFoundView)
+      }
   }
 
   def remove(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
@@ -25,13 +29,20 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
         case true =>
           Form2[ActivityEndDate](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(remove_trading_premises(f, index, complete, tradingName, showDateField)))
-            case ValidForm(_, data) =>
+              getData[TradingPremises](index) map {
+                case Some(tp) => BadRequest(views.html.tradingpremises.remove_trading_premises(f, index, complete,
+                  tp.yourTradingPremises.fold("")(_.tradingName), showDateField))
+                case None => NotFound(notFoundView)
+              }
+            case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[TradingPremises](index) { tp =>
                   tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data))
                 }
               } yield Redirect(routes.SummaryController.get(complete))
+            }.recoverWith {
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
           }
         case false => removeDataStrict[TradingPremises](index) map { _ =>
           Redirect(routes.SummaryController.get(complete))
