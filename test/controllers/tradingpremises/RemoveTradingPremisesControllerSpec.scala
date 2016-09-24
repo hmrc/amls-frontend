@@ -102,7 +102,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
     "successfully load remove trading premises page" in new Fixture {
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
-      val result = controller.get(1,false,"tradingName1") (request)
+      val result = controller.get(1,false) (request)
 
       val contentString = contentAsString(result)
 
@@ -115,7 +115,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.get(1,false,"trading Name")(request)
+        val result = controller.get(1,false)(request)
 
         status(result) must be(NOT_FOUND)
       }
