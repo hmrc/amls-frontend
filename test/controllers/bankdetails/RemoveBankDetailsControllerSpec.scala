@@ -11,7 +11,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{StatusConstants, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -29,14 +29,19 @@ class RemoveBankDetailsControllerSpec extends PlaySpec with OneAppPerSuite with 
   "Get" must {
 
     "load the remove bank account page when section data is available" in new Fixture {
-      val result = controller.get(1,"",false)(request)
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
 
-      status(result) must be(OK)
+      val result = controller.get(1,false)(request)
+
+      status(result) must be(NOT_FOUND)
     }
 
     "show bank account details on the remove bank account page" in new Fixture {
+      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(BankAccount("Account Name", NonUKAccountNumber("12345678"))))))))
 
-      val result = controller.get(1,"account Name",true) (request)
+      val result = controller.get(1,true) (request)
 
       val contentString = contentAsString(result)
 
@@ -60,13 +65,12 @@ class RemoveBankDetailsControllerSpec extends PlaySpec with OneAppPerSuite with 
       val accountType4 = PersonalAccount
       val bankAccount4 = BankAccount("My Account4", UKAccount("444444", "44-44-44"))
 
-      val completeModel1 = BankDetails(Some(accountType1), Some(bankAccount1))
+      val completeModel1 = BankDetails(Some(accountType1), Some(bankAccount1), false, Some(StatusConstants.Deleted))
       val completeModel2 = BankDetails(Some(accountType2), Some(bankAccount2))
       val completeModel3 = BankDetails(Some(accountType3), Some(bankAccount3))
       val completeModel4 = BankDetails(Some(accountType4), Some(bankAccount4))
 
       val bankAccounts = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
-
       when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(bankAccounts)))
 
@@ -77,7 +81,8 @@ class RemoveBankDetailsControllerSpec extends PlaySpec with OneAppPerSuite with 
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be (Some(controllers.bankdetails.routes.SummaryController.get(false).url))
 
-      verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(), meq(Seq(completeModel2,completeModel3,completeModel4)))(any(), any(), any())
+      verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(),
+        meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4)))(any(), any(), any())
 
     }
 
