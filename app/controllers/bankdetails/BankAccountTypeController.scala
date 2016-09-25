@@ -16,7 +16,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[BankDetails](index) map {
-        case Some(BankDetails(Some(data), _, _)) =>
+        case Some(BankDetails(Some(data), _, _,_)) =>
           Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
         case Some(_) =>
           Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index))

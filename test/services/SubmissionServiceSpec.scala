@@ -13,6 +13,7 @@ import models.governmentgateway.EnrolmentResponse
 import models.tradingpremises.TradingPremises
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Reads
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
@@ -91,7 +92,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
     } thenReturn Some(mock[Seq[TradingPremises]])
     when {
-      cache.getEntry[Seq[BankDetails]](BankDetails.key)
+      cache.getEntry[Seq[BankDetails]](BankDetails.key)(any())
     } thenReturn Some(mock[Seq[BankDetails]])
   }
 

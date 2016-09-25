@@ -7,7 +7,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class BankDetails (
                          bankAccountType: Option[BankAccountType] = None,
                          bankAccount: Option[BankAccount] = None,
-                         hasChanged: Boolean = false
+                         hasChanged: Boolean = false,
+                         status:Option[String] = None
                         ){
 
   def bankAccountType(v: Option[BankAccountType]): BankDetails = {
@@ -21,8 +22,8 @@ case class BankDetails (
   }
   def isComplete: Boolean =
     this match {
-      case BankDetails(Some(_), Some(_), _) => true
-      case BankDetails(None, None, _) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case BankDetails(Some(_), Some(_), _,_) => true
+      case BankDetails(None, None, _,_) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
@@ -64,20 +65,13 @@ object BankDetails {
   }
 
   implicit val reads: Reads[BankDetails] = (
-      __.read[Option[BankAccountType]] and
-      __.read[Option[BankAccount]] and
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
+    (__ \ "bankAccountType").readNullable[BankAccountType] and
+      (__ \ "bankAccount").readNullable[BankAccount] and
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "status").readNullable[String]
     ) (BankDetails.apply _)
 
-  implicit val writes: Writes[BankDetails] = Writes[BankDetails] {
-    model =>
-      Seq(
-        Json.toJson(model.bankAccountType).asOpt[JsObject],
-        Json.toJson(model.bankAccount).asOpt[JsObject]
-      ).flatten.fold(Json.obj()) {
-        _ ++ _
-      } + ("hasChanged" -> JsBoolean(model.hasChanged))
-  }
+  implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]
 
   implicit def default(details: Option[BankDetails]): BankDetails =
     details.getOrElse(BankDetails())

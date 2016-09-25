@@ -5,24 +5,29 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.bankdetails.BankDetails
-import utils.RepeatingSection
-
-import scala.concurrent.Future
+import utils.{StatusConstants, RepeatingSection}
 
 trait RemoveBankDetailsController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, accountName: String, complete: Boolean = false) = Authorised.async {
+  def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, accountName, complete)))
+      getData[BankDetails](index) map {
+        case Some(BankDetails(_, Some(bankAcct), _,_)) =>
+        Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, bankAcct.accountName, complete))
+        case _ => NotFound(notFoundView)
+      }
   }
 
   def remove(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      removeDataStrict[BankDetails](index) map { _ =>
-        Redirect(routes.SummaryController.get(complete))
-      }
+    implicit authContext => implicit request => {
+      for {
+        rs <- updateDataStrict[BankDetails](index) { ba =>
+          ba.copy(status = Some(StatusConstants.Deleted))
+        }
+      } yield Redirect(routes.SummaryController.get(complete))
+    }
   }
 }
 

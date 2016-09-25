@@ -20,7 +20,8 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse, NotFoundException}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import utils.StatusConstants
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -75,6 +76,13 @@ trait SubmissionService extends DataCacheService {
       bt <- rd.businessType
     } yield bt
 
+  def bankDetailsExceptRemoved(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
+    bankDetails match {
+      case Some(bankAccts) => Some(bankAccts.filterNot(_.status.contains(StatusConstants.Deleted)))
+      case None => None
+    }
+  }
+
   private def createSubscriptionRequest
   (cache: CacheMap)
   (implicit
@@ -87,7 +95,7 @@ trait SubmissionService extends DataCacheService {
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
       tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
       aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
-      bankDetailsSection = cache.getEntry[Seq[BankDetails]](BankDetails.key),
+      bankDetailsSection = bankDetailsExceptRemoved(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
       responsiblePeopleSection = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key),
