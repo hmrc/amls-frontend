@@ -77,6 +77,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
           contentAsString(result) must include(Messages("submit.amendment.application"))
         }
+
         "status is pre-submission" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
@@ -104,53 +105,6 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
         }
       }
 
-      "load WhoIsRegistering page with pre-populated data from save4later" in new Fixture {
-
-        val whoIsRegistering = Some(WhoIsRegistering("DivyaTadisetti"))
-        val mockCacheMap = mock[CacheMap]
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(NotCompleted))
-
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(rp)))
-
-        when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
-          .thenReturn(whoIsRegistering)
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("person-DivyaTadisetti").attr("checked") mustBe "checked"
-      }
-
-      "load WhoIsRegistering page with pre-populated data from save4later for the option 'Someone else'" in new Fixture {
-
-        val whoIsRegistering = Some(WhoIsRegistering("-1"))
-        val mockCacheMap = mock[CacheMap]
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(NotCompleted))
-
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(rp)))
-        
-        when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
-          .thenReturn(whoIsRegistering)
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("person--1").attr("checked") mustBe "checked"
-      }
     }
 
     "Post" must {

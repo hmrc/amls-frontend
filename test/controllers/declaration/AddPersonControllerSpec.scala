@@ -98,25 +98,23 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
       document.select("input[name=roleWithinBusiness][checked]").`val` must be("")
     }
 
-    "on get display the persons page with fields populated" in new Fixture {
 
-      val addPerson = AddPerson("John", Some("Envy"),
-        "Doe", Director)
+    "on getWithAmendment display the persons page with blank fields" in new Fixture {
 
       when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(addPersonController.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionReady))
 
-      val result = addPersonController.get()(request)
+      val result = addPersonController.getWithAmendment()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=firstName]").`val` must be("John")
-      document.select("input[name=middleName]").`val` must be("Envy")
-      document.select("input[name=lastName]").`val` must be("Doe")
-      document.select("input[name=roleWithinBusiness][checked]").`val` must be("02")
+      document.select("input[name=firstName]").`val` must be("")
+      document.select("input[name=middleName]").`val` must be("")
+      document.select("input[name=lastName]").`val` must be("")
+      document.select("input[name=roleWithinBusiness][checked]").`val` must be("")
     }
 
     "must pass on post with all the mandatory parameters supplied" when {
