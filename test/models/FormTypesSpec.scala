@@ -256,11 +256,11 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail validation when anything other than 8 characters are supplied" in {
       ukBankAccountNumberType.validate("123456") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.pattern", ukBankAccountNumberRegex)))))
+        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
     }
 
     ukBankAccountNumberType.validate("1234567890") must be(
-      Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
+      Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxUKBankAccountNumberLength )))))
   }
 
   "For the Overseas Bank Account" must {
