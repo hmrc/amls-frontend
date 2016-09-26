@@ -2,16 +2,21 @@ package models
 
 import play.api.libs.json.Json
 
-case class AmendVariationResponse(
-                                   processingDate: String,
-                                   etmpFormBundleNumber: String,
-                                   registrationFee: BigDecimal,
-                                   fpFee: Option[BigDecimal],
-                                   premiseFee: BigDecimal,
-                                   totalFees: BigDecimal,
-                                   paymentReference: Option[String],
-                                   difference: Option[BigDecimal]
-                                 )
+trait SubmissionResponse {
+  val registrationFee: BigDecimal
+  val fpFee: Option[BigDecimal]
+}
+
+case class AmendVariationResponse (
+                                    processingDate: String,
+                                    etmpFormBundleNumber: String,
+                                    registrationFee: BigDecimal,
+                                    fpFee: Option[BigDecimal],
+                                    premiseFee: BigDecimal,
+                                    totalFees: BigDecimal,
+                                    paymentReference: Option[String],
+                                    difference: Option[BigDecimal]
+                                  ) extends SubmissionResponse
 
 object AmendVariationResponse {
 

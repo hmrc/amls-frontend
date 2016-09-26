@@ -9,7 +9,7 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
-import models.{AmendVariationResponse, SubscriptionRequest, SubscriptionResponse}
+import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
@@ -127,16 +127,57 @@ trait SubmissionService extends DataCacheService {
     for {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
-      subscription <- amlsConnector.update(createSubscriptionRequest(cache), regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")))
-      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, subscription)
+      amendment <- amlsConnector.update(createSubscriptionRequest(cache), regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")))
+      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
 
-    } yield subscription
+    } yield amendment
   }
 
-  private def subscriptionQuantity(subscription: SubscriptionResponse): Int =
+  def getAmendment
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[(String, Currency, Seq[BreakdownRow], BigDecimal)] =
+    cacheConnector.fetchAll flatMap {
+      option =>
+        (for {
+          cache <- option
+          amendmentResponse <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+        } yield {
+          val subQuantity = subscriptionQuantity(amendmentResponse)
+          val total = amendmentResponse.totalFees
+          val difference = amendmentResponse.difference
+          val rows = Seq(
+            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+          ) ++ responsiblePeopleRows(people, amendmentResponse) ++
+            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendmentResponse.premiseFee))
+          Future.successful(("", Currency.fromBD(total), rows, difference))
+          // TODO
+        }) getOrElse Future.failed(new Exception("TODO"))
+    }
+
+  /*(implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future [(String, Currency, Seq[BreakdownRow], BigDecimal)] = {
+    update flatMap  {
+      amendmentResponse =>
+
+        val subQuantity = subscriptionQuantity(amendmentResponse)
+        val total = amendmentResponse.totalFees
+
+        Future.successful(("", Currency.fromBD(total), rows, amendmentResponse.difference))
+    }
+  }*/
+
+  private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
 
-  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubscriptionResponse): Seq[BreakdownRow] = {
+  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
     people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
       case (b, a) =>
         Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
