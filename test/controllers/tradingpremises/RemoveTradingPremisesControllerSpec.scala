@@ -110,6 +110,17 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
       document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
     }
 
+    "successfully load remove trading premises page no trade name" in new Fixture {
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(None,None)))))
+      val result = controller.get(1,false) (request)
+
+      val contentString = contentAsString(result)
+
+      val document = Jsoup.parse(contentString)
+      document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
+    }
+
     "respond with NOT_FOUND" when {
       "there is no data at all at that index" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -120,7 +131,6 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
         status(result) must be(NOT_FOUND)
       }
     }
-
 
     "remove trading premises and redirect to summary before submission" in new Fixture {
 
