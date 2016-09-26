@@ -556,8 +556,6 @@ table.summary ul li {
   margin-bottom: 0;
 }
 
-.check-your-answers dt,
-.check-your-answers dd,
 .check-your-answers header,
 .check-your-answers footer,
 .check-your-answers li {
@@ -570,22 +568,10 @@ table.summary ul li {
 }
 
 .check-your-answers h2,
-.check-your-answers dt,
-.check-your-answers dd,
 .check-your-answers li {
   margin-bottom: 0;
   margin-top: 0;
   padding: .73684em 1.05263em .52632em 0;
-}
-
-.check-your-answers dt {
-  display: flex;
-  font-weight: bold;
-  padding-right: 0;
-}
-
-.check-your-answers dt a {
-  display: block;
 }
 
 .check-your-answers h2 a {
@@ -594,12 +580,11 @@ table.summary ul li {
   text-decoration: none;
 }
 
-.check-your-answers {
+.check-your-answers,
+.check-your-answers--amend {
   margin-bottom: 20px;
 }
 
-.check-your-answers dd,
-.check-your-answers dt,
 .check-your-answers .edit,
 .check-your-answers--list li,
 .check-your-answers--header .heading-xsmall {
@@ -616,18 +601,12 @@ table.summary ul li {
   text-decoration: underline;
 }
 
-.check-your-answers dt .edit {
-  align-content: flex-end;
-  flex: 1;
-  text-align: right;
-}
-
-.check-your-answers .grid-layout__column--1-4 {
+.check-your-answers--amend__footer {
   text-align: right;
   vertical-align: middle;
 }
 
-@media (max-width: 640px) {sbt compile
+@media (max-width: 640px) {
   .check-your-answers .grid-layout--stacked .grid-layout__column {
       display: table-cell;
   }

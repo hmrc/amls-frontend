@@ -5,7 +5,7 @@
 # title.
 # lbl.
 # button.
-#
+# visuallyhidden.
 
 ########################################################################################################################
 ##################################       Generic Error Messages     ####################################################
@@ -291,6 +291,7 @@ button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
 button.delete = Delete
+button.remove = Remove
 button.payfee = Pay registration fee
 button.logout = Log out
 
@@ -973,6 +974,9 @@ responsiblepeople.have.registered.person.text = You have registered {0} responsi
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
 responsiblepeople.check_your_answers.add = Add a responsible person
+responsiblepeople.check_your_answers.you.have.registered = You have registered
+responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person = the responsible person
+responsiblepeople.check_your_answers.visuallyhidden.from.your = from your responsible people
 responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.detailed_answers.title = Detailed answers
 responsiblepeople.detailed_answers.previous_names = Previous names
