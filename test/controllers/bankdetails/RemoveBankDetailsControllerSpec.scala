@@ -65,7 +65,7 @@ class RemoveBankDetailsControllerSpec extends PlaySpec with OneAppPerSuite with 
       val accountType4 = PersonalAccount
       val bankAccount4 = BankAccount("My Account4", UKAccount("444444", "44-44-44"))
 
-      val completeModel1 = BankDetails(Some(accountType1), Some(bankAccount1), false, Some(StatusConstants.Deleted))
+      val completeModel1 = BankDetails(Some(accountType1), Some(bankAccount1), true, Some(StatusConstants.Deleted))
       val completeModel2 = BankDetails(Some(accountType2), Some(bankAccount2))
       val completeModel3 = BankDetails(Some(accountType3), Some(bankAccount3))
       val completeModel4 = BankDetails(Some(accountType4), Some(bankAccount4))

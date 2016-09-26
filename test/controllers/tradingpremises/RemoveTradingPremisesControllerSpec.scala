@@ -147,7 +147,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
         "endDate.year" -> "1999"
       )
       val newCompleteModel1 = completeModel1.copy(status = Some(StatusConstants.Deleted),
-        endDate = Some(ActivityEndDate(new LocalDate(1999,5,12))))
+        endDate = Some(ActivityEndDate(new LocalDate(1999,5,12))), hasChanged = true)
 
       val tradingPremisesList = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
 
