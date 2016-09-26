@@ -24,7 +24,7 @@ trait RemoveBankDetailsController extends RepeatingSection with BaseController {
     implicit authContext => implicit request => {
       for {
         rs <- updateDataStrict[BankDetails](index) { ba =>
-          ba.copy(status = Some(StatusConstants.Deleted))
+          ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
         }
       } yield Redirect(routes.SummaryController.get(complete))
     }

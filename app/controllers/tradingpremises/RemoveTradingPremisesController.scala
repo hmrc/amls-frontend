@@ -33,7 +33,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
             case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[TradingPremises](index) { tp =>
-                  tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data))
+                  tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
                 }
               } yield Redirect(routes.SummaryController.get(complete))
             }
