@@ -19,7 +19,7 @@
         <li class="grid-layout">
             <span class="grid-layout__column--3-4"><span class="visuallyhidden">@Messages("responsiblepeople.check_your_answers.you.have.registered") </span>@personDetails.fullName</span>
             <footer class="grid-layout__column--1-4 check-your-answers--amend__footer">
-                <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit")<span class="visuallyhidden"> @Messages("responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person") @personDetails.fullName</span></a> @* @Messages("responsiblepeople.or.lbl") <a href="remove">Remove<span class="visuallyhidden"> @personDetails.fullName @Messages("responsiblepeople.check_your_answers.visuallyhidden.from.your")</span>*@</a>
+                <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit")<span class="visuallyhidden"> @Messages("responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person") @personDetails.fullName</span></a> @* @Messages("responsiblepeople.or.lbl") <a href="remove">@Messages("button.remove")<span class="visuallyhidden"> @personDetails.fullName @Messages("responsiblepeople.check_your_answers.visuallyhidden.from.your")</span>*@</a>
             </footer>
         </li>
         }
