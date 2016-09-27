@@ -2,11 +2,6 @@ package models
 
 import play.api.libs.json.Json
 
-trait SubmissionResponse {
-  val registrationFee: BigDecimal
-  val fpFee: Option[BigDecimal]
-}
-
 case class AmendVariationResponse (
                                     processingDate: String,
                                     etmpFormBundleNumber: String,

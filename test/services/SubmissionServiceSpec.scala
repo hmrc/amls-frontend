@@ -8,6 +8,7 @@ import models.bankdetails.BankDetails
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.SoleProprietor
+import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.governmentgateway.EnrolmentResponse
 import models.tradingpremises.TradingPremises
@@ -153,7 +154,41 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       whenReady(SubmissionService.update) {
         result =>
-          result must equal(subscriptionResponse)
+          result must equal(amendmentResponse)
+      }
+    }
+
+    "successfully submit amendment returning submission data" in new Fixture {
+
+      when {
+        SubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        SubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        SubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+      } thenReturn Future.successful(amendmentResponse)
+
+      when {
+        SubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+      val rows = Seq(
+        BreakdownRow("", 2, 10, 20)
+      ) ++ Seq(
+        BreakdownRow("", 1, 5, 5)
+      ) ++ Seq(
+        BreakdownRow("", 1, 5, 5)
+      )
+
+      val response = Future.successful(("amlsRef", Currency.fromBD(100), rows, Some(Currency.fromBD(20))))
+
+      whenReady(SubmissionService.getAmendment) {
+        result =>
+          result must equal(response)
       }
     }
 

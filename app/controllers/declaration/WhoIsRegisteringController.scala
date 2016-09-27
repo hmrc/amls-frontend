@@ -1,6 +1,6 @@
 package controllers.declaration
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -29,14 +29,12 @@ trait WhoIsRegisteringController extends BaseController {
           (for {
             cache <- optionalCache
             responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-          } yield {
-            (for {
-              whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
-            } yield whoIsRegisteringView(Ok, Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople))
-              .getOrElse(whoIsRegisteringView(Ok, EmptyForm, responsiblePeople))
-          }) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
+          } yield whoIsRegisteringView(Ok, EmptyForm, responsiblePeople)
+          ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
+
+  def getWithAmendment = get
 
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
@@ -82,7 +80,7 @@ trait WhoIsRegisteringController extends BaseController {
                 dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
                   case "-1" => {
-                    Future.successful(Redirect(routes.AddPersonController.get()))
+                    redirectToAddPersonPage
                   }
                   case _ => {
                     getAddPerson(data, responsiblePeople) map { addPerson =>
@@ -100,14 +98,21 @@ trait WhoIsRegisteringController extends BaseController {
   private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePeople])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview => status(who_is_registering("submit.amendment.application", form, rp))
-      case _ => status(who_is_registering("submit.registration", form, rp))
+      case SubmissionReadyForReview if AmendmentsToggle.feature =>
+        status(who_is_registering(("declaration.who.is.registering.amendment.title","submit.amendment.application"), form, rp))
+      case _ => status(who_is_registering(("declaration.who.is.registering.title","submit.registration"), form, rp))
     }
 
   private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
+      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
       case _ => Redirect(routes.DeclarationController.get())
+    }
+
+  private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.AddPersonController.getWithAmendment())
+      case _ => Redirect(routes.AddPersonController.get())
     }
 
 }

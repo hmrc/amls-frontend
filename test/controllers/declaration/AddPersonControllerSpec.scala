@@ -5,6 +5,7 @@ import java.util.UUID
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.declaration.{AddPerson, Director}
+import models.status.{SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -12,7 +13,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -29,6 +32,7 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
     val addPersonController = new AddPersonController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -41,21 +45,48 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
       AddPersonController.authConnector must be(AMLSAuthConnector)
     }
 
-    "on get display the persons page" in new Fixture {
+    "on get display the persons page" when {
+      "status is pending" in new Fixture {
 
-      when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = addPersonController.get()(request)
-      status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("declaration.addperson.title"))
+        when(addPersonController.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = addPersonController.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.title() must be (Messages("declaration.addperson.amendment.title"))
+
+        contentAsString(result) must include(Messages("submit.amendment.application"))
+      }
+      "status is pre-submission" in new Fixture {
+
+        when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(addPersonController.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
+
+        val result = addPersonController.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.title() must be (Messages("declaration.addperson.title"))
+
+        contentAsString(result) must include(Messages("submit.registration"))
+      }
     }
 
     "on get display the persons page with blank fields" in new Fixture {
 
       when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(addPersonController.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
 
       val result = addPersonController.get()(request)
       status(result) must be(OK)
@@ -67,37 +98,62 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
       document.select("input[name=roleWithinBusiness][checked]").`val` must be("")
     }
 
-    "on get display the persons page with fields populated" in new Fixture {
 
-      val addPerson = AddPerson("John", Some("Envy"),
-        "Doe", Director)
+    "on getWithAmendment display the persons page with blank fields" in new Fixture {
 
       when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(addPerson)))
+        (any(), any(), any())).thenReturn(Future.successful(None))
 
-      val result = addPersonController.get()(request)
+      when(addPersonController.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
+      val result = addPersonController.getWithAmendment()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=firstName]").`val` must be("John")
-      document.select("input[name=middleName]").`val` must be("Envy")
-      document.select("input[name=lastName]").`val` must be("Doe")
-      document.select("input[name=roleWithinBusiness][checked]").`val` must be("02")
+      document.select("input[name=firstName]").`val` must be("")
+      document.select("input[name=middleName]").`val` must be("")
+      document.select("input[name=lastName]").`val` must be("")
+      document.select("input[name=roleWithinBusiness][checked]").`val` must be("")
     }
 
-    "must pass on post with all the mandatory parameters supplied" in new Fixture {
+    "must pass on post with all the mandatory parameters supplied" when {
+      "status is pending" in new Fixture {
 
-      val requestWithParams = request.withFormUrlEncodedBody(
-        "firstName" -> "John",
-        "lastName" -> "Doe",
-        "roleWithinBusiness" -> "01"
-      )
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "firstName" -> "John",
+          "lastName" -> "Doe",
+          "roleWithinBusiness" -> "01"
+        )
 
-      when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-      val result = addPersonController.post()(requestWithParams)
-      status(result) must be(SEE_OTHER)
+        when(addPersonController.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = addPersonController.post()(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
+      }
+      "status is pre-submission" in new Fixture {
+
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "firstName" -> "John",
+          "lastName" -> "Doe",
+          "roleWithinBusiness" -> "01"
+        )
+
+        when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        when(addPersonController.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionReady))
+
+        val result = addPersonController.post()(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+      }
     }
 
     "must fail on post if first name not supplied" in new Fixture {
@@ -109,6 +165,9 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      when(addPersonController.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
 
       val result = addPersonController.post()(firstNameMissingInRequest)
       status(result) must be(BAD_REQUEST)
@@ -127,6 +186,9 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
+      when(addPersonController.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
       val result = addPersonController.post()(lastNameNissingInRequest)
       status(result) must be(BAD_REQUEST)
 
@@ -144,6 +206,9 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
       when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
+      when(addPersonController.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
       val result = addPersonController.post()(roleMissingInRequest)
       status(result) must be(BAD_REQUEST)
 
@@ -152,6 +217,68 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
     }
 
+  }
+
+}
+
+class AddPersonControllerWithoutAmendmentSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+
+  val userId = s"user-${UUID.randomUUID()}"
+  val mockDataCacheConnector = mock[DataCacheConnector]
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val addPersonController = new AddPersonController {
+      override val dataCacheConnector = mockDataCacheConnector
+      override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
+    }
+  }
+
+  val emptyCache = CacheMap("", Map.empty)
+
+  "AddPersonController" must {
+    "on get display the persons page" when {
+      "status is pending" in new Fixture {
+
+        when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when(addPersonController.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = addPersonController.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.title() must be (Messages("declaration.addperson.title"))
+
+        contentAsString(result) must include(Messages("submit.registration"))
+      }
+    }
+    "must pass on post with all the mandatory parameters supplied" when {
+      "status is pending" in new Fixture {
+
+        val requestWithParams = request.withFormUrlEncodedBody(
+          "firstName" -> "John",
+          "lastName" -> "Doe",
+          "roleWithinBusiness" -> "01"
+        )
+
+        when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        when(addPersonController.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        val result = addPersonController.post()(requestWithParams)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+      }
+    }
   }
 
 }
