@@ -15,7 +15,6 @@ trait SummaryController extends BaseController {
       dataCache.fetch[Seq[BankDetails]](BankDetails.key) map {
         case Some(data) =>{
           val bandDtls = data.filterNot(_.status.contains(StatusConstants.Deleted))
-          println("********bank***********"+bandDtls)
             Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bandDtls)))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
