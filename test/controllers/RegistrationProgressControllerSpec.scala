@@ -2,12 +2,13 @@ package controllers
 
 import connectors.{DataCacheConnector}
 import models.SubscriptionResponse
-import models.registrationprogress.Section
+import models.registrationprogress.{NotStarted, Completed, Section}
 import org.jsoup.Jsoup
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, OneAppPerSuite}
+import play.api.mvc.Call
 import play.api.test.FakeApplication
 import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -32,16 +33,6 @@ trait Fixture extends AuthorisedFixture {
   }
 
   protected val mockCacheMap = mock[CacheMap]
-
-  when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
-    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-  when(controller.service.sections(mockCacheMap))
-    .thenReturn(Seq.empty[Section])
-
-
-  when(controller.service.sections(any[HeaderCarrier], any[AuthContext], any[ExecutionContext]))
-    .thenReturn(Future.successful(Seq.empty[Section]))
 }
 
 class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite with MockitoSugar{
@@ -51,9 +42,14 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
   "RegistrationProgressController" when {
     "the user is enrolled into the AMLS Account" must {
       "show the update your information page" in new Fixture {
-
         when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.service.sections(mockCacheMap))
+          .thenReturn(Seq.empty[Section])
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
@@ -61,8 +57,108 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
       }
     }
 
+    "all sections are complete and" when {
+      "a section has changed" must {
+        "enable the submission button" in new Fixture{
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", Completed, false, mock[Call]),
+              Section("TESTSECTION2", Completed, true, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (false)
+        }
+      }
+
+
+      "no section has changed" must {
+        "disable the submission button" in new Fixture{
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", Completed, false, mock[Call]),
+              Section("TESTSECTION2", Completed, false, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (true)
+        }
+      }
+    }
+
+    "some sections are not complete and" when {
+      "a section has changed" must {
+        "disable the submission button" in new Fixture {
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", NotStarted, false, mock[Call]),
+              Section("TESTSECTION2", Completed, true, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (true)
+        }
+      }
+
+      "no section has changed" must {
+        "disable the submission button" in new Fixture {
+          when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(Some("AMLSREFNO")))
+
+          when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(controller.service.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", NotStarted, false, mock[Call]),
+              Section("TESTSECTION2", Completed, false, mock[Call])
+            ))
+
+          val responseF = controller.get()(request)
+          status(responseF) must be (OK)
+          val submitButtons = Jsoup.parse(contentAsString(responseF)).select("button[type=\"submit\"]")
+          submitButtons.size() must be (1)
+          submitButtons.first().hasAttr("disabled") must be (true)
+        }
+      }
+    }
+
     "the user is not enrolled into the AMLS Account" must {
       "show the registration progress page" in new Fixture {
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.service.sections(mockCacheMap))
+          .thenReturn(Seq.empty[Section])
+
         when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(None))
 
@@ -81,8 +177,11 @@ class RegistrationProgressControllerWithoutAmendmentsSpec extends WordSpec with 
   "RegistrationProgressController" when {
     "there has already been a submission" must {
       "show the registration progress page" in new Fixture {
-        when(mockCacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-          .thenReturn(Some(SubscriptionResponse("FRMBNDLENO", "AMLSREFNO", 120, None, 12, 134, "PAYREF")))
+        when(controller.service.sections(any[HeaderCarrier], any[AuthContext], any[ExecutionContext]))
+          .thenReturn(Future.successful(Seq(
+            Section("TESTSECTION1", Completed, false, mock[Call]),
+            Section("TESTSECTION2", Completed, false, mock[Call])
+          )))
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
