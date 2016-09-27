@@ -9,7 +9,6 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.SoleProprietor
 import models.estateagentbusiness.EstateAgentBusiness
-import models.governmentgateway.EnrolmentResponse
 import models.tradingpremises.TradingPremises
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec

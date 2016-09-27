@@ -7,6 +7,7 @@ import controllers.BaseController
 import models.bankdetails.BankDetails
 import models.responsiblepeople.BankAccountRegistered
 import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import utils.StatusConstants
 
 
 import scala.concurrent.Future
@@ -19,11 +20,10 @@ trait BankAccountRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) map {
-          case Some(data) => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, data.count(_.bankAccountType.isDefined)))
+          case Some(data) => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, data.count(!_.status.contains(StatusConstants.Deleted))))
           case _ => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, index))
         }
     }
-
 
   def post(index: Int) =
      Authorised.async {
@@ -38,7 +38,6 @@ trait BankAccountRegisteredController extends BaseController {
               }
           }
       }
-
 }
 
 object BankAccountRegisteredController extends BankAccountRegisteredController {
