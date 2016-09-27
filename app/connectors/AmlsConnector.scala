@@ -89,7 +89,7 @@ trait AmlsConnector {
                                              headerCarrier: HeaderCarrier,
                                              ec: ExecutionContext,
                                              reqW: Writes[SubscriptionRequest],
-                                             resW: Writes[SubscriptionResponse],
+                                             resW: Writes[AmendVariationResponse],
                                              ac: AuthContext
   ): Future[AmendVariationResponse] = {
 

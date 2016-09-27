@@ -127,9 +127,13 @@ trait SubmissionService extends DataCacheService {
     for {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
-      amendment <- amlsConnector.update(createSubscriptionRequest(cache), regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")))
-      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
-
+      amendment <- amlsConnector.update(
+        createSubscriptionRequest(cache),
+        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
+      )
+//      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment) recover{
+//        case e:Throwable => println(" >>>> " + e.getMessage); throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")
+//      }
     } yield amendment
   }
 
@@ -138,41 +142,28 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[(String, Currency, Seq[BreakdownRow], BigDecimal)] =
+  ): Future[(String, Currency, Seq[BreakdownRow], Option[Currency])] =
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
           cache <- option
-          amendmentResponse <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+          amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
           premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
         } yield {
-          val subQuantity = subscriptionQuantity(amendmentResponse)
-          val total = amendmentResponse.totalFees
-          val difference = amendmentResponse.difference
+          val subQuantity = subscriptionQuantity(amendment)
+          val mlrRegNo = "amlsReg"
+          val total = amendment.totalFees
+          val difference = amendment.difference map Currency.fromBD
           val rows = Seq(
             BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-          ) ++ responsiblePeopleRows(people, amendmentResponse) ++
-            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendmentResponse.premiseFee))
-          Future.successful(("", Currency.fromBD(total), rows, difference))
-          // TODO
+          ) ++ responsiblePeopleRows(people, amendment) ++
+            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
+          Future.successful((mlrRegNo, Currency.fromBD(total), rows, difference))
         }) getOrElse Future.failed(new Exception("TODO"))
+    } recover{
+      case e:Throwable => println(" >>>> " + e.getMessage); throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")
     }
-
-  /*(implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future [(String, Currency, Seq[BreakdownRow], BigDecimal)] = {
-    update flatMap  {
-      amendmentResponse =>
-
-        val subQuantity = subscriptionQuantity(amendmentResponse)
-        val total = amendmentResponse.totalFees
-
-        Future.successful(("", Currency.fromBD(total), rows, amendmentResponse.difference))
-    }
-  }*/
 
   private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
