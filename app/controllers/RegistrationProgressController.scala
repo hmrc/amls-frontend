@@ -25,6 +25,17 @@ trait RegistrationProgressController extends BaseController {
   private def declarationAvailable(seq: Seq[Section]): Boolean =
     seq forall { _.status == Completed }
 
+  private def amendmentDeclarationAvailable(sections : Seq[Section]) = {
+
+    sections.foldLeft((true, false)) {(acc, s) =>
+      (acc._1 && s.status == Completed,
+        acc._2 || s.hasChanged)
+    } match {
+      case (true, true) => true
+      case _ => false
+    }
+  }
+
   def get() = Authorised.async {
     implicit authContext => implicit request =>
      if (AmendmentsToggle.feature) {
@@ -41,7 +52,7 @@ trait RegistrationProgressController extends BaseController {
           val sections = service.sections(cacheMap)
           enrolmentsService.amlsRegistrationNumber map {
             case Some(_) => {
-              Ok(registration_amendment(sections, declarationAvailable(sections)))
+              Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
             }
             case None => {
               Ok(registration_progress(sections, declarationAvailable(sections)))
