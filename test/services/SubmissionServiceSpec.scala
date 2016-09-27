@@ -105,6 +105,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     when {
       cache.getEntry[Seq[BankDetails]](BankDetails.key)
     } thenReturn Some(mock[Seq[BankDetails]])
+    when {
+      cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+    } thenReturn Some(amendmentResponse)
   }
 
   "SubmissionService" must {
@@ -140,7 +143,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(cache))
 
       when {
-        SubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
+        SubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
@@ -165,7 +168,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(cache))
 
       when {
-        SubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
+        cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+      } thenReturn None
+
+      when {
+        SubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
