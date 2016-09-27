@@ -626,6 +626,14 @@ table.summary ul li {
   text-align: right;
   vertical-align: middle;
 }
+/* cheap fix before S&T */
+.check-your-answers .question {
+  word-break: break-word;
+}
+
+.check-your-answers .answer {
+  width: 120px;
+}
 
 @media (max-width: 640px) {sbt compile
   .check-your-answers .grid-layout--stacked .grid-layout__column {

@@ -1,15 +1,17 @@
 package controllers.bankdetails
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.bankdetails._
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future

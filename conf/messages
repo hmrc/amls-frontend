@@ -280,6 +280,7 @@ button.saveandreturn = Save and return to summary
 button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Edit
+button.remove = Remove
 button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
@@ -655,6 +656,7 @@ tradingpremises.summary.address = Address:
 tradingpremises.summary.residential = Residential address:
 tradingpremises.summary.who-uses = Who uses these premises?
 tradingpremises.summary.services = Services at this address:
+tradingpremises.summary.no.trading.premises = You currently have no trading premises registered
 
 tradingpremises.agentcompanyname.title = What is your agent’s registered company name? - Trading premises
 tradingpremises.agentcompanyname.heading = What is your agent’s registered company name?
@@ -671,6 +673,12 @@ tradingpremises.premises.registered.title = Premises registered - Trading premis
 tradingpremises.premises.registered.heading = Premises registered
 tradingpremises.have.registered.premises.text = You have registered {0} trading premises.
 tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
+
+tradingpremises.remove.trading.premises.title = Trading premises - Remove trading premises
+tradingpremises.remove.trading.premises.heading = Remove trading premises
+tradingpremises.remove.trading.premises.text = This will permanently remove {0} from your list of trading premises.
+tradingpremises.remove.trading.premises.enddate.lbl = When did you stop trading from these premises?
+tradingpremises.remove.trading.premises.btn = Remove trading premises
 
 estateagentbusiness.whatyouneed.title = Estate Agent Business - What you need
 estateagentbusiness.whatyouneed.heading = What you need
@@ -803,6 +811,10 @@ bankdetails.have.registered.account.text = You have registered {0} bank account.
 bankdetails.have.registered.accounts.text = You have registered {0} bank accounts.
 bankdetails.want.to.register.another.account = Do you want to register another bank account?
 
+bankdetails.remove.bank.account.title = Bank details - Remove bank details
+bankdetails.remove.bank.account.heading = Remove bank details
+bankdetails.remove.bank.account = This will permanently remove {0} from your list of bank accounts.
+bankdetails.remove.bank.account.btn = Remove bank account
 
 
 businessactivities.whatyouneed.title = Business Activities – What you need

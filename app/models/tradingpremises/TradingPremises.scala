@@ -4,6 +4,8 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+import scala.collection.Seq
+
 case class TradingPremises(
                             registeringAgentPremises: Option[RegisteringAgentPremises] = None,
                             yourTradingPremises: Option[YourTradingPremises] = None,
@@ -15,7 +17,8 @@ case class TradingPremises(
                             msbServices: Option[MsbServices] = None,
                             hasChanged: Boolean = false,
                             lineId: Option[Int] = None,
-                            status: Option[String] = None
+                            status: Option[String] = None,
+                            endDate:Option[ActivityEndDate] = None
                           ) {
 
   def businessStructure(p: BusinessStructure): TradingPremises =
@@ -44,16 +47,15 @@ case class TradingPremises(
 
   def isComplete: Boolean =
     this match {
-      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_) => true
-      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_) => true
-      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_,_) => true
+      case TradingPremises(_,_,Some(_), Some(_),Some(_),Some(_), Some(_), _,_,_,_,_) => true
+      case TradingPremises(None, None, None, None, None, None, None, None,_,_,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
 
 object TradingPremises {
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
   val key = "trading-premises"
@@ -87,35 +89,26 @@ object TradingPremises {
     override def apply(): String = "trading-premises"
   }
 
-  implicit val reads: Reads[TradingPremises] = (
-      __.read[Option[RegisteringAgentPremises]] and
-      __.read[Option[YourTradingPremises]] and
-        __.read[Option[BusinessStructure]] and
-        __.read[Option[AgentName]] and
-        __.read[Option[AgentCompanyName]] and
-        __.read[Option[AgentPartnership]] and
-      __.read[Option[WhatDoesYourBusinessDo]] and
-      __.read[Option[MsbServices]] and
-        (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
-      __.read[Option[Int]] and
-      __.read[Option[String]]
-    ) (TradingPremises.apply _)
-
-  implicit val writes: Writes[TradingPremises] = Writes[TradingPremises] {
-    model =>
-      Seq(
-        Json.toJson(model.registeringAgentPremises).asOpt[JsObject],
-        Json.toJson(model.yourTradingPremises).asOpt[JsObject],
-        Json.toJson(model.businessStructure).asOpt[JsObject],
-        Json.toJson(model.agentName).asOpt[JsObject],
-        Json.toJson(model.agentCompanyName).asOpt[JsObject],
-        Json.toJson(model.agentPartnership).asOpt[JsObject],
-        Json.toJson(model.whatDoesYourBusinessDoAtThisAddress).asOpt[JsObject],
-        Json.toJson(model.msbServices).asOpt[JsObject]
-      ).flatten.fold(Json.obj()) {
-        _ ++ _
-      } + ("hasChanged" -> JsBoolean(model.hasChanged))
+  implicit val reads: Reads[TradingPremises] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      (__ \ "registeringAgentPremises").readNullable[RegisteringAgentPremises] and
+        (__ \ "yourTradingPremises").readNullable[YourTradingPremises] and
+        (__ \ "businessStructure").readNullable[BusinessStructure] and
+        (__ \ "agentName").readNullable[AgentName] and
+        (__ \ "agentCompanyName").readNullable[AgentCompanyName] and
+        (__ \ "agentPartnership").readNullable[AgentPartnership] and
+        (__ \ "whatDoesYourBusinessDoAtThisAddress").readNullable[WhatDoesYourBusinessDo] and
+        (__ \ "msbServices").readNullable[MsbServices] and
+        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
+        (__ \ "lineId").readNullable[Int] and
+        (__ \ "status").readNullable[String] and
+        (__ \ "endDate").readNullable[ActivityEndDate]
+      ) apply TradingPremises.apply _
   }
+
+  implicit val writes: Writes[TradingPremises] = Json.writes[TradingPremises]
 
   implicit def default(tradingPremises: Option[TradingPremises]): TradingPremises =
     tradingPremises.getOrElse(TradingPremises())
