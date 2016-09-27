@@ -17,7 +17,7 @@
 ) {
 
     @if(add && !model.isEmpty){
-        <div class="panel panel-border-wide spacelarge">
+         <div class="panel-indent panel-border-wide spacelarge">
             <p>
                 <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
             </p>
@@ -25,7 +25,7 @@
     }
 
     @if(model.isEmpty){
-        <div class="panel panel-border-wide spacelarge">
+         <div class="panel-indent panel-border-wide spacelarge">
             <p> @Messages("tradingpremises.summary.no.trading.premises") </p>
             <p>
                 <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
