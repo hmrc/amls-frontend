@@ -1,0 +1,24 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+
+@(f: forms.Form2[_],index: Int, accountName:String, complete:Boolean)(implicit request: Request[_], lang: Lang)
+
+@header = {
+    @heading("bankdetails.remove.bank.account.heading", "summary.bankdetails")
+}
+
+@main(
+    title = Messages("bankdetails.remove.bank.account.title"),
+    heading = header
+) {
+
+    @form(f, controllers.bankdetails.routes.RemoveBankDetailsController.remove(index, complete)) {
+        <div class="panel-indent panel-border-wide">
+            <p>@Messages("bankdetails.remove.bank.account", accountName)</p>
+        </div>
+        <br>
+        <br>
+        @submit(false, Some(Messages("bankdetails.remove.bank.account.btn")))
+    }
+}

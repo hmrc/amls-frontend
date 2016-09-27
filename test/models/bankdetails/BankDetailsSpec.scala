@@ -16,34 +16,34 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
   val accountType = PersonalAccount
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeJson = Json.obj("bankAccountType" -> "01", "hasChanged" -> false)
+  val accountTypeJson = Json.obj("bankAccountType" ->Json.obj("bankAccountType" -> "01"), "hasChanged" -> false)
   val accountTypeNew = BelongsToBusiness
 
   val bankAccount = BankAccount("My Account", UKAccount("111111", "11-11-11"))
   val bankAccountPartialModel = BankDetails(None, Some(bankAccount))
-  val bankAccountJson = Json.obj(
+  val bankAccountJson = Json.obj("bankAccount" -> Json.obj(
     "accountName" -> "My Account",
     "isUK" -> true,
     "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11",
+    "sortCode" -> "11-11-11"),
     "hasChanged" -> false)
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
 
   val completeModel = BankDetails(Some(accountType), Some(bankAccount))
   val completeJson = Json.obj(
-    "bankAccountType" -> "01",
-    "accountName" -> "My Account",
+    "bankAccountType"-> Json.obj("bankAccountType" -> "01"),
+    "bankAccount" -> Json.obj("accountName" -> "My Account",
     "isUK" -> true,
     "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11",
+    "sortCode" -> "11-11-11"),
     "hasChanged" -> false)
   val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
   val completeJsonChanged = Json.obj(
-    "bankAccountType" -> "01",
-    "accountName" -> "My Account",
+    "bankAccountType"-> Json.obj("bankAccountType" -> "01"),
+    "bankAccount" -> Json.obj("accountName" -> "My Account",
     "isUK" -> true,
     "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11",
+    "sortCode" -> "11-11-11"),
     "hasChanged" -> true)
 
 
