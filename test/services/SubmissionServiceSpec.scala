@@ -2,6 +2,7 @@ package services
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
+import models.responsiblepeople.ResponsiblePeople
 import models.{AmendVariationResponse, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
@@ -10,10 +11,10 @@ import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.governmentgateway.EnrolmentResponse
 import models.tradingpremises.TradingPremises
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.test.FakeApplication
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
@@ -27,11 +28,13 @@ import play.api.http.Status._
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
-class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience {
+class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite {
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.amounts.registration" -> 100) )
 
   trait Fixture {
 
-    object SubmissionService extends SubmissionService {
+    val TestSubmissionService = new SubmissionService {
       override private[services] val cacheConnector = mock[DataCacheConnector]
       override private[services] val amlsConnector = mock[AmlsConnector]
       override private[services] val ggService = mock[GovernmentGatewayService]
@@ -61,10 +64,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     val amendmentResponse = AmendVariationResponse(
       processingDate = "",
       etmpFormBundleNumber = "",
-      registrationFee = 0,
+      registrationFee = 100,
       fpFee = Some(0),
       premiseFee = 0,
-      totalFees = 0,
+      totalFees = 100,
       paymentReference = Some(""),
       difference = Some(0)
     )
@@ -100,9 +103,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
     } thenReturn Some(mock[AboutTheBusiness])
     when {
-      cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-    } thenReturn Some(mock[Seq[TradingPremises]])
-    when {
       cache.getEntry[Seq[BankDetails]](BankDetails.key)
     } thenReturn Some(mock[Seq[BankDetails]])
     when {
@@ -115,22 +115,22 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "successfully subscribe and enrol" in new Fixture {
 
       when {
-        SubmissionService.cacheConnector.fetchAll(any(), any())
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
 
       when {
-        SubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
+        TestSubmissionService.cacheConnector.save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
-        SubmissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+        TestSubmissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
       } thenReturn Future.successful(subscriptionResponse)
 
       when {
-        SubmissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId))(any(), any())
+        TestSubmissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId))(any(), any())
       } thenReturn Future.successful(enrolmentResponse)
 
-      whenReady(SubmissionService.subscribe) {
+      whenReady(TestSubmissionService.subscribe) {
         result =>
           result must equal(subscriptionResponse)
       }
@@ -139,23 +139,23 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "successfully submit amendment" in new Fixture {
 
       when {
-        SubmissionService.cacheConnector.fetchAll(any(), any())
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
 
       when {
-        SubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
-        SubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+        TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
       } thenReturn Future.successful(amendmentResponse)
 
       when {
-        SubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
 
-      whenReady(SubmissionService.update) {
+      whenReady(TestSubmissionService.update) {
         result =>
           result must equal(amendmentResponse)
       }
@@ -164,36 +164,40 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "successfully submit amendment returning submission data" in new Fixture {
 
       when {
-        SubmissionService.cacheConnector.fetchAll(any(), any())
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
 
       when {
-        cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-      } thenReturn None
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(Seq(TradingPremises()))
 
       when {
-        SubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+      } thenReturn Some(Seq(ResponsiblePeople()))
+
+      when {
+        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
       } thenReturn Future.successful(CacheMap("", Map.empty))
 
       when {
-        SubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+        TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
       } thenReturn Future.successful(amendmentResponse)
 
       when {
-        SubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
       val rows = Seq(
-        BreakdownRow("", 2, 10, 20)
+        BreakdownRow("confirmation.submission", 1, 100, 100)
       ) ++ Seq(
-        BreakdownRow("", 1, 5, 5)
+        BreakdownRow("confirmation.responsiblepeople", 1, 100, 0)
       ) ++ Seq(
-        BreakdownRow("", 1, 5, 5)
+        BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
       )
 
-      val response = Future.successful(("amlsRef", Currency.fromBD(100), rows, Some(Currency.fromBD(20))))
+      val response = ("amlsReg", Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
-      whenReady(SubmissionService.getAmendment) {
+      whenReady(TestSubmissionService.getAmendment) {
         result =>
           result must equal(response)
       }
@@ -202,15 +206,15 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "return failed future when no enrolment" in new Fixture {
 
       when {
-        SubmissionService.cacheConnector.fetchAll(any(), any())
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
 
       when {
-        SubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       }.thenReturn(Future.successful(None))
 
 
-      whenReady(SubmissionService.update.failed) {
+      whenReady(TestSubmissionService.update.failed) {
         result =>
           result mustBe a[NoEnrolmentException]
       }

@@ -6,7 +6,7 @@ import exceptions.NoEnrolmentException
 import models.asp.Asp
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
@@ -163,6 +163,7 @@ trait SubmissionService extends DataCacheService {
         }) getOrElse Future.failed(new Exception("TODO"))
     }
   }
+
 
   private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
