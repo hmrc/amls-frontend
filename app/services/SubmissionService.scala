@@ -142,7 +142,7 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[(String, Currency, Seq[BreakdownRow], Option[Currency])] =
+  ): Future[(String, Currency, Seq[BreakdownRow], Option[Currency])] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -161,9 +161,8 @@ trait SubmissionService extends DataCacheService {
             Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
           Future.successful((mlrRegNo, Currency.fromBD(total), rows, difference))
         }) getOrElse Future.failed(new Exception("TODO"))
-    } recover{
-      case e:Throwable => println(" >>>> " + e.getMessage); throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")
     }
+  }
 
   private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
