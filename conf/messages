@@ -472,6 +472,8 @@ confirmation.unpaidpeople = Responsible people who have passed the Fit and Prope
 confirmation.whathappensnext.heading = What happens next
 confirmation.whathappensnext.p.1 = You will receive an email from HM Revenue and Customs within 45 days of paying the registration fee.
 confirmation.whathappensnext.p.2 = When you receive the email, sign back in to this website to see if your application has been approved or rejected.
+confirmation.amendment.responsiblepeople = Additional responsible people
+confirmation.amendment.tradingpremises = Additional trading premises
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration

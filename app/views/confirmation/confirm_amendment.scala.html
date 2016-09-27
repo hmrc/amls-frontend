@@ -2,7 +2,7 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
+@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow], difference: Option[BigDecimal])(implicit request: Request[_])
 
 @main(
     title = "You’ve submitted your amended application - Registration - Anti-money laundering registration - GOV.UK"
