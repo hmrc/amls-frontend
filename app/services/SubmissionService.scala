@@ -46,10 +46,12 @@ trait SubmissionService extends DataCacheService {
     val feePer = ApplicationConfig.premisesFee
   }
 
+
   private object People {
     val message = "confirmation.responsiblepeople"
     val feePer = ApplicationConfig.peopleFee
   }
+
 
   private object UnpaidPeople {
     val message = "confirmation.unpaidpeople"
