@@ -1,7 +1,7 @@
 package connectors
 
 import models.declaration.{AddPerson, BeneficialShareholder, RoleWithinBusiness}
-import models.{ReadStatusResponse, SubscriptionRequest, SubscriptionResponse, ViewResponse}
+import models._
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -71,6 +71,17 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     paymentReference = ""
   )
 
+  val amendmentResponse = AmendVariationResponse(
+    processingDate = "",
+    etmpFormBundleNumber = "",
+    registrationFee = 0,
+    fpFee = Some(0),
+    premiseFee = 0,
+    totalFees = 0,
+    paymentReference = Some(""),
+    difference = Some(0)
+  )
+
 
   val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
 
@@ -134,12 +145,12 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     "successfully submit amendment" in {
       when {
-        AmlsConnector.httpPost.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/update")
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/update")
           , eqTo(subscriptionRequest), any())(any(), any(), any())
-      }.thenReturn(Future.successful(subscriptionResponse))
+      }.thenReturn(Future.successful(amendmentResponse))
 
       whenReady(AmlsConnector.update(subscriptionRequest,amlsRegistrationNumber)){
-        _ mustBe subscriptionResponse
+        _ mustBe amendmentResponse
       }
     }
   }
