@@ -7,6 +7,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 
 class BankDetailsSpec extends PlaySpec with MockitoSugar {
@@ -140,6 +141,26 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incomplete)
 
       BankDetails.section(cache) must be(startedSection)
+    }
+
+    "Amend Variation: the section is complete" must {
+      "direct the user to the what you need page when all the bank details has been removed" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(BankDetails(status=Some(StatusConstants.Deleted)), BankDetails(status=Some(StatusConstants.Deleted)))))
+
+        BankDetails.section(mockCacheMap).call must be (controllers.bankdetails.routes.BankAccountAddController.get(true))
+      }
+
+      "direct the user to the what you need page when one of the trading premises has been removed" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+          .thenReturn(Some(Seq(BankDetails(status=Some(StatusConstants.Deleted)), completeModel)))
+
+        BankDetails.section(mockCacheMap).call must be (controllers.bankdetails.routes.SummaryController.get(true))
+      }
     }
   }
 

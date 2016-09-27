@@ -3,6 +3,7 @@ package models.bankdetails
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 case class BankDetails (
                          bankAccountType: Option[BankAccountType] = None,
@@ -43,7 +44,7 @@ object BankDetails {
 
 
     cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
-      _.filterNot(_ == BankDetails()) match {
+      _.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == BankDetails()) match {
         case Nil => notStarted
         case model if model.isEmpty => Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
         case model if model forall { _.isComplete } => Section(messageKey, Completed, anyChanged(model),
