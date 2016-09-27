@@ -3,21 +3,21 @@ package services
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector, GovernmentGatewayConnector}
 import exceptions.NoEnrolmentException
-import models.asp.Asp
-import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
-import models.supervision.Supervision
-import models.tcsp.Tcsp
-import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
+import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.confirmation.{BreakdownRow, Currency}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.MoneyServiceBusiness
+import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
+import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -152,7 +152,7 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[(String, Currency, Seq[BreakdownRow], Option[Currency])] = {
+  ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -162,14 +162,18 @@ trait SubmissionService extends DataCacheService {
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
         } yield {
           val subQuantity = subscriptionQuantity(amendment)
-          val mlrRegNo = "amlsReg"
-          val total = amendment.totalFees
-          val difference = amendment.difference map Currency.fromBD
-          val rows = Seq(
-            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-          ) ++ responsiblePeopleRows(people, amendment) ++
-            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
-          Future.successful((mlrRegNo, Currency.fromBD(total), rows, difference))
+          authEnrolmentsService.amlsRegistrationNumber flatMap {
+            case Some(mlrRegNo) => {
+              val total = amendment.totalFees
+              val difference = amendment.difference map Currency.fromBD
+              val rows = Seq(
+                BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+              ) ++ responsiblePeopleRows(people, amendment) ++
+                Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
+              Future.successful(Some((mlrRegNo, Currency.fromBD(total), rows, difference)))
+            }
+            case None => Future.successful(None)
+          }
         }) getOrElse Future.failed(new Exception("TODO"))
     }
   }

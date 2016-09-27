@@ -28,7 +28,7 @@ trait ConfirmationController extends BaseController {
       statusService.getStatus flatMap {
         case SubmissionReadyForReview => {
           subscriptionService.getAmendment flatMap {
-            case (regNo, total, rows, difference) =>
+            case Some((regNo, total, rows, difference)) =>
               Future.successful(Ok(views.html.confirmation.confirm_amendment(regNo, total, rows, difference)))
           }
         }

@@ -168,6 +168,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(cache))
 
       when {
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+      } thenReturn Future.successful(Some("12345"))
+
+      when {
         cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
       } thenReturn Some(Seq(TradingPremises()))
 
@@ -183,10 +187,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
       } thenReturn Future.successful(amendmentResponse)
 
-      when {
-        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-      }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
       val rows = Seq(
         BreakdownRow("confirmation.submission", 1, 100, 100)
       ) ++ Seq(
@@ -195,7 +195,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
       )
 
-      val response = ("amlsReg", Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
+      val response = Some("12345", Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
       whenReady(TestSubmissionService.getAmendment) {
         result =>
