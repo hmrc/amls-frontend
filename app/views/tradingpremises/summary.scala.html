@@ -35,12 +35,12 @@
 
     @model.zipWithIndex.map { case (tp, y) =>
         @if(!tp.status.contains(StatusConstants.Deleted)) {
-            <table class="spacesummary">
+            <table class="check-your-answers">
                 @tp.yourTradingPremises.map { ytp =>
                     <tbody>
                     <tr>
-                        <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
-                        <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a>
+                        <td class="question">@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
+                        <td class="answer"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a>
                         @Messages("lbl.or")
                         <a href="@controllers.tradingpremises.routes.RemoveTradingPremisesController.get(y + 1, add)">@Messages("button.remove")</a></td>
                     </tr>
