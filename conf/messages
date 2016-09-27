@@ -454,6 +454,7 @@ confirmation.amendment.lede = You’ve submitted your amended application
 confirmation.thankyou = Thank you for registering online.
 confirmation.thankyou.p = You now need to pay the registration fee. Your application won’t be reviewed by HM Revenue and Customs until the fee is paid.
 confirmation.amendment.thankyou.p = Because you’ve added more [trading premises / responsible people] you need to pay an additional fee.
+confirmation.amendment.previousfees.p = You still need to pay your previous fees, if you’ve not paid them already.
 confirmation.notice = You must make a note of this reference number and registration fee. You will need them to make the payment.
 confirmation.fee = Your fee:
 confirmation.breakdown = How your registration fee has been calculated:
