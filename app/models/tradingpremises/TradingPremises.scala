@@ -3,6 +3,7 @@ package models.tradingpremises
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 import scala.collection.Seq
 
@@ -69,7 +70,7 @@ object TradingPremises {
     val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
 
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
-      _.filterNot(_ == TradingPremises()) match {
+      _.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises()) match {
         case Nil => notStarted
         case premises if premises.nonEmpty && premises.forall {
           _.isComplete

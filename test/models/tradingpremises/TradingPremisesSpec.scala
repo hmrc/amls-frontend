@@ -1,7 +1,6 @@
 package models.tradingpremises
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
-import models.responsiblepeople.ResponsiblePeople
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -10,6 +9,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
@@ -155,6 +155,26 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
         val tradingPremises = TradingPremises(None, None)
         tradingPremises.isComplete must be(true)
       }
+    }
+  }
+
+  "Amend Variation: the section is complete" must {
+    "direct the user to the what you need page when all the trading premises has been removed" in {
+      val mockCacheMap = mock[CacheMap]
+
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+        .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted)), TradingPremises(status=Some(StatusConstants.Deleted)))))
+
+      TradingPremises.section(mockCacheMap).call must be (controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+    }
+
+    "direct the user to the what you need page when one of the trading premises has been removed" in {
+      val mockCacheMap = mock[CacheMap]
+
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+        .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted)), completeModel)))
+
+      TradingPremises.section(mockCacheMap).call must be (controllers.tradingpremises.routes.SummaryController.answers())
     }
   }
 
