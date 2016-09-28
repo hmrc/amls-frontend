@@ -1,11 +1,11 @@
 @(
-    question: String,
+    question: String = "",
     editUrl: String = "",
     removeUrl: String = ""
 )(content: Html)(implicit lang: Lang)
 
 <section class="check-your-answers">
-    <h2 class="heading-small">@question</h2>
+    @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
     <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
     @content
     @if(editUrl.nonEmpty){<footer class="group">
