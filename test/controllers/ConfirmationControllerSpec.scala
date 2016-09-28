@@ -1,6 +1,8 @@
 package controllers
 
+import config.AMLSAuthConnector
 import models.confirmation.Currency
+import models.status.{SubmissionReady, SubmissionReadyForReview}
 import models.{ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
@@ -20,8 +22,8 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
   trait Fixture extends AuthorisedFixture {
     self =>
     val controller = new ConfirmationController {
-      override def subscriptionService: SubmissionService = mock[SubmissionService]
-      override protected def authConnector: AuthConnector = self.authConnector
+      override protected val authConnector = self.authConnector
+      override private[controllers] val subscriptionService = mock[SubmissionService]
       override val statusService: StatusService = mock[StatusService]
     }
 
@@ -38,12 +40,18 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
     protected val mockCacheMap = mock[CacheMap]
 
     when(controller.subscriptionService.getSubscription(any(),any(),any()))
-      .thenReturn(Future.successful(("", Currency(0), Seq())))
+      .thenReturn(Future.successful(("",Currency.fromInt(0),Seq())))
+
+    when(controller.subscriptionService.getAmendment(any(),any(),any()))
+      .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(0)))))
   }
 
   "ConfirmationController" must {
 
     "notify user of progress if application has not already been submitted" in new Fixture {
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
 
       val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
 
@@ -54,23 +62,14 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
     "notify user of amendment if application has already been submitted but not approved" in new Fixture {
 
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
       val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
 
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
-    }
-    "show new calculation of fees if Trading Premises has been amended" in new Fixture {
-
-    }
-    "show new calculation of fees if Responsible People has been amended" in new Fixture {
-
-    }
-    "show new calculation of fees if Trading Premises and Responsible People has been amended" in new Fixture {
-
-    }
-    "be taken to the payment page on clicking Pay Amendment Fee" in new Fixture {
-
     }
   }
 }

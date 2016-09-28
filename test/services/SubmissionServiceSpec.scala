@@ -2,8 +2,6 @@ package services
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
-import models.responsiblepeople.ResponsiblePeople
-import models.{AmendVariationResponse, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
 import models.businesscustomer.ReviewDetails
@@ -11,19 +9,21 @@ import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
+import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
+import models.{AmendVariationResponse, SubscriptionResponse}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.http.Status._
 import play.api.test.FakeApplication
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -200,6 +200,70 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       whenReady(TestSubmissionService.getAmendment) {
         result =>
           result must equal(response)
+      }
+    }
+
+    "return None if data cannot be returned containing AMLS Reg No" in new Fixture {
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+      } thenReturn Future.successful(None)
+
+      when {
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(Seq(TradingPremises()))
+
+      when {
+        cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+      } thenReturn Some(Seq(ResponsiblePeople()))
+
+      when {
+        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+      } thenReturn Future.successful(amendmentResponse)
+
+      whenReady(TestSubmissionService.getAmendment) {
+        result =>
+          result must equal(None)
+      }
+    }
+
+    "return None if data cannot be returned containing AMLS Reg No" in new Fixture {
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+      } thenReturn Future.successful(None)
+
+      when {
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(Seq(TradingPremises()))
+
+      when {
+        cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+      } thenReturn Some(Seq(ResponsiblePeople()))
+
+      when {
+        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+      } thenReturn Future.successful(amendmentResponse)
+
+      whenReady(TestSubmissionService.getAmendment) {
+        result =>
+          result must equal(None)
       }
     }
 

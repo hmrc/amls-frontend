@@ -141,9 +141,7 @@ trait SubmissionService extends DataCacheService {
         createSubscriptionRequest(cache),
         regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
       )
-//      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment) recover{
-//        case e:Throwable => println(" >>>> " + e.getMessage); throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")
-//      }
+      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
     } yield amendment
   }
 
@@ -174,7 +172,7 @@ trait SubmissionService extends DataCacheService {
             }
             case None => Future.successful(None)
           }
-        }) getOrElse Future.failed(new Exception("TODO"))
+        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
 

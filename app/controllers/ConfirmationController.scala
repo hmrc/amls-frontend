@@ -12,17 +12,6 @@ trait ConfirmationController extends BaseController {
 
   val statusService: StatusService
 
-  /*def get() = Authorised.async {
-    implicit authContext => implicit request =>
-      subscriptionService.getSubscription flatMap {
-        case (mlrRegNo, total, rows) =>
-          statusService.getStatus flatMap {
-              case SubmissionReadyForReview => Future.successful(Ok(views.html.confirmation.confirm_amendment(mlrRegNo, total, rows)))
-              case _ => Future.successful(Ok(views.html.confirmation.confirmation(mlrRegNo, total, rows)))
-          }
-      }
-  }*/
-
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       statusService.getStatus flatMap {
@@ -30,17 +19,20 @@ trait ConfirmationController extends BaseController {
           subscriptionService.getAmendment flatMap {
             case Some((regNo, total, rows, difference)) =>
               Future.successful(Ok(views.html.confirmation.confirm_amendment(regNo, total, rows, difference)))
+            case None =>
+              Future.failed(new Exception("Could not get AMLSRegNo"))
           }
         }
-          case _ => {
-            subscriptionService.getSubscription flatMap {
-              case (mlrRegNo, total, rows) =>
-                Future.successful(Ok(views.html.confirmation.confirmation(mlrRegNo, total, rows)))
-            }
+        case _ => {
+          subscriptionService.getSubscription flatMap {
+            case (mlrRegNo, total, rows) =>
+              Future.successful(Ok(views.html.confirmation.confirmation(mlrRegNo, total, rows)))
           }
         }
       }
+  }
 }
+
 object ConfirmationController extends ConfirmationController {
   // $COVERAGE-OFF$
   override protected val authConnector = AMLSAuthConnector
