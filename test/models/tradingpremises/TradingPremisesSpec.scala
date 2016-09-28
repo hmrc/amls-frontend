@@ -1,6 +1,7 @@
 package models.tradingpremises
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.registrationprogress.{Completed, NotStarted}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -158,23 +159,64 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
     }
   }
 
-  "Amend Variation: the section is complete" must {
-    "direct the user to the what you need page when all the trading premises has been removed" in {
-      val mockCacheMap = mock[CacheMap]
+  "Amendment and Variation flow" when {
+    "the section is complete with all the trading premises being removed" must {
+      "successfully redirect to what you need page" in {
+        val mockCacheMap = mock[CacheMap]
 
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-        .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted)), TradingPremises(status=Some(StatusConstants.Deleted)))))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
+            TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true))))
+        val section = TradingPremises.section(mockCacheMap)
 
-      TradingPremises.section(mockCacheMap).call must be (controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+        section.hasChanged must be(true)
+        section.status must be(NotStarted)
+        section.call must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+      }
     }
 
-    "direct the user to the what you need page when one of the trading premises has been removed" in {
-      val mockCacheMap = mock[CacheMap]
+    "the section is complete with one of the trading premises object being removed" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
 
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-        .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted)), completeModel)))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
+            completeModel)))
+        val section = TradingPremises.section(mockCacheMap)
 
-      TradingPremises.section(mockCacheMap).call must be (controllers.tradingpremises.routes.SummaryController.answers())
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+      }
+    }
+
+    "the section is complete with all the trading premises unchanged" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(completeModel, completeModel)))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(false)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+      }
+    }
+
+    "the section is complete with all the trading premises being modified" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true),
+            TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true))))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+      }
     }
   }
 
