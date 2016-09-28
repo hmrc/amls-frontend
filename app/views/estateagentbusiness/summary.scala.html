@@ -1,4 +1,5 @@
 @import include._
+@import include.forms2._
 @import models.estateagentbusiness._
 
 @(model: EstateAgentBusiness)(implicit request: Request[_], lang: Lang)
@@ -13,106 +14,66 @@
 ) {
 
     @model.services.map { a =>
-        <table>
-            <tr>
-                <th>@Messages("estateagentbusiness.servicess.title")</th>
-                <td width="12"><a href="@controllers.estateagentbusiness.routes.BusinessServicesController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
+        @checkYourAnswers(
+            question = Messages("estateagentbusiness.servicess.title"),
+            editUrl = controllers.estateagentbusiness.routes.BusinessServicesController.get(true).toString
+        ) {
+            <ul class="list list--comma">
             @a.services.map { line =>
-            <tr>
-                <td colspan="2">
-                    @line match {
-                        case Residential => {@Messages("estateagentbusiness.service.lbl.01")}
-                        case Commercial => {@Messages("estateagentbusiness.service.lbl.02")}
-                        case Auction => {@Messages("estateagentbusiness.service.lbl.03")}
-                        case Relocation => {@Messages("estateagentbusiness.service.lbl.04")}
-                        case BusinessTransfer => {@Messages("estateagentbusiness.service.lbl.05")}
-                        case AssetManagement => {@Messages("estateagentbusiness.service.lbl.06")}
-                        case LandManagement => {@Messages("estateagentbusiness.service.lbl.07")}
-                        case Development => {@Messages("estateagentbusiness.service.lbl.08")}
-                        case SocialHousing => {@Messages("estateagentbusiness.service.lbl.09")}
-                    }
-                </td>
-            </tr>
+                <li>@line match {
+                    case Residential => {@Messages("estateagentbusiness.service.lbl.01")}
+                    case Commercial => {@Messages("estateagentbusiness.service.lbl.02")}
+                    case Auction => {@Messages("estateagentbusiness.service.lbl.03")}
+                    case Relocation => {@Messages("estateagentbusiness.service.lbl.04")}
+                    case BusinessTransfer => {@Messages("estateagentbusiness.service.lbl.05")}
+                    case AssetManagement => {@Messages("estateagentbusiness.service.lbl.06")}
+                    case LandManagement => {@Messages("estateagentbusiness.service.lbl.07")}
+                    case Development => {@Messages("estateagentbusiness.service.lbl.08")}
+                    case SocialHousing => {@Messages("estateagentbusiness.service.lbl.09")}
+                }</li>
             }
-        </table>
+            </ul>
+        }
     }
 
     @model.services.map { a =>
         @if(a.services.contains(Residential)) {
-        <table class="table--spaced-top">
-            <tr>
-                <th>@Messages("estateagentbusiness.registered.redress.title")</th>
-                <td width="12"><a href="@controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            @model.redressScheme.map { a =>
-                <tr>
-                    <td colspan="2">
-                        @a match {
-                            case ThePropertyOmbudsman => {@Messages("lbl.yes"): @Messages("estateagentbusiness.redress.lbl.01") }
-                            case OmbudsmanServices => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.02") }
-                            case PropertyRedressScheme => { @Messages("lbl.yes") : @Messages("estateagentbusiness.redress.lbl.03") }
-                            case Other(value) => { @Messages("lbl.yes") : @value }
-                            case RedressSchemedNo => {@Messages("lbl.no")}
-                        }
-                    </td>
-                </tr>
+            @checkYourAnswers(
+                question = Messages("estateagentbusiness.registered.redress.title"),
+                editUrl = controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).toString
+            ) {
+                @model.redressScheme.map { a =>
+                    <p>@a match {
+                        case ThePropertyOmbudsman => {@Messages("estateagentbusiness.redress.lbl.01") }
+                        case OmbudsmanServices => {@Messages("estateagentbusiness.redress.lbl.02") }
+                        case PropertyRedressScheme => {@Messages("estateagentbusiness.redress.lbl.03") }
+                        case Other(value) => {@value }
+                        case RedressSchemedNo => {@Messages("lbl.no")}
+                    }</p>
+                }
             }
-        </table>
         }
     }
 
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("estateagentbusiness.penalisedbyprofessional.title")</th>
-            <td width="12"><a href="@controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.professionalBody.map {
-                    case ProfessionalBodyNo => { @Messages("lbl.no") }
-                    case ProfessionalBodyYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
+    @checkYourAnswers(
+        question = Messages("estateagentbusiness.penalisedbyprofessional.title"),
+        editUrl = controllers.estateagentbusiness.routes.PenalisedByProfessionalController.get(true).toString
+    ) {
+        <p>@model.professionalBody.map {
+            case ProfessionalBodyNo => { @Messages("lbl.no") }
+            case ProfessionalBodyYes(v) => { @v }
+        }</p>
+    }
 
-        @model.professionalBody.map {
-            case ProfessionalBodyNo => { }
-            case ProfessionalBodyYes(v) => {
-            <tr>
-                <td colspan="2">
-                    @v
-                </td>
-            </tr>
-            }
-        }
-    </table>
-
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("estateagentbusiness.penalisedunderestateagentsact.title")</th>
-            <td width="12"><a href="@controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.penalisedUnderEstateAgentsAct.map {
-                    case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.no") }
-                    case PenalisedUnderEstateAgentsActYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-
-        @model.penalisedUnderEstateAgentsAct.map {
-            case PenalisedUnderEstateAgentsActNo => { }
-            case PenalisedUnderEstateAgentsActYes(v) => {
-            <tr>
-                <td colspan="2">
-                    @v
-                </td>
-            </tr>
-            }
-        }
-    </table>
+    @checkYourAnswers(
+        question = Messages("estateagentbusiness.penalisedunderestateagentsact.title"),
+        editUrl = controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get(true).toString
+    ) {
+        <p>@model.penalisedUnderEstateAgentsAct.map {
+            case PenalisedUnderEstateAgentsActNo => { @Messages("lbl.no") }
+            case PenalisedUnderEstateAgentsActYes(v) => { @v }
+        }</p>
+    }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
