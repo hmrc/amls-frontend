@@ -490,6 +490,8 @@ summary.supervision = Supervision
 summary.msb = Money Service Business
 summary.hvd = High Value Dealer
 summary.status = Your registration
+summary.visuallyhidden.answer = Answer
+summary.visuallyhidden.your.answer.for = your answer for
 
 summary.checkyouranswers.title = Check your answers
 summary.youranswers.title = Your answers
@@ -572,7 +574,7 @@ aboutthebusiness.correspondenceaddress.nonUkAddress = This is an overseas addres
 aboutthebusiness.correspondenceaddress.address = Address
 aboutthebusiness.correspondenceaddress.postCode = Postcode
 aboutthebusiness.correspondenceaddress.country = Country
-aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision? – About the business
+aboutthebusiness.registeredformlr.title = Is your business currently registered for anti-money laundering supervision?
 aboutthebusiness.registeredformlr.heading = Is your business currently registered for anti-money laundering supervision?
 aboutthebusiness.registeredformlr.lbl = This only refers to registration with HMRC
 aboutthebusiness.registeredformlr.mlrregno.lbl = Money Laundering Regulations registration number

@@ -1,0 +1,13 @@
+@(
+    question: String,
+    editUrl: String = "",
+    removeUrl: String = ""
+)(content: Html)(implicit lang: Lang)
+
+<li class="group check-your-answers check-your-answers--amend">
+    <p class="grid-layout grid-layout__column--3-4"><span class="visuallyhidden">@Messages("tradingpremises.visuallyhidden.you.have.registered") </span>@content</p>
+    @if(editUrl.nonEmpty){<footer class="grid-layout grid-layout__column--1-4 check-your-answers__footer">
+        <p><a href="@editUrl">@Messages("button.edit")<span class="visuallyhidden"> @Messages("tradingpremises.visuallyhidden.the.details.for") @content</span></a>@* @Messages("lbl.or") <a href="@removeUrl">@Messages("button.remove")<span class="visuallyhidden"> ACME Limited @Messages("tradingpremises.visuallyhidden.from.your.trading.premises")</span></a>*@
+        </p>
+    </footer>}
+</li>

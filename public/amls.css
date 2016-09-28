@@ -328,7 +328,7 @@ a.progress-step,
 /********************************************************************/
 /* add back some margins */
 .list {
-  margin-bottom: 40px;
+  margin-bottom: 1.05263em;
   margin-top: 5px;
 }
 
@@ -556,12 +556,9 @@ table.summary ul li {
   margin-bottom: 0;
 }
 
-.check-your-answers dt,
-.check-your-answers dd,
-.check-your-answers header,
-.check-your-answers footer,
-.check-your-answers li {
+.check-your-answers {
   border-bottom: 1px solid #bfc1c3;
+  margin-bottom: 20px;
   padding: 0 0 .52632em 0;
 }
 
@@ -570,32 +567,16 @@ table.summary ul li {
 }
 
 .check-your-answers h2,
-.check-your-answers dt,
-.check-your-answers dd,
 .check-your-answers li {
   margin-bottom: 0;
   margin-top: 0;
-  padding: .73684em 1.05263em .52632em 0;
-}
-
-.check-your-answers dt {
-  display: flex;
-  font-weight: bold;
-  padding-right: 0;
-}
-
-.check-your-answers dt a {
-  display: block;
+  padding: 0 0 .52632em 0;
 }
 
 .check-your-answers h2 a {
   color: #0b0c0c;
   display: flex;
   text-decoration: none;
-}
-
-.check-your-answers {
-  margin-bottom: 20px;
 }
 
 .check-your-answers dd,
@@ -612,14 +593,7 @@ table.summary ul li {
   font-weight: normal;
   line-height: 1.25;
   margin: 0 0 .21053em;
-  padding-left: 1.05263em;
   text-decoration: underline;
-}
-
-.check-your-answers dt .edit {
-  align-content: flex-end;
-  flex: 1;
-  text-align: right;
 }
 
 .check-your-answers .grid-layout__column--1-4 {
@@ -635,7 +609,7 @@ table.summary ul li {
   width: 120px;
 }
 
-@media (max-width: 640px) {sbt compile
+@media (max-width: 640px) {
   .check-your-answers .grid-layout--stacked .grid-layout__column {
       display: table-cell;
   }
@@ -655,7 +629,24 @@ table.summary ul li {
   }
 }
 
+.list--comma li,
+.list--inline li {
+  display: inline-block;
+  padding-right: 0;
+}
 
+.lte-ie8 .list--comma li,
+.lte-ie8 .list--inline li {
+  display: list-item;
+}
+
+.list--comma li::after {
+  content: ', ';
+}
+
+.list--comma li:last-child::after {
+  content: '';
+}
 
 
 
