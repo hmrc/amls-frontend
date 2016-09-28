@@ -148,18 +148,24 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-          .thenReturn(Some(Seq(BankDetails(status=Some(StatusConstants.Deleted)), BankDetails(status=Some(StatusConstants.Deleted)))))
+          .thenReturn(Some(Seq(BankDetails(status=Some(StatusConstants.Deleted), hasChanged = true), BankDetails(status=Some(StatusConstants.Deleted), hasChanged = true))))
+          val section = BankDetails.section(mockCacheMap)
 
-        BankDetails.section(mockCacheMap).call must be (controllers.bankdetails.routes.BankAccountAddController.get(true))
+        section.hasChanged must be (true)
+        section.status must be(NotStarted)
+        section.call must be (controllers.bankdetails.routes.BankAccountAddController.get(true))
       }
 
       "direct the user to the what you need page when one of the trading premises has been removed" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
-          .thenReturn(Some(Seq(BankDetails(status=Some(StatusConstants.Deleted)), completeModel)))
+          .thenReturn(Some(Seq(BankDetails(status=Some(StatusConstants.Deleted), hasChanged = true), completeModel)))
+        val section = BankDetails.section(mockCacheMap)
 
-        BankDetails.section(mockCacheMap).call must be (controllers.bankdetails.routes.SummaryController.get(true))
+        section.hasChanged must be (true)
+        section.status must be(Completed)
+        section.call must be (controllers.bankdetails.routes.SummaryController.get(true))
       }
     }
   }
