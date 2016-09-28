@@ -16,7 +16,7 @@
     heading = header
 ) {
 
-    @if(add && !model.isEmpty){
+    @if(add && !(model.isEmpty || (model.count(!_.status.contains(StatusConstants.Deleted)) == 0))){
          <div class="panel-indent panel-border-wide spacelarge">
             <p>
                 <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
@@ -24,7 +24,7 @@
         </div>
     }
 
-    @if(model.isEmpty){
+    @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0){
          <div class="panel-indent panel-border-wide spacelarge">
             <p> @Messages("tradingpremises.summary.no.trading.premises") </p>
             <p>
