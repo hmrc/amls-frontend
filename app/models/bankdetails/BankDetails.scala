@@ -42,9 +42,8 @@ object BankDetails {
     val messageKey = "bankdetails"
     val notStarted = Section(messageKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
 
-
     cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
-      _.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == BankDetails()) match {
+      _.filterNot(_ == BankDetails()) match {
         case Nil => notStarted
         case model if model.isEmpty => Section(messageKey, Completed, anyChanged(model), controllers.bankdetails.routes.SummaryController.get(true))
         case model if model forall { _.isComplete } => Section(messageKey, Completed, anyChanged(model),
