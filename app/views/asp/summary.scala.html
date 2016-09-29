@@ -1,4 +1,5 @@
 @import include._
+@import include.forms2._
 @import models.asp._
 
 @(model: Asp)(implicit request: Request[_], lang: Lang)
@@ -13,46 +14,33 @@
 ) {
 
     @model.services.map { a =>
-        <table class="table--spaced-top">
-            <tr>
-                <th>@Messages("asp.services.title")</th>
-                <td width="12"><a href="@controllers.asp.routes.ServicesOfBusinessController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
+        @checkYourAnswers(
+            question = Messages("asp.services.title"),
+            editUrl = controllers.asp.routes.ServicesOfBusinessController.get(true).toString
+        ) {
+            <ul class="list list--comma">
             @a.services.map { line =>
-            <tr>
-                <td colspan="2">
-                    @line match {
-                        case Accountancy => {@Messages("asp.service.lbl.01")}
-                        case PayrollServices => {@Messages("asp.service.lbl.02")}
-                        case BookKeeping => {@Messages("asp.service.lbl.03")}
-                        case Auditing => {@Messages("asp.service.lbl.04")}
-                        case FinancialOrTaxAdvice => {@Messages("asp.service.lbl.05")}
-                    }
-                </td>
-            </tr>
+                <li>@line match {
+                    case Accountancy => {@Messages("asp.service.lbl.01")}
+                    case PayrollServices => {@Messages("asp.service.lbl.02")}
+                    case BookKeeping => {@Messages("asp.service.lbl.03")}
+                    case Auditing => {@Messages("asp.service.lbl.04")}
+                    case FinancialOrTaxAdvice => {@Messages("asp.service.lbl.05")}
+                }</li>
             }
-        </table>
+            </ul>
+        }
     }
 
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("asp.other.business.tax.matters.title")</th>
-            <td width="12"><a href="@controllers.asp.routes.OtherBusinessTaxMattersController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.otherBusinessTaxMatters.map {
-                    case OtherBusinessTaxMattersNo => { @Messages("lbl.no") }
-                    case OtherBusinessTaxMattersYes => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-
-        @model.otherBusinessTaxMatters.map {
-            case OtherBusinessTaxMattersNo => { }
-            case OtherBusinessTaxMattersYes => { }
-        }
-    </table>
+    @checkYourAnswers(
+        question = Messages("asp.other.business.tax.matters.title"),
+        editUrl = controllers.asp.routes.OtherBusinessTaxMattersController.get(true).toString
+    ) {
+        <p>@model.otherBusinessTaxMatters.map {
+            case OtherBusinessTaxMattersNo => { @Messages("lbl.no") }
+            case OtherBusinessTaxMattersYes => { @Messages("lbl.yes") }
+        }</p>
+    }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }
