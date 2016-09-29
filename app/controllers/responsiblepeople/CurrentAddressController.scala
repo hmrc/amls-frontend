@@ -68,6 +68,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
         res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
             case (Some(a), ThreeYearsPlus) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
+            case (Some(a), OneToThreeYears) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
             case (Some(a), _) => a.currentAddress(data)
             case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
           })
