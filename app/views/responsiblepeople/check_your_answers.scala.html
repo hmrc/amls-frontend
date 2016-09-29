@@ -1,4 +1,5 @@
 @import include._
+@import include.forms2._
 @import models.responsiblepeople._
 
 @(model: Seq[ResponsiblePeople])(implicit request: Request[_], lang: Lang)
@@ -12,24 +13,20 @@
     heading = header
 ) {
 
-    <table>
-        <tbody>
-            @model.zipWithIndex.map { case (responsiblePerson, idx)=>
+    <ul class="list">
+        @model.zipWithIndex.map { case (responsiblePerson, idx)=>
 
-                @responsiblePerson.personName.map { personDetails =>
-                 <tr>
-                    <th class="summary-title">
-                        @personDetails.fullName
-                    </th>
-                    <td>
-                        <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit") </a>
-                    </td>
-                </tr>
+            @responsiblePerson.personName.map { personDetails =>
+                @checkYourAnswersListing(
+                    item = personDetails.fullName,
+                    editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1).toString
+                ) {
+
                 }
-
             }
-        </tbody>
-    </table>
+
+        }
+    </ul>
 
     <div class="form-field">
         <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.checkyouranswers.acceptandcomplete")</a>
