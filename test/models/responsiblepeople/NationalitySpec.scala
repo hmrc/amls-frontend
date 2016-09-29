@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import models.Country
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -24,18 +25,18 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
     "successfully pass validation for otherCountry" in {
       val urlFormEncoded = Map(
         "nationality" -> Seq("03"),
-        "otherCountry" -> Seq("Some other value")
+        "otherCountry" -> Seq("GB")
       )
-      Nationality.formRule.validate(urlFormEncoded) must be(Success(OtherCountry("Some other value")))
+      Nationality.formRule.validate(urlFormEncoded) must be(Success(OtherCountry(Country("United Kingdom","GB"))))
     }
 
     "fail validation if not Other value" in {
       val urlFormEncoded = Map(
-        "nationality" -> Seq("08"),
+        "nationality" -> Seq("03"),
         "otherCountry" -> Seq("")
       )
       Nationality.formRule.validate(urlFormEncoded) must be(Failure(Seq(
-        (Path \ "otherCountry") -> Seq(ValidationError("error.required"))
+        (Path \ "otherCountry") -> Seq(ValidationError("error.required.country"))
       )))
     }
 
@@ -61,48 +62,35 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
     }
 
     "load the correct value in the form for Other value" in {
-      Nationality.formWrite.writes(OtherCountry("some value")) must be(Map(
-        "nationality" -> Seq("08"),
-        "otherCountry" -> Seq("some value")
+      Nationality.formWrite.writes(OtherCountry(Country("United Kingdom","GB"))) must be(Map(
+        "nationality" -> Seq("03"),
+        "otherCountry" -> Seq("GB")
       ))
     }
   }
 
   "JSON" must {
 
-    "Read the json and return the RoleWithinBusiness domain object successfully for the BeneficialShareholder" in {
-      val json = Json.obj(
-        "nationality" -> "01"
-      )
-      Nationality.jsonReads.reads(json) must be(JsSuccess(British, JsPath \ "roleWithinBusiness"))
+    "Read json and write the option British successfully" in {
+
+      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(British)) must be(JsSuccess(British, JsPath \ "nationality"))
     }
 
+    "Read json and write the option Irish successfully" in {
 
-    "Read the json and return the Nationality domain object successfully for the Director" in {
-      val json = Json.obj(
-        "nationality" -> "02"
-      )
-      Nationality.jsonReads.reads(json) must be(JsSuccess(Director, JsPath \ "roleWithinBusiness"))
+      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(Irish)) must be(JsSuccess(Irish, JsPath \ "nationality"))
     }
 
     "Read the json and return the given `other` value" in {
-
-      val json = Json.obj(
-        "nationality" -> "08",
-        "otherCountry" -> "any other value"
-      )
-
-      Json.fromJson[Nationality](json) must
-        be(JsSuccess(OtherCountry("GBe"), JsPath \ "roleWithinBusiness" \ "roleWithinBusinessOther"))
+      val json = Nationality.jsonWrites.writes(OtherCountry(Country("United Kingdom","GB")))
+      Nationality.jsonReads.reads(json) must be(
+        JsSuccess(OtherCountry(Country("United Kingdom","GB")), JsPath \ "nationality" \ "otherCountry"))
     }
 
-    "Read the json and return error if an invalid value is found" in {
-      val json = Json.obj(
-        "roleWithinBusiness" -> "09"
-      )
-      Nationality.jsonReads.reads(json) must be(JsError((JsPath \ "roleWithinBusiness") -> ValidationError("error.invalid")))
+    "fail to validate given an invalid value supplied that is not matching to any nationality" in {
+
+      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath \ "nationality",List(ValidationError("error.invalid"))))))
+
     }
   }
-
-
 }

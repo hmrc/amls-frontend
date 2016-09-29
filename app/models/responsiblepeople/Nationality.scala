@@ -1,5 +1,6 @@
 package models.responsiblepeople
 
+import models.Country
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
@@ -11,7 +12,7 @@ case object British extends Nationality
 
 case object Irish extends Nationality
 
-case class OtherCountry(value: String) extends Nationality
+case class OtherCountry(name: Country) extends Nationality
 
 object Nationality {
 
@@ -19,34 +20,31 @@ object Nationality {
 
   implicit val formRule: Rule[UrlFormEncoded, Nationality] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
-      import models.FormTypes._
       import play.api.data.mapping.forms.Rules._
       (readerURLFormEncoded \ "nationality").read[String] flatMap {
         case "01" => British
         case "02" => Irish
-        case "08" =>
-          (readerURLFormEncoded \ "roleWithinBusinessOther").read(roleWithinBusinessOtherType) fmap OtherCountry.apply
+        case "03" =>
+          (readerURLFormEncoded \ "otherCountry").read[Country] fmap OtherCountry.apply
         case _ =>
-          (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
+          (Path \ "nationality") -> Seq(ValidationError("error.invalid"))
       }
     }
 
   implicit val formWrite: Write[Nationality, UrlFormEncoded] = Write {
     case British => "nationality" -> "01"
     case Irish => "nationality" -> "02"
-    case OtherCountry(value) => Map("nationality" -> "08",
-      "OtherCountry" -> value)
+    case OtherCountry(value) => Map("nationality" -> "03",
+      "otherCountry" -> value.code)
   }
 
   implicit val jsonReads: Reads[Nationality] = {
     import play.api.libs.json._
 
-    (__ \ "roleWithinBusiness").read[String].flatMap[Nationality] {
+    (__ \ "nationality").read[String].flatMap[Nationality] {
       case "01" => British
       case "02" => Irish
-      case "03" => (JsPath \ "nationality").read[String] map {
-        OtherCountry(_)
-      }
+      case "03" => (JsPath \ "otherCountry").read[Country] map OtherCountry.apply
       case _ => ValidationError("error.invalid")
     }
   }
@@ -55,8 +53,24 @@ object Nationality {
     case British => Json.obj("nationality" -> "01")
     case Irish => Json.obj("nationality" -> "02")
     case OtherCountry(value) => Json.obj(
-      "nationality" -> "08",
-      "OtherCountry" -> value
+      "nationality" -> "03",
+      "otherCountry" -> value
     )
+  }
+
+  implicit def getNationality(country: Country): Nationality = {
+    country match {
+      case Country("United Kingdom", "GB") => British
+      case Country("Ireland", "IE") => Irish
+      case someCountry => OtherCountry(someCountry)
+    }
+  }
+
+  implicit def getCountry(nationality: Nationality): Country = {
+    nationality match {
+      case British =>Country("United Kingdom", "GB")
+      case Irish => Country("Ireland", "IE")
+      case OtherCountry(someCountry) => someCountry
+    }
   }
 }

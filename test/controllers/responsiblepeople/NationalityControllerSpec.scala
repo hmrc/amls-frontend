@@ -30,9 +30,9 @@ class NationalityControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "PersonResidentTypeController" must {
+  "NationalityController" must {
 
-    "display person a UK resident page" in new Fixture {
+    "successfully load nationality page" in new Fixture {
       val responsiblePeople = ResponsiblePeople()
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())

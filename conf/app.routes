@@ -211,6 +211,9 @@ POST        /responsible-people/address/:index                          controll
 GET         /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false)
+
 GET         /responsible-people/check-your-answers                      controllers.responsiblepeople.CheckYourAnswersController.get()
 GET         /responsible-people/person-details/:index                   controllers.responsiblepeople.DetailedAnswersController.get(index: Int)
 
