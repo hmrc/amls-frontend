@@ -10,32 +10,27 @@ title = Messages("summary.checkyouranswers.title")
 ) {
 
     @heading("summary.checkyouranswers.title", "summary.hvd")
-
-    @model.products.map { p =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.products.heading")</th>
-                <td width="12"><a href="@controllers.hvd.routes.ProductsController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @{p.sorted.map {
-                        case Alcohol => Messages("hvd.products.option.01")
-                        case Tobacco => Messages("hvd.products.option.02")
-                        case Antiques => Messages("hvd.products.option.03")
-                        case Cars => Messages("hvd.products.option.04")
-                        case OtherMotorVehicles => Messages("hvd.products.option.05")
-                        case Caravans => Messages("hvd.products.option.06")
-                        case Jewellery => Messages("hvd.products.option.07")
-                        case Gold => Messages("hvd.products.option.08")
-                        case ScrapMetals => Messages("hvd.products.option.09")
-                        case MobilePhones => Messages("hvd.products.option.10")
-                        case Clothing => Messages("hvd.products.option.11")
-                        case Other(x) => x
-                    }.mkString(", ")}
-                </td>
-            </tr>
-        </table>
+    <h2>@Messages("hvd.products.heading")</h2>
+    <p><a href="@controllers.hvd.routes.ProductsController.get(true)">@Messages("button.edit")</a></p>
+    <ul class="panel-indent panel-indent--gutter panel-border-wide">
+        @model.products.map { p =>
+        @p.items.map{ i =>
+            @i match {
+                case Alcohol => {<li>@Messages("hvd.products.option.01")</li>}
+                case Tobacco => {<li>@Messages("hvd.products.option.02")</li>}
+                case Antiques => {<li>@Messages("hvd.products.option.03")</li>}
+                case Cars => {<li>@Messages("hvd.products.option.04")</li>}
+                case OtherMotorVehicles => {<li>@Messages("hvd.products.option.05")</li>}
+                case Caravans => {<li>@Messages("hvd.products.option.06")</li>}
+                case Jewellery => {<li>@Messages("hvd.products.option.07")</li>}
+                case Gold => {<li>@Messages("hvd.products.option.08")</li>}
+                case ScrapMetals => {<li>@Messages("hvd.products.option.09")</li>}
+                case MobilePhones => {<li>@Messages("hvd.products.option.10")</li>}
+                case Clothing => {<li>@Messages("hvd.products.option.11")</li>}
+                case Other(x) => {@x}
+            }
+        }
+    </ul>
 
         @if(p.items.contains(Alcohol) | p.items.contains(Tobacco)) {
             @model.exciseGoods.map { eg =>
