@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.TimeAtAddress.{Empty, ZeroToFiveMonths, ThreeYearsPlus}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, Empty, ZeroToFiveMonths, ThreeYearsPlus}
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddressHistory, ResponsiblePersonAddress, ResponsiblePeople}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
@@ -48,8 +48,10 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
               doUpdate(index, data).map { _ =>
                   (data.timeAtAddress, edit) match {
                     case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
+                    case (OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
                     case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit))
                     case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
+                    case (OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index))
                     case (_, true) => Redirect(routes.AdditionalAddressController.get(index, edit))
                 }
               }
