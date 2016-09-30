@@ -60,7 +60,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your application")
     }
 
-    "notify user of amendment if application has already been submitted but not approved" in new Fixture {
+    "notify user of amendment if application has already been submitted but not approved with difference" in new Fixture {
 
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -70,6 +70,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
+      contentAsString(result) must include("Your amendment fee")
     }
   }
 }
