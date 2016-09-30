@@ -87,7 +87,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
       Nationality.jsonReads.reads(Nationality.jsonWrites.writes(Irish)) must be(JsSuccess(Irish, JsPath \ "nationality"))
     }
 
-    "Read the json and return the given `other` value" in {
+    "Read read and write the option `other country` successfully" in {
       val json = Nationality.jsonWrites.writes(OtherCountry(Country("United Kingdom", "GB")))
       Nationality.jsonReads.reads(json) must be(
         JsSuccess(OtherCountry(Country("United Kingdom", "GB")), JsPath \ "nationality" \ "otherCountry"))

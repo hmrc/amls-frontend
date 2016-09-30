@@ -42,6 +42,20 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
       contentAsString(result) must include(Messages("responsiblepeople.person.a.resident.title"))
     }
 
+    "load 'not found' error page" when {
+      "get throws an error " in new Fixture {
+        val responsiblePeople = ResponsiblePeople()
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        val result = controller.get(10)(request)
+
+        status(result) must be(NOT_FOUND)
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.title must be("Not Found")
+      }
+    }
+
     "submit with valid Non UK data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -61,41 +75,21 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
 
       val result = controller.post(1)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
     }
 
     "Prepopulate UI with saved data" in new Fixture {
+
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,
         Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
-        Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))), None)))))
+          Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))), None)))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[name=ukPassportNumber]").`val`() must include("12346464646")
-    }
-
-    "fail submission on error" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUKResidence" -> "true",
-        "nino" -> "AAAAAAAAA",
-        "countryOfBirth" -> "GB",
-        "nationality" -> ""
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#nationality]").html() must include(Messages("error.required.nationality"))
     }
 
     "submit with valid UK model data in edit mode" in new Fixture {
@@ -140,6 +134,53 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
       val result = controller.post(1, false)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
+    }
+
+    "throw error message when data is not valid" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "nino" -> "AA346464B",
+        "countryOfBirth" -> "GB",
+        "nationality" -> "GB"
+      )
+
+      val responsiblePeople = ResponsiblePeople()
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(1, false)(newRequest)
+      status(result) must be(BAD_REQUEST)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#isUKResidence]").html() must include(Messages("error.required.rp.is.uk.resident"))
+    }
+
+    "redirect to 'not found' error page" when {
+      "post throws exception" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isUKResidence" -> "true",
+          "nino" -> "AA346464B",
+          "countryOfBirth" -> "GB",
+          "nationality" -> "GB"
+        )
+
+        val responsiblePeople = ResponsiblePeople()
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(10, false)(newRequest)
+        status(result) must be(NOT_FOUND)
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.title must be("Not Found")
+      }
     }
   }
 }
