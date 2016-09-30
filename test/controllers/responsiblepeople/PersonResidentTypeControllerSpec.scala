@@ -68,7 +68,7 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,
         Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
-        Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))), None)))))
+        Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))), None)))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
@@ -118,6 +118,28 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+    }
+
+    "submit with valid UK model data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUKResidence" -> "true",
+        "nino" -> "AA346464B",
+        "countryOfBirth" -> "GB",
+        "nationality" -> "GB"
+      )
+
+      val responsiblePeople = ResponsiblePeople()
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(1, false)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
     }
   }
 }

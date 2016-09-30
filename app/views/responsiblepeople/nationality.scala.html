@@ -12,18 +12,17 @@
 }
 
 @main(
-    title = Messages("responsiblepeople.person.a.resident.title"),
+    title = Messages("responsiblepeople.nationality.title"),
     heading = header
 )  {
 
     @form(f, controllers.responsiblepeople.routes.NationalityController.post(index, edit)) {
           @radioGroup(f("nationality")) {
-                @legend("responsiblepeople.nationality.select", jsHidden = false)
                 @radio(f("nationality"), "responsiblepeople.nationality.selection.british", "01")
                 @radio(f("nationality"), "responsiblepeople.nationality.selection.irish", "02")
                 @radio(f("nationality"), "responsiblepeople.nationality.selection.other", "03", target = s"#$target")
                 @fieldset("TODO", jsHidden = true, id = target) {
-                    @country(f("nationality"), labelText = "responsiblepeople.nationality.selection.other.name")
+                    @country(f("otherCountry"), labelText = "responsiblepeople.nationality.selection.other.name")
                 }
 
           }

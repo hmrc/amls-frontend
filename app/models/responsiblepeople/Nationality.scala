@@ -21,7 +21,7 @@ object Nationality {
   implicit val formRule: Rule[UrlFormEncoded, Nationality] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
       import play.api.data.mapping.forms.Rules._
-      (readerURLFormEncoded \ "nationality").read[String] flatMap {
+      (readerURLFormEncoded \ "nationality").read[String].withMessage("error.required.nationality") flatMap {
         case "01" => British
         case "02" => Irish
         case "03" =>
@@ -56,6 +56,13 @@ object Nationality {
       "nationality" -> "03",
       "otherCountry" -> value
     )
+  }
+
+  implicit def getNationality(country: Option[Country]): Option[Nationality] = {
+    country match {
+      case Some(countryType)=> Some(countryType)
+      case _ => None
+    }
   }
 
   implicit def getNationality(country: Country): Nationality = {

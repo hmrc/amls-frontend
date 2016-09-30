@@ -16,18 +16,22 @@ trait NationalityController extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
-    Authorised.async {
-      implicit authContext => implicit request =>
+      Authorised.async {
+        implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(nationality(Form2[Nationality](residencyType.nationality), edit, index))
+            =>
+              residencyType.nationality match {
+                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index))
+                case _ => Ok(nationality(EmptyForm, edit, index))
+              }
             case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(nationality(EmptyForm, edit, index))
+            => Ok(nationality(EmptyForm, edit, index))
             case _
-              => NotFound(notFoundView)
+            => NotFound(notFoundView)
           }
+      }
     }
-  }
 
   def post(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
@@ -40,7 +44,7 @@ trait NationalityController extends RepeatingSection with BaseController {
             case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  val residenceType = rp.personResidenceType.map(x => x.copy(nationality = data))
+                  val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
                   rp.copy(personResidenceType = residenceType)
                 }
               } yield edit match {
@@ -58,6 +62,7 @@ trait NationalityController extends RepeatingSection with BaseController {
 object NationalityController extends NationalityController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
+
   override def dataCacheConnector = DataCacheConnector
 }
 
