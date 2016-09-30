@@ -44,7 +44,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.ContactDetailsController.get(index, edit))
+                case false => Redirect(routes.NationalityController.get(index, edit))
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

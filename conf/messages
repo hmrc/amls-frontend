@@ -1012,14 +1012,14 @@ responsiblepeople.position_within_business.lbl.04 = Nominated officer
 responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
-responsiblepeople.person.a.resident.heading = Is this person a UK resident?
+responsiblepeople.person.a.resident.heading = Is {0} a UK resident?
 responsiblepeople.dob.lbl = Date of birth
 responsiblepeople.dob.lbl.hint = For example, 31 3 1980
 responsiblepeople.passporttype.lbl = What type of passport does this person have?
 responsiblepeople.uk.passport.lbl = UK passport
 responsiblepeople.non.uk.passport.lbl = Non-UK passport
 responsiblepeople.no.passport.lbl = This person doesn’t have a passport
-responsiblepeople.country.of.birth.lbl = Country of birth
+responsiblepeople.country.of.birth.lbl = What''s {0} country of birth
 responsiblepeople.country.of.birth.hint = If you were born in England, Scotland, Wales, or Northern Ireland, select ''United Kingdom''.
 responsiblepeople.or.lbl = or
 responsiblepeople.whomustregister.title = Who must register as a responsible person
@@ -1072,6 +1072,15 @@ responsiblepeople.detailed_answers.registered_for_sa = Registered for Self Asses
 responsiblepeople.detailed_answers.previous_experience = Previous Experience
 responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
+responsiblepeople.nationality.header = What is the nationality of
+responsiblepeople.nationality.select = Select all that apply
+responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
+responsiblepeople.nationality.selection.irish = Irish
+responsiblepeople.nationality.selection.other = National of a different country
+responsiblepeople.nationality.selection.other.name = Country name
+
+
+
 
 #TCSP
 tcsp.whatyouneed.title = What you need
