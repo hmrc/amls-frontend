@@ -1,7 +1,7 @@
 package controllers.bankdetails
 
 import connectors.DataCacheConnector
-import models.bankdetails.{BankAccount, BankDetails, PersonalAccount, UKAccount}
+import models.bankdetails._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -28,18 +28,40 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
   val emptyCache = CacheMap("", Map.empty)
 
   "BankAccountTypeController" when {
-    "get is called" must {
+    "get:" must {
       "respond with OK and display the blank 'bank account type' page" when {
         "there is no bank account type information yet" in new Fixture {
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
 
           val result = controller.get(1, false)(request)
-          //          val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("unchecked")
 
           status(result) must be(OK)
           contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
-          //insert check that the fields are empty
+          val document = Jsoup.parse(contentAsString(result))
+
+          document.select("input[type=radio][name=bankAccountType][value=01]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=bankAccountType][value=03]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=bankAccountType][value=04]").hasAttr("checked") must be(false)
+        }
+
+        "load bank account type UI with out the option 'user does not have bank account'" when {
+          "user alreday added an account" in new Fixture {
+            when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount))))))
+
+            val result = controller.get(2, false)(request)
+
+            status(result) must be(OK)
+            contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
+            val document = Jsoup.parse(contentAsString(result))
+
+            document.select("input[type=radio][name=bankAccountType][value=01]").hasAttr("checked") must be(true)
+            document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
+            document.select("input[type=radio][name=bankAccountType][value=03]").hasAttr("checked") must be(false)
+            document.select("input[type=radio][name=bankAccountType-04]").`val`() must be("")
+          }
         }
 
         "there is already a bank account type" in new Fixture {

@@ -78,7 +78,13 @@ trait SubmissionService extends DataCacheService {
 
   def bankDetailsExceptRemoved(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
     bankDetails match {
-      case Some(bankAccts) => Some(bankAccts.filterNot(_.status.contains(StatusConstants.Deleted)))
+      case Some(bankAccts) => {
+        val count = bankAccts.filterNot(_.status.contains(StatusConstants.Deleted)).count(x => x.bankAccountType.isDefined)
+        count > 0 match {
+          case true => Some(bankAccts.filterNot(_.status.contains(StatusConstants.Deleted)))
+          case false => Some(Seq.empty)
+        }
+      }
       case _ => Some(Seq.empty)
     }
   }
