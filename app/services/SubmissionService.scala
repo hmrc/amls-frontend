@@ -76,12 +76,12 @@ trait SubmissionService extends DataCacheService {
       bt <- rd.businessType
     } yield bt
 
-  def bankDetailsExceptRemoved(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
+  def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
     bankDetails match {
       case Some(bankAccts) => {
-        val count = bankAccts.filterNot(_.status.contains(StatusConstants.Deleted)).count(x => x.bankAccountType.isDefined)
-        count > 0 match {
-          case true => Some(bankAccts.filterNot(_.status.contains(StatusConstants.Deleted)))
+        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
+        bankDtls.nonEmpty match {
+          case true => Some(bankDtls)
           case false => Some(Seq.empty)
         }
       }
@@ -101,7 +101,7 @@ trait SubmissionService extends DataCacheService {
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
       tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
       aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
-      bankDetailsSection = bankDetailsExceptRemoved(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
+      bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
       responsiblePeopleSection = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key),

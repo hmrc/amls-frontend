@@ -3,8 +3,10 @@ package controllers.bankdetails
 import connectors.DataCacheConnector
 import models.bankdetails._
 import org.jsoup.Jsoup
+import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.matchers.Matcher
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
@@ -60,7 +62,8 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
             document.select("input[type=radio][name=bankAccountType][value=01]").hasAttr("checked") must be(true)
             document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
             document.select("input[type=radio][name=bankAccountType][value=03]").hasAttr("checked") must be(false)
-            document.select("input[type=radio][name=bankAccountType-04]").`val`() must be("")
+            document.getElementById("bankAccountType-03").`val`() must be("03")
+     
           }
         }
 

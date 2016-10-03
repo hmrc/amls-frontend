@@ -19,11 +19,11 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
         bankDetail <- getData[BankDetails](index)
         count <- getData[BankDetails].map(x => x.count(!_.status.contains(StatusConstants.Deleted)))
       } yield bankDetail match {
-        case Some(BankDetails(Some(data), _, _,_)) =>println("-------------------------"+count+"================================"+bankDetail)
+        case Some(BankDetails(Some(data), _, _,_)) =>
           Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
-        case Some(_) =>println("-------------------------"+count+"================================"+bankDetail)
+        case Some(_) =>
           Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index, count))
-        case _ => println("-------------------------"+count+"================================"+bankDetail);NotFound(notFoundView)
+        case _ => NotFound(notFoundView)
       }
   }
 
