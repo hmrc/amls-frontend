@@ -4,8 +4,9 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -36,6 +37,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
   val RecordId = 1
 
+  private val startDate: Option[LocalDate] = Some(new LocalDate())
   "PositionWithinBusinessController" must {
 
     "on get()" must {
@@ -165,7 +167,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
       "Prepopulate form with a single saved data" in new Fixture {
 
-        val positions = Positions(Set(BeneficialOwner))
+        val positions = Positions(Set(BeneficialOwner), startDate)
         val responsiblePeople = ResponsiblePeople(positions = Some(positions))
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
@@ -193,7 +195,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
       "Prepopulate form with multiple saved data" in new Fixture {
 
-        val positions = Positions(Set(Director))
+        val positions = Positions(Set(Director), startDate)
         val responsiblePeople = ResponsiblePeople(positions = Some(positions))
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -220,7 +222,10 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
     "submit with valid data as a partnership" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "05")
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "05",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
@@ -232,7 +237,10 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
     "submit with valid data as a sole proprietor" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "06")
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
@@ -248,7 +256,10 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
       for (i <- 1 to 4) {
-        val newRequest = request.withFormUrlEncodedBody("positions" -> s"0$i")
+        val newRequest = request.withFormUrlEncodedBody("positions" -> s"0$i",
+          "startDate.day" -> "24",
+          "startDate.month" -> "2",
+          "startDate.year" -> "1990")
         val result = controller.post(RecordId)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ExperienceTrainingController.get(RecordId).url))
@@ -257,12 +268,15 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
     "submit with mixture of data types selected" in new Fixture {
 
-      val positions = Positions(Set(Director))
+      val positions = Positions(Set(Director), startDate)
       val responsiblePeople = ResponsiblePeople(positions = Some(positions))
 
       val newRequest = request.withFormUrlEncodedBody(
         "positions" -> "06",
-        "positions" -> "01"
+        "positions" -> "01",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990"
       )
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
@@ -277,6 +291,19 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
     "fail submission on empty string" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "")
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      val result = controller.post(RecordId)(newRequest)
+      status(result) must be(BAD_REQUEST)
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
+    }
+
+    "fail with missing date" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "01")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
@@ -305,7 +332,10 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
     "submit with valid personal tax data and with edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "05")
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "05",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
@@ -317,7 +347,10 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
 
     "submit with valid non-personal tax data with edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("positions" -> "01")
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "01",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
