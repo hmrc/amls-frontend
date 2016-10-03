@@ -24,7 +24,7 @@
                 <th class="summary-title" colspan="2">
                 @pn.fullName
                 </th>
-                <td><a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1)">@Messages("button.edit")</a></td>
+                <td class="numeric"><a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1)">@Messages("button.edit")</a> @Messages("lbl.or") <a>Remove</a></td>
             </tr>
             }
         }
