@@ -23,7 +23,7 @@
                     </th>
                     <td class="numeric">
                         <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit") </a> @Messages("lbl.or")
-                        <a href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get">Remove</a>
+                        <a href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false)">Remove</a>
                     </td>
                 </tr>
                 }

@@ -244,7 +244,7 @@ POST        /responsible-people/contacting-you/:index                   controll
 GET         /responsible-people/responsible-person-registered/:index    controllers.responsiblepeople.PersonRegisteredController.get(index:Int)
 POST        /responsible-people/responsible-person-registered/:index    controllers.responsiblepeople.PersonRegisteredController.post(index:Int)
 
-GET         /responsible-people/remove                                  controllers.responsiblepeople.RemoveResponsiblePersonController.get
+GET         /responsible-people/remove                                  controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean)
 
 GET         /responsible-people/your-answers                            controllers.responsiblepeople.YourAnswersController.get()
 

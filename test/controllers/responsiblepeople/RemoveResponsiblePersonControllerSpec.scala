@@ -26,14 +26,21 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
     "get is called" must {
 
-      "show the page to confirm removal of a responsible person" in new Fixture {
+      "respond with OK" in new Fixture {
 
-        val result = controller.get()(request)
+        val result = controller.get(1, false)(request)
 
         status(result) must be(OK)
 
       }
     }
+
+//    "remove is called" must {
+//      "respond with ???" in new Fixture {
+//
+//        val result = controller.remove()(request)
+//      }
+//    }
   }
 
 }

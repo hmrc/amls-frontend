@@ -3,7 +3,7 @@
 @import include.{main, heading}
 @import include.forms2._
 
-@()(implicit request: Request[_], lang: Lang)
+@(f: forms.Form2[_],index: Int, personName:String, complete:Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
 @heading("responsiblepeople.remove.responsible.person.heading", "summary.responsiblepeople")
@@ -14,13 +14,13 @@ title = Messages("responsiblepeople.remove.responsible.person.title"),
 heading = header
 ) {
 
-<!--form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove()) {-->
-<!--<div class="panel-indent panel-border-wide">-->
-    <!--<p>Messages("responsiblepeople.remove.responsible.person", accountName)</p>-->
-<!--</div>-->
-<!--<br>-->
-<!--<br>-->
-<!--submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))-->
-<!--}-->
+form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove()) {
+<div class="panel-indent panel-border-wide">
+    <p>Messages("responsiblepeople.remove.responsible.person", accountName)</p>
+</div>
+<br>
+<br>
+submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))
+}
 }
 
