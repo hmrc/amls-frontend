@@ -20,6 +20,36 @@ a.block-link {
     display: block;
 }
 
+/* new-style page headers */
+.page-header {
+  clear: both;
+  display: table;
+  margin-top: 1.8em;
+}
+
+.page-header .heading-xlarge {
+  margin: .15em 0 1.25em;
+}
+
+.page-header .heading-secondary {
+  display: table-header-group;
+  margin-bottom: 0;
+  color: #6f777b;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.11111;
+  text-transform: none;
+}
+
+@media screen and (min-width: 641px) {
+  .page-header .heading-secondary {
+    font-size: 27px;
+    line-height: 1.11111;
+    padding-bottom: 6px;
+    padding-top: 4px;
+  }
+}
+
 /* -- application progress page -- */
 .grid-layout {
     table-layout: fixed;
