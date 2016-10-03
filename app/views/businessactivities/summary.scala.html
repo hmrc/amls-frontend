@@ -71,10 +71,16 @@
         @checkYourAnswers(
             editUrl = controllers.businessactivities.routes.HowManyEmployeesController.get(true).toString
         ) {
-            <h2 class="heading-small">@Messages("businessactivities.employees.line1.cya")</h2>
-            <p>@employees.employeeCount</p>
-            <h3>@Messages("businessactivities.employees.line2.cya")</h3>
-            <p>@employees.employeeCountAMLSSupervision</p>
+            @checkYourAnswersExtra(
+                question = Messages("businessactivities.employees.line1.cya")
+            ) {
+                <p>@employees.employeeCount</p>
+            }
+            @checkYourAnswersExtra(
+                question = Messages("businessactivities.employees.line2.cya")
+            ) {
+                <p>@employees.employeeCountAMLSSupervision</p>
+            }
         }
     }
 

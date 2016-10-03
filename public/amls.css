@@ -630,12 +630,14 @@ table.summary ul li {
 }
 
 .list--comma li,
+.list--semicolon li,
 .list--inline li {
   display: inline-block;
   padding-right: 0;
 }
 
 .lte-ie8 .list--comma li,
+.lte-ie8 .list--semicolon li,
 .lte-ie8 .list--inline li {
   display: list-item;
 }
@@ -644,7 +646,12 @@ table.summary ul li {
   content: ', ';
 }
 
-.list--comma li:last-child::after {
+.list--semicolon li::after {
+  content: '; ';
+}
+
+.list--comma li:last-child::after,
+.list--semicolon li:last-child::after {
   content: '';
 }
 
