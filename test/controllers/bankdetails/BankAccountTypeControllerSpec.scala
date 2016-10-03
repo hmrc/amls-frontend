@@ -12,7 +12,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -34,7 +34,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       "respond with OK and display the blank 'bank account type' page" when {
         "there is no bank account type information yet" in new Fixture {
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None, status = Some(StatusConstants.Deleted))))))
 
           val result = controller.get(1, false)(request)
 
@@ -46,6 +46,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
           document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
           document.select("input[type=radio][name=bankAccountType][value=03]").hasAttr("checked") must be(false)
           document.select("input[type=radio][name=bankAccountType][value=04]").hasAttr("checked") must be(false)
+          document.select("input[type=radio][name=bankAccountType]").size() must be(4)
         }
 
         "load bank account type UI with out the option 'user does not have bank account'" when {
@@ -61,9 +62,8 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
             document.select("input[type=radio][name=bankAccountType][value=01]").hasAttr("checked") must be(true)
             document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
-            document.select("input[type=radio][name=bankAccountType][value=03]").hasAttr("checked") must be(false)
-            document.getElementById("bankAccountType-03").`val`() must be("03")
-     
+            document.select("input[type=radio][name=bankAccountType]").size() must be(3)
+
           }
         }
 
