@@ -9,6 +9,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -42,8 +43,6 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
     when(controller.subscriptionService.getSubscription(any(),any(),any()))
       .thenReturn(Future.successful(("",Currency.fromInt(0),Seq())))
 
-    when(controller.subscriptionService.getAmendment(any(),any(),any()))
-      .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(0)))))
   }
 
   "ConfirmationController" must {
@@ -52,8 +51,6 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionReady))
-
-      val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -65,12 +62,47 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
-      val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
+      when(controller.subscriptionService.getAmendment(any(),any(),any()))
+        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(100)))))
 
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
-      contentAsString(result) must include("Your amendment fee")
+      contentAsString(result) must include(Messages("confirmation.amendment.fee"))
+      contentAsString(result) must include(Messages("confirmation.amendment.thankyou.p"))
+      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
     }
+
+    "notify user of no fee if there is no difference(/Some(0))" in new Fixture {
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      when(controller.subscriptionService.getAmendment(any(),any(),any()))
+        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(0)))))
+
+      val result = controller.get()(request)
+      status(result) mustBe OK
+      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
+      contentAsString(result) must include(Messages("confirmation.no.fee"))
+      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+      contentAsString(result) must include(Messages("button.finish"))
+    }
+    "notify user of no fee if there is no difference(/None)" in new Fixture {
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      when(controller.subscriptionService.getAmendment(any(),any(),any()))
+        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), None)))
+
+      val result = controller.get()(request)
+      status(result) mustBe OK
+      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
+      contentAsString(result) must include(Messages("confirmation.no.fee"))
+      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+      contentAsString(result) must include(Messages("button.finish"))
+    }
+
   }
 }

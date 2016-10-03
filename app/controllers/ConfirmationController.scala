@@ -18,7 +18,10 @@ trait ConfirmationController extends BaseController {
         case SubmissionReadyForReview => {
           subscriptionService.getAmendment flatMap {
             case Some((regNo, total, rows, difference)) =>
-              Future.successful(Ok(views.html.confirmation.confirm_amendment(regNo, total, rows, difference)))
+              difference match {
+                case Some(currency) if currency.value > 0 => Future.successful(Ok(views.html.confirmation.confirm_amendment(regNo, total, rows, difference)))
+                case _ => Future.successful(Ok(views.html.confirmation.confirmation_amendment_no_fee(regNo)))
+              }
             case None =>
               Future.failed(new Exception("Could not get AMLSRegNo"))
           }
