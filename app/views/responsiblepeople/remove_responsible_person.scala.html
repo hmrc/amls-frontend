@@ -14,13 +14,13 @@ title = Messages("responsiblepeople.remove.responsible.person.title"),
 heading = header
 ) {
 
-form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove()) {
+@form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete)) {
 <div class="panel-indent panel-border-wide">
-    <p>Messages("responsiblepeople.remove.responsible.person", accountName)</p>
+    <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
 </div>
 <br>
 <br>
-submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))
+@submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))
 }
 }
 
