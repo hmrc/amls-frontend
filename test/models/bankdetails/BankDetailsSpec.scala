@@ -147,14 +147,14 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       BankDetails.section(cache) must be(startedSection)
     }
 
-    "return a completed Section when model is complete with No bankaccount option selected" in {
+/*    "return a completed Section when model is complete with No bankaccount option selected" in {
       val noBankAcount = Seq(BankDetails(None, None))
       val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAcount)
 
       BankDetails.section(cache) must be(startedSection)
-    }
+    }*/
 
     "Amendment and Variation flow" when {
       "the section is complete with all the bank details being removed" must {

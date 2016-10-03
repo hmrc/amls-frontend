@@ -12,7 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{LandingService, AuthEnrolmentsService, StatusService}
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{StatusConstants, AuthorisedFixture}
@@ -159,6 +159,8 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
       "there is no data at all at that index" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get(1,false)(request)
 
