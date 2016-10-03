@@ -1,3 +1,26 @@
-@()
 
-<p>hello</p>
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+
+@()(implicit request: Request[_], lang: Lang)
+
+@header = {
+@heading("responsiblepeople.remove.responsible.person.heading", "summary.responsiblepeople")
+}
+
+@main(
+title = Messages("responsiblepeople.remove.responsible.person.title"),
+heading = header
+) {
+
+<!--form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove()) {-->
+<!--<div class="panel-indent panel-border-wide">-->
+    <!--<p>Messages("responsiblepeople.remove.responsible.person", accountName)</p>-->
+<!--</div>-->
+<!--<br>-->
+<!--<br>-->
+<!--submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))-->
+<!--}-->
+}
+

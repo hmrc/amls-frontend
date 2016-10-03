@@ -1073,6 +1073,11 @@ responsiblepeople.detailed_answers.previous_experience = Previous Experience
 responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
 
+responsiblepeople.remove.responsible.person.title = Responsible People - Remove a responsible person
+responsiblepeople.remove.responsible.person.heading = Remove responsible person
+responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
+responsiblepeople.remove.responsible.person.btn = Remove responsible person
+
 #TCSP
 tcsp.whatyouneed.title = What you need
 tcsp.whatyouneed.heading = What you need
