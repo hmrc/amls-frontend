@@ -4,7 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, Form2, InvalidForm, EmptyForm}
+import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{BusinessStructure, ActivityEndDate, TradingPremises}
+import services.{LandingService, AuthEnrolmentsService, StatusService}
 import utils.{StatusConstants, RepeatingSection}
 import views.html.tradingpremises.remove_trading_premises
 
@@ -14,12 +16,19 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
 
   val dataCacheConnector: DataCacheConnector
 
+  private[controllers] def statusService: StatusService
+
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[TradingPremises](index) map {
-        case Some(tp) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
-          tp.yourTradingPremises.fold("")(_.tradingName), tp.lineId.isDefined))
-        case None => NotFound(notFoundView)
+      for {
+        tp <- getData[TradingPremises](index)
+        status <- statusService.getStatus
+      } yield (tp, status) match {
+        case (Some(tradingPremises), SubmissionDecisionApproved) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
+          tp.yourTradingPremises.fold("")(_.tradingName), true))
+        case (Some(tradingPremises),_) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
+          tp.yourTradingPremises.fold("")(_.tradingName), false))
+        case _ => NotFound(notFoundView)
       }
   }
 
@@ -49,4 +58,6 @@ object RemoveTradingPremisesController extends RemoveTradingPremisesController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  override private[controllers] val statusService: StatusService = StatusService
+
 }

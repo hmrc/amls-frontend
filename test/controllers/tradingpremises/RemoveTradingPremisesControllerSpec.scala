@@ -2,6 +2,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService, BillPaymentServices}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -11,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{StatusConstants, AuthorisedFixture}
@@ -24,6 +26,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
     val controller = new RemoveTradingPremisesController {
       override val dataCacheConnector: DataCacheConnector =  mock[DataCacheConnector]
+      override val statusService: StatusService =  mock[StatusService]
       override protected def authConnector: AuthConnector = self.authConnector
     }
   }
@@ -99,20 +102,51 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
     )
     val emptyCache = CacheMap("", Map.empty)
 
-    "successfully load remove trading premises page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
-      val result = controller.get(1,false) (request)
+    "successfully load remove trading premises page" when {
 
-      val contentString = contentAsString(result)
+      "application status is approved" in new Fixture {
 
-      val document = Jsoup.parse(contentString)
-      document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get(1,false) (request)
+
+        val contentString = contentAsString(result)
+
+        val document = Jsoup.parse(contentString)
+        document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
+        document.getElementById("endDate-day").`val`() must be("")
+
+      }
+
+      "application status is NotCompleted" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        val result = controller.get(1,false) (request)
+
+        val contentString = contentAsString(result)
+
+        val document = Jsoup.parse(contentString)
+        document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
+      }
     }
 
-    "successfully load remove trading premises page no trade name" in new Fixture {
+    "successfully load remove trading premises page with no trading name" in new Fixture {
+
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(None,None)))))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
       val result = controller.get(1,false) (request)
 
       val contentString = contentAsString(result)
@@ -125,6 +159,8 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
       "there is no data at all at that index" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get(1,false)(request)
 
