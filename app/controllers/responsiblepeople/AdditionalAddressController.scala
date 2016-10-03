@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.responsiblepeople.TimeAtAddress.{Empty, ZeroToFiveMonths, ThreeYearsPlus}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, Empty, ZeroToFiveMonths, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -45,8 +45,10 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
               doUpdate(index, data).map { _ =>
                 (data.timeAtAddress, edit) match {
                   case (ThreeYearsPlus, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
+                  case (OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
                   case (_, false) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
                   case (ThreeYearsPlus, true) => Redirect(routes.DetailedAnswersController.get(index))
+                  case (OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index))
                   case (_, true) => Redirect(routes.AdditionalExtraAddressController.get(index, edit))
                 }
               }
@@ -62,6 +64,7 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
         res.addressHistory(
           (res.addressHistory, data.timeAtAddress) match {
             case (Some(a), ThreeYearsPlus) => a.additionalAddress(data).removeAdditionalExtraAddress
+            case (Some(a), OneToThreeYears) => a.additionalAddress(data).removeAdditionalExtraAddress
             case (Some(a), _) => a.additionalAddress(data)
             case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
           })
