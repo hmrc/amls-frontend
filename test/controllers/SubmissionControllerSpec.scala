@@ -1,7 +1,7 @@
 package controllers
 
 import connectors.AmlsConnector
-import models.SubscriptionResponse
+import models.{AmendVariationResponse, SubscriptionResponse}
 import models.status.{SubmissionReady, SubmissionReadyForReview}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsString
@@ -36,6 +36,17 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
     paymentReference = ""
   )
 
+  val amendmentResponse = AmendVariationResponse(
+    processingDate = "",
+    etmpFormBundleNumber = "",
+    registrationFee = 0,
+    fpFee = Some(0),
+    premiseFee = 0,
+    totalFees = 0,
+    paymentReference = Some(""),
+    difference = Some(0)
+  )
+
   "SubmissionController" must {
 
     "post must return the response from the service correctly when Submission Ready" in new Fixture {
@@ -56,7 +67,7 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
 
       when {
         controller.subscriptionService.update(any(), any(), any())
-      } thenReturn Future.successful(response)
+      } thenReturn Future.successful(amendmentResponse)
 
       when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReadyForReview))
 

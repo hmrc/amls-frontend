@@ -1,18 +1,10 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.{AmlsConnector, KeystoreConnector}
-import models.SubscriptionResponse
 import models.businessmatching.BusinessMatching
-import models.registrationprogress.{Completed, Section}
-
-import scala.concurrent.Future
+import models.status.CompletionStateViewModel
+import services.{AuthEnrolmentsService, LandingService, _}
 import views.html.status.status
-import models.status.{CompletionStateViewModel, _}
-import services._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 
 trait StatusController extends BaseController {

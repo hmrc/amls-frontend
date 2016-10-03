@@ -1,7 +1,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.{ReadStatusResponse, SubscriptionRequest, SubscriptionResponse, ViewResponse}
+import models._
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
@@ -89,16 +89,16 @@ trait AmlsConnector {
                                              headerCarrier: HeaderCarrier,
                                              ec: ExecutionContext,
                                              reqW: Writes[SubscriptionRequest],
-                                             resW: Writes[SubscriptionResponse],
+                                             resW: Writes[AmendVariationResponse],
                                              ac: AuthContext
-  ): Future[SubscriptionResponse] = {
+  ): Future[AmendVariationResponse] = {
 
     val (accountType, accountId) = accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
-    httpPost.POST[SubscriptionRequest, SubscriptionResponse](postUrl, updateRequest) map {
+    httpPost.POST[SubscriptionRequest, AmendVariationResponse](postUrl, updateRequest) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
