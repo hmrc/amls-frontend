@@ -32,7 +32,7 @@ object BankAccountType {
   implicit val formWrites:Write[Option[BankAccountType], UrlFormEncoded] = Write {
     case Some(PersonalAccount) => "bankAccountType" -> "01"
     case Some(BelongsToBusiness) => "bankAccountType" -> "02"
-    case Some(BelongsToOtherBusiness) => "bankAccountType" -> "git status03"
+    case Some(BelongsToOtherBusiness) => "bankAccountType" -> "03"
     case _ => Map.empty
   }
 
