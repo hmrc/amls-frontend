@@ -14,7 +14,7 @@ import org.scalatest.{MustMatchers, WordSpecLike}
 import org.scalatestplus.play.OneAppPerSuite
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{StatusConstants, AuthorisedFixture}
 import play.api.test.Helpers._
 import org.mockito.Matchers.{eq => meq, _}
 
@@ -91,43 +91,74 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
     }
 
     "remove is called" must {
-      "respond with SEE_OTHER when the index is valid" in new Fixture {
+      "respond with SEE_OTHER" when {
+        "editing an unsubmitted application (showDateField is false)" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          val emptyCache = CacheMap("", Map.empty)
 
-        val result = controller.remove(1, false,"John Envy Doe")(request)
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
 
-        status(result) must be(SEE_OTHER)
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-      }
+          val result = controller.remove(1, false, "John Envy Doe")(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
-      "remove responsible person when editing an unsubmitted application" in new Fixture {
-
-        val emptyCache = CacheMap("", Map.empty)
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-
-        val result = controller.remove(1, false,"John Envy Doe")(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be (Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
-
-        verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
-        )))(any(), any(), any())
+          )))(any(), any(), any())
 
+        }
+        "amending a pending application (showDateField is true)" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "12",
+            "endDate.month" -> "5",
+            "endDate.year" -> "1999"
+          )
+          val newCompleteResponsiblePeople1 = CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted),
+            endDate = Some(ResponsiblePersonEndDate(new LocalDate(1999,5,12))), hasChanged = true)
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.remove(1, false, "John Envy Doe", true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+            newCompleteResponsiblePeople1,
+            CompleteResponsiblePeople2,
+            CompleteResponsiblePeople3
+          )))(any(), any(), any())
+
+        }
+        "amending a pending application (showDateField is true) and no end date is filled in" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "",
+            "endDate.month" -> "",
+            "endDate.year" -> ""
+          )
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.remove(1, false, "John Envy Doe", true)(newRequest)
+          status(result) must be(BAD_REQUEST)
+        }
       }
-
-      "mark a responsible person for deletion when amending a pending application" in new Fixture {
-
-
-      }
-
     }
   }
 

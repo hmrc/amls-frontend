@@ -35,16 +35,6 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         }
   }
 
-//  def remove(index: Int, complete: Boolean = false) = Authorised.async {
-//    implicit authContext => implicit request => {
-//      for {
-//        rs <- updateDataStrict[ResponsiblePeople](index) { rp =>
-//          rp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-//        }
-//      } yield Redirect(routes.CheckYourAnswersController.get())
-//    }
-//  }
-
 
   def remove(index: Int, complete: Boolean = false, personName: String, showDateField: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
