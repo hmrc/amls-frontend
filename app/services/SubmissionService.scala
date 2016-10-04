@@ -113,7 +113,6 @@ trait SubmissionService extends DataCacheService {
       hvdSection = cache.getEntry[Hvd](Hvd.key),
       supervisionSection = cache.getEntry[Supervision](Supervision.key)
     )
-
   }
 
   def subscribe
