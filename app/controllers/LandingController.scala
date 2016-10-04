@@ -17,7 +17,7 @@ import models.tradingpremises.TradingPremises
 import play.api.Logger
 import play.api.libs.json.{JsBoolean, JsObject}
 import play.api.mvc.{Call, Request}
-import services.{AuthEnrolmentsService, LandingService}
+import services.{AuthEnrolmentsService, LandingService, ProgressService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -47,7 +47,13 @@ trait LandingController extends BaseController {
           case true =>
             Future.successful(Redirect(controllers.routes.StatusController.get()))
           case _ =>
-            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+            (for{
+                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              } yield bm.isComplete match {
+                case true => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+                case false => ???
+              }
+              ).getOrElse(Future.successful(Redirect(controllers.routes.RegistrationProgressController.get())))
         }
       case None => {
         for {
@@ -73,6 +79,10 @@ trait LandingController extends BaseController {
     landingService.refreshCache(amlsRegistrationNumber) map {
       cache =>  Redirect(controllers.routes.StatusController.get())
     }
+  }
+
+  private def removePreAppData() = {
+    ???
   }
 
   private def dataHasChanged(cacheMap : CacheMap) = {
