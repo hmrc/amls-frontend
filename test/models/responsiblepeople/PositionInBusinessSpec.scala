@@ -1,8 +1,9 @@
 package models.responsiblepeople
 
+import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Success, Path, Failure}
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
@@ -46,6 +47,21 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
       PositionWithinBusiness.formWrite.writes(SoleProprietor) must be("06")
     }
 
+  }
+
+  "Positions hasNominatedOfficer" must {
+
+    "return true when there is a nominated officer RP" in {
+      val positions = Positions(Set(NominatedOfficer,InternalAccountant),Some(new LocalDate()))
+      positions.hasNominatedOfficer must be(true)
+
+    }
+
+    "return false when there is no nominated officer RP" in {
+      val positions = Positions(Set(InternalAccountant),Some(new LocalDate()))
+      positions.hasNominatedOfficer must be(false)
+
+    }
   }
 
   "JSON validation" must {
