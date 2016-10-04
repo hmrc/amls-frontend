@@ -20,7 +20,16 @@ heading = header
 </div>
 <br>
 <br>
+@if(showDateField) {
+@date(
+f = f,
+p = "endDate",
+labelText = "responsiblepeople.remove.responsible.person.enddate.lbl",
+hintText = "",
+true
+)
+}
+
 @submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))
 }
 }
-

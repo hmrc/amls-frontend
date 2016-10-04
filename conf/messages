@@ -1094,6 +1094,7 @@ responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passe
 responsiblepeople.remove.responsible.person.title = Responsible People - Remove a responsible person
 responsiblepeople.remove.responsible.person.heading = Remove responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
+responsiblepeople.remove.responsible.person.enddate.lbl = <<Text asking for date?>>
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
 
 #TCSP
