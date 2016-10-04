@@ -1,6 +1,6 @@
 package controllers
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import models.SubscriptionResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import views.html.asp.summary
 
 import scala.concurrent.Future
 
@@ -45,15 +46,21 @@ trait LandingController extends BaseController {
       case Some(cache) =>
         ApplicationConfig.statusToggle match {
           case true =>
-            Future.successful(Redirect(controllers.routes.StatusController.get()))
-          case _ =>
             (for{
-                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              } yield bm.isComplete match {
-                case true => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-                case false => ???
+              bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+            } yield bm.isComplete match {
+              case true => println(">>>>>>>>>>> TRUE"); Future.successful(Redirect(controllers.routes.StatusController.get()))
+              case false => {
+                AmlsShortLivedCache.remove(authContext.user.oid) map { http =>
+                  http.status match {
+                  case 204 => println(">>>>>>>>>>>>>>>> deleted user id " + authContext.user.oid); Redirect(controllers.routes.LandingController.get())
+                  case _ => throw new Exception("Cannot remove pre application data")
+                }
+                }
               }
-              ).getOrElse(Future.successful(Redirect(controllers.routes.RegistrationProgressController.get())))
+            }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
+          case _ =>
+            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
       case None => {
         for {
@@ -81,9 +88,6 @@ trait LandingController extends BaseController {
     }
   }
 
-  private def removePreAppData() = {
-    ???
-  }
 
   private def dataHasChanged(cacheMap : CacheMap) = {
     Seq(

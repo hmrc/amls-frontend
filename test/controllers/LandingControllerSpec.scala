@@ -122,7 +122,7 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe  Some(controllers.LandingController.get())
+          redirectLocation(result) mustBe  Some(controllers.routes.LandingController.get().url)
 
         }
       }
@@ -130,14 +130,16 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
       "go to the beginning of pre-application" when {
         "there is data in BusinessMatching but the pre-application is incomplete" in new Fixture {
 
+          val testBusinessMatching = BusinessMatching()
+
           val emptyCacheMap = mock[CacheMap]
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
+          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe  Some(controllers.LandingController.get())
+          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
 
         }
       }
