@@ -22,12 +22,12 @@
                 editUrl = controllers.msb.routes.ExpectedThroughputController.get(true).toString
             ) {
                 <p>@throughput match {
-                    case ExpectedThroughput.First =>   {@Messages("msb.throughput.lbl.01")}
-                    case ExpectedThroughput.Second =>  {@Messages("msb.throughput.lbl.02")}
-                    case ExpectedThroughput.Third =>   {@Messages("msb.throughput.lbl.03")}
-                    case ExpectedThroughput.Fourth =>  {@Messages("msb.throughput.lbl.04")}
-                    case ExpectedThroughput.Fifth =>   {@Messages("msb.throughput.lbl.05")}
-                    case ExpectedThroughput.Sixth =>   {@Messages("msb.throughput.lbl.06")}
+                    case ExpectedThroughput.First => {@Messages("msb.throughput.lbl.01")}
+                    case ExpectedThroughput.Second => {@Messages("msb.throughput.lbl.02")}
+                    case ExpectedThroughput.Third => {@Messages("msb.throughput.lbl.03")}
+                    case ExpectedThroughput.Fourth => {@Messages("msb.throughput.lbl.04")}
+                    case ExpectedThroughput.Fifth => {@Messages("msb.throughput.lbl.05")}
+                    case ExpectedThroughput.Sixth => {@Messages("msb.throughput.lbl.06")}
                     case ExpectedThroughput.Seventh => {@Messages("msb.throughput.lbl.07")}
                 }</p>
             }
@@ -168,20 +168,14 @@
                     editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
                 ) {
                     <ul class="list">
-                    @wc.bankMoneySource.map {bms =>
-                        <li>
-                            @Messages("msb.which_currencies.source.banks"): @bms.bankNames
-                        </li>
+                    @wc.bankMoneySource.map { bms =>
+                        <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
                     }
-                    @wc.wholesalerMoneySource.map {wms =>
-                        <li>
-                            @Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames
-                        </li>
+                    @wc.wholesalerMoneySource.map { wms =>
+                        <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
                     }
                     @if(wc.customerMoneySource) {
-                        <li>
-                            @Messages("msb.which_currencies.source.customers")
-                        </li>
+                        <li>@Messages("msb.which_currencies.source.customers")</li>
                     }
                     </ul>
                 }

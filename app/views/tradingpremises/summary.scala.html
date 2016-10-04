@@ -19,24 +19,20 @@
 
     @if(add && !(model.isEmpty || (model.count(!_.status.contains(StatusConstants.Deleted)) == 0))){
          <div class="panel-indent panel-border-wide spacelarge">
-            <p>
-                <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
-            </p>
+            <p><a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)">@Messages("tradingpremises.summary.addanother")</a></p>
         </div>
     }
 
     @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0){
          <div class="panel-indent panel-border-wide spacelarge">
-            <p> @Messages("tradingpremises.summary.no.trading.premises") </p>
-            <p>
-                <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
-            </p>
+            <p>@Messages("tradingpremises.summary.no.trading.premises")</p>
+            <p><a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)">@Messages("tradingpremises.summary.addanother")</a></p>
         </div>
     }
 
+    <ul class="list">
     @model.zipWithIndex.map { case (tp, y) =>
         @if(!tp.status.contains(StatusConstants.Deleted)) {
-            <ul class="">
             @tp.yourTradingPremises.map { ytp =>
                 @checkYourAnswersListing(
                     item = ytp.tradingPremisesAddress.toLines.mkString(", ").toString,
@@ -46,9 +42,9 @@
 
                 }
             }
-            </ul>
         }
     }
+    </ul>
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

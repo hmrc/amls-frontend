@@ -586,7 +586,8 @@ table.summary ul li {
   margin-bottom: 0;
 }
 
-.check-your-answers {
+.check-your-answers,
+.check-your-answers__listing {
   border-bottom: 1px solid #bfc1c3;
   margin-bottom: 20px;
   padding: 0 0 .52632em 0;
@@ -596,8 +597,7 @@ table.summary ul li {
   padding: 0;
 }
 
-.check-your-answers h2,
-.check-your-answers li {
+.check-your-answers h2 {
   margin-bottom: 0;
   margin-top: 0;
   padding: 0 0 .52632em 0;
@@ -607,6 +607,13 @@ table.summary ul li {
   color: #0b0c0c;
   display: flex;
   text-decoration: none;
+}
+
+.check-your-answers .list,
+.check-your-answers .list li,
+.check-your-answers p {
+  margin-top: 0;
+  margin-bottom: 1.05263em;
 }
 
 .check-your-answers dd,
@@ -626,7 +633,7 @@ table.summary ul li {
   text-decoration: underline;
 }
 
-.check-your-answers .grid-layout__column--1-4 {
+.check-your-answers__footer {
   text-align: right;
   vertical-align: middle;
 }
@@ -659,10 +666,19 @@ table.summary ul li {
   }
 }
 
+@media screen and (min-width: 641px) {
+  .check-your-answers .list,
+  .check-your-answers .list li,
+  .check-your-answers p {
+    margin-top: 0;
+    margin-bottom: 1.05263em;
+  }
+}
+
 .list--comma li,
 .list--semicolon li,
 .list--inline li {
-  display: inline-block;
+  display: inline;
   padding-right: 0;
 }
 

@@ -4,14 +4,12 @@
     removeUrl: String = ""
 )(content: Html)(implicit lang: Lang)
 
-<li class="group grid-layout">
+<li class="group grid-layout check-your-answers__listing">
     <div class="grid-layout__column grid-layout__column--3-4">
-      <span class="visuallyhidden">@Messages("visuallyhidden.you.have.registered") </span>
-      <p>@item</p>
+      <span class="visuallyhidden">@Messages("visuallyhidden.you.have.registered") </span> @item
     </div>
-    @if(editUrl.nonEmpty){<footer class="grid-layout__column grid-layout__column--1-4 check-your-answers--amend__footer">
-        <p><a href="@editUrl">@Messages("button.edit")<span class="visuallyhidden"> @Messages("visuallyhidden.the.details.for") @item</span></a>
+    @if(editUrl.nonEmpty){<footer class="grid-layout__column grid-layout__column--1-4 check-your-answers__footer">
+        <a href="@editUrl">@Messages("button.edit")<span class="visuallyhidden"> @Messages("visuallyhidden.the.details.for") @item</span></a>
           @if(removeUrl.nonEmpty){@Messages("lbl.or") <a href="@removeUrl">@Messages("button.remove")<span class="visuallyhidden"> @item @Messages("visuallyhidden.from.your.application")</span></a>}
-        </p>
     </footer>}
 </li>

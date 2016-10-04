@@ -15,14 +15,14 @@
 ) {
 
     @if(!hasBankAccount) {
-        <div class="panel-indent">
+        <div class="panel-indent panel-border-wide">
             <p>@Messages("bankdetails.summary.nobank.account")</p>
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>
     }
 
     @if(complete && hasBankAccount) {
-        <div class="panel-indent">
+        <div class="panel-indent panel-border-wide">
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>
     }
