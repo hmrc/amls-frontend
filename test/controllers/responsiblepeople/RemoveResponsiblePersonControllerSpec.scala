@@ -1,18 +1,18 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import controllers.responsiblepeople.RemoveResponsiblePersonController
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
-import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{MustMatchers, WordSpecLike}
 import org.scalatestplus.play.OneAppPerSuite
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
@@ -29,31 +29,64 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
     val controller = new RemoveResponsiblePersonController {
       override val dataCacheConnector = mock[DataCacheConnector]
+      override val statusService: StatusService =  mock[StatusService]
       override val authConnector = self.authConnector
     }
   }
 
   "RemoveResponsiblePersonController" when {
-    "get is called" must {
-      "respond with OK when the index is valid" in new Fixture {
+    "get is called" when {
+      "the submission status is NotCompleted" must {
+        "respond with OK when the index is valid" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)))))))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(NotCompleted))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)))))))
 
-        val result = controller.get(1, false)(request)
+          val result = controller.get(1, false)(request)
 
-        status(result) must be(OK)
+          status(result) must be(OK)
 
+        }
+        "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(NotCompleted))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+          val result = controller.get(100, false)(request)
+
+          status(result) must be(NOT_FOUND)
+
+        }
       }
-      "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
+      "the submission status is SubmissionDecisionApproved" must {
+        "respond with OK when the index is valid" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)))))))
 
-        val result = controller.get(100, false)(request)
+          val result = controller.get(1, false)(request)
 
-        status(result) must be(NOT_FOUND)
+          status(result) must be(OK)
 
+        }
+        "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
+
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+          val result = controller.get(100, false)(request)
+
+          status(result) must be(NOT_FOUND)
+
+        }
       }
     }
 

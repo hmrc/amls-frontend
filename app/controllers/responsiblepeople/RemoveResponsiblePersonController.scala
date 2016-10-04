@@ -5,6 +5,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.responsiblepeople.ResponsiblePeople
+import models.status.SubmissionDecisionApproved
+import services.StatusService
 import utils.{StatusConstants, RepeatingSection}
 
 import scala.concurrent.Future
@@ -13,13 +15,24 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
 
   val dataCacheConnector: DataCacheConnector
 
+  private[controllers] def statusService: StatusService
+
   def get(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      getData[ResponsiblePeople](index) map {
-        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(views.html.responsiblepeople.remove_responsible_person(EmptyForm, index, personName.fullName, complete))
-        case _ => NotFound(notFoundView)
-      }
+      implicit authContext => implicit request =>
+        for {
+          rp <- getData[ResponsiblePeople](index)
+          status <- statusService.getStatus
+        } yield (rp, status) match {
+          case (Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_)), SubmissionDecisionApproved) => {
+            Ok(views.html.responsiblepeople.remove_responsible_person(
+              EmptyForm, index, personName.fullName, complete, true))
+          }
+          case (Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_)),_) => {
+            Ok(views.html.responsiblepeople.remove_responsible_person(
+              EmptyForm, index, personName.fullName, complete, false))
+          }
+          case _ => NotFound(notFoundView)
+        }
   }
 
   def remove(index: Int, complete: Boolean = false) = Authorised.async {
@@ -37,4 +50,6 @@ object RemoveResponsiblePersonController extends RemoveResponsiblePersonControll
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+  override private[controllers] val statusService: StatusService = StatusService
+
 }
