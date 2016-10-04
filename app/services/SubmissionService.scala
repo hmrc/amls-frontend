@@ -3,21 +3,21 @@ package services
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector, GovernmentGatewayConnector}
 import exceptions.NoEnrolmentException
-import models.asp.Asp
-import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
-import models.responsiblepeople.ResponsiblePeople
-import models.supervision.Supervision
-import models.tcsp.Tcsp
-import models.{SubscriptionRequest, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
+import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.confirmation.{BreakdownRow, Currency}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.MoneyServiceBusiness
+import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
+import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -46,10 +46,12 @@ trait SubmissionService extends DataCacheService {
     val feePer = ApplicationConfig.premisesFee
   }
 
+
   private object People {
     val message = "confirmation.responsiblepeople"
     val feePer = ApplicationConfig.peopleFee
   }
+
 
   private object UnpaidPeople {
     val message = "confirmation.unpaidpeople"
@@ -79,7 +81,7 @@ trait SubmissionService extends DataCacheService {
   def bankDetailsExceptRemoved(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
     bankDetails match {
       case Some(bankAccts) => Some(bankAccts.filterNot(_.status.contains(StatusConstants.Deleted)))
-      case _ => None
+      case _ => Some(Seq.empty)
     }
   }
 
@@ -131,20 +133,54 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[SubscriptionResponse] = {
+  ): Future[AmendVariationResponse] = {
     for {
       cache <- getCache
       regNo <- authEnrolmentsService.amlsRegistrationNumber
-      subscription <- amlsConnector.update(createSubscriptionRequest(cache), regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment")))
-      _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
-
-    } yield subscription
+      amendment <- amlsConnector.update(
+        createSubscriptionRequest(cache),
+        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
+      )
+      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
+    } yield amendment
   }
 
-  private def subscriptionQuantity(subscription: SubscriptionResponse): Int =
+  def getAmendment
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
+    cacheConnector.fetchAll flatMap {
+      option =>
+        (for {
+          cache <- option
+          amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+        } yield {
+          val subQuantity = subscriptionQuantity(amendment)
+          authEnrolmentsService.amlsRegistrationNumber flatMap {
+            case Some(mlrRegNo) => {
+              val total = amendment.totalFees
+              val difference = amendment.difference map Currency.fromBD
+              val rows = Seq(
+                BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+              ) ++ responsiblePeopleRows(people, amendment) ++
+                Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
+              Future.successful(Some((mlrRegNo, Currency.fromBD(total), rows, difference)))
+            }
+            case None => Future.successful(None)
+          }
+        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+    }
+  }
+
+
+  private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
 
-  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubscriptionResponse): Seq[BreakdownRow] = {
+  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
     people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
       case (b, a) =>
         Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++

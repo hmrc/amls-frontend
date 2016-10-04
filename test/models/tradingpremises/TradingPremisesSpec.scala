@@ -1,7 +1,7 @@
 package models.tradingpremises
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
-import models.responsiblepeople.ResponsiblePeople
+import models.registrationprogress.{Completed, NotStarted}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -10,6 +10,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
@@ -154,6 +155,67 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
       "return false when tradingPremises no data" in {
         val tradingPremises = TradingPremises(None, None)
         tradingPremises.isComplete must be(true)
+      }
+    }
+  }
+
+  "Amendment and Variation flow" when {
+    "the section is complete with all the trading premises being removed" must {
+      "successfully redirect to what you need page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
+            TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true))))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(NotStarted)
+        section.call must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+      }
+    }
+
+    "the section is complete with one of the trading premises object being removed" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
+            completeModel)))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+      }
+    }
+
+    "the section is complete with all the trading premises unchanged" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(completeModel, completeModel)))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(false)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+      }
+    }
+
+    "the section is complete with all the trading premises being modified" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true),
+            TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true))))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
       }
     }
   }
