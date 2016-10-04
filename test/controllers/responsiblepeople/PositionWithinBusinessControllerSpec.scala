@@ -305,11 +305,12 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
+
     }
 
     "fail with missing date" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("positionWithinBusiness" -> "01")
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
@@ -317,7 +318,7 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#positions]").html() must include(Messages("error.required.positionWithinBusiness"))
+      document.body().html() must include(Messages("error.expected.jodadate.format"))
     }
 
     "fail submission on invalid string" in new Fixture {
