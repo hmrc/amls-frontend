@@ -14,7 +14,7 @@ title = Messages("responsiblepeople.remove.responsible.person.title"),
 heading = header
 ) {
 
-@form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete)) {
+@form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete, personName)) {
 <div class="panel-indent panel-border-wide">
     <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
 </div>

@@ -96,7 +96,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
-        val result = controller.remove(1, false)(request)
+        val result = controller.remove(1, false,"John Envy Doe")(request)
 
         status(result) must be(SEE_OTHER)
 
@@ -112,7 +112,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
         when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
-        val result = controller.remove(1, false)(request)
+        val result = controller.remove(1, false,"John Envy Doe")(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be (Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 

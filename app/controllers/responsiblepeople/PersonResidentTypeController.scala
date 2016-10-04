@@ -19,9 +19,9 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     Authorised.async {
       implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _, _,_))
               => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _,_))
               => Ok(person_residence_type(EmptyForm, edit, index))
             case _
               => NotFound(notFoundView)

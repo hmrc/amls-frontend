@@ -3,8 +3,8 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
-import models.responsiblepeople.ResponsiblePeople
+import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import models.responsiblepeople.{ResponsiblePersonEndDate, ResponsiblePeople}
 import models.status.SubmissionDecisionApproved
 import services.StatusService
 import utils.{StatusConstants, RepeatingSection}
@@ -23,11 +23,11 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
           rp <- getData[ResponsiblePeople](index)
           status <- statusService.getStatus
         } yield (rp, status) match {
-          case (Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_)), SubmissionDecisionApproved) => {
+          case (Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_)), SubmissionDecisionApproved) => {
             Ok(views.html.responsiblepeople.remove_responsible_person(
               EmptyForm, index, personName.fullName, complete, true))
           }
-          case (Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_)),_) => {
+          case (Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_)),_) => {
             Ok(views.html.responsiblepeople.remove_responsible_person(
               EmptyForm, index, personName.fullName, complete, false))
           }
@@ -35,14 +35,36 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         }
   }
 
-  def remove(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      for {
-        rs <- updateDataStrict[ResponsiblePeople](index) { rp =>
-          rp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+//  def remove(index: Int, complete: Boolean = false) = Authorised.async {
+//    implicit authContext => implicit request => {
+//      for {
+//        rs <- updateDataStrict[ResponsiblePeople](index) { rp =>
+//          rp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+//        }
+//      } yield Redirect(routes.CheckYourAnswersController.get())
+//    }
+//  }
+
+
+  def remove(index: Int, complete: Boolean = false, personName: String, showDateField: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      showDateField match {
+        case true =>
+          Form2[ResponsiblePersonEndDate](request.body) match {
+            case f: InvalidForm =>
+              Future.successful(BadRequest(views.html.responsiblepeople.remove_responsible_person(f, index, personName, complete, showDateField)))
+            case ValidForm(_, data) => {
+              for {
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                }
+              } yield Redirect(routes.CheckYourAnswersController.get())
+            }
+          }
+        case false => removeDataStrict[ResponsiblePeople](index) map { _ =>
+          Redirect(routes.CheckYourAnswersController.get())
         }
-      } yield Redirect(routes.CheckYourAnswersController.get())
-    }
+      }
   }
 }
 
