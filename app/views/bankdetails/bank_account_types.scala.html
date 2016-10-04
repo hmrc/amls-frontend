@@ -19,7 +19,7 @@
             @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.01", "01")
             @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.02", "02")
             @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.03", "03")
-            @if(count <= 1) {
+            @if(count == 1) {
                 @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.04", "04")
             }
         }
