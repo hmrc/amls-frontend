@@ -53,7 +53,4 @@ object BankAccountType {
     case BelongsToOtherBusiness => Json.obj("bankAccountType" -> "03")
   }
 
-  implicit def convert(s: Option[BankAccountType]): Option[BankDetails] =
-    s map { x => BankDetails(Some(x), None) }
-
 }
