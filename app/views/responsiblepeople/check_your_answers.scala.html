@@ -1,5 +1,6 @@
 @import include._
 @import models.responsiblepeople._
+@import utils.StatusConstants
 
 @(model: Seq[ResponsiblePeople])(implicit request: Request[_], lang: Lang)
 
@@ -16,18 +17,19 @@
         <tbody>
             @model.zipWithIndex.map { case (responsiblePerson, idx)=>
 
-                @responsiblePerson.personName.map { personDetails =>
-                 <tr>
-                    <th class="summary-title">
-                        @personDetails.fullName
-                    </th>
-                    <td class="numeric">
-                        <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit") </a> @Messages("lbl.or")
-                        <a href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false)">Remove</a>
-                    </td>
-                </tr>
+                @if(!responsiblePerson.status.contains(StatusConstants.Deleted)) {
+                    @responsiblePerson.personName.map { personDetails =>
+                     <tr>
+                        <th class="summary-title">
+                            @personDetails.fullName
+                        </th>
+                        <td class="numeric">
+                            <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit") </a> @Messages("lbl.or")
+                            <a href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false)">Remove</a>
+                        </td>
+                    </tr>
+                    }
                 }
-
             }
         </tbody>
     </table>
