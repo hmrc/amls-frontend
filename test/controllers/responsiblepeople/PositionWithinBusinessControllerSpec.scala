@@ -65,6 +65,8 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
         document.select("input[value=05]").isEmpty must be(true)
         document.select("input[value=06]").isEmpty must be(false)
 
+        document.body().html() must include(Messages("responsiblepeople.position_within_business.startDate.lbl"))
+
       }
 
       "display position within the business page when business Type is SoleProprietor" in new Fixture {
@@ -191,6 +193,10 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
         document.select("input[value=04]").hasAttr("checked") must be(false)
         document.select("input[value=05]").hasAttr("checked") must be(false)
         document.select("input[value=06]").hasAttr("checked") must be(false)
+
+        document.select("input[id=startDate-day").`val`() must be(startDate.get.dayOfMonth().get().toString)
+        document.select("input[id=startDate-month").`val`() must be(startDate.get.monthOfYear().get().toString)
+        document.select("input[id=startDate-year").`val`() must be(startDate.get.getYear.toString)
       }
 
       "Prepopulate form with multiple saved data" in new Fixture {

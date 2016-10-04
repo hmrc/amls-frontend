@@ -85,14 +85,22 @@ object Positions {
       ((__ \ "positions")
         .read(minLengthR[Set[PositionWithinBusiness]](1)
           .withMessage("error.required.positionWithinBusiness")) ~
-        (__ \ "startDate").read(localDateRule.fmap {x:LocalDate => Some(x)})) (Positions.apply _)
+        (__ \ "startDate").read(localDateRule.fmap { x: LocalDate => Some(x) })) (Positions.apply _)
     }
 
   implicit def formWrites
   (implicit
    w: Write[PositionWithinBusiness, String]
   ) = Write[Positions, UrlFormEncoded] { data =>
-    Map("positions[]" -> data.positions.toSeq.map(w.writes))
+    Map("positions[]" -> data.positions.toSeq.map(w.writes)) ++ {
+      if (data.startDate.isDefined) {
+        localDateWrite.writes(data.startDate.get) map {
+          case (key, value) =>
+            s"startDate.$key" -> value
+        }
+      }
+      else Nil
+    }
   }
 
   implicit val formats = Json.format[Positions]

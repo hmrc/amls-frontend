@@ -57,11 +57,11 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
       case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _, _, _, _) if !pos.personalTax => true
+      Some(_), _, _, _, _) if (!pos.personalTax & pos.startDate.isDefined) => true
       case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
-      Some(_), Some(_), Some(_), Some(_),
-      Some(_), _, _, _, _) => true
+      Some(pos), Some(_), Some(_), Some(_),
+      Some(_), _, _, _, _) if(pos.startDate.isDefined) => true
       case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
       case _ => false
     }
