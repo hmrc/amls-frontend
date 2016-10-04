@@ -1,7 +1,6 @@
 package models.responsiblepeople
 
 import play.Logger
-import play.api.libs.json.Json
 import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap

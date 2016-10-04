@@ -3,6 +3,7 @@ package models.tradingpremises
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 import scala.collection.Seq
 
@@ -68,18 +69,18 @@ object TradingPremises {
     val messageKey = "tradingpremises"
     val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
 
-    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {
-      _.filterNot(_ == TradingPremises()) match {
-        case Nil => notStarted
+    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) {tp =>
+      tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises()) match {
+        case Nil => Section(messageKey, NotStarted, anyChanged(tp), controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
         case premises if premises.nonEmpty && premises.forall {
           _.isComplete
-        } => Section(messageKey, Completed, anyChanged(premises), controllers.tradingpremises.routes.SummaryController.answers())
+        } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.SummaryController.answers())
         case premises => {
           val index = premises.indexWhere {
             case model if !model.isComplete => true
             case _ => false
           }
-          Section(messageKey, Started, anyChanged(premises), controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
+          Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
         }
       }
     }
