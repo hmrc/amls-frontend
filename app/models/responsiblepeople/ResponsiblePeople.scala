@@ -27,6 +27,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def personResidenceType(p: PersonResidenceType): ResponsiblePeople =
     this.copy(personResidenceType = Some(p), hasChanged = hasChanged || !this.personResidenceType.contains(p))
 
+  def personResidenceType(p: Option[PersonResidenceType]): ResponsiblePeople =
+    this.copy(personResidenceType = p, hasChanged = hasChanged || !this.personResidenceType.contains(p))
+
   def contactDetails(p: ContactDetails): ResponsiblePeople =
     this.copy(contactDetails = Some(p), hasChanged = hasChanged || !this.contactDetails.contains(p))
 

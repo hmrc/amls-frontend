@@ -44,7 +44,7 @@ trait NationalityController extends RepeatingSection with BaseController {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>
                   val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
-                  rp.copy(personResidenceType = residenceType)
+                  rp.personResidenceType(residenceType)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
