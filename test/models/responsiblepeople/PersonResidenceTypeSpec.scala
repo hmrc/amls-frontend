@@ -22,7 +22,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Success(PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))))
+          be(Success(PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))))
       }
 
       "fail to validate on missing nino" in {
@@ -62,16 +62,15 @@ class PersonResidenceTypeSpec extends PlaySpec {
           be(Failure(Seq(Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country")))))
       }
 
-      "fail to validate on invalid nationality" in {
+      "successfully read json when nationality field is empty" in {
         val ukModel = Map(
           "isUKResidence" -> Seq("true"),
           "nino" -> Seq("AA346464B"),
-          "countryOfBirth" -> Seq("GB"),
-          "nationality" -> Seq("")
+          "countryOfBirth" -> Seq("GB")
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(Path \ "nationality" -> Seq(ValidationError("error.required.nationality")))))
+          be(Success(PersonResidenceType(UKResidence("AA346464B"),Country("United Kingdom", "GB"), None)))
       }
 
       "successfully validate non uk model" in {
@@ -88,7 +87,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
 
         PersonResidenceType.formRule.validate(ukModel) must
           be(Success(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
-            Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))))
+            Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))))
       }
 
       "fail to validate when non uk fields missing or invalid" in {
@@ -159,7 +158,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
 
       "write correct UKResidence model" in {
 
-        val data = PersonResidenceType(UKResidence("12346464646"), Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
+        val data = PersonResidenceType(UKResidence("12346464646"), Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
 
         PersonResidenceType.formWrites.writes(data) mustBe Map(
           "isUKResidence" -> Seq("true"),
@@ -172,7 +171,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
       "write correct NonUKResidence model" in {
 
         val data = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
-          Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
+          Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
 
         PersonResidenceType.formWrites.writes(data) mustBe Map(
           "isUKResidence" -> Seq("false"),
@@ -191,7 +190,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
 
       "Successfully read uk residence type model" in {
         val ukModel = PersonResidenceType(UKResidence("123464646"),
-          Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
+          Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
 
         PersonResidenceType.jsonRead.reads( PersonResidenceType.jsonWrite.writes(ukModel)) must
           be(JsSuccess(ukModel))
@@ -200,7 +199,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
 
       "Successfully validate non uk residence type model" in {
         val nonUKModel = PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
-          Country("United Kingdom", "GB"), Country("United Kingdom", "GB"))
+          Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))
 
         PersonResidenceType.jsonRead.reads(
           PersonResidenceType.jsonWrite.writes(nonUKModel)) must

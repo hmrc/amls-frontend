@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import models.Country
 import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople}
 import utils.RepeatingSection
 import views.html.responsiblepeople.person_residence_type
@@ -40,11 +41,13 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
             case ValidForm(_, data) => {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.personResidenceType(data)
+                  val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
+                  val updatedData = data.copy(nationality = nationality)
+                  rp.personResidenceType(updatedData)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.ContactDetailsController.get(index, edit))
+                case false => Redirect(routes.NationalityController.get(index, edit))
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

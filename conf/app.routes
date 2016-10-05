@@ -125,7 +125,7 @@ POST        /bank-details/account-registered/:index                     controll
 
 
 GET         /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
-POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
+POST        /bank-details/accounts/:index                               controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
 
 GET         /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-details/:index                        controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
@@ -210,6 +210,9 @@ POST        /responsible-people/address/:index                          controll
 
 GET         /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
+
+GET         /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/nationality/:index                      controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false)
 
 GET         /responsible-people/check-your-answers                      controllers.responsiblepeople.CheckYourAnswersController.get()
 GET         /responsible-people/person-details/:index                   controllers.responsiblepeople.DetailedAnswersController.get(index: Int)

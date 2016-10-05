@@ -147,14 +147,17 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       BankDetails.section(cache) must be(startedSection)
     }
 
-/*    "return a completed Section when model is complete with No bankaccount option selected" in {
-      val noBankAcount = Seq(BankDetails(None, None))
-      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
+    "return a completed Section when model is complete with No bankaccount option selected" in {
+      val noBankAcount = Seq(BankDetails(None, None, true, None))
+      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAcount)
 
-      BankDetails.section(cache) must be(startedSection)
-    }*/
+      val section = BankDetails.section(cache)
+      section.hasChanged must be(true)
+      section.status must be(Completed)
+      BankDetails.section(cache) must be(completedSection)
+    }
 
     "Amendment and Variation flow" when {
       "the section is complete with all the bank details being removed" must {
@@ -212,9 +215,24 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
           section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
         }
       }
+
+
+      "exclude Nobank account and deleted bank accounts before sending to ETMP" in {
+
+        val completeModel = BankDetails(Some(accountType), Some(bankAccount), status = Some(StatusConstants.Deleted))
+        val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
+        val NoBankAccount = BankDetails(None,None, true)
+
+        val bankAccts = Seq(completeModel, completeModelChanged, NoBankAccount)
+        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
+        val test = bankDtls.nonEmpty match {
+          case true => Some(bankDtls)
+          case false => Some(Seq.empty)
+        }
+        test must be(Some(Seq(completeModelChanged)))
+      }
     }
   }
-
 
   it when {
     val completeModel = BankDetails(Some(PersonalAccount), Some(BankAccount("ACCOUNTNAME", UKAccount("ACCOUNTNUMBER", "SORTCODE"))))
