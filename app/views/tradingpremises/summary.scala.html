@@ -6,14 +6,15 @@
 @(model: Seq[TradingPremises], add: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @if(add){
-        @heading("summary.youranswers.title", "summary.tradingpremises")
-    } else {
-        @heading("summary.checkyouranswers.title", "summary.tradingpremises")
-    }
+    @heading(if(add) "title.ya" else "title.cya", "summary.tradingpremises")
 }
+
 @main(
-    title = if(add) Messages("summary.youranswers.title") else Messages("summary.checkyouranswers.title"),
+    title = if(add) {
+        Messages("title.ya") + " - " + Messages("summary.tradingpremises")
+    } else {
+        Messages("title.cya") + " - " + Messages("summary.tradingpremises")
+    },
     heading = header
 ) {
 

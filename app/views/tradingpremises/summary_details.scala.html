@@ -10,7 +10,7 @@
     @heading("summary.detailedanswers.title", "summary.tradingpremises")
 }
 @main(
-    title = Messages("summary.detailedanswers.title"),
+    title = Messages("summary.detailedanswers.title") + " - " + Messages("summary.tradingpremises"),
     heading = header
 ) {
     @model.yourTradingPremises.map { yta =>

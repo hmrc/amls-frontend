@@ -5,11 +5,11 @@
 @(model: Asp)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.asp")
+    @heading("title.cya", "summary.asp")
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("title.cya"),
     heading = header
 ) {
 

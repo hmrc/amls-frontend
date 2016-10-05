@@ -9,11 +9,11 @@ s"""${f("franchiseName").id}-fieldset"""
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.businessfranchise.heading", "summary.businessactivities")
+    @heading("businessactivities.businessfranchise.title", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.businessfranchise.title"),
+    title = Messages("businessactivities.businessfranchise.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 )  {
 

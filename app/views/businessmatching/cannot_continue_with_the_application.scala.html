@@ -3,11 +3,11 @@
 @()(implicit request: Request[_])
 
 @header = {
-    @heading("businessmatching.cannotcontinuewiththeapplication.heading", "summary.businessmatching")
+    @heading("businessmatching.cannotcontinuewiththeapplication.title", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("businessmatching.cannotcontinuewiththeapplication.title"),
+    title = Messages("businessmatching.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
 

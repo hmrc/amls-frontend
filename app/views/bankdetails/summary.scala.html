@@ -6,11 +6,15 @@
 @(model: Seq[BankDetails], complete: Boolean, hasBankAccount : Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading(if(complete) "summary.youranswers.title" else "summary.checkyouranswers.title", "summary.bankdetails")
+    @heading(if(complete) "title.ya" else "title.cya", "summary.bankdetails")
 }
 
 @main(
-    title = if(complete) Messages("summary.youranswers.title") else Messages("summary.bankdetails.checkyouranswers.title"),
+    title = if(complete) {
+        Messages("title.ya") + " - " + Messages("summary.bankdetails")
+    } else {
+        Messages("title.cya") + " - " + Messages("summary.bankdetails")
+    },
     heading = header
 ) {
 

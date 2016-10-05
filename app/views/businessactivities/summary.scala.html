@@ -5,11 +5,11 @@
 @(model: BusinessActivities)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.businessactivities")
+    @heading("title.cya", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
 
