@@ -1,6 +1,6 @@
 package controllers
 
-import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig, BusinessCustomerSessionCache}
 import models.SubscriptionResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -46,19 +46,7 @@ trait LandingController extends BaseController {
       case Some(cache) =>
         ApplicationConfig.statusToggle match {
           case true =>
-            (for{
-              bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            } yield bm.isComplete match {
-              case true => println(">>>>>>>>>>> TRUE"); Future.successful(Redirect(controllers.routes.StatusController.get()))
-              case false => {
-                AmlsShortLivedCache.remove(authContext.user.oid) map { http =>
-                  http.status match {
-                  case 204 => println(">>>>>>>>>>>>>>>> deleted user id " + authContext.user.oid); Redirect(controllers.routes.LandingController.get())
-                  case _ => throw new Exception("Cannot remove pre application data")
-                }
-                }
-              }
-            }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
+            preApplicationComplete(cache)
           case _ =>
             Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
@@ -80,6 +68,23 @@ trait LandingController extends BaseController {
         }
       }.flatMap(identity)
     }
+  }
+
+  private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+    (for{
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+      ab <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+    } yield (bm.isComplete, ab.isComplete) match {
+      case (true, true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
+      case _ => {
+        AmlsShortLivedCache.remove(authContext.user.oid).map { http =>
+          http.status match {
+            case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
+            case _ => throw new Exception("Cannot remove pre application data")
+          }
+        }
+      }
+    }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
   }
 
   private def refreshAndRedirect(amlsRegistrationNumber :String)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
