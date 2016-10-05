@@ -13,6 +13,15 @@
     heading = header
 ) {
 
+    @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0){
+    <div class="panel-indent panel-border-wide spacelarge">
+        <p> @Messages("tradingpremises.summary.no.trading.premises") </p>
+        <p>
+            <a href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)"> @Messages("responsiblepeople.check_your_answers.add") </a>
+        </p>
+    </div>
+    } else {
+
     <table>
         <tbody>
             @model.zipWithIndex.map { case (responsiblePerson, idx)=>
@@ -33,6 +42,7 @@
             }
         </tbody>
     </table>
+}
 
     <div class="form-field">
         <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.checkyouranswers.acceptandcomplete")</a>
