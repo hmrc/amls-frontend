@@ -285,6 +285,7 @@ button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
+button.backtosignin = Back to sign in
 button.delete = Delete
 button.payfee = Pay registration fee
 button.amendment.payfee = Pay amendment fee
@@ -343,7 +344,7 @@ businessType.lbl.05 = Unincorporated association or trust
 
 ############################### Login Page ###############################
 amls.Login.title= AMLS
-unauthorised.title = Unauthorised
+unauthorised.title = You can’t access this service with an agent account
 
 ############################### Status page ###############################
 status.title = Your registration
