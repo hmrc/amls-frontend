@@ -16,7 +16,7 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.mvc.{Call, Request}
 import services.{AuthEnrolmentsService, LandingService}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -26,6 +26,7 @@ trait LandingController extends BaseController {
 
   private[controllers] def landingService: LandingService
   private[controllers] def enrolmentsService: AuthEnrolmentsService
+  val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -69,11 +70,10 @@ trait LandingController extends BaseController {
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     (for{
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      //ab <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
     } yield bm.isComplete match {
       case (true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
       case _ => {
-        AmlsShortLivedCache.remove(authContext.user.oid).map { http =>
+        shortLivedCache.remove(authContext.user.oid) flatMap { http =>
           http.status match {
             case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
             case _ => throw new Exception("Cannot remove pre application data")
@@ -136,4 +136,5 @@ object LandingController extends LandingController {
   override private[controllers] val landingService = LandingService
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected val authConnector = AMLSAuthConnector
+  override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 }
