@@ -1,6 +1,6 @@
 package controllers
 
-import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig, BusinessCustomerSessionCache}
+import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import models.SubscriptionResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -14,15 +14,11 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.Logger
-import play.api.libs.json.{JsBoolean, JsObject}
 import play.api.mvc.{Call, Request}
-import services.{AuthEnrolmentsService, LandingService, ProgressService}
+import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-import views.html.asp.summary
 
 import scala.concurrent.Future
 
@@ -73,9 +69,9 @@ trait LandingController extends BaseController {
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     (for{
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      ab <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-    } yield (bm.isComplete, ab.isComplete) match {
-      case (true, true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
+      //ab <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+    } yield bm.isComplete match {
+      case (true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
       case _ => {
         AmlsShortLivedCache.remove(authContext.user.oid).map { http =>
           http.status match {

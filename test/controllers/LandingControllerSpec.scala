@@ -54,6 +54,14 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
         "the form has not been submitted" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+
+          val complete = mock[BusinessMatching]
+          val emptyCacheMap = mock[CacheMap]
+
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
+          when(complete.isComplete) thenReturn true
+          when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
@@ -61,10 +69,17 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
 
         "the form has been submitted" in new Fixture {
           val cacheMap = mock[CacheMap]
+
+          val complete = mock[BusinessMatching]
+
+          when(complete.isComplete) thenReturn true
+          when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", 1.00, None, 1.00, 1.00, "")))
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
@@ -117,7 +132,7 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
           when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
-          when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(None)
+          //when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(None)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -130,13 +145,13 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
         "there is data in BusinessMatching but the pre-application is incomplete" in new Fixture {
 
           val testBusinessMatching = BusinessMatching()
-          val testAboutTheBusinessMatching = AboutTheBusiness()
+          //val testAboutTheBusinessMatching = AboutTheBusiness()
 
           val emptyCacheMap = mock[CacheMap]
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
           when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-          when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusinessMatching))
+          //when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusinessMatching))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -347,49 +362,18 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
     }
 
     "an enrolment does not exist" when {
-     /* "there is data in S4L " should {
+      "there is data in S4L " should {
         "do not refresh API5 and redirect to status controller" in new Fixture{
 
-          setUpMocksForNoEnrolment(controller)
-          setUpMocksForDataExistsInSaveForLater(controller)
-
-          val msbServices = MsbServices(
-            Set(
-              TransmittingMoney,
-              CurrencyExchange,
-              ChequeCashingNotScrapMetal,
-              ChequeCashingScrapMetal
-            )
-          )
-
-          val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-          val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-          val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB"))
-          val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0001234567890")
-          val TypeOfBusinessModel = TypeOfBusiness("test")
-          val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
-          val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
-
-          val testBusinessMatching = BusinessMatching(
-            Some(ReviewDetailsModel),
-            Some(BusinessActivitiesModel),
-            Some(msbServices),
-            Some(TypeOfBusinessModel),
-            Some(CompanyRegistrationNumberModel),
-            Some(BusinessAppliedForPSRNumberModel),
-            hasChanged = false)
-
-          val testAboutTheBusinessMatching = AboutTheBusiness(any(), _, _, _, any(), any(), _, _)
-
+          val complete = mock[BusinessMatching]
           val emptyCacheMap = mock[CacheMap]
 
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-          when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusinessMatching))
-
-          //when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
+          setUpMocksForNoEnrolment(controller)
 
 
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
+          when(complete.isComplete) thenReturn true
+          when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
           val result = controller.get()(request)
 
@@ -397,7 +381,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be (Some(controllers.routes.StatusController.get().url))
         }
-      }*/
+      }
 
       "there is no data in S4L" when {
         "there is data in keystore " should {
