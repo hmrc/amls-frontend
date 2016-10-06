@@ -15,7 +15,7 @@
 
     @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0){
     <div class="panel-indent panel-border-wide spacelarge">
-        <p> @Messages("tradingpremises.summary.no.trading.premises") </p>
+        <p> @Messages("responsiblepeople.summary.no.responsible.people") </p>
         <p>
             <a href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)"> @Messages("responsiblepeople.check_your_answers.add") </a>
         </p>
