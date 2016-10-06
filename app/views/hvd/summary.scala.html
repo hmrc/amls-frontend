@@ -75,14 +75,19 @@
             question = Messages("hvd.cash.payment.title"),
             editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString
         ) {
-            <p>@cp match {
+            @cp match {
                 case CashPaymentYes(date) => {
-                    @Messages("hvd.summary.payment.date.label"): @DateHelper.formatDate(date)
+                    <p>@Messages("lbl.yes")</p>
+                    @checkYourAnswersExtra(
+                        question = Messages("hvd.summary.payment.date.label")
+                    ) {
+                        <p>@DateHelper.formatDate(date)</p>
+                    }
                 }
                 case CashPaymentNo => {
-                    @Messages("lbl.no")
+                    <p>@Messages("lbl.no")</p>
                 }
-            }</p>
+            }
         }
     }
 

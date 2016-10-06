@@ -162,22 +162,21 @@
                         <li>@cur</li>
                         }
                     </ul>
-                }
-                @checkYourAnswers(
-                    question = Messages("msb.which_currencies.who"),
-                    editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
-                ) {
-                    <ul class="list">
-                    @wc.bankMoneySource.map { bms =>
-                        <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+                    @checkYourAnswersExtra(
+                        question = Messages("msb.which_currencies.who")
+                    ) {
+                        <ul class="list">
+                        @wc.bankMoneySource.map { bms =>
+                            <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+                        }
+                        @wc.wholesalerMoneySource.map { wms =>
+                            <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
+                        }
+                        @if(wc.customerMoneySource) {
+                            <li>@Messages("msb.which_currencies.source.customers")</li>
+                        }
+                        </ul>
                     }
-                    @wc.wholesalerMoneySource.map { wms =>
-                        <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
-                    }
-                    @if(wc.customerMoneySource) {
-                        <li>@Messages("msb.which_currencies.source.customers")</li>
-                    }
-                    </ul>
                 }
             }
         }

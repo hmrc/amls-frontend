@@ -69,13 +69,10 @@
 
     @model.howManyEmployees.map { employees =>
         @checkYourAnswers(
+            question = Messages("businessactivities.employees.line1.cya"),
             editUrl = controllers.businessactivities.routes.HowManyEmployeesController.get(true).toString
         ) {
-            @checkYourAnswersExtra(
-                question = Messages("businessactivities.employees.line1.cya")
-            ) {
-                <p>@employees.employeeCount</p>
-            }
+            <p>@employees.employeeCount</p>
             @checkYourAnswersExtra(
                 question = Messages("businessactivities.employees.line2.cya")
             ) {
@@ -152,14 +149,19 @@
         @model.riskAssessmentPolicy.map {
             case RiskAssessmentPolicyNo => { <p>@Messages("lbl.no")</p> }
             case RiskAssessmentPolicyYes(v) => {
-                <ul class="list list--comma">
-                    @v.map { x=>
-                        <li>@x match {
-                            case PaperBased => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
-                            case Digital => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
-                        }</li>
+                    <p>@Messages("lbl.yes")</p>
+                    @checkYourAnswersExtra(
+                        question = Messages("hvd.summary.payment.date.label")
+                    ) {
+                        <ul class="list list--comma">
+                            @v.map { x=>
+                                <li>@x match {
+                                    case PaperBased => {@Messages("businessactivities.RiskAssessmentType.lbl.01")}
+                                    case Digital => {@Messages("businessactivities.RiskAssessmentType.lbl.02")}
+                                }</li>
+                            }
+                        </ul>
                     }
-                </ul>
             }
         }
     }
