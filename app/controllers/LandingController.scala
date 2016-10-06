@@ -1,6 +1,6 @@
 package controllers
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig, BusinessCustomerSessionCache}
 import models.SubscriptionResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import views.html.asp.summary
 
 import scala.concurrent.Future
 
@@ -45,15 +46,9 @@ trait LandingController extends BaseController {
       case Some(cache) =>
         ApplicationConfig.statusToggle match {
           case true =>
-            Future.successful(Redirect(controllers.routes.StatusController.get()))
+            preApplicationComplete(cache)
           case _ =>
-            (for{
-                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              } yield bm.isComplete match {
-                case true => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-                case false => ???
-              }
-              ).getOrElse(Future.successful(Redirect(controllers.routes.RegistrationProgressController.get())))
+            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
       case None => {
         for {
@@ -75,15 +70,29 @@ trait LandingController extends BaseController {
     }
   }
 
+  private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+    (for{
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+      ab <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+    } yield (bm.isComplete, ab.isComplete) match {
+      case (true, true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
+      case _ => {
+        AmlsShortLivedCache.remove(authContext.user.oid).map { http =>
+          http.status match {
+            case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
+            case _ => throw new Exception("Cannot remove pre application data")
+          }
+        }
+      }
+    }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
+  }
+
   private def refreshAndRedirect(amlsRegistrationNumber :String)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     landingService.refreshCache(amlsRegistrationNumber) map {
       cache =>  Redirect(controllers.routes.StatusController.get())
     }
   }
 
-  private def removePreAppData() = {
-    ???
-  }
 
   private def dataHasChanged(cacheMap : CacheMap) = {
     Seq(
