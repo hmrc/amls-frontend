@@ -1,0 +1,32 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean, index: Int)(implicit request: Request[_])
+
+@target = @{
+    s"""${f("other").id}-fieldset"""
+}
+@header = {
+    @errorSummary(f)
+    @heading("responsiblepeople.nationality.header", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.nationality.title"),
+    heading = header
+)  {
+
+    @form(f, controllers.responsiblepeople.routes.NationalityController.post(index, edit)) {
+          @radioGroup(f("nationality")) {
+                @radio(f("nationality"), "responsiblepeople.nationality.selection.british", "01")
+                @radio(f("nationality"), "responsiblepeople.nationality.selection.irish", "02")
+                @radio(f("nationality"), "responsiblepeople.nationality.selection.other", "03", target = s"#$target")
+                @fieldset("TODO", jsHidden = true, id = target) {
+                    @country(f("otherCountry"), labelText = "responsiblepeople.nationality.selection.other.name")
+                }
+
+          }
+
+        @submit(edit)
+    }
+}

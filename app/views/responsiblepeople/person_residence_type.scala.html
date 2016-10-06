@@ -25,14 +25,7 @@
                 @input(f("nino"), "lbl.nino", "lbl.nino.hint", bold = false)
             }
             @fieldset("TODO", jsHidden = true, id = s"""${f("targetno").id}-fieldset""") {
-                @date(
-                    f = f,
-                    p = "dateOfBirth",
-                    labelText = "responsiblepeople.dob.lbl",
-                    hintText = "responsiblepeople.dob.lbl.hint",
-                    example = false,
-                    jsHidden = true
-                )
+
                 @radioGroup(f("passportType")) {
                     @legend("responsiblepeople.passporttype.lbl", jsHidden = false, bold = false)
                     @radio(f("passportType"), "responsiblepeople.uk.passport.lbl", "01", target = s"#${f("ukPassportNumber").id}-fieldset")
@@ -45,18 +38,24 @@
                     }
                     @radio(f("passportType"), "responsiblepeople.no.passport.lbl", "03")
                 }
+                @date(
+                    f = f,
+                    p = "dateOfBirth",
+                    labelText = "responsiblepeople.dob.lbl",
+                    hintText = "responsiblepeople.dob.lbl.hint",
+                    example = false,
+                    jsHidden = true
+                )
             }
         }
         </div>
+
         <div class="form-field-group">
             <div class="form-field">
-                @country(f("countryOfBirth"), labelText = "responsiblepeople.country.of.birth.lbl" , hintText = "responsiblepeople.country.of.birth.hint")
-            </div>
-            <div class="form-field">
-                @country(f("nationality"), labelText = "lbl.nationality", hintText = "lbl.nationality.hint")
+                @country(f("countryOfBirth"), labelText = "responsiblepeople.country.of.birth.lbl" )
             </div>
         </div>
 
-        @submit(edit)
+        @submit(false)
     }
 }

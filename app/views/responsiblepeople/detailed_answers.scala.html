@@ -127,7 +127,7 @@
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.nationality"),
-            editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true).toString(),
+            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true).toString(),
             dataItem = person.personResidenceType
         ) { prt =>
             <p>@prt.nationality</p>

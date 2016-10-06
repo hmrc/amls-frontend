@@ -49,7 +49,7 @@ object BankDetails {
           controllers.bankdetails.routes.SummaryController.get(true))
         case model =>
           val index = model.indexWhere {
-            case model if !model.isComplete => true
+            case bdModel if !bdModel.isComplete => true
             case _ => false
           }
           Section(messageKey, Started, anyChanged(bds), controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))

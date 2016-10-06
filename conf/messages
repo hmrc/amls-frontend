@@ -29,7 +29,7 @@ error.invalid.postcode = Enter valid postcode.
 error.required.country = Enter a country.
 error.invalid.country = Enter valid country.
 error.required.country.name = Enter at least one country.
-error.required.nationality = Enter your nationality.
+error.required.nationality = Select the nationality of the responsible person.
 error.required.uk.or.overseas = Select one option: is this a UK address or an overseas address?
 
 error.required.firstname = Enter a first name.
@@ -1042,7 +1042,7 @@ responsiblepeople.detailed_answers.uk_resident.dob = D.O.B
 responsiblepeople.detailed_answers.uk_resident.passport_number = Passport Number
 responsiblepeople.detailed_answers.uk_resident.no_passport = No passport
 responsiblepeople.detailed_answers.country_of_birth = Country of birth
-responsiblepeople.detailed_answers.nationality = Nationality
+responsiblepeople.detailed_answers.nationality = Country of nationality
 responsiblepeople.detailed_answers.phone_number = Phone number
 responsiblepeople.detailed_answers.email = Email
 responsiblepeople.detailed_answers.address = Address
@@ -1055,6 +1055,13 @@ responsiblepeople.detailed_answers.registered_for_sa = Registered for Self Asses
 responsiblepeople.detailed_answers.previous_experience = Previous Experience
 responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
+responsiblepeople.nationality.title = Responsible people -  What is the nationality of this person? - Anti-money laundering supervision - GOV.UK
+responsiblepeople.nationality.header =  What is the nationality of this person?
+responsiblepeople.nationality.select = Select all that apply
+responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
+responsiblepeople.nationality.selection.irish = Irish
+responsiblepeople.nationality.selection.other = National of a different country
+responsiblepeople.nationality.selection.other.name = Country name
 responsiblepeople.visuallyhidden.detailed.header = Responsible person
 
 #TCSP

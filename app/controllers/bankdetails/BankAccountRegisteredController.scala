@@ -20,7 +20,8 @@ trait BankAccountRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) map {
-          case Some(data) => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, data.count(!_.status.contains(StatusConstants.Deleted))))
+          case Some(data) => Ok(views.html.bankdetails.bank_account_registered(EmptyForm,
+            data.filter(_.bankAccountType.isDefined).count(!_.status.contains(StatusConstants.Deleted))))
           case _ => Ok(views.html.bankdetails.bank_account_registered(EmptyForm, index))
         }
     }
