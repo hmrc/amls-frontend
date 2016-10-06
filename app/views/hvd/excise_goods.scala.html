@@ -5,7 +5,7 @@
 
 @header = {
     @errorSummary(f)
-    @heading("hvd.excise.goods.heading", "summary.hvd")
+    @heading("hvd.excise.goods.title", "summary.hvd")
 }
 
 @main(
@@ -17,7 +17,7 @@
 
         <div class="form-field-group">
             @inlineRadioGroup(f("exciseGoods")) {
-                @legend("hvd.excise.goods.heading")
+                @legend("hvd.excise.goods.title", jsHidden = true)
                 @radio(f("exciseGoods"), "lbl.yes", "true")
                 @radio(f("exciseGoods"), "lbl.no", "false")
             }

@@ -30,7 +30,7 @@
             @m match {
                 case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
                     @checkYourAnswers(
-                        question = Messages("businessmatching.registrationnumber.heading"),
+                        question = Messages("businessmatching.registrationnumber.title"),
                         editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString
                     ) {
                         <p>@model.companyRegistrationNumber.map { number =>
@@ -40,7 +40,7 @@
                 }
                 case BusinessType.UnincorporatedBody => {
                     @checkYourAnswers(
-                        question = Messages("businessmatching.typeofbusiness.heading"),
+                        question = Messages("businessmatching.typeofbusiness.title"),
                         editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString
                     ) {
                         <p>@model.typeOfBusiness.map { business =>
@@ -55,7 +55,7 @@
 
     @model.activities.map { activity =>
         @checkYourAnswers(
-            question = Messages("businessmatching.registerservices.heading"),
+            question = Messages("businessmatching.registerservices.title"),
             editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString
         ) {
             <ul class="list list--comma">
@@ -76,16 +76,16 @@
         @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
             @model.msbServices.map { services =>
                 @checkYourAnswers(
-                    question = Messages("businessmatching.services.heading"),
+                    question = Messages("msb.services.title"),
                     editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString
                 ) {
                     <ul class="list list--comma">
                     @services.services.map { svc =>
                         <li>@svc match {
-                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
-                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
-                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
+                            case TransmittingMoney => {@Messages("services.list.lbl.01")}
+                            case CurrencyExchange => {@Messages("services.list.lbl.02")}
+                            case ChequeCashingNotScrapMetal => {@Messages("services.list.lbl.03")}
+                            case ChequeCashingScrapMetal => {@Messages("services.list.lbl.04")}
                         }</li>
                     }
                     </ul>

@@ -7,14 +7,14 @@
 @(model: Hvd)(implicit request: Request[_], lang: Lang)
 
 @main(
-    title = Messages("summary.checkyouranswers.title")
+    title = Messages("title.cya")
 ) {
 
-    @heading("summary.checkyouranswers.heading", "summary.hvd")
+    @heading("title.cya", "summary.hvd")
 
     @model.products.map { p =>
         @checkYourAnswers(
-            question = Messages("hvd.products.heading"),
+            question = Messages("hvd.products.title"),
             editUrl = controllers.hvd.routes.ProductsController.get(true).toString
         ) {
             <ul class="list list--comma">
@@ -40,7 +40,7 @@
         @if(p.items.contains(Alcohol) | p.items.contains(Tobacco)) {
             @model.exciseGoods.map { eg =>
                 @checkYourAnswers(
-                    question = Messages("hvd.excise.goods.heading"),
+                    question = Messages("hvd.excise.goods.title"),
                     editUrl = controllers.hvd.routes.ExciseGoodsController.get(true).toString
                 ) {
                     <p>@if(eg.exciseGoods) {
@@ -55,7 +55,7 @@
 
     @model.howWillYouSellGoods.map { goods =>
         @checkYourAnswers(
-            question = Messages("hvd.how-will-you-sell-goods.heading"),
+            question = Messages("hvd.how-will-you-sell-goods.title"),
             editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString
         ) {
             <ul class="list list--comma">
@@ -72,7 +72,7 @@
 
     @model.cashPayment.map { cp =>
         @checkYourAnswers(
-            question = Messages("hvd.cash.payment.heading"),
+            question = Messages("hvd.cash.payment.title"),
             editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString
         ) {
             <p>@cp match {
@@ -88,7 +88,7 @@
 
     @model.linkedCashPayment.map { p =>
         @checkYourAnswers(
-            question = Messages("hvd.identify.linked.cash.payment.heading"),
+            question = Messages("hvd.identify.linked.cash.payment.title"),
             editUrl = controllers.hvd.routes.LinkedCashPaymentsController.get(true).toString
         ) {
             <p>@if(p.linkedCashPayments) {
@@ -101,7 +101,7 @@
 
     @model.receiveCashPayments.map { rcp =>
         @checkYourAnswers(
-            question = Messages("hvd.receiving.heading"),
+            question = Messages("hvd.receiving.title"),
             editUrl = controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString
         ) {
             @rcp.paymentMethods match {

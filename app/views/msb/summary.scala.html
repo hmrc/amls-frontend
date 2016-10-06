@@ -7,18 +7,18 @@
 @(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices])(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.heading", "summary.msb")
+    @heading("title.cya", "summary.msb")
 }
 
 @main(
-    title = Messages("summary.msb.checkyouranswers.title"),
+    title = Messages("title.cya"),
     heading = header
 ) {
 
     @bmMsbServices.map{ services =>
         @model.throughput.map{ throughput =>
             @checkYourAnswers(
-                question = Messages("msb.throughput.heading"),
+                question = Messages("msb.throughput.title"),
                 editUrl = controllers.msb.routes.ExpectedThroughputController.get(true).toString
             ) {
                 <p>@throughput match {
@@ -35,7 +35,7 @@
 
         @model.branchesOrAgents.map { boa =>
             @checkYourAnswers(
-                question = Messages("msb.branchesoragents.heading"),
+                question = Messages("msb.branchesoragents.title"),
                 editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
             ) {
                 @boa.branches.fold {
@@ -52,7 +52,7 @@
 
         @model.identifyLinkedTransactions.map { ilt =>
             @checkYourAnswers(
-                question = Messages("msb.linked.txn.heading"),
+                question = Messages("msb.linked.txn.title"),
                 editUrl = controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).toString
             ) {
                 <p>@ilt.linkedTxn match {
@@ -65,7 +65,7 @@
         @if(services.services.contains(TransmittingMoney)) {
             @model.businessUseAnIPSP.map { ipsp =>
                 @checkYourAnswers(
-                    question = Messages("msb.ipsp.heading"),
+                    question = Messages("msb.ipsp.title"),
                     editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
                 ) {
                     @ipsp match {
@@ -82,7 +82,7 @@
 
             @model.fundsTransfer.map { ft =>
                 @checkYourAnswers(
-                    question = Messages("msb.fundstransfer.heading"),
+                    question = Messages("msb.fundstransfer.title"),
                     editUrl = controllers.msb.routes.FundsTransferController.get(true).toString
                 ) {
                     <p>@ft.transferWithoutFormalSystems match {
@@ -94,7 +94,7 @@
 
             @model.transactionsInNext12Months.map{ trans =>
                 @checkYourAnswers(
-                    question = Messages("msb.transactions.expected.heading"),
+                    question = Messages("msb.transactions.expected.title"),
                     editUrl = controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString
                 ) {
                     <p>@trans.txnAmount</p>
@@ -103,7 +103,7 @@
 
             @model.sendMoneyToOtherCountry.map{ otherCountries =>
                 @checkYourAnswers(
-                    question = Messages("msb.send.money.heading"),
+                    question = Messages("msb.send.money.title"),
                     editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
                 ) {
                     <p>@otherCountries.money match {
@@ -115,7 +115,7 @@
                 @if(otherCountries.money) {
                     @model.sendTheLargestAmountsOfMoney.map { lom =>
                         @checkYourAnswers(
-                            question = Messages("msb.send.the.largest.amounts.of.money.heading"),
+                            question = Messages("msb.send.the.largest.amounts.of.money.title"),
                             editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
                         ) {
                             <ul class="list list--comma">
@@ -128,7 +128,7 @@
 
                     @model.mostTransactions.map { mt =>
                         @checkYourAnswers(
-                            question = Messages("msb.most.transactions.heading"),
+                            question = Messages("msb.most.transactions.title"),
                             editUrl = controllers.msb.routes.MostTransactionsController.get(true).toString
                         ) {
                             <ul class="list list--comma">
@@ -145,7 +145,7 @@
         @if(services.services.contains(CurrencyExchange)) {
             @model.ceTransactionsInNext12Months.map{ trans =>
                 @checkYourAnswers(
-                    question = Messages("msb.ce.transactions.expected.in.12.months.heading"),
+                    question = Messages("msb.ce.transactions.expected.in.12.months.title"),
                     editUrl = controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString
                 ) {
                     <p>@trans.ceTransaction</p>
@@ -154,7 +154,7 @@
 
             @model.whichCurrencies.map { wc =>
                 @checkYourAnswers(
-                    question = Messages("msb.which_currencies.heading"),
+                    question = Messages("msb.which_currencies.title"),
                     editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
                 ) {
                     <ul class="list list--comma">

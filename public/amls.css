@@ -616,6 +616,10 @@ table.summary ul li {
   margin-bottom: 1.05263em;
 }
 
+.check-your-answers .list li {
+  margin-bottom: .05263em;
+}
+
 .check-your-answers .edit,
 .check-your-answers--list li,
 .check-your-answers--header .heading-xsmall {
@@ -635,6 +639,11 @@ table.summary ul li {
   text-align: right;
   vertical-align: middle;
 }
+
+.list--listing .check-your-answers__footer {
+  text-align:  left;
+}
+
 /* cheap fix before S&T */
 .check-your-answers .question {
   word-break: break-word;
@@ -661,15 +670,6 @@ table.summary ul li {
   form .form-group-month input[type="number"].form-control,
   form .form-group-year input[type="number"].form-control {
     width: 100%;
-  }
-}
-
-@media screen and (min-width: 641px) {
-  .check-your-answers .list,
-  .check-your-answers .list li,
-  .check-your-answers p {
-    margin-top: 0;
-    margin-bottom: 1.05263em;
   }
 }
 

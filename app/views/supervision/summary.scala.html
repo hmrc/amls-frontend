@@ -6,16 +6,16 @@
 @(model: Supervision)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.heading", "summary.supervision")
+    @heading("title.cya", "summary.supervision")
 }
 
 @main(
-    title = Messages("summary.supervision.checkyouranswers.title"),
+    title = Messages("title.cya"),
     heading = header
 ) {
 
     @checkYourAnswers(
-        question = Messages("supervision.another_body.heading"),
+        question = Messages("supervision.another_body.title"),
         editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
     ) {
         @model.anotherBody.map {
@@ -32,7 +32,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("supervision.memberofprofessionalbody.heading"),
+        question = Messages("supervision.memberofprofessionalbody.title"),
         editUrl = controllers.supervision.routes.ProfessionalBodyMemberController.get(true).toString
     ) {
         @model.professionalBodyMember.map {
@@ -63,7 +63,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("supervision.penalisedbyprofessional.heading"),
+        question = Messages("supervision.penalisedbyprofessional.title"),
         editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
     ) {
         <p>@model.professionalBody.map {

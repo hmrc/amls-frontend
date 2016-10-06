@@ -14,7 +14,7 @@
 ) {
 
     @checkYourAnswers(
-        question = Messages("businessactivities.confirm-activities.heading"),
+        question = Messages("businessactivities.confirm-activities.title"),
         editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString
     ) {
         <p>@model.involvedInOther.map {
@@ -25,7 +25,7 @@
 
     @model.expectedBusinessTurnover.map { turnover =>
         @checkYourAnswers(
-            question = Messages("businessactivities.business-turnover.heading"),
+            question = Messages("businessactivities.business-turnover.title"),
             editUrl = controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString
         ) {
             <p>@turnover match {
@@ -42,7 +42,7 @@
 
     @model.expectedAMLSTurnover.map { turnover =>
         @checkYourAnswers(
-            question = Messages("businessactivities.turnover.heading"),
+            question = Messages("businessactivities.turnover.title"),
             editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString
         ) {
             <p>@turnover match {
@@ -58,7 +58,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessactivities.businessfranchise.heading"),
+        question = Messages("businessactivities.businessfranchise.title"),
         editUrl = controllers.businessactivities.routes.BusinessFranchiseController.get(true).toString
     ) {
         <p>@model.businessFranchise.map {
@@ -86,7 +86,7 @@
 
     @model.customersOutsideUK.map { boa =>
         @checkYourAnswers(
-            question = Messages("businessactivities.customer.outside.uk.heading"),
+            question = Messages("businessactivities.customer.outside.uk.title"),
             editUrl = controllers.businessactivities.routes.CustomersOutsideUKController.get(true).toString
         ) {
             @boa.countries.fold {
@@ -102,7 +102,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessactivities.keep.customer.records.heading"),
+        question = Messages("businessactivities.keep.customer.records.title"),
         editUrl = controllers.businessactivities.routes.TransactionRecordController.get(true).toString
     ) {
         @model.transactionRecord.map {
@@ -122,7 +122,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessactivities.identify-suspicious-activity.heading"),
+        question = Messages("businessactivities.identify-suspicious-activity.title"),
         editUrl = controllers.businessactivities.routes.IdentifySuspiciousActivityController.get(true).toString
     ) {
         <p>@model.identifySuspiciousActivity.map { x =>
@@ -134,7 +134,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessactivities.ncaRegistered.heading"),
+        question = Messages("businessactivities.ncaRegistered.title"),
         editUrl = controllers.businessactivities.routes.NCARegisteredController.get(true).toString
     ) {
         <p>@model.ncaRegistered.map { x =>
@@ -146,7 +146,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessactivities.riskassessment.policy.heading"),
+        question = Messages("businessactivities.riskassessment.policy.title"),
         editUrl = controllers.businessactivities.routes.RiskAssessmentController.get(true).toString
     ) {
         @model.riskAssessmentPolicy.map {
@@ -166,7 +166,7 @@
 
     @model.accountantForAMLSRegulations.map { x =>
         @checkYourAnswers(
-            question = Messages("businessactivities.accountantForAMLSRegulations.heading"),
+            question = Messages("businessactivities.accountantForAMLSRegulations.title"),
             editUrl = controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true).toString
         ) {
             <p>@x.accountantForAMLSRegulations match {
@@ -180,7 +180,7 @@
         @x.accountantForAMLSRegulations match {
             case true => {
                 @checkYourAnswers(
-                    question = Messages("businessactivities.whoisyouraccountant.heading"),
+                    question = Messages("businessactivities.whoisyouraccountant.title"),
                     editUrl = controllers.businessactivities.routes.WhoIsYourAccountantController.get(true).toString
                 ) {
                     @model.whoIsYourAccountant.map { accountant =>

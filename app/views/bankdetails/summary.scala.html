@@ -34,7 +34,7 @@
     @model.zipWithIndex.map { case (x, y) =>
         @x.bankAccount.map {bankAccount =>
             @if(!x.status.contains(StatusConstants.Deleted)) {
-                <ul class="list">
+                <ul class="list list--listing">
                 @bankAccount.account match {
                     case f:UKAccount => {
                         @checkYourAnswersBanks(
