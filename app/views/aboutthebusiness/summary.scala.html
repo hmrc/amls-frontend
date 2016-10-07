@@ -71,16 +71,23 @@
     @model.contactingYou.map { c =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.contactingyou.title"),
-            editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
+            editUrl = controllers.aboutthebusiness.routes.CorrespondenceAddressController.get(true).toString
         ) {
             <ul class="list">
                 <li>@c.phoneNumber</li>
                 <li>@c.email</li>
-                @model.correspondenceAddress.map { ca =>
-                    <li>@ca.toLines.map { line =>
-                        @line<br />
-                    }</li>
-                }
+            </ul>
+        }
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.correspondenceaddress.postal.address"),
+            editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
+        ) {
+            <ul class="list">
+            @model.correspondenceAddress.map { ca =>
+                <li>@ca.toLines.map { line =>
+                    @line<br />
+                }</li>
+            }
             </ul>
         }
     }
