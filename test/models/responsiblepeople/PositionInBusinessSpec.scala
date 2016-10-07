@@ -53,13 +53,13 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
     "return true when there is a nominated officer RP" in {
       val positions = Positions(Set(NominatedOfficer,InternalAccountant),Some(new LocalDate()))
-      positions.hasNominatedOfficer must be(true)
+      positions.isNominatedOfficer must be(true)
 
     }
 
     "return false when there is no nominated officer RP" in {
       val positions = Positions(Set(InternalAccountant),Some(new LocalDate()))
-      positions.hasNominatedOfficer must be(false)
+      positions.isNominatedOfficer must be(false)
 
     }
   }

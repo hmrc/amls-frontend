@@ -9,9 +9,11 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{Json, Reads, Writes, _}
 import utils.TraversableValidators._
 
+import scala.collection.immutable.HashSet
+
 case class Positions(positions: Set[PositionWithinBusiness], startDate: Option[LocalDate]) {
 
-  def hasNominatedOfficer = positions.contains(NominatedOfficer)
+  def isNominatedOfficer = positions.contains(NominatedOfficer)
 
   def isComplete = positions.nonEmpty
 

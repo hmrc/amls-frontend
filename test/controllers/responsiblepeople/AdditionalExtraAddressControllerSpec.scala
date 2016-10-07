@@ -130,6 +130,8 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
 
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      val mockCacheMap = mock[CacheMap]
+      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
@@ -149,6 +151,8 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
 
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      val mockCacheMap = mock[CacheMap]
+      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)
@@ -219,6 +223,8 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
 
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      val mockCacheMap = mock[CacheMap]
+      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
       status(result) must be(SEE_OTHER)
@@ -239,6 +245,8 @@ class AdditionalExtraAddressControllerSpec extends PlaySpec with OneAppPerSuite 
 
       when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+      val mockCacheMap = mock[CacheMap]
+      when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
       status(result) must be(SEE_OTHER)

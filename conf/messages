@@ -60,6 +60,8 @@ error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
 error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
 
+error.required.rp.nominated_officer = Select yes or not to the question: Is this person the nominated officer for the business?
+
 error.not-found.title = Not Found
 error.not-found.heading = Item not found
 error.not-found.message = Please check that you have entered the correct web address.
@@ -196,7 +198,7 @@ error.rp.previous.invalid = Enter a first name, middle name or last name.
 error.required.rp.otherNames = Enter an alternative name.
 error.invalid.length.otherNames = You can't enter more than 140 characters for the alternative name.
 error.required.timeAtAddress = Select how long this person lived at this address.
-error.required.positionWithinBusiness = Select at least one business position.
+error.required.positionWithinBusiness = Select at least one position within the business.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 
 ############################### Trust and company service providers ###############################
@@ -1031,6 +1033,8 @@ responsiblepeople.position_within_business.lbl.03 = Internal accountant
 responsiblepeople.position_within_business.lbl.04 = Nominated officer
 responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
+responsiblepeople.aretheynominatedofficer.heading = Is this person the nominated officer for the business?
+responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.person.a.resident.heading = Is this person a UK resident?
 responsiblepeople.dob.lbl = Date of birth
