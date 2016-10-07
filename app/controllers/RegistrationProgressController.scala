@@ -3,6 +3,7 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.SubscriptionResponse
+import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
 import play.api.mvc.Request
 import services.{AuthEnrolmentsService, ProgressService}
@@ -49,15 +50,7 @@ trait RegistrationProgressController extends BaseController {
     val x = dataCache.fetchAll
     x.flatMap { cacheMapO =>
         cacheMapO.map { cacheMap: CacheMap =>
-          val sections = service.sections(cacheMap)
-          enrolmentsService.amlsRegistrationNumber map {
-            case Some(_) => {
-              Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
-            }
-            case None => {
-              Ok(registration_progress(sections, declarationAvailable(sections)))
-            }
-          }
+          preApplicationComplete(cacheMap)
         }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
     }
   }
@@ -68,6 +61,25 @@ trait RegistrationProgressController extends BaseController {
           Ok(registration_progress(sections, declarationAvailable(sections)))
         }
       }
+
+  private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, r : Request[_]) = {
+    (for{
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+    } yield bm.isComplete match {
+      case (true) => {
+        val sections = service.sections(cache)
+        enrolmentsService.amlsRegistrationNumber map {
+          case Some(_) => {
+            Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+          }
+          case None => {
+            Ok(registration_progress(sections, declarationAvailable(sections)))
+          }
+        }
+      }
+      case _ => Future.successful(Redirect(controllers.routes.LandingController.get()))
+    }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
+  }
 
 }
 

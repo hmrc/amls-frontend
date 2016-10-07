@@ -1,23 +1,24 @@
 package controllers
 
-import connectors.{DataCacheConnector}
+import connectors.DataCacheConnector
 import models.SubscriptionResponse
-import models.registrationprogress.{NotStarted, Completed, Section}
+import models.businessmatching.BusinessMatching
+import models.registrationprogress.{Completed, NotStarted, Section}
 import org.jsoup.Jsoup
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, OneAppPerSuite}
+import org.scalatestplus.play.{OneAppPerSuite, OneServerPerSuite}
 import play.api.mvc.Call
 import play.api.test.FakeApplication
 import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 import play.api.http.Status.OK
 import org.mockito.Mockito._
-import org.mockito.Matchers.{any}
+import org.mockito.Matchers.any
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 
@@ -165,6 +166,20 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
         Jsoup.parse(contentAsString(responseF)).title must be ("Application progress – Anti-money laundering supervision - GOV.UK")
+      }
+    }
+
+    "pre application must throw an exception" when {
+      "the business matching is incomplete" in new Fixture {
+        val cachmap = mock[CacheMap]
+        val complete = mock[BusinessMatching]
+
+       when(complete.isComplete) thenReturn false
+        when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+        val result = controller.get()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
       }
     }
   }
