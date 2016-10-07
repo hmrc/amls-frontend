@@ -373,6 +373,23 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
       }
     }
+    "status value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.status(StatusConstants.Unchanged)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.status(StatusConstants.Deleted)
+          result must be(CompleteResponsiblePeople.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
   }
 
   "anyChanged" must {
@@ -389,10 +406,6 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "return true" when {
       "at least one ResponsiblePeople within the sequence has changed" in {
         val res = ResponsiblePeople.anyChanged(responsiblePeopleChanged)
-        res must be(true)
-      }
-      "at least one ResponsiblePeople has a status flagged as Deleted" in {
-        val res = ResponsiblePeople.anyChanged(responsiblePeopleDeleted)
         res must be(true)
       }
     }
@@ -463,7 +476,7 @@ trait ResponsiblePeopleValues {
     Some(true),
     false,
     Some(1),
-    Some("test")
+    Some(StatusConstants.Unchanged)
   )
 
   val InCompleteResponsiblePeople = ResponsiblePeople(
@@ -538,7 +551,7 @@ trait ResponsiblePeopleValues {
     "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
-    "status" -> "test"
+    "status" -> "Unchanged"
   )
 
   /** Make sure Responsible People model is complete */

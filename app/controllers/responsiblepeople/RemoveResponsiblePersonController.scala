@@ -25,11 +25,11 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         rp <- getData[ResponsiblePeople](index)
         status <- statusService.getStatus
       } yield (rp, status) match {
-        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, lineId, _, _)), SubmissionDecisionApproved) => {
+        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _)), SubmissionDecisionApproved) => {
           Ok(views.html.responsiblepeople.remove_responsible_person(
             EmptyForm, index, personName.fullName, complete))
         }
-        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, lineId, _, _)), _) => {
+        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _)), _) => {
           Ok(views.html.responsiblepeople.remove_responsible_person(
             EmptyForm, index, personName.fullName, complete))
         }

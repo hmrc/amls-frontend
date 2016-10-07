@@ -20,8 +20,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              hasAlreadyPassedFitAndProper: Option[Boolean] = None,
                              hasChanged: Boolean = false,
                              lineId: Option[Int] = None,
-                             status: Option[String] = None,
-                             endDate:Option[ResponsiblePersonEndDate] = None
+                             status: Option[String] = None
 
 ) {
 
@@ -58,18 +57,21 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def hasAlreadyPassedFitAndProper(p: Boolean) : ResponsiblePeople =
     this.copy(hasAlreadyPassedFitAndProper = Some(p), hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.contains(p))
 
+  def status(p: String): ResponsiblePeople =
+    this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p))
+
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
     this match {
       case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(pos), None, None, Some(_),
-      Some(_), _, _, _, _,_) if !pos.personalTax => true
+      Some(_), _, _, _, _) if !pos.personalTax => true
       case ResponsiblePeople(
       Some(_), Some(_), Some(_), Some(_),
       Some(_), Some(_), Some(_), Some(_),
-      Some(_), _, _, _, _,_) => true
-      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _,_) => true
+      Some(_), _, _, _, _) => true
+      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
       case _ => false
     }
   }
@@ -78,8 +80,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
 object ResponsiblePeople {
 
   def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean = {
-    println("**************" + newModel)
-    (newModel exists { _.hasChanged }) || newModel.exists(_.status.contains(StatusConstants.Deleted))
+    (newModel exists { _.hasChanged }) //|| newModel.exists(_.status.contains(StatusConstants.Deleted))
   }
 
   def section(implicit cache: CacheMap): Section = {
@@ -129,8 +130,7 @@ object ResponsiblePeople {
       (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
       (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
       (__ \ "lineId").readNullable[Int] and
-      (__ \ "status").readNullable[String] and
-      (__ \ "endDate").readNullable[ResponsiblePersonEndDate]
+      (__ \ "status").readNullable[String]
       ) apply ResponsiblePeople.apply _
   }
 
