@@ -71,20 +71,21 @@
     @model.contactingYou.map { c =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.contactingyou.title"),
-            editUrl = controllers.aboutthebusiness.routes.CorrespondenceAddressController.get(true).toString
+            editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
         ) {
             <ul class="list">
                 <li>@c.phoneNumber</li>
                 <li>@c.email</li>
             </ul>
         }
+    @model.correspondenceAddress.map { ca =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.correspondenceaddress.postal.address"),
             classes = Seq("check-your-answers__last"),
-            editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
+            editUrl = controllers.aboutthebusiness.routes.CorrespondenceAddressController.get(true).toString
         ) {
             <ul class="list">
-            @model.correspondenceAddress.map { ca =>
+
                 <li>@ca.toLines.map { line =>
                     @line<br />
                 }</li>
