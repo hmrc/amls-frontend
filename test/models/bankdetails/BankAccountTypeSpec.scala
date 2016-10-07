@@ -28,6 +28,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
       BankAccountType.formWrites.writes(Some(PersonalAccount)) must be (Map("bankAccountType" -> Seq("01")))
       BankAccountType.formWrites.writes(Some(BelongsToBusiness)) must be (Map("bankAccountType" -> Seq("02")))
       BankAccountType.formWrites.writes(Some(BelongsToOtherBusiness)) must be (Map("bankAccountType" -> Seq("03")))
+      BankAccountType.formWrites.writes(None) must be (Map.empty)
     }
 
     "validate Json read" in {
