@@ -4,6 +4,9 @@ import play.Logger
 import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
+
+import scala.collection.Seq
 
 case class ResponsiblePeople(personName: Option[PersonName] = None,
                              personResidenceType: Option[PersonResidenceType] = None,
@@ -18,7 +21,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              hasChanged: Boolean = false,
                              lineId: Option[Int] = None,
                              status: Option[String] = None,
-                               endDate:Option[ResponsiblePersonEndDate] = None
+                             endDate:Option[ResponsiblePersonEndDate] = None
 
 ) {
 
@@ -75,21 +78,26 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
 object ResponsiblePeople {
 
   def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean = {
-    newModel exists { _.hasChanged }
+    println("**************" + newModel)
+    (newModel exists { _.hasChanged }) || newModel.exists(_.status.contains(StatusConstants.Deleted))
   }
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
-    cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {
-      _.filterNot(_ == ResponsiblePeople()) match {
-        case Nil => notStarted
-        case model if model forall {
+
+    cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) {rp =>
+      rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople()) match {
+        case Nil => Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
+        case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
           _.isComplete
-        } => Section(messageKey, Completed, anyChanged(model), controllers.responsiblepeople.routes.YourAnswersController.get())
-        case model => {
-          val index = model.indexWhere { m => !m.isComplete }
-          Section(messageKey, Started, anyChanged(model), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+        } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
+        case responsiblePeople => {
+          val index = responsiblePeople.indexWhere {
+            case model if !model.isComplete => true
+            case _ => false
+          }
+          Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
         }
       }
     }
@@ -120,7 +128,7 @@ object ResponsiblePeople {
       (__ \ "training").readNullable[Training] and
       (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
       (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
-        (__ \ "lineId").readNullable[Int] and
+      (__ \ "lineId").readNullable[Int] and
       (__ \ "status").readNullable[String] and
       (__ \ "endDate").readNullable[ResponsiblePersonEndDate]
       ) apply ResponsiblePeople.apply _

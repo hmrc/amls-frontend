@@ -112,52 +112,6 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
           )))(any(), any(), any())
 
         }
-        "amending a pending application (showDateField is true)" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
-            "endDate.day" -> "12",
-            "endDate.month" -> "5",
-            "endDate.year" -> "1999"
-          )
-          val newCompleteResponsiblePeople1 = CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted),
-            endDate = Some(ResponsiblePersonEndDate(new LocalDate(1999,5,12))), hasChanged = true)
-
-          val emptyCache = CacheMap("", Map.empty)
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.remove(1, false, "John Envy Doe", true)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
-
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
-            newCompleteResponsiblePeople1,
-            CompleteResponsiblePeople2,
-            CompleteResponsiblePeople3
-          )))(any(), any(), any())
-
-        }
-        "amending a pending application (showDateField is true) and no end date is filled in" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "endDate.day" -> "",
-            "endDate.month" -> "",
-            "endDate.year" -> ""
-          )
-          val emptyCache = CacheMap("", Map.empty)
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          val result = controller.remove(1, false, "John Envy Doe", true)(newRequest)
-          status(result) must be(BAD_REQUEST)
-        }
       }
     }
   }
@@ -172,7 +126,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
   //scalastyle:off magic.number
   val previousName = PreviousName(Some("Matt"), Some("Mc"), Some("Fly"), new LocalDate(1990, 2, 24))
   val personName = PersonName("John", Some("Envy"), "Doe", Some(previousName), Some("name"))
-  val personResidenceType = PersonResidenceType(residence, residenceCountry, residenceNationality)
+  val personResidenceType = PersonResidenceType(residence, residenceCountry, Some(residenceNationality))
   val saRegistered = SaRegisteredYes("0123456789")
   val contactDetails = ContactDetails("07702743555", "test@test.com")
   val addressHistory = ResponsiblePersonAddressHistory(Some(currentAddress), Some(additionalAddress))
