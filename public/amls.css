@@ -593,6 +593,12 @@ table.summary ul li {
   padding: 0 0 .52632em 0;
 }
 
+/* class for older browsers; pseudo-class for modern browsers */
+.check-your-answers__last,
+.check-your-answers:last-of-type {
+  border: 0;
+}
+
 .check-your-answers header {
   padding: 0;
 }

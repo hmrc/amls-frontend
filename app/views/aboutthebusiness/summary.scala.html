@@ -80,6 +80,7 @@
         }
         @checkYourAnswers(
             question = Messages("aboutthebusiness.correspondenceaddress.postal.address"),
+            classes = Seq("check-your-answers__last"),
             editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
         ) {
             <ul class="list">
