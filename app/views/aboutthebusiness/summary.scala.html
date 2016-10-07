@@ -84,13 +84,10 @@
             classes = Seq("check-your-answers__last"),
             editUrl = controllers.aboutthebusiness.routes.CorrespondenceAddressController.get(true).toString
         ) {
-            <ul class="list">
-
-                <li>@ca.toLines.map { line =>
+            <p>@ca.toLines.map { line =>
                     @line<br />
-                }</li>
-            }
-            </ul>
+                }
+            }</p>
         }
     }
 
