@@ -50,7 +50,14 @@ trait RegistrationProgressController extends BaseController {
     val x = dataCache.fetchAll
     x.flatMap { cacheMapO =>
         cacheMapO.map { cacheMap: CacheMap =>
-          preApplicationComplete(cacheMap)
+          val sections = service.sections(cacheMap)
+          preApplicationComplete(cacheMap) map {
+            case Some(x) => x match {
+              case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+              case false => Ok(registration_progress(sections, declarationAvailable(sections)))
+            }
+            case None => Redirect(controllers.routes.LandingController.get())
+          }
         }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
     }
   }
@@ -62,23 +69,19 @@ trait RegistrationProgressController extends BaseController {
         }
       }
 
-  private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, r : Request[_]) = {
+  private def preApplicationComplete(cache: CacheMap)(implicit hc : HeaderCarrier, ac : AuthContext): Future[Option[Boolean]] = {
     (for{
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
     } yield bm.isComplete match {
       case (true) => {
         val sections = service.sections(cache)
         enrolmentsService.amlsRegistrationNumber map {
-          case Some(_) => {
-            Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
-          }
-          case None => {
-            Ok(registration_progress(sections, declarationAvailable(sections)))
-          }
+          case Some(_) => Some(true)
+          case None => Some(false)
         }
       }
-      case _ => Future.successful(Redirect(controllers.routes.LandingController.get()))
-    }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
+      case _ =>  Future.successful(None)
+    }).getOrElse(Future.successful(None))
   }
 
 }
