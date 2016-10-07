@@ -20,6 +20,7 @@ import org.mockito.Mockito._
 import org.mockito.Mockito
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.MustMatchers
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.fixture.WordSpec
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
@@ -196,12 +197,9 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
           when(complete.isComplete) thenReturn false
           when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
-//          val result = intercept[Exception](controller.get()(request))
-          val result = await(controller.get()(request))
-//          result.getMessage mustBe "Cannot remove pre application data"
-          result mustBe a[Exception]
-
-
+          a[Exception] must be thrownBy {
+            await(controller.get()(request))
+          }
         }
       }
     }

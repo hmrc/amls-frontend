@@ -73,7 +73,7 @@ trait LandingController extends BaseController {
     } yield bm.isComplete match {
       case (true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
       case _ => {
-        shortLivedCache.remove(authContext.user.oid) flatMap { http =>
+        shortLivedCache.remove(authContext.user.oid).map { http =>
           http.status match {
             case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
             case _ => throw new Exception("Cannot remove pre application data")
