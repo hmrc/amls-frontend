@@ -6,7 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
 import models.status.SubmissionDecisionApproved
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
@@ -16,6 +16,8 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
   val dataCacheConnector: DataCacheConnector
 
   private[controllers] def statusService: StatusService
+
+  private[controllers] def authEnrolmentsService: AuthEnrolmentsService
 
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -41,23 +43,17 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
              personName: String
             ) = Authorised.async {
     implicit authContext => implicit request =>
-      val submitted = false // here call the Reg service to find out if registration has been submitted.
-      submitted match {
-        case true =>
-          Form2[ResponsiblePersonEndDate](request.body) match {
-            case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.responsiblepeople.remove_responsible_person(f, index, personName, complete)))
-            case ValidForm(_, data) => {
+
+      authEnrolmentsService.amlsRegistrationNumber flatMap {
+        case Some(_) => {
               for {
                 result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                  rp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
                 }
               } yield Redirect(routes.CheckYourAnswersController.get())
-            }
-          }
-        case false => {
-          val thing = removeDataStrict[ResponsiblePeople](index)
-          thing map { _ =>
+        }
+        case _ => {
+          removeDataStrict[ResponsiblePeople](index) map { _ =>
             Redirect(routes.CheckYourAnswersController.get())
           }
         }
@@ -70,5 +66,6 @@ object RemoveResponsiblePersonController extends RemoveResponsiblePersonControll
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override private[controllers] val statusService: StatusService = StatusService
+  override private[controllers] val authEnrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
 
 }

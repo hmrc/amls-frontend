@@ -12,7 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{MustMatchers, WordSpecLike}
 import org.scalatestplus.play.OneAppPerSuite
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{StatusConstants, AuthorisedFixture}
 import play.api.test.Helpers._
@@ -31,6 +31,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
       override val dataCacheConnector = mock[DataCacheConnector]
       override val statusService: StatusService =  mock[StatusService]
       override val authConnector = self.authConnector
+      override val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
     }
   }
 
@@ -92,13 +93,14 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
     "remove is called" must {
       "respond with SEE_OTHER" when {
-        "editing an unsubmitted application (showDateField is false)" in new Fixture {
+        "removing a responsible person from an unsubmitted application" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(None))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
@@ -110,7 +112,28 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
+        }
 
+        "removing a responsible person from a previously submitted application" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(Some("RegNo")))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.remove(1, false, "John Envy Doe")(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+            CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
+            CompleteResponsiblePeople2,
+            CompleteResponsiblePeople3
+          )))(any(), any(), any())
         }
       }
     }
