@@ -27,9 +27,9 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "PersonRegisteredController" must {
+  "PersonRegisteredController" when {
 
-    "Get Option:" must {
+    "Get is called" must {
 
       "load the Person Registered page" in new Fixture {
 
@@ -68,7 +68,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
       }
     }
 
-    "Post" must {
+    "Post is called" must {
 
       "successfully redirect to the page on selection of 'Yes'" in new Fixture {
 

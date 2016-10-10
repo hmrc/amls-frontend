@@ -5,7 +5,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.{PersonRegistered, VATRegistered, ResponsiblePeople}
-import utils.RepeatingSection
+import utils.{StatusConstants, RepeatingSection}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
@@ -19,7 +19,7 @@ trait PersonRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-          case Some(data) => Ok(person_registered(EmptyForm, data.count(_.personName.isDefined)))
+          case Some(data) => Ok(person_registered(EmptyForm, data.count(!_.status.contains(StatusConstants.Deleted))))
           case _ => Ok(person_registered(EmptyForm, index))
         }
     }
