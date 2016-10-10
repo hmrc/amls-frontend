@@ -17,24 +17,20 @@
     <p>@Messages("tcsp.whatyouneed.requiredinfo.title")</p>
 
     <ul class="list list-bullet">
-        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
-        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
-        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.3")</li>
-    </ul>
-
-    <p>@Messages("tcsp.whatyouneed.dependinginfo.title")</p>
-
-    <ul class="list list-bullet">
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.1")</li>
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.2")</li>
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.3")</li>
     </ul>
 
-    <div class="form-group">
-        <a class="button" role="button" href="@controllers.tcsp.routes.TcspTypesController.get()">
-            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.tcsp")</span>
-        </a>
-    </div>
+    <p>@Messages("tcsp.whatyouneed.dependinginfo.title")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.3")</li>
+    </ul>
+
+    <a class="button" role="button" href="@controllers.tcsp.routes.TcspTypesController.get()">@Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.tcsp")</span></a>
 
 }
 

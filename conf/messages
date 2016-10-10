@@ -6,6 +6,7 @@
 # lbl.
 # button.
 # visuallyhidden.
+# hint.
 
 ########################################################################################################################
 ##################################       Generic Error Messages     ####################################################
@@ -358,6 +359,9 @@ services.list.lbl.02 = Currency exchange
 services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
+hint.8.digits = For example: 12345678
+hint.9.digits = For example: 123456789
+hint.10.digits = For example: 1234567890
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -1056,7 +1060,7 @@ tcsp.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
 tcsp.whatyouneed.requiredinfo.text.1 = what kind of Trust or Company Service Provider you are
 tcsp.whatyouneed.requiredinfo.text.2 = which services your business provides
 tcsp.whatyouneed.requiredinfo.text.3 = whether or not you use the services of another Trust or Company Service Provider
-tcsp.whatyouneed.dependinginfo.heading = Depending on your circumstances, you may also need to know:
+tcsp.whatyouneed.dependinginfo.heading = You’ll also need to know:
 tcsp.whatyouneed.dependinginfo.text.1 = if you only sell off-the-shelf companies
 tcsp.whatyouneed.dependinginfo.text.2 = if you create complex corporate structures for clients, or plan to do so in the future
 tcsp.whatyouneed.dependinginfo.text.3 = the Money Laundering Regulation reference number of the Trust or Company Service Provider you use
