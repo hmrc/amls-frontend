@@ -1064,10 +1064,10 @@ responsiblepeople.person.registered.heading = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
-responsiblepeople.check_your_answers.title = Check your answers
+responsiblepeople.check_your_answers.title = Responsible People - Check your answers
 responsiblepeople.check_your_answers.heading = Check your answers
-responsiblepeople.your_answers.title = Your answers
-responsiblepeople.your_answers.heading = Your answers
+responsiblepeople.your_answers.title = Responsible People - People you have registered
+responsiblepeople.your_answers.heading = People you have registered
 responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.heading = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
@@ -1101,9 +1101,13 @@ responsiblepeople.nationality.selection.british = British (including English, Sc
 responsiblepeople.nationality.selection.irish = Irish
 responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
+responsiblepeople.summary.no.responsible.people = You currently have no responsible people registered
 
-
-
+responsiblepeople.remove.responsible.person.title = Responsible People - Remove a responsible person
+responsiblepeople.remove.responsible.person.heading = Remove responsible person
+responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
+responsiblepeople.remove.responsible.person.enddate.lbl = <<Text asking for date?>>
+responsiblepeople.remove.responsible.person.btn = Remove responsible person
 
 #TCSP
 tcsp.whatyouneed.title = What you need
