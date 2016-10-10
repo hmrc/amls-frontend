@@ -19,7 +19,12 @@ trait PersonRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-          case Some(data) => Ok(person_registered(EmptyForm, data.count(!_.status.contains(StatusConstants.Deleted))))
+          case Some(data) =>
+            val count = data.count(x => {
+              !x.status.contains(StatusConstants.Deleted) &&
+              x.personName.isDefined
+            })
+            Ok(person_registered(EmptyForm, count))
           case _ => Ok(person_registered(EmptyForm, index))
         }
     }
