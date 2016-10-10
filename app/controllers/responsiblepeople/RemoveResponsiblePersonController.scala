@@ -23,13 +23,8 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
     implicit authContext => implicit request =>
       for {
         rp <- getData[ResponsiblePeople](index)
-        status <- statusService.getStatus
-      } yield (rp, status) match {
-        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _)), SubmissionDecisionApproved) => {
-          Ok(views.html.responsiblepeople.remove_responsible_person(
-            EmptyForm, index, personName.fullName, complete))
-        }
-        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _)), _) => {
+      } yield rp match {
+        case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _)) => {
           Ok(views.html.responsiblepeople.remove_responsible_person(
             EmptyForm, index, personName.fullName, complete))
         }

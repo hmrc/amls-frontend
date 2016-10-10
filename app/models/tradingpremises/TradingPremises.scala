@@ -62,7 +62,6 @@ object TradingPremises {
   val key = "trading-premises"
 
   def anyChanged(newModel: Seq[TradingPremises]): Boolean = {
-    println("*******TRADING PREMISES*******" + newModel.length)
     newModel exists { _.hasChanged }
   }
 

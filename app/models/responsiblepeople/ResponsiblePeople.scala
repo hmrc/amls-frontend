@@ -80,7 +80,7 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
 object ResponsiblePeople {
 
   def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean = {
-    (newModel exists { _.hasChanged }) //|| newModel.exists(_.status.contains(StatusConstants.Deleted))
+    newModel exists { _.hasChanged }
   }
 
   def section(implicit cache: CacheMap): Section = {
