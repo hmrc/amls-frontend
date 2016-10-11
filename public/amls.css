@@ -586,7 +586,10 @@ table.summary ul li {
   margin-bottom: 0;
 }
 
-.panel-indent,
+.panel-indent {
+  margin-bottom: 40px;
+}
+
 .check-your-answers {
   margin-bottom: 20px;
 }
