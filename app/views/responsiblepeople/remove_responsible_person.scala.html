@@ -6,21 +6,20 @@
 @(f: forms.Form2[_],index: Int, personName:String, complete:Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-@heading("responsiblepeople.remove.responsible.person.heading", "summary.responsiblepeople")
+  @heading("responsiblepeople.remove.responsible.person.remove.title", "summary.responsiblepeople")
 }
 
 @main(
-title = Messages("responsiblepeople.remove.responsible.person.title"),
-heading = header
+  title = Messages("responsiblepeople.remove.responsible.person.remove.title"),
+  heading = header
 ) {
 
-@form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete, personName)) {
-<div class="panel-indent panel-border-wide">
-    <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
-</div>
-<br>
-<br>
+  @form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete, personName)) {
+    <div class="panel-indent panel-border-wide">
+        <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
+    </div>
 
-@submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))
-}
+    @submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))
+  }
+
 }
