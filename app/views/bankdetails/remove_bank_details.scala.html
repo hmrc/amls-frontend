@@ -15,10 +15,9 @@
 
     @form(f, controllers.bankdetails.routes.RemoveBankDetailsController.remove(index, complete)) {
         <div class="panel-indent panel-border-wide">
-            <p>@Messages("bankdetails.remove.bank.account", accountName)</p>
+            <p>@Messages("bankdetails.remove.bank.account.text", accountName)</p>
         </div>
-        <br>
-        <br>
+
         @submit(false, Some(Messages("bankdetails.remove.bank.account.btn")))
     }
 }

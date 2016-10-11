@@ -590,6 +590,10 @@ table.summary ul li {
   margin-bottom: 40px;
 }
 
+fieldset .panel-indent {
+  margin-bottom: 0;
+}
+
 .check-your-answers {
   margin-bottom: 20px;
 }
