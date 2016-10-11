@@ -132,6 +132,44 @@ class AreTheyNominatedOfficerControllerSpec extends PlaySpec with OneAppPerSuite
         document.select("a[href=#isNominatedOfficer]").html() must include(Messages("error.required.rp.nominated_officer"))
 
       }
+
+      "return not found when no rps" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        val result = controller.post(RecordId)(newRequest)
+        status(result) must be(NOT_FOUND)
+
+      }
+
+      "return not found when index out of bounds" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.failed(new IndexOutOfBoundsException))
+
+        val result = controller.post(RecordId)(newRequest)
+        status(result) must be(NOT_FOUND)
+
+      }
+
+      "return not found" in new Fixture {
+        val mockCacheMap = mock[CacheMap]
+        val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          .thenReturn(Some(Seq(withPartnerShip)))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
+        when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+        val result = controller.post(0)(newRequest)
+        status(result) must be(NOT_FOUND)
+       
+      }
     }
   }
 
