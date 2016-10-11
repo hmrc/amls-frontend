@@ -38,9 +38,11 @@ import scala.concurrent.Future
         case ValidForm(_, data) => {
           for {
             result <- updateDataStrict[TradingPremises](index) { tp =>
+              tp.agentCompanyName(data)
                 TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises,
-                  tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices)
+                  tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress,
+                  tp.msbServices, true)
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
