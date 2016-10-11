@@ -14,8 +14,8 @@ trait FitAndProperController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
-  implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
-  implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME)
 
   def get(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
