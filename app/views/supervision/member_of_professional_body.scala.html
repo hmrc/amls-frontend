@@ -16,7 +16,7 @@
     @form(f, controllers.supervision.routes.ProfessionalBodyMemberController.post(edit)) {
 
         @inlineRadioGroup(f("isAMember")) {
-            @legend("supervision.memberofprofessionalbody.heading", jsHidden = true)
+            @legend("supervision.memberofprofessionalbody.title", jsHidden = true)
             @radio(f("isAMember"), "lbl.yes", "true", target = s"#${f("businessType").id}-fieldset")
             @radio(f("isAMember"), "lbl.no", "false")
         }

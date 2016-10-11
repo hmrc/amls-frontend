@@ -58,7 +58,7 @@
 
         @model.msbServices.map{ msb =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.msb.services.heading"),
+                question = Messages("tradingpremises.msb.services.title"),
                 editUrl = controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString
             ) {
                 <ul class="list list--comma">

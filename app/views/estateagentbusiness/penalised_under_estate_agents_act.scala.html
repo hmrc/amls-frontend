@@ -5,12 +5,12 @@
 @(f: Form2[_], edit: Boolean = false)(implicit request: Request[_], lang: Lang)
 
 @target = @{
-s"""${f("penalisedUnderEstateAgentsActDetails").id}-fieldset"""
+    s"""${f("penalisedUnderEstateAgentsActDetails").id}-fieldset"""
 }
 
 @header = {
     @errorSummary(f)
-    @heading("estateagentbusiness.penalisedunderestateagentsact.heading", "summary.estateagentbusiness")
+    @heading("estateagentbusiness.penalisedunderestateagentsact.title", "summary.estateagentbusiness")
 }
 
 @main(

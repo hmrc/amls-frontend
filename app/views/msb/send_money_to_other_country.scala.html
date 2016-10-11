@@ -16,7 +16,7 @@
     @form(f, controllers.msb.routes.SendMoneyToOtherCountryController.post(edit)) {
 
         @inlineRadioGroup(f("money")) {
-        @legend("msb.send.money.heading", jsHidden = true)
+        @legend("msb.send.money.title", jsHidden = true)
             @radio(f("money"), "lbl.yes", "true")
             @radio(f("money"), "lbl.no", "false")
         }

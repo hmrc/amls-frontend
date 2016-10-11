@@ -15,7 +15,7 @@
 
     @model.services.map { a =>
         @checkYourAnswers(
-            question = Messages("estateagentbusiness.servicess.title"),
+            question = Messages("estateagentbusiness.services.title"),
             editUrl = controllers.estateagentbusiness.routes.BusinessServicesController.get(true).toString
         ) {
             <ul class="list list--comma">
