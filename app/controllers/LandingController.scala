@@ -1,6 +1,6 @@
 package controllers
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import models.SubscriptionResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -14,13 +14,10 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.Logger
-import play.api.libs.json.{JsBoolean, JsObject}
 import play.api.mvc.{Call, Request}
 import services.{AuthEnrolmentsService, LandingService}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -29,6 +26,7 @@ trait LandingController extends BaseController {
 
   private[controllers] def landingService: LandingService
   private[controllers] def enrolmentsService: AuthEnrolmentsService
+  val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
@@ -45,7 +43,7 @@ trait LandingController extends BaseController {
       case Some(cache) =>
         ApplicationConfig.statusToggle match {
           case true =>
-            Future.successful(Redirect(controllers.routes.StatusController.get()))
+            preApplicationComplete(cache)
           case _ =>
             Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
@@ -69,11 +67,28 @@ trait LandingController extends BaseController {
     }
   }
 
+  private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+    (for{
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+    } yield bm.isComplete match {
+      case (true) => Future.successful(Redirect(controllers.routes.StatusController.get()))
+      case _ => {
+        shortLivedCache.remove(authContext.user.oid).map { http =>
+          http.status match {
+            case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
+            case _ => throw new Exception("Cannot remove pre application data")
+          }
+        }
+      }
+    }).getOrElse(Future.successful(Redirect(controllers.routes.LandingController.get())))
+  }
+
   private def refreshAndRedirect(amlsRegistrationNumber :String)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     landingService.refreshCache(amlsRegistrationNumber) map {
       cache =>  Redirect(controllers.routes.StatusController.get())
     }
   }
+
 
   private def dataHasChanged(cacheMap : CacheMap) = {
     Seq(
@@ -121,4 +136,5 @@ object LandingController extends LandingController {
   override private[controllers] val landingService = LandingService
   override private[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected val authConnector = AMLSAuthConnector
+  override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 }

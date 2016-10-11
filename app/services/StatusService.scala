@@ -37,8 +37,9 @@ trait StatusService {
       sections =>
         if (isComplete(sections)) {
           SubmissionReady
+        } else {
+          NotCompleted
         }
-        else NotCompleted
     }
   }
 
