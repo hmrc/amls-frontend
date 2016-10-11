@@ -41,7 +41,7 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
           businessActivitiesData flatMap {
             activities =>
               getData[ResponsiblePeople](index) map {
-                case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _, _))
+                case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _,_))
                   => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index))
                 case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
                   => Ok(experience_training(EmptyForm, activities, edit, index))

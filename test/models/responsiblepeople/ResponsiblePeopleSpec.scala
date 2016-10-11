@@ -9,6 +9,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import org.mockito.Matchers.{any, eq => meq}
+import utils.StatusConstants
 
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
@@ -372,6 +373,42 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
       }
     }
+    "status value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.status(StatusConstants.Unchanged)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.status(StatusConstants.Deleted)
+          result must be(CompleteResponsiblePeople.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
+  }
+
+  "anyChanged" must {
+    val originalResponsiblePeople = Seq(CompleteResponsiblePeople)
+    val responsiblePeopleChanged = Seq(CompleteResponsiblePeople.copy(hasChanged=true))
+    val responsiblePeopleDeleted = Seq(CompleteResponsiblePeople.copy(status=Some(StatusConstants.Deleted)))
+
+    "return false" when {
+      "no ResponsiblePeople within the sequence have changed" in {
+        val res = ResponsiblePeople.anyChanged(originalResponsiblePeople)
+        res must be(false)
+      }
+    }
+    "return true" when {
+      "at least one ResponsiblePeople within the sequence has changed" in {
+        val res = ResponsiblePeople.anyChanged(responsiblePeopleChanged)
+        res must be(true)
+      }
+    }
   }
 }
 
@@ -443,7 +480,7 @@ trait ResponsiblePeopleValues {
     Some(true),
     false,
     Some(1),
-    Some("test")
+    Some(StatusConstants.Unchanged)
   )
 
   val InCompleteResponsiblePeople = ResponsiblePeople(
@@ -519,7 +556,7 @@ trait ResponsiblePeopleValues {
     "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
-    "status" -> "test"
+    "status" -> "Unchanged"
   )
 
   /** Make sure Responsible People model is complete */

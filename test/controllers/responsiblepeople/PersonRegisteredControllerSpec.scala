@@ -11,7 +11,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{StatusConstants, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -27,9 +27,9 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "PersonRegisteredController" must {
+  "PersonRegisteredController" when {
 
-    "Get Option:" must {
+    "Get is called" must {
 
       "load the Person Registered page" in new Fixture {
 
@@ -43,7 +43,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
         htmlValue.title mustBe Messages("responsiblepeople.person.registered.title")
       }
 
-      "load the Person Registered page1" in new Fixture {
+      "load the Person Registered page with a count of 0 when no responsible people have a name recorded" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,None), ResponsiblePeople(None,None)))))
@@ -54,7 +54,18 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
         contentAsString(result) must include(Messages("responsiblepeople.have.registered.person.text", 0))
       }
 
-      "load the Person Registered page 2" in new Fixture {
+      "load the Person Registered page with a count of 0 when the responsible person has a status of deleted" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(status = Some(StatusConstants.Deleted))))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("responsiblepeople.have.registered.person.text", 0))
+      }
+
+      "load the Person Registered page with a count of 2 when there are two complete responsible people" in new Fixture {
         val previousName = PreviousName(Some("Matt"), Some("Mc"), Some("Fly"), new LocalDate(1990, 2, 24))
         val personName = PersonName("John", Some("Envy"), "Doe", Some(previousName), Some("name"))
 
@@ -68,7 +79,7 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
       }
     }
 
-    "Post" must {
+    "Post is called" must {
 
       "successfully redirect to the page on selection of 'Yes'" in new Fixture {
 
