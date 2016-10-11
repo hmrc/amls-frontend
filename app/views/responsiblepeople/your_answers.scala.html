@@ -1,15 +1,16 @@
 @import include._
 @import include.forms2._
 @import models.responsiblepeople.ResponsiblePeople
+@import utils.StatusConstants
 
 @(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
 
 @header = {
-    @heading("responsiblepeople.your_answers.title", "summary.responsiblepeople")
+    @heading("title.ya", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.your_answers.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("title.ya") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -19,12 +20,15 @@
 
     <ul class="list">
         @responsiblePeople.zipWithIndex.map { case (rp, index) =>
-            @rp.personName.map { pn =>
-                @checkYourAnswersListing(
-                    item = pn.fullName,
-                    editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).toString
-                ) {
+            @if(!rp.status.contains(StatusConstants.Deleted)) {
+                @rp.personName.map { pn =>
+                    @checkYourAnswersListing(
+                        item = pn.fullName,
+                        editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).toString,
+                        removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, false).toString
+                    ) {
 
+                    }
                 }
             }
         }

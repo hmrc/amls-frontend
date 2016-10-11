@@ -586,17 +586,26 @@ table.summary ul li {
   margin-bottom: 0;
 }
 
+.panel-indent,
+.check-your-answers {
+  margin-bottom: 20px;
+}
+
+.check-your-answers__listing {
+  margin: 0 0 10px;
+}
+
 .check-your-answers,
 .check-your-answers__listing {
   border-bottom: 1px solid #bfc1c3;
-  margin-bottom: 20px;
   padding: 0 0 .52632em 0;
   word-break: break-word;
 }
 
 /* class for older browsers; pseudo-class for modern browsers */
 .check-your-answers__last,
-.check-your-answers:last-of-type {
+.check-your-answers:last-of-type,
+.check-your-answers__listing:last-of-type {
   border: 0;
 }
 
@@ -608,12 +617,6 @@ table.summary ul li {
   margin-bottom: 0;
   margin-top: 0;
   padding: 0 0 .52632em 0;
-}
-
-.check-your-answers h2 a {
-  color: #0b0c0c;
-  display: flex;
-  text-decoration: none;
 }
 
 .check-your-answers .list,
