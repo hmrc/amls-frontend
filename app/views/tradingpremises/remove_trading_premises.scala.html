@@ -5,7 +5,7 @@
 @(f: forms.Form2[_],index: Int, complete: Boolean, tradingName:String, showDateField:Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("tradingpremises.remove.trading.premises.heading", "summary.tradingpremises")
+    @heading("tradingpremises.remove.trading.premises.title", "summary.tradingpremises")
 }
 
 @main(
@@ -17,8 +17,7 @@
         <div class="panel-indent panel-border-wide">
             <p>@Messages("tradingpremises.remove.trading.premises.text", tradingName)</p>
         </div>
-        <br />
-        <br />
+
         @if(showDateField) {
             @date(
                 f = f,

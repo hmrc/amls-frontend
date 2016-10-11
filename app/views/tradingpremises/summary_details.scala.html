@@ -79,7 +79,7 @@
         }
         @model.businessStructure.map { x =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.businessStructure.heading"),
+                question = Messages("tradingpremises.businessStructure.title"),
                 editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
             ) {
                 <p>@Messages(x.message)</p>
@@ -88,7 +88,7 @@
 
         @model.agentName.map { x =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.agentname.heading"),
+                question = Messages("tradingpremises.agentname.title"),
                 editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
             ) {
                 <p>@x.agentName</p>
@@ -97,7 +97,7 @@
 
         @model.agentPartnership.map { x =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.agentpartnership.heading"),
+                question = Messages("tradingpremises.agentpartnership.title"),
                 editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
             ) {
                 <p>@x.agentPartnership</p>
@@ -106,7 +106,7 @@
 
         @model.agentCompanyName.map { x =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.agentcompanyname.heading"),
+                question = Messages("tradingpremises.agentcompanyname.title"),
                 editUrl = controllers.tradingpremises.routes.AgentCompanyNameController.get(index, true).toString
             ) {
                 <p>@x.agentCompanyName</p>

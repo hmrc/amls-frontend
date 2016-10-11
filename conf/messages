@@ -677,7 +677,7 @@ tradingpremises.premises.registered.title = Premises registered
 tradingpremises.have.registered.premises.text = You have registered {0} trading premises.
 tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
 
-tradingpremises.remove.trading.premises.title = Trading premises
+tradingpremises.remove.trading.premises.title = Remove a trading premises
 tradingpremises.remove.trading.premises.text = This will permanently remove {0} from your list of trading premises.
 tradingpremises.remove.trading.premises.enddate.lbl = When did you stop trading from these premises?
 tradingpremises.remove.trading.premises.btn = Remove trading premises
@@ -1047,6 +1047,7 @@ responsiblepeople.detailed_answers.registered_for_sa = Registered for Self Asses
 responsiblepeople.detailed_answers.previous_experience = Previous Experience
 responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
+responsiblepeople.detailed_answers.visuallyhidden.header = Responsible person
 responsiblepeople.nationality.title = What is the nationality of this person?
 responsiblepeople.nationality.select = Select all that apply
 responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
@@ -1054,10 +1055,9 @@ responsiblepeople.nationality.selection.irish = Irish
 responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
 responsiblepeople.summary.no.responsible.people = You currently have no responsible people registered
-responsiblepeople.remove.responsible.person.title = Responsible People
+responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
 responsiblepeople.remove.responsible.person.enddate.lbl = <<Text asking for date?>>
-responsiblepeople.remove.responsible.person.remove.title = Remove a responsible person
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
 
 #TCSP

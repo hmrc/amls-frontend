@@ -6,11 +6,11 @@
 @(f: forms.Form2[_],index: Int, personName:String, complete:Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-  @heading("responsiblepeople.remove.responsible.person.remove.title", "summary.responsiblepeople")
+  @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
 }
 
 @main(
-  title = Messages("responsiblepeople.remove.responsible.person.remove.title"),
+  title = Messages("responsiblepeople.remove.responsible.person.title"),
   heading = header
 ) {
 

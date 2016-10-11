@@ -49,7 +49,7 @@
     @model.map { person =>
 
         <h2 class="heading-large">
-            @Messages("responsiblepeople.visuallyhidden.detailed.header"):
+            @Messages("responsiblepeople.detailed_answers.visuallyhidden.header"):
             @person.personName.map { name =>
                 @name.fullName
             }.getOrElse{
