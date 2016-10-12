@@ -5,7 +5,7 @@
     removeUrl: String = ""
 )(content: Html)(implicit lang: Lang)
 
-<section class="check-your-answers @classes.mkString(" ")"">
+<section class="check-your-answers @classes.mkString(" ")">
     @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
     <span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
     @content
