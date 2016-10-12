@@ -7,8 +7,7 @@ import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.http._
+import uk.gov.hmrc.play.http.{HeaderCarrier, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,7 +22,7 @@ trait FeeConnector {
   def feeResponse(amlsRegistrationNumber: String)(implicit
                                              headerCarrier: HeaderCarrier,
                                              ec: ExecutionContext,
-                                             reqW: Writes[ReadStatusResponse],
+                                             reqW: Writes[FeeResponse],
                                              ac: AuthContext
   ): Future[FeeResponse] = {
 
@@ -38,7 +37,6 @@ trait FeeConnector {
         response
     }
   }
-
 
   protected[connectors] def accountTypeAndId(implicit ac: AuthContext): (String, String) = {
     val accounts = ac.principal.accounts

@@ -11,7 +11,7 @@
     <p class="heading-large">
     @feeResponse.responseType match {
         case SubscriptionResponseType => {£@feeResponse.totalFees}
-        case AmendOrVariationResponseType => {£ @feeResponse.difference}
+        case AmendOrVariationResponseType => {£@feeResponse.difference}
     }
     </p>
     <p>@Messages("fee.reference.number.lbl")</p>

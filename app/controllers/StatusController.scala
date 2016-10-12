@@ -5,7 +5,7 @@ import connectors.FeeConnector
 import models.FeeResponse
 
 import models.businessmatching.BusinessMatching
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, CompletionStateViewModel}
+import models.status.{SubmissionStatus, SubmissionDecisionApproved, SubmissionReadyForReview, CompletionStateViewModel}
 import services.{AuthEnrolmentsService, LandingService, _}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -24,11 +24,10 @@ trait StatusController extends BaseController {
 
   private[controllers] def feeConnector: FeeConnector
 
-  def getFeeResponse(mlrRegNumber: Option[String])(implicit authContext: AuthContext,
+  def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
                                                    headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
-
-    mlrRegNumber match {
-      case Some(mlNumber) => feeConnector.feeResponse(mlNumber).map(x => Some(x))
+    (mlrRegNumber,submissionStatus)  match {
+      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeConnector.feeResponse(mlNumber).map(x => Some(x))
       case _ => Future.successful(None)
     }
   }
@@ -50,12 +49,11 @@ trait StatusController extends BaseController {
             mlrRegNumber <- enrolmentsService.amlsRegistrationNumber
             submissionStatus <- statusService.getStatus
             businessNameOption <- businessName
-            feeResponse <- getFeeResponse(mlrRegNumber)
-          } yield submissionStatus match {
-            case SubmissionReadyForReview | SubmissionDecisionApproved =>
-              Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus), feeResponse))
-            case _ => Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus), feeResponse))
+            feeResponse <- getFeeResponse(mlrRegNumber, submissionStatus)
+          } yield {
+            Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus), feeResponse))
           }
+
     }
   }
 }

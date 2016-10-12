@@ -6,8 +6,8 @@
 <p>@Messages("status.submissionreadyforreview.description2")</p>
 
 @feeResponse.map {fee =>
-<details>
-    <summary>@Messages("status.fee.link")</summary>
-     @include.status.fee_details(fee)
+    <details>
+        <summary>@Messages("status.fee.link")</summary>
+        @include.status.fee_details(fee)
     </details>
 }

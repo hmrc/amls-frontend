@@ -1,5 +1,4 @@
 @import models.FeeResponse
-@import models.ResponseType
 
 @(feeResponse: Option[FeeResponse])(implicit request: Request[_], lang: Lang)
 
@@ -7,8 +6,8 @@
 <p>@Messages("status.submissiondecisionapproved.description2")</p>
 
 @feeResponse.map {fee =>
-<details>
-    <summary>@Messages("status.fee.link")</summary>
-    @include.status.fee_details(fee)
-</details>
+    <details>
+        <summary>@Messages("status.fee.link")</summary>
+        @include.status.fee_details(fee)
+    </details>
 }
