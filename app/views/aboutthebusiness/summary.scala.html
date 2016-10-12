@@ -20,7 +20,7 @@
     ) {
         <p>@model.previouslyRegistered.map {
             case PreviouslyRegisteredNo => { @Messages("lbl.no") }
-            case PreviouslyRegisteredYes(v) => { @v }
+            case PreviouslyRegisteredYes(v) => { @Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"): @v }
         }</p>
     }
 
@@ -52,7 +52,7 @@
         ) {
             <p>@ctRegistered match {
                 case CorporationTaxRegisteredNo => { @Messages("lbl.no") }
-                case CorporationTaxRegisteredYes(v) => { @v }
+                case CorporationTaxRegisteredYes(v) => { @Messages("aboutthebusiness.registeredforcorporationtax.taxReference"): @v }
             }</p>
         }
     }
@@ -74,8 +74,8 @@
             editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
         ) {
             <ul class="list">
-                <li>@c.phoneNumber</li>
-                <li>@c.email</li>
+                <li><span class="visuallyhidden">@Messages("aboutthebusiness.contactingyou.phone.lbl"): </span>@c.phoneNumber</li>
+                <li><span class="visuallyhidden">@Messages("aboutthebusiness.contactingyou.email.lbl"): </span>@c.email</li>
             </ul>
         }
     @model.correspondenceAddress.map { ca =>
