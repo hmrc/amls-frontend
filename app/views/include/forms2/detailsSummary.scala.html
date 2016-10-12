@@ -1,0 +1,13 @@
+@(
+    details: String = "",
+    detailsClass: String = "",
+    detailsInner: String = "",
+    summaryClasses: Seq[String] = Seq.empty
+)(content: Html)(implicit lang: Lang)
+
+<details@if(detailsClass.nonEmpty) { class="details"}>
+  <summary class="@summaryClasses.mkString(" ")">@details</summary>
+  <div@if(detailsInner.nonEmpty) { class="details__inner"}>
+  @content
+  </div>
+</details>
