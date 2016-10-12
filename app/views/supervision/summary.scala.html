@@ -21,12 +21,27 @@
         @model.anotherBody.map {
             case AnotherBodyNo => { <p>@Messages("lbl.no")</p> }
             case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
-            <h3 class="heading-small">@supervisorName</h3>
-            <ul class="list">
-                <li>@Messages("lbl.start.date") @DateHelper.formatDate(startDate)</li>
-                <li>@Messages("lbl.end.date") @DateHelper.formatDate(endDate)</li>
-                <li>@endingReason</li>
-            </ul>
+                <p>@Messages("lbl.yes")</p>
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.lbl.supervisor")
+                ) {
+                    <p>@supervisorName</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.startDate.lbl")
+                ) {
+                    <p>@DateHelper.formatDate(startDate)</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.endDate.lbl")
+                ) {
+                    <p>@DateHelper.formatDate(endDate)</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.endingReason.lbl")
+                ) {
+                    <p>@endingReason</p>
+                }
             }
         }
     }
@@ -38,7 +53,7 @@
         @model.professionalBodyMember.map {
             case ProfessionalBodyMemberNo => { <p>@Messages("lbl.no")</p> }
             case ProfessionalBodyMemberYes(v) => {
-            <ul class="list list--comma">
+            <ul class="list list--semicolon">
                 @v.map { x=>
                 <li>@x match {
                         case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
