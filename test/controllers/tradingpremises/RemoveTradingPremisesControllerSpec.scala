@@ -199,6 +199,8 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(tradingPremisesList)))
+      val mockCacheMap = mock[CacheMap]
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.remove(1, true, "trade Name", true)(newRequest)
       status(result) must be(SEE_OTHER)

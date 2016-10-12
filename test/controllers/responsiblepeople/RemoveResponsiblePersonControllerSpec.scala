@@ -156,7 +156,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
   val vatRegistered = VATRegisteredNo
   val training = TrainingYes("test")
   val experienceTraining = ExperienceTrainingYes("Some training")
-  val positions = Positions(Set(BeneficialOwner, InternalAccountant))
+  val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(new LocalDate()))
 
   val CompleteResponsiblePeople1 = ResponsiblePeople(
     Some(personName),
