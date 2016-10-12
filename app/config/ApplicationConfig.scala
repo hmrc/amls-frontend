@@ -37,7 +37,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
 
-  lazy val paymentUrl = s"$amlsUrl/amls/payment"
+  lazy val feePaymentUrl = s"$amlsUrl/amls/payment"
 
   lazy val authUrl = baseUrl("auth")
 

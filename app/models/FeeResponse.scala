@@ -1,18 +1,17 @@
 package models
 
 import org.joda.time.{DateTime, DateTimeZone}
-import org.joda.time.format.ISODateTimeFormat
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait ResponseType
 
-case object SubscriptionResponseType extends ResponseType
-case object AmendOrVariationResponseType extends ResponseType
-
 object ResponseType {
 
   import utils.MappingUtils.Implicits._
+
+  case object SubscriptionResponseType extends ResponseType
+  case object AmendOrVariationResponseType extends ResponseType
 
   implicit val jsonWrites = Writes[ResponseType] {
     case SubscriptionResponseType => JsString("SubscriptionReponse")
@@ -41,31 +40,17 @@ case class FeeResponse(responseType: ResponseType,
                        createdAt: DateTime)
 
 object FeeResponse {
-  implicit def convert(subscriptionResponse: SubscriptionResponse): FeeResponse = {
-    FeeResponse(SubscriptionResponseType,
-      subscriptionResponse.amlsRefNo,
-      subscriptionResponse.registrationFee,
-      subscriptionResponse.fpFee,
-      subscriptionResponse.premiseFee,
-      subscriptionResponse.totalFees,
-      Some(subscriptionResponse.paymentReference),
-      None,
-      DateTime.now(DateTimeZone.UTC))
+
+  implicit val dateTimeRead: Reads[DateTime] =
+    (__ \ "$date").read[Long].map { dateTime =>
+      new DateTime(dateTime, DateTimeZone.UTC)
+    }
+
+
+  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
+    def writes(dateTime: DateTime): JsValue = Json.obj(
+      "$date" -> dateTime.getMillis
+    )
   }
-
-  implicit def convert2(amendVariationResponse: AmendVariationResponse,  amlsReferenceNumber: String): FeeResponse = {
-    FeeResponse(AmendOrVariationResponseType,
-      amlsReferenceNumber,
-      amendVariationResponse.registrationFee,
-      amendVariationResponse.fpFee,
-      amendVariationResponse.premiseFee,
-      amendVariationResponse.totalFees,
-      amendVariationResponse.paymentReference,
-      amendVariationResponse.difference,
-      DateTime.now(DateTimeZone.UTC))
-  }
-
-  val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
-
   implicit val format = Json.format[FeeResponse]
 }

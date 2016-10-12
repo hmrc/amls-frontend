@@ -8,7 +8,7 @@
 @import models.status.SubmissionDecisionRejected
 @import models.status.{Current,SubmissionReady}
 
-@(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel)(implicit request: Request[_])
+@(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel, feeResponse: Option[FeeResponse])(implicit request: Request[_])
 @borderClass(entry:(SubmissionStatus,CompletionState)) = {
     @entry match{
         case (NotCompleted,Current)=> {status-list--start}
@@ -98,8 +98,8 @@ case _ => { None }
             @completionState.currentState match {
                 case NotCompleted => {@include.status.rightpanel_incomplete()}
                 case SubmissionReady => {@include.status.rightpanel_submissionready()}
-                case SubmissionReadyForReview => {@include.status.rightpanel_submissionreadyforreview()}
-                case SubmissionDecisionApproved => {@include.status.rightpanel_submissiondecisionapproved()}
+                case SubmissionReadyForReview => {@include.status.rightpanel_submissionreadyforreview(feeResponse)}
+                case SubmissionDecisionApproved => {@include.status.rightpanel_submissiondecisionapproved(feeResponse)}
                 case SubmissionDecisionRejected => {@include.status.rightpanel_submissiondecisionrejected()}
                 case _ => {@include.status.rightpanel_incomplete()}
             }

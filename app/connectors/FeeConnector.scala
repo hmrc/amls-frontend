@@ -32,7 +32,6 @@ trait FeeConnector {
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[FeeConnector]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
-
     httpGet.GET[FeeResponse](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
@@ -56,5 +55,5 @@ trait FeeConnector {
 object FeeConnector extends FeeConnector {
   override private[connectors] val httpPost = WSHttp
   override private[connectors] val httpGet = WSHttp
-  override private[connectors] val url = ApplicationConfig.paymentsUrl
+  override private[connectors] val url = ApplicationConfig.feePaymentUrl
 }

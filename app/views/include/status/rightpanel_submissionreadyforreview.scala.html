@@ -1,3 +1,11 @@
-@()(implicit request: Request[_])
+@import models.FeeResponse
+
+@(feeResponse: Option[FeeResponse])(implicit request: Request[_], lang: Lang)
+
 <p>@Messages("status.submissionreadyforreview.description")</p>
 <p>@Messages("status.submissionreadyforreview.description2")</p>
+
+@feeResponse.map {fee =>
+    <a>@Messages("status.fee.link")</a>
+     @include.status.fee_details(fee)
+}
