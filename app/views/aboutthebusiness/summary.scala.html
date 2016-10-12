@@ -74,8 +74,8 @@
             editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
         ) {
             <ul class="list">
-                <li><span class="visuallyhidden">@Messages("aboutthebusiness.contactingyou.phone.lbl"): </span>@c.phoneNumber</li>
-                <li><span class="visuallyhidden">@Messages("aboutthebusiness.contactingyou.email.lbl"): </span>@c.email</li>
+                <li>@Messages("aboutthebusiness.contactingyou.phone.lbl"): @c.phoneNumber</li>
+                <li>@Messages("aboutthebusiness.contactingyou.email.lbl"): @c.email</li>
             </ul>
         }
     @model.correspondenceAddress.map { ca =>

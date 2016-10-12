@@ -772,6 +772,7 @@ bankdetails.accounttype.lbl.04 = The business doesn’t use a bank account
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname = Account name
 bankdetails.bankaccount.accounttype = Is this a UK bank account?
+bankdetails.bankaccount.accounttype.uk.lbl = UK Bank Account
 bankdetails.bankaccount.accounttype.lbl = Account type
 bankdetails.bankaccount.accountnumber = Account number
 bankdetails.bankaccount.sortcode = Sort code
