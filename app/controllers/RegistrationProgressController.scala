@@ -3,6 +3,7 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.SubscriptionResponse
+import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, Section}
 import play.api.mvc.Request
 import services.{AuthEnrolmentsService, ProgressService}
@@ -50,13 +51,12 @@ trait RegistrationProgressController extends BaseController {
     x.flatMap { cacheMapO =>
         cacheMapO.map { cacheMap: CacheMap =>
           val sections = service.sections(cacheMap)
-          enrolmentsService.amlsRegistrationNumber map {
-            case Some(_) => {
-              Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+          preApplicationComplete(cacheMap) map {
+            case Some(x) => x match {
+              case true => Ok(registration_amendment(sections, amendmentDeclarationAvailable(sections)))
+              case false => Ok(registration_progress(sections, declarationAvailable(sections)))
             }
-            case None => {
-              Ok(registration_progress(sections, declarationAvailable(sections)))
-            }
+            case None => Redirect(controllers.routes.LandingController.get())
           }
         }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
     }
@@ -68,6 +68,21 @@ trait RegistrationProgressController extends BaseController {
           Ok(registration_progress(sections, declarationAvailable(sections)))
         }
       }
+
+  private def preApplicationComplete(cache: CacheMap)(implicit hc : HeaderCarrier, ac : AuthContext): Future[Option[Boolean]] = {
+    (for{
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+    } yield bm.isComplete match {
+      case (true) => {
+        val sections = service.sections(cache)
+        enrolmentsService.amlsRegistrationNumber map {
+          case Some(_) => Some(true)
+          case None => Some(false)
+        }
+      }
+      case _ =>  Future.successful(None)
+    }).getOrElse(Future.successful(None))
+  }
 
 }
 
