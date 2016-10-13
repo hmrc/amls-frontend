@@ -12,7 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{StatusConstants, AuthorisedFixture}
@@ -28,13 +28,14 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
       override val dataCacheConnector: DataCacheConnector =  mock[DataCacheConnector]
       override val statusService: StatusService =  mock[StatusService]
       override protected def authConnector: AuthConnector = self.authConnector
+      override val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
     }
   }
 
   "RemoveTradingPremisesController" must {
 
-    val address = Address("1", "2",None,None,"asdfasdf")
-    val year =1990
+    val address = Address("1", "2", None, None, "asdfasdf")
+    val year = 1990
     val month = 2
     val day = 24
     val date = new LocalDate(year, month, day)
@@ -112,7 +113,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        val result = controller.get(1,false) (request)
+        val result = controller.get(1, false)(request)
 
         val contentString = contentAsString(result)
 
@@ -130,7 +131,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
-        val result = controller.get(1,false) (request)
+        val result = controller.get(1, false)(request)
 
         val contentString = contentAsString(result)
 
@@ -142,12 +143,12 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
     "successfully load remove trading premises page with no trading name" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises(None,None)))))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None)))))
 
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      val result = controller.get(1,false) (request)
+      val result = controller.get(1, false)(request)
 
       val contentString = contentAsString(result)
 
@@ -162,71 +163,147 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
-        val result = controller.get(1,false)(request)
+        val result = controller.get(1, false)(request)
 
         status(result) must be(NOT_FOUND)
       }
     }
 
-    "remove trading premises and redirect to summary before submission" in new Fixture {
+// test invalid until form is used in variations
+//    "on post with invalid data show error" in new Fixture {
+//      val newRequest = request.withFormUrlEncodedBody(
+//        "endDate.day" -> "",
+//        "endDate.month" -> "",
+//        "endDate.year" -> ""
+//      )
+//      val tradingPremisesList = Seq(completeModel1, completeModel2, completeModel3, completeModel4)
+//
+//      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+//        .thenReturn(Future.successful(Some(tradingPremisesList)))
+//      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+//        .thenReturn(Future.successful(Some("RegNo")))
+//
+//      val result = controller.remove(1, true, "trading Name")(newRequest)
+//      status(result) must be(BAD_REQUEST)
+//      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+//
+//    }
+  }
+  it when {
+    "remove is called" must {
+      "respond with SEE_OTHER" when {
+        "removing a responsible person from an unsubmitted application" in new Fixture {
 
-      val tradingPremisesList = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
+          val emptyCache = CacheMap("", Map.empty)
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(tradingPremisesList)))
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(tradingPremisesList)))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+          val result = controller.remove(1, false, "John Envy Doe")(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
 
-      val result = controller.remove(1, false, "trade Name")(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.tradingpremises.routes.SummaryController.get(false).url))
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+            completeTradingPremises2,
+            completeTradingPremises3
+          )))(any(), any(), any())
+        }
 
-      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(completeModel2,completeModel3,completeModel4)))(any(), any(), any())
+        "removing a responsible person from a previously submitted application" in new Fixture {
 
-    }
+          val emptyCache = CacheMap("", Map.empty)
 
-    "remove trading premises and redirect to summary after submission" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "endDate.day" -> "12",
-        "endDate.month" -> "5",
-        "endDate.year" -> "1999"
-      )
-      val newCompleteModel1 = completeModel1.copy(status = Some(StatusConstants.Deleted),
-        endDate = Some(ActivityEndDate(new LocalDate(1999,5,12))), hasChanged = true)
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(Some("RegNo")))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(tradingPremisesList)))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-      val tradingPremisesList = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
+          val result = controller.remove(1, false, "John Envy Doe")(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(tradingPremisesList)))
-      val mockCacheMap = mock[CacheMap]
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val result = controller.remove(1, true, "trade Name", true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.tradingpremises.routes.SummaryController.get(true).url))
-
-      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(),
-        meq(Seq(newCompleteModel1, completeModel2,completeModel3,completeModel4)))(any(), any(), any())
-
-    }
-
-
-    "on post with invalid data show error" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "endDate.day" -> "",
-        "endDate.month" -> "",
-        "endDate.year" -> ""
-      )
-      val tradingPremisesList = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
-
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(tradingPremisesList)))
-
-      val result = controller.remove(1, true,"trading Name", true)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+            completeTradingPremises1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
+            completeTradingPremises2,
+            completeTradingPremises3
+          )))(any(), any(), any())
+        }
+      }
     }
   }
+
+  val ytp = YourTradingPremises(
+    "foo",
+    Address(
+      "1",
+      "2",
+      None,
+      None,
+      "asdfasdf"
+    ),
+    true,
+    new LocalDate(1990, 2, 24)
+  )
+
+  val businessStructure = SoleProprietor
+  val agentName = AgentName("test")
+  val agentCompanyName = AgentCompanyName("test")
+  val agentPartnership = AgentPartnership("test")
+  val wdbd = WhatDoesYourBusinessDo(
+    Set(
+      BillPaymentServices,
+      EstateAgentBusinessService,
+      MoneyServiceBusiness)
+  )
+  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val completeTradingPremises1 = TradingPremises(
+    Some(RegisteringAgentPremises(true)),
+    Some(ytp),
+    Some(businessStructure),
+    Some(agentName),
+    Some(agentCompanyName),
+    Some(agentPartnership),
+    Some(wdbd),
+    Some(msbServices),
+    false,
+    Some(123456),
+    Some("Added"),
+    Some(ActivityEndDate(new LocalDate(1999,1,1)))
+  )
+  val completeTradingPremises2 = TradingPremises(
+    Some(RegisteringAgentPremises(true)),
+    Some(ytp),
+    Some(businessStructure),
+    Some(agentName),
+    Some(agentCompanyName),
+    Some(agentPartnership),
+    Some(wdbd),
+    Some(msbServices),
+    false,
+    Some(123456),
+    Some("Added"),
+    Some(ActivityEndDate(new LocalDate(1999,1,1)))
+  )
+  val completeTradingPremises3 = TradingPremises(
+    Some(RegisteringAgentPremises(true)),
+    Some(ytp),
+    Some(businessStructure),
+    Some(agentName),
+    Some(agentCompanyName),
+    Some(agentPartnership),
+    Some(wdbd),
+    Some(msbServices),
+    false,
+    Some(123456),
+    Some("Added"),
+    Some(ActivityEndDate(new LocalDate(1999,1,1)))
+  )
+
+  val tradingPremisesList = Seq(completeTradingPremises1,completeTradingPremises2,completeTradingPremises3)
 }
