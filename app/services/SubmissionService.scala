@@ -1,33 +1,39 @@
 package services
 
 import config.ApplicationConfig
-import connectors.{DESConnector, DataCacheConnector, GovernmentGatewayConnector}
-import models.asp.Asp
-import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
-import models.responsiblepeople.ResponsiblePeople
-import models.supervision.Supervision
-import models.tcsp.Tcsp
-import models.{SubscriptionRequest, SubscriptionResponse}
+import connectors.{AmlsConnector, DataCacheConnector, GovernmentGatewayConnector}
+import exceptions.NoEnrolmentException
 import models.aboutthebusiness.AboutTheBusiness
+import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.confirmation.{BreakdownRow, Currency}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.MoneyServiceBusiness
+import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
+import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse, NotFoundException}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import utils.StatusConstants
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait SubscriptionService extends DataCacheService {
+trait SubmissionService extends DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
-  private[services] def desConnector: DESConnector
+
+  private[services] def amlsConnector: AmlsConnector
+
   private[services] def ggService: GovernmentGatewayService
+
+  private[services] def authEnrolmentsService: AuthEnrolmentsService
 
   private object Submission {
     val message = "confirmation.submission"
@@ -40,10 +46,12 @@ trait SubscriptionService extends DataCacheService {
     val feePer = ApplicationConfig.premisesFee
   }
 
+
   private object People {
     val message = "confirmation.responsiblepeople"
     val feePer = ApplicationConfig.peopleFee
   }
+
 
   private object UnpaidPeople {
     val message = "confirmation.unpaidpeople"
@@ -70,30 +78,41 @@ trait SubscriptionService extends DataCacheService {
       bt <- rd.businessType
     } yield bt
 
-  private def subscribe
-  (cache: CacheMap, safeId: String)
+  def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
+    bankDetails match {
+      case Some(bankAccts) => {
+        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
+        bankDtls.nonEmpty match {
+          case true => Some(bankDtls)
+          case false => Some(Seq.empty)
+        }
+      }
+      case _ => Some(Seq.empty)
+    }
+  }
+
+  private def createSubscriptionRequest
+  (cache: CacheMap)
   (implicit
    ac: AuthContext,
    hc: HeaderCarrier,
    ec: ExecutionContext
-  ): Future[SubscriptionResponse] = {
-    val request = SubscriptionRequest(
+  ): SubscriptionRequest = {
+    SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
       tradingPremisesSection = cache.getEntry[Seq[TradingPremises]](TradingPremises.key),
       aboutTheBusinessSection = cache.getEntry[AboutTheBusiness](AboutTheBusiness.key),
-      bankDetailsSection = cache.getEntry[Seq[BankDetails]](BankDetails.key),
+      bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
       responsiblePeopleSection = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key),
-      tcspSection =  cache.getEntry[Tcsp](Tcsp.key),
+      tcspSection = cache.getEntry[Tcsp](Tcsp.key),
       aspSection = cache.getEntry[Asp](Asp.key),
       msbSection = cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key),
       hvdSection = cache.getEntry[Hvd](Hvd.key),
       supervisionSection = cache.getEntry[Supervision](Supervision.key)
     )
-
-    desConnector.subscribe(request, safeId)
   }
 
   def subscribe
@@ -105,7 +124,7 @@ trait SubscriptionService extends DataCacheService {
     for {
       cache <- getCache
       safeId <- safeId(cache)
-      subscription <- subscribe(cache, safeId)
+      subscription <- amlsConnector.subscribe(createSubscriptionRequest(cache), safeId)
       _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
       _ <- ggService.enrol(
         safeId = safeId,
@@ -114,10 +133,59 @@ trait SubscriptionService extends DataCacheService {
     } yield subscription
   }
 
-  private def subscriptionQuantity(subscription: SubscriptionResponse): Int =
+  def update
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[AmendVariationResponse] = {
+    for {
+      cache <- getCache
+      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      amendment <- amlsConnector.update(
+        createSubscriptionRequest(cache),
+        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
+      )
+      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
+    } yield amendment
+  }
+
+  def getAmendment
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
+    cacheConnector.fetchAll flatMap {
+      option =>
+        (for {
+          cache <- option
+          amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+        } yield {
+          val subQuantity = subscriptionQuantity(amendment)
+          authEnrolmentsService.amlsRegistrationNumber flatMap {
+            case Some(mlrRegNo) => {
+              val total = amendment.totalFees
+              val difference = amendment.difference map Currency.fromBD
+              val rows = Seq(
+                BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+              ) ++ responsiblePeopleRows(people, amendment) ++
+                Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
+              Future.successful(Some((mlrRegNo, Currency.fromBD(total), rows, difference)))
+            }
+            case None => Future.successful(None)
+          }
+        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+    }
+  }
+
+
+  private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
 
-  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubscriptionResponse): Seq[BreakdownRow] = {
+  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
     people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
       case (b, a) =>
         Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
@@ -156,7 +224,7 @@ trait SubscriptionService extends DataCacheService {
     }
 }
 
-object SubscriptionService extends SubscriptionService {
+object SubmissionService extends SubmissionService {
 
   object MockGGService extends GovernmentGatewayService {
 
@@ -173,7 +241,8 @@ object SubscriptionService extends SubscriptionService {
   }
 
   override private[services] val cacheConnector = DataCacheConnector
-  override private[services] val desConnector = DESConnector
+  override private[services] val amlsConnector = AmlsConnector
+  override private[services] val authEnrolmentsService = AuthEnrolmentsService
   override private[services] val ggService = {
     if (ApplicationConfig.enrolmentToggle) {
       GovernmentGatewayService

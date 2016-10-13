@@ -96,7 +96,7 @@
                         @prt.countryOfBirth
                     }
 
-                    @optionalBlock(Messages("responsiblepeople.detailed_answers.nationality"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
+                    @optionalBlock(Messages("responsiblepeople.detailed_answers.nationality"), person.personResidenceType, NationalityController.get(idx, true)) {prt =>
                         @prt.nationality
                     }
 

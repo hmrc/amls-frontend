@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{TransmittingMoney, CurrencyExchange, MsbService, BusinessMatching}
 import models.moneyservicebusiness._
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -15,22 +16,22 @@ trait IdentifyLinkedTransactionsController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit:Boolean = false) = Authorised.async {
-   implicit authContext => implicit request =>
-     dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-       response =>
-         val form: Form2[IdentifyLinkedTransactions] = (for {
-           msb <- response
-           transactions <- msb.identifyLinkedTransactions
-         } yield Form2[IdentifyLinkedTransactions](transactions)).getOrElse(EmptyForm)
-         Ok(identify_linked_transactions(form, edit))
-     }
+  def get(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        response =>
+          val form: Form2[IdentifyLinkedTransactions] = (for {
+            msb <- response
+            transactions <- msb.identifyLinkedTransactions
+          } yield Form2[IdentifyLinkedTransactions](transactions)).getOrElse(EmptyForm)
+          Ok(identify_linked_transactions(form, edit))
+      }
   }
 
   private def standardRouting(services: Set[MsbService]): Result =
     services match {
       case s if s contains TransmittingMoney =>
-        Redirect(routes.BusinessAppliedForPSRNumberController.get())
+        Redirect(routes.BusinessUseAnIPSPController.get())
       case s if s contains CurrencyExchange =>
         Redirect(routes.CETransactionsInNext12MonthsController.get())
       case _ =>
@@ -48,10 +49,10 @@ trait IdentifyLinkedTransactionsController extends BaseController {
     }
 
   private def mtRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
-    if (msb.businessAppliedForPSRNumber.isDefined) {
+    if (msb.businessUseAnIPSP.isDefined) {
       editRouting(services - TransmittingMoney, msb)
     } else {
-      Redirect(routes.BusinessAppliedForPSRNumberController.get(true))
+      Redirect(routes.BusinessUseAnIPSPController.get(true))
     }
 
   private def ceRouting(msb: MoneyServiceBusiness): Result =
@@ -69,11 +70,11 @@ trait IdentifyLinkedTransactionsController extends BaseController {
         case ValidForm(_, data) =>
           dataCacheConnector.fetchAll flatMap {
             optMap =>
-
               val result = for {
                 cache <- optMap
                 msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                services <- msb.msbServices
+                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
               } yield {
                 dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                   msb.identifyLinkedTransactions(data)
@@ -86,7 +87,6 @@ trait IdentifyLinkedTransactionsController extends BaseController {
                     }
                 }
               }
-
               result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       }
@@ -97,5 +97,6 @@ trait IdentifyLinkedTransactionsController extends BaseController {
 object IdentifyLinkedTransactionsController extends IdentifyLinkedTransactionsController {
   // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
+
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }

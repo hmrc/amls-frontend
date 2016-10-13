@@ -37,12 +37,10 @@ import scala.concurrent.Future
           Future.successful(BadRequest(views.html.tradingpremises.agent_partnership(f, index,edit)))
         case ValidForm(_, data) => {
           for {
-            result <- updateDataStrict[TradingPremises](index) {
-              case Some(tp) =>
-                Some(TradingPremises(tp.registeringAgentPremises,
+            result <- updateDataStrict[TradingPremises](index) { tp =>
+                TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises, tp.businessStructure,
-                  None, None, Some(data),tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices))
-              case _=> data
+                  None, None, Some(data),tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices)
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))

@@ -98,7 +98,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Supervision]
-        val completedSection = Section("supervision", Completed, false,  controllers.supervision.routes.SummaryController.get(true))
+        val completedSection = Section("supervision", Completed, false,  controllers.supervision.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(complete)
@@ -140,7 +140,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
         }
 
         "Deserialise as expected" in {
-          completeJson.as[Supervision] must be(completeModel)
+          (completeJson - "hasChanged").as[Supervision] must be(completeModel)
         }
       }
     }

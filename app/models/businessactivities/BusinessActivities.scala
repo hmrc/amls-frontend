@@ -1,6 +1,7 @@
 package models.businessactivities
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.Logger
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessActivities(
@@ -16,6 +17,7 @@ case class BusinessActivities(
                                riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
                                howManyEmployees: Option[HowManyEmployees] = None,
                                whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
+                               taxMatters: Option[TaxMatters] = None,
                                hasChanged: Boolean = false
                              ) {
 
@@ -55,15 +57,20 @@ case class BusinessActivities(
   def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
     this.copy(whoIsYourAccountant = Some(p), hasChanged = hasChanged || !this.whoIsYourAccountant.contains(p))
 
+  def taxMatters(p: TaxMatters): BusinessActivities =
+    this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p))
 
-  def isComplete: Boolean =
+
+  def isComplete: Boolean = {
+    Logger.debug(s"Testing isComplete for : $this")
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
-      Some(_), _, Some(_), Some(_), Some(_), _, _
+      Some(_), _, Some(_), Some(_), Some(_), _, _, _
       ) => true
       case _ => false
     }
+  }
 }
 
 object BusinessActivities {
@@ -99,6 +106,7 @@ object BusinessActivities {
       __.read[Option[RiskAssessmentPolicy]] and
       __.read[Option[HowManyEmployees]] and
       __.read[Option[WhoIsYourAccountant]] and
+      __.read[Option[TaxMatters]] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessActivities.apply _)
 
@@ -117,10 +125,10 @@ object BusinessActivities {
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject],
         Json.toJson(model.whoIsYourAccountant).asOpt[JsObject],
-        Json.toJson(model.hasChanged).asOpt[JsObject]
+        Json.toJson(model.taxMatters).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
-      }
+      } + ("hasChanged" -> JsBoolean(model.hasChanged))
   }
 
   implicit def default(businessActivities: Option[BusinessActivities]): BusinessActivities =

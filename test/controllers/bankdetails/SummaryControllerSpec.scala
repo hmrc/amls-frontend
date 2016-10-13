@@ -1,15 +1,17 @@
 package controllers.bankdetails
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.bankdetails._
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -26,11 +28,6 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
   }
 
   "Get" must {
-
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
 
     "load the summary page when section data is available" in new Fixture {
 
@@ -74,6 +71,18 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       contentString must include("Sort code: 12-12-12")
       contentString must include("UK Bank Account")
       contentString must include("Personal")
+    }
+
+    "show no bank account text" when {
+      "no bank account is selected" in new Fixture {
+        val model = BankDetails(None, None)
+
+        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(model))))
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include (Messages("bankdetails.summary.nobank.account"))
+      }
     }
   }
 }

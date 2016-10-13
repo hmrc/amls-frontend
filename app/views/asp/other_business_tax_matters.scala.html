@@ -9,6 +9,7 @@ s"""${f("agentRegNo").id}-fieldset"""
 }
 
 @header = {
+    @errorSummary(f)
     @heading("asp.other.business.tax.matters.title", "summary.asp")
 }
 
@@ -24,9 +25,7 @@ s"""${f("agentRegNo").id}-fieldset"""
         @inlineRadioGroup(f("otherBusinessTaxMatters")) {
             @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
             @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @input(f("agentRegNo"), "asp.other.business.tax.matters.agentrefno.lbl", bold = false)
-            }
+
         }
 
         @submit(edit)

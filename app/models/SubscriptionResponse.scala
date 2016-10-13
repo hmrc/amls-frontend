@@ -2,6 +2,7 @@ package models
 
 import play.api.libs.json.Json
 
+
 case class SubscriptionResponse(
                                  etmpFormBundleNumber: String,
                                  amlsRefNo: String,
@@ -10,7 +11,7 @@ case class SubscriptionResponse(
                                  premiseFee: BigDecimal,
                                  totalFees: BigDecimal,
                                  paymentReference: String
-                               )
+                               ) extends SubmissionResponse
 
 object SubscriptionResponse {
 

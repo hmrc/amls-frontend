@@ -3,9 +3,8 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.aboutthebusiness.RegisteredOfficeUK
-import models.businessactivities.{AccountantDoesNotAlsoDealWithTax, UkAccountantsAddress, WhoIsYourAccountant, BusinessActivities}
+import forms.{Form2, InvalidForm, ValidForm}
+import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -15,7 +14,7 @@ trait WhoIsYourAccountantController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   //TODO: Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
-  private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""), AccountantDoesNotAlsoDealWithTax)
+  private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -40,8 +39,7 @@ trait WhoIsYourAccountantController extends BaseController {
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
               businessActivity.whoIsYourAccountant(data)
             )
-          } yield Redirect(routes.SummaryController.get())
-
+          } yield Redirect(routes.TaxMattersController.get())
         }
       }
   }

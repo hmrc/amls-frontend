@@ -6,7 +6,8 @@
 @(f: Form2[_],index: Int, edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("tradingpremises.businessStructure.heading", "summary.tradingpremises")
+    @errorSummary(f)
+    @heading("tradingpremises.businessStructure.title", "summary.tradingpremises")
 }
 
 @main(

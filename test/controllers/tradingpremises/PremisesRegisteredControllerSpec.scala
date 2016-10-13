@@ -12,7 +12,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{StatusConstants, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -49,12 +49,13 @@ class PremisesRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with
           true, new LocalDate(1990, 2, 24))
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(None,Some(ytp)), TradingPremises(None,Some(ytp))))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None,Some(ytp)), TradingPremises(registeringAgentPremises = None,
+            yourTradingPremises = Some(ytp), status =  Some(StatusConstants.Deleted))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("tradingpremises.have.registered.premises.text", 2))
+        contentAsString(result) must include(Messages("tradingpremises.have.registered.premises.text", 1))
       }
     }
 
