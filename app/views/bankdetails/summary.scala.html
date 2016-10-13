@@ -9,7 +9,6 @@
     @heading(if(complete) "summary.youranswers.title" else "summary.checkyouranswers.title", "summary.bankdetails")
 }
 
-
 @main(
     title = if(complete) Messages("summary.youranswers.title") else Messages("summary.bankdetails.checkyouranswers.title"),
     heading = header
@@ -17,18 +16,15 @@
 
     @if(!hasBankAccount){
         <div class="panel-indent">
-            @Messages("bankdetails.summary.nobank.account")
-            <br><br>
+            <p>@Messages("bankdetails.summary.nobank.account")</p>
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>
-        <br><br>
     }
 
     @if(complete && hasBankAccount) {
         <div class="panel-indent">
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>
-        <br><br>
     }
         @model.zipWithIndex.map { case (x, y) =>
             @x.bankAccount.map {bankAccount =>
