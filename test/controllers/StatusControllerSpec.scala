@@ -267,17 +267,19 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
   }
 
   "show the correct content to edit submission" when {
+
+    val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+    val cacheMap = mock[CacheMap]
+
+    when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
+      Some(BusinessMatching(Some(reviewDtls), None)))
+
     "application has not yet been submitted" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
-
-      val cacheMap = mock[CacheMap]
       when(controller.landingService.cacheMap(any(), any(), any())).
         thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
-        Some(BusinessMatching(Some(reviewDtls), None)))
 
       when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any()))
         .thenReturn(Future.successful(None))
@@ -297,17 +299,36 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
     "application is in review" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+      when(controller.landingService.cacheMap(any(), any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
 
-      val cacheMap = mock[CacheMap]
-      when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        .thenReturn(Future.successful(Some("XAML00000567890")))
 
-      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
-        Some(BusinessMatching(Some(reviewDtls), None)))
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
 
-      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("XAML00000567890")))
-      when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+
+      document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
+      document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
+
+    }
+
+    "application has been approved" in new Fixture {
+
+      when(controller.landingService.cacheMap(any(), any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        .thenReturn(Future.successful(Some("XBML00000567890")))
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
       val result = controller.get()(request)
       status(result) must be(OK)
 
