@@ -1,33 +1,40 @@
 package controllers.declaration
 
-import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
+import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
+import models.status._
+import play.api.mvc.{Action, AnyContent, Request, Result}
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 import views.html.declaration.who_is_registering
+
+import scala.concurrent.Future
 
 trait WhoIsRegisteringController extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+  private[controllers] def amlsConnector: AmlsConnector
+  def dataCacheConnector: DataCacheConnector
+  def statusService: StatusService
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchAll map {
+      dataCacheConnector.fetchAll flatMap {
         optionalCache =>
           (for {
             cache <- optionalCache
             responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-          } yield {
-            (for {
-              whoIsRegistering <- cache.getEntry[WhoIsRegistering](WhoIsRegistering.key)
-            } yield Ok(who_is_registering(Form2[WhoIsRegistering](whoIsRegistering), responsiblePeople)))
-              .getOrElse(Ok(who_is_registering(EmptyForm, responsiblePeople)))
-          }) getOrElse Ok(who_is_registering(EmptyForm, Seq.empty))
+          } yield whoIsRegisteringView(Ok, EmptyForm, responsiblePeople)
+          ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
+
+  def getWithAmendment = get
 
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
@@ -55,16 +62,16 @@ trait WhoIsRegisteringController extends BaseController {
     }
   }
 
-  def post = Authorised.async {
+  def post: Action[AnyContent] = Authorised.async {
     implicit authContext => implicit request => {
       Form2[WhoIsRegistering](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-            case Some(data) => BadRequest(who_is_registering(f, data))
-            case None => BadRequest(who_is_registering(f, Seq.empty))
+          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
+            case Some(data) => whoIsRegisteringView(BadRequest, f, data)
+            case None => whoIsRegisteringView(BadRequest, f, Seq.empty)
           }
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll map {
+          dataCacheConnector.fetchAll flatMap {
             optionalCache =>
               (for {
                 cache <- optionalCache
@@ -73,25 +80,47 @@ trait WhoIsRegisteringController extends BaseController {
                 dataCacheConnector.save[WhoIsRegistering](WhoIsRegistering.key, data)
                 data.person match {
                   case "-1" => {
-                    dataCacheConnector.save[AddPerson](AddPerson.key, AddPerson("", None, "", BeneficialShareholder))
-                    Redirect(routes.AddPersonController.get())
+                    redirectToAddPersonPage
                   }
                   case _ => {
                     getAddPerson(data, responsiblePeople) map { addPerson =>
                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
-                    Redirect(routes.DeclarationController.get())
+                    redirectToDeclarationPage
                   }
                 }
-              }) getOrElse Redirect(routes.DeclarationController.get())
+              }) getOrElse redirectToDeclarationPage
           }
       }
     }
   }
+
+  private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePeople])
+                                  (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview if AmendmentsToggle.feature =>
+        status(who_is_registering(("declaration.who.is.registering.amendment.title","submit.amendment.application"), form, rp))
+      case _ => status(who_is_registering(("declaration.who.is.registering.title","submit.registration"), form, rp))
+    }
+
+  private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
+      case _ => Redirect(routes.DeclarationController.get())
+    }
+
+  private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
+    statusService.getStatus map {
+      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.AddPersonController.getWithAmendment())
+      case _ => Redirect(routes.AddPersonController.get())
+    }
+
 }
 
 object WhoIsRegisteringController extends WhoIsRegisteringController {
   // $COVERAGE-OFF$
+  override private[controllers] val amlsConnector: AmlsConnector = AmlsConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
+  override val statusService: StatusService = StatusService
 }

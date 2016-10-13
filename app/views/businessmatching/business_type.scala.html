@@ -6,7 +6,8 @@
 @(f: Form2[_])(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("businessmatching.businessType.heading", "summary.businessmatching")
+    @errorSummary(f)
+    @heading("businessmatching.businessType.title", "summary.businessmatching")
 }
 
 @main(

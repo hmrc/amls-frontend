@@ -5,18 +5,22 @@
     p: String,
     labelText: String,
     hintText: String = "",
-    example: Boolean = true
+    example: Boolean = true,
+    hintId: String = "",
+    jsHidden: Boolean = false
 )(implicit lang: Lang)
 
 @field = @{ f(p) }
 
-<fieldset class="form-field date @if(field.hasErrors) {form-field--error}" id="@field.id">
-    @legend(labelText)
+<fieldset class="form-field form-date @if(field.hasErrors) {form-field--error}" id="@field.id">
+    @legend(
+        legend = labelText
+    )
     @if(hintText.nonEmpty) {
         <span class="form-field--hint">@Messages(hintText)</span>
     }
     @if(example) {
-        <span class="form-field--hint">@Messages("lbl.date.example")</span>
+        <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
     }
     @if(field.hasErrors) {
         <span class="error-notification">@field.error</span>
@@ -24,16 +28,33 @@
     @input(
         labelText = "lbl.day",
         field = f(s"${p}.day"),
-        bold = false
+        bold = false,
+        classes = Seq("input--no-spinner"),
+        parentDateAttr = "day",
+        attrType = "number",
+        attrMin = "1",
+        attrMax = "31",
+        attrPattern = "[0-9]{2}",
+        attrDescribedBy = s"${hintId}"
     )
     @input(
         labelText = "lbl.month",
         field = f(s"${p}.month"),
-        bold = false
+        bold = false,
+        classes = Seq("input--no-spinner"),
+        parentDateAttr = "month",
+        attrType = "number",
+        attrMin = "1",
+        attrMax = "12",
+        attrPattern = "[0-9]{2}"
     )
     @input(
         labelText = "lbl.year",
         field = f(s"${p}.year"),
-        bold = false
+        bold = false,
+        classes = Seq("input--no-spinner"),
+        parentDateAttr = "year",
+        attrType = "number",
+        attrPattern = "[1-9][0-9]{3}"
     )
 </fieldset>

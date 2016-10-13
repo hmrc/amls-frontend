@@ -3,7 +3,9 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.RepeatingSection
 import views.html.tradingpremises._
 
@@ -11,21 +13,27 @@ trait SummaryController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get = Authorised.async {
+  def get(edit:Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
-        case Some(data) =>
-          Ok(summary(data))
-        case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get())
+      dataCacheConnector.fetchAll map {
+        cache =>
+          for {
+            c: CacheMap <- cache
+            tp <- c.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          } yield tp
+      } map {
+        case Some(data) => Ok(summary(data,edit))
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
+
+  def answers = get(true)
 
   def getIndividual(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
         case Some(data) =>
-          Ok(summary_2(data, index))
+          Ok(summary_details(data, index))
         case _ =>
           NotFound(notFoundView)
       }

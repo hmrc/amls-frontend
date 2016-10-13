@@ -37,7 +37,7 @@ trait HowManyEmployeesController extends BaseController {
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
-              businessActivities.employees(data))
+              businessActivities.howManyEmployees(data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.CustomersOutsideUKController.get())

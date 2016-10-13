@@ -1,0 +1,26 @@
+@import include._
+@import config.{ApplicationConfig => appConfig}
+@()(implicit request: Request[_])
+
+@header = {
+    @heading("businessmatching.cannotcontinuewiththeapplication.title", "summary.businessmatching")
+}
+
+@main(
+    title = Messages("businessmatching.cannotcontinuewiththeapplication.title"),
+    heading = header
+) {
+
+    <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.first")</p>
+
+    <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.second")</p>
+
+    <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.third")</p>
+
+    <div class="form-group">
+        <a class="button" role="button" href="@appConfig.logoutUrl">
+        @Messages("button.logout")<span class="visuallyhidden"> @Messages("summary.businessmatching")</span>
+        </a>
+    </div>
+}
+

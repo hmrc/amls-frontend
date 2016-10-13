@@ -21,9 +21,19 @@ class HvdSpec extends PlaySpec with MockitoSugar{
 
     val completeJson = Json.obj(
       "cashPayment" ->Json.obj(
-      "acceptedAnyPayment" -> true,
-      "paymentDate" ->  new LocalDate(1956, 2, 15)),
-      "receiveCashPayments" -> Json.obj("receivePayments" ->true,"paymentMethods" ->Json.obj("courier" ->true,"direct" ->true,"other" ->true,"details" ->"foo")))
+        "acceptedAnyPayment" -> true,
+        "paymentDate" ->  new LocalDate(1956, 2, 15)
+      ),
+      "receiveCashPayments" -> Json.obj(
+        "receivePayments" -> true,
+        "paymentMethods" -> Json.obj(
+          "courier" -> true,
+          "direct" -> true,
+          "other" -> true,
+          "details" -> "foo")
+      ),
+      "hasChanged" -> false
+    )
 
     val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
       None,None,None,None,
@@ -40,9 +50,12 @@ class HvdSpec extends PlaySpec with MockitoSugar{
 
     "Update how will you sell goods correctly" in {
       val sut = Hvd(cashPayment = Some(DefaultCashPayment), howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail))))
-
-      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (Hvd(cashPayment = Some(DefaultCashPayment),
-                                                                                howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale)))))
+      val expectedModel = Hvd(
+        cashPayment = Some(DefaultCashPayment),
+        howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Wholesale))),
+        hasChanged = true
+      )
+      sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (expectedModel)
     }
   }
   
@@ -59,7 +72,7 @@ class HvdSpec extends PlaySpec with MockitoSugar{
 
       "return a NotStarted Section when model is empty" in {
 
-        val notStartedSection = Section("hvd", NotStarted, controllers.hvd.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("hvd", NotStarted, false,  controllers.hvd.routes.WhatYouNeedController.get())
 
         when(cache.getEntry[Hvd]("hvd")) thenReturn None
 
@@ -70,7 +83,7 @@ class HvdSpec extends PlaySpec with MockitoSugar{
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Hvd]
-        val completedSection = Section("hvd", Completed, controllers.hvd.routes.SummaryController.get())
+        val completedSection = Section("hvd", Completed, false,  controllers.hvd.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(complete)
@@ -82,7 +95,7 @@ class HvdSpec extends PlaySpec with MockitoSugar{
       "return a Started Section when model is incomplete" in {
 
         val incompleteTcsp = mock[Hvd]
-        val startedSection = Section("hvd", Started, controllers.hvd.routes.WhatYouNeedController.get())
+        val startedSection = Section("hvd", Started, false, controllers.hvd.routes.WhatYouNeedController.get())
 
         when(incompleteTcsp.isComplete) thenReturn false
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(incompleteTcsp)

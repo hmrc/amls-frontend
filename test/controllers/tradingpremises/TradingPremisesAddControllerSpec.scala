@@ -1,26 +1,20 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.tradingpremises.{Address, YourTradingPremises, TradingPremises}
-import org.joda.time.LocalDate
-import org.scalacheck.Gen
-import org.scalatest.concurrent.ScalaFutures
+import models.businessmatching._
+import models.tradingpremises.TradingPremises
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.{MustMatchers, WordSpecLike}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.mvc.Call
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 
-import scala.annotation.tailrec
 import scala.concurrent.Future
 
 
-class TradingPremisesAddControllerSpec extends WordSpecLike
-  with MustMatchers with MockitoSugar with ScalaFutures with OneAppPerSuite with PropertyChecks {
+class TradingPremisesAddControllerSpec extends PlaySpec with OneAppPerSuite with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -29,68 +23,65 @@ class TradingPremisesAddControllerSpec extends WordSpecLike
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
-
-    @tailrec
-    final def buildTestSequence(requiredCount: Int, acc: Seq[TradingPremises] = Nil): Seq[TradingPremises] = {
-      require(requiredCount >= 0, "cannot build a sequence with negative elements")
-      if (requiredCount == acc.size) {
-        acc
-      } else {
-        val tradingPremisesData = TradingPremises(
-          Some(YourTradingPremises(
-            "Trading Name",
-            Address(
-              "line 1", "line 2", Some("line 3"), Some("line 4"), "postcode"
-            ),
-            true,
-            new LocalDate(10,10,10),
-            false
-          ))
-        )
-
-        buildTestSequence(requiredCount, acc :+ tradingPremisesData)
-      }
-    }
-
-    def guidanceOptions(currentCount: Int) = Table(
-      ("guidanceRequested", "expectedRedirect"),
-      (true, controllers.tradingpremises.routes.WhatYouNeedController.get(currentCount + 1)),
-      (false, controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(currentCount + 1, false))
-    )
   }
 
-  "TradingPremisesAddController" when {
-    "get is called" should {
-      "add empty trading premises and redirect to the correct page" in new Fixture {
-        val min = 0
-        val max = 25
-        val requiredSuccess =10
+  "TradingPremisesAddController" should {
 
+    "load What You Need successfully when displayGuidance is true" in new Fixture {
 
-        val zeroCase = Gen.const(0)
-        val reasonableCounts = for (n <- Gen.choose(min, max)) yield n
-        val partitions = Seq (zeroCase, reasonableCounts)
+      val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+      val mockCacheMap = mock[CacheMap]
 
-        forAll(reasonableCounts, minSuccessful(requiredSuccess)) { currentCount: Int =>
-          forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, expectedRedirect: Call) =>
-            val testSeq  = buildTestSequence(currentCount)
-            println(s"currentCount = $currentCount")
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-            when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(testSeq)))
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            val resultF = controller.get(guidanceRequested)(request)
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
 
-            status(resultF) must be(SEE_OTHER)
-            redirectLocation(resultF) must be(Some(expectedRedirect.url))
+      val result = controller.get(true)(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.WhatYouNeedController.get(1).url))
+    }
 
-            verify(controller.dataCacheConnector)
-              .save[Seq[TradingPremises]](meq(TradingPremises.key), meq(testSeq :+ TradingPremises()))(any(), any(), any())
+    "load Where Are Trading Premises page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
-            reset(controller.dataCacheConnector)
-          }
-        }
-      }
+      val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
+      val mockCacheMap = mock[CacheMap]
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      val result = controller.get(false)(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
+    }
+
+    "load Registering Agent Premises page successfully when user selects MSB in business matching page" in new Fixture {
+
+      val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+      val mockCacheMap = mock[CacheMap]
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      val result = controller.get(false)(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.RegisteringAgentPremisesController.get(1, false).url))
     }
   }
 }

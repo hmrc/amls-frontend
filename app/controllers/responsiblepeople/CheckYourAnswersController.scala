@@ -8,16 +8,14 @@ import views.html.responsiblepeople._
 
 trait CheckYourAnswersController extends BaseController {
 
-  protected def dataCache: DataCacheConnector
+  val dataCacheConnector: DataCacheConnector
 
   def get =
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-          dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-            case Some(data) => {
-              Ok(check_your_answers(data))
-            }
+          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+            case Some(data) => Ok(check_your_answers(data))
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
       }
@@ -26,6 +24,6 @@ trait CheckYourAnswersController extends BaseController {
 
 object CheckYourAnswersController extends CheckYourAnswersController {
   // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
+  override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector
 }

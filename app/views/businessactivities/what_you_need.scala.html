@@ -1,18 +1,11 @@
 @import include._
 @()(implicit request: Request[_])
 
-@sidebar = {
-<div class="user-attention">
-    <h3>@Messages("main.sidebar.title")</h3>
-    <p>@Messages("main.sidebar.information")</p>
-</div>
-}
-
 @header = {
     @heading("businessactivities.whatyouneed.heading", "summary.businessactivities")
 }
 
-@main(
+@whatyouneed(
     title = Messages("businessactivities.whatyouneed.title"),
     heading = header,
     sidebar = sidebar
@@ -36,6 +29,16 @@
     </ul>
 
     <div class="form-group">
-        <a class="button" href="@controllers.businessactivities.routes.InvolvedInOtherController.get()">@Messages("button.continue") <span class="visuallyhidden"> @Messages("summary.businessactivities")</span></a>
+        <a class="button" role="button" href="@controllers.businessactivities.routes.InvolvedInOtherController.get()">
+            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.businessactivities")</span>
+        </a>
+    </div>
+
+}
+
+@sidebar = {
+    <div class="user-attention">
+        <h2>@Messages("main.sidebar.title")</h2>
+        <p>@Messages("main.sidebar.information")</p>
     </div>
 }

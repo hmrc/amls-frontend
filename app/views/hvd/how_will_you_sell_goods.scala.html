@@ -10,11 +10,14 @@
 @main(
 title = Messages("hvd.how-will-you-sell-goods.title")
 ) {
-
+    @errorSummary(f)
     @heading("hvd.how-will-you-sell-goods.heading", "summary.hvd")
 
     @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
-        @fieldset(legend = "lbl.select.all", panel=false, classes=Seq("form-group")) {
+        @fieldset(
+            legend = "lbl.select.all",
+            panel = false,
+            classes = Seq("form-group")) {
             @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.auction", "Auction")
             @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.retail" , "Retail" )
             @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.wholesale" , "Wholesale" )

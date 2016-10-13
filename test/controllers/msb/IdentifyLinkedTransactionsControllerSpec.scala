@@ -1,9 +1,12 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
+import models.businessmatching._
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
@@ -27,7 +30,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
     }
   }
 
-  val completedMT = Some(BusinessAppliedForPSRNumberNo)
+  val completedMT = Some(BusinessUseAnIPSPNo)
   val completedCE = Some(CETransactionsInNext12Months("10"))
 
   val emptyCache = CacheMap("", Map.empty)
@@ -78,28 +81,29 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "true"
       )
-
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(
-          MsbServices(
-            Set(
-              TransmittingMoney,
-              CurrencyExchange,
-              ChequeCashingNotScrapMetal,
-              ChequeCashingScrapMetal
-            )
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            TransmittingMoney,
+            CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal
           )
         )
       )
+      val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
         identifyLinkedTransactions = Some(
           IdentifyLinkedTransactions(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
@@ -109,7 +113,7 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessAppliedForPSRNumberController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessUseAnIPSPController.get().url))
     }
 
     "Navigate to next page if they have selected CE as a service" in new Fixture {
@@ -117,23 +121,22 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "true"
       )
-
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(
-          MsbServices(
-            Set(
-              CurrencyExchange,
-              ChequeCashingNotScrapMetal,
-              ChequeCashingScrapMetal
-            )
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal
           )
         )
       )
 
+      val incomingModel = MoneyServiceBusiness()
+
       val outgoingModel = incomingModel.copy(
         identifyLinkedTransactions = Some(
           IdentifyLinkedTransactions(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
@@ -141,6 +144,9 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -156,21 +162,21 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
         "linkedTxn" -> "true"
       )
 
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(
-          MsbServices(
-            Set(
-              ChequeCashingNotScrapMetal,
-              ChequeCashingScrapMetal
-            )
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal
           )
         )
       )
 
+      val incomingModel = MoneyServiceBusiness()
+
       val outgoingModel = incomingModel.copy(
         identifyLinkedTransactions = Some(
           IdentifyLinkedTransactions(true)
-        )
+        ), hasChanged = true
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
@@ -178,6 +184,9 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -187,22 +196,63 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
-    "Navigate to Summary page in edit mode when all services are included and have data filled" in new Fixture {
+    "Navigate to next page if they have selected cheque cashing as a servicein edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "true"
       )
 
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal
+          )
+        )
+      )
+
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
+        identifyLinkedTransactions = Some(
+          IdentifyLinkedTransactions(true)
+        ), hasChanged = true
+      )
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+    }
+
+    "Navigate to Summary page in edit mode when all services are included and have data filled" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody (
+        "linkedTxn" -> "true"
+      )
+      val msbServices = Some(
+        MsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
             ChequeCashingScrapMetal
           )
-        )),
-        businessAppliedForPSRNumber = completedMT,
+        )
+      )
+      val incomingModel = MoneyServiceBusiness(
+        businessUseAnIPSP = completedMT,
         ceTransactionsInNext12Months = completedCE
       )
 
@@ -211,6 +261,9 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -225,20 +278,24 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "true"
       )
-
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
+      val msbServices = Some(
+        MsbServices(
           Set(
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
             ChequeCashingScrapMetal
           )
-        )),
+        )
+      )
+      val incomingModel = MoneyServiceBusiness(
         ceTransactionsInNext12Months = completedCE
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
@@ -256,16 +313,17 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "true"
       )
-
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
+      val msbServices = Some(
+        MsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
             ChequeCashingScrapMetal
           )
-        )),
+        )
+      )
+      val incomingModel = MoneyServiceBusiness(
         ceTransactionsInNext12Months = completedCE
       )
 
@@ -274,13 +332,14 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
 
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
-
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessAppliedForPSRNumberController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.BusinessUseAnIPSPController.get(true).url))
     }
 
     "Navigate to CE section in edit mode when CE data is not in the store" in new Fixture {
@@ -288,22 +347,24 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "true"
       )
-
-      val incomingModel = MoneyServiceBusiness(
-        msbServices = Some(MsbServices(
+      val msbServices = Some(
+        MsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
             ChequeCashingScrapMetal
           )
-        )),
-        businessAppliedForPSRNumber = completedMT
+        )
+      )
+      val incomingModel = MoneyServiceBusiness(
+        businessUseAnIPSP = completedMT
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
         .thenReturn(Future.successful(Some(cacheMap)))
-
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
       when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
@@ -313,6 +374,37 @@ class IdentifyLinkedTransactionsControllerSpec extends PlaySpec with OneAppPerSu
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
+    }
+
+    "throw exception when msb services in Business Matching returns none" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody (
+        "linkedTxn" -> "true"
+      )
+
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+        hasChanged = true
+      )
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(None)
+
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+
+      a[Exception] must be thrownBy {
+        ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
+      }
     }
   }
 }

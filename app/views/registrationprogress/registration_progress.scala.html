@@ -25,7 +25,7 @@
 
         @* Main section *@
         <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
-            @sections.map { case Section(name, status, call) =>
+            @sections.map { case Section(name, status, _, call) =>
                 @section(name, status, call)
             }
         </ul>

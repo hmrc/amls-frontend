@@ -122,30 +122,29 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   "emailType" must {
 
-    "successfully validate" in {
+    val validEmailAddresses = Seq("test@test.com", "blah76@blah.com", "t@t", "name@abc-def.com", "test@abc.def.ghi.com", "t@t.com")
+    val invalidEmailAddresses = Seq("test@-test.com", "foo@bar,com", "foo", "test@jhfd_jkj.com", "test@blah-.com", "test@-fdhkf-.com")
 
-      emailType.validate("test@test.com") must
-        be(Success("test@test.com"))
+    validEmailAddresses.foreach { testData =>
+      s"succesfully validate $testData" in {
+        emailType.validate(testData) must
+          be(Success(testData))
+      }
     }
 
-    "successfully validate 2" in {
-
-      emailType.validate("t@t") must
-        be(Success("t@t"))
+    invalidEmailAddresses.foreach { testData =>
+      s"fail to validate $testData" in {
+        emailType.validate(testData) must be(Failure(Seq(
+          Path -> Seq(ValidationError("error.invalid.rp.email"))
+        )))
+      }
     }
 
     "fail to validate an empty string" in {
-
       emailType.validate("") must
         equal(Failure(Seq(
           Path -> Seq(ValidationError("error.required.rp.email"))
         )))
-    }
-
-    "fail to validate an email with a comma instead of a dot" in {
-      emailType.validate("foo@bar,com") must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.rp.email"))
-      )))
     }
 
     "fail to validate a string longer than 100" in {
@@ -154,13 +153,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.max.length.rp.email"))
         )))
-    }
-
-    "fail to validate an email without a `@` in it" in {
-
-      emailType.validate("foo") must be(Failure(Seq(
-                Path -> Seq(ValidationError("error.invalid.rp.email"))
-              )))
     }
   }
 
@@ -262,13 +254,15 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       ukBankAccountNumberType.validate("87654321") must be(Success("87654321"))
     }
 
-    "fail validation when anything other than 8 characters are supplied" in {
+    "fail validation when less than 8 characters are supplied" in {
       ukBankAccountNumberType.validate("123456") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.pattern", ukBankAccountNumberRegex)))))
+        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
     }
 
-    ukBankAccountNumberType.validate("1234567890") must be(
-      Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
+    "fail validation when more than 8 characters are supplied" in {
+      ukBankAccountNumberType.validate("1234567890") must be(
+        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxUKBankAccountNumberLength)))))
+    }
   }
 
   "For the Overseas Bank Account" must {

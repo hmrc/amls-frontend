@@ -34,7 +34,8 @@ trait AccountantForAMLSRegulationsController extends BaseController {
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
+            _ <- dataCacheConnector.save[BusinessActivities](
+              BusinessActivities.key,
               businessActivities.accountantForAMLSRegulations(data)
             )
           } yield (edit, data.accountantForAMLSRegulations) match {

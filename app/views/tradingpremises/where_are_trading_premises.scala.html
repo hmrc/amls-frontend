@@ -6,6 +6,7 @@
 @(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
 @header = {
+    @errorSummary(f)
     @heading("tradingpremises.yourtradingpremises.heading", "summary.tradingpremises")
 }
 
@@ -16,49 +17,38 @@
 
     @form(f, controllers.tradingpremises.routes.WhereAreTradingPremisesController.post(index, edit)) {
 
-        <p>@Messages("tradingpremises.yourtradingpremises.include.heading")</p>
-        <ul class="list-bullet form-group">
-            <li>@Messages("tradingpremises.yourtradingpremises.include.text.1")</li>
-            <li>@Messages("tradingpremises.yourtradingpremises.include.text.2")</li>
-        </ul>
-
         @input(
             field = f("tradingName"),
             labelText = "tradingpremises.yourtradingpremises.tradingname"
         )
 
-        <fieldset>
-            @legend("tradingpremises.yourtradingpremises.address", false, false)
-            @input(f("addressLine1"))
-            @input(f("addressLine2"))
-            @input(f("addressLine3"))
-            @input(f("addressLine4"))
-        </fieldset>
-
-        @input(
-            field = f("postcode"),
-            labelText = "tradingpremises.yourtradingpremises.postcode",
-            classes = Seq("postcode")
-        )
-
-        @date(
-            f = f,
-            p = "startDate",
-            labelText = "tradingpremises.yourtradingpremises.startdate",
-            hintText = "tradingpremises.yourtradingpremises.startdate.sub"
-        )
+        @fieldset(
+            legend = "legend.address",
+            panel = false
+        ) {
+            @input(f("addressLine1"), "lbl.address.line1", labelHidden = true)
+            @input(f("addressLine2"), "lbl.address.line2", labelHidden = true)
+            @input(f("addressLine3"), "lbl.address.line3", labelHidden = true, requiredField = false)
+            @input(f("addressLine4"), "lbl.address.line4", labelHidden = true, requiredField = false)
+            @input(
+                field = f("postcode"),
+                labelText = "lbl.address.postcode",
+                classes = Seq("postcode")
+            )
+        }
 
         @inlineRadioGroup(f("isResidential")) {
-            @legend("tradingpremises.yourtradingpremises.isresidential", false, true)
+            @legend("tradingpremises.yourtradingpremises.isresidential", false, false)
             @radio(f("isResidential"), "lbl.yes", "true")
             @radio(f("isResidential"), "lbl.no", "false")
         }
 
-        @radioGroup(f("isOwner")) {
-            @legend("tradingpremises.yourtradingpremises.whose",false, true)
-            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.my", "true")
-            @radio(f("isOwner"), "tradingpremises.yourtradingpremises.whose.another", "false")
-        }
+        @date(
+            f = f,
+            p = "startDate",
+            hintId = "dob",
+            labelText = "tradingpremises.yourtradingpremises.startdate"
+        )
 
         @submit(false)
     }

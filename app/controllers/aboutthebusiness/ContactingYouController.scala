@@ -17,9 +17,9 @@ trait ContactingYouController extends BaseController {
         aboutTheBusiness <-
         dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
       } yield aboutTheBusiness match {
-        case Some(AboutTheBusiness(_,_, _, _, Some(details), Some(registeredOffice), _)) =>
+        case Some(AboutTheBusiness(_,_, _, _, Some(details), Some(registeredOffice), _, _)) =>
           Ok(contacting_you(Form2[ContactingYou](details), registeredOffice, edit))
-        case Some(AboutTheBusiness(_,_, _, _, None, Some(registeredOffice), _)) =>
+        case Some(AboutTheBusiness(_,_, _, _, None, Some(registeredOffice), _, _)) =>
           Ok(contacting_you(EmptyForm, registeredOffice, edit))
         case _ =>
           // TODO: Make sure this redirects to the right place
@@ -35,7 +35,7 @@ trait ContactingYouController extends BaseController {
             aboutTheBusiness <-
             dataCache.fetch[AboutTheBusiness](AboutTheBusiness.key)
           } yield aboutTheBusiness match {
-            case Some(AboutTheBusiness(_, _,_, _, _, Some(registeredOffice), _)) =>
+            case Some(AboutTheBusiness(_, _,_, _, _, Some(registeredOffice), _, _)) =>
               BadRequest(contacting_you(f, registeredOffice, edit))
             case _ =>
               Redirect(routes.ContactingYouController.get(edit))

@@ -4,18 +4,11 @@
 
 @()(implicit request: Request[_])
 
-@sidebar = {
-    <div class="user-attention">
-        <h3>@Messages("main.sidebar.title")</h3>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
-}
-
 @header = {
     @heading("supervision.whatyouneed.heading", "summary.supervision")
 }
 
-@main(
+@whatyouneed(
     title = Messages("supervision.whatyouneed.title"),
     heading = header,
     sidebar = sidebar
@@ -23,7 +16,7 @@
 
     <p>@Messages("supervision.whatyouneed.requiredinfo.heading")</p>
 
-    <ul class="list list-bullet spacelarge">
+    <ul class="list list-bullet">
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.1")</li>
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.2")</li>
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.3")</li>
@@ -32,9 +25,16 @@
     </ul>
 
     <div class="form-group">
-        <a class="button" href="@controllers.supervision.routes.AnotherBodyController.get()">
-            @Messages("button.continue")
+        <a class="button" role="button" href="@controllers.supervision.routes.AnotherBodyController.get()">
+            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.supervision")</span>
         </a>
     </div>
 
+}
+
+@sidebar = {
+    <div class="user-attention">
+        <h2>@Messages("main.sidebar.title")</h2>
+        <p>@Messages("main.sidebar.information")</p>
+    </div>
 }
