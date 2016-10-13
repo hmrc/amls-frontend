@@ -26,7 +26,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
     val controller = new BankAccountTypeController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
+      override implicit val statusService = mock[StatusService]
     }
   }
 

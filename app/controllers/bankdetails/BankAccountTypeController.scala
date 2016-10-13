@@ -9,21 +9,21 @@ import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.{RepeatingSection, StatusConstants}
+import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
 trait BankAccountTypeController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+  implicit val statusService: StatusService
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       for {
         bankDetail <- getData[BankDetails](index)
         count <- getData[BankDetails].map(x => x.count(!_.status.contains(StatusConstants.Deleted)))
-        allowedToEdit <- allowedToEdit(edit)
+        allowedToEdit <- ControllerHelper.allowedToEdit(edit)
       } yield bankDetail match {
         case Some(BankDetails(Some(data), _, _,_)) if allowedToEdit =>
           Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
@@ -56,17 +56,11 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
     }
   }
 
-  private def allowedToEdit(edit: Boolean)(implicit hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
-    statusService.getStatus map {
-      case SubmissionReady | NotCompleted => true
-      case _ => !edit
-    }
-  }
 }
 
 object BankAccountTypeController extends BankAccountTypeController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
-  override val statusService = StatusService
+  override implicit val statusService = StatusService
 }
