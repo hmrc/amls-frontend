@@ -235,6 +235,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
           )))(any(), any(), any())
         }
       }
+
     }
   }
 
