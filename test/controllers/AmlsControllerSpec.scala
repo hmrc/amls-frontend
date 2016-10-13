@@ -12,9 +12,9 @@ class AmlsControllerSpec extends PlaySpec with OneAppPerSuite {
     trait UnauthenticatedFixture extends MockitoSugar {
       self =>
       implicit val unauthenticatedRequest = FakeRequest()
-      val authConnector = mock[AuthConnector]
+      val mockAuthConnector = mock[AuthConnector]
       val controller = new AmlsController {
-        override protected def authConnector: AuthConnector = authConnector
+        override protected def authConnector: AuthConnector = mockAuthConnector
       }
     }
 

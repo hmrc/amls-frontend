@@ -38,7 +38,7 @@ trait ProgressService {
         case HighValueDealing if ApplicationConfig.hvdToggle =>
           m + Hvd.section
         case MoneyServiceBusiness =>
-          m + Msb.section
+          bm.msbServices.fold(m)(x => m + Msb.section)
         case TrustAndCompanyServices =>
           m + Tcsp.section + Supervision.section
         case _ => m
@@ -73,14 +73,16 @@ trait ProgressService {
     cacheConnector.fetchAll map {
       optionCache =>
         optionCache map {
-          implicit cache =>
-            Seq(
-              mandatorySections,
-              responsiblePeople,
-              dependentSections
-            ).foldLeft[Seq[Section]](Seq.empty) { _ ++ _ }
+          cache =>
+            sections(cache)
         } getOrElse Seq.empty
     }
+
+  def sections(cache : CacheMap) : Seq[Section] = {
+      mandatorySections(cache) ++
+      responsiblePeople(cache) ++
+      dependentSections(cache)
+  }
 }
 
 object ProgressService extends ProgressService {

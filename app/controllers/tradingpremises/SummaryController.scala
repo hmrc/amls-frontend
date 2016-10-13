@@ -3,7 +3,7 @@ package controllers.tradingpremises
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.RepeatingSection
@@ -13,35 +13,27 @@ trait SummaryController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  def get = Authorised.async {
+  def get(edit:Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetchAll map {
         cache =>
           for {
             c: CacheMap <- cache
-            bm <- c.getEntry[BusinessMatching](BusinessMatching.key)
             tp <- c.getEntry[Seq[TradingPremises]](TradingPremises.key)
-          } yield (bm, tp)
+          } yield tp
       } map {
-        case Some(data) => Ok(summary(data._2,isMSBSelected(Some(data._1))))
+        case Some(data) => Ok(summary(data,edit))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
-  private def isMSBSelected(bm: Option[BusinessMatching]): Boolean = {
-    bm match {
-      case Some(matching) => matching.activities.foldLeft(false){(x, y) =>
-        y.businessActivities.contains(MoneyServiceBusiness)
-      }
-      case None => false
-    }
-  }
+  def answers = get(true)
 
   def getIndividual(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
         case Some(data) =>
-          Ok(summary_2(data, index))
+          Ok(summary_details(data, index))
         case _ =>
           NotFound(notFoundView)
       }

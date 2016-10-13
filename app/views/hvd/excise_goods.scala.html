@@ -4,6 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("hvd.excise.goods.heading", "summary.hvd")
 }
 
@@ -15,12 +16,14 @@
     @form(f, controllers.hvd.routes.ExciseGoodsController.post(edit)) {
 
         <div class="form-field-group">
-        @inlineRadioGroup(f("exciseGoods")) {
-            @radio(f("exciseGoods"), "lbl.yes", "true")
-            @radio(f("exciseGoods"), "lbl.no", "false")
-        }
-    </div>
-    @submit(edit)
+            @inlineRadioGroup(f("exciseGoods")) {
+                @legend("hvd.excise.goods.heading")
+                @radio(f("exciseGoods"), "lbl.yes", "true")
+                @radio(f("exciseGoods"), "lbl.no", "false")
+            }
+        </div>
+
+        @submit(edit)
 
     }
 }

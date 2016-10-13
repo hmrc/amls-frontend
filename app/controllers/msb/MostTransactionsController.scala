@@ -4,7 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{CurrencyExchange, MoneyServiceBusiness, MostTransactions, MsbService}
+import models.businessmatching.{CurrencyExchange, MsbService, BusinessMatching}
+import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -19,7 +20,6 @@ trait MostTransactionsController extends BaseController {
 
       cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
-
           val form = (for {
             msb <- response
             transactions <- msb.mostTransactions
@@ -50,27 +50,32 @@ trait MostTransactionsController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.most_transactions(f, edit)))
         case ValidForm(_, data) =>
-          for {
-            msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.mostTransactions(data)
-            )
-          } yield {
-
-            val services = msb.msbServices.map(_.services).getOrElse(Set.empty)
-
-            edit match {
-              case false =>
-                standardRouting(services)
-              case true =>
-                editRouting(services, msb)
-            }
+          cache.fetchAll flatMap {
+            optMap =>
+              val result = for {
+                cacheMap <- optMap
+                msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
+              } yield {
+                cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                  msb.mostTransactions(data)
+                ) map {
+                  _ =>
+                    edit match {
+                      case false => standardRouting(services.services)
+                      case true => editRouting(services.services, msb)
+                    }
+                }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       }
   }
 }
 
 object MostTransactionsController extends MostTransactionsController {
+  // $COVERAGE-OFF$
   override val cache: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

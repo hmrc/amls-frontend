@@ -6,7 +6,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.{PremisesRegistered, PersonRegistered, VATRegistered, ResponsiblePeople}
 import models.tradingpremises.TradingPremises
-import utils.RepeatingSection
+import utils.{StatusConstants, RepeatingSection}
 
 
 import scala.concurrent.Future
@@ -19,25 +19,24 @@ trait PremisesRegisteredController extends BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
-          case Some(data) => Ok(views.html.tradingpremises.premises_registered(EmptyForm, data.size))
+          case Some(data) => Ok(views.html.tradingpremises.premises_registered(EmptyForm, data.count(!_.status.contains(StatusConstants.Deleted))))
           case _ => Ok(views.html.tradingpremises.premises_registered(EmptyForm, index))
         }
     }
 
-
   def post(index: Int) =
-     Authorised.async {
-        implicit authContext => implicit request =>
-          Form2[PremisesRegistered](request.body) match {
-            case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.tradingpremises.premises_registered(f, index)))
-            case ValidForm(_, data) =>
-               data.registerAnotherPremises match {
-                case true => Future.successful(Redirect(routes.TradingPremisesAddController.get(false)))
-                case false => Future.successful(Redirect(routes.SummaryController.get()))
-              }
-          }
-      }
+    Authorised.async {
+      implicit authContext => implicit request =>
+        Form2[PremisesRegistered](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.tradingpremises.premises_registered(f, index)))
+          case ValidForm(_, data) =>
+            data.registerAnotherPremises match {
+              case true => Future.successful(Redirect(routes.TradingPremisesAddController.get(false)))
+              case false => Future.successful(Redirect(routes.SummaryController.get()))
+            }
+        }
+    }
 
 }
 

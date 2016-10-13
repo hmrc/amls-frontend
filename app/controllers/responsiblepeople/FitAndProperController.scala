@@ -14,19 +14,17 @@ trait FitAndProperController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
-  implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
-  implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME)
 
   def get(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
-
-
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, Some(alreadyPassed)))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, Some(alreadyPassed), _, _,_))
               => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _,_))
               => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index))
             case _
               => NotFound(notFoundView)
@@ -43,8 +41,8 @@ trait FitAndProperController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index)))
             case ValidForm(_, data) =>{
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.hasAlreadyPassedFitAndProper(data))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.hasAlreadyPassedFitAndProper(data)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))

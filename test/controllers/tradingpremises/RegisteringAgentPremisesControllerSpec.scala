@@ -1,6 +1,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import models.businessmatching._
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -10,7 +11,10 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 
 import scala.concurrent.Future
 
@@ -26,14 +30,23 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
 
   val emptyCache = CacheMap("", Map.empty)
 
+  val mockCacheMap = mock[CacheMap]
+
   "RegisteringAgentPremisesController" must {
 
     "Get Option:" must {
 
       "load the Register Agent Premises page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+        val businessMatchingActivitiesAll = BusinessMatchingActivities(
+          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+        val model = TradingPremises()
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(model)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -49,8 +62,14 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
             RegisteringAgentPremises(true)
           )
         )
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+        val businessMatchingActivitiesAll = BusinessMatchingActivities(
+          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(model)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -66,8 +85,14 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
             RegisteringAgentPremises(false)
           )
         )
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+        val businessMatchingActivitiesAll = BusinessMatchingActivities(
+          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(model)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -78,8 +103,20 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
       }
 
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+        val businessMatchingActivitiesAll = BusinessMatchingActivities(
+          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(None))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+          .thenReturn(Some(Seq(model)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
         val result = controller.get(1)(request)
         status(result) must be(NOT_FOUND)
       }
@@ -99,7 +136,31 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         contentAsString(result) must include(Messages("err.summary"))
       }
 
-      "return a redirect to the Trading Premises details page on submitting false" in new Fixture {
+      "redirect to the Trading Premises details page on submitting false and edit true" in new Fixture {
+
+        val model = TradingPremises(
+          registeringAgentPremises = Some(
+            RegisteringAgentPremises(true)
+          )
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "agentPremises" -> "false"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        val result = controller.post(1,edit = true)(newRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+      }
+
+      "redirect to the Trading Premises details page on submitting false and edit false" in new Fixture {
 
         val model = TradingPremises(
           registeringAgentPremises = Some(
@@ -122,7 +183,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1).url)
       }
-      "return a redirect to the 'what is your agent's business structure?' page on submitting true" in new Fixture {
+      "redirect to the 'what is your agent's business structure?' page on submitting true" in new Fixture {
 
         val model = TradingPremises(
           registeringAgentPremises = Some(
@@ -159,6 +220,30 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
           val result = controller.post(10, false)(newRequest)
 
           status(result) must be(NOT_FOUND)
+
+        }
+      }
+
+      "redirect to Trading Premises Details form" when {
+        "MSB is not found in business matching" in new Fixture {
+          val model = TradingPremises(
+            registeringAgentPremises = Some(
+              RegisteringAgentPremises(true)
+            )
+          )
+          val businessMatchingActivitiesAll = BusinessMatchingActivities(
+            Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(model)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+          val result = controller.get(1)(request)
+          status(result) must be(SEE_OTHER)
+
+          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
 
         }
       }

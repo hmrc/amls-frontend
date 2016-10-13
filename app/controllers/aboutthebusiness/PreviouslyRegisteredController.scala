@@ -53,8 +53,10 @@ trait PreviouslyRegisteredController extends BaseController {
 
   private def getUpdatedModel(businessType: BusinessType, aboutTheBusiness: AboutTheBusiness, data: PreviouslyRegistered): AboutTheBusiness = {
     data match {
-      case PreviouslyRegisteredYes(_) => aboutTheBusiness.copy(previouslyRegistered = Some(data), activityStartDate = None)
-      case PreviouslyRegisteredNo => aboutTheBusiness.copy(previouslyRegistered = Some(data), vatRegistered = None, corporationTaxRegistered = None)
+      case PreviouslyRegisteredYes(_) => aboutTheBusiness.copy(previouslyRegistered = Some(data), activityStartDate = None,
+                                                                hasChanged = true)
+      case PreviouslyRegisteredNo => aboutTheBusiness.copy(previouslyRegistered = Some(data), vatRegistered = None, corporationTaxRegistered = None,
+                                                                hasChanged = true)
     }
   }
 

@@ -12,15 +12,15 @@ sealed trait BusinessStructure {
   def message(implicit lang: Lang): String =
     this match {
       case SoleProprietor =>
-        Messages("tradingpremises.youragent.businessstructure.lbl.01")
+        Messages("businessType.lbl.01")
       case LimitedLiabilityPartnership =>
-        Messages("tradingpremises.youragent.businessstructure.lbl.02")
+        Messages("businessType.lbl.02")
       case Partnership =>
-        Messages("tradingpremises.youragent.businessstructure.lbl.03")
+        Messages("businessType.lbl.03")
       case IncorporatedBody =>
-        Messages("tradingpremises.youragent.businessstructure.lbl.04")
+        Messages("businessType.lbl.04")
       case UnincorporatedBody =>
-        Messages("tradingpremises.youragent.businessstructure.lbl.05")
+        Messages("businessType.lbl.05")
     }
 }
 

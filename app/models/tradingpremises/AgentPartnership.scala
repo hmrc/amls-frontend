@@ -24,7 +24,7 @@ object AgentPartnership {
   implicit val mongoKey = new MongoKey[AgentPartnership] {
     override def apply(): String = "agent-partnership"
   }
-  implicit val formats = Json.format[AgentPartnership]
+  implicit val format = Json.format[AgentPartnership]
 
   implicit val formReads: Rule[UrlFormEncoded, AgentPartnership] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
@@ -34,5 +34,4 @@ object AgentPartnership {
   implicit val formWrites: Write[AgentPartnership, UrlFormEncoded] = Write {
     case AgentPartnership(ap) => Map("agentPartnership" -> Seq(ap))
   }
-
 }

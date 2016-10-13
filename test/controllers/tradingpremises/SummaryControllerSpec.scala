@@ -10,6 +10,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -84,6 +85,22 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = summaryController.getIndividual(1)(request)
       status(result) must be(NOT_FOUND)
+    }
+
+    "direct to your answers when the model is present" in new Fixture {
+      val businessMatchingActivitiesAll = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      val model = TradingPremises()
+      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+      val result = summaryController.answers()(request)
+      status(result) must be(OK)
+      contentAsString(result) must include(Messages("summary.youranswers.title"))
     }
 
   }

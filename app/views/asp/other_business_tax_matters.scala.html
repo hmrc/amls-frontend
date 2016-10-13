@@ -4,12 +4,12 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @target = @{
-
-s"""${f("agentRegNo").id}-fieldset"""
+    s"""${f("agentRegNo").id}-fieldset"""
 }
 
 @header = {
-    @heading("asp.other.business.tax.matters.heading", "summary.asp")
+    @errorSummary(f)
+    @heading("asp.other.business.tax.matters.title", "summary.asp")
 }
 
 @main(
@@ -23,9 +23,6 @@ s"""${f("agentRegNo").id}-fieldset"""
             @legend("asp.other.business.tax.matters.lbl")
             @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
             @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
-            @fieldset("asp.other.business.tax.matters.agentrefno.lbl", jsHidden = true, id = target) {
-                @input(f("agentRegNo"), "asp.other.business.tax.matters.agentrefno.lbl", bold = false)
-            }
         }
 
         @submit(edit)

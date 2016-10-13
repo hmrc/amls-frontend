@@ -19,14 +19,13 @@ private object AppDependencies {
   private val playHealthVersion = "1.1.0"
   private val govukTemplateVersion = "4.0.0"
   private val playUiVersion = "4.15.0"
-  private val httpVerbsVersion = "3.4.0"
 
-  private val frontendBootstrapVersion = "6.4.0"
-  private val playPartialsVersion = "4.4.0"
-  private val playAuthorisedFrontendVersion = "5.4.0"
+  private val frontendBootstrapVersion = "6.7.0"
+  private val playPartialsVersion = "4.5.0"
+  private val playAuthorisedFrontendVersion = "5.5.0"
   private val playConfigVersion = "2.1.0"
   private val playJsonLoggerVersion = "2.1.1"
-  private val httpCachingClientVersion = "5.3.0"
+  private val httpCachingClientVersion = "5.6.0"
   private val playWhitelistFilterVersion = "1.1.0"
 
   private val metricsPlayVersion = "0.2.1"
@@ -34,17 +33,14 @@ private object AppDependencies {
 
   private val validationVersion = "1.1"
 
-
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "http-verbs" % httpVerbsVersion,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
 
-    // play-frontend replacement libraries
     "uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "play-authorised-frontend" % playAuthorisedFrontendVersion,
@@ -65,7 +61,6 @@ private object AppDependencies {
     val scope: String
     val dependencies: Seq[ModuleID]
   }
-
 
   private val scalatestVersion = "2.2.5"
   private val scalatestPlusPlayVersion = "1.2.0"
@@ -106,5 +101,3 @@ private object AppDependencies {
 
   def apply() = compile ++ Test() ++It()
 }
-
-

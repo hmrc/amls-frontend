@@ -35,11 +35,13 @@ trait MSBServicesController extends RepeatingSection with BaseController {
           Future.successful(BadRequest(views.html.tradingpremises.msb_services(f, index, edit)))
         case ValidForm(_, data) => {
           for {
-            _ <- updateDataStrict[TradingPremises](index) {
-              case Some(tp) => Some(tp.msbServices(data))
-              case _ => Some(TradingPremises(msbServices = Some(data)))
+            _ <- updateDataStrict[TradingPremises](index) { tp =>
+              tp.msbServices(data)
             }
-          } yield Redirect(routes.PremisesRegisteredController.get(index))
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.getIndividual(index))
+            case false => Redirect(routes.PremisesRegisteredController.get(index))
+          }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }

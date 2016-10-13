@@ -2,7 +2,8 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePeople
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -11,7 +12,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{StatusConstants, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -44,14 +45,17 @@ class PremisesRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with
       }
 
       "load the Premises Registered page1" in new Fixture {
+        val ytp = YourTradingPremises("foo", Address("1", "2", None, None, "asdfasdf"),
+          true, new LocalDate(1990, 2, 24))
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(None,None), TradingPremises(None,None)))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(None,Some(ytp)), TradingPremises(registeringAgentPremises = None,
+            yourTradingPremises = Some(ytp), status =  Some(StatusConstants.Deleted))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("tradingpremises.have.registered.premises.text", 2))
+        contentAsString(result) must include(Messages("tradingpremises.have.registered.premises.text", 1))
       }
     }
 

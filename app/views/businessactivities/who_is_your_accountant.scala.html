@@ -5,6 +5,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
+    @errorSummary(f)
     @heading("businessactivities.whoisyouraccountant.heading", "summary.businessactivities")
 }
 
@@ -69,19 +70,6 @@
                     )
                 }
             </div>
-        }
-
-        @fieldset(
-            legend = "businessactivities.whoisyouraccountant.taxMessage",
-            panel = false
-        ) {
-            @inlineRadioGroup(f("alsoDealsWithTax")) {
-                @radio(f("alsoDealsWithTax"), "lbl.yes", "true", target = s"#${f("accountantsReferenceNumber").id}-fieldset")
-                @radio(f("alsoDealsWithTax"), "lbl.no", "false")
-                @fieldset("businessactivities.whoisyouraccountant.reference.details", jsHidden = true, id = s"${f("accountantsReferenceNumber").id}-fieldset") {
-                    @input(f("accountantsReferenceNumber"), "businessactivities.whoisyouraccountant.reference.details", bold = false)
-                }
-            }
         }
 
     @submit(edit)

@@ -2,18 +2,19 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_])(implicit request: Request[_], lang: Lang)
+@(content: (String,String), f: Form2[_])(implicit request: Request[_], lang: Lang)
 
 @target = @{
     s"""${f("other").id}-fieldset"""
 }
 
 @header = {
-    @heading("declaration.addperson.title", "submit.registration")
+    @errorSummary(f)
+    @heading("declaration.addperson.header", content._2)
 }
 
 @main(
-    title = Messages("declaration.addperson.title"),
+    title = Messages(content._1),
     heading = header
 ) {
 

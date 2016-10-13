@@ -2,10 +2,10 @@
 @()(implicit request: Request[_])
 
 @header = {
-    @heading("asp.whatyouneed.heading", "summary.asp")
+    @heading("asp.whatyouneed.title", "summary.asp")
 }
 
-@main(
+@whatyouneed(
     title = Messages("asp.whatyouneed.title"),
     heading = header,
     sidebar = sidebar
@@ -20,13 +20,16 @@
     </ul>
 
     <div class="form-group">
-        <a class="button" role="button" href="@controllers.asp.routes.ServicesOfBusinessController.get()">@Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.asp")</span></a>
+        <a class="button" role="button" href="@controllers.asp.routes.ServicesOfBusinessController.get()">
+            @Messages("button.continue") <span class="visuallyhidden"> @Messages("summary.asp")</span>
+        </a>
     </div>
 
 }
+
 @sidebar = {
-<div class="user-attention">
-  <h2>@Messages("main.sidebar.title")</h2>
-  <p>@Messages("main.sidebar.information")</p>
-</div>
+    <div class="user-attention">
+        <h2>@Messages("main.sidebar.title")</h2>
+        <p>@Messages("main.sidebar.information")</p>
+    </div>
 }

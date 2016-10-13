@@ -1,8 +1,8 @@
 package models.tcsp
 
-import models.registrationprogress.{Completed, Started, NotStarted, Section}
-import org.scalatest.mock.MockitoSugar
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -49,7 +49,8 @@ trait TcspValues {
     "servicesOfAnotherTCSP" -> Json.obj(
       "servicesOfAnotherTCSP" -> true,
       "mlrRefNumber" -> "12345678"
-    )
+    ),
+    "hasChanged" -> false
   )
 
   val completeModel = Tcsp(
@@ -65,11 +66,11 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
     "have a default function that" must {
 
-      "correctly provides a default value when none is provided" in {
+      "correctly provide a default value when none is provided" in {
         Tcsp.default(None) must be(Tcsp())
       }
 
-      "correctly provides a default value when existing value is provided" in {
+      "correctly provide a default value when existing value is provided" in {
         Tcsp.default(Some(completeModel)) must be(completeModel)
       }
     }
@@ -86,7 +87,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
 
       "return a NotStarted Section when model is empty" in {
 
-        val notStartedSection = Section("tcsp", NotStarted, controllers.tcsp.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("tcsp", NotStarted, false, controllers.tcsp.routes.WhatYouNeedController.get())
 
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn None
 
@@ -97,7 +98,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Tcsp]
-        val completedSection = Section("tcsp", Completed, controllers.tcsp.routes.SummaryController.get())
+        val completedSection = Section("tcsp", Completed, false, controllers.tcsp.routes.SummaryController.get())
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
@@ -109,7 +110,7 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       "return a Started Section when model is incomplete" in {
 
         val incompleteTcsp = mock[Tcsp]
-        val startedSection = Section("tcsp", Started, controllers.tcsp.routes.WhatYouNeedController.get())
+        val startedSection = Section("tcsp", Started, false, controllers.tcsp.routes.WhatYouNeedController.get())
 
         when(incompleteTcsp.isComplete) thenReturn false
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(incompleteTcsp)
@@ -119,100 +120,102 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues {
       }
     }
 
-    "have an isComplete function that" must {
-      "Allow providedServices to be missing" when {
-        "service type does not include Registered office etc" in  {
-          val SUT = Tcsp(Some(TcspTypes(Set(NomineeShareholdersProvider))), None, Some(ServicesOfAnotherTCSPNo))
-          SUT.isComplete must be (true)
-        }
-      }
-
-      "correctly show if the model is complete" in {
-        completeModel.isComplete must be(true)
-      }
-
-      "correctly show if the model is incomplete" in {
-        val incompleteModel = completeModel.copy(servicesOfAnotherTCSP = None)
-        incompleteModel.isComplete must be (false)
-      }
-
+    "Serialise as expected" in {
+      Json.toJson(completeModel) must be(completeJson)
     }
 
-    "Complete Model" when {
-
-      "correctly show if the model is complete" in {
-        completeModel.isComplete must be(true)
-      }
-
-      "correctly convert between json formats" when {
-
-        "Serialise as expected" in {
-          Json.toJson(completeModel) must be(completeJson)
-        }
-
-        "Deserialise as expected" in {
-          completeJson.as[Tcsp] must be(completeModel)
-        }
-      }
+    "Deserialise as expected" in {
+      completeJson.as[Tcsp] must be(completeModel)
     }
 
     "None" when {
-
       val initial: Option[Tcsp] = None
-
-      "correctly show if the model is incomplete" in {
-        val incompleteModel = initial.copy(providedServices = None)
-        incompleteModel.isComplete must be(false)
-      }
 
       "Merged with Company Service Providers" must {
         "return Tcsp with correct Company Service Providers" in {
           val result = initial.tcspTypes(NewValues.NewCompanyServiceProviders)
-          result must be(Tcsp(tcspTypes = Some(NewValues.NewCompanyServiceProviders)))
+          result must be(Tcsp(tcspTypes = Some(NewValues.NewCompanyServiceProviders), hasChanged = true))
         }
       }
 
       "Merged with Provided Services" must {
         "return Tcsp with correct Provided Services" in {
           val result = initial.providedServices(NewValues.NewProvidedServices)
-          result must be(Tcsp(providedServices = Some(NewValues.NewProvidedServices)))
+          result must be(Tcsp(providedServices = Some(NewValues.NewProvidedServices), hasChanged = true))
         }
       }
       "Merged with services of another tcsp" must {
         "return Tcsp with correct services of another tcsp" in {
           val result = initial.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
-          result must be(Tcsp(servicesOfAnotherTCSP = Some(NewValues.NewServicesOfAnotherTCSP)))
+          result must be(Tcsp(servicesOfAnotherTCSP = Some(NewValues.NewServicesOfAnotherTCSP), hasChanged = true))
         }
       }
     }
+  }
 
+  "isComplete" must {
+    "return true if the model is complete" in {
+      completeModel.isComplete must be(true)
+    }
+    val initial: Option[Tcsp] = None
 
-    "Tcsp:merge with completeModel" when {
+    "return false if the model is incomplete" in {
+      val incompleteModel = initial.copy(providedServices = None)
+      incompleteModel.isComplete must be(false)
+    }
+  }
 
-      "model is complete" when {
-
-        "Merged with Company Service Providers" must {
-          "return Tcsp with correct Company Service Providers" in {
-            val result = completeModel.tcspTypes(NewValues.NewCompanyServiceProviders)
-            result.tcspTypes must be(Some(NewValues.NewCompanyServiceProviders))
-          }
-        }
-
-        "Merged with Provided Services" must {
-          "return Tcsp with correct Provided Services" in {
-            val result = completeModel.providedServices(NewValues.NewProvidedServices)
-            result.providedServices must be(Some(NewValues.NewProvidedServices))
-          }
-        }
-
-        "Merged with services of another tcsp" must {
-          "return Tcsp with correct services of another tcsp" in {
-            val result = completeModel.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
-            result.servicesOfAnotherTCSP must be(Some(NewValues.NewServicesOfAnotherTCSP))
-          }
+  "TCSP class" when {
+    "tcspTypes value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.tcspTypes(DefaultValues.DefaultCompanyServiceProviders)
+          res.hasChanged must be(false)
+          res must be(completeModel)
         }
       }
 
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.tcspTypes(NewValues.NewCompanyServiceProviders)
+          res.hasChanged must be(true)
+          res.tcspTypes must be(Some(NewValues.NewCompanyServiceProviders))
+        }
+      }
+    }
+    "providedServices value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.providedServices(DefaultValues.DefaultProvidedServices)
+          res.hasChanged must be(false)
+          res must be(completeModel)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.providedServices(NewValues.NewProvidedServices)
+          res.hasChanged must be(true)
+          res.providedServices must be(Some(NewValues.NewProvidedServices))
+        }
+      }
+    }
+    "servicesOfAnotherTCSP value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val res = completeModel.servicesOfAnotherTCSP(DefaultValues.DefaultServicesOfAnotherTCSP)
+          res.hasChanged must be(false)
+          res must be(completeModel)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val res = completeModel.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
+          res.hasChanged must be(true)
+          res.servicesOfAnotherTCSP must be(Some(NewValues.NewServicesOfAnotherTCSP))
+        }
+      }
     }
   }
 }
