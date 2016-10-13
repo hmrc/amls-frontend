@@ -8,8 +8,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
-import uk.gov.hmrc.play.frontend.auth.{LoggedInUser, AuthContext}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.Future
 
@@ -94,6 +94,22 @@ class DataCacheConnectorSpec
       whenReady(result) {
         result =>
           result must be (Some(emptyCache))
+      }
+    }
+
+    "remove data from save4later" in new Fixture {
+
+      val response = mock[HttpResponse]
+
+      when {
+        DataCacheConnector.shortLivedCache.remove(any())(any())
+      } thenReturn Future.successful(response)
+
+      val result = DataCacheConnector.remove(eqTo(key))(any())
+
+      whenReady(result) {
+        result =>
+          result must be (response)
       }
     }
   }
