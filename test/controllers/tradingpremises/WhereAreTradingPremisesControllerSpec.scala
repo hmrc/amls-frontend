@@ -2,10 +2,10 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import models.tradingpremises.{WhatDoesYourBusinessDo, Address, TradingPremises, YourTradingPremises}
+import models._
+import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -13,6 +13,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import org.mockito.Matchers.{eq => meq, _}
 
 import scala.concurrent.Future
 
@@ -179,6 +180,31 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           status(result) must be(NOT_FOUND)
         }
+      }
+
+      "set the hasChanged flag to true" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("tradingName" -> "text")
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(1)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1, false).url))
+
+        verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+          any(),
+          meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+            hasChanged = true,
+            agentName = None,
+            agentCompanyName = Some(AgentCompanyName("text")),
+            agentPartnership = None
+          ))))(any(), any(), any())
       }
     }
   }
