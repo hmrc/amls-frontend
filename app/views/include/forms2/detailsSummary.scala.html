@@ -1,13 +1,15 @@
 @(
     details: String = "",
-    detailsClass: String = "",
-    detailsInner: String = "",
-    summaryClasses: Seq[String] = Seq.empty
+    detailsClass: Boolean = true,
+    detailsInner: Boolean = true,
+    summaryClasses: Seq[String] = Seq("summary")
 )(content: Html)(implicit lang: Lang)
 
-<details@if(detailsClass.nonEmpty) { class="details"}>
+@* http://hmrc.github.io/assets-frontend/section-details.html *@
+
+<details@if(detailsClass) { class="details"}>
   <summary class="@summaryClasses.mkString(" ")">@details</summary>
-  <div@if(detailsInner.nonEmpty) { class="details__inner"}>
+  <div@if(detailsInner) { class="details__inner"}>
   @content
   </div>
 </details>
