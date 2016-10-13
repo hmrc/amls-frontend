@@ -2,6 +2,7 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import models.bankdetails._
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Matchers._
@@ -11,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, StatusConstants}
 
@@ -24,6 +26,7 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
     val controller = new BankAccountTypeController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -33,8 +36,11 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
     "get:" must {
       "respond with OK and display the blank 'bank account type' page" when {
         "there is no bank account type information yet" in new Fixture {
+
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, None, status = Some(StatusConstants.Deleted))))))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.get(1, false)(request)
 
@@ -51,8 +57,11 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
         "load bank account type UI with out the option 'user does not have bank account'" when {
           "user alreday added an account" in new Fixture {
+
             when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount))))))
+            when(controller.statusService.getStatus(any(),any(),any()))
+              .thenReturn(Future.successful(SubmissionReady))
 
             val result = controller.get(2, false)(request)
 
@@ -68,8 +77,11 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
         }
 
         "there is already a bank account type" in new Fixture {
+
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.get(1)(request)
           val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("checked")
@@ -81,13 +93,39 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
       "respond with NOT_FOUND" when {
         "there is no bank account information at all" in new Fixture {
+
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.get(1, false)(request)
 
           status(result) must be(NOT_FOUND)
         }
+        "editing an amendment" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount))))))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = controller.get(1, true)(request)
+
+          status(result) must be(NOT_FOUND)
+        }
+        "editing an variation" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount))))))
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.get(1, true)(request)
+
+          status(result) must be(NOT_FOUND)
+        }
+
       }
     }
 
@@ -187,6 +225,8 @@ class BankAccountTypeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
             "bankAccountType" -> "04"
           )
 
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
           when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))

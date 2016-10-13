@@ -5,23 +5,29 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccountType, BankDetails}
-import utils.{StatusConstants, RepeatingSection}
+import models.status.{NotCompleted, SubmissionReady}
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
 trait BankAccountTypeController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  val statusService: StatusService
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       for {
         bankDetail <- getData[BankDetails](index)
         count <- getData[BankDetails].map(x => x.count(!_.status.contains(StatusConstants.Deleted)))
+        allowedToEdit <- allowedToEdit(edit)
       } yield bankDetail match {
-        case Some(BankDetails(Some(data), _, _,_)) =>
+        case Some(BankDetails(Some(data), _, _,_)) if allowedToEdit =>
           Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
-        case Some(_) =>
+        case Some(_) if allowedToEdit =>
           Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index, count))
         case _ => NotFound(notFoundView)
       }
@@ -49,10 +55,18 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
       }
     }
   }
+
+  private def allowedToEdit(edit: Boolean)(implicit hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
+    statusService.getStatus map {
+      case SubmissionReady | NotCompleted => true
+      case _ => !edit
+    }
+  }
 }
 
 object BankAccountTypeController extends BankAccountTypeController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override val statusService = StatusService
 }
