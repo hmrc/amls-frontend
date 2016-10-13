@@ -3,12 +3,13 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.FeeConnector
 import models.FeeResponse
+import models.ResponseType.AmendOrVariationResponseType
 
 import models.businessmatching.BusinessMatching
 import models.status.{SubmissionStatus, SubmissionDecisionApproved, SubmissionReadyForReview, CompletionStateViewModel}
 import services.{AuthEnrolmentsService, LandingService, _}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{NotFoundException, HeaderCarrier}
 import views.html.status.status
 
 import scala.concurrent.Future
@@ -25,9 +26,16 @@ trait StatusController extends BaseController {
   private[controllers] def feeConnector: FeeConnector
 
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
-                                                   headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
-    (mlrRegNumber,submissionStatus)  match {
-      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeConnector.feeResponse(mlNumber).map(x => Some(x))
+                                                                                       headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
+    (mlrRegNumber, submissionStatus) match {
+      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
+        feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
+          case AmendOrVariationResponseType if x.difference.isEmpty => None
+          case _ => Some(x)
+        })
+      }.recoverWith {
+        case _: NotFoundException => Future.successful(None)
+      }
       case _ => Future.successful(None)
     }
   }

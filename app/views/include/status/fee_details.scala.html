@@ -6,16 +6,20 @@
 
 <p>@Messages("fee.details.heading")</p>
 
-<div class="panel panel-border-wide">
-    <p>@Messages("fee.details.registration.fee.lbl") </p>
-    <p class="heading-large">
-    @feeResponse.responseType match {
-        case SubscriptionResponseType => {£@feeResponse.totalFees}
-        case AmendOrVariationResponseType => {£@feeResponse.difference}
-    }
-    </p>
-    <p>@Messages("fee.reference.number.lbl")</p>
-    <p class="heading-large">@feeResponse.paymentReference </p>
+<div class="list panel-indent reg-online--pay-fee">
+    <div class="form-field-group">
+        @Messages("fee.details.registration.fee.lbl")
+        <p class="heading-large">
+        @feeResponse.responseType match {
+            case SubscriptionResponseType => {£@feeResponse.totalFees}
+            case AmendOrVariationResponseType => {£@feeResponse.difference}
+        }
+        </p>
+    </div>
+    <div class="form-field-group">
+        @Messages("fee.reference.number.lbl")
+        <p class="heading-large">@feeResponse.paymentReference </p>
+    </div>
     <p>@Messages("fee.details.note")</p>
 
 </div>
