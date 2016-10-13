@@ -187,12 +187,14 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       "set the hasChanged flag to true" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "tradingName" -> "text",
-          "addressLine1" -> "1",
-          "addressLine2" -> "2",
-          "postcode" -> "asdfasdf",
+          "tradingName" -> "Trading Name",
+          "addressLine1" -> "Address 1",
+          "addressLine2" -> "Address 2",
+          "postcode" -> "NE98 1ZZ",
           "isResidential" -> "true",
-          "startDate" -> "1990-2-24"
+          "startDate.day" -> "01",
+          "startDate.month" -> "02",
+          "startDate.year" -> "2010"
         )
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -210,7 +212,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
           any(),
           meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
-            yourTradingPremises = Some(YourTradingPremises("text", TradingPremisesSection.address, true, TradingPremisesSection.date))
+            yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, true, TradingPremisesSection.date))
           ))))(any(), any(), any())
       }
     }
