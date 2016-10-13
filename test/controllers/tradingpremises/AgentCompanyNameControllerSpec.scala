@@ -200,18 +200,6 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
   )
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
 
-  val tradingPremisesWithHasChangedTrue = TradingPremises(
-    Some(RegisteringAgentPremises(true)),
-    Some(ytp),
-    Some(businessStructure),
-    Some(testAgentName),
-    Some(testAgentCompanyName),
-    Some(testAgentPartnership),
-    Some(wdbd),
-    Some(msbServices),
-    true
-  )
-
   val tradingPremisesWithHasChangedFalse = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),
