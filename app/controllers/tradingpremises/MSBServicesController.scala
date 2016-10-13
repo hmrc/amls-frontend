@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.tradingpremises.{TradingPremises, MsbServices}
+import models.tradingpremises.{MsbServices, TradingPremises}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
@@ -17,13 +17,14 @@ trait MSBServicesController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
-        response =>
-          val form = (for {
-            tp <- response
-            services <- tp.msbServices
-          } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
-
+        case Some(tp) => {
+          val form = tp.msbServices match {
+            case Some(service) => Form2[MsbServices](service)
+            case None => EmptyForm
+          }
           Ok(views.html.tradingpremises.msb_services(form, index, edit))
+        }
+        case None => NotFound(notFoundView)
       }
   }
 
@@ -32,13 +33,18 @@ trait MSBServicesController extends RepeatingSection with BaseController {
       Form2[MsbServices](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.tradingpremises.msb_services(f, index, edit)))
-        case ValidForm(_, data) =>
+        case ValidForm(_, data) => {
           for {
-            _ <- updateData[TradingPremises](index) {
-              case Some(tp) => Some(tp.msbServices(data))
-              case _ => Some(TradingPremises(msbServices = Some(data)))
+            _ <- updateDataStrict[TradingPremises](index) { tp =>
+              tp.msbServices(data)
             }
-          } yield Redirect(routes.SummaryController.get())
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.getIndividual(index))
+            case false => Redirect(routes.PremisesRegisteredController.get(index))
+          }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
       }
   }
 }

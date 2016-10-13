@@ -5,11 +5,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
-
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
 class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
+
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -19,20 +19,18 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     }
   }
 
-  "WhatYouNeedController" must {
+  "WhatYouNeedController" when {
 
-    "on get display the what you need page" in new Fixture {
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("bankdetails.whatyouneed.title"))
-    }
+    "get is called" must {
 
-    "on click of continue button, page to be redirectd to " in new Fixture{
+      "respond with SEE_OTHER and redirect to the 'what you need' page" in new Fixture {
 
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("button.continue"))
+        val result = controller.get(1)(request)
+
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("bankdetails.whatyouneed.title"))
+        contentAsString(result) must include(Messages("button.continue"))
+      }
     }
   }
-
 }

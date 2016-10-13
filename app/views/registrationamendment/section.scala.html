@@ -1,0 +1,19 @@
+@import models.registrationprogress._
+
+@(name: String, status: Status, hasChanged: Boolean, call: Call)(implicit request: Request[_], lang: Lang)
+
+<li>
+    <a href="@call.url" class="progress-step" aria-label="@Messages(s"progress.$name.name"). @Messages(s"progress.$name.description"). @Messages("progress.visuallyhidden.view.amend")">
+        <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
+            <h2 class="heading-small">@Messages(s"progress.$name.name")</h2>
+            <p>@Messages(s"progress.$name.description")</p>
+        </div>
+        <div class="grid-layout__column grid-layout__column--1-3 progress-step--status @if(hasChanged){progress-step_changed}">
+
+            <div class="grid-layout__column grid-layout__column--2-3 progress-step--status-time">
+                <p class="font-xsmall">View and <br>amend your <br>information</p>
+            </div>
+
+        </div>
+    </a>
+</li>

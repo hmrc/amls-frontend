@@ -7,11 +7,16 @@
 s"""${f("paymentDate").id}-fieldset"""
 }
 
+@header = {
+    @errorSummary(f)
+    @heading("hvd.cash.payment.heading", "summary.hvd")
+}
+
 @main(
-title = Messages("hvd.cash.payment.title")
+    title = Messages("hvd.cash.payment.title"),
+    heading = header
 )  {
 
-    @heading("hvd.cash.payment.heading", "summary.hvd")
 
     @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
 

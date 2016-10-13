@@ -4,7 +4,8 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("businessactivities.accountantForAMLSRegulations.title", "summary.businessactivities")
+    @errorSummary(f)
+    @heading("businessactivities.accountantForAMLSRegulations.heading", "summary.businessactivities")
 }
 
 @main(

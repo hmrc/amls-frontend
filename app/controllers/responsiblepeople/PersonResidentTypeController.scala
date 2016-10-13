@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import models.Country
 import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople}
 import utils.RepeatingSection
 import views.html.responsiblepeople.person_residence_type
@@ -18,14 +19,14 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     ResponsiblePeopleToggle {
     Authorised.async {
       implicit authContext => implicit request =>
-        getData[ResponsiblePeople](index) map {
-          response =>
-            val form: Form2[PersonResidenceType] = (for {
-              responsiblePeople <- response
-              personResidence <- responsiblePeople.personResidenceType
-            } yield Form2[PersonResidenceType](personResidence)).getOrElse(EmptyForm)
-            Ok(person_residence_type(form, edit, index))
-        }
+          getData[ResponsiblePeople](index) map {
+            case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _, _))
+              => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
+              => Ok(person_residence_type(EmptyForm, edit, index))
+            case _
+              => NotFound(notFoundView)
+          }
     }
   }
 
@@ -33,19 +34,24 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
+
           Form2[PersonResidenceType](request.body) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(person_residence_type(f, edit, index)))
-            case ValidForm(_, data) =>
+            case ValidForm(_, data) => {
               for {
-                _ <- updateData[ResponsiblePeople](index) {
-                  case Some(res) => Some(res.personResidenceType(data))
-                  case _ => data
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
+                  val updatedData = data.copy(nationality = nationality)
+                  rp.personResidenceType(updatedData)
                 }
               } yield edit match {
-                case false => Redirect(routes.ContactDetailsController.get(index, edit))
-                case true  => Redirect(routes.DetailedAnswersController.get(index))
+                case true => Redirect(routes.DetailedAnswersController.get(index))
+                case false => Redirect(routes.NationalityController.get(index, edit))
               }
+            }.recoverWith {
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
           }
       }
     }

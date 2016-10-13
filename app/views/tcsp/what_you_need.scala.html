@@ -4,43 +4,39 @@
 
 @()(implicit request: Request[_])
 
-@sidebar = {
-    <div class="user-attention">
-        <h3>@Messages("main.sidebar.title")</h3>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
-}
-
 @header = {
     @heading("tcsp.whatyouneed.heading", "summary.tcsp")
 }
 
-@main(
+@whatyouneed(
     title = Messages("tcsp.whatyouneed.title"),
     heading = header,
     sidebar = sidebar
 ) {
 
-    <p>@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
+    <p class="heading-small">@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
 
-    <ul class="list list-bullet spacelarge">
-        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
-        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
-        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.3")</li>
-    </ul>
-
-    <p>@Messages("tcsp.whatyouneed.dependinginfo.heading")</p>
-
-    <ul class="list list-bullet spacelarge">
+    <ul class="list list-bullet">
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.1")</li>
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.2")</li>
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.3")</li>
     </ul>
 
-    <div class="form-group">
-        <a class="button" href="@controllers.tcsp.routes.TcspTypesController.get()">
-            @Messages("button.continue")
-        </a>
-    </div>
+    <p class="heading-small">@Messages("tcsp.whatyouneed.dependinginfo.heading")</p>
 
+    <ul class="list list-bullet">
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.3")</li>
+    </ul>
+
+    <a class="button" role="button" href="@controllers.tcsp.routes.TcspTypesController.get()">@Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.tcsp")</span></a>
+
+}
+
+@sidebar = {
+    <div class="user-attention">
+        <h2>@Messages("main.sidebar.title")</h2>
+        <p>@Messages("main.sidebar.information")</p>
+    </div>
 }

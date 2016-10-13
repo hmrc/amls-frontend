@@ -1,0 +1,30 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+@import models.responsiblepeople.Positions
+
+@(f: Form2[_], edit: Boolean = false, index: Int)(implicit request: Request[_], lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @heading("responsiblepeople.aretheynominatedofficer.heading", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.aretheynominatedofficer.title"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.post(index,edit)) {
+
+        <div class="form-field">
+        @inlineRadioGroup(f("positions")) {
+            @legend("aboutthebusiness.confirmingyouraddress.title", jsHidden = true)
+            @radio(f("isNominatedOfficer"), "lbl.yes", "true")
+            @radio(f("isNominatedOfficer"), "lbl.no", "false")
+        }
+        </div>
+
+        @submit(edit)
+    }
+}

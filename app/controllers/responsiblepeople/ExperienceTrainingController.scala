@@ -10,6 +10,7 @@ import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.RepeatingSection
+import views.html.responsiblepeople.experience_training
 
 import scala.concurrent.Future
 
@@ -40,12 +41,12 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
           businessActivitiesData flatMap {
             activities =>
               getData[ResponsiblePeople](index) map {
-                response =>
-                  val form = (for {
-                    responsiblePeople <- response
-                    experienceTraining <- responsiblePeople.experienceTraining
-                  } yield Form2[ExperienceTraining](experienceTraining)).getOrElse(EmptyForm)
-                  Ok(views.html.responsiblepeople.experience_training(form, activities, edit, index))
+                case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _,_))
+                  => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index))
+                case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
+                  => Ok(experience_training(EmptyForm, activities, edit, index))
+                case _
+                  => NotFound(notFoundView)
               }
           }
       }
@@ -60,16 +61,18 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
               Form2[ExperienceTraining](request.body) match {
                 case f: InvalidForm =>
                   Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index)))
-                case ValidForm(_, data) =>
+                case ValidForm(_, data) => {
                   for {
-                    _ <- updateData[ResponsiblePeople](index) {
-                      case Some(rp) => Some(rp.experienceTraining(data))
-                      case _ => Some(ResponsiblePeople(experienceTraining = Some(data)))
+                    result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                      rp.experienceTraining(data)
                     }
                   } yield edit match {
-                    case false => Redirect(routes.TrainingController.get(index, edit))
                     case true => Redirect(routes.DetailedAnswersController.get(index))
+                    case false => Redirect(routes.TrainingController.get(index, edit))
                   }
+                }.recoverWith {
+                  case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+                }
               }
           }
         }

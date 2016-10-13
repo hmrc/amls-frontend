@@ -4,7 +4,8 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("msb.ipsp.title", "summary.msb")
+    @errorSummary(f)
+    @heading("msb.ipsp.heading", "summary.msb")
 }
 
 @main(
@@ -18,7 +19,7 @@
             @legend("msb.ipsp.text", jsHidden = false)
             @radio(f("useAnIPSP"), "lbl.yes", "true", target = s"#${f("name").id}-fieldset")
             @radio(f("useAnIPSP"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
+            @fieldset("msb.ipsp.text", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
                 @input(f("name"), "msb.ipsp.name.lbl", bold = false)
                 @input(f("referenceNumber"), "msb.ipsp.referenceNumber.lbl", bold = false)
             }

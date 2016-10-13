@@ -23,9 +23,8 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
     dataCacheConnector.fetchAll map {
       cache =>
-        type Tupe = (CacheMap, Set[BusinessActivity])
         (for {
-          c <- cache
+          c: CacheMap <- cache
           bm <- c.getEntry[BusinessMatching](BusinessMatching.key)
           activities <- bm.activities flatMap {
             _.businessActivities match {
@@ -34,7 +33,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             }
           }
         } yield (c, activities))
-          .fold[Either[Result, Tupe]] {
+          .fold[Either[Result, (CacheMap, Set[BusinessActivity])]] {
           // TODO: Need to think about what we should do in case of this error
           Left(Redirect(routes.WhereAreTradingPremisesController.get(index, edit)))
         } {
@@ -43,18 +42,17 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
     }
   }
 
+  // scalastyle:off cyclomatic.complexity
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       data(index, edit) flatMap {
         case Right((c, activities)) =>
           if (activities.size == 1) {
-            updateData[TradingPremises](c, index) {
-              case Some(tp) =>
+            // If there is only one activity in the data from the pre-reg,
+            // then save that and redirect immediately without showing the
+            // 'what does your business do' page.
+            updateDataStrict[TradingPremises](index) { tp =>
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
-              case _ =>
-                Some(TradingPremises(
-                  whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities))
-                ))
             }
             Future.successful {
               activities.contains(MoneyServiceBusiness) match {
@@ -66,10 +64,11 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             val ba = BusinessActivities(activities)
             Future.successful {
               getData[TradingPremises](c, index) match {
-                case Some(TradingPremises(_, _, Some(wdbd),_)) =>
+                case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_,_,_,_)) =>
                   Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
-                case _ =>
+                case Some(TradingPremises(_,_,  _,_,_,_, None, _,_,_,_,_)) =>
                   Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
+                case _ => NotFound(notFoundView)
               }
             }
           }
@@ -77,7 +76,6 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
       }
   }
 
-  // scalastyle:off cyclomatic.complexity
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       data(index, edit) flatMap {
@@ -88,26 +86,38 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
               Future.successful {
                 BadRequest(what_does_your_business_do(f, ba, edit, index))
               }
-            case ValidForm(_, data) =>
-              updateData[TradingPremises](c, index) {
-                case Some(tp) if data.activities.contains(MoneyServiceBusiness) =>
-                  Some(tp.whatDoesYourBusinessDoAtThisAddress(data))
-                case Some(tp) if !data.activities.contains(MoneyServiceBusiness) =>
-                  Some(TradingPremises(tp.yourTradingPremises, tp.yourAgent, Some(data), None))
-                case _ => Some(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(data)))
+            case ValidForm(_, data) => {
+              updateDataStrict[TradingPremises](index) {
+                case tp if data.activities.contains(MoneyServiceBusiness) =>
+                  tp.whatDoesYourBusinessDoAtThisAddress(data)
+                case tp if !data.activities.contains(MoneyServiceBusiness) =>
+                  TradingPremises(
+                    tp.registeringAgentPremises,
+                    tp.yourTradingPremises,
+                    tp.businessStructure,
+                    tp.agentName,
+                    tp.agentCompanyName,
+                    tp.agentPartnership,
+                    Some(data),
+                    None
+                  )
               } map {
-                _ =>  data.activities.contains(MoneyServiceBusiness) match {
-                  case true =>  Redirect(routes.MSBServicesController.get(index, edit))
+                _ => data.activities.contains(MoneyServiceBusiness) match {
+                  case true => Redirect(routes.MSBServicesController.get(index, edit))
                   case false => edit match {
                     case true => Redirect(routes.SummaryController.getIndividual(index))
-                    case false => Redirect(routes.SummaryController.get())
+                    case false => Redirect(routes.PremisesRegisteredController.get(index))
                   }
                 }
               }
+            }.recoverWith{
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
           }
         case Left(result) => Future.successful(result)
       }
   }
+
   // scalastyle:on cyclomatic.complexity
 }
 

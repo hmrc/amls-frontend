@@ -14,20 +14,20 @@ trait FitAndProperController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
-  implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
-  implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME)
 
   def get(index: Int, edit: Boolean = false) =
     ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            response =>
-              val form = (for {
-                responsiblePeople <- response
-                fitAndProper <- responsiblePeople.hasAlreadyPassedFitAndProper
-              } yield Form2[Boolean](fitAndProper)).getOrElse(EmptyForm)
-              Ok(views.html.responsiblepeople.fit_and_proper(form, edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, Some(alreadyPassed), _, _,_))
+              => Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _,_))
+              => Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index))
+            case _
+              => NotFound(notFoundView)
           }
       }
     }
@@ -39,18 +39,18 @@ trait FitAndProperController extends RepeatingSection with BaseController {
           Form2[Boolean](request.body) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index)))
-            case ValidForm(_, data) =>
+            case ValidForm(_, data) =>{
               for {
-                _ <- updateData[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.hasAlreadyPassedFitAndProper(data))
-                  case _ => Some(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(data)))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.hasAlreadyPassedFitAndProper(data)
                 }
-              } yield {
-                  edit match {
-                    case false => Redirect (routes.PersonRegisteredController.get (index))
-                    case true => Redirect (routes.DetailedAnswersController.get(index))
-                  }
+              } yield edit match {
+                case true => Redirect(routes.DetailedAnswersController.get(index))
+                case false => Redirect(routes.PersonRegisteredController.get(index))
               }
+            }.recoverWith {
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
           }
         }
       }

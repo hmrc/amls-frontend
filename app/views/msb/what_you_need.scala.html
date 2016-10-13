@@ -1,18 +1,11 @@
 @import include._
 @()(implicit request: Request[_])
 
-@sidebar = {
-    <div class="user-attention">
-        <h3>@Messages("main.sidebar.title")</h3>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
-}
-
 @header = {
     @heading("msb.whatyouneed.heading", "summary.msb")
 }
 
-@main(
+@whatyouneed(
     title = Messages("msb.whatyouneed.title"),
     heading = header,
     sidebar = sidebar
@@ -20,7 +13,7 @@
 
     <p>@Messages("msb.whatyouneed.requiredinfo.heading")</p>
 
-    <ul class="list list-bullet spacelarge">
+    <ul class="list list-bullet">
         <li>@Messages("msb.whatyouneed.line_1")</li>
         <li>@Messages("msb.whatyouneed.line_2")</li>
         <li>@Messages("msb.whatyouneed.line_3")</li>
@@ -33,7 +26,7 @@
 
     <p>@Messages("msb.whatyouneed.possiblerequiredinfo.heading")</p>
 
-    <ul class="list list-bullet spacelarge">
+    <ul class="list list-bullet">
         <li>@Messages("msb.whatyouneed.possiblerequiredinfo.line_1")</li>
         <li>@Messages("msb.whatyouneed.possiblerequiredinfo.line_2")</li>
         <li>@Messages("msb.whatyouneed.possiblerequiredinfo.line_3")</li>
@@ -43,8 +36,16 @@
     </ul>
 
     <div class="form-group">
-        <a class="button" href="@controllers.msb.routes.ServicesController.get()">
-            @Messages("button.continue")
+        <a class="button" role="button" href="@controllers.msb.routes.ExpectedThroughputController.get()">
+            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.msb")</span>
         </a>
+    </div>
+
+}
+
+@sidebar = {
+    <div class="user-attention">
+        <h2>@Messages("main.sidebar.title")</h2>
+        <p>@Messages("main.sidebar.information")</p>
     </div>
 }

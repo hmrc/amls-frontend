@@ -19,12 +19,12 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            response =>
-              val form = (for {
-                resp <- response
-                person <- resp.saRegistered
-              } yield Form2[SaRegistered](person)).getOrElse(EmptyForm)
-              Ok(registered_for_self_assessment(form, edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, Some(person), _, _, _, _, _,_,_))
+            => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_))
+            => Ok(registered_for_self_assessment(EmptyForm, edit, index))
+            case _
+            => NotFound(notFoundView)
           }
       }
     }
@@ -36,11 +36,10 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
           Form2[SaRegistered](request.body) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(registered_for_self_assessment(f, edit, index)))
-            case ValidForm(_, data) =>
+            case ValidForm(_, data) => {
               for {
-                _ <- updateData[ResponsiblePeople](index) {
-                  case Some(rp) => Some(rp.saRegistered(data))
-                  case _ => Some(ResponsiblePeople(saRegistered = Some(data)))
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.saRegistered(data)
                 }
               } yield {
                 edit match {
@@ -48,6 +47,9 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
                   case true => Redirect(routes.DetailedAnswersController.get(index))
                 }
               }
+            }.recoverWith {
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
           }
       }
     }

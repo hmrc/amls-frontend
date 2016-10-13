@@ -5,6 +5,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
+    @errorSummary(f)
     @heading("businessactivities.whoisyouraccountant.heading", "summary.businessactivities")
 }
 
@@ -16,64 +17,60 @@
     @form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
 
         <fieldset>
+            @legend("businessactivities.whoisyouraccountant.heading", jsHidden = true)
             <div class="form-field-group">
                 @input(
-                field = f("name"),
-                labelText = "businessactivities.whoisyouraccountant.name"
+                    field = f("name"),
+                    labelText = "businessactivities.whoisyouraccountant.name"
                 )
 
                 @input(
-                field = f("tradingName"),
-                labelText = "businessactivities.whoisyouraccountant.tradingName"
+                    field = f("tradingName"),
+                    labelText = "businessactivities.whoisyouraccountant.tradingName"
                 )
             </div>
         </fieldset>
 
-        <div class="form-field-group">
-            @inlineRadioGroup(f("isUK")) {
-            @legend("TODO", jsHidden = true)
+        @inlineRadioGroup(f("isUK")) {
+            @legend("businessactivities.whoisyouraccountant.address.location", jsHidden = true)
             @radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}-field")
             @radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}-field")
-            }
-        </div>
+        }
 
-        <fieldset>
-            <legend class="form-label">@Messages("businessactivities.whoisyouraccountant.address")</legend>
-
+        @fieldset(
+            legend = "businessactivities.whoisyouraccountant.address",
+            panel = false
+        ) {
             <div class="form-field-group">
-                @input(f("addressLine1"))
-                @input(f("addressLine2"))
-                @input(f("addressLine3"))
-                @input(f("addressLine4"))
-                @fieldset(id=s"${f("postCode").id}-field", legend="POSTCODE", jsHidden=true, panel=false){
+                @input(f("addressLine1"), labelText = "lbl.address.line1", labelHidden = true)
+                @input(f("addressLine2"), labelText = "lbl.address.line2", labelHidden = true)
+                @input(f("addressLine3"), labelText = "lbl.address.line3", labelHidden = true)
+                @input(f("addressLine4"), labelText = "lbl.address.line4", labelHidden = true)
+                @fieldset(
+                    id = s"${f("postCode").id}-field",
+                    legend = "businessactivities.whoisyouraccountant.postCode",
+                    jsHidden = true,
+                    panel = false
+                ) {
                     @input(
                         field = f("postCode"),
                         labelText = "businessactivities.whoisyouraccountant.postCode",
                         classes = Seq("postcode")
                     )
                 }
-                @fieldset(id=s"${f("country").id}-field", legend="COuntry", jsHidden=true, panel=false){
+                @fieldset(
+                    id = s"${f("country").id}-field",
+                    legend = "businessactivities.whoisyouraccountant.country",
+                    jsHidden = true,
+                    panel = false
+                ) {
                     @country(
                         field = f("country"),
                         labelText = "businessactivities.whoisyouraccountant.country"
                     )
                 }
             </div>
-        </fieldset>
-
-        <fieldset>
-            <div class="form-field-group">
-                <label class="form-label">@Messages("businessactivities.whoisyouraccountant.taxMessage")</label>
-                @inlineRadioGroup(f("alsoDealsWithTax")) {
-                    @legend("TODO", jsHidden = true)
-                    @radio(f("alsoDealsWithTax"), "lbl.yes", "true", target = s"#${f("accountantsReferenceNumber").id}-fieldset")
-                    @radio(f("alsoDealsWithTax"), "lbl.no", "false")
-                    @fieldset("TODO", jsHidden = true, id = s"${f("accountantsReferenceNumber").id}-fieldset") {
-                        @input(f("accountantsReferenceNumber"), "businessactivities.whoisyouraccountant.reference.details", bold = false)
-                    }
-                }
-            </div>
-        </fieldset>
+        }
 
     @submit(edit)
 

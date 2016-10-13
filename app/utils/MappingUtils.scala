@@ -26,7 +26,7 @@ object TraversableValidators {
     GenericRules.validateWith[T]("error.required") {
       _.size >= l
     }
-    
+
   def maxLengthR[T <: Traversable[_]](l: Int): Rule[T, T] =
     GenericRules.validateWith[T]("error.maxLength", l) {
       _.size <= l

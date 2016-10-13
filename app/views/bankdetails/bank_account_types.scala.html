@@ -1,24 +1,26 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean, index:Int)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, index:Int, count:Int)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("bankdetails.accounttype.heading", "summary.bankdetails")
+    @errorSummary(f)
+    @heading("bankdetails.accounttype.title", "summary.bankdetails")
 }
 
 @main(
-    title = Messages("bankdetails.accounttype.title"),
+    title = Messages("bankdetails.accounttype.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
 
-    @form(f, controllers.bankdetails.routes.BankAccountTypeController.post(index, edit)) {
+    @form(f, controllers.bankdetails.routes.BankAccountTypeController.post(index, edit, count)) {
+
         @radioGroup(f("bankAccountType")) {
             @legend("bankdetails.accounttype.title", jsHidden = true)
             @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.01", "01")
             @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.02", "02")
             @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.03", "03")
-            @if(!edit) {
+            @if(count <= 1) {
                 @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.04", "04")
             }
         }

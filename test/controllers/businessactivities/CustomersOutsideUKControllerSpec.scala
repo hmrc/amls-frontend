@@ -52,13 +52,15 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
     "pre-populate the Customer outside UK Page" in new Fixture  {
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(customersOutsideUK = Some(CustomersOutsideUKYes(Countries(Country("United Kingdom", "GB"))))))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("select[name=country_1] > option[value=GB]").hasAttr("selected") must be(true)
+      document.select("input[name=isOutside]").size mustEqual 2
+      document.select("input[name=isOutside][checked]").`val` mustEqual "true"
+      document.select("select[name=countries[0]] > option[value=GB]").hasAttr("selected") must be(true)
 
     }
 
@@ -66,7 +68,8 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
 
       val newRequest = request.withFormUrlEncodedBody(
         "isOutside" -> "true",
-        "country_1" -> "GS"
+        "countries[0]" -> "GB",
+        "countries[1]" -> "US"
       )
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -84,7 +87,8 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
 
       val newRequest = request.withFormUrlEncodedBody(
         "isOutside" -> "true",
-        "country_1" -> "GS"
+        "countries[0]" -> "GB",
+        "countries[1]" -> "US"
       )
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -102,7 +106,8 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
 
       val newRequest = request.withFormUrlEncodedBody(
         "isOutside" -> "true",
-        "country_1" -> ""
+        "countries[0]" -> "",
+        "countries[1]" -> ""
       )
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
@@ -115,7 +120,26 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#country_1]").html() must include(Messages("error.required.country.name"))
+      document.select("a[href=#countries]").html() must include(Messages("error.required.country.name"))
+    }
+
+    "on post with invalid data1" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isOutside" -> ""
+      )
+
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#isOutside]").html() must include(Messages("error.required.ba.select.country"))
     }
   }
 

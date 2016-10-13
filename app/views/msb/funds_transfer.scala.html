@@ -4,11 +4,12 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("msb.fundstransfer.heading", "summary.msb")
 }
 
 @main(
-    title = Messages("msb.fundstransfer.heading"),
+    title = Messages("msb.fundstransfer.title"),
     heading = header
 ) {
 

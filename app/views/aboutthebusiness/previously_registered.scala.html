@@ -8,7 +8,8 @@
 }
 
 @header = {
-    @heading("aboutthebusiness.registeredformlr.title", "summary.aboutbusiness")
+    @errorSummary(f)
+    @heading("aboutthebusiness.registeredformlr.heading", "summary.aboutbusiness")
 }
 
 @main(
@@ -24,9 +25,8 @@
             @legend("aboutthebusiness.registeredformlr.title", jsHidden = true)
             @radio(f("previouslyRegistered"), "lbl.yes", "true", target = s"#$target")
             @radio(f("previouslyRegistered"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("aboutthebusiness.registeredformlr.mlrregno.lbl", id = target) {
                 @input(f("prevMLRRegNo"),
-                "aboutthebusiness.registeredformlr.mlrregno.lbl",
                 hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
                 bold = false)
             }

@@ -8,7 +8,8 @@
 }
 
 @header = {
-    @heading("aboutthebusiness.registeredforcorporationtax.title", "summary.aboutbusiness")
+    @errorSummary(f)
+    @heading("aboutthebusiness.registeredforcorporationtax.heading", "summary.aboutbusiness")
 }
 
 @main(
@@ -22,7 +23,7 @@
             @legend("aboutthebusiness.registeredforcorporationtax.title", jsHidden = true)
             @radio(f("registeredForCorporationTax"), "lbl.yes", "true", target = s"#$target")
             @radio(f("registeredForCorporationTax"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("aboutthebusiness.registeredforcorporationtax.taxReference", jsHidden = true, id = target) {
                 @input(f("corporationTaxReference"),
                         "aboutthebusiness.registeredforcorporationtax.taxReference",
                         hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",

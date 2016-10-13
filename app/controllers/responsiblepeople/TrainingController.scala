@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.businessmatching.{TrustAndCompanyServices, MoneyServiceBusiness, BusinessActivities, BusinessMatching}
-import models.responsiblepeople.{ResponsiblePeople, Training}
+import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople, Training}
 import play.api.mvc.Result
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.RepeatingSection
@@ -21,12 +21,12 @@ trait TrainingController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            response =>
-              val form = (for {
-                responsiblePeople <- response
-                training <- responsiblePeople.training
-              } yield Form2[Training](training)).getOrElse(EmptyForm)
-              Ok(views.html.responsiblepeople.training(form, edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, Some(training), _, _,_,_))
+              => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_))
+              => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index))
+            case _
+              => NotFound(notFoundView)
           }
       }
     }
@@ -38,15 +38,15 @@ trait TrainingController extends RepeatingSection with BaseController {
           Form2[Training](request.body) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(views.html.responsiblepeople.training(f, edit, index)))
-            case ValidForm(_, data) =>
+            case ValidForm(_, data) =>{
               for {
-                cacheMap <- fetchAllAndUpdate[ResponsiblePeople](index) {(_, rpOpt) =>
-                  rpOpt match {
-                    case Some(rp) => Some(rp.training(data))
-                    case _ => Some(ResponsiblePeople(training = Some(data)))
-                  }
+                cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) {(_, rp) =>
+                  rp.training(data)
                 }
               } yield identifyRoutingTarget(index, edit, cacheMap)
+            }.recoverWith {
+              case _ : IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
           }
         }
       }
@@ -57,7 +57,7 @@ trait TrainingController extends RepeatingSection with BaseController {
       case Some(cacheMap) =>{
                             (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
                               case (true, _) => Redirect(routes.DetailedAnswersController.get(index))
-                              case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts)), _, _)))
+                              case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts)), _, _,_, _,_)))
                                 if acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
                                   => Redirect(routes.FitAndProperController.get(index))
                               case (false, _) => Redirect(routes.PersonRegisteredController.get(index))

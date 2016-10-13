@@ -33,7 +33,7 @@ class VATRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with Mock
 
     "on get display the registered for VAT page" in new Fixture {
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
       val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("responsiblepeople.registeredforvat.title"))
@@ -90,7 +90,7 @@ class VATRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with Mock
      )
 
      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+       (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
 
      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
        (any(), any(), any())).thenReturn(Future.successful(emptyCache))

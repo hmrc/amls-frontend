@@ -5,7 +5,8 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("aboutthebusiness.registeredoffice.title", "summary.aboutbusiness")
+    @errorSummary(f)
+    @heading("aboutthebusiness.registeredoffice.heading", "summary.aboutbusiness")
 }
 
 @main(
@@ -29,9 +30,9 @@
         ) {
             <div class="form-field-group">
                 @input(f("addressLine1"))
-                @input(f("addressLine2"))
-                @input(f("addressLine3"))
-                @input(f("addressLine4"))
+                @input(f("addressLine2"), requiredField = false)
+                @input(f("addressLine3"), requiredField = false)
+                @input(f("addressLine4"), requiredField = false)
             </div>
             <div class="form-field-group">
                 @input(

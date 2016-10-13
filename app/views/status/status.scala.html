@@ -1,0 +1,114 @@
+@import include._
+@import models.status.CompletionStateViewModel
+@import models.status.SubmissionStatus
+@import models.status.CompletionState
+@import models.status.NotCompleted
+@import models.status.SubmissionReadyForReview
+@import models.status.SubmissionDecisionApproved
+@import models.status.SubmissionDecisionRejected
+@import models.status.{Current,SubmissionReady}
+
+@(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel)(implicit request: Request[_])
+@borderClass(entry:(SubmissionStatus,CompletionState)) = {
+    @entry match{
+        case (NotCompleted,Current)=> {status-list--start}
+        case (SubmissionDecisionApproved,Current)=> {status-list--end}
+        case (SubmissionDecisionRejected,Current)=> {status-list--end}
+        case (_,_) => {}
+    }
+}
+
+@statusTitle = @{completionState.currentState match {
+case NotCompleted => {Messages("status.incomplete.heading")}
+case SubmissionReady => {Messages("status.submissionready.heading")}
+case SubmissionReadyForReview => {Messages("status.submissionreadyforreview.heading")}
+case SubmissionDecisionApproved => {Messages("status.submissiondecisionapproved.heading")}
+case SubmissionDecisionRejected => {Messages("status.submissiondecisionrejected.heading")}
+case _ => {Messages("status.incomplete.heading")}
+}}
+
+@changeLink = @{completionState.currentState match {
+case SubmissionReady => { Some(Messages("status.submissionready.changelink1")) }
+case SubmissionReadyForReview => { Some(Messages("status.amendment.edit")) }
+case _ => { None }
+}}
+
+@main2(title = statusTitle +" - Your registration - Anti-money laundering registration - GOV.UK") {
+
+@* Heading *@
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--3-3">
+        <h1 class="heading-xlarge">
+        <span class="heading-secondary">
+            @Messages("summary.status")
+        </span>
+            <span>@statusTitle</span>
+        </h1>
+
+    </div>
+</div>
+
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        @(businessName,completionState.currentState) match {
+        case (Some(bn),SubmissionDecisionApproved) => {
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
+            <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+            <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
+        </div>}
+        case (Some(bn),_) =>{
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
+            <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
+        </div>}
+        case (None,SubmissionDecisionApproved) => {
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
+            <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
+        </div>}
+        case _ => {}
+        }
+    </div>
+    <div class = "grid-layout__column grid-layout__column--1-3">
+        @changeLink match {
+            case Some(text:String) => {
+                <div class="grid-row statusblock declaration">
+                    <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
+                    <ul>
+                        <li><a href="@controllers.routes.RegistrationProgressController.get()">@text</a></li>
+                    </ul>
+                </div>
+            }
+            case _ => {}
+        }
+    </div>
+
+</div>
+
+<div class="grid-layout grid-layout--stacked">
+    <div class="grid-layout__column grid-layout__column--1-3">
+        <ol class="list list-number status-list">
+
+            @completionState.statuses.map{entry=>
+                <li class="status-list--pending @{entry._2.cssClass+borderClass(entry)}">@completionState.statusTitle(entry._1)</li>
+            }
+        </ol>
+    </div>
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <div class="status-detail">
+
+            @completionState.currentState match {
+                case NotCompleted => {@include.status.rightpanel_incomplete()}
+                case SubmissionReady => {@include.status.rightpanel_submissionready()}
+                case SubmissionReadyForReview => {@include.status.rightpanel_submissionreadyforreview()}
+                case SubmissionDecisionApproved => {@include.status.rightpanel_submissiondecisionapproved()}
+                case SubmissionDecisionRejected => {@include.status.rightpanel_submissiondecisionrejected()}
+                case _ => {@include.status.rightpanel_incomplete()}
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+
+}

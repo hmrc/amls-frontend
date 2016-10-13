@@ -1,45 +1,27 @@
 @import include._
 @import models.moneyservicebusiness._
+@import models.businessmatching._
 @import models.Country
 
-@(model: MoneyServiceBusiness)(implicit request: Request[_], lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices])(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading("summary.checkyouranswers.title", "summary.msb")
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("summary.msb.checkyouranswers.title"),
     heading = header
 ) {
 
-    @Messages("summary.linetext")
+    <p>@Messages("summary.linetext")</p>
 
-    @model.msbServices.map{ services =>
-        <table>
-            <tr>
-                <th>@Messages("msb.services.heading")</th>
-                <td width="12"><a href="@controllers.msb.routes.ServicesController.get(true)">Edit</a></td>
-            </tr>
-            @services.services.map { svc =>
-                <tr>
-                    <td colspan="2">
-                        @svc match {
-                            case TransmittingMoney => {@Messages("msb.services.list.lbl.01")}
-                            case CurrencyExchange => {@Messages("msb.services.list.lbl.02")}
-                            case ChequeCashingNotScrapMetal => {@Messages("msb.services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("msb.services.list.lbl.04")}
-                        }
-                    </td>
-                </tr>
-            }
-        </table>
-
+    @bmMsbServices.map{ services =>
         @model.throughput.map{ throughput =>
-            <table>
+            <table class="table--spaced-top">
                 <tr>
-                    <th>@Messages("msb.throughput.title")</th>
-                    <td width="12"><a href="@controllers.msb.routes.ExpectedThroughputController.get(true)">Edit</a></td>
+                    <th>@Messages("msb.throughput.heading")</th>
+                    <td width="12"><a href="@controllers.msb.routes.ExpectedThroughputController.get(true)">@Messages("button.edit")</a></td>
                 </tr>
 
                 <tr>
@@ -59,10 +41,10 @@
         }
 
         @model.branchesOrAgents.map { boa =>
-            <table>
+            <table class="table--spaced-top">
                 <tr>
                     <th>@Messages("msb.branchesoragents.heading")</th>
-                    <td width="12"><a href="@controllers.msb.routes.BranchesOrAgentsController.get(true)">Edit</a></td>
+                    <td width="12"><a href="@controllers.msb.routes.BranchesOrAgentsController.get(true)">@Messages("button.edit")</a></td>
                 </tr>
                 @boa.branches.fold {
                     <tr>
@@ -88,10 +70,10 @@
         }
 
         @model.identifyLinkedTransactions.map { ilt =>
-            <table>
+            <table class="table--spaced-top">
                 <tr>
-                    <th>@Messages("msb.linked.txn.title")</th>
-                    <td width="12"><a href="@controllers.msb.routes.IdentifyLinkedTransactionsController.get(true)">Edit</a></td>
+                    <th>@Messages("msb.linked.txn.heading")</th>
+                    <td width="12"><a href="@controllers.msb.routes.IdentifyLinkedTransactionsController.get(true)">@Messages("button.edit")</a></td>
                 </tr>
                 <tr>
                     <td colspan="2">
@@ -105,36 +87,11 @@
         }
 
         @if(services.services.contains(TransmittingMoney)) {
-            @model.businessAppliedForPSRNumber.map { psr =>
-                <table>
+           @model.businessUseAnIPSP.map { ipsp =>
+                <table class="table--spaced-top">
                     <tr>
-                        <th>@Messages("msb.psr.number.title")</th>
-                        <td width="12"><a href="@controllers.msb.routes.BusinessAppliedForPSRNumberController.get(true)">Edit</a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @psr match {
-                                case BusinessAppliedForPSRNumberNo => {
-                                    @Messages("lbl.no")
-                                }
-                                case BusinessAppliedForPSRNumberYes(number) => {
-                                    @Messages("lbl.yes")
-                                    </td>
-                                    <tr>
-                                        <td colspan="2">
-                                            @Messages("msb.psr.number.lbl") : @number
-                                }
-                            }
-                        </td>
-                    </tr>
-                </table>
-            }
-
-            @model.businessUseAnIPSP.map { ipsp =>
-                <table>
-                    <tr>
-                        <th>@Messages("msb.ipsp.title")</th>
-                        <td width="12"><a href="@controllers.msb.routes.BusinessUseAnIPSPController.get(true)">Edit</a></td>
+                        <th>@Messages("msb.ipsp.heading")</th>
+                        <td width="12"><a href="@controllers.msb.routes.BusinessUseAnIPSPController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     @ipsp match {
                         case BusinessUseAnIPSPNo => {
@@ -162,16 +119,14 @@
                             </tr>
                         }
                     }
-
-
                 </table>
             }
 
             @model.fundsTransfer.map { ft =>
-                <table>
+                <table class="table--spaced-top">
                     <tr>
                         <th>@Messages("msb.fundstransfer.heading")</th>
-                        <td width="12"><a href="@controllers.msb.routes.FundsTransferController.get(true)">Edit</a></td>
+                        <td width="12"><a href="@controllers.msb.routes.FundsTransferController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -185,10 +140,10 @@
             }
 
             @model.transactionsInNext12Months.map{ trans =>
-                <table>
+                <table class="table--spaced-top">
                     <tr>
-                        <th>@Messages("msb.transactions.expected.title")</th>
-                        <td width="12"><a href="@controllers.msb.routes.TransactionsInNext12MonthsController.get(true)">Edit</a></td>
+                        <th>@Messages("msb.transactions.expected.heading")</th>
+                        <td width="12"><a href="@controllers.msb.routes.TransactionsInNext12MonthsController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -199,10 +154,10 @@
             }
 
             @model.sendMoneyToOtherCountry.map{ otherCountries =>
-                <table>
+                <table class="table--spaced-top">
                     <tr>
-                        <th>@Messages("msb.send.money.title")</th>
-                        <td width="12"><a href="@controllers.msb.routes.SendMoneyToOtherCountryController.get(true)">Edit</a></td>
+                        <th>@Messages("msb.send.money.heading")</th>
+                        <td width="12"><a href="@controllers.msb.routes.SendMoneyToOtherCountryController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -216,10 +171,10 @@
 
                 @if(otherCountries.money) {
                     @model.sendTheLargestAmountsOfMoney.map { lom =>
-                        <table>
+                        <table class="table--spaced-top">
                             <tr>
-                                <th>@Messages("msb.send.the.largest.amounts.of.money.title")</th>
-                                <td width="12"><a href="@controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true)">Edit</a></td>
+                                <th>@Messages("msb.send.the.largest.amounts.of.money.heading")</th>
+                                <td width="12"><a href="@controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true)">@Messages("button.edit")</a></td>
                             </tr>
                             @lom.countryList.map { country =>
                                 <tr>
@@ -232,10 +187,10 @@
                     }
 
                     @model.mostTransactions.map { mt =>
-                        <table>
+                        <table class="table--spaced-top">
                             <tr>
-                                <th>@Messages("msb.most.transactions.title")</th>
-                                <td width="12"><a href="@controllers.msb.routes.MostTransactionsController.get(true)">Edit</a></td>
+                                <th>@Messages("msb.most.transactions.heading")</th>
+                                <td width="12"><a href="@controllers.msb.routes.MostTransactionsController.get(true)">@Messages("button.edit")</a></td>
                             </tr>
                             @mt.countries.map { country =>
                             <tr>
@@ -252,10 +207,10 @@
 
         @if(services.services.contains(CurrencyExchange)) {
             @model.ceTransactionsInNext12Months.map{ trans =>
-                <table>
+                <table class="table--spaced-top">
                     <tr>
-                        <th>@Messages("msb.ce.transactions.expected.in.12.months.title")</th>
-                        <td width="12"><a href="@controllers.msb.routes.CETransactionsInNext12MonthsController.get(true)">Edit</a></td>
+                        <th>@Messages("msb.ce.transactions.expected.in.12.months.heading")</th>
+                        <td width="12"><a href="@controllers.msb.routes.CETransactionsInNext12MonthsController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -266,10 +221,10 @@
             }
 
             @model.whichCurrencies.map { wc =>
-                <table>
+                <table class="table--spaced-top">
                     <tr>
-                        <th>@Messages("msb.which_currencies.title")</th>
-                        <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">Edit</a></td>
+                        <th>@Messages("msb.which_currencies.heading")</th>
+                        <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     @wc.currencies.map { cur =>
                         <tr>
@@ -279,10 +234,10 @@
                         </tr>
                     }
                 </table>
-                <table>
+                <table class="table--spaced-top">
                     <tr>
                         <th>@Messages("msb.which_currencies.who")</th>
-                        <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">Edit</a></td>
+                        <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     @wc.bankMoneySource.map {bms =>
                         <tr>

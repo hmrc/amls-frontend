@@ -5,8 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccount, BankDetails}
-import play.api.Logger
-import utils.RepeatingSection
+import utils.{RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -14,28 +13,38 @@ trait BankAccountController extends RepeatingSection with BaseController {
 
   val dataCacheConnector : DataCacheConnector
 
-  def get(index:Int = 0, edit: Boolean = false) = Authorised.async {
+  def get(index:Int, edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[BankDetails](index) map {
-        case Some(BankDetails(_, Some(data))) =>
+        case Some(BankDetails(_, Some(data),_,_)) =>
           Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
-        case _ =>
+        case Some(_) =>
           Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
+        case _ => {
+          NotFound(notFoundView)
+        }
       }
   }
 
-  def post(index:Int = 0, edit: Boolean = false) = Authorised.async {
+  def post(index:Int, edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[BankAccount](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-            _ <- updateData[BankDetails](index) {
-              case Some(BankDetails(Some(x), _)) => Some(BankDetails(Some(x), Some(data)))
-              case _ => data
+            result <- updateDataStrict[BankDetails](index) { bd =>
+              bd.bankAccount(data)
             }
-          } yield {Redirect(routes.SummaryController.get())}
+          } yield {
+            if(edit) {
+              Redirect(routes.SummaryController.get(false))
+            } else {
+              Redirect(routes.BankAccountRegisteredController.get(index))
+            }
+          }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
     }
