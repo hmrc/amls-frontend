@@ -25,119 +25,77 @@ class OtherBusinessTaxMattersControllerSpec extends PlaySpec with OneAppPerSuite
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
+
+    when(controller.dataCacheConnector.fetch[Asp](any())
+      (any(), any(), any())).thenReturn(Future.successful(None))
+
+    when(controller.dataCacheConnector.save[Asp](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+  val newRequest = request.withFormUrlEncodedBody(
+    "otherBusinessTaxMatters" -> "true"
+  )
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "OtherBusinessTaxMattersController" must {
 
-    "on get display the are you registered with HMRC to handle other business's tax matters page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Asp](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("asp.other.business.tax.matters.title"))
+
+  "OtherBusinessTaxMattersController" when {
+    "get is called" must {
+      "display the are you registered with HMRC to handle other business's tax matters page" in new Fixture {
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("asp.other.business.tax.matters.title"))
+      }
+
+      "display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
+        when(controller.dataCacheConnector.fetch[Asp](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes)))))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("otherBusinessTaxMatters-true").hasAttr("checked") must be(true)
+      }
     }
 
-    "on get display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Asp](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes("1234yh78256"))))))
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include("1234yh78256")
+    "post is called" must {
+      "on post with valid data" in new Fixture {
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
+
+      "on post with invalid boolean data" in new Fixture {
+        val newRequestInvalid = request.withFormUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
+        val result = controller.post()(newRequestInvalid)
+
+        status(result) must be(BAD_REQUEST)
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.select("span").html() must include(Messages("error.required.asp.other.business.tax.matters"))
+      }
+
+      "On post with missing boolean data" in new Fixture {
+        val newRequestInvalid = request.withFormUrlEncodedBody("otherBusinessTaxMatters" -> "")
+        val result = controller.post()(newRequestInvalid)
+
+        status(result) must be(BAD_REQUEST)
+
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.select("span").html() must include(Messages("error.required.asp.other.business.tax.matters"))
+      }
+
+
+      "on post with valid data in edit mode" in new Fixture {
+        val result = controller.post(true)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
     }
-
-    "on post with valid data" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "otherBusinessTaxMatters" -> "true",
-        "agentRegNo" -> "1234yh78256"
-      )
-
-      when(controller.dataCacheConnector.fetch[Asp](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
-
-    "on post with max data" in new Fixture {
-
-      val newRequestInvalid = request.withFormUrlEncodedBody(
-        "otherBusinessTaxMatters" -> "true",
-        "agentRegNo" -> "adbg123312589"
-      )
-
-      val result = controller.post()(newRequestInvalid)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.invalid.length.asp.agentRegNo"))
-
-    }
-
-    "on post with invalid data" in new Fixture {
-
-      val newRequestInvalid = request.withFormUrlEncodedBody(
-        "otherBusinessTaxMatters" -> "true",
-        "agentRegNo" -> "adbg"
-      )
-
-      val result = controller.post()(newRequestInvalid)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.invalid.asp.agentRegNo"))
-
-    }
-
-    "On post with missing boolean data" in new Fixture {
-
-      val newRequestInvalid = request.withFormUrlEncodedBody(
-        "otherBusinessTaxMatters" -> ""
-      )
-
-      val result = controller.post()(newRequestInvalid)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.asp.other.business.tax.matters"))
-    }
-
-    "On post with missing agent registration number" in new Fixture {
-
-      val newRequestInvalid = request.withFormUrlEncodedBody(
-        "otherBusinessTaxMatters" -> "true",
-        "agentRegNo" -> ""
-      )
-
-      val result = controller.post()(newRequestInvalid)
-      status(result) must be(BAD_REQUEST)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.asp.agentRegNo"))
-    }
-
-    "on post with valid data in edit mode" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "otherBusinessTaxMatters" -> "true",
-        "agentRegNo" -> "adbg1233125"
-      )
-
-      when(controller.dataCacheConnector.fetch[Asp](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-    }
-
   }
 
 }

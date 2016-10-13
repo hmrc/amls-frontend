@@ -5,7 +5,8 @@
 @(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType)(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("responsiblepeople.position_within_business.heading", "summary.responsiblepeople")
+    @errorSummary(f)
+    @heading("responsiblepeople.position_within_business.title", "summary.responsiblepeople")
 }
 
 @main(
@@ -13,8 +14,9 @@
     heading = header
 ) {
 
-    <div class="form-group">
-        <p class="important-notice">@Messages("responsiblepeople.position_within_business.important")</p>
+    <div class="notice">
+        <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
+        <strong class="bold-small">@Messages("responsiblepeople.position_within_business.important")</strong>
     </div>
 
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit)) {
@@ -36,6 +38,14 @@
                 }
             }
         }
+
+        @date(
+        f = f,
+        p = "startDate",
+        labelText = "responsiblepeople.position_within_business.startDate.lbl",
+        hintText = "responsiblepeople.position_within_business.startDate.hint",
+        false
+        )
 
         @submit()
     }

@@ -6,6 +6,7 @@
 @(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_], lang: Lang)
 
 @header = {
+    @errorSummary(f)
     @heading("aboutthebusiness.confirmingyouraddress.heading", "summary.aboutbusiness")
 }
 

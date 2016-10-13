@@ -30,7 +30,7 @@
 }
 
 @header = {
-    @heading("responsiblepeople.detailed_answers.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.detailed_answers.title", "summary.responsiblepeople")
 }
 
 @main(
@@ -93,10 +93,6 @@
 
                 @optionalBlock(Messages("responsiblepeople.detailed_answers.country_of_birth"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
                     @prt.countryOfBirth
-                }
-
-                @optionalBlock(Messages("responsiblepeople.detailed_answers.nationality"), person.personResidenceType, PersonResidentTypeController.get(idx, true)) {prt =>
-                    @prt.nationality
                 }
 
                 @optionalBlock(Messages("responsiblepeople.detailed_answers.phone_number"), person.contactDetails, ContactDetailsController.get(idx, true)) {cd =>

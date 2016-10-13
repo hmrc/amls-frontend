@@ -2,10 +2,10 @@
 @(index: Int)(implicit request: Request[_])
 
 @header = {
-    @heading("responsiblepeople.whatyouneed.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.whatyouneed.title", "summary.responsiblepeople")
 }
 
-@main(
+@whatyouneed(
     title = Messages("responsiblepeople.whatyouneed.title"),
     heading = header
 ) {

@@ -2,25 +2,23 @@
 @import models.responsiblepeople._
 @import forms2._
 
-@(f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang: Lang, request: Request[_])
+@(content: (String,String), f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang: Lang, request: Request[_])
 
 @header = {
-    @heading("declaration.who.is.registering.title", "submit.registration")
+    @errorSummary(f)
+    @heading("declaration.who.is.registering.header", content._2)
 }
 
 @main(
-    title = Messages("declaration.who.is.registering.title"),
+    title = Messages(content._1),
     heading = header
 ) {
-
     @form(f, controllers.declaration.routes.WhoIsRegisteringController.post()) {
         <p class="panel-indent panel-border-wide panel-indent--gutter">
             @Messages("declaration.who.is.registering.text")
         </p>
-
         @radioGroup(f("person")) {
             @legend("", jsHidden = false)
-
             @model.map { people =>
                 @people.personName.map { obj =>
                     @radio(f("person"), obj.firstName+" "+obj.lastName, obj.firstName+obj.lastName)

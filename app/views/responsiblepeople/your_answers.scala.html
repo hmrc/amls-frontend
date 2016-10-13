@@ -1,10 +1,11 @@
 @import include._
 @import models.responsiblepeople.ResponsiblePeople
+@import utils.StatusConstants
 
 @(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
 
 @header = {
-    @heading("responsiblepeople.your_answers.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.your_answers.title", "summary.responsiblepeople")
 }
 
 @main(
@@ -18,19 +19,24 @@
 
     <table>
         @responsiblePeople.zipWithIndex.map { case (rp, index) =>
-
-            @rp.personName.map { pn =>
-            <tr>
-                <th class="summary-title" colspan="2">
-                @pn.fullName
-                </th>
-                <td><a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1)">@Messages("button.edit")</a></td>
-            </tr>
+            @if(!rp.status.contains(StatusConstants.Deleted)) {
+                @rp.personName.map { pn =>
+                <tr>
+                    <th class="summary-title" colspan="2">
+                    @pn.fullName
+                    </th>
+                    <td class="numeric">
+                        <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1)">@Messages("button.edit")</a> @Messages("lbl.or")
+                        <a href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, false)">Remove</a>
+                    </td>
+                </tr>
+                }
             }
         }
+
     </table>
 
-    <div class="form-group">
-        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.confirmandcontinue")</a>
+    <div class="form-field">
+        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
     </div>
 }

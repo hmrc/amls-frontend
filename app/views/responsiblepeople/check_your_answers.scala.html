@@ -1,35 +1,48 @@
 @import include._
 @import models.responsiblepeople._
+@import utils.StatusConstants
 
 @(model: Seq[ResponsiblePeople])(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.responsiblepeople")
+    @heading("responsiblepeople.your_answers.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("responsiblepeople.your_answers.title"),
     heading = header
 ) {
+
+    @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0){
+    <div class="panel-indent panel-border-wide spacelarge">
+        <p> @Messages("responsiblepeople.summary.no.responsible.people") </p>
+        <p>
+            <a href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)"> @Messages("responsiblepeople.check_your_answers.add") </a>
+        </p>
+    </div>
+    } else {
 
     <table>
         <tbody>
             @model.zipWithIndex.map { case (responsiblePerson, idx)=>
 
-                @responsiblePerson.personName.map { personDetails =>
-                 <tr>
-                    <th class="summary-title">
-                        @personDetails.fullName
-                    </th>
-                    <td>
-                        <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit") </a>
-                    </td>
-                </tr>
+                @if(!responsiblePerson.status.contains(StatusConstants.Deleted)) {
+                    @responsiblePerson.personName.map { personDetails =>
+                     <tr>
+                        <th class="summary-title">
+                            @personDetails.fullName
+                        </th>
+                        <td class="numeric">
+                            <a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1)">@Messages("button.edit") </a> @Messages("lbl.or")
+                            <a href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false)">Remove</a>
+                        </td>
+                    </tr>
+                    }
                 }
-
             }
         </tbody>
     </table>
+}
 
     <div class="form-field">
         <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.checkyouranswers.acceptandcomplete")</a>

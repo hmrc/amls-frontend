@@ -2,13 +2,15 @@ package controllers.msb
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -23,6 +25,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       override val authConnector = self.authConnector
     }
   }
+  val mockCacheMap = mock[CacheMap]
 
   "Get" must {
 
@@ -34,6 +37,25 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     "load the summary page when section data is available" in new Fixture {
 
       val model = MoneyServiceBusiness(None)
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            TransmittingMoney,
+            CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal
+          )
+        )
+      )
+
+      when(controller.dataCache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(model))
 
       when(controller.dataCache.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
@@ -44,9 +66,24 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
+      when(controller.dataCache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      val msbServices = Some(
+        MsbServices(
+          Set(
+            TransmittingMoney,
+            CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal
+          )
+        )
+      )
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(None)
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)

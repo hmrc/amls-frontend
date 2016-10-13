@@ -1,7 +1,7 @@
-package controllers.msb
+package controllers.businessmatching
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness._
+import models.businessmatching._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -11,7 +11,6 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.test.Helpers._
 import org.jsoup.Jsoup
-import play.api.test.FakeRequest
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
@@ -33,7 +32,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -48,13 +47,13 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
 
     "show a prefilled form when there is data in the store" in new Fixture {
 
-      val model = MoneyServiceBusiness(
+      val model = BusinessMatching(
         msbServices = Some(
           MsbServices(Set(TransmittingMoney, CurrencyExchange))
         )
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -81,36 +80,38 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
 
       document.select("input[type=checkbox]").size mustBe 4
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 1
+      document.select(".amls-error-summary").size mustBe 0
     }
 
     "return a redirect to the 'How much Throughput' page on valid submission" in new Fixture {
 
-      val model = MoneyServiceBusiness(
+      val model = BusinessMatching(
         msbServices = Some(MsbServices(
           Set(TransmittingMoney)
-        ))
+        )),
+        businessAppliedForPSRNumber = None,
+        hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
         "msbServices[0]" -> "01"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.ExpectedThroughputController.get().url)
+      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(false).url)
     }
 
     "return a redirect to the 'X' page when adding 'Transmitting Money' as a service during edit" in new Fixture {
 
-      val currentModel = MoneyServiceBusiness(
+      val currentModel = BusinessMatching(
         msbServices = Some(MsbServices(
           Set(ChequeCashingNotScrapMetal)
         ))
@@ -119,7 +120,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val newModel = currentModel.copy(
         msbServices = Some(MsbServices(
           Set(TransmittingMoney, CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-        ))
+        )), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -129,10 +130,10 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
         "msbServices[3]" -> "04"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(currentModel)))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(newModel))(any(), any(), any()))
+      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
@@ -143,7 +144,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
 
     "return a redirect to the 'X' page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
-      val currentModel = MoneyServiceBusiness(
+      val currentModel = BusinessMatching(
         msbServices = Some(MsbServices(
           Set(ChequeCashingNotScrapMetal)
         ))
@@ -152,7 +153,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
       val newModel = currentModel.copy(
         msbServices = Some(MsbServices(
           Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-        ))
+        )), hasChanged = true
       )
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -161,29 +162,23 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
         "msbServices[3]" -> "04"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(currentModel)))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(newModel))(any(), any(), any()))
+      when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get(true).url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
     "return a redirect to the 'Check Your Answers' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
-      Seq((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
+      Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
         case (model, id) =>
-          val currentModel = MoneyServiceBusiness(
-            ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
-              ""
-            )),
-            businessAppliedForPSRNumber = Some(
-              BusinessAppliedForPSRNumberNo
-            ),
+          val currentModel = BusinessMatching(
             msbServices = Some(MsbServices(
               Set(TransmittingMoney, CurrencyExchange)
             ))
@@ -192,7 +187,7 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
           val newModel = currentModel.copy(
             msbServices = Some(MsbServices(
               Set(TransmittingMoney, CurrencyExchange, model)
-            ))
+            )), hasChanged = true
           )
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -201,16 +196,16 @@ class ServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSuga
             "msbServices[3]" -> id
           )
 
-          when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+          when(cache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(currentModel)))
 
-          when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(newModel))(any(), any(), any()))
+          when(cache.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
           val result = controller.post(edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
       }
     }
   }
