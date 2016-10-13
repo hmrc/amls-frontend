@@ -41,9 +41,9 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
           businessActivitiesData flatMap {
             activities =>
               getData[ResponsiblePeople](index) map {
-                case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _))
+                case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _,_))
                   => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index))
-                case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+                case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
                   => Ok(experience_training(EmptyForm, activities, edit, index))
                 case _
                   => NotFound(notFoundView)
@@ -63,8 +63,8 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
                   Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index)))
                 case ValidForm(_, data) => {
                   for {
-                    result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                      Some(currentData.experienceTraining(data))
+                    result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                      rp.experienceTraining(data)
                     }
                   } yield edit match {
                     case true => Redirect(routes.DetailedAnswersController.get(index))

@@ -8,7 +8,7 @@ import play.api.libs.json.{Reads, Writes}
 case class PersonResidenceType (
                                isUKResidence : ResidenceType,
                                countryOfBirth: Country,
-                               nationality: Country
+                               nationality: Option[Country]
                               )
 
 object PersonResidenceType {
@@ -20,7 +20,7 @@ object PersonResidenceType {
     (
       __.read[ResidenceType] and
       (__ \ "countryOfBirth").read[Country].withMessage("error.required.rp.birth.country") and
-      (__ \ "nationality").read[Country].withMessage("error.required.nationality")
+      (__ \ "nationality").read[Option[Country]].withMessage("error.required.nationality")
       )(PersonResidenceType.apply _)
   }
 
@@ -30,7 +30,7 @@ object PersonResidenceType {
     (
       __.write[ResidenceType] and
         (__ \ "countryOfBirth").write[Country] and
-        (__ \ "nationality").write[Country]
+        (__ \ "nationality").write[Option[Country]]
       ) (unlift(PersonResidenceType.unapply))
   }
 
@@ -40,7 +40,7 @@ object PersonResidenceType {
     (
       __.read[ResidenceType] and
         (__ \ "countryOfBirth").read[Country] and
-        (__ \ "nationality").read[Country]
+        (__ \ "nationality").read[Option[Country]]
       ) (PersonResidenceType.apply _)
   }
 
@@ -50,7 +50,7 @@ object PersonResidenceType {
     (
       __.write[ResidenceType] and
         (__ \ "countryOfBirth").write[Country] and
-        (__ \ "nationality").write[Country]
+        (__ \ "nationality").write[Option[Country]]
       ) (unlift(PersonResidenceType.unapply))
   }
 

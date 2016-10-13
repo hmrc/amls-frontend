@@ -4,6 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("businessactivities.business-turnover.heading", "summary.businessactivities")
 }
 
@@ -13,6 +14,8 @@
 ) {
 
     @form(f, controllers.businessactivities.routes.ExpectedBusinessTurnoverController.post(edit)) {
+
+        <span>@Messages("businessactivities.business-turnover.text")</span>
 
         <div class="form-field-group">
             @radioGroup(f("expectedBusinessTurnover")) {

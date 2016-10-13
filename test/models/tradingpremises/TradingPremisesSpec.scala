@@ -1,7 +1,7 @@
 package models.tradingpremises
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
-import models.responsiblepeople.ResponsiblePeople
+import models.registrationprogress.{Completed, NotStarted}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -10,6 +10,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
@@ -45,26 +46,34 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
     Some(agentCompanyName),
     Some(agentPartnership),
     Some(wdbd),
-    Some(msbServices)
+    Some(msbServices),
+    false,
+    Some(123456),
+    Some("Added"),
+    Some(ActivityEndDate(new LocalDate(1999,1,1)))
+
   )
 
   val incompleteModel = TradingPremises(Some(RegisteringAgentPremises(true)),
     Some(ytp), Some(businessStructure), Some(agentName),None, None, None, None)
 
-  val completeJson = Json.obj("agentPremises" -> true,
-    "tradingName" -> "foo",
-    "addressLine1" -> "1",
-    "addressLine2" -> "2",
-    "postcode" -> "asdfasdf",
-    "isResidential" -> true,
-    "startDate" -> "1990-02-24",
-    "agentsBusinessStructure" ->"01",
-    "agentName" ->"test",
-    "agentCompanyName" ->"test",
-    "agentPartnership" ->"test",
-    "activities" -> Json.arr("02", "03", "05"),
-    "msbServices" ->Json.arr("01","02"),
-    "hasChanged" -> false
+  val completeJson = Json.obj("registeringAgentPremises"-> Json.obj("agentPremises"->true),
+    "yourTradingPremises"-> Json.obj("tradingName" -> "foo",
+      "addressLine1" ->"1",
+      "addressLine2" ->"2",
+      "postcode" ->"asdfasdf",
+      "isResidential" ->true,
+      "startDate" ->"1990-02-24"),
+    "businessStructure" -> Json.obj("agentsBusinessStructure" ->"01"),
+    "agentName" -> Json.obj("agentName" ->"test"),
+    "agentCompanyName" -> Json.obj("agentCompanyName" ->"test"),
+    "agentPartnership" -> Json.obj("agentPartnership" ->"test"),
+    "whatDoesYourBusinessDoAtThisAddress" ->Json.obj("activities" -> Json.arr("02","03","05")),
+    "msbServices" -> Json.obj("msbServices"-> Json.arr("01","02")),
+    "hasChanged" ->false,
+    "lineId" ->123456,
+    "status" ->"Added",
+    "endDate"-> Json.obj("endDate" ->"1999-01-01")
   )
 
   "TradingPremises" must {
@@ -122,9 +131,15 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
         be(completeJson)
     }
 
+    "deserialise correctly when hasChanged field is missing from the Json" in {
+      (completeJson - "hasChanged").as[TradingPremises] must
+        be(completeModel)
+    }
+
     "Deserialise as expected" in {
       completeJson.as[TradingPremises] must
         be(completeModel)
+      TradingPremises.writes.writes(completeModel) must be(completeJson)
     }
 
     "isComplete" must {
@@ -140,6 +155,67 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
       "return false when tradingPremises no data" in {
         val tradingPremises = TradingPremises(None, None)
         tradingPremises.isComplete must be(true)
+      }
+    }
+  }
+
+  "Amendment and Variation flow" when {
+    "the section is complete with all the trading premises being removed" must {
+      "successfully redirect to what you need page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
+            TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true))))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(NotStarted)
+        section.call must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+      }
+    }
+
+    "the section is complete with one of the trading premises object being removed" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Deleted), hasChanged = true),
+            completeModel)))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+      }
+    }
+
+    "the section is complete with all the trading premises unchanged" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(completeModel, completeModel)))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(false)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+      }
+    }
+
+    "the section is complete with all the trading premises being modified" must {
+      "successfully redirect to check your answers page" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true),
+            TradingPremises(status=Some(StatusConstants.Updated), hasChanged = true))))
+        val section = TradingPremises.section(mockCacheMap)
+
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
       }
     }
   }

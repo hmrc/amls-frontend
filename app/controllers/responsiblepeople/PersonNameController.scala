@@ -22,9 +22,9 @@ trait PersonNameController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(name), _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(Some(name), _, _, _, _, _, _, _, _, _, _, _,_))
                 => Ok(person_name(Form2[PersonName](name), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
                 => Ok(person_name(EmptyForm, edit, index))
             case _
                 => NotFound(notFoundView)
@@ -41,8 +41,8 @@ trait PersonNameController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.personName(data))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.personName(data)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))

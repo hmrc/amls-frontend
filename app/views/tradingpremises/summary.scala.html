@@ -1,5 +1,6 @@
 @import include._
 @import models.tradingpremises._
+@import utils.StatusConstants
 
 @(model: Seq[TradingPremises], add: Boolean)(implicit request: Request[_], lang: Lang)
 
@@ -15,8 +16,17 @@
     heading = header
 ) {
 
-    @if(add){
-        <div class="panel panel-border-wide spacelarge">
+    @if(add && !(model.isEmpty || (model.count(!_.status.contains(StatusConstants.Deleted)) == 0))){
+         <div class="panel-indent panel-border-wide spacelarge">
+            <p>
+                <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
+            </p>
+        </div>
+    }
+
+    @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0){
+         <div class="panel-indent panel-border-wide spacelarge">
+            <p> @Messages("tradingpremises.summary.no.trading.premises") </p>
             <p>
                 <a href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)"> @Messages("tradingpremises.summary.addanother") </a>
             </p>
@@ -24,18 +34,21 @@
     }
 
     @model.zipWithIndex.map { case (tp, y) =>
-        <table class="spacesummary">
+        @if(!tp.status.contains(StatusConstants.Deleted)) {
+            <table class="check-your-answers">
+                @tp.yourTradingPremises.map { ytp =>
+                    <tbody>
+                    <tr>
+                        <td class="question">@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
+                        <td class="answer"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a>
+                        @Messages("lbl.or")
+                        <a href="@controllers.tradingpremises.routes.RemoveTradingPremisesController.get(y + 1, add)">@Messages("button.remove")</a></td>
+                    </tr>
+                    </tbody>
+                }
 
-            @tp.yourTradingPremises.map { ytp =>
-                <tbody>
-                <tr>
-                        <td>@ytp.tradingPremisesAddress.toLines.mkString(", ")</td>
-                    <td class="numeric"><a href="@controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1)">@Messages("button.edit")</a></td>
-                </tr>
-                </tbody>
-            }
-
-        </table>
+            </table>
+        }
     }
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

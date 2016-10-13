@@ -51,13 +51,8 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             // If there is only one activity in the data from the pre-reg,
             // then save that and redirect immediately without showing the
             // 'what does your business do' page.
-            updateDataStrict[TradingPremises](index) {
-              case Some(tp) =>
+            updateDataStrict[TradingPremises](index) { tp =>
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
-              case _ =>
-                Some(TradingPremises(
-                  whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities))
-                ))
             }
             Future.successful {
               activities.contains(MoneyServiceBusiness) match {
@@ -69,9 +64,9 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             val ba = BusinessActivities(activities)
             Future.successful {
               getData[TradingPremises](c, index) match {
-                case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_)) =>
+                case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_,_,_,_)) =>
                   Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
-                case Some(TradingPremises(_,_,  _,_,_,_, None, _,_)) =>
+                case Some(TradingPremises(_,_,  _,_,_,_, None, _,_,_,_,_)) =>
                   Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
                 case _ => NotFound(notFoundView)
               }
@@ -93,10 +88,10 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
               }
             case ValidForm(_, data) => {
               updateDataStrict[TradingPremises](index) {
-                case Some(tp) if data.activities.contains(MoneyServiceBusiness) =>
-                  Some(tp.whatDoesYourBusinessDoAtThisAddress(data))
-                case Some(tp) if !data.activities.contains(MoneyServiceBusiness) =>
-                  Some(TradingPremises(
+                case tp if data.activities.contains(MoneyServiceBusiness) =>
+                  tp.whatDoesYourBusinessDoAtThisAddress(data)
+                case tp if !data.activities.contains(MoneyServiceBusiness) =>
+                  TradingPremises(
                     tp.registeringAgentPremises,
                     tp.yourTradingPremises,
                     tp.businessStructure,
@@ -105,8 +100,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                     tp.agentPartnership,
                     Some(data),
                     None
-                  ))
-                case _ => Some(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(data)))
+                  )
               } map {
                 _ => data.activities.contains(MoneyServiceBusiness) match {
                   case true => Redirect(routes.MSBServicesController.get(index, edit))

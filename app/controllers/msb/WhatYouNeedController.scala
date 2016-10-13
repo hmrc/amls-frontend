@@ -12,7 +12,6 @@ trait WhatYouNeedController extends BaseController {
     implicit authContext => implicit request =>
       Future.successful(Ok(what_you_need()))
   }
-
 }
 
 object WhatYouNeedController extends WhatYouNeedController {

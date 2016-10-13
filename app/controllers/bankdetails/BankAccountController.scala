@@ -16,7 +16,7 @@ trait BankAccountController extends RepeatingSection with BaseController {
   def get(index:Int, edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[BankDetails](index) map {
-        case Some(BankDetails(_, Some(data),_)) =>
+        case Some(BankDetails(_, Some(data),_,_)) =>
           Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
         case Some(_) =>
           Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
@@ -33,8 +33,8 @@ trait BankAccountController extends RepeatingSection with BaseController {
           Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, edit, index)))
         case ValidForm(_, data) => {
           for {
-            result <- updateDataStrict[BankDetails](index) {
-              _.map {_.bankAccount(data)}
+            result <- updateDataStrict[BankDetails](index) { bd =>
+              bd.bankAccount(data)
             }
           } yield {
             if(edit) {

@@ -7,6 +7,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.StatusConstants
 
 
 class BankDetailsSpec extends PlaySpec with MockitoSugar {
@@ -16,34 +17,34 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
   val accountType = PersonalAccount
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeJson = Json.obj("bankAccountType" -> "01", "hasChanged" -> false)
+  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false)
   val accountTypeNew = BelongsToBusiness
 
   val bankAccount = BankAccount("My Account", UKAccount("111111", "11-11-11"))
   val bankAccountPartialModel = BankDetails(None, Some(bankAccount))
-  val bankAccountJson = Json.obj(
+  val bankAccountJson = Json.obj("bankAccount" -> Json.obj(
     "accountName" -> "My Account",
     "isUK" -> true,
     "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11",
+    "sortCode" -> "11-11-11"),
     "hasChanged" -> false)
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
 
   val completeModel = BankDetails(Some(accountType), Some(bankAccount))
   val completeJson = Json.obj(
-    "bankAccountType" -> "01",
-    "accountName" -> "My Account",
-    "isUK" -> true,
-    "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11",
+    "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
+    "bankAccount" -> Json.obj("accountName" -> "My Account",
+      "isUK" -> true,
+      "accountNumber" -> "111111",
+      "sortCode" -> "11-11-11"),
     "hasChanged" -> false)
   val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
   val completeJsonChanged = Json.obj(
-    "bankAccountType" -> "01",
-    "accountName" -> "My Account",
-    "isUK" -> true,
-    "accountNumber" -> "111111",
-    "sortCode" -> "11-11-11",
+    "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
+    "bankAccount" -> Json.obj("accountName" -> "My Account",
+      "isUK" -> true,
+      "accountNumber" -> "111111",
+      "sortCode" -> "11-11-11"),
     "hasChanged" -> true)
 
 
@@ -109,6 +110,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
   }
 
   "Section" must {
+
     "return a NotStarted Section when there is no data at all" in {
       val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
 
@@ -116,6 +118,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       BankDetails.section(cache) must be(notStartedSection)
     }
+
     "return a Completed Section when model is complete and has not changed" in {
       val complete = Seq(completeModel)
       val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
@@ -124,8 +127,9 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       BankDetails.section(cache) must be(completedSection)
     }
+
     "return a Completed Section when model is complete and has changed" in {
-      val completeChangedModel = BankDetails(Some(accountType), Some(bankAccount),true)
+      val completeChangedModel = BankDetails(Some(accountType), Some(bankAccount), true)
 
       val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
@@ -133,6 +137,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
       BankDetails.section(cache) must be(completedSection)
     }
+
     "return a Started Section when model is incomplete" in {
       val incomplete = Seq(accountTypePartialModel)
       val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get(1))
@@ -140,6 +145,92 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(incomplete)
 
       BankDetails.section(cache) must be(startedSection)
+    }
+
+    "return a completed Section when model is complete with No bankaccount option selected" in {
+      val noBankAcount = Seq(BankDetails(None, None, true, None))
+      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+
+      when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAcount)
+
+      val section = BankDetails.section(cache)
+      section.hasChanged must be(true)
+      section.status must be(Completed)
+      BankDetails.section(cache) must be(completedSection)
+    }
+
+    "Amendment and Variation flow" when {
+      "the section is complete with all the bank details being removed" must {
+        "successfully redirect to what you need page" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+            .thenReturn(Some(Seq(BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true), BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true))))
+          val section = BankDetails.section(mockCacheMap)
+
+          section.hasChanged must be(true)
+          section.status must be(NotStarted)
+          section.call must be(controllers.bankdetails.routes.BankAccountAddController.get(true))
+        }
+      }
+
+      "the section is complete with one of the bank details object being removed" must {
+        "successfully redirect to check your answers page" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+            .thenReturn(Some(Seq(BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true), completeModel)))
+          val section = BankDetails.section(mockCacheMap)
+
+          section.hasChanged must be(true)
+          section.status must be(Completed)
+          section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
+        }
+      }
+
+      "the section is complete with all the bank details unchanged" must {
+        "successfully redirect to check your answers page" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+            .thenReturn(Some(Seq(completeModel, completeModel)))
+          val section = BankDetails.section(mockCacheMap)
+
+          section.hasChanged must be(false)
+          section.status must be(Completed)
+          section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
+        }
+      }
+
+      "the section is complete with all the bank details being modified" must {
+        "successfully redirect to check your answers page" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any()))
+            .thenReturn(Some(Seq(completeModelChanged, completeModelChanged)))
+          val section = BankDetails.section(mockCacheMap)
+
+          section.hasChanged must be(true)
+          section.status must be(Completed)
+          section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
+        }
+      }
+
+
+      "exclude Nobank account and deleted bank accounts before sending to ETMP" in {
+
+        val completeModel = BankDetails(Some(accountType), Some(bankAccount), status = Some(StatusConstants.Deleted))
+        val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
+        val NoBankAccount = BankDetails(None,None, true)
+
+        val bankAccts = Seq(completeModel, completeModelChanged, NoBankAccount)
+        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
+        val test = bankDtls.nonEmpty match {
+          case true => Some(bankDtls)
+          case false => Some(Seq.empty)
+        }
+        test must be(Some(Seq(completeModelChanged)))
+      }
     }
   }
 

@@ -20,6 +20,36 @@ a.block-link {
     display: block;
 }
 
+/* new-style page headers */
+.page-header {
+  clear: both;
+  display: table;
+  margin-top: 1.8em;
+}
+
+.page-header .heading-xlarge {
+  margin: .15em 0 1.25em;
+}
+
+.page-header .heading-secondary {
+  display: table-header-group;
+  margin-bottom: 0;
+  color: #6f777b;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.11111;
+  text-transform: none;
+}
+
+@media screen and (min-width: 641px) {
+  .page-header .heading-secondary {
+    font-size: 27px;
+    line-height: 1.11111;
+    padding-bottom: 6px;
+    padding-top: 4px;
+  }
+}
+
 /* -- application progress page -- */
 .grid-layout {
     table-layout: fixed;
@@ -35,7 +65,8 @@ a.block-link {
     margin-top: 12px;
 }
 
-.progress-steps li:first-child {
+.progress-steps li:first-child,
+.progress-steps__amend li:first-child + li {
     margin-top: 0;
 }
 
@@ -515,7 +546,7 @@ form .inline .block-label {
   clear: both;
 }
 
-.visuallyhidden-legend legend {
+.visuallyhidden-legend > legend {
   border: 0;
   clip: rect(0 0 0 0);
   clip: rect(0, 0, 0, 0);
@@ -528,17 +559,14 @@ form .inline .block-label {
 }
 
 /* summary styles */
-.summary-title {
+table.summary-title {
   width: 88%;
-}
-
-.summary {
-  font-size: 16px;
-  margin-bottom: 20px;
 }
 
 table.summary {
   table-layout: fixed;
+  font-size: 16px;
+  margin-bottom: 20px;
 }
 
 table.summary th {
@@ -553,7 +581,7 @@ table.summary td {
   word-break: break-all;
 }
 
-.summary ul li {
+table.summary ul li {
   font-size: 16px;
   margin-bottom: 0;
 }
@@ -628,8 +656,16 @@ table.summary td {
   text-align: right;
   vertical-align: middle;
 }
+/* cheap fix before S&T */
+.check-your-answers .question {
+  word-break: break-word;
+}
 
-@media (max-width: 640px) {
+.check-your-answers .answer {
+  width: 120px;
+}
+
+@media (max-width: 640px) {sbt compile
   .check-your-answers .grid-layout--stacked .grid-layout__column {
       display: table-cell;
   }
@@ -873,6 +909,12 @@ fieldset.panel-indent legend {
   -webkit-appearance: textfield;
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+/* Temp override */
+
+.details__inner li {
+  padding-bottom: 20px;
 }
 
 

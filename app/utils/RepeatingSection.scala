@@ -1,5 +1,6 @@
 package utils
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader
 import connectors.DataCacheConnector
 import play.api.libs.json.Format
 import typeclasses.MongoKey
@@ -124,7 +125,7 @@ trait RepeatingSection {
 
   protected def fetchAllAndUpdateStrict[T]
   (index: Int)
-  (fn: (CacheMap, Option[T]) => Option[T])
+  (fn: (CacheMap, T) => T)
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
@@ -137,8 +138,7 @@ trait RepeatingSection {
         cacheMap => {
           cacheMap.getEntry[Seq[T]](key()).map {
             data => {
-              if (index < 1 || data.size < index) throw new IndexOutOfBoundsException()
-              putData(data.patch(index - 1, fn(cacheMap, data.lift(index - 1)).toSeq, 1))
+              putData(data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
             }
           }
           cacheMap
@@ -165,7 +165,22 @@ trait RepeatingSection {
 
   protected def updateDataStrict[T]
   (index: Int)
-  (fn: Option[T] => Option[T])
+  (fn: T => T)
+  (implicit
+   user: AuthContext,
+   hc: HeaderCarrier,
+   formats: Format[T],
+   key: MongoKey[T],
+   ec: ExecutionContext
+  ): Future[_] =
+    getData[T] flatMap {
+      data => {
+        putData(data.patch(index - 1, Seq(fn(data(index - 1))), 1))
+      }
+    }
+
+  protected def removeDataStrict[T]
+  (index: Int)
   (implicit
    user: AuthContext,
    hc: HeaderCarrier,
@@ -175,8 +190,7 @@ trait RepeatingSection {
   ): Future[_] =
     getData[T] map {
       data => {
-        if (index < 1 || data.size < index) throw new IndexOutOfBoundsException()
-        putData(data.patch(index - 1, fn(data.lift(index - 1)).toSeq, 1))
+        putData(data.patch(index - 1, Nil, 1))
       }
     }
 

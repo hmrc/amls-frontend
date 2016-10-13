@@ -4,6 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import models.Country
 import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople}
 import utils.RepeatingSection
 import views.html.responsiblepeople.person_residence_type
@@ -19,9 +20,9 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     Authorised.async {
       implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, Some(residencyType), _, _, _, _, _, _, _, _, _, _, _))
               => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _))
               => Ok(person_residence_type(EmptyForm, edit, index))
             case _
               => NotFound(notFoundView)
@@ -39,12 +40,14 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
               Future.successful(BadRequest(person_residence_type(f, edit, index)))
             case ValidForm(_, data) => {
               for {
-                result <- updateDataStrict[ResponsiblePeople](index) { currentData =>
-                  Some(currentData.personResidenceType(data))
+                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
+                  val updatedData = data.copy(nationality = nationality)
+                  rp.personResidenceType(updatedData)
                 }
               } yield edit match {
                 case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.ContactDetailsController.get(index, edit))
+                case false => Redirect(routes.NationalityController.get(index, edit))
               }
             }.recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

@@ -7,7 +7,7 @@ import forms.{Form2, _}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -21,7 +21,7 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
         cache =>
           cache.map{ c =>
             getData[TradingPremises](c, index) match {
-              case Some(tp) if isMSBSelected(c.getEntry[BusinessMatching](BusinessMatching.key)) => {
+              case Some(tp) if ControllerHelper.isMSBSelected(c.getEntry[BusinessMatching](BusinessMatching.key)) => {
                 val form = tp.registeringAgentPremises match {
                   case Some(service) => Form2[RegisteringAgentPremises](service)
                   case None => EmptyForm
@@ -42,8 +42,8 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
           Future.successful(BadRequest(views.html.tradingpremises.registering_agent_premises(f, index, edit)))
         case ValidForm(_, data) => {
           for {
-            _ <- updateDataStrict[TradingPremises](index) {
-              case Some(tp) => Some(resetAgentValues(tp.registeringAgentPremises(data), data))
+            _ <- updateDataStrict[TradingPremises](index) { tp =>
+              resetAgentValues(tp.registeringAgentPremises(data), data)
             }
           } yield data.agentPremises match {
             case true => Redirect(routes.BusinessStructureController.get(index,edit))
@@ -63,14 +63,6 @@ trait RegisteringAgentPremisesController extends RepeatingSection with BaseContr
     case false => tp.copy(agentName=None,businessStructure=None,agentCompanyName=None,agentPartnership=None)
   }
 
-  private def isMSBSelected(bm: Option[BusinessMatching]): Boolean = {
-    bm match {
-      case Some(matching) => matching.activities.foldLeft(false){(x, y) =>
-        y.businessActivities.contains(MoneyServiceBusiness)
-      }
-      case None => false
-    }
-  }
 }
 
 object RegisteringAgentPremisesController extends RegisteringAgentPremisesController {
