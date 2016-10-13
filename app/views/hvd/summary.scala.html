@@ -6,11 +6,14 @@
 
 @(model: Hvd)(implicit request: Request[_], lang: Lang)
 
-@main(
-    title = Messages("title.cya")
-) {
-
+@header = {
     @heading("title.cya", "summary.hvd")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.hvd"),
+    heading = header
+) {
 
     @model.products.map { p =>
         @checkYourAnswers(
