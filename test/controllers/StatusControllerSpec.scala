@@ -437,5 +437,4 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       }
     }
   }
-
 }
