@@ -75,9 +75,9 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       }
     }
 
-    "post is called" when {
-      "edit is false" must {
-        "respond with SEE_OTHER when given valid data" in new Fixture {
+    "post is called" must {
+      "respond with SEE_OTHER" when {
+        "edit is false and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "agentCompanyName" -> "text"
@@ -93,9 +93,8 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
         }
-      }
-      "edit is true" must {
-        "respond with SEE_OTHER when given valid data" in new Fixture {
+
+        "edit is true and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "agentCompanyName" -> "text"
@@ -113,8 +112,9 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
 
         }
       }
-      "given invalid data" must {
-        "respond with BAD_REQUEST" in new Fixture {
+
+      "respond with BAD_REQUEST" when {
+        "given invalid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "agentCompanyName" -> "11111111111" * 40
@@ -131,10 +131,8 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
           contentAsString(result) must include(Messages("error.invalid.tp.agent.registered.company.name"))
 
         }
-      }
 
-      "given missing mandatory field" must {
-        "respond with BAD_REQUEST" in new Fixture {
+        "given missing mandatory field" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
             "agentCompanyName" -> " "
           )
@@ -151,32 +149,29 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         }
       }
 
-      "the hasChanged flag should be true" in new Fixture {
+      "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "agentCompanyName" -> "text"
-        )
+        val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text")
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremisesWithHasChangedFalse))))
 
-        // make this not return an empty cache?
         when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1)(newRequest)
+
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
 
-      // put in a verify
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = None,
-            agentCompanyName = Some(AgentCompanyName("text")))))
-        )(any(), any(), any())
-
+            agentCompanyName = Some(AgentCompanyName("text")),
+            agentPartnership = None
+          ))))(any(), any(), any())
       }
     }
   }
@@ -196,7 +191,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
   val businessStructure = SoleProprietor
   val testAgentName = AgentName("test")
   val testAgentCompanyName = AgentCompanyName("test")
-  val agentPartnership = AgentPartnership("test")
+  val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(
       BillPaymentServices,
@@ -211,7 +206,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
     Some(businessStructure),
     Some(testAgentName),
     Some(testAgentCompanyName),
-    Some(agentPartnership),
+    Some(testAgentPartnership),
     Some(wdbd),
     Some(msbServices),
     true
@@ -223,7 +218,7 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
     Some(businessStructure),
     Some(testAgentName),
     Some(testAgentCompanyName),
-    Some(agentPartnership),
+    Some(testAgentPartnership),
     Some(wdbd),
     Some(msbServices),
     false
