@@ -17,7 +17,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.http.{NotFoundException, HeaderCarrier}
+import uk.gov.hmrc.play.http.NotFoundException
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -357,63 +357,83 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.title() must be(Messages("status.submissiondecisionrejected.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionrejected.description"))
-
+      }
       }
     }
 
-    "show the correct content to edit submission" when {
-      "application has not yet been submitted" in new Fixture {
+  "show the correct content to edit submission" when {
 
-        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+    val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
 
-        val cacheMap = mock[CacheMap]
-        when(controller.landingService.cacheMap(any(), any(), any())).
-          thenReturn(Future.successful(Some(cacheMap)))
+    val cacheMap = mock[CacheMap]
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
-          Some(BusinessMatching(Some(reviewDtls), None)))
+    when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
+      Some(BusinessMatching(Some(reviewDtls), None)))
 
-        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+    "application has not yet been submitted" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionReady))
+      when(controller.landingService.cacheMap(any(), any(), any())).
+        thenReturn(Future.successful(Some(cacheMap)))
 
-        val result = controller.get()(request)
-        status(result) must be(OK)
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        .thenReturn(Future.successful(None))
 
-        val document = Jsoup.parse(contentAsString(result))
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
 
-        document.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
-        document.getElementsByClass("statusblock").first().html() must include(Messages("status.submissionready.changelink1"))
+      val result = controller.get()(request)
+      status(result) must be(OK)
 
-      }
+      val document = Jsoup.parse(contentAsString(result))
 
-      "application is in review" in new Fixture {
+      document.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
+      document.getElementsByClass("statusblock").first().html() must include(Messages("status.submissionready.changelink1"))
 
-        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+    }
 
-        val cacheMap = mock[CacheMap]
-        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+    "application is in review" in new Fixture {
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any())).thenReturn(
-          Some(BusinessMatching(Some(reviewDtls), None)))
+      when(controller.landingService.cacheMap(any(), any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("XAML00000567890")))
-        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
-        when(controller.feeConnector.feeResponse(any())(any(), any(), any(),any())).thenReturn(Future.successful(feeResponse))
-        val result = controller.get()(request)
-        status(result) must be(OK)
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        .thenReturn(Future.successful(Some("XAML00000567890")))
 
-        val document = Jsoup.parse(contentAsString(result))
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
 
-        document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
-        document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
-        document.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
-      }
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+
+      document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
+      document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
+
+    }
+
+    "application has been approved" in new Fixture {
+
+      when(controller.landingService.cacheMap(any(), any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        .thenReturn(Future.successful(Some("XBML00000567890")))
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+
+      document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
+      document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
+
     }
   }
+
 
 }

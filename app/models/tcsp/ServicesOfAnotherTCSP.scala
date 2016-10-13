@@ -16,7 +16,10 @@ object ServicesOfAnotherTCSP {
   import utils.MappingUtils.Implicits._
 
   private val mlrPattern = "^([0-9]{8}|[0-9]{15})$".r
-  val service = notEmpty.withMessage("error.required.tcsp.mlr.reference.number") compose pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number")
+
+  val service = notEmpty
+    .withMessage("error.required.tcsp.mlr.reference.number")
+    .compose(pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number"))
 
   implicit val formRule: Rule[UrlFormEncoded, ServicesOfAnotherTCSP] = From[UrlFormEncoded] { __ =>
   import play.api.data.mapping.forms.Rules._

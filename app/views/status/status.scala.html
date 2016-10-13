@@ -29,7 +29,7 @@ case _ => {Messages("status.incomplete.heading")}
 
 @changeLink = @{completionState.currentState match {
 case SubmissionReady => { Some(Messages("status.submissionready.changelink1")) }
-case SubmissionReadyForReview => { Some(Messages("status.amendment.edit")) }
+case SubmissionReadyForReview | SubmissionDecisionApproved => { Some(Messages("status.amendment.edit")) }
 case _ => { None }
 }}
 
