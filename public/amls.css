@@ -475,6 +475,17 @@ select {
 }
 
 /* forms */
+
+/* full-width buttons for smaller screens, until they're in assets-frontend */
+@media (max-width: 640px) {
+  button,
+  .button,
+  .button--get-started {
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+
 .form-group {
     padding-top: 0;
     padding-bottom: 0;

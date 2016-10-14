@@ -23,7 +23,12 @@
             @radio(f("appliedFor"), "lbl.yes", "true", target = s"#$target")
             @radio(f("appliedFor"), "lbl.no", "false")
             @fieldset("businessmatching.psr.number.lbl", jsHidden = true, id = target) {
-                @input(f("regNumber"), "businessmatching.psr.number.lbl", bold = false)
+                @input(
+                    field = f("regNumber"),
+                    bold = false,
+                    labelText = "businessmatching.psr.number.lbl",
+                    hintText = "businessmatching.psr.number.hint"
+                )
             }
         }
         @submit(edit)

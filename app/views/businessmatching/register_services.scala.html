@@ -17,11 +17,11 @@
 
     @form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
 
-        @Messages("lbl.select.all")
+        <p>@Messages("lbl.select.all")</p>
 
         <div class="form-field-group">
             @radioGroup(f("businessActivities")) {
-                @legend("lbl.select.all", jsHidden = true)
+                @legend("businessmatching.registerservices.title", jsHidden = true)
                 @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.01", "01")
                 @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.02", "02")
                 @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.03", "03")
