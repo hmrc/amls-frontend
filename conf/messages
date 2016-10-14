@@ -623,7 +623,6 @@ tradingpremises.whatyouneed.agents.individual.info.text2 = your agent’s busine
 tradingpremises.whatyouneed.agents.circumstances.info.heading = Depending on your agent’s circumstances, you may also need:
 tradingpremises.whatyouneed.agents.circumstances.info.text1 = your agent’s company registration number
 tradingpremises.whatyouneed.agents.circumstances.info.text2 = your agent’s date of birth
-
 tradingpremises.youragent.title = Who is your agent?
 tradingpremises.youragent.paragraph1.text = An agent is an individual or business that works on behalf of your business to offer your services.
 tradingpremises.youragent.requiredinfo.heading = For each of your trading premises, you’ll need:
@@ -632,7 +631,6 @@ tradingpremises.youragent.registeredname.subtitle = It must be identical to the 
 tradingpremises.youragent.taxtype = What type of tax does your agent pay?
 tradingpremises.youragent.taxtype.lbl.01 = Self-assessment
 tradingpremises.youragent.taxtype.lbl.02 = Corporation tax
-
 tradingpremises.whatdoesyourbusinessdo.title = What does your business do at these premises?
 tradingpremises.yourtradingpremises.title = Trading premises details
 tradingpremises.yourtradingpremises.include.heading = Include:
@@ -650,9 +648,7 @@ tradingpremises.yourtradingpremises.isresidential = Is this a residential addres
 tradingpremises.msb.services.title = Which activities take place at these premises?
 tradingpremises.agent.premises.title = Are you registering an agent’s premises?
 tradingpremises.agent.premises.text = An agent is an individual or business that works on behalf of your business, to provide your services. An employee is not an agent.
-
 tradingpremises.businessStructure.title = What is your agent’s business structure?
-
 tradingpremises.summary.addanother = Add another premises
 tradingpremises.summary.own = Own
 tradingpremises.summary.mybusiness = My Business
@@ -663,20 +659,15 @@ tradingpremises.summary.residential = Residential address
 tradingpremises.summary.who-uses = Who uses these premises?
 tradingpremises.summary.services = Services at this address
 tradingpremises.summary.no.trading.premises = You currently have no trading premises registered
-
 tradingpremises.agentcompanyname.title = What is your agent’s registered company name?
 tradingpremises.agentcompanyname.lbl.hint = It must be identical to the registered name on the incorporation certificate.
-
 tradingpremises.agentname.title = What is your agent’s name?
-
 tradingpremises.agentpartnership.title = Your agent’s partnership
 tradingpremises.agentpartnership.lbl.hint = List all your agent’s partners
-
 tradingpremises.premises.registered.title = Premises registered
 tradingpremises.have.registered.premises.text = You have registered {0} trading premises.
 tradingpremises.want.to.register.another.premises = Do you want to register another trading premises?
-
-tradingpremises.remove.trading.premises.title = Remove a trading premises
+tradingpremises.remove.trading.premises.title = Remove trading premises
 tradingpremises.remove.trading.premises.text = This will permanently remove {0} from your list of trading premises.
 tradingpremises.remove.trading.premises.enddate.lbl = When did you stop trading from these premises?
 tradingpremises.remove.trading.premises.btn = Remove trading premises

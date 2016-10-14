@@ -894,8 +894,6 @@ fieldset.panel-indent legend {
   }
 }
 
-
-
 /* Bits from Gov Elements */
 .notice {
   position: relative;
@@ -945,5 +943,3 @@ fieldset.panel-indent legend {
 .details__inner li {
   padding-bottom: 20px;
 }
-
-
