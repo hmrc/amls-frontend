@@ -5,8 +5,8 @@ import models._
 import org.joda.time.{DateTimeZone, DateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import uk.gov.hmrc.domain.Org
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, ConfidenceLevel, CredentialStrength, OrgAccount}
+import uk.gov.hmrc.domain.{CtUtr, SaUtr, Org}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -59,5 +59,60 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         _ mustBe feeResponse
       }
     }
+
+    "return sa account type and reference" in {
+      implicit val saAcct = AuthContext(
+        LoggedInUser(
+          "UserName",
+          None,
+          None,
+          None,
+          CredentialStrength.Weak,
+          ConfidenceLevel.L50),
+        Principal(
+          None,
+          Accounts(sa = Some(SaAccount("Link", SaUtr("saRef"))))),
+        None,
+        None,
+        None)
+      FeeConnector.accountTypeAndId(saAcct) must be("sa","saRef")
+    }
+
+    "return ct account type and reference" in {
+      implicit val ctAcct = AuthContext(
+        LoggedInUser(
+          "UserName",
+          None,
+          None,
+          None,
+          CredentialStrength.Weak,
+          ConfidenceLevel.L50),
+        Principal(
+          None,
+          Accounts(ct = Some(CtAccount("Link", CtUtr("ctRef"))))),
+        None,
+        None,
+        None)
+      FeeConnector.accountTypeAndId(ctAcct) must be("ct","ctRef")
+    }
+
+    "fail in not finding correct accountType" in {
+      implicit val ctAcct = AuthContext(
+        LoggedInUser(
+          "UserName",
+          None,
+          None,
+          None,
+          CredentialStrength.Weak,
+          ConfidenceLevel.L50),
+        Principal(
+          None,
+          Accounts(ct = None)),
+        None,
+        None,
+        None)
+      an[IllegalArgumentException] should be thrownBy FeeConnector.accountTypeAndId(ctAcct)
+    }
+
   }
 }

@@ -51,6 +51,7 @@ trait FeeConnector {
 }
 
 object FeeConnector extends FeeConnector {
+  // $COVERAGE-OFF$
   override private[connectors] val httpPost = WSHttp
   override private[connectors] val httpGet = WSHttp
   override private[connectors] val url = ApplicationConfig.feePaymentUrl

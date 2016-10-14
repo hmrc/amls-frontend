@@ -1,14 +1,14 @@
 package connectors
 
-import models.declaration.{AddPerson, BeneficialShareholder, RoleWithinBusiness}
+import models.declaration.{AddPerson, BeneficialShareholder}
 import models._
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import uk.gov.hmrc.domain.Org
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, ConfidenceLevel, CredentialStrength, OrgAccount}
+import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.domain.{CtUtr, SaUtr, Org}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -153,5 +153,60 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         _ mustBe amendmentResponse
       }
     }
+  }
+
+
+  "return sa account type and reference" in {
+    implicit val saAcct = AuthContext(
+      LoggedInUser(
+        "UserName",
+        None,
+        None,
+        None,
+        CredentialStrength.Weak,
+        ConfidenceLevel.L50),
+      Principal(
+        None,
+        Accounts(sa = Some(SaAccount("Link", SaUtr("saRef"))))),
+      None,
+      None,
+      None)
+    AmlsConnector.accountTypeAndId(saAcct) must be("sa","saRef")
+  }
+
+  "return ct account type and reference" in {
+    implicit val ctAcct = AuthContext(
+      LoggedInUser(
+        "UserName",
+        None,
+        None,
+        None,
+        CredentialStrength.Weak,
+        ConfidenceLevel.L50),
+      Principal(
+        None,
+        Accounts(ct = Some(CtAccount("Link", CtUtr("ctRef"))))),
+      None,
+      None,
+      None)
+    AmlsConnector.accountTypeAndId(ctAcct) must be("ct","ctRef")
+  }
+
+  "fail in not finding correct accountType" in {
+    implicit val ctAcct = AuthContext(
+      LoggedInUser(
+        "UserName",
+        None,
+        None,
+        None,
+        CredentialStrength.Weak,
+        ConfidenceLevel.L50),
+      Principal(
+        None,
+        Accounts(ct = None)),
+      None,
+      None,
+      None)
+    an[IllegalArgumentException] should be thrownBy AmlsConnector.accountTypeAndId(ctAcct)
   }
 }
