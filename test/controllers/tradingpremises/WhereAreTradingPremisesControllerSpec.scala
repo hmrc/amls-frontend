@@ -2,17 +2,20 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import models.tradingpremises.{WhatDoesYourBusinessDo, Address, TradingPremises, YourTradingPremises}
+import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService, BillPaymentServices}
+import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
-import play.api.test.Helpers._
+import play.api.test.Helpers.{status => hstatus, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import org.scalatest.mock.MockitoSugar
+import org.mockito.Matchers.{eq => meq, _}
+import models._
+
 
 import scala.concurrent.Future
 
@@ -49,7 +52,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
         val result = controller.get(RecordId1, true)(request)
         val document = Jsoup.parse(contentAsString(result))
 
-        status(result) must be(OK)
+        hstatus(result) must be(OK)
         contentAsString(result) must include(Messages("tradingpremises.yourtradingpremises.title"))
         for (field <- fields)
           document.select(s"input[id=$field]").`val`() must not be empty
@@ -63,7 +66,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
         val result = controller.get(RecordId1, false)(request)
         val document = Jsoup.parse(contentAsString(result))
 
-        status(result) must be(OK)
+        hstatus(result) must be(OK)
         contentAsString(result) must include(Messages("tradingpremises.yourtradingpremises.title"))
         for (field <- fields)
           document.select(s"input[id=$field]").`val`() must be(empty)
@@ -77,7 +80,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
         val result = controller.get(RecordId1, false)(request)
 
-        status(result) must be(NOT_FOUND)
+        hstatus(result) must be(NOT_FOUND)
       }
     }
 
@@ -104,7 +107,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           val result = controller.post(RecordId1, false)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
         }
 
@@ -130,7 +133,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           val result = controller.post(RecordId1, true)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
             Some(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url))
         }
@@ -149,7 +152,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           val result = controller.post(RecordId1, true)(newRequest)
 
-          status(result) must be(BAD_REQUEST)
+          hstatus(result) must be(BAD_REQUEST)
 
         }
       }
@@ -177,8 +180,40 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
           val result = controller.post(3, false)(newRequest)
 
-          status(result) must be(NOT_FOUND)
+          hstatus(result) must be(NOT_FOUND)
         }
+      }
+
+      "set the hasChanged flag to true" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "tradingName" -> "Trading Name",
+          "addressLine1" -> "Address 1",
+          "addressLine2" -> "Address 2",
+          "postcode" -> "NE98 1ZZ",
+          "isResidential" -> "true",
+          "startDate.day" -> "01",
+          "startDate.month" -> "02",
+          "startDate.year" -> "2010"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(1)(newRequest)
+
+        hstatus(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1, false).url))
+
+        verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+          any(),
+          meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+            hasChanged = true,
+            yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, true, TradingPremisesSection.date))
+          ))))(any(), any(), any())
       }
     }
   }

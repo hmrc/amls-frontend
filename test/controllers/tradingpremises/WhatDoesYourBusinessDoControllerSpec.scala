@@ -3,12 +3,13 @@ package controllers.tradingpremises
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.TradingPremisesSection
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -211,6 +212,37 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId1).url))
         }
+      }
+
+      "set the hasChanged flag to true" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "activities[0]" -> "01",
+          "activities[1]" -> "02",
+          "activities[2]" -> "03"
+        )
+
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+
+        when(mockDataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+        val result = whatDoesYourBusinessDoController.post(1)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+
+        verify(mockDataCacheConnector).save[Seq[TradingPremises]](
+          any(),
+          meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+            hasChanged = true,
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))),
+            msbServices = None
+          ))))(any(), any(), any())
       }
     }
   }
