@@ -1,5 +1,6 @@
 @import include._
 @import models.ResponseType.{SubscriptionResponseType,AmendOrVariationResponseType}
+@import models.confirmation.Currency
 @import config.ApplicationConfig
 
 @(feeResponse: FeeResponse)(implicit request: Request[_], lang: Lang)
@@ -9,16 +10,16 @@
 <div class="list panel-indent reg-online--pay-fee">
     <div class="form-field-group">
         @Messages("fee.details.registration.fee.lbl")
-        <p class="heading-large">
+        <p class="heading-large numeric">
         @feeResponse.responseType match {
-            case SubscriptionResponseType => {£@feeResponse.totalFees}
-            case AmendOrVariationResponseType => {£@feeResponse.difference}
+            case SubscriptionResponseType => {@Currency.fromBD(feeResponse.totalFees)}
+            case AmendOrVariationResponseType => {@Currency.fromBD(feeResponse.difference.getOrElse(0))}
         }
         </p>
     </div>
     <div class="form-field-group">
         @Messages("fee.reference.number.lbl")
-        <p class="heading-large">@feeResponse.paymentReference </p>
+        <p class="heading-large numeric">@feeResponse.paymentReference </p>
     </div>
     <p>@Messages("fee.details.note")</p>
 
