@@ -20,10 +20,10 @@
     @form(f, controllers.responsiblepeople.routes.VATRegisteredController.post(index, edit)) {
 
         @inlineRadioGroup(f("registeredForVAT")) {
-            @legend("TODO", jsHidden = true)
+            @legend("responsiblepeople.registeredforvat.heading", jsHidden = true)
             @radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
             @radio(f("registeredForVAT"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("responsiblepeople.registeredforvat.lbl.vatNumber", jsHidden = true, id = target) {
                 @input(f("vrnNumber"), "responsiblepeople.registeredforvat.lbl.vatNumber", bold = false)
             }
         }

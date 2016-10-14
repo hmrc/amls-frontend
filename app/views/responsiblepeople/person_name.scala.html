@@ -38,7 +38,7 @@
             @radio(f("hasPreviousName"), "lbl.yes", "true", target = "#previous-fieldset")
             @radio(f("hasPreviousName"), "lbl.no", "false")
 
-            @fieldset("", jsHidden = true, id = "previous-fieldset") {
+            @fieldset("responsiblepeople.personName.isknownbyothernames", jsHidden = true, id = "previous-fieldset") {
 
                 @errorGroup(f("previous")) {
                     @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
@@ -57,7 +57,7 @@
             @radio(f("hasOtherNames"), "lbl.yes", "true", target = "#otherNames-fieldset")
             @radio(f("hasOtherNames"), "lbl.no", "false")
 
-            @fieldset("", jsHidden = true, id = "otherNames-fieldset") {
+            @fieldset("responsiblepeople.personName.hasOtherNames", jsHidden = true, id = "otherNames-fieldset") {
                 @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
             }
         }

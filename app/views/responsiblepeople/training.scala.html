@@ -19,17 +19,20 @@
 ) {
 
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
-        <span class="form-hint">
-            @Messages("responsiblepeople.training.hinttext")
-        </span>
-        @inlineRadioGroup(f("training")) {
-            @radio(f("training"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("training"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @textarea(f("information"), "responsiblepeople.training.information", bold = false)
+        @fieldset(
+            legend = "",
+            hint = "responsiblepeople.training.hinttext",
+            jsHidden = false,
+            panel = false
+        ) {
+            @inlineRadioGroup(f("training")) {
+                @radio(f("training"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("training"), "lbl.no", "false")
+                @fieldset("responsiblepeople.training.information", jsHidden = false, id = target) {
+                    @textarea(f("information"), bold = false)
+                }
             }
         }
-
     @submit(edit)
   }
 }

@@ -337,7 +337,6 @@ lbl.list.upto.3.countries = List up to 3 countries
 lbl.some.one.else = Someone else
 lbl.vat.reg.number = VAT registration number:
 lbl.add.another.country = Add another country
-
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
 
@@ -953,6 +952,9 @@ responsiblepeople.contact_details.lbl = By providing this information, this resp
 responsiblepeople.contact_details.phone.lbl = Phone number
 responsiblepeople.contact_details.email.lbl = Email address
 responsiblepeople.wherepersonlives.title = Where does this person live?
+responsiblepeople.wherepersonlives.need.to.know = We need to know all the home addresses for the last 3 years.
+responsiblepeople.wherepersonlives.is.uk = Is this a UK address?
+responsiblepeople.wherepersonlives.is.overseas = Is this address overseas?
 responsiblepeople.wherepersonlives.ukAddress = UK
 responsiblepeople.wherepersonlives.nonUkAddress = Overseas
 responsiblepeople.wherepersonlives.address = Address
@@ -997,7 +999,7 @@ responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
-responsiblepeople.person.a.resident.title = Responsible people - Is this person a UK resident?
+responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.dob.lbl = Date of birth
 responsiblepeople.dob.lbl.hint = For example, 31 3 1980
 responsiblepeople.passporttype.lbl = What type of passport does this person have?

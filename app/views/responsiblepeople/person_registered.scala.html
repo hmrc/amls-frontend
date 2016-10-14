@@ -14,7 +14,7 @@
 ) {
 
     @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
-        <div class="panel-indent panel-border-wide">
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
             @if(index <= 1){
                 <p>@Messages("responsiblepeople.have.registered.person.text", index) </p>
             } else {
