@@ -3,7 +3,7 @@
 @import utils.StatusConstants
 @import forms2._
 
-@(model: Seq[BankDetails], complete: Boolean, hasBankAccount : Boolean)(implicit request: Request[_], lang: Lang)
+@(model: Seq[BankDetails], complete: Boolean, hasBankAccount: Boolean, canEdit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading(if(complete) "summary.youranswers.title" else "summary.checkyouranswers.title", "summary.bankdetails")
@@ -84,13 +84,12 @@
                                 </td>
                     }
                 }
-                <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
-                  <td>  @Messages("lbl.or")</td>
-                    <td class="numeric"><a href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete)">@Messages("button.remove")</a></td>
-
+                        @if(canEdit) {
+                            <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
+                            <td>@Messages("lbl.or")</td>
+                        }
+                        <td class="numeric"><a href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete)">@Messages("button.remove")</a></td>
                 </tr>
-
-
              </table>
                 }
             }
