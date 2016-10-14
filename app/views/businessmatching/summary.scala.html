@@ -35,7 +35,7 @@
                 case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
                     <table class="table--spaced-top">
                         <tr>
-                            <th>@Messages("businessmatching.registrationnumber.heading")</th>
+                            <th>@Messages("businessmatching.registrationnumber.title")</th>
                             <td width="12"><a href="@controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true)">@Messages("button.edit")</a></td>
                         </tr>
                         <tr>
@@ -50,7 +50,7 @@
                 case BusinessType.UnincorporatedBody => {
                     <table class="table--spaced-top">
                         <tr>
-                            <th>@Messages("businessmatching.typeofbusiness.heading")</th>
+                            <th>@Messages("businessmatching.typeofbusiness.title")</th>
                             <td width="12"><a href="@controllers.businessmatching.routes.TypeOfBusinessController.get(true)">@Messages("button.edit")</a></td>
                         </tr>
                         <tr>
@@ -71,7 +71,7 @@
     @model.activities.map { activity =>
         <table class="table--spaced-top">
             <tr>
-                <th>@Messages("businessmatching.registerservices.heading")</th>
+                <th>@Messages("businessmatching.registerservices.title")</th>
                 <td width="12"><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
             </tr>
             @activity.businessActivities.map { line =>
@@ -97,7 +97,7 @@
                 <!-- original table-based solution -->
                 <table class="table--spaced-top">
                     <tr>
-                        <th>@Messages("businessmatching.services.heading")</th>
+                        <th>@Messages("businessmatching.services.title")</th>
                         <td width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">@Messages("button.edit")</a></td>
                     </tr>
                     @services.services.map { svc =>
