@@ -5,7 +5,6 @@ import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -16,7 +15,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => meq, _}
-
 
 import scala.concurrent.Future
 
@@ -214,18 +212,6 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
       MoneyServiceBusiness)
   )
   val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
-
-  val tradingPremisesWithHasChangedTrue = TradingPremises(
-    Some(RegisteringAgentPremises(true)),
-    Some(ytp),
-    Some(businessStructure),
-    Some(testAgentName),
-    Some(testAgentCompanyName),
-    Some(testAgentPartnership),
-    Some(wdbd),
-    Some(msbServices),
-    true
-  )
 
   val tradingPremisesWithHasChangedFalse = TradingPremises(
     Some(RegisteringAgentPremises(true)),
