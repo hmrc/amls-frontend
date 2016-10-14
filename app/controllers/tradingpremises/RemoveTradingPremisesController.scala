@@ -18,6 +18,8 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
 
   private[controllers] def statusService: StatusService
 
+  private[controllers] def authEnrolmentsService: AuthEnrolmentsService
+
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       for {
@@ -32,22 +34,17 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
       }
   }
 
-  def remove(index: Int, complete: Boolean = false, tradingName: String, showDateField: Boolean = false) = Authorised.async {
+  def remove(index: Int, complete: Boolean = false, tradingName: String) = Authorised.async {
     implicit authContext => implicit request =>
-      showDateField match {
-        case true =>
-          Form2[ActivityEndDate](request.body) match {
-            case f: InvalidForm =>
-              Future.successful(BadRequest(remove_trading_premises(f, index, complete, tradingName, showDateField)))
-            case ValidForm(_, data) => {
+
+      authEnrolmentsService.amlsRegistrationNumber flatMap {
+        case Some(_) =>
               for {
                 result <- updateDataStrict[TradingPremises](index) { tp =>
-                  tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                  tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
                 }
               } yield Redirect(routes.SummaryController.get(complete))
-            }
-          }
-        case false => removeDataStrict[TradingPremises](index) map { _ =>
+        case _ => removeDataStrict[TradingPremises](index) map { _ =>
           Redirect(routes.SummaryController.get(complete))
         }
       }
@@ -59,5 +56,6 @@ object RemoveTradingPremisesController extends RemoveTradingPremisesController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override private[controllers] val statusService: StatusService = StatusService
+  override private[controllers] val authEnrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
 
 }

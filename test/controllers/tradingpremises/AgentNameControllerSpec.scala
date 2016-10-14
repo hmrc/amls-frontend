@@ -76,7 +76,24 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
     }
 
     "post is called" must {
-      "espond with SEE_OTHER" when {
+      "respond with NOT_FOUND" when {
+        "there is no data at all at that index" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentName" -> "text"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(99)(newRequest)
+          status(result) must be(NOT_FOUND)
+        }
+      }
+
+      "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
