@@ -2,7 +2,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService, BillPaymentServices}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.{SubmissionReady, SubmissionReadyForReview, NotCompleted, SubmissionDecisionApproved}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -192,7 +192,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
   it when {
     "remove is called" must {
       "respond with SEE_OTHER" when {
-        "removing a responsible person from an unsubmitted application" in new Fixture {
+        "removing a responsible person from an application with status NotCompleted" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
@@ -202,6 +202,30 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(NotCompleted))
+
+          val result = controller.remove(1, false, "John Envy Doe")(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+            completeTradingPremises2,
+            completeTradingPremises3
+          )))(any(), any(), any())
+        }
+        "removing a responsible person from an application with status SubmissionReady" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(tradingPremisesList)))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.remove(1, false, "John Envy Doe")(request)
           status(result) must be(SEE_OTHER)
@@ -213,7 +237,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
           )))(any(), any(), any())
         }
 
-        "removing a responsible person from a previously submitted application" in new Fixture {
+        "removing a responsible person from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
@@ -223,6 +247,9 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
 
           val result = controller.remove(1, false, "John Envy Doe")(request)
           status(result) must be(SEE_OTHER)
@@ -234,7 +261,89 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
             completeTradingPremises3
           )))(any(), any(), any())
         }
+
+        "removing a trading premises from an application with status SubmissionDecisionApproved" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+          val newRequest = request.withFormUrlEncodedBody(
+                    "endDate.day" -> "1",
+                    "endDate.month" -> "1",
+                    "endDate.year" -> "1990"
+                  )
+
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(Some("RegNo")))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(tradingPremisesList)))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+
+          val result = controller.remove(1, false, "John Envy Doe")(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(Seq(
+            completeTradingPremises1.copy(
+              status = Some(StatusConstants.Deleted),
+              hasChanged = true,
+              endDate = Some(ActivityEndDate(new LocalDate(1990,1,1)))),
+            completeTradingPremises2,
+            completeTradingPremises3
+          )))(any(), any(), any())
+        }
+
+        "removing a trading premises from an application with no date" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+                  "endDate.day" -> "",
+                  "endDate.month" -> "",
+                  "endDate.year" -> ""
+                )
+
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(Some("RegNo")))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(tradingPremisesList)))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+                val result = controller.remove(1, true, "trading Name")(newRequest)
+                status(result) must be(BAD_REQUEST)
+                contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+
+              }
       }
+
+      "removing a trading premises from an application with future date" in new Fixture {
+        val emptyCache = CacheMap("", Map.empty)
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "endDate.day" -> "",
+          "endDate.month" -> "",
+          "endDate.year" -> ""
+        )
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("RegNo")))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(tradingPremisesList)))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.remove(1, true, "trading Name")(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+
+      }
+
 
     }
   }
