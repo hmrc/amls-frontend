@@ -1,3 +1,4 @@
+import org.joda.time.LocalDate
 import play.api.data.mapping.Rule
 
 package object models {
@@ -6,6 +7,7 @@ package object models {
 
   //ISO 4217 currency codes
   //http://www.iso.org/iso/home/standards/currency_codes.htm
+
   val currencies = Seq(
       "AED",
       "AFN",
