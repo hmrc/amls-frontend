@@ -40,7 +40,8 @@ import scala.concurrent.Future
             result <- updateDataStrict[TradingPremises](index) { tp =>
                 TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises,
-                  tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices)
+                  tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress,
+                  tp.msbServices, true)
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
