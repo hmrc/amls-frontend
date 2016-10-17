@@ -46,6 +46,9 @@ case class TradingPremises(
   def registeringAgentPremises(p: RegisteringAgentPremises): TradingPremises =
     this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p))
 
+  def status(p: String): TradingPremises =
+    this.copy(status = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p))
+
   def isComplete: Boolean =
     this match {
       case TradingPremises(_,Some(x), _, _,_,_,Some(_),_,_,_,_,_) => true

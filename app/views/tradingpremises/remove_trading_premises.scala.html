@@ -13,7 +13,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete, tradingName, showDateField)) {
+    @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete, tradingName)) {
         <div class="panel-indent panel-border-wide">
             <p>@Messages("tradingpremises.remove.trading.premises.text", tradingName)</p>
         </div>

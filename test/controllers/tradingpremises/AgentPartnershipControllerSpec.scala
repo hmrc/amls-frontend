@@ -1,6 +1,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import models.TradingPremisesSection
 import models.tradingpremises.{AgentPartnership, AgentCompanyName, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -9,11 +10,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
-import play.api.libs.json.{JsPath, JsSuccess}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
+import org.mockito.Matchers.{eq => meq, _}
 
 import scala.concurrent.Future
 
@@ -28,137 +29,163 @@ class AgentPartnershipControllerSpec extends PlaySpec with OneAppPerSuite with M
     }
   }
 
-  "AgentPartnershipController" must {
+  "AgentPartnershipController" when {
 
     val emptyCache = CacheMap("", Map.empty)
 
-    "display agent partnership Page" in new Fixture {
+    "get is called" must {
+      "display agent partnership Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
-
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-
-      document.title() must be(Messages("tradingpremises.agentpartnership.title"))
-      document.select("input[type=text]").`val`() must be(empty)
-    }
-
-    "display main Summary Page" in new Fixture {
-
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises(agentPartnership = Some(AgentPartnership("test")))))))
-
-      val result = controller.get(1)(request)
-      status(result) must be(OK)
-
-      val document = Jsoup.parse(contentAsString(result))
-
-      document.title() must be(Messages("tradingpremises.agentpartnership.title"))
-      document.select("input[type=text]").`val`() must be("test")
-    }
-
-    "post with valid data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "agentPartnership" -> "text"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
-
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
-    }
-
-
-
-    "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "agentPartnership" -> "text"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(50)(newRequest)
-      status(result) must be(NOT_FOUND)
-    }
-
-    "post with valid data in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "agentPartnership" -> "text"
-      )
-
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
-
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1, true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
-
-    }
-
-    "post with invalid data" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "agentPartnership" -> "11111111111" * 40
-      )
-
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.agent.partnership"))
-
-    }
-
-    "respond with NOT_FOUND" when {
-      "there is no data at all at that index" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(1)(request)
+        status(result) must be(OK)
 
-        status(result) must be(NOT_FOUND)
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.title() must be(Messages("tradingpremises.agentpartnership.title"))
+        document.select("input[type=text]").`val`() must be(empty)
+      }
+
+      "display main Summary Page" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentPartnership = Some(AgentPartnership("test")))))))
+
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.title() must be(Messages("tradingpremises.agentpartnership.title"))
+        document.select("input[type=text]").`val`() must be("test")
+      }
+      "respond with NOT_FOUND" when {
+        "there is no data at all at that index" in new Fixture {
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.get(1)(request)
+
+          status(result) must be(NOT_FOUND)
+        }
       }
     }
 
+    "post is called" must {
+      "respond with NOT_FOUND" when {
+        "there is no data at all at that index" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentPartnership" -> "text"
+          )
 
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
 
-    "post with missing mandatory field" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "agentPartnership" -> " "
-      )
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+          val result = controller.post(99)(newRequest)
+          status(result) must be(NOT_FOUND)
+        }
+      }
+      "respond with SEE_OTHER" when {
+        "edit is false and given valid data" in new Fixture {
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentPartnership" -> "text"
+          )
 
-      val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.tp.agent.partnership"))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
+        }
+
+        "edit is true and given valid data" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentPartnership" -> "text"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
+
+        }
+      }
+
+      "respond with BAD_REQUEST" when {
+        "given invalid data" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentPartnership" -> "11111111111" * 40
+          )
+
+          when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.invalid.tp.agent.partnership"))
+
+        }
+        "given missing mandatory field" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentPartnership" -> " "
+          )
+
+          when(controller.dataCacheConnector.fetch[TradingPremises](any())(any(), any(), any()))
+            .thenReturn(Future.successful(None))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.required.tp.agent.partnership"))
+        }
+      }
+      "set the hasChanged flag to true" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody("agentPartnership" -> "text")
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(1)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
+
+        verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+          any(),
+          meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+            hasChanged = true,
+            agentPartnership = Some(AgentPartnership("text")),
+            agentName = None,
+            agentCompanyName = None
+          ))))(any(), any(), any())
+      }
     }
-  }
 
+  }
 }
