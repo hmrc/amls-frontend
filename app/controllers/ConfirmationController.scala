@@ -1,7 +1,7 @@
 package controllers
 
 import config.AMLSAuthConnector
-import models.status.SubmissionReadyForReview
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import services.{StatusService, SubmissionService}
 
 import scala.concurrent.Future
@@ -15,7 +15,7 @@ trait ConfirmationController extends BaseController {
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       statusService.getStatus flatMap {
-        case SubmissionReadyForReview => {
+        case SubmissionReadyForReview | SubmissionDecisionApproved => {
           subscriptionService.getAmendment flatMap {
             case Some((regNo, total, rows, difference)) =>
               difference match {
