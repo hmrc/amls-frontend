@@ -164,7 +164,7 @@ object FormTypes {
 
   val ukBankAccountNumberType = notEmpty
     .withMessage("error.bankdetails.accountnumber")
-    .compose(maxLength(maxUKBankAccountNumberLength))
+    .compose(maxLength(maxUKBankAccountNumberLength).withMessage("error.invalid.bankdetails.accountnumber"))
     .compose(pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber"))
 
   val nonUKBankAccountNumberType = notEmpty
