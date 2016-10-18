@@ -17,6 +17,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{StatusConstants, AuthorisedFixture}
 import play.api.test.Helpers._
 import org.mockito.Matchers.{eq => meq, _}
+import play.api.i18n.Messages
 
 
 import scala.concurrent.Future
@@ -97,8 +98,6 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(None))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
@@ -120,8 +119,6 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("RegNo")))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
@@ -144,8 +141,6 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("RegNo")))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
@@ -174,8 +169,6 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
             "endDate.year" -> "1990"
           )
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("RegNo")))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
@@ -196,6 +189,53 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
           )))(any(), any(), any())
         }
       }
+
+      "respond with BAD_REQUEST" when {
+        "removing a responsible person from an application with no date" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "",
+            "endDate.month" -> "",
+            "endDate.year" -> ""
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+
+        }
+
+        "removing a trading premises from an application with future date" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "15",
+            "endDate.month" -> "1",
+            "endDate.year" -> "2020"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.future.date"))
+
+        }
+      }
+
     }
   }
 
