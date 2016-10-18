@@ -934,10 +934,10 @@ businessactivities.tax.matters.heading = Does this professional advisor also man
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
 
 submit.registration = Submit registration
-submit.amendment.application = Submit amended application
+submit.amendment.application = Update information
 
 declaration.addperson.title = What’s your name? - Submit registration - Anti-money laundering registration - GOV.UK
-declaration.addperson.amendment.title = What’s your name? - Submit amended application - Anti-money laundering registration - GOV.UK
+declaration.addperson.amendment.title = What’s your name? - Update information - Anti-money laundering registration - GOV.UK
 declaration.addperson.header = What’s your name?
 declaration.addperson.firstname = First name
 declaration.addperson.middlename = Middle name (optional)
@@ -958,7 +958,8 @@ declaration.declaration.submit = Declaration - submit declaration
 declaration.declaration.fullname = You have told us that you are
 declaration.declaration.declare = I declare that:
 declaration.declaration.correctinformation = all the information in this application is correct
-declaration.declaration.tellhmrc = I understand that the business must tell HM Revenue and Customs about any change to any of the information on this form
+declaration.declaration.amendment.correctinformation = all the information in this submission is correct
+declaration.declaration.tellhmrc = I understand that the business must tell HM Revenue and Customs about any change to any of the information provided
 declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
 declaration.declaration.confirm = I confirm that I have read and understood the
 declaration.declaration.guidance = guidance
