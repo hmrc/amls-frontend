@@ -248,7 +248,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         BreakdownRow("confirmation.tradingpremises", 5, 115, Currency(tpTotalFee))
       )
 
-      val response = Some("12345", Currency.fromBD(totalFee), rows, None)
+      val response = Some("12345", Currency.fromBD(totalFee), rows)
 
       whenReady(TestSubmissionService.getVariation) {
         result =>

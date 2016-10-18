@@ -108,12 +108,27 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      when(controller.subscriptionService.getAmendment(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), None)))
+      when(controller.subscriptionService.getVariation(any(),any(),any()))
+        .thenReturn(Future.successful(Some("",Currency.fromInt(100),Seq())))
 
       val result = controller.get()(request)
       status(result) mustBe OK
+      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
     }
+    "notify user there is no fee from a variation without the addition of tp or rp" in new Fixture {
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(controller.subscriptionService.getVariation(any(),any(),any()))
+        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq())))
+
+      val result = controller.get()(request)
+      status(result) mustBe OK
+      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+      contentAsString(result) must include(Messages("confirmation.no.fee"))
+      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+      contentAsString(result) must include(Messages("button.finish"))    }
 
   }
 }

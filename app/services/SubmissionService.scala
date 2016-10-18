@@ -176,7 +176,7 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
+  ): Future[Option[(String, Currency, Seq[BreakdownRow])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
       (for {
@@ -192,7 +192,7 @@ trait SubmissionService extends DataCacheService {
             val rows =
               Seq(BreakdownRow(People.message, variation.addedResponsiblePeople, People.feePer, peopleFee)) ++
               Seq(BreakdownRow(Premises.message, premises, Premises.feePer, Currency(premisesFee)))
-            Future.successful(Some((mlrRegNo, Currency(totalFees), rows, None)))
+            Future.successful(Some((mlrRegNo, Currency(totalFees), rows)))
           }
           case None => Future.successful(None)
         }

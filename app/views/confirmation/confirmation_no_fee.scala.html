@@ -2,14 +2,14 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(mlrRegNo: String)(implicit request: Request[_])
+@(mlrRegNo: String, content: (String, String))(implicit request: Request[_])
 
 @main(
-title = Messages("confirmation.amendment.title")
+title = Messages(content._1)
 ) {
 
 <div class="confirmation">
-    <h1 class="heading-large">@Messages("confirmation.amendment.lede")</h1>
+    <h1 class="heading-large">@Messages(content._2)</h1>
 </div>
 
 <p>@Messages("confirmation.no.fee")</p>
