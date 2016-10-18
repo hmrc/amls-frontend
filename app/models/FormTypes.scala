@@ -65,6 +65,8 @@ object FormTypes {
 
   def required(msg: String) = notEmpty.withMessage(msg)
 
+  def maxDateWithMsg(maxDate: LocalDate, msg: String) = max(maxDate).withMessage(msg)
+
   val notEmptyStrip = Rule.zero[String] fmap {
     _.trim
   }
@@ -150,9 +152,8 @@ object FormTypes {
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
 
-  def maxDateWithMsg(maxDate: LocalDate, msg: String) = max(maxDate).withMessage(msg)
-  val futureDateRule = maxDateWithMsg(LocalDate.now, "error.expected.future.date")
-  val localDateFuture = localDateRule compose futureDateRule
+  val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
+  val localDateFutureRule = localDateRule compose futureDateRule
 
   /** Bank details Rules **/
 

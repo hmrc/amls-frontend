@@ -204,12 +204,12 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     val model = new LocalDate(1990, 2, 24)
 
     "fail to validate a future date" in {
-      localDateFuture.validate(Map(
+      localDateFutureRule.validate(Map(
         "day" -> Seq("1"),
         "month" -> Seq("1"),
         "year" -> Seq("2020")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.expected.future.date"))
+        Path -> Seq(ValidationError("error.future.date"))
       )))
     }
 
