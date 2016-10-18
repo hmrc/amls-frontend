@@ -20,7 +20,8 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              hasAlreadyPassedFitAndProper: Option[Boolean] = None,
                              hasChanged: Boolean = false,
                              lineId: Option[Int] = None,
-                             status: Option[String] = None
+                             status: Option[String] = None,
+                             endDate:Option[ResponsiblePersonEndDate] = None
                             ) {
 
   def personName(p: PersonName): ResponsiblePeople =
@@ -62,15 +63,11 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
     this match {
-      case ResponsiblePeople(
-      Some(_), Some(_), Some(_), Some(_),
-      Some(pos), None, None, Some(_),
-      Some(_), _, _, _, _) if (!pos.personalTax & pos.startDate.isDefined) => true
-      case ResponsiblePeople(
-      Some(_), Some(_), Some(_), Some(_),
-      Some(pos), Some(_), Some(_), Some(_),
-      Some(_), _, _, _, _) if (pos.startDate.isDefined) => true
-      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _) => true
+      case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(pos),
+      None, None, Some(_), Some(_), _, _, _, _, _) if !pos.personalTax & pos.startDate.isDefined => true
+      case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(pos),
+      Some(_), Some(_), Some(_), Some(_), _, _, _, _, _) if pos.startDate.isDefined => true
+      case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, _, _, _, _) => true
       case _ => false
     }
   }
@@ -138,7 +135,8 @@ object ResponsiblePeople {
           _.getOrElse(false)
         } and
         (__ \ "lineId").readNullable[Int] and
-        (__ \ "status").readNullable[String]
+        (__ \ "status").readNullable[String] and
+        (__ \ "endDate").readNullable[ResponsiblePersonEndDate]
       ) apply ResponsiblePeople.apply _
   }
 

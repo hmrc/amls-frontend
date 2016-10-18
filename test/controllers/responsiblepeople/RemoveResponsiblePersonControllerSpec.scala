@@ -4,7 +4,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status._
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -156,7 +156,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val result = controller.remove(1, false, "John Envy Doe")(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
@@ -186,10 +186,11 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val result = controller.remove(1, false, "John Envy Doe")(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
-            CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true, endDate = Some(ActivityEndDate(new LocalDate(1990, 1, 1)))),
+            CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true,
+              endDate = Some(ResponsiblePersonEndDate(new LocalDate(1990, 1, 1)))),
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
