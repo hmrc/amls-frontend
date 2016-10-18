@@ -2,7 +2,7 @@ package controllers
 
 import config.AMLSAuthConnector
 import models.confirmation.Currency
-import models.status.{SubmissionReady, SubmissionReadyForReview}
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.{ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
@@ -67,12 +67,11 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
       val result = controller.get()(request)
       status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
+      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
       contentAsString(result) must include(Messages("confirmation.amendment.fee"))
       contentAsString(result) must include(Messages("confirmation.amendment.thankyou.p"))
       contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
     }
-
     "notify user of no fee if there is no difference(/Some(0))" in new Fixture {
 
       when(controller.statusService.getStatus(any(),any(),any()))
@@ -83,7 +82,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
       val result = controller.get()(request)
       status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
+      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
       contentAsString(result) must include(Messages("confirmation.no.fee"))
       contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
       contentAsString(result) must include(Messages("button.finish"))
@@ -98,10 +97,22 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
       val result = controller.get()(request)
       status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your amended application")
+      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted an updated application")
       contentAsString(result) must include(Messages("confirmation.no.fee"))
       contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
       contentAsString(result) must include(Messages("button.finish"))
+    }
+
+    "notify user of fees accrued by a variation of Trading Premises and Responsible People" in new Fixture {
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(controller.subscriptionService.getAmendment(any(),any(),any()))
+        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), None)))
+
+      val result = controller.get()(request)
+      status(result) mustBe OK
     }
 
   }

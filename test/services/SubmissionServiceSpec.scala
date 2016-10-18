@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite {
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.amounts.registration" -> 100) )
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.amounts.registration" -> 100))
 
   trait Fixture {
 
@@ -168,7 +168,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(cache))
 
       when {
-        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       } thenReturn Future.successful(Some("12345"))
 
       when {
@@ -203,6 +203,60 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
     }
 
+    "retrieve data from variation submission" in new Fixture {
+
+      val variationResponse = AmendVariationResponse(
+        processingDate = "",
+        etmpFormBundleNumber = "",
+        registrationFee = 100,
+        fpFee = Some(0),
+        premiseFee = 0,
+        totalFees = 100,
+        paymentReference = Some(""),
+        difference = Some(0),
+        addedResponsiblePeople = 1,
+        addedFullYearTradingPremises = 1,
+        halfYearlyTradingPremises = 3,
+        zeroRatedTradingPremises = 1
+      )
+
+      val rpFee: Double = 100
+      val tpFee: Double = 115
+      val tpHalfFee: Double = tpFee/2
+      val tpTotalFee: Double = tpFee + (tpHalfFee * 3)
+      val totalFee: Double = rpFee + tpTotalFee
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      } thenReturn Future.successful(Some("12345"))
+
+      when {
+        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        cache.getEntry[AmendVariationResponse](any())(any())
+      } thenReturn Some(variationResponse)
+
+      val rows = Seq(
+        BreakdownRow("confirmation.responsiblepeople", 1, 100, Currency(rpFee))
+      ) ++ Seq(
+        BreakdownRow("confirmation.tradingpremises", 5, 115, Currency(tpTotalFee))
+      )
+
+      val response = Some("12345", Currency.fromBD(totalFee), rows, None)
+
+      whenReady(TestSubmissionService.getVariation) {
+        result =>
+          result must equal(response)
+      }
+
+    }
+
     "return None if data cannot be returned containing AMLS Reg No" in new Fixture {
 
       when {
@@ -210,7 +264,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Future.successful(Some(cache))
 
       when {
-        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       } thenReturn Future.successful(None)
 
       when {

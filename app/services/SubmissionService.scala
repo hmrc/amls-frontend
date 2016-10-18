@@ -58,38 +58,46 @@ trait SubmissionService extends DataCacheService {
     val feePer = 0
   }
 
-  private def safeId(cache: CacheMap): Future[String] = {
-    (for {
-      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      rd <- bm.reviewDetails
-    } yield rd.safeId) match {
-      case Some(a) =>
-        Future.successful(a)
-      case _ =>
-        // TODO: Better exception
-        Future.failed(new Exception(""))
-    }
-  }
-
-  private def businessType(cache: CacheMap): Option[BusinessType] =
+  def subscribe
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[SubscriptionResponse] = {
     for {
-      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      rd <- bm.reviewDetails
-      bt <- rd.businessType
-    } yield bt
-
-  def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
-    bankDetails match {
-      case Some(bankAccts) => {
-        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
-        bankDtls.nonEmpty match {
-          case true => Some(bankDtls)
-          case false => Some(Seq.empty)
-        }
-      }
-      case _ => Some(Seq.empty)
-    }
+      cache <- getCache
+      safeId <- safeId(cache)
+      subscription <- amlsConnector.subscribe(createSubscriptionRequest(cache), safeId)
+      _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
+      _ <- ggService.enrol(
+        safeId = safeId,
+        mlrRefNo = subscription.amlsRefNo
+      )
+    } yield subscription
   }
+
+  def getSubscription
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[(String, Currency, Seq[BreakdownRow])] =
+    cacheConnector.fetchAll flatMap {
+      option =>
+        (for {
+          cache <- option
+          subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+        } yield {
+          val subQuantity = subscriptionQuantity(subscription)
+          val mlrRegNo = subscription.amlsRefNo
+          val total = subscription.totalFees
+          val rows = getBreakdownRows(subscription, premises, people, subQuantity)
+          Future.successful((mlrRegNo, Currency.fromBD(total), rows))
+          // TODO
+        }) getOrElse Future.failed(new Exception("TODO"))
+    }
 
   private def createSubscriptionRequest
   (cache: CacheMap)
@@ -113,24 +121,6 @@ trait SubmissionService extends DataCacheService {
       hvdSection = cache.getEntry[Hvd](Hvd.key),
       supervisionSection = cache.getEntry[Supervision](Supervision.key)
     )
-  }
-
-  def subscribe
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[SubscriptionResponse] = {
-    for {
-      cache <- getCache
-      safeId <- safeId(cache)
-      subscription <- amlsConnector.subscribe(createSubscriptionRequest(cache), safeId)
-      _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
-      _ <- ggService.enrol(
-        safeId = safeId,
-        mlrRefNo = subscription.amlsRefNo
-      )
-    } yield subscription
   }
 
   def update
@@ -157,30 +147,103 @@ trait SubmissionService extends DataCacheService {
    ac: AuthContext
   ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
     cacheConnector.fetchAll flatMap {
-      option =>
-        (for {
-          cache <- option
-          amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
-          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-        } yield {
-          val subQuantity = subscriptionQuantity(amendment)
-          authEnrolmentsService.amlsRegistrationNumber flatMap {
-            case Some(mlrRegNo) => {
-              val total = amendment.totalFees
-              val difference = amendment.difference map Currency.fromBD
-              val rows = Seq(
-                BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-              ) ++ responsiblePeopleRows(people, amendment) ++
-                Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
-              Future.successful(Some((mlrRegNo, Currency.fromBD(total), rows, difference)))
-            }
-            case None => Future.successful(None)
-          }
-        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+        getDataForAmendment(_) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
 
+  private def getDataForAmendment(option: Option[CacheMap])(implicit authContent: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
+    for {
+      cache <- option
+      amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+      premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+      people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+    } yield {
+      val subQuantity = subscriptionQuantity(amendment)
+      authEnrolmentsService.amlsRegistrationNumber flatMap {
+        case Some(mlrRegNo) => {
+          val total = amendment.totalFees
+          val difference = amendment.difference map Currency.fromBD
+          val rows = getBreakdownRows(amendment, premises, people, subQuantity)
+          Future.successful(Some((mlrRegNo, Currency.fromBD(total), rows, difference)))
+        }
+        case None => Future.successful(None)
+      }
+    }
+  }
+
+  def getVariation
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
+    cacheConnector.fetchAll flatMap {
+      option =>
+      (for {
+        cache <- option
+        variation <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+      } yield {
+        authEnrolmentsService.amlsRegistrationNumber flatMap {
+          case Some(mlrRegNo) => {
+            val premises = variation.addedFullYearTradingPremises + variation.halfYearlyTradingPremises + variation.zeroRatedTradingPremises
+            val premisesFee = getPremisesFee(variation)
+            val peopleFee = getPeopleFee(variation)
+            val totalFees: Double = peopleFee + premisesFee
+            val rows =
+              Seq(BreakdownRow(People.message, variation.addedResponsiblePeople, People.feePer, peopleFee)) ++
+              Seq(BreakdownRow(Premises.message, premises, Premises.feePer, Currency(premisesFee)))
+            Future.successful(Some((mlrRegNo, Currency(totalFees), rows, None)))
+          }
+          case None => Future.successful(None)
+        }
+      }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+    }
+  }
+
+  private def getPremisesFee(variation: AmendVariationResponse): Double = {
+    val fee: Double = ApplicationConfig.premisesFee
+    (fee * variation.addedFullYearTradingPremises) + ((fee / 2) * variation.halfYearlyTradingPremises)
+  }
+
+  private def getPeopleFee(variation: AmendVariationResponse): Int =
+    ApplicationConfig.peopleFee * variation.addedResponsiblePeople
+
+  private def getBreakdownRows
+  (submission: SubmissionResponse,
+   premises: Seq[TradingPremises],
+   people: Seq[ResponsiblePeople],
+   subQuantity: Int): Seq[BreakdownRow] = {
+    Seq(
+      BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+    ) ++ responsiblePeopleRows(people, submission) ++
+      Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, submission.premiseFee))
+  }
+
+  private def safeId(cache: CacheMap): Future[String] = {
+    (for {
+      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+      rd <- bm.reviewDetails
+    } yield rd.safeId) match {
+      case Some(a) =>
+        Future.successful(a)
+      case _ =>
+        // TODO: Better exception
+        Future.failed(new Exception(""))
+    }
+  }
+
+  def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
+    bankDetails match {
+      case Some(bankAccts) => {
+        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
+        bankDtls.nonEmpty match {
+          case true => Some(bankDtls)
+          case false => Some(Seq.empty)
+        }
+      }
+      case _ => Some(Seq.empty)
+    }
+  }
 
   private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
@@ -197,31 +260,6 @@ trait SubmissionService extends DataCacheService {
     }
   }
 
-  def getSubscription
-  (implicit
-   ec: ExecutionContext,
-   hc: HeaderCarrier,
-   ac: AuthContext
-  ): Future[(String, Currency, Seq[BreakdownRow])] =
-    cacheConnector.fetchAll flatMap {
-      option =>
-        (for {
-          cache <- option
-          subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
-          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-        } yield {
-          val subQuantity = subscriptionQuantity(subscription)
-          val mlrRegNo = subscription.amlsRefNo
-          val total = subscription.totalFees
-          val rows = Seq(
-            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-          ) ++ responsiblePeopleRows(people, subscription) ++
-            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee))
-          Future.successful((mlrRegNo, Currency.fromBD(total), rows))
-          // TODO
-        }) getOrElse Future.failed(new Exception("TODO"))
-    }
 }
 
 object SubmissionService extends SubmissionService {
