@@ -93,7 +93,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
     "remove is called" must {
       "respond with SEE_OTHER" when {
-        "removing a responsible person from an unsubmitted application" in new Fixture {
+        "removing a responsible person from an application with status NotCompleted" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
@@ -103,6 +103,8 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(NotCompleted))
 
           val result = controller.remove(1, false, "John Envy Doe")(request)
           status(result) must be(SEE_OTHER)
@@ -114,7 +116,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
           )))(any(), any(), any())
         }
 
-        "removing a responsible person from a previously submitted application" in new Fixture {
+        "removing a responsible person from an application with status SubmissionReady" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
@@ -124,6 +126,8 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.remove(1, false, "John Envy Doe")(request)
           status(result) must be(SEE_OTHER)
@@ -131,6 +135,61 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
+            CompleteResponsiblePeople2,
+            CompleteResponsiblePeople3
+          )))(any(), any(), any())
+        }
+
+        "removing a responsible person from an application with status SubmissionReadyForReview" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(Some("RegNo")))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+
+          val result = controller.remove(1, false, "John Envy Doe")(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+            CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
+            CompleteResponsiblePeople2,
+            CompleteResponsiblePeople3
+          )))(any(), any(), any())
+        }
+
+        "removing a responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "1",
+            "endDate.month" -> "1",
+            "endDate.year" -> "1990"
+          )
+
+          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+            .thenReturn(Future.successful(Some("RegNo")))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+
+          val result = controller.remove(1, false, "John Envy Doe")(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+            CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true, endDate = Some(ActivityEndDate(new LocalDate(1990, 1, 1)))),
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
