@@ -103,6 +103,28 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
         }
       }
 
+      "redirect to Premises registered page" when {
+        "only one activity is selected in Business Matching business activities page" in new Fixture {
+          val tradingPremises = TradingPremises()
+
+          val businessActivity = BusinessMatchingActivities(Set(AccountancyServices))
+
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessActivity))))
+
+          val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(recordId1).url))
+        }
+      }
+
+
       "respond with SEE_OTHER and show the trading premises page" when {
         "there is no business activity" in new Fixture {
 
