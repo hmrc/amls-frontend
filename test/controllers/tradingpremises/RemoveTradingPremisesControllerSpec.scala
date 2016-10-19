@@ -171,30 +171,11 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
       }
     }
 
-    // test invalid until form is used in variations
-    //    "on post with invalid data show error" in new Fixture {
-    //      val newRequest = request.withFormUrlEncodedBody(
-    //        "endDate.day" -> "",
-    //        "endDate.month" -> "",
-    //        "endDate.year" -> ""
-    //      )
-    //      val tradingPremisesList = Seq(completeModel1, completeModel2, completeModel3, completeModel4)
-    //
-    //      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-    //        .thenReturn(Future.successful(Some(tradingPremisesList)))
-    //      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-    //        .thenReturn(Future.successful(Some("RegNo")))
-    //
-    //      val result = controller.remove(1, true, "trading Name")(newRequest)
-    //      status(result) must be(BAD_REQUEST)
-    //      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-    //
-    //    }
   }
   it when {
     "remove is called" must {
       "respond with SEE_OTHER" when {
-        "removing a responsible person from an application with status NotCompleted" in new Fixture {
+        "removing a trading premises from an application with status NotCompleted" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
@@ -216,7 +197,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
             completeTradingPremises3
           )))(any(), any(), any())
         }
-        "removing a responsible person from an application with status SubmissionReady" in new Fixture {
+        "removing a trading premises from an application with status SubmissionReady" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
@@ -239,7 +220,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
           )))(any(), any(), any())
         }
 
-        "removing a responsible person from an application with status SubmissionReadyForReview" in new Fixture {
+        "removing a trading premises from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
