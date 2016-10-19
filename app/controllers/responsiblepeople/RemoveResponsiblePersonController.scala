@@ -27,8 +27,8 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         status <- statusService.getStatus
       } yield (rp, status) match {
         case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _)), SubmissionDecisionApproved) => {
-          Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
-            personName.fullName, true))
+          Ok(views.html.responsiblepeople.remove_responsible_person(EmptyForm, index,
+            personName.fullName, complete, true))
         }
         case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _)),_) => {
           Ok(views.html.responsiblepeople.remove_responsible_person(EmptyForm, index, personName.fullName, complete, false))
