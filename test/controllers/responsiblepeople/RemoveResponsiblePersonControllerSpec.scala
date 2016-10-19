@@ -131,7 +131,6 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
-            CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
