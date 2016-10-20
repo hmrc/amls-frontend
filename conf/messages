@@ -137,6 +137,7 @@ error.required.tp.activity.your.business.do = Select at least one activity that 
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
+error.future.date = Enter a valid date. The date cannot be in the future.
 error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
@@ -937,7 +938,7 @@ submit.registration = Submit registration
 submit.amendment.application = Update information
 
 declaration.addperson.title = What’s your name? - Submit registration - Anti-money laundering registration - GOV.UK
-declaration.addperson.amendment.title = What’s your name? - Update information - Anti-money laundering registration - GOV.UK
+declaration.addperson.amendment.title = What’s your name? - Submit amended application - Anti-money laundering registration - GOV.UK
 declaration.addperson.header = What’s your name?
 declaration.addperson.firstname = First name
 declaration.addperson.middlename = Middle name (optional)
