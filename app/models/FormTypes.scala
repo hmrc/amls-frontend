@@ -4,7 +4,7 @@ import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
-
+import utils.DateHelper.localDateOrdering
 import scala.util.matching.Regex
 
 object FormTypes {
@@ -64,6 +64,8 @@ object FormTypes {
   def regexWithMsg(regex: Regex, msg: String) = pattern(regex).withMessage(msg)
 
   def required(msg: String) = notEmpty.withMessage(msg)
+
+  def maxDateWithMsg(maxDate: LocalDate, msg: String) = max(maxDate).withMessage(msg)
 
   val notEmptyStrip = Rule.zero[String] fmap {
     _.trim
@@ -149,6 +151,9 @@ object FormTypes {
        (__ \ "day").write[String]
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
+
+  val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
+  val localDateFutureRule = localDateRule compose futureDateRule
 
   /** Bank details Rules **/
 
