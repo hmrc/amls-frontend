@@ -248,11 +248,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       val rows = Seq(
         BreakdownRow("confirmation.responsiblepeople", 1, Currency(100), Currency(rpFee))
       ) ++ Seq(
+        BreakdownRow("confirmation.tradingpremises.zero", 1, Currency(0), Currency(0))
+      ) ++ Seq(
+        BreakdownRow("confirmation.tradingpremises.half", 3, Currency(57.50), Currency(tpHalfFee * 3))
+      ) ++ Seq(
         BreakdownRow("confirmation.tradingpremises", 1, Currency(115), Currency(tpFee))
-      ) ++ Seq(
-        BreakdownRow("confirmation.tradingpremises", 3, Currency(57.50), Currency(tpHalfFee * 3))
-      ) ++ Seq(
-        BreakdownRow("confirmation.tradingpremises", 1, Currency(0), Currency(0))
       )
 
       val response = Some("12345", Currency.fromBD(totalFee), rows)
@@ -391,7 +391,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         whenReady(TestSubmissionService.getVariation) {
           case Some((_,_,breakdownRows)) =>
-            breakdownRows.head.label mustBe "confirmation.tradingpremises"
+            breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(tpHalfFee)
             breakdownRows.head.total mustBe Currency(tpHalfFee)
@@ -422,7 +422,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         whenReady(TestSubmissionService.getVariation) {
           case Some((_,_,breakdownRows)) =>
-            breakdownRows.head.label mustBe "confirmation.tradingpremises"
+            breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(0)
             breakdownRows.head.total mustBe Currency(0)
@@ -488,27 +488,25 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         whenReady(TestSubmissionService.getVariation) {
           case Some((_,_,breakdownRows)) =>
 
-            println(breakdownRows)
-
             breakdownRows.head.label mustBe "confirmation.responsiblepeople"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(rpFee)
             breakdownRows.head.total mustBe Currency(rpFee)
 
-            breakdownRows(1).label mustBe "confirmation.tradingpremises"
+            breakdownRows(1).label mustBe "confirmation.tradingpremises.zero"
             breakdownRows(1).quantity mustBe 1
-            breakdownRows(1).perItm mustBe Currency(tpFee)
-            breakdownRows(1).total mustBe Currency(tpFee)
+            breakdownRows(1).perItm mustBe Currency(0)
+            breakdownRows(1).total mustBe Currency(0)
 
-            breakdownRows(2).label mustBe "confirmation.tradingpremises"
+            breakdownRows(2).label mustBe "confirmation.tradingpremises.half"
             breakdownRows(2).quantity mustBe 1
             breakdownRows(2).perItm mustBe Currency(tpHalfFee)
             breakdownRows(2).total mustBe Currency(tpHalfFee)
 
             breakdownRows.last.label mustBe "confirmation.tradingpremises"
             breakdownRows.last.quantity mustBe 1
-            breakdownRows.last.perItm mustBe Currency(0)
-            breakdownRows.last.total mustBe Currency(0)
+            breakdownRows.last.perItm mustBe Currency(tpFee)
+            breakdownRows.last.total mustBe Currency(tpFee)
 
           case _ => false
         }

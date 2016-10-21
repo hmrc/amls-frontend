@@ -38,24 +38,32 @@ trait SubmissionService extends DataCacheService {
   private object Submission {
     val message = "confirmation.submission"
     val quantity = 1
-    val feePer = ApplicationConfig.regFee
+    val feePer: BigDecimal = ApplicationConfig.regFee
   }
 
   private object Premises {
     val message = "confirmation.tradingpremises"
-    val feePer = ApplicationConfig.premisesFee
+    val feePer: BigDecimal = ApplicationConfig.premisesFee
   }
 
+  private object PremisesHalfYear {
+    val message = "confirmation.tradingpremises.half"
+    val feePer: BigDecimal = Premises.feePer / 2
+  }
+
+  private object PremisesZero {
+    val message = "confirmation.tradingpremises.zero"
+    val feePer: BigDecimal = 0
+  }
 
   private object People {
     val message = "confirmation.responsiblepeople"
-    val feePer = ApplicationConfig.peopleFee
+    val feePer: BigDecimal = ApplicationConfig.peopleFee
   }
-
 
   private object UnpaidPeople {
     val message = "confirmation.unpaidpeople"
-    val feePer = 0
+    val feePer: BigDecimal = 0
   }
 
   def subscribe
@@ -199,15 +207,11 @@ trait SubmissionService extends DataCacheService {
 
   private def getVariationBreakdown(variation: AmendVariationResponse, peopleFee: BigDecimal): Seq[BreakdownRow] = {
 
-    val rpFee: BigDecimal = People.feePer
-    val tpFee: BigDecimal = Premises.feePer
-    val tpHalfFee: BigDecimal = tpFee/2
-
     val breakdownRows = Seq()
 
     def rpRow: Seq[BreakdownRow] = {
       if(variation.addedResponsiblePeople > 0) {
-        breakdownRows ++ Seq(BreakdownRow(People.message, variation.addedResponsiblePeople, rpFee, Currency(peopleFee)))
+        breakdownRows ++ Seq(BreakdownRow(People.message, variation.addedResponsiblePeople, People.feePer, Currency(peopleFee)))
       } else {
         Seq()
       }
@@ -215,7 +219,7 @@ trait SubmissionService extends DataCacheService {
 
     def tpFullYearRow: Seq[BreakdownRow] = {
       if(variation.addedFullYearTradingPremises > 0) {
-        breakdownRows ++ Seq(BreakdownRow(Premises.message, variation.addedFullYearTradingPremises, tpFee, Currency(getFullPremisesFee(variation))))
+        breakdownRows ++ Seq(BreakdownRow(Premises.message, variation.addedFullYearTradingPremises, Premises.feePer, Currency(getFullPremisesFee(variation))))
       } else {
         Seq()
       }
@@ -223,7 +227,7 @@ trait SubmissionService extends DataCacheService {
 
     def tpHalfYearRow: Seq[BreakdownRow] = {
       if(variation.halfYearlyTradingPremises > 0) {
-        breakdownRows ++ Seq(BreakdownRow(Premises.message, variation.halfYearlyTradingPremises, tpHalfFee, Currency(getHalfYearPremisesFee(variation))))
+        breakdownRows ++ Seq(BreakdownRow(PremisesHalfYear.message, variation.halfYearlyTradingPremises, PremisesHalfYear.feePer, Currency(getHalfYearPremisesFee(variation))))
       } else {
         Seq()
       }
@@ -231,33 +235,30 @@ trait SubmissionService extends DataCacheService {
 
     def tpZeroRow: Seq[BreakdownRow] = {
       if(variation.zeroRatedTradingPremises > 0) {
-        breakdownRows ++ Seq(BreakdownRow(Premises.message, variation.zeroRatedTradingPremises, 0, Currency(0)))
+        breakdownRows ++ Seq(BreakdownRow(PremisesZero.message, variation.zeroRatedTradingPremises, PremisesZero.feePer, Currency(PremisesZero.feePer)))
       } else {
         Seq()
       }
     }
 
-    rpRow ++ tpFullYearRow ++ tpHalfYearRow ++ tpZeroRow
+    rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
 
   }
 
   private def getTotalPremisesFee(variation: AmendVariationResponse): BigDecimal = {
-    val fee: BigDecimal = ApplicationConfig.premisesFee
-    (fee * variation.addedFullYearTradingPremises) + getHalfYearPremisesFee(variation)
+    (Premises.feePer * variation.addedFullYearTradingPremises) + getHalfYearPremisesFee(variation)
   }
 
   private def getFullPremisesFee(variation: AmendVariationResponse): BigDecimal = {
-    val fee: BigDecimal = ApplicationConfig.premisesFee
-    fee * variation.addedFullYearTradingPremises
+    Premises.feePer * variation.addedFullYearTradingPremises
   }
 
   private def getHalfYearPremisesFee(variation: AmendVariationResponse): BigDecimal = {
-    val fee: BigDecimal = ApplicationConfig.premisesFee
-    (fee / 2) * variation.halfYearlyTradingPremises
+    PremisesHalfYear.feePer * variation.halfYearlyTradingPremises
   }
 
   private def getPeopleFee(variation: AmendVariationResponse): BigDecimal =
-    ApplicationConfig.peopleFee * variation.addedResponsiblePeople
+    People.feePer * variation.addedResponsiblePeople
 
   private def getBreakdownRows
   (submission: SubmissionResponse,
