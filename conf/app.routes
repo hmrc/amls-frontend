@@ -190,7 +190,7 @@ POST        /declaration/add-person                                     controll
 GET         /amend-application/add-person                               controllers.declaration.AddPersonController.getWithAmendment()
 
 GET         /declaration/declaration                                    controllers.declaration.DeclarationController.get()
-GET         /amend-application/declaration                              controllers.declaration.DeclarationController.getWithAmendment()
+GET         /update-information/declaration                             controllers.declaration.DeclarationController.getWithAmendment()
 
 GET         /confirmation                                               controllers.ConfirmationController.get()
 
