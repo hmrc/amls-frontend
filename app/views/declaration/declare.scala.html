@@ -23,21 +23,19 @@
     <p>@Messages("declaration.declaration.declare")</p>
 
     <ul class="list list-bullet">
-        <li>@Messages("declaration.declaration.correctinformation")</li>
+        @if(Messages(content._2).equals(Messages("submit.amendment.application"))) {
+            <li>@Messages("declaration.declaration.amendment.correctinformation")</li>
+        } else {
+            <li>@Messages("declaration.declaration.correctinformation")</li>
+        }
         <li>@Messages("declaration.declaration.tellhmrc")</li>
         <li>@Messages("declaration.declaration.noncompliance")</li>
-        <li>@Messages("declaration.declaration.confirm")
-            <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("declaration.declaration.guidance")</a>
-        </li>
+        <li>@Messages("declaration.declaration.confirm") <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("declaration.declaration.guidance")</a></li>
     </ul>
 
     @form(EmptyForm, controllers.routes.SubmissionController.post()) {
         <div class="form-group">
-            <input
-                type="submit"
-                name="submit"
-                class="button"
-                value="@Messages("button.confirmandsubmit")">
+            <input type="submit" name="submit" class="button" value="@Messages("button.confirmandsubmit")" />
         </div>
     }
 
