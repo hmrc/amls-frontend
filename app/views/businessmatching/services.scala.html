@@ -5,6 +5,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("msb.services.title", "summary.businessmatching")
 }
 

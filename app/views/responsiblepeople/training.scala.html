@@ -20,7 +20,8 @@
 
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
         @fieldset(
-            legend = "",
+            classes = Seq("visuallyhidden-legend"),
+            legend = "responsiblepeople.training.title",
             hint = "responsiblepeople.training.hinttext",
             jsHidden = false,
             panel = false
