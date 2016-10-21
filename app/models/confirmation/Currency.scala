@@ -3,7 +3,7 @@ package models.confirmation
 case class Currency(value: BigDecimal) {
 
   override def toString: String =
-    f"£${value.toInt}%,d"
+    f"£${value}%1.2f"
 }
 
 object Currency {

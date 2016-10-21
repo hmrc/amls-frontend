@@ -40,8 +40,8 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
     protected val mockCacheMap = mock[CacheMap]
 
-    when(controller.subscriptionService.getSubscription(any(),any(),any()))
-      .thenReturn(Future.successful(("",Currency.fromInt(0),Seq())))
+    when(controller.subscriptionService.getSubscription(any(), any(), any()))
+      .thenReturn(Future.successful(("", Currency.fromInt(0), Seq())))
 
   }
 
@@ -49,7 +49,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
     "notify user of progress if application has not already been submitted" in new Fixture {
 
-      when(controller.statusService.getStatus(any(),any(),any()))
+      when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReady))
 
       val result = controller.get()(request)
@@ -59,11 +59,11 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
 
     "notify user of amendment if application has already been submitted but not approved with difference" in new Fixture {
 
-      when(controller.statusService.getStatus(any(),any(),any()))
+      when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
-      when(controller.subscriptionService.getAmendment(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(100)))))
+      when(controller.subscriptionService.getAmendment(any(), any(), any()))
+        .thenReturn(Future.successful(Some("", Currency.fromInt(0), Seq(), Some(Currency.fromInt(100)))))
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -74,11 +74,11 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
     }
     "notify user of no fee if there is no difference(/Some(0))" in new Fixture {
 
-      when(controller.statusService.getStatus(any(),any(),any()))
+      when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
-      when(controller.subscriptionService.getAmendment(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(0)))))
+      when(controller.subscriptionService.getAmendment(any(), any(), any()))
+        .thenReturn(Future.successful(Some("", Currency.fromInt(0), Seq(), Some(Currency.fromInt(0)))))
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -89,11 +89,11 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
     }
     "notify user of no fee if there is no difference(/None)" in new Fixture {
 
-      when(controller.statusService.getStatus(any(),any(),any()))
+      when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
-      when(controller.subscriptionService.getAmendment(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), None)))
+      when(controller.subscriptionService.getAmendment(any(), any(), any()))
+        .thenReturn(Future.successful(Some("", Currency.fromInt(0), Seq(), None)))
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -103,32 +103,24 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       contentAsString(result) must include(Messages("button.finish"))
     }
 
-    "notify user of fees accrued by a variation of Trading Premises and Responsible People" in new Fixture {
+    "notify user there is no fee" when {
 
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
+      "a variation without the addition of tp or rp" in new Fixture {
 
-      when(controller.subscriptionService.getVariation(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(100),Seq())))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      val result = controller.get()(request)
-      status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+        when(controller.subscriptionService.getVariation(any(), any(), any()))
+          .thenReturn(Future.successful(Some("", Currency.fromInt(0), Seq())))
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
+        Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
+        contentAsString(result) must include(Messages("confirmation.no.fee"))
+        contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+        contentAsString(result) must include(Messages("button.finish"))
+      }
+
     }
-    "notify user there is no fee from a variation without the addition of tp or rp" in new Fixture {
-
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-      when(controller.subscriptionService.getVariation(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq())))
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-      Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your updated information")
-      contentAsString(result) must include(Messages("confirmation.no.fee"))
-      contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
-      contentAsString(result) must include(Messages("button.finish"))    }
-
   }
 }

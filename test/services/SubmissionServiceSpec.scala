@@ -10,8 +10,10 @@ import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.responsiblepeople.ResponsiblePeople
+import models.status.SubmissionDecisionApproved
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, SubscriptionResponse}
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -19,6 +21,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.http.Status._
 import play.api.test.FakeApplication
+import play.api.test.Helpers.{OK => _, _}
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
@@ -220,11 +223,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         zeroRatedTradingPremises = 1
       )
 
-      val rpFee: Double = 100
-      val tpFee: Double = 115
-      val tpHalfFee: Double = tpFee/2
-      val tpTotalFee: Double = tpFee + (tpHalfFee * 3)
-      val totalFee: Double = rpFee + tpTotalFee
+      val rpFee: BigDecimal = 100
+      val tpFee: BigDecimal = 115
+      val tpHalfFee: BigDecimal = tpFee/2
+      val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
+      val totalFee: BigDecimal = rpFee + tpTotalFee
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -243,9 +246,13 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       } thenReturn Some(variationResponse)
 
       val rows = Seq(
-        BreakdownRow("confirmation.responsiblepeople", 1, 100, Currency(rpFee))
+        BreakdownRow("confirmation.responsiblepeople", 1, Currency(100), Currency(rpFee))
       ) ++ Seq(
-        BreakdownRow("confirmation.tradingpremises", 5, 115, Currency(tpTotalFee))
+        BreakdownRow("confirmation.tradingpremises", 1, Currency(115), Currency(tpFee))
+      ) ++ Seq(
+        BreakdownRow("confirmation.tradingpremises", 3, Currency(57.50), Currency(tpHalfFee * 3))
+      ) ++ Seq(
+        BreakdownRow("confirmation.tradingpremises", 1, Currency(0), Currency(0))
       )
 
       val response = Some("12345", Currency.fromBD(totalFee), rows)
@@ -303,6 +310,208 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       whenReady(TestSubmissionService.update.failed) {
         result =>
           result mustBe a[NoEnrolmentException]
+      }
+    }
+
+    "notify user of variation fees to pay" when {
+
+      val rpFee: BigDecimal = 100
+      val tpFee: BigDecimal = 115
+      val tpHalfFee: BigDecimal = tpFee/2
+      val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
+      val totalFee: BigDecimal = rpFee + tpTotalFee
+
+      val testVariationResponse = AmendVariationResponse(
+        processingDate = "",
+        etmpFormBundleNumber = "",
+        registrationFee = 100,
+        fpFee = Some(0),
+        premiseFee = 0,
+        totalFees = 100,
+        paymentReference = Some(""),
+        difference = Some(0),
+        addedResponsiblePeople = 0,
+        addedFullYearTradingPremises = 0,
+        halfYearlyTradingPremises = 0,
+        zeroRatedTradingPremises = 0
+      )
+
+      "a Trading Premises has been added with a full year fee" in new Fixture {
+
+        val variationResponse = testVariationResponse.copy(
+        addedFullYearTradingPremises = 1
+        )
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse)
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_,_,breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.tradingpremises"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(tpFee)
+            breakdownRows.head.total mustBe Currency(tpFee)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+      "a Trading Premises has been added with a half year fee" in new Fixture {
+        val variationResponse = testVariationResponse.copy(
+          halfYearlyTradingPremises = 1
+        )
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse)
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_,_,breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.tradingpremises"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(tpHalfFee)
+            breakdownRows.head.total mustBe Currency(tpHalfFee)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+      "a Trading Premises has been added with a zero fee" in new Fixture {
+        val variationResponse = testVariationResponse.copy(
+          zeroRatedTradingPremises = 1
+        )
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse)
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_,_,breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.tradingpremises"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(0)
+            breakdownRows.head.total mustBe Currency(0)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+      "a Responsible Person has been added" in new Fixture {
+        val variationResponse = testVariationResponse.copy(
+          addedResponsiblePeople = 1
+        )
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse)
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_,_,breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.responsiblepeople"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(rpFee)
+            breakdownRows.head.total mustBe Currency(rpFee)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+      "each of the categorised fees are in the response" in new Fixture {
+        val variationResponse = testVariationResponse.copy(
+          addedResponsiblePeople = 1,
+          addedFullYearTradingPremises = 1,
+          halfYearlyTradingPremises = 1,
+          zeroRatedTradingPremises = 1
+        )
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse)
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_,_,breakdownRows)) =>
+
+            println(breakdownRows)
+
+            breakdownRows.head.label mustBe "confirmation.responsiblepeople"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(rpFee)
+            breakdownRows.head.total mustBe Currency(rpFee)
+
+            breakdownRows(1).label mustBe "confirmation.tradingpremises"
+            breakdownRows(1).quantity mustBe 1
+            breakdownRows(1).perItm mustBe Currency(tpFee)
+            breakdownRows(1).total mustBe Currency(tpFee)
+
+            breakdownRows(2).label mustBe "confirmation.tradingpremises"
+            breakdownRows(2).quantity mustBe 1
+            breakdownRows(2).perItm mustBe Currency(tpHalfFee)
+            breakdownRows(2).total mustBe Currency(tpHalfFee)
+
+            breakdownRows.last.label mustBe "confirmation.tradingpremises"
+            breakdownRows.last.quantity mustBe 1
+            breakdownRows.last.perItm mustBe Currency(0)
+            breakdownRows.last.total mustBe Currency(0)
+
+          case _ => false
+        }
       }
     }
   }

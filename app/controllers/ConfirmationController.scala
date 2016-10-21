@@ -30,7 +30,8 @@ trait ConfirmationController extends BaseController {
         case SubmissionDecisionApproved => {
           subscriptionService.getVariation flatMap {
             case Some((mlrRegNo, total, rows)) => {
-              if(total.value > 0) Future.successful(Ok(views.html.confirmation.confirmation_variation(mlrRegNo, total, rows)))
+              if(total.value > 0)
+                Future.successful(Ok(views.html.confirmation.confirmation_variation(mlrRegNo, total, rows)))
               else {
                 val content = ("confirmation.variation.title", "confirmation.variation.lede")
                 Future.successful(Ok(views.html.confirmation.confirmation_no_fee(mlrRegNo, content)))
