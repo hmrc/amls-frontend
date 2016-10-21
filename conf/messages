@@ -1072,6 +1072,7 @@ responsiblepeople.nationality.selection.british = British (including English, Sc
 responsiblepeople.nationality.selection.irish = Irish
 responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
+responsiblepeople.summary.responsible.people = People you have registered
 responsiblepeople.summary.no.responsible.people = You currently have no responsible people registered
 responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
