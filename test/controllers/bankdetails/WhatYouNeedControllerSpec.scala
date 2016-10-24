@@ -28,7 +28,12 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         val result = controller.get(1)(request)
 
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("bankdetails.whatyouneed.title"))
+
+        val pageTitle = Messages("title.wyn") + " - " +
+          Messages("summary.bankdetails") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
+        contentAsString(result) must include(pageTitle)
         contentAsString(result) must include(Messages("button.continue"))
       }
     }
