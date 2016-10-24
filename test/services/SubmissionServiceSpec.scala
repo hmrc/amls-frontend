@@ -161,6 +161,31 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
     }
 
+    "successfully submit variation" in new Fixture {
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+      } thenReturn Future.successful(CacheMap("", Map.empty))
+
+      when {
+        TestSubmissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+      } thenReturn Future.successful(amendmentResponse)
+
+      when {
+        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+      }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+
+      whenReady(TestSubmissionService.variation) {
+        result =>
+          result must equal(amendmentResponse)
+      }
+    }
+
     "successfully submit amendment returning submission data" in new Fixture {
 
       when {

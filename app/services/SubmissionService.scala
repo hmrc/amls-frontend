@@ -150,6 +150,23 @@ trait SubmissionService extends DataCacheService {
     } yield amendment
   }
 
+  def variation
+  (implicit
+   ec: ExecutionContext,
+   hc: HeaderCarrier,
+   ac: AuthContext
+  ): Future[AmendVariationResponse] = {
+    for {
+      cache <- getCache
+      regNo <- authEnrolmentsService.amlsRegistrationNumber
+      amendment <- amlsConnector.variation(
+        createSubscriptionRequest(cache),
+        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
+      )
+      _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
+    } yield amendment
+  }
+
   def getAmendment
   (implicit
    ec: ExecutionContext,
