@@ -92,8 +92,6 @@ trait LandingController extends BaseController {
     ).exists(identity)
   }
 
-
-
   def getWithAmendments(implicit authContext: AuthContext, request : Request[_]) = {
     enrolmentsService.amlsRegistrationNumber flatMap  {
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap { //enrolment exists

@@ -25,7 +25,6 @@ trait SubmissionController extends BaseController {
     }.map {
       _ => Redirect(controllers.routes.ConfirmationController.get())
     }
-
   }
 }
 
