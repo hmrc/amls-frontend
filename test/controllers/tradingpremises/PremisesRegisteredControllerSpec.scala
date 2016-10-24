@@ -41,7 +41,10 @@ class PremisesRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("tradingpremises.premises.registered.title")
+
+        val title = s"${Messages("tradingpremises.premises.registered.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+
+        htmlValue.title mustBe title
       }
 
       "load the Premises Registered page1" in new Fixture {
