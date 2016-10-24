@@ -40,7 +40,10 @@ class PersonRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with M
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("responsiblepeople.person.registered.title")
+
+        val title = s"${Messages("responsiblepeople.person.registered.title")} - ${Messages("progress.responsiblepeople.name")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+
+        htmlValue.title mustBe title
       }
 
       "load the Person Registered page with a count of 0 when no responsible people have a name recorded" in new Fixture {

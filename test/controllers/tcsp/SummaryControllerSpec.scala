@@ -45,7 +45,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite {
       val result = controller.get()(request)
       status(result) must be(OK)
       val document: Document = Jsoup.parseBodyFragment(contentAsString(result))
-      document.title must be(Messages("summary.checkyouranswers.title"))
+      document.title must be(s"${Messages("summary.checkyouranswers.title")} - ${Messages("summary.tcsp")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
       val elements = document.getElementsByTag("table")
       elements.get(0).select("tr").get(0).text must include(Messages("tcsp.kind.of.service.provider.title"))
       elements.get(0).select("tr").get(1).text must include(Messages("tcsp.service.provider.lbl.03"))

@@ -39,7 +39,7 @@ class YourAnswersControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        contentAsString(result) must include (Messages("responsiblepeople.your_answers.heading"))
+        contentAsString(result) must include (s"${Messages("title.ya")} - ${Messages("summary.responsiblepeople")}")
       }
 
       "show the 'Add a responsible person' link" in new Fixture {
