@@ -31,11 +31,14 @@ class LinkedCashPaymentsControllerSpec extends PlaySpec  with OneAppPerSuite {
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
+      val title = Messages("hvd.identify.linked.cash.payment.title") + " - " +
+        Messages("summary.hvd") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe Messages("hvd.identify.linked.cash.payment.title")
+      htmlValue.title mustBe title
     }
 
     "successfully load UI from save4later" in new Fixture {
@@ -43,11 +46,14 @@ class LinkedCashPaymentsControllerSpec extends PlaySpec  with OneAppPerSuite {
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Hvd(linkedCashPayment = Some(LinkedCashPayments(true))))))
 
+      val title = Messages("hvd.identify.linked.cash.payment.title") + " - " +
+        Messages("summary.hvd") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe Messages("hvd.identify.linked.cash.payment.title")
+      htmlValue.title mustBe title
       htmlValue.getElementById("linkedCashPayments-true").`val`() mustBe "true"
       htmlValue.getElementById("linkedCashPayments-false").`val`() mustBe "false"
     }

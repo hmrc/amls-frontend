@@ -5,38 +5,39 @@
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.person.a.resident.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.person.a.resident.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.person.a.resident.title"),
+    title = Messages("responsiblepeople.person.a.resident.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 )  {
-
 
     @form(f, controllers.responsiblepeople.routes.PersonResidentTypeController.post(index, edit)) {
 
         <div class="form-field-group">
         @inlineRadioGroup(f("isUKResidence")) {
-            @legend("TODO", jsHidden = true)
+
+            @legend("responsiblepeople.person.a.resident.title", jsHidden = true)
             @radio(f("isUKResidence"), "lbl.yes", "true", target = s"#${f("targetyes").id}-fieldset")
             @radio(f("isUKResidence"), "lbl.no", "false", target = s"#${f("targetno").id}-fieldset")
-            @fieldset("TODO", jsHidden = true, id = s"""${f("targetyes").id}-fieldset""") {
+
+            @fieldset("responsiblepeople.person.a.resident.heading.lbl.yes", jsHidden = true, id = s"""${f("targetyes").id}-fieldset""") {
                 @input(f("nino"), "lbl.nino", "lbl.nino.hint", bold = false)
             }
-            @fieldset("TODO", jsHidden = true, id = s"""${f("targetno").id}-fieldset""") {
+
+            @fieldset("responsiblepeople.person.a.resident.heading.lbl.no", jsHidden = true, id = s"""${f("targetno").id}-fieldset""") {
 
                 @radioGroup(f("passportType")) {
                     @legend("responsiblepeople.passporttype.lbl", jsHidden = false, bold = false)
                     @radio(f("passportType"), "responsiblepeople.uk.passport.lbl", "01", target = s"#${f("ukPassportNumber").id}-fieldset")
-                    @fieldset("TODO", jsHidden = true, id = s"""${f("ukPassportNumber").id}-fieldset""") {
+                    @fieldset("lbl.passport.number", jsHidden = true, id = s"""${f("ukPassportNumber").id}-fieldset""") {
                        @input(f("ukPassportNumber"), "lbl.passport.number", bold = false)
                     }
                     @radio(f("passportType"), "responsiblepeople.non.uk.passport.lbl", "02", target = s"#${f("nonUKPassportNumber").id}-fieldset")
-                    @fieldset("TODO", jsHidden = true, id = s"""${f("nonUKPassportNumber").id}-fieldset""") {
+                    @fieldset("lbl.passport.number", jsHidden = true, id = s"""${f("nonUKPassportNumber").id}-fieldset""") {
                         @input(f("nonUKPassportNumber"), "lbl.passport.number", bold = false)
                     }
-                    @radio(f("passportType"), "responsiblepeople.no.passport.lbl", "03")
                 }
                 @date(
                     f = f,

@@ -5,11 +5,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("msb.ipsp.heading", "summary.msb")
+    @heading("msb.ipsp.title", "summary.msb")
 }
 
 @main(
-    title = Messages("msb.ipsp.title"),
+    title = Messages("msb.ipsp.title") + " - " + Messages("summary.msb"),
     heading = header
 ) {
 

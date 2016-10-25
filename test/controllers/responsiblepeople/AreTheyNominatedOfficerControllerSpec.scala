@@ -67,11 +67,16 @@ class AreTheyNominatedOfficerControllerSpec extends PlaySpec with OneAppPerSuite
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must include(Messages("responsiblepeople.aretheynominatedofficer.title"))
+
+        val pageTitle = Messages("responsiblepeople.aretheynominatedofficer.title") + " - " +
+          Messages("summary.responsiblepeople") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
+        document.title mustBe(pageTitle)
         document.select("input[value=true]") must not be(null)
         document.select("input[value=false]") must not be(null)
 
-        document.body().html() must include(Messages("responsiblepeople.aretheynominatedofficer.heading"))
+        document.body().html() must include(Messages("responsiblepeople.aretheynominatedofficer.title"))
 
       }
     }

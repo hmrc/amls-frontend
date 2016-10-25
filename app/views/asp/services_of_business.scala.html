@@ -9,14 +9,13 @@
 }
 
 @main(
-    title = Messages("asp.services.title"),
+    title = Messages("asp.services.title") + " - " + Messages("summary.asp"),
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
-
     @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
         @radioGroup(f("services")) {
+            @legend("lbl.select.all")
             @checkbox(f("services[]"), "asp.service.lbl.01", "01")
             @checkbox(f("services[]"), "asp.service.lbl.02", "02")
             @checkbox(f("services[]"), "asp.service.lbl.03", "03")

@@ -1,0 +1,24 @@
+@(
+    question: String,
+    editUrl: String = "",
+    removeUrl: String = "",
+    canEdit: Boolean
+)(content: Html)(implicit lang: Lang)
+
+<li class="group check-your-answers">
+    <span class="visuallyhidden">@Messages("visuallyhidden.you.have.registered")</span>
+    <h2 class="heading-small">@question</h2>
+    @content
+    @if(editUrl.nonEmpty){<footer class="check-your-answers__footer">
+        <p>
+        @if(canEdit) {
+            <a href="@editUrl">@Messages("button.edit")<span class="visuallyhidden"> @Messages("visuallyhidden.the.details.for") @question</span></a>
+            @if(removeUrl.nonEmpty){
+                @Messages("lbl.or") <a href="@removeUrl">@Messages("button.remove")<span class="visuallyhidden"> @question @Messages("visuallyhidden.from.your.application")</span></a>
+            }
+        }
+        </p>
+    </footer>}
+</li>
+
+

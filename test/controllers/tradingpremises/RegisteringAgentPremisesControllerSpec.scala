@@ -52,7 +52,10 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("tradingpremises.agent.premises.title")
+
+        val title = s"${Messages("tradingpremises.agent.premises.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+
+        htmlValue.title mustBe title
       }
 
       "load Yes when save4later returns true" in new Fixture {
@@ -132,7 +135,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
 
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("tradingpremises.agent.premises.heading"))
+        contentAsString(result) must include(Messages("tradingpremises.agent.premises.title"))
         contentAsString(result) must include(Messages("err.summary"))
       }
 

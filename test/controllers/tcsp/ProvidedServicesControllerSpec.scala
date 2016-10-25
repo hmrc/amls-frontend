@@ -48,7 +48,7 @@ class ProvidedServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.title() must be (Messages("tcsp.provided_services.title"))
+        document.title() must be (s"${Messages("tcsp.provided_services.title")} - ${Messages("summary.tcsp")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
 
         document.select("input[id=services-08]").attr("checked") must be("checked")
         document.select("input[name=details]").`val` must be ("some other service")

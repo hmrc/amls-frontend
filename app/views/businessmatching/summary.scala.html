@@ -1,14 +1,15 @@
 @import include._
+@import forms2._
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 @(model: BusinessMatching)(implicit request: Request[_])
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.businessmatching")
+    @heading("title.cya", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
 
@@ -17,67 +18,49 @@
     </div>
 
     @model.reviewDetails.map { review =>
-        <table class="table--spaced-top">
-            <tr>
-                <th colspan="2">@Messages("businessmatching.summary.business.address.lbl")</th>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @review.businessAddress.toLines.map { line =>
-                        @line<br>
-                    }
-                </td>
-            </tr>
-        </table>
+        @checkYourAnswers(
+            question = Messages("businessmatching.summary.business.address.lbl")
+        ) {
+            <p>@review.businessAddress.toLines.map { line =>
+                @line<br />
+            }</p>
+        }
 
         @review.businessType.map { m =>
             @m match {
                 case BusinessType.LPrLLP | BusinessType.LimitedCompany => {
-                    <table class="table--spaced-top">
-                        <tr>
-                            <th>@Messages("businessmatching.registrationnumber.heading")</th>
-                            <td width="12"><a href="@controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true)">@Messages("button.edit")</a></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                @model.companyRegistrationNumber.map {number =>
-                                    @number.companyRegistrationNumber
-                                }
-                            </td>
-                        </tr>
-                    </table>
+                    @checkYourAnswers(
+                        question = Messages("businessmatching.registrationnumber.title"),
+                        editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString
+                    ) {
+                        <p>@model.companyRegistrationNumber.map { number =>
+                            @number.companyRegistrationNumber
+                        }</p>
+                    }
                 }
                 case BusinessType.UnincorporatedBody => {
-                    <table class="table--spaced-top">
-                        <tr>
-                            <th>@Messages("businessmatching.typeofbusiness.heading")</th>
-                            <td width="12"><a href="@controllers.businessmatching.routes.TypeOfBusinessController.get(true)">@Messages("button.edit")</a></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                @model.typeOfBusiness.map {business =>
-                                    @business.typeOfBusiness
-                                }
-                            </td>
-                        </tr>
-                    </table>
+                    @checkYourAnswers(
+                        question = Messages("businessmatching.typeofbusiness.title"),
+                        editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString
+                    ) {
+                        <p>@model.typeOfBusiness.map { business =>
+                            @business.typeOfBusiness
+                        }</p>
+                    }
                 }
                 case _ => {}
-
             }
         }
     }
 
     @model.activities.map { activity =>
-        <table class="table--spaced-top">
-            <tr>
-                <th>@Messages("businessmatching.registerservices.heading")</th>
-                <td width="12"><a href="@controllers.businessmatching.routes.RegisterServicesController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            @activity.businessActivities.map { line =>
-            <tr>
-                <td colspan="2">
-                    @line match {
+        @checkYourAnswers(
+            question = Messages("businessmatching.registerservices.title"),
+            editUrl = controllers.businessmatching.routes.RegisterServicesController.get(true).toString
+        ) {
+            <ul class="list list--comma">
+                @activity.businessActivities.map { line =>
+                    <li>@line match {
                         case AccountancyServices => {@Messages("businessmatching.registerservices.servicename.lbl.01")}
                         case BillPaymentServices => {@Messages("businessmatching.registerservices.servicename.lbl.02")}
                         case EstateAgentBusinessService => {@Messages("businessmatching.registerservices.servicename.lbl.03")}
@@ -85,79 +68,57 @@
                         case MoneyServiceBusiness => {@Messages("businessmatching.registerservices.servicename.lbl.05")}
                         case TrustAndCompanyServices => {@Messages("businessmatching.registerservices.servicename.lbl.06")}
                         case TelephonePaymentService => {@Messages("businessmatching.registerservices.servicename.lbl.07")}
-                    }
-                </td>
-            </tr>
-            }
-        </table>
-
+                    }</li>
+                }
+            </ul>
+        }
 
         @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
             @model.msbServices.map { services =>
-                <!-- original table-based solution -->
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("businessmatching.services.heading")</th>
-                        <td width="12"><a href="@controllers.businessmatching.routes.ServicesController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
+                @checkYourAnswers(
+                    question = Messages("msb.services.title"),
+                    editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString
+                ) {
+                    <ul class="list list--comma">
                     @services.services.map { svc =>
-                    <tr>
-                        <td colspan="2">
-                            @svc match {
-                            case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
-                            case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
-                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
-                            }
-                        </td>
-                    </tr>
+                        <li>@svc match {
+                            case TransmittingMoney => {@Messages("services.list.lbl.01")}
+                            case CurrencyExchange => {@Messages("services.list.lbl.02")}
+                            case ChequeCashingNotScrapMetal => {@Messages("services.list.lbl.03")}
+                            case ChequeCashingScrapMetal => {@Messages("services.list.lbl.04")}
+                        }</li>
                     }
-                </table>
-
+                    </ul>
+                }
 
                 @if(services.services.contains(TransmittingMoney)) {
                     @model.businessAppliedForPSRNumber.map { psr =>
-                        <table class="table--spaced-top">
-                            <tr>
-                                <th>@Messages("businessmatching.psr.number.title")</th>
-                                <td width="12"><a href="@controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true)">@Messages("button.edit")</a></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    @psr match {
-                                        case BusinessAppliedForPSRNumberNo => {
-                                            @Messages("lbl.no")
-                                            }
-                                        case BusinessAppliedForPSRNumberYes(number) => {
-                                        @Messages("lbl.yes")
-                                </td>
-                            <tr>
-                                <td colspan="2">
-                                    @Messages("businessmatching.psr.number.lbl") : @number
-                                        }
-                                    }
-                                </td>
-                            </tr>
-                        </table>
+                        @checkYourAnswers(
+                            question = Messages("businessmatching.psr.number.title"),
+                            editUrl = controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString
+                        ) {
+                            <p>@psr match {
+                                case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
+                                case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
+                            }</p>
+                        }
                     }
                 }
             }
         }
     }
+
     @model.businessAppliedForPSRNumber.map { psr =>
         @psr match {
             case BusinessAppliedForPSRNumberNo => {
-                <div class="form-group">
-                    <a class="button" href="@appConfig.logoutUrl">
-                        @Messages("button.logout")
-                    </a>
-                </div>
+                <a class="button" href="@appConfig.logoutUrl">@Messages("button.logout")</a>
             }
             case BusinessAppliedForPSRNumberYes(number) => {
                 <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("businessmatching.button.confirm.start")</a>
             }
         }
     }
+
     @if(model.businessAppliedForPSRNumber.isEmpty) {
         <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("businessmatching.button.confirm.start")</a>
     }

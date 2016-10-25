@@ -42,7 +42,7 @@
 
 @insideHeader = {
     @uiLayouts.header_nav(
-        navTitle = Some(Messages("amls.title")),
+        navTitle = Some(Messages("title.amls")),
         navTitleLink = None,
         showBetaLink = false,
         navLinks = Some(navLinks)
@@ -85,7 +85,7 @@
 }
 
 @hmrcGovUkTemplate(
-    Some(title),
+    Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
     bodyClasses
 )(
     head,

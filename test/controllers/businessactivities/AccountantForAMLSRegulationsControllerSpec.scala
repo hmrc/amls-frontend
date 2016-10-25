@@ -39,8 +39,12 @@ class AccountantForAMLSRegulationsControllerSpec extends PlaySpec with OneAppPer
         val result = controller.get()(request)
         status(result) must be(OK)
 
+        val pageTitle = Messages("businessactivities.accountantForAMLSRegulations.title") + " - " +
+          Messages("progress.businessactivities.name") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("businessactivities.accountantForAMLSRegulations.title")
+        htmlValue.title mustBe pageTitle
       }
 
       "load Yes when accountant For AMLS Regulations from save4later returns True" in new Fixture {

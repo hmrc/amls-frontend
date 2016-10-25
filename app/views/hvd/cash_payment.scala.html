@@ -9,11 +9,11 @@ s"""${f("paymentDate").id}-fieldset"""
 
 @header = {
     @errorSummary(f)
-    @heading("hvd.cash.payment.heading", "summary.hvd")
+    @heading("hvd.cash.payment.title", "summary.hvd")
 }
 
 @main(
-    title = Messages("hvd.cash.payment.title"),
+    title = Messages("hvd.cash.payment.title") + " - " + Messages("summary.hvd"),
     heading = header
 )  {
 

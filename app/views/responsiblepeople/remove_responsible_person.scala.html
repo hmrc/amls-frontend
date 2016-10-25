@@ -6,11 +6,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.remove.responsible.person.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.remove.responsible.person.title"),
+    title = Messages("responsiblepeople.remove.responsible.person.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -18,8 +18,7 @@
         <div class="panel-indent panel-border-wide">
             <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
         </div>
-        <br />
-        <br />
+
         @if(showDateField) {
             @date(
                 f = f,

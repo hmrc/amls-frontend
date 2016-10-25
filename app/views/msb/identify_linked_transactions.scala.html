@@ -5,11 +5,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("msb.linked.txn.heading", "summary.msb")
+    @heading("msb.linked.txn.title", "summary.msb")
 }
 
 @main(
-    title = Messages("msb.linked.txn.title"),
+    title = Messages("msb.linked.txn.title") + " - " + Messages("summary.msb"),
     heading = header
 ) {
 

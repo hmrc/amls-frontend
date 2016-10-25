@@ -2,11 +2,11 @@
 @(index:Int)(implicit request: Request[_])
 
 @header = {
-    @heading("bankdetails.whatyouneed.heading", "summary.bankdetails")
+    @heading("title.wyn", "summary.bankdetails")
 }
 
 @whatyouneed(
-    title = Messages("bankdetails.whatyouneed.title"),
+    title = Messages("title.wyn") + " - " + Messages("summary.bankdetails"),
     heading = header,
     sidebar = sidebar
 ) {
@@ -22,9 +22,9 @@
     </ul>
 
      <div class="form-field">
-            <a class="button" role="button" href="@controllers.bankdetails.routes.BankAccountTypeController.get(index)">
-                @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.bankdetails")</span>
-            </a>
+        <a class="button" role="button" href="@controllers.bankdetails.routes.BankAccountTypeController.get(index)">
+            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.bankdetails")</span>
+        </a>
      </div>
 }
 
