@@ -21,6 +21,7 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.any
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import play.api.i18n.Messages
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,7 +60,10 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
-        Jsoup.parse(contentAsString(responseF)).title must be ("Update your information - Your application - Anti-money laundering registration - GOV.UK")
+        val pageTitle = Messages("amendment.title") + " - " +
+          Messages("title.yapp") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+        Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
       }
     }
 
@@ -195,7 +199,10 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
-        Jsoup.parse(contentAsString(responseF)).title must be ("Application progress – Anti-money laundering supervision - GOV.UK")
+        val pageTitle = Messages("progress.title") + " - " +
+          Messages("title.yapp") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+        Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
       }
     }
 
@@ -235,7 +242,10 @@ class RegistrationProgressControllerWithoutAmendmentsSpec extends WordSpec with 
 
         val responseF = controller.get()(request)
         status(responseF) must be (OK)
-        Jsoup.parse(contentAsString(responseF)).title must be ("Application progress – Anti-money laundering supervision - GOV.UK")
+        val pageTitle = Messages("progress.title") + " - " +
+          Messages("title.yapp") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+        Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
       }
     }
   }

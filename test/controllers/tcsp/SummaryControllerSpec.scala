@@ -45,19 +45,26 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite {
       val result = controller.get()(request)
       status(result) must be(OK)
       val document: Document = Jsoup.parseBodyFragment(contentAsString(result))
-      document.title must be(s"${Messages("summary.checkyouranswers.title")} - ${Messages("summary.tcsp")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
-      val elements = document.getElementsByTag("table")
-      elements.get(0).select("tr").get(0).text must include(Messages("tcsp.kind.of.service.provider.title"))
-      elements.get(0).select("tr").get(1).text must include(Messages("tcsp.service.provider.lbl.03"))
-      elements.get(0).select("tr").get(2).text must include(Messages("tcsp.service.provider.lbl.05"))
 
-      elements.get(1).select("tr").get(0).text must include(Messages("tcsp.provided_services.title"))
-      elements.get(1).select("tr").get(1).text must include(Messages("tcsp.provided_services.service.lbl.01"))
-      elements.get(1).select("tr").get(2).text must include(Messages("tcsp.provided_services.service.lbl.08"))
+      val pageTitle = Messages("title.cya") + " - " +
+        Messages("summary.tcsp") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
 
-      elements.get(2).select("tr").get(0).text must include(Messages("tcsp.servicesOfAnotherTcsp.title"))
-      elements.get(2).select("tr").get(1).text must include(Messages("lbl.yes"))
-      elements.get(2).select("tr").get(2).text must include("12345678")
+      document.title mustBe pageTitle
+
+      val content = contentAsString(result)
+
+      content must include(Messages("tcsp.kind.of.service.provider.title"))
+      content must include(Messages("tcsp.service.provider.lbl.03"))
+      content must include(Messages("tcsp.service.provider.lbl.05"))
+
+      content must include(Messages("tcsp.provided_services.title"))
+      content must include(Messages("tcsp.provided_services.service.lbl.01"))
+      content must include(Messages("tcsp.provided_services.service.lbl.08"))
+
+      content must include(Messages("tcsp.servicesOfAnotherTcsp.title"))
+      content must include(Messages("lbl.yes"))
+      content must include("12345678")
 
     }
 

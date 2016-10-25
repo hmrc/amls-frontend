@@ -5,9 +5,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
-import models.status.SubmissionDecisionApproved
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{RepeatingSection, StatusConstants}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
 
@@ -23,33 +24,40 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
     implicit authContext => implicit request =>
       for {
         rp <- getData[ResponsiblePeople](index)
-      } yield rp match {
-        case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _)) => {
-          Ok(views.html.responsiblepeople.remove_responsible_person(
-            EmptyForm, index, personName.fullName, complete))
+        status <- statusService.getStatus
+      } yield (rp, status) match {
+        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _)), SubmissionDecisionApproved) => {
+          Ok(views.html.responsiblepeople.remove_responsible_person(EmptyForm, index,
+            personName.fullName, complete, true))
+        }
+        case (Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _)),_) => {
+          Ok(views.html.responsiblepeople.remove_responsible_person(EmptyForm, index, personName.fullName, complete, false))
         }
         case _ => NotFound(notFoundView)
       }
   }
 
-
-  def remove(index: Int,
-             complete: Boolean = false,
-             personName: String
-            ) = Authorised.async {
+  def remove(index: Int, complete: Boolean = false, personName: String) = Authorised.async {
     implicit authContext => implicit request =>
 
-      authEnrolmentsService.amlsRegistrationNumber flatMap {
-        case Some(_) => {
-              for {
-                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-                }
-              } yield Redirect(routes.CheckYourAnswersController.get())
+      statusService.getStatus flatMap {
+        case NotCompleted | SubmissionReady => removeDataStrict[ResponsiblePeople](index) map { _ =>
+          Redirect(routes.CheckYourAnswersController.get())
         }
-        case _ => {
-          removeDataStrict[ResponsiblePeople](index) map { _ =>
-            Redirect(routes.CheckYourAnswersController.get())
+        case SubmissionReadyForReview => for {
+          result <- updateDataStrict[ResponsiblePeople](index) { tp =>
+            tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+          }
+        } yield Redirect(routes.CheckYourAnswersController.get())
+        case SubmissionDecisionApproved => Form2[ResponsiblePersonEndDate](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete,  true)))
+          case ValidForm(_, data) => {
+            for {
+              result <- updateDataStrict[ResponsiblePeople](index) { tp =>
+                tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+              }
+            } yield Redirect(routes.CheckYourAnswersController.get())
           }
         }
       }

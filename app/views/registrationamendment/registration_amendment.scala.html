@@ -6,7 +6,7 @@
 @(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_])
 
 @main2(
-    title = Messages("amendment.title")
+    title = Messages("amendment.title") + " - " + Messages("title.yapp")
 ) {
     @* Heading *@
     <div class="grid-layout">
