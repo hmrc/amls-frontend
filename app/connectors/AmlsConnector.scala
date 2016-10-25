@@ -115,7 +115,7 @@ trait AmlsConnector {
     val (accountType, accountId) = accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
-    val prefix = "[AmlsConnector][amend]"
+    val prefix = "[AmlsConnector][variation]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
     httpPost.POST[SubscriptionRequest, AmendVariationResponse](postUrl, updateRequest) map {
       response =>
