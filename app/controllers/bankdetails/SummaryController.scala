@@ -4,18 +4,30 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.bankdetails.BankDetails
+import models.status.{NotCompleted, SubmissionReady}
+import services.StatusService
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.StatusConstants
+
+import scala.concurrent.Future
 
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
+  val statusService: StatusService
 
   def get(complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[Seq[BankDetails]](BankDetails.key) map {
-        case Some(data) =>{
+      for {
+        bankDetails <- dataCache.fetch[Seq[BankDetails]](BankDetails.key)
+        canEdit <- statusService.getStatus map {
+          case NotCompleted | SubmissionReady => true
+          case _ => false
+        }
+      } yield bankDetails match {
+        case Some(data) => {
           val bankDtls = data.filterNot(_.status.contains(StatusConstants.Deleted))
-            Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bankDtls)))
+          Ok(views.html.bankdetails.summary(data, complete, hasBankAccount(bankDtls), canEdit))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
@@ -30,4 +42,5 @@ object SummaryController extends SummaryController {
   // $COVERAGE-OFF$
   override val dataCache = DataCacheConnector
   override val authConnector = AMLSAuthConnector
+  override val statusService = StatusService
 }
