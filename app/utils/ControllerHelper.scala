@@ -1,6 +1,13 @@
 package utils
 
 import models.businessmatching._
+import models.status.{NotCompleted, SubmissionReady}
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import scala.concurrent.Future
 
 object ControllerHelper {
 
@@ -35,6 +42,13 @@ object ControllerHelper {
         y.businessActivities.contains(MoneyServiceBusiness)
       }
       case None => false
+    }
+  }
+
+  def allowedToEdit(edit: Boolean)(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
+    statusService.getStatus map {
+      case SubmissionReady | NotCompleted => true
+      case _ => !edit
     }
   }
 }
