@@ -64,7 +64,12 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       val contentString = contentAsString(result)
 
       val document = Jsoup.parse(contentString)
-      document.title() must be(Messages("summary.bankdetails.checkyouranswers.title"))
+
+      val pageTitle = Messages("title.cya") + " - " +
+        Messages("summary.bankdetails") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+
+      document.title() mustBe pageTitle
 
       contentString must include("Account Name")
       contentString must include("Account number: 12341234")

@@ -46,7 +46,12 @@ class CustomersOutsideUKControllerSpec extends PlaySpec with MockitoSugar with O
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("businessactivities.customer.outside.uk.title"))
+
+      val pageTitle = Messages("businessactivities.customer.outside.uk.title") + " - " +
+        Messages("summary.businessactivities") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+
+      document.title() mustBe pageTitle
     }
 
     "pre-populate the Customer outside UK Page" in new Fixture  {

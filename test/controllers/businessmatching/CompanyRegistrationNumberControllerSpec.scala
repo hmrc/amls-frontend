@@ -39,7 +39,11 @@ class CompanyRegistrationNumberControllerSpec extends PlaySpec with OneAppPerSui
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("businessmatching.registrationnumber.title"))
+      val pageTitle = Messages("businessmatching.registrationnumber.title") + " - " +
+        Messages("summary.businessmatching") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+
+      document.title() mustBe pageTitle
     }
 
     "on get() display existing data if it exists" in new Fixture {
@@ -62,7 +66,11 @@ class CompanyRegistrationNumberControllerSpec extends PlaySpec with OneAppPerSui
 
         val result = controller.post()(invalidRequest)
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be (Messages("businessmatching.registrationnumber.title"))
+        val pageTitle = Messages("businessmatching.registrationnumber.title") + " - " +
+          Messages("summary.businessmatching") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
+        document.title() mustBe pageTitle
     }
 
     "on post() redirect correctly if valid data sent and edit is true" in new Fixture {
