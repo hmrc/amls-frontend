@@ -34,10 +34,10 @@
                 panel = false,
                 id = s"""${f("address").id}-fieldset"""
             ) {
-                @labelWithInput(f("addressLine1"), "lbl.address.line1", jsHidden = true)
-                @labelWithInput(f("addressLine2"), "lbl.address.line2", jsHidden = true)
-                @labelWithInput(f("addressLine3"), "lbl.address.line3", jsHidden = true)
-                @labelWithInput(f("addressLine4"), "lbl.address.line4", jsHidden = true)
+                @input(f("addressLine1"))
+                @input(f("addressLine2"))
+                @input(f("addressLine3"))
+                @input(f("addressLine4"))
                 @input(
                     field = f("postCode"),
                     labelText = "responsiblepeople.wherepersonlives.postcode",
