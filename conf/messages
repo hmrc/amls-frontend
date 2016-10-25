@@ -5,7 +5,7 @@
 # title.
 # lbl.
 # button.
-#
+# hint.
 
 ########################################################################################################################
 ##################################       Generic Error Messages     ####################################################
@@ -59,6 +59,8 @@ error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’
 error.required.utr.number = Enter a Unique Taxpayer Reference (UTR) number
 error.invalid.length.utr.number = Enter a valid Unique Taxpayer Reference (UTR) number. It must be 10 numbers long
 error.required.sa.registration = Select yes or no to the question: is this person registered for Self Assessment?
+
+error.required.rp.nominated_officer = Select yes or not to the question: Is this person the nominated officer for the business?
 
 error.not-found.title = Not Found
 error.not-found.heading = Item not found
@@ -135,6 +137,7 @@ error.required.tp.activity.your.business.do = Select at least one activity that 
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
+error.future.date = Enter a valid date. The date cannot be in the future.
 error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
@@ -196,8 +199,9 @@ error.rp.previous.invalid = Enter a first name, middle name or last name.
 error.required.rp.otherNames = Enter an alternative name.
 error.invalid.length.otherNames = You can't enter more than 140 characters for the alternative name.
 error.required.timeAtAddress = Select how long this person lived at this address.
-error.required.positionWithinBusiness = Select at least one business position.
+error.required.positionWithinBusiness = Select at least one position within the business.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
+error.expected.future.date = Enter a valid date. The date cannot be in the future.
 
 ############################### Trust and company service providers ###############################
 
@@ -341,6 +345,10 @@ businessType.lbl.03 = Partnership
 businessType.lbl.04 = Limited partnership or limited liability partnership
 businessType.lbl.05 = Unincorporated association or trust
 
+hint.8.digits = For example: 12345678
+hint.9.digits = For example: 123456789
+hint.10.digits = For example: 1234567890
+
 ############################### Login Page ###############################
 amls.Login.title= AMLS
 unauthorised.title = Unauthorised
@@ -376,6 +384,12 @@ status.submissiondecisionrejected.heading = Application rejected
 status.submissiondecisionrejected.description = Your application has been rejected.
 status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
 status.amendment.edit = update your information
+status.fee.link = If you haven’t paid the fee
+
+fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
+fee.details.registration.fee.lbl = Your registration fee
+fee.reference.number.lbl = Your reference number
+fee.details.note = You must keep a record of the fee amount and reference number. You will need them to make the payment.
 
 ############################### Progress page ###############################
 progress.title = Application progress – Anti-money laundering supervision - GOV.UK
@@ -922,7 +936,7 @@ businessactivities.tax.matters.heading = Does this professional advisor also man
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
 
 submit.registration = Submit registration
-submit.amendment.application = Submit amended application
+submit.amendment.application = Update information
 
 declaration.addperson.title = What’s your name? - Submit registration - Anti-money laundering registration - GOV.UK
 declaration.addperson.amendment.title = What’s your name? - Submit amended application - Anti-money laundering registration - GOV.UK
@@ -940,13 +954,14 @@ declaration.addperson.lbl.06=Partner
 declaration.addperson.lbl.07=Sole proprietor
 declaration.addperson.lbl.08=Other
 declaration.declaration.title = Declaration - Submit registration - Anti-money laundering registration - GOV.UK
-declaration.declaration.amendment.title = Declaration - Submit amended application - Anti-money laundering registration - GOV.UK
+declaration.declaration.amendment.title = Declaration - Update information - Anti-money laundering registration - GOV.UK
 declaration.declaration.header = Declaration
 declaration.declaration.submit = Declaration - submit declaration
 declaration.declaration.fullname = You have told us that you are
 declaration.declaration.declare = I declare that:
-declaration.declaration.correctinformation = all the information I have given in this application is correct
-declaration.declaration.tellhmrc = I understand that the business must tell HMRC about any change to any of the information on this form
+declaration.declaration.correctinformation = all the information in this application is correct
+declaration.declaration.amendment.correctinformation = all the information in this submission is correct
+declaration.declaration.tellhmrc = I understand that the business must tell HM Revenue and Customs about any change to any of the information provided
 declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
 declaration.declaration.confirm = I confirm that I have read and understood the
 declaration.declaration.guidance = guidance
@@ -1022,6 +1037,8 @@ responsiblepeople.additional_extra_address.6_11_months = 6 to 11 months
 responsiblepeople.additional_extra_address.1_3_years = 1 to 3 years
 responsiblepeople.additional_extra_address.more_3_years = More than 3 years
 responsiblepeople.position_within_business.title = What’s this person’s position within the business?
+responsiblepeople.position_within_business.startDate.lbl = When did this position start? If there is more than one position, give the date of the earliest.
+responsiblepeople.position_within_business.startDate.hint=For example, 31 3 1980
 responsiblepeople.position_within_business.important = The business must have a nominated officer. Only one person can register as the nominated officer.
 responsiblepeople.position_within_business.lbl.01 = Beneficial owner (holding more than 25% of shares)
 responsiblepeople.position_within_business.lbl.02 = Director
@@ -1029,6 +1046,8 @@ responsiblepeople.position_within_business.lbl.03 = Internal accountant
 responsiblepeople.position_within_business.lbl.04 = Nominated officer
 responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
+responsiblepeople.aretheynominatedofficer.heading = Is this person the nominated officer for the business?
+responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business? - Responsible People - Anti-money laundering supervision - GOV.UK
 responsiblepeople.person.a.resident.title = Responsible people - Is this person a UK resident? - Anti-money laundering supervision - GOV.UK
 responsiblepeople.person.a.resident.heading = Is this person a UK resident?
 responsiblepeople.dob.lbl = Date of birth
@@ -1060,10 +1079,10 @@ responsiblepeople.person.registered.heading = Responsible person registered
 responsiblepeople.have.registered.person.text = You have registered {0} responsible person.
 responsiblepeople.have.registered.people.text = You have registered {0} responsible people.
 responsiblepeople.want.to.register.another.person = Do you want to register another responsible person?
-responsiblepeople.check_your_answers.title = Check your answers
+responsiblepeople.check_your_answers.title = Responsible People - Check your answers
 responsiblepeople.check_your_answers.heading = Check your answers
-responsiblepeople.your_answers.title = Your answers
-responsiblepeople.your_answers.heading = Your answers
+responsiblepeople.your_answers.title = Responsible People - People you have registered
+responsiblepeople.your_answers.heading = People you have registered
 responsiblepeople.check_your_answers.add = Add a responsible person
 responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.heading = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
@@ -1097,18 +1116,22 @@ responsiblepeople.nationality.selection.british = British (including English, Sc
 responsiblepeople.nationality.selection.irish = Irish
 responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
+responsiblepeople.summary.no.responsible.people = You currently have no responsible people registered
 
-
-
+responsiblepeople.remove.responsible.person.title = Responsible People - Remove a responsible person
+responsiblepeople.remove.responsible.person.heading = Remove responsible person
+responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
+responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
+responsiblepeople.remove.responsible.person.btn = Remove responsible person
 
 #TCSP
 tcsp.whatyouneed.title = What you need
 tcsp.whatyouneed.heading = What you need
-tcsp.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
+tcsp.whatyouneed.requiredinfo.heading = For this section you may need to know:
 tcsp.whatyouneed.requiredinfo.text.1 = what kind of Trust or Company Service Provider you are
 tcsp.whatyouneed.requiredinfo.text.2 = which services your business provides
 tcsp.whatyouneed.requiredinfo.text.3 = whether or not you use the services of another Trust or Company Service Provider
-tcsp.whatyouneed.dependinginfo.heading = Depending on your circumstances, you may also need to know:
+tcsp.whatyouneed.dependinginfo.heading = You’ll also need to know:
 tcsp.whatyouneed.dependinginfo.text.1 = if you only sell off-the-shelf companies
 tcsp.whatyouneed.dependinginfo.text.2 = if you create complex corporate structures for clients, or plan to do so in the future
 tcsp.whatyouneed.dependinginfo.text.3 = the Money Laundering Regulation reference number of the Trust or Company Service Provider you use

@@ -152,6 +152,8 @@ class NationalityControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople1)))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))

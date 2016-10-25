@@ -173,7 +173,7 @@ trait RepeatingSection {
    key: MongoKey[T],
    ec: ExecutionContext
   ): Future[_] =
-    getData[T] map {
+    getData[T] flatMap {
       data => {
         putData(data.patch(index - 1, Seq(fn(data(index - 1))), 1))
       }

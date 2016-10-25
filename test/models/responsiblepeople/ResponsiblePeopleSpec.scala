@@ -2,13 +2,14 @@ package models.responsiblepeople
 
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
-import org.joda.time.LocalDate
+import org.joda.time.{DateTimeUtils, LocalDate}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import org.mockito.Matchers.{any, eq => meq}
+import utils.StatusConstants
 
 
 class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
@@ -45,7 +46,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
           .thenReturn(None)
 
-        ResponsiblePeople.section(mockCacheMap).call must be (controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
+        ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true))
       }
     }
 
@@ -56,7 +57,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
           .thenReturn(Some(Seq(CompleteResponsiblePeople)))
 
-        ResponsiblePeople.section(mockCacheMap).call must be (controllers.responsiblepeople.routes.YourAnswersController.get())
+        ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
       }
     }
 
@@ -67,21 +68,21 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
           .thenReturn(Some(Seq(CompleteResponsiblePeople, CompleteResponsiblePeople, InCompleteResponsiblePeople)))
 
-        ResponsiblePeople.section(mockCacheMap).call must be (controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
+        ResponsiblePeople.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
 
       }
     }
 
     "the section consistes of just 1 empty Responsible Person" must {
-        "return a result indicating NotStarted" in {
-          val mockCacheMap = mock[CacheMap]
+      "return a result indicating NotStarted" in {
+        val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople())))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
+          .thenReturn(Some(Seq(ResponsiblePeople())))
 
-          ResponsiblePeople.section(mockCacheMap).status must be (models.registrationprogress.NotStarted)
-        }
+        ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
       }
+    }
 
     "the section consists of a partially complete model followed by a completely empty one" must {
       "return a result indicating partial completeness" in {
@@ -90,7 +91,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
           .thenReturn(Some(Seq(InCompleteResponsiblePeople, ResponsiblePeople())))
 
-        ResponsiblePeople.section(mockCacheMap).status must be (models.registrationprogress.Started)
+        ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Started)
       }
     }
 
@@ -101,7 +102,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
           .thenReturn(Some(Seq(CompleteResponsiblePeople, ResponsiblePeople())))
 
-        ResponsiblePeople.section(mockCacheMap).status must be (models.registrationprogress.Completed)
+        ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Completed)
       }
     }
   }
@@ -113,28 +114,28 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "Merged with personName" must {
       "return ResponsiblePeople with correct personName" in {
         val result = EmptyResponsiblePeople.personName(NewValues.personName)
-        result must be (ResponsiblePeople(personName = Some(NewValues.personName), hasChanged = true))
+        result must be(ResponsiblePeople(personName = Some(NewValues.personName), hasChanged = true))
       }
     }
 
     "Merged with PersonResidenceType" must {
       "return ResponsiblePeople with correct PersonResidenceType" in {
         val result = EmptyResponsiblePeople.personResidenceType(NewValues.personResidenceType)
-        result must be (ResponsiblePeople(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
+        result must be(ResponsiblePeople(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
       }
     }
 
     "Merged with ContactDetails" must {
       "return ResponsiblePeople with correct ContactDetails" in {
         val result = EmptyResponsiblePeople.contactDetails(NewValues.contactDetails)
-        result must be (ResponsiblePeople(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
+        result must be(ResponsiblePeople(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
       }
     }
 
     "Merged with AddressHistory" must {
       "return ResponsiblePeople with correct AddressHistory" in {
         val result = EmptyResponsiblePeople.addressHistory(NewValues.addressHistory)
-        result must be (ResponsiblePeople(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
+        result must be(ResponsiblePeople(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
       }
     }
 
@@ -142,42 +143,42 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "Merged with Positions" must {
       "return ResponsiblePeople with correct Positions" in {
         val result = EmptyResponsiblePeople.positions(NewValues.positions)
-        result must be (ResponsiblePeople(positions = Some(NewValues.positions), hasChanged = true))
+        result must be(ResponsiblePeople(positions = Some(NewValues.positions), hasChanged = true))
       }
     }
 
     "Merged with SaRegistered" must {
       "return ResponsiblePeople with correct SaRegistered" in {
         val result = EmptyResponsiblePeople.saRegistered(NewValues.saRegistered)
-        result must be (ResponsiblePeople(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
+        result must be(ResponsiblePeople(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
       }
     }
 
     "Merged with VatRegistered" must {
       "return ResponsiblePeople with correct VatRegistered" in {
         val result = EmptyResponsiblePeople.vatRegistered(NewValues.vatRegistered)
-        result must be (ResponsiblePeople(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
+        result must be(ResponsiblePeople(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
       }
     }
 
     "Merged with experienceTraining" must {
       "return ResponsiblePeople with correct experienceTraining" in {
         val result = EmptyResponsiblePeople.experienceTraining(NewValues.experienceTraining)
-        result must be (ResponsiblePeople(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
+        result must be(ResponsiblePeople(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
       }
     }
 
     "Merged with Training" must {
       "return ResponsiblePeople with correct Training" in {
         val result = EmptyResponsiblePeople.training(NewValues.training)
-        result must be (ResponsiblePeople(training = Some(NewValues.training), hasChanged = true))
+        result must be(ResponsiblePeople(training = Some(NewValues.training), hasChanged = true))
       }
     }
 
     "Merged with FitAndProper" must {
       "return ResponsiblePeople with correct hasAlreadyPassedFitAndProper" in {
         val result = EmptyResponsiblePeople.hasAlreadyPassedFitAndProper(true)
-        result must be (ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true), hasChanged = true))
+        result must be(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true), hasChanged = true))
       }
     }
 
@@ -372,12 +373,52 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
       }
     }
+    "status value is set" which {
+      "is the same as before" must {
+        "leave the object unchanged" in {
+          val result = CompleteResponsiblePeople.status(StatusConstants.Unchanged)
+          result must be(CompleteResponsiblePeople)
+          result.hasChanged must be(false)
+        }
+      }
+
+      "is different" must {
+        "set the hasChanged & previouslyRegisterd Properties" in {
+          val result = CompleteResponsiblePeople.status(StatusConstants.Deleted)
+          result must be(CompleteResponsiblePeople.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
+          result.hasChanged must be(true)
+        }
+      }
+    }
+  }
+
+  "anyChanged" must {
+    val originalResponsiblePeople = Seq(CompleteResponsiblePeople)
+    val responsiblePeopleChanged = Seq(CompleteResponsiblePeople.copy(hasChanged=true))
+    val responsiblePeopleDeleted = Seq(CompleteResponsiblePeople.copy(status=Some(StatusConstants.Deleted)))
+
+    "return false" when {
+      "no ResponsiblePeople within the sequence have changed" in {
+        val res = ResponsiblePeople.anyChanged(originalResponsiblePeople)
+        res must be(false)
+      }
+    }
+    "return true" when {
+      "at least one ResponsiblePeople within the sequence has changed" in {
+        val res = ResponsiblePeople.anyChanged(responsiblePeopleChanged)
+        res must be(true)
+      }
+    }
   }
 }
 
 trait ResponsiblePeopleValues {
 
   import DefaultValues._
+
+
+
+  private val startDate = Some(new LocalDate())
 
   object DefaultValues {
 
@@ -398,7 +439,7 @@ trait ResponsiblePeopleValues {
     val vatRegistered = VATRegisteredNo
     val training = TrainingYes("test")
     val experienceTraining = ExperienceTrainingYes("Some training")
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant))
+    val positions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
   }
 
   object NewValues {
@@ -421,7 +462,7 @@ trait ResponsiblePeopleValues {
     val personResidenceType = PersonResidenceType(residence, residenceCountry, Some(residenceNationality))
     val saRegistered = SaRegisteredNo
     val vatRegistered = VATRegisteredYes("12345678")
-    val positions = Positions(Set(Director, SoleProprietor))
+    val positions = Positions(Set(Director, SoleProprietor), startDate)
     val experienceTraining = ExperienceTrainingNo
     val training = TrainingNo
   }
@@ -439,7 +480,7 @@ trait ResponsiblePeopleValues {
     Some(true),
     false,
     Some(1),
-    Some("test")
+    Some(StatusConstants.Unchanged)
   )
 
   val InCompleteResponsiblePeople = ResponsiblePeople(
@@ -455,11 +496,11 @@ trait ResponsiblePeopleValues {
       "middleName" -> "Envy",
       "lastName" -> "Doe",
       "previousName" -> Json.obj(
-            "firstName" -> "Matt",
-            "middleName" -> "Mc",
-            "lastName" -> "Fly",
-            "date" -> "1990-02-24"
-          ),
+        "firstName" -> "Matt",
+        "middleName" -> "Mc",
+        "lastName" -> "Fly",
+        "date" -> "1990-02-24"
+      ),
       "otherNames" -> "name"
     ),
     "personResidenceType" -> Json.obj(
@@ -494,7 +535,8 @@ trait ResponsiblePeopleValues {
       )
     ),
     "positions" -> Json.obj(
-      "positions" -> Seq("01", "03")
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -514,7 +556,7 @@ trait ResponsiblePeopleValues {
     "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
-    "status" -> "test"
+    "status" -> "Unchanged"
   )
 
   /** Make sure Responsible People model is complete */

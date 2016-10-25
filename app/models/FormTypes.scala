@@ -4,7 +4,7 @@ import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
-
+import utils.DateHelper.localDateOrdering
 import scala.util.matching.Regex
 
 object FormTypes {
@@ -64,6 +64,8 @@ object FormTypes {
   def regexWithMsg(regex: Regex, msg: String) = pattern(regex).withMessage(msg)
 
   def required(msg: String) = notEmpty.withMessage(msg)
+
+  def maxDateWithMsg(maxDate: LocalDate, msg: String) = max(maxDate).withMessage(msg)
 
   val notEmptyStrip = Rule.zero[String] fmap {
     _.trim
@@ -150,24 +152,53 @@ object FormTypes {
      )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
    }
 
+  val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
+  val localDateFutureRule = localDateRule compose futureDateRule
+
   /** Bank details Rules **/
 
   //TODO: Add error messages
 
-  val accountNameType = notEmptyStrip compose notEmpty.withMessage("error.bankdetails.accountname") compose maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname")
-  val sortCodeType = notEmpty.withMessage("error.bankdetails.sortcode") compose pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode")
-  val ukBankAccountNumberType = notEmpty.withMessage("error.bankdetails.accountnumber") compose maxLength(maxUKBankAccountNumberLength)compose pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber")
-  val nonUKBankAccountNumberType = notEmpty compose maxLength(maxNonUKBankAccountNumberLength).withMessage("error.amx.length.bankdetails.account") compose pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account")
-  val ibanType = notEmpty compose maxLength(maxIBANLength).withMessage("error.max.length.bankdetails.iban") compose pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban")
+  val accountNameType = notEmptyStrip
+    .compose(notEmpty.withMessage("error.bankdetails.accountname"))
+    .compose(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
+
+  val sortCodeType = notEmpty
+    .withMessage("error.bankdetails.sortcode")
+    .compose(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
+
+  val ukBankAccountNumberType = notEmpty
+    .withMessage("error.bankdetails.accountnumber")
+    .compose(maxLength(maxUKBankAccountNumberLength))
+    .compose(pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber"))
+
+  val nonUKBankAccountNumberType = notEmpty
+    .compose(maxLength(maxNonUKBankAccountNumberLength).withMessage("error.amx.length.bankdetails.account"))
+    .compose(pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account"))
+
+  val ibanType = notEmpty
+    .compose(maxLength(maxIBANLength).withMessage("error.max.length.bankdetails.iban"))
+    .compose(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
 
   /** Business Identifier Rules */
 
   //TODO: Add error messages
 
-  val accountantRefNoType = notEmpty compose maxLength(minAccountantRefNoTypeLength) compose minLength(minAccountantRefNoTypeLength)
-  val declarationNameType = notEmptyStrip compose notEmpty compose maxLength(maxNameTypeLength)
-  val roleWithinBusinessOtherType = notEmptyStrip compose notEmpty compose maxLength(maxRoleWithinBusinessOtherType)
-  val typeOfBusinessType = notEmptyStrip compose notEmpty.withMessage("error.required.bm.businesstype.type") compose maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type")
+  val accountantRefNoType = notEmpty
+    .compose(maxLength(minAccountantRefNoTypeLength))
+    .compose(minLength(minAccountantRefNoTypeLength))
+
+  val declarationNameType = notEmptyStrip
+    .compose(notEmpty)
+    .compose(maxLength(maxNameTypeLength))
+
+  val roleWithinBusinessOtherType = notEmptyStrip
+    .compose(notEmpty)
+    .compose(maxLength(maxRoleWithinBusinessOtherType))
+
+  val typeOfBusinessType = notEmptyStrip
+    .compose(notEmpty.withMessage("error.required.bm.businesstype.type"))
+    .compose(maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type"))
 
   /** Personal Identification Rules **/
 

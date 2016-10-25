@@ -5,5 +5,4 @@ object StatusConstants {
   val Updated = "Updated"
   val Deleted = "Deleted"
   val Unchanged = "Unchanged"
-
 }
