@@ -2,7 +2,7 @@
 @import forms2._
 @import models.businessactivities._
 
-@(model: BusinessActivities)(implicit request: Request[_], lang: Lang)
+@(model: BusinessActivities, isEditable:Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.businessactivities")
@@ -15,7 +15,7 @@
 
     @checkYourAnswers(
         question = Messages("businessactivities.confirm-activities.title"),
-        editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString
+        editUrl = if(isEditable){controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString} else ""
     ) {
         <p>@model.involvedInOther.map {
             case InvolvedInOtherNo => { @Messages("lbl.no") }
