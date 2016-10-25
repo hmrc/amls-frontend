@@ -202,6 +202,7 @@ error.invalid.length.otherNames = You can’t enter more than 140 characters for
 error.required.timeAtAddress = Select how long this person lived at this address.
 error.required.positionWithinBusiness = Select at least one position within the business.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
+error.expected.future.date = Enter a valid date. The date cannot be in the future.
 
 ############################### Trust and company service providers ###############################
 
@@ -1061,7 +1062,7 @@ responsiblepeople.summary.responsible.people = People you have registered
 responsiblepeople.summary.no.responsible.people = You currently have no responsible people registered
 responsiblepeople.remove.responsible.person.title = Remove a responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
-responsiblepeople.remove.responsible.person.enddate.lbl = <<Text asking for date?>>
+responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
 
 #TCSP

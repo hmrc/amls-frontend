@@ -5,20 +5,25 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccount, BankDetails}
-import utils.{RepeatingSection}
+import services.StatusService
+import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 trait BankAccountController extends RepeatingSection with BaseController {
 
   val dataCacheConnector : DataCacheConnector
+  implicit val statusService : StatusService
 
   def get(index:Int, edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[BankDetails](index) map {
-        case Some(BankDetails(_, Some(data),_,_)) =>
+      for {
+        bankDetails <- getData[BankDetails](index)
+        allowedToEdit <- ControllerHelper.allowedToEdit(edit)
+      } yield bankDetails match {
+        case Some(BankDetails(_, Some(data),_,_)) if allowedToEdit =>
           Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
-        case Some(_) =>
+        case Some(_) if allowedToEdit =>
           Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
         case _ => {
           NotFound(notFoundView)
@@ -55,4 +60,5 @@ object BankAccountController extends BankAccountController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override implicit val statusService = StatusService
 }

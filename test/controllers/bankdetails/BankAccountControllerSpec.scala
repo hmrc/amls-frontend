@@ -2,6 +2,7 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import models.bankdetails._
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -9,6 +10,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -21,6 +23,7 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     val controller = new BankAccountController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override implicit val statusService = mock[StatusService]
     }
   }
 
@@ -31,8 +34,12 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     "get is called" must {
       "respond with OK" when {
         "there is no bank account detail information yet" in new Fixture {
+
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.get(1, false)(request)
           val document: Document = Jsoup.parse(contentAsString(result))
@@ -48,6 +55,9 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(ukBankAccount))))))
 
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
           val result = controller.get(1, true)(request)
           status(result) must be(OK)
           // check the radio buttons are checked
@@ -56,12 +66,46 @@ class BankAccountControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       "respond with NOT_FOUND" when {
         "there is no bank account information at all" in new Fixture {
+
           when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.get(1, false)(request)
 
           status(result) must be(NOT_FOUND)
+        }
+        "editing an amendment" in new Fixture {
+
+          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
+
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(ukBankAccount))))))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = controller.get(1, true)(request)
+
+          status(result) must be(NOT_FOUND)
+
+        }
+        "editing a variaton" in new Fixture {
+
+          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "202502"))
+
+          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(ukBankAccount))))))
+
+          when(controller.statusService.getStatus(any(),any(),any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.get(1, true)(request)
+
+          status(result) must be(NOT_FOUND)
+
         }
       }
     }
