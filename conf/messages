@@ -137,6 +137,7 @@ error.required.tp.activity.your.business.do = Select at least one activity that 
 error.required.tp.trading.name = Enter a trading name.
 error.invalid.tp.trading.name = You can’t enter more than 120 characters for the trading name.
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
+error.future.date = Enter a valid date. The date cannot be in the future.
 error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
@@ -200,6 +201,7 @@ error.invalid.length.otherNames = You can't enter more than 140 characters for t
 error.required.timeAtAddress = Select how long this person lived at this address.
 error.required.positionWithinBusiness = Select at least one position within the business.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
+error.expected.future.date = Enter a valid date. The date cannot be in the future.
 
 ############################### Trust and company service providers ###############################
 
@@ -934,7 +936,7 @@ businessactivities.tax.matters.heading = Does this professional advisor also man
 businessactivities.summary.directly.involved.text = directly involved in MLR activities
 
 submit.registration = Submit registration
-submit.amendment.application = Submit amended application
+submit.amendment.application = Update information
 
 declaration.addperson.title = What’s your name? - Submit registration - Anti-money laundering registration - GOV.UK
 declaration.addperson.amendment.title = What’s your name? - Submit amended application - Anti-money laundering registration - GOV.UK
@@ -952,13 +954,14 @@ declaration.addperson.lbl.06=Partner
 declaration.addperson.lbl.07=Sole proprietor
 declaration.addperson.lbl.08=Other
 declaration.declaration.title = Declaration - Submit registration - Anti-money laundering registration - GOV.UK
-declaration.declaration.amendment.title = Declaration - Submit amended application - Anti-money laundering registration - GOV.UK
+declaration.declaration.amendment.title = Declaration - Update information - Anti-money laundering registration - GOV.UK
 declaration.declaration.header = Declaration
 declaration.declaration.submit = Declaration - submit declaration
 declaration.declaration.fullname = You have told us that you are
 declaration.declaration.declare = I declare that:
-declaration.declaration.correctinformation = all the information I have given in this application is correct
-declaration.declaration.tellhmrc = I understand that the business must tell HMRC about any change to any of the information on this form
+declaration.declaration.correctinformation = all the information in this application is correct
+declaration.declaration.amendment.correctinformation = all the information in this submission is correct
+declaration.declaration.tellhmrc = I understand that the business must tell HM Revenue and Customs about any change to any of the information provided
 declaration.declaration.noncompliance = I understand that non-compliance with the Money Laundering Regulations may result in a civil penalty or criminal prosecution
 declaration.declaration.confirm = I confirm that I have read and understood the
 declaration.declaration.guidance = guidance
@@ -1118,7 +1121,7 @@ responsiblepeople.summary.no.responsible.people = You currently have no responsi
 responsiblepeople.remove.responsible.person.title = Responsible People - Remove a responsible person
 responsiblepeople.remove.responsible.person.heading = Remove responsible person
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
-responsiblepeople.remove.responsible.person.enddate.lbl = <<Text asking for date?>>
+responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
 
 #TCSP
