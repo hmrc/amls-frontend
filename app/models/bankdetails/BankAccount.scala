@@ -20,8 +20,8 @@ object Account {
       (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") flatMap {
         case true =>
           (
-            (__ \ "accountNumber").read(ukBankAccountNumberType) and
-              (__ \ "sortCode").read(sortCodeType)
+            (__ \ "sortCode").read(sortCodeType) and
+              (__ \ "accountNumber").read(ukBankAccountNumberType)
             ) (UKAccount.apply _)
         case false =>
           ((__ \ "IBANNumber").read(optionR(ibanType)) and

@@ -9,11 +9,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("supervision.another_body.heading", "summary.supervision")
+    @heading("supervision.another_body.title", "summary.supervision")
 }
 
 @main(
-    title = Messages("supervision.another_body.title"),
+    title = Messages("supervision.another_body.title") + " - " + Messages("summary.supervision"),
     heading = header
 )  {
 
@@ -23,7 +23,7 @@
 
         @inlineRadioGroup(f("anotherBody")) {
 
-            @legend("supervision.another_body.heading", jsHidden = true)
+            @legend("supervision.another_body.title", jsHidden = true)
             @radio(f("anotherBody"), "lbl.yes", "true", target = s"#$target")
             @radio(f("anotherBody"), "lbl.no", "false")
 

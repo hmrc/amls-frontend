@@ -41,6 +41,8 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       , 150.00, Some(100.0), 300.0, 550.0, Some("XA353523452345"), None,
       new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
+    val pageTitleSuffix = " - Your registration - Anti-money laundering registration - GOV.UK - Anti-money laundering supervision - GOV.UK"
+
 
     "load the status page" in new Fixture {
 
@@ -116,7 +118,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         for (index <- 1 to 3) {
           document.getElementsByClass("status-list").first().child(index).hasClass("current") must be(false)
         }
-        document.title() must be(Messages("status.incomplete.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
+        document.title() must be(Messages("status.incomplete.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.incomplete.description"))
 
@@ -147,7 +149,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         for (index <- 2 to 3) {
           document.getElementsByClass("status-list").first().child(index).hasClass("status-list--upcoming") must be(true)
         }
-        document.title() must be(Messages("status.submissionready.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
+        document.title() must be(Messages("status.submissionready.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionready.description"))
         document.getElementsByTag("details").html() must be("")
@@ -188,7 +190,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("status-list").first().child(2).hasClass("current") must be(true)
 
         document.getElementsByClass("status-list").first().child(3).hasClass("status-list--upcoming") must be(true)
-        document.title() must be(Messages("status.submissionreadyforreview.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
+        document.title() must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionreadyforreview.description"))
         document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissionreadyforreview.description2"))
@@ -230,7 +232,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("status-list").first().child(2).hasClass("current") must be(true)
 
         document.getElementsByClass("status-list").first().child(3).hasClass("status-list--upcoming") must be(true)
-        document.title() must be(Messages("status.submissionreadyforreview.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
+        document.title() must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissionreadyforreview.description"))
         document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissionreadyforreview.description2"))
@@ -271,7 +273,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         document.getElementsByClass("status-list").first().child(3).hasClass("current") must be(true)
 
-        document.title() must be(Messages("status.submissiondecisionapproved.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
+        document.title() must be(Messages("status.submissiondecisionapproved.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionapproved.description"))
         document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissiondecisionapproved.description2"))
@@ -315,7 +317,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         document.getElementsByClass("status-list").first().child(3).hasClass("current") must be(true)
 
-        document.title() must be(Messages("status.submissiondecisionapproved.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
+        document.title() must be(Messages("status.submissiondecisionapproved.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionapproved.description"))
         document.getElementsByClass("status-detail").first().child(1).html() must be(Messages("status.submissiondecisionapproved.description2"))
@@ -354,7 +356,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         }
 
         document.getElementsByClass("status-list").first().child(3).hasClass("current") must be(true)
-        document.title() must be(Messages("status.submissiondecisionrejected.heading") + " - Your registration - Anti-money laundering registration - GOV.UK")
+        document.title() must be(Messages("status.submissiondecisionrejected.heading") + pageTitleSuffix)
 
         document.getElementsByClass("status-detail").first().child(0).html() must be(Messages("status.submissiondecisionrejected.description"))
       }

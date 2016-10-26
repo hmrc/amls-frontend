@@ -38,7 +38,10 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("businessmatching.typeofbusiness.title"))
+      val pageTitle = Messages("businessmatching.typeofbusiness.title") + " - " +
+        Messages("summary.businessmatching") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+      document.title() mustBe pageTitle
     }
 
     "display main Summary Page" in new Fixture {
@@ -49,7 +52,10 @@ class TypeOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("businessmatching.typeofbusiness.title"))
+      val pageTitle = Messages("businessmatching.typeofbusiness.title") + " - " +
+        Messages("summary.businessmatching") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+      document.title() mustBe pageTitle
       document.select("input[type=text]").`val`() must be("test")
     }
 

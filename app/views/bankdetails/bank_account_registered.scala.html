@@ -5,24 +5,22 @@
 
 @header = {
     @errorSummary(f)
-    @heading("bankdetails.account.registered.heading", "summary.bankdetails")
+    @heading("bankdetails.bank.account.registered.title", "summary.bankdetails")
 }
 
 @main(
-    title = Messages("bankdetails.bank.account.registered.title"),
+    title = Messages("bankdetails.bank.account.registered.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
 
     @form(f, controllers.bankdetails.routes.BankAccountRegisteredController.post(index)) {
-<div class="panel-indent panel-border-wide">
-    @if(index <= 1){
-    <p>@Messages("bankdetails.have.registered.account.text", index) </p>
-    } else {
-    <p>@Messages("bankdetails.have.registered.accounts.text", index) </p>
-    }
-</div>
-<br>
-<br>
+        <div class="panel-indent panel-border-wide">
+            @if(index <= 1){
+            <p>@Messages("bankdetails.have.registered.account.text", index) </p>
+            } else {
+            <p>@Messages("bankdetails.have.registered.accounts.text", index) </p>
+            }
+        </div>
 
         @inlineRadioGroup(f("registerAnotherBank")) {
             @legend("bankdetails.want.to.register.another.account")

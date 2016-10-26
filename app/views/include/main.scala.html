@@ -43,7 +43,7 @@
 
 @insideHeader = {
     @uiLayouts.header_nav(
-        navTitle = Some(Messages("amls.title")),
+        navTitle = Some(Messages("title.amls")),
         navTitleLink = None,
         showBetaLink = false,
         navLinks = Some(navLinks)
@@ -91,7 +91,6 @@
             <div class="grid-layout grid-layout--stacked">
                 <div class="grid-layout__column grid-layout__column--2-3">
                     @mainContent
-                    @getHelpForm
                 </div>
                 <div class="grid-layout__column grid-layout__column--1-3">
                     @if(sidebar == HtmlFormat.empty) {
@@ -101,12 +100,15 @@
                     }
                 </div>
             </div>
+          <div class="get-help-form">
+              @getHelpForm
+          </div>
         </div>
     </main>
 }
 
 @hmrcGovUkTemplate(
-    Some(title),
+    Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
     bodyClasses
 )(
     head,

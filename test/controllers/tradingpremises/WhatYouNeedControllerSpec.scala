@@ -34,7 +34,12 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         val result = controller.get(1)(request)
         status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be(Messages("tradingpremises.whatyouneed.title"))
+
+      val pageTitle = Messages("title.wyn") + " - " +
+        Messages("summary.tradingpremises") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+
+      document.title() must be(pageTitle)
 
       status(result) mustBe OK
     }

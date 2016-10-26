@@ -10,26 +10,30 @@
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.training.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.training.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.training.title"),
+    title = Messages("responsiblepeople.training.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
-        <span class="form-hint">
-            @Messages("responsiblepeople.training.hinttext")
-        </span>
-        @inlineRadioGroup(f("training")) {
-            @radio(f("training"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("training"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @textarea(f("information"), "responsiblepeople.training.information", bold = false)
+        @fieldset(
+            classes = Seq("visuallyhidden-legend"),
+            legend = "responsiblepeople.training.title",
+            hint = "responsiblepeople.training.hinttext",
+            jsHidden = false,
+            panel = false
+        ) {
+            @inlineRadioGroup(f("training")) {
+                @radio(f("training"), "lbl.yes", "true", target = s"#$target")
+                @radio(f("training"), "lbl.no", "false")
+                @fieldset("responsiblepeople.training.information", jsHidden = false, id = target) {
+                    @textarea(f("information"), bold = false)
+                }
             }
         }
-
     @submit(edit)
   }
 }

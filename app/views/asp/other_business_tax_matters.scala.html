@@ -4,8 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @target = @{
-
-s"""${f("agentRegNo").id}-fieldset"""
+    s"""${f("agentRegNo").id}-fieldset"""
 }
 
 @header = {
@@ -14,18 +13,16 @@ s"""${f("agentRegNo").id}-fieldset"""
 }
 
 @main(
-    title = Messages("asp.other.business.tax.matters.title"),
+    title = Messages("asp.other.business.tax.matters.title") + " - " + Messages("summary.asp"),
     heading = header
 ) {
-
-    <p>@Messages("asp.other.business.tax.matters.lbl")</p>
 
     @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
         @inlineRadioGroup(f("otherBusinessTaxMatters")) {
+            @legend("asp.other.business.tax.matters.lbl")
             @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
             @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
-
         }
 
         @submit(edit)

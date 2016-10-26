@@ -8,11 +8,11 @@
 }
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.nationality.header", "summary.responsiblepeople")
+    @heading("responsiblepeople.nationality.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.nationality.title"),
+    title = Messages("responsiblepeople.nationality.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 )  {
 
@@ -21,7 +21,7 @@
                 @radio(f("nationality"), "responsiblepeople.nationality.selection.british", "01")
                 @radio(f("nationality"), "responsiblepeople.nationality.selection.irish", "02")
                 @radio(f("nationality"), "responsiblepeople.nationality.selection.other", "03", target = s"#$target")
-                @fieldset("TODO", jsHidden = true, id = target) {
+                @fieldset("responsiblepeople.nationality.selection.other.name", jsHidden = true, id = target) {
                     @country(f("otherCountry"), labelText = "responsiblepeople.nationality.selection.other.name")
                 }
 

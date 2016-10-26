@@ -10,15 +10,13 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.involved.other.heading", "summary.businessactivities")
+    @heading("businessactivities.involved.other.title", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.involved.other.title"),
+    title = Messages("businessactivities.involved.other.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 )  {
-
-
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 

@@ -1,155 +1,95 @@
 @import include._
+@import forms2._
 @import models.aboutthebusiness._
 @import utils._
 
 @(model: AboutTheBusiness)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.aboutbusiness")
+    @heading("title.cya", "summary.aboutbusiness")
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.aboutbusiness"),
     heading = header
 ) {
 
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("aboutthebusiness.registeredformlr.title")</th>
-            <td width="12"><a href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.previouslyRegistered.map {
-                case PreviouslyRegisteredNo => { @Messages("lbl.no") }
-                case PreviouslyRegisteredYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-        @model.previouslyRegistered.map {
-            case PreviouslyRegisteredNo => { }
-            case PreviouslyRegisteredYes(v) => {
-            <tr>
-                <td colspan="2">
-                    @v
-                </td>
-            </tr>
-            }
-        }
-
-    </table>
+    @checkYourAnswers(
+        question = Messages("aboutthebusiness.registeredformlr.title"),
+        editUrl = controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true).toString
+    ) {
+        <p>@model.previouslyRegistered.map {
+            case PreviouslyRegisteredNo => { @Messages("lbl.no") }
+            case PreviouslyRegisteredYes(v) => { @Messages("aboutthebusiness.registeredformlr.mlrregno.lbl"): @v }
+        }</p>
+    }
 
     @model.activityStartDate.map { activityStartDate =>
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("aboutthebusiness.activity.start.date.title")</th>
-            <td width="12"><a href="@controllers.aboutthebusiness.routes.ActivityStartDateController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)
-            </td>
-        </tr>
-    </table>
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.activity.start.date.title"),
+            editUrl = controllers.aboutthebusiness.routes.ActivityStartDateController.get(true).toString
+        ) {
+            <p>@Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)</p>
+        }
     }
 
     @model.vatRegistered.map { vatRegistered =>
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("aboutthebusiness.registeredforvat.title")</th>
-            <td width="12"><a href="@controllers.aboutthebusiness.routes.VATRegisteredController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @vatRegistered match {
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.registeredforvat.title"),
+            editUrl = controllers.aboutthebusiness.routes.VATRegisteredController.get(true).toString
+        ) {
+            <p>@vatRegistered match {
                 case VATRegisteredNo => { @Messages("lbl.no") }
-                case VATRegisteredYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-
-        @vatRegistered match {
-        case VATRegisteredNo => { }
-        case VATRegisteredYes(v) => {
-        <tr>
-            <td colspan="2">
-                @Messages("lbl.vat.reg.number") @v
-            </td>
-        </tr>
+                case VATRegisteredYes(v) => { @Messages("lbl.vat.reg.number") @v }
+            }</p>
         }
-        }
-    </table>
     }
 
     @model.corporationTaxRegistered.map { ctRegistered =>
-    <table class="table--spaced-top ">
-        <tr>
-            <th>@Messages("aboutthebusiness.registeredforcorporationtax.title")</th>
-            <td width="12"><a href="@controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @ctRegistered match {
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.registeredforcorporationtax.title"),
+            editUrl = controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true).toString
+        ) {
+            <p>@ctRegistered match {
                 case CorporationTaxRegisteredNo => { @Messages("lbl.no") }
-                case CorporationTaxRegisteredYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-
-        @ctRegistered match {
-        case CorporationTaxRegisteredNo => { }
-        case CorporationTaxRegisteredYes(v) => {
-        <tr>
-            <td colspan="2">
-                @v
-            </td>
-        </tr>
+                case CorporationTaxRegisteredYes(v) => { @Messages("aboutthebusiness.registeredforcorporationtax.taxReference"): @v }
+            }</p>
         }
-        }
-
-    </table>
     }
+
     @model.registeredOffice.map { a =>
-        <table>
-            <tr>
-                <th>@Messages("aboutthebusiness.registeredoffice.title")</th>
-                <td width="12"><a href="@controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @a.toLines.map { line =>
-                        @line<br/>
-                    }
-                </td>
-            </tr>
-        </table>
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.registeredoffice.title"),
+            editUrl = controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true).toString
+        ) {
+            <p>@a.toLines.map { line =>
+                @line<br />
+            }</p>
+        }
     }
 
     @model.contactingYou.map { c =>
-        <table class="table--spaced-top">
-            <tr>
-                <th class="">@Messages("aboutthebusiness.contactingyou.title")</th>
-                <td width="12"><a href="@controllers.aboutthebusiness.routes.ContactingYouController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">@c.phoneNumber</td>
-            </tr>
-            <tr>
-                <td colspan="2">@c.email</td>
-            </tr>
-            @model.correspondenceAddress.map { ca =>
-                <tr>
-                    <td colspan="2">
-                        @ca.toLines.map { line =>
-                            @line<br/>
-                        }
-                    </td>
-                </tr>
-            }
-        </table>
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.contactingyou.title"),
+            editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
+        ) {
+            <ul class="list">
+                <li>@Messages("aboutthebusiness.contactingyou.phone.lbl"): @c.phoneNumber</li>
+                <li>@Messages("aboutthebusiness.contactingyou.email.lbl"): @c.email</li>
+            </ul>
+        }
+    @model.correspondenceAddress.map { ca =>
+        @checkYourAnswers(
+            question = Messages("aboutthebusiness.correspondenceaddress.postal.address"),
+            classes = Seq("check-your-answers__last"),
+            editUrl = controllers.aboutthebusiness.routes.CorrespondenceAddressController.get(true).toString
+        ) {
+            <p>@ca.toLines.map { line =>
+                    @line<br />
+                }
+            }</p>
+        }
     }
 
-
-
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">Accept and complete section</a>
+    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.checkyouranswers.acceptandcomplete")</a>
 }
