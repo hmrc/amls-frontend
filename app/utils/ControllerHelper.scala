@@ -45,6 +45,7 @@ object ControllerHelper {
     }
   }
 
+  //For repeating section
   def allowedToEdit(edit: Boolean)(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
     statusService.getStatus map {
       case SubmissionReady | NotCompleted => true
