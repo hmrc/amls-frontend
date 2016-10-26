@@ -51,4 +51,11 @@ object ControllerHelper {
       case _ => !edit
     }
   }
+
+  def allowedToEdit(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
+    statusService.getStatus map {
+      case SubmissionReady | NotCompleted => true
+      case _ => false
+    }
+  }
 }

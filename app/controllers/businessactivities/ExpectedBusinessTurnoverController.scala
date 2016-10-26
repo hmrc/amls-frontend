@@ -5,6 +5,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities._
+import services.StatusService
+import utils.ControllerHelper
 import views.html.businessactivities._
 
 import scala.concurrent.Future
@@ -12,16 +14,20 @@ import scala.concurrent.Future
 trait ExpectedBusinessTurnoverController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  implicit val statusService: StatusService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
-        response =>
-          val form: Form2[ExpectedBusinessTurnover] = (for {
-            businessActivities <- response
-            expectedTurnover <- businessActivities.expectedBusinessTurnover
-          } yield Form2[ExpectedBusinessTurnover](expectedTurnover)).getOrElse(EmptyForm)
-          Ok(expected_business_turnover(form, edit))
+      ControllerHelper.allowedToEdit flatMap {
+        case true => dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) flatMap {
+          response =>
+            val form: Form2[ExpectedBusinessTurnover] = (for {
+              businessActivities <- response
+              expectedTurnover <- businessActivities.expectedBusinessTurnover
+            } yield Form2[ExpectedBusinessTurnover](expectedTurnover)).getOrElse(EmptyForm)
+            Future.successful(Ok(expected_business_turnover(form, edit)))
+        }
+        case false => Future.successful(NotFound(notFoundView))
       }
   }
 
@@ -49,4 +55,5 @@ object ExpectedBusinessTurnoverController extends ExpectedBusinessTurnoverContro
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override val statusService: StatusService = StatusService
 }

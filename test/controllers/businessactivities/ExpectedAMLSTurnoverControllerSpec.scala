@@ -3,6 +3,7 @@ package controllers.businessactivities
 
 import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
+import models.status.{NotCompleted, SubmissionDecisionApproved, Incomplete}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities => Activities, _}
@@ -14,6 +15,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -27,6 +29,7 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneAppPerSuite wi
     val controller = new ExpectedAMLSTurnoverController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService: StatusService = mock[StatusService]
     }
 
     val cache = mock[CacheMap]
@@ -36,6 +39,9 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneAppPerSuite wi
     )
 
     def model: Option[BusinessActivities] = None
+
+    when(controller.statusService.getStatus(any(), any(), any()))
+      .thenReturn(Future.successful(NotCompleted))
 
     when(controller.dataCacheConnector.fetchAll(any(), any()))
       .thenReturn(Future.successful(Some(cache)))
@@ -53,6 +59,9 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneAppPerSuite wi
 
     "on get display the Turnover Expect In 12Months Related To AMLS page" in new Fixture {
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("businessactivities.turnover.title"))
@@ -61,12 +70,25 @@ class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneAppPerSuite wi
     "on get display the Role Within Business page with pre populated data" in new Fixture {
 
       override def model = Some(BusinessActivities(expectedAMLSTurnover = Some(First)))
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[value=01]").hasAttr("checked") must be(true)
+    }
+
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
     }
 
     "on post with valid data" in new Fixture {

@@ -3,7 +3,7 @@ package controllers.businessactivities
 import connectors.DataCacheConnector
 import models.Country
 import models.businessactivities._
-import models.status.NotCompleted
+import models.status.{SubmissionDecisionApproved, NotCompleted}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -49,6 +49,8 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     "load the summary page when section data is available" in new Fixture {
 
       val model = BusinessActivities(None)
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
@@ -58,6 +60,8 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
@@ -66,20 +70,40 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       status(result) must be(SEE_OTHER)
     }
 
-    "hide edit link in variation mode" in new Fixture {
-      when(controller.dataCache.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+    "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
+      "application in variation mode" in new Fixture {
+        when(controller.dataCache.fetch[BusinessActivities](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        val document = Jsoup.parse(contentAsString(result))
 
-      document.getElementsByTag("section").get(0).getElementsByClass("edit").isEmpty must be(true)
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("edit") must be(false)
+      }
+    }
 
+    "show edit link" when {
+      "application not in variation mode" in new Fixture {
+        when(controller.dataCache.fetch[BusinessActivities](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("edit") must be(true)
+      }
     }
   }
 }

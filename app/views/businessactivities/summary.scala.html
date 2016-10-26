@@ -26,7 +26,7 @@
     @model.expectedBusinessTurnover.map { turnover =>
         @checkYourAnswers(
             question = Messages("businessactivities.business-turnover.title"),
-            editUrl = controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString
+            editUrl = if(isEditable){controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).toString} else ""
         ) {
             <p>@turnover match {
                 case ExpectedBusinessTurnover.First => { @Messages("businessactivities.turnover.lbl.01") }
@@ -43,7 +43,7 @@
     @model.expectedAMLSTurnover.map { turnover =>
         @checkYourAnswers(
             question = Messages("businessactivities.turnover.title"),
-            editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString
+            editUrl = if(isEditable){controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString} else ""
         ) {
             <p>@turnover match {
                 case ExpectedAMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
