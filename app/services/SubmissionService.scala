@@ -63,7 +63,7 @@ trait SubmissionService extends DataCacheService {
 
   private object UnpaidPeople {
     val message = "confirmation.unpaidpeople"
-    val feePer: BigDecimal = 0
+    val feePer: BigDecimal = 0 - ApplicationConfig.peopleFee
   }
 
   def subscribe
@@ -195,7 +195,8 @@ trait SubmissionService extends DataCacheService {
           case Some(mlrRegNo) => {
             val premisesFee: BigDecimal = getTotalPremisesFee(variation)
             val peopleFee: BigDecimal = getPeopleFee(variation)
-            val totalFees: BigDecimal = peopleFee + premisesFee
+            val fitAndProperDeduction: BigDecimal = getFitAndProperDeduction(variation)
+            val totalFees: BigDecimal = peopleFee + fitAndProperDeduction + premisesFee
             val rows = getVariationBreakdown(variation, peopleFee)
             Future.successful(Some((mlrRegNo, Currency(totalFees), rows)))
           }
@@ -210,8 +211,18 @@ trait SubmissionService extends DataCacheService {
     val breakdownRows = Seq()
 
     def rpRow: Seq[BreakdownRow] = {
-      if(variation.addedResponsiblePeople > 0) {
-        breakdownRows ++ Seq(BreakdownRow(People.message, variation.addedResponsiblePeople, People.feePer, Currency(peopleFee)))
+      val rp = variation.addedResponsiblePeople
+      val fp = variation.addedResponsiblePeopleFitAndProper
+      if(rp > 0 || fp > 0) {
+        breakdownRows ++ Seq(BreakdownRow(People.message, rp + fp, People.feePer, Currency(peopleFee)))
+      } else {
+        Seq()
+      }
+    }
+
+    def fpRow: Seq[BreakdownRow] = {
+      if(variation.addedResponsiblePeopleFitAndProper > 0) {
+        breakdownRows ++ Seq(BreakdownRow(UnpaidPeople.message, variation.addedResponsiblePeopleFitAndProper, UnpaidPeople.feePer, Currency(getFitAndProperDeduction(variation))))
       } else {
         Seq()
       }
@@ -241,7 +252,7 @@ trait SubmissionService extends DataCacheService {
       }
     }
 
-    rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+    rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
 
   }
 
@@ -258,7 +269,10 @@ trait SubmissionService extends DataCacheService {
   }
 
   private def getPeopleFee(variation: AmendVariationResponse): BigDecimal =
-    People.feePer * variation.addedResponsiblePeople
+    People.feePer * (variation.addedResponsiblePeople + variation.addedResponsiblePeopleFitAndProper)
+
+  private def getFitAndProperDeduction(variation: AmendVariationResponse): BigDecimal =
+    0 - (People.feePer * variation.addedResponsiblePeopleFitAndProper)
 
   private def getBreakdownRows
   (submission: SubmissionResponse,

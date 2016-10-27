@@ -75,7 +75,7 @@ trait AmlsConnector {
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsConnector][view]"
-    Logger.debug(s"$prefix - Request : ${amlsRegistrationNumber}")
+    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
 
     httpGet.GET[ViewResponse](getUrl) map {
       response =>
