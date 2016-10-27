@@ -9,7 +9,7 @@
 )(implicit lang: Lang)
 
 <div class="form-field form-field--tall @if(field.hasErrors) {form-field--error}">
-    <label>
+    <label for="@field.id">
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
         }

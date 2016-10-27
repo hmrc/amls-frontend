@@ -52,7 +52,7 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
 
         status(result) must be(NOT_FOUND)
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be("Not Found")
+        document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       }
     }
 
@@ -179,7 +179,7 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
         val result = controller.post(10, false)(newRequest)
         status(result) must be(NOT_FOUND)
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be("Not Found")
+        document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       }
     }
   }

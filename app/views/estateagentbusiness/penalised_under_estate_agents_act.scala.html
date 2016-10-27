@@ -5,7 +5,7 @@
 @(f: Form2[_], edit: Boolean = false)(implicit request: Request[_], lang: Lang)
 
 @target = @{
-s"""${f("penalisedUnderEstateAgentsActDetails").id}-fieldset"""
+    s"""${f("penalisedUnderEstateAgentsActDetails").id}-fieldset"""
 }
 
 @header = {
@@ -14,7 +14,7 @@ s"""${f("penalisedUnderEstateAgentsActDetails").id}-fieldset"""
 }
 
 @main(
-    title = Messages("estateagentbusiness.penalisedunderestateagentsact.title"),
+    title = Messages("estateagentbusiness.penalisedunderestateagentsact.title") + " - " + Messages("summary.estateagentbusiness"),
     heading = header
 ) {
 

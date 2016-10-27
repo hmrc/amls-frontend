@@ -58,7 +58,7 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be (Messages("declaration.addperson.amendment.title"))
+        document.title() must be (Messages("declaration.addperson.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
         contentAsString(result) must include(Messages("submit.amendment.application"))
       }
@@ -74,7 +74,7 @@ class AddPersonControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be (Messages("declaration.addperson.title"))
+        document.title() must be (Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
         contentAsString(result) must include(Messages("submit.registration"))
       }
@@ -254,7 +254,7 @@ class AddPersonControllerWithoutAmendmentSpec extends PlaySpec with OneAppPerSui
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be (Messages("declaration.addperson.title"))
+        document.title() must be (Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
         contentAsString(result) must include(Messages("submit.registration"))
       }

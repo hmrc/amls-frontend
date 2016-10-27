@@ -119,8 +119,12 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
         val contentString = contentAsString(result)
 
+        val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
+          Messages("summary.tradingpremises") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
         val document = Jsoup.parse(contentString)
-        document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
+        document.title() mustBe pageTitle
         document.getElementById("endDate-day").`val`() must be("")
 
       }
@@ -137,8 +141,12 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
         val contentString = contentAsString(result)
 
+        val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
+          Messages("summary.tradingpremises") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
         val document = Jsoup.parse(contentString)
-        document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
+        document.title() mustBe pageTitle
       }
     }
 
@@ -154,8 +162,12 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
       val contentString = contentAsString(result)
 
+      val pageTitle = Messages("tradingpremises.remove.trading.premises.title") + " - " +
+        Messages("summary.tradingpremises") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+
       val document = Jsoup.parse(contentString)
-      document.title() must be(Messages("tradingpremises.remove.trading.premises.title"))
+      document.title() mustBe pageTitle
     }
 
     "respond with NOT_FOUND" when {

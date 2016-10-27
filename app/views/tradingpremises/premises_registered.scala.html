@@ -5,11 +5,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("tradingpremises.premises.registered.heading", "summary.tradingpremises")
+    @heading("tradingpremises.premises.registered.title", "summary.tradingpremises")
 }
 
 @main(
-    title = Messages("tradingpremises.premises.registered.title"),
+    title = Messages("tradingpremises.premises.registered.title") + " - " + Messages("summary.tradingpremises"),
     heading = header
 ) {
 
@@ -18,8 +18,6 @@
             <p>@Messages("tradingpremises.have.registered.premises.text", index) </p>
 
         </div>
-        <br>
-        <br>
 
         @inlineRadioGroup(f("registerAnotherPremises")) {
             @legend("tradingpremises.want.to.register.another.premises")

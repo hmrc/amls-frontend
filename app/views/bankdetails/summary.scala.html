@@ -3,106 +3,102 @@
 @import utils.StatusConstants
 @import forms2._
 
-@(model: Seq[BankDetails], complete: Boolean, hasBankAccount : Boolean)(implicit request: Request[_], lang: Lang)
+@(model: Seq[BankDetails], complete: Boolean, hasBankAccount: Boolean, canEdit: Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading(if(complete) "summary.youranswers.title" else "summary.checkyouranswers.title", "summary.bankdetails")
+    @heading(if(complete) "title.ya" else "title.cya", "summary.bankdetails")
 }
 
-
 @main(
-    title = if(complete) Messages("summary.youranswers.title") else Messages("summary.bankdetails.checkyouranswers.title"),
+    title = if(complete) {
+        Messages("title.ya") + " - " + Messages("summary.bankdetails")
+    } else {
+        Messages("title.cya") + " - " + Messages("summary.bankdetails")
+    },
     heading = header
 ) {
 
-    @if(!hasBankAccount){
-        <div class="panel-indent">
-            @Messages("bankdetails.summary.nobank.account")
-            <br><br>
+    @if(!hasBankAccount) {
+        <div class="panel-indent panel-border-wide">
+            <p>@Messages("bankdetails.summary.nobank.account")</p>
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>
-        <br><br>
     }
 
     @if(complete && hasBankAccount) {
-        <div class="panel-indent">
+        <div class="panel-indent panel-border-wide">
             <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
         </div>
-        <br><br>
     }
-        @model.zipWithIndex.map { case (x, y) =>
-            @x.bankAccount.map {bankAccount =>
-                @if(!x.status.contains(StatusConstants.Deleted)){
-                <table>
-                    <tr>
-                    @bankAccount.account match {
-                        case f:UKAccount => {
-                            <td width="75%">
-                                @bankAccount.accountName
-                                <br>
-                                @Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode
-                                <br>
-                                @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
-                                <br>
-                                @Messages("lbl.uk") @Messages("bankdetails.summary.bankaccount")
-                                <br>
-                                @x.bankAccountType.map {
-                                case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                }
-                            </td>
-                        }
-                        case f:NonUKAccountNumber => {
-                            <td width="75%">
-                                @bankAccount.accountName
-                                <br>
-                                @Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber
-                                <br>
-                                @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
-                                <br>
-                                @x.bankAccountType.map {
-                                case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                }
-                            </td>
-                        }
-                        case f:NonUKIBANNumber => {
-                                <td width="75%">
-                                    @bankAccount.accountName
-                                    <br>
-                                    @Messages("bankdetails.bankaccount.iban"): @f.IBANNumber
-                                    <br>
-                                    @Messages("lbl.overseas") @Messages("bankdetails.summary.bankaccount")
-                                    <br>
-                                    @x.bankAccountType.map {
+
+    <ul class="list list--listing">
+    @model.zipWithIndex.map { case (x, y) =>
+        @x.bankAccount.map {bankAccount =>
+            @if(!x.status.contains(StatusConstants.Deleted)) {
+                @bankAccount.account match {
+                    case f:UKAccount => {
+                        @checkYourAnswersBanks(
+                            question = Messages("bankdetails.bankaccount.accountname") + ": " + bankAccount.accountName,
+                            editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
+                            removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
+                            canEdit
+                        ) {
+                            <ul class="list">
+                                <li>@Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode</li>
+                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.yes")</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
                                     case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
                                     case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
                                     case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                    }
-                                </td>
+                                }</li>
+                            </ul>
+                        }
+                    }
+                    case f:NonUKAccountNumber => {
+                        @checkYourAnswersBanks(
+                            question = Messages("bankdetails.bankaccount.accountname") + ": " + bankAccount.accountName,
+                            editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
+                            removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
+                            canEdit
+                        ) {
+                            <ul class="list">
+                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
+                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                }</li>
+                            </ul>
+                        }
+                    }
+                    case f:NonUKIBANNumber => {
+                        @checkYourAnswersBanks(
+                            question = Messages("bankdetails.bankaccount.accountname") + ": " + bankAccount.accountName,
+                            editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
+                            removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
+                            canEdit
+                        ) {
+                            <ul class="list">
+                                <li>@Messages("bankdetails.bankaccount.iban"): @f.IBANNumber</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
+                                <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
+                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                }</li>
+                            </ul>
+                        }
                     }
                 }
-                <td class="numeric"><a href="@controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true)">@Messages("button.edit")</a></td>
-                  <td>  @Messages("lbl.or")</td>
-                    <td class="numeric"><a href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete)">@Messages("button.remove")</a></td>
-
-                </tr>
-
-
-             </table>
-                }
             }
-
         }
+    }
+    </ul>
 
     @if(complete) {
-         <div class="form-group">
-            <a class="button" href="@controllers.routes.RegistrationProgressController.get()">
-                @Messages("button.summary.acceptandcomplete")
-            </a>
-         </div>
+        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 
     } else {
         <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>

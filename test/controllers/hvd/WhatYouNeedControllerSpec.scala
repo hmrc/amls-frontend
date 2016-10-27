@@ -21,9 +21,12 @@ class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
     "get" must {
 
       "load the page" in new Fixture {
+
+        val pageTitle = Messages("title.wyn") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+
         val result = controller.get(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("hvd.whatyouneed.title"))
+        contentAsString(result) must include(pageTitle)
       }
     }
   }

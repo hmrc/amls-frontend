@@ -5,11 +5,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("hvd.products.heading", "summary.hvd")
+    @heading("hvd.products.title", "summary.hvd")
 }
 
 @main(
-    title = Messages("hvd.products.title"),
+    title = Messages("hvd.products.title") + " - " + Messages("summary.hvd"),
     heading = header
 ) {
 

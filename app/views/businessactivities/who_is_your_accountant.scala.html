@@ -6,18 +6,18 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.whoisyouraccountant.heading", "summary.businessactivities")
+    @heading("businessactivities.whoisyouraccountant.title", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.whoisyouraccountant.title"),
+    title = Messages("businessactivities.whoisyouraccountant.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
 
     @form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
 
         <fieldset>
-            @legend("businessactivities.whoisyouraccountant.heading", jsHidden = true)
+            @legend("businessactivities.whoisyouraccountant.title", jsHidden = true)
             <div class="form-field-group">
                 @input(
                     field = f("name"),

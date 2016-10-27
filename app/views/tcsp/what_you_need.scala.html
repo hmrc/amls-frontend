@@ -5,16 +5,16 @@
 @()(implicit request: Request[_])
 
 @header = {
-    @heading("tcsp.whatyouneed.heading", "summary.tcsp")
+    @heading("title.wyn", "summary.tcsp")
 }
 
 @whatyouneed(
-    title = Messages("tcsp.whatyouneed.title"),
+    title = Messages("title.wyn") + " - " + Messages("summary.tcsp"),
     heading = header,
     sidebar = sidebar
 ) {
 
-    <p class="heading-small">@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
+    <p>@Messages("tcsp.whatyouneed.requiredinfo.heading")</p>
 
     <ul class="list list-bullet">
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.1")</li>
@@ -22,7 +22,7 @@
         <li>@Messages("tcsp.whatyouneed.dependinginfo.text.3")</li>
     </ul>
 
-    <p class="heading-small">@Messages("tcsp.whatyouneed.dependinginfo.heading")</p>
+    <p>@Messages("tcsp.whatyouneed.dependinginfo.heading")</p>
 
     <ul class="list list-bullet">
         <li>@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>

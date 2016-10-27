@@ -39,8 +39,12 @@ class NCARegisteredControllerSpec extends PlaySpec with OneAppPerSuite with Mock
         val result = controller.get()(request)
         status(result) must be(OK)
 
+        val pageTitle = Messages("businessactivities.ncaRegistered.title") + " - " +
+          Messages("summary.businessactivities") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("businessactivities.ncaRegistered.title")
+        htmlValue.title mustBe pageTitle
       }
 
       "load Yes when ncaRegistered from save4later returns True" in new Fixture {

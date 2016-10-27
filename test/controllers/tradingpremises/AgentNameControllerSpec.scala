@@ -44,7 +44,9 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.title() must be(Messages("tradingpremises.agentname.title"))
+        val title = s"${Messages("tradingpremises.agentname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+
+        document.title() must be(title)
         document.select("input[type=text]").`val`() must be(empty)
       }
 
@@ -58,7 +60,9 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.title() must be(Messages("tradingpremises.agentname.title"))
+        val title = s"${Messages("tradingpremises.agentname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+
+        document.title() must be(title)
         document.select("input[type=text]").`val`() must be("test")
       }
       "respond with NOT_FOUND" when {

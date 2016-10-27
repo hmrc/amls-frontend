@@ -6,11 +6,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("tcsp.provided_services.heading", "summary.tcsp")
+    @heading("tcsp.provided_services.title", "summary.tcsp")
 }
 
 @main(
-    title = Messages("tcsp.provided_services.title"),
+    title = Messages("tcsp.provided_services.title") + " - " + Messages("summary.tcsp"),
     heading = header
 ) {
 

@@ -6,13 +6,13 @@
 @(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_])
 
 @main2(
-    title = Messages("progress.title")
+    title = Messages("progress.title") + " - " + Messages("title.yapp")
 ) {
 
     @* Heading *@
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @heading("progress.heading")
+            @heading("progress.title")
             <p class="lede">@Messages("progress.lede")</p>
             <p>@Messages("progress.saved.automatically")</p>
         </div>
@@ -24,7 +24,7 @@
     <div class="grid-layout grid-layout--stacked">
 
         @* Main section *@
-        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps" role="menu">
+        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
             @sections.map { case Section(name, status, _, call) =>
                 @section(name, status, call)
             }
