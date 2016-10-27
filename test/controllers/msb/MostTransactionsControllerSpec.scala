@@ -5,9 +5,11 @@ import models.Country
 import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
+import models.status.{SubmissionDecisionApproved, NotCompleted}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import org.mockito.Mockito._
@@ -28,12 +30,16 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
     val controller = new MostTransactionsController {
       override val cache: DataCacheConnector = self.cache
       override protected def authConnector: AuthConnector = self.authConnector
+      override val statusService: StatusService = mock[StatusService]
     }
   }
 
   "MostTransactionsController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
@@ -58,6 +64,9 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
         )
       )
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(model)))
 
@@ -69,6 +78,17 @@ class MostTransactionsControllerSpec extends PlaySpec with MockitoSugar with One
       document.select("select").size mustEqual 3
       document.select("option[selected]").size mustEqual 3
       document.select(".amls-error-summary").size mustEqual 0
+    }
+
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
     }
 
     "return a Bad request with errors on invalid submission" in new Fixture {

@@ -7,25 +7,29 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{CurrencyExchange, MsbService, BusinessMatching}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 
 import scala.concurrent.Future
 
 trait MostTransactionsController extends BaseController {
 
   def cache: DataCacheConnector
+  implicit val statusService: StatusService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-
-      cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            transactions <- msb.mostTransactions
-          } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-
+      ControllerHelper.allowedToEdit flatMap {
+        case true => cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+          response =>
+            val form = (for {
+              msb <- response
+              transactions <- msb.mostTransactions
+            } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
           Ok(views.html.msb.most_transactions(form, edit))
+        }
+        case false => Future.successful(NotFound(notFoundView))
       }
   }
 
@@ -78,4 +82,5 @@ object MostTransactionsController extends MostTransactionsController {
   // $COVERAGE-OFF$
   override val cache: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
+  override val statusService: StatusService = StatusService
 }

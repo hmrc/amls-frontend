@@ -3,6 +3,7 @@ package controllers.msb
 import connectors.DataCacheConnector
 import models.Country
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, SendTheLargestAmountsOfMoney}
+import models.status.{SubmissionDecisionApproved, NotCompleted}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -11,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -26,6 +28,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSu
 
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override protected def authConnector: AuthConnector = self.authConnector
+      override implicit val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -38,6 +41,9 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSu
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
@@ -45,6 +51,9 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSu
     }
 
     "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture  {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(MoneyServiceBusiness(
@@ -56,6 +65,18 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSu
       val document = Jsoup.parse(contentAsString(result))
       document.select("select[name=country_1] > option[value=GB]").hasAttr("selected") must be(true)
 
+    }
+
+
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
     }
 
     "on post with valid data" in new Fixture {

@@ -4,15 +4,10 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessactivities.BusinessActivities
-import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 import services.StatusService
 import utils.ControllerHelper
 import views.html.businessactivities.summary
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-
-import scala.concurrent.Future
 
 trait SummaryController extends BaseController {
 
