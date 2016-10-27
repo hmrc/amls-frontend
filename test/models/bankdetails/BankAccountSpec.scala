@@ -30,7 +30,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> Seq("112233")
       )
 
-      Account.formRead.validate(urlFormEncoded) must be(Success(UKAccount("112233", "12345678")))
+      Account.formRead.validate(urlFormEncoded) must be(Success(UKAccount("12345678", "112233")))
     }
 
     "fail on invalid selection" in {
@@ -233,7 +233,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> Seq("112233")
       )
 
-      BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("test", UKAccount("112233", "12345678"))))
+      BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("test", UKAccount("12345678", "112233"))))
     }
 
     "Form Write validation for UKAccount" in {
