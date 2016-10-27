@@ -159,7 +159,7 @@ trait SubmissionService extends DataCacheService {
       regNo <- authEnrolmentsService.amlsRegistrationNumber
       amendment <- amlsConnector.variation(
         createSubscriptionRequest(cache),
-        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
+        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][variation] - No enrolment"))
       )
       _ <- cacheConnector.save[AmendVariationResponse](AmendVariationResponse.key, amendment)
     } yield amendment
