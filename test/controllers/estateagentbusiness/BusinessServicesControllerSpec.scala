@@ -41,7 +41,7 @@ class BusinessServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("estateagentbusiness.servicess.title"))
+      contentAsString(result) must include(Messages("estateagentbusiness.services.title") + " - " + Messages("summary.estateagentbusiness") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
     }
 
     "submit with valid data 1" in new Fixture {

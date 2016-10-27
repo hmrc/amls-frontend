@@ -5,17 +5,15 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.business-turnover.heading", "summary.businessactivities")
+    @heading("businessactivities.business-turnover.title", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.business-turnover.title"),
+    title = Messages("businessactivities.business-turnover.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
 
     @form(f, controllers.businessactivities.routes.ExpectedBusinessTurnoverController.post(edit)) {
-
-        <span>@Messages("businessactivities.business-turnover.text")</span>
 
         <div class="form-field-group">
             @radioGroup(f("expectedBusinessTurnover")) {

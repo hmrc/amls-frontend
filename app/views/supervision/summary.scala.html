@@ -1,81 +1,61 @@
 @import include._
+@import include.forms2._
 @import models.supervision._
 @import utils._
 
 @(model: Supervision)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.supervision")
+    @heading("title.cya", "summary.supervision")
 }
 
 @main(
-    title = Messages("summary.supervision.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.supervision"),
     heading = header
 ) {
 
-    <table>
-        <tr>
-            <th>@Messages("supervision.another_body.heading")</th>
-            <td width="12"><a href="@controllers.supervision.routes.AnotherBodyController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.anotherBody.map {
-                    case AnotherBodyNo => { @Messages("lbl.no") }
-                    case AnotherBodyYes(v,_,_,_) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-
+    @checkYourAnswers(
+        question = Messages("supervision.another_body.title"),
+        editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
+    ) {
         @model.anotherBody.map {
-            case AnotherBodyNo => { }
+            case AnotherBodyNo => { <p>@Messages("lbl.no")</p> }
             case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
-                <tr>
-                    <td colspan="2">
-                        @supervisorName
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        @Messages("lbl.start.date") @DateHelper.formatDate(startDate)
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        @Messages("lbl.end.date") @DateHelper.formatDate(endDate)
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        @endingReason
-                    </td>
-                </tr>
+                <p>@Messages("lbl.yes")</p>
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.lbl.supervisor")
+                ) {
+                    <p>@supervisorName</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.startDate.lbl")
+                ) {
+                    <p>@DateHelper.formatDate(startDate)</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.endDate.lbl")
+                ) {
+                    <p>@DateHelper.formatDate(endDate)</p>
+                }
+                @checkYourAnswersExtra(
+                    question = Messages("supervision.another_body.endingReason.lbl")
+                ) {
+                    <p>@endingReason</p>
+                }
             }
         }
-    </table>
+    }
 
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("supervision.memberofprofessionalbody.heading")</th>
-            <td width="12"><a href="@controllers.supervision.routes.ProfessionalBodyMemberController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.professionalBodyMember.map {
-                    case ProfessionalBodyMemberNo => { @Messages("lbl.no") }
-                    case ProfessionalBodyMemberYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-
+    @checkYourAnswers(
+        question = Messages("supervision.memberofprofessionalbody.title"),
+        editUrl = controllers.supervision.routes.ProfessionalBodyMemberController.get(true).toString
+    ) {
         @model.professionalBodyMember.map {
-            case ProfessionalBodyMemberNo => { }
+            case ProfessionalBodyMemberNo => { <p>@Messages("lbl.no")</p> }
             case ProfessionalBodyMemberYes(v) => {
-
+            <ul class="list list--semicolon">
                 @v.map { x=>
-                <tr>
-                    <td colspan="2">
-                    @x match {
+                <li>@x match {
                         case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
                         case CharteredCertifiedAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.02")}
                         case InternationalAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.03")}
@@ -89,40 +69,23 @@
                         case FinancialAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.11")}
                         case AssociationOfBookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.12")}
                         case LawSociety => {@Messages("supervision.memberofprofessionalbody.lbl.13")}
-                        case Other(details) => {@Messages("supervision.memberofprofessionalbody.lbl.14"):@details}
-                    }
-                    </td>
-                </tr>
+                        case Other(details) => {@Messages("supervision.memberofprofessionalbody.lbl.14"): @details}
+                    }</li>
                 }
+            </ul>
             }
         }
-    </table>
+    }
 
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("supervision.penalisedbyprofessional.heading")</th>
-            <td width="12"><a href="@controllers.supervision.routes.PenalisedByProfessionalController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.professionalBody.map {
-                    case ProfessionalBodyNo => { @Messages("lbl.no") }
-                    case ProfessionalBodyYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-
-        @model.professionalBody.map {
-            case ProfessionalBodyNo => { }
-            case ProfessionalBodyYes(v) => {
-                <tr>
-                    <td colspan="2">
-                        @v
-                    </td>
-                </tr>
-            }
-        }
-    </table>
+    @checkYourAnswers(
+        question = Messages("supervision.penalisedbyprofessional.title"),
+        editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
+    ) {
+        <p>@model.professionalBody.map {
+            case ProfessionalBodyNo => { @Messages("lbl.no") }
+            case ProfessionalBodyYes(v) => { @v }
+        }</p>
+    }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

@@ -45,8 +45,12 @@ class RemoveBankDetailsControllerSpec extends PlaySpec with OneAppPerSuite with 
 
       val contentString = contentAsString(result)
 
+      val pageTitle = Messages("bankdetails.remove.bank.account.title") + " - " +
+        Messages("summary.bankdetails") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
+
       val document = Jsoup.parse(contentString)
-      document.title() must be(Messages("bankdetails.remove.bank.account.title"))
+      document.title() mustBe pageTitle
     }
 
     "remove bank account from summary" in new Fixture {

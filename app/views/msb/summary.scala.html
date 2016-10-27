@@ -1,4 +1,5 @@
 @import include._
+@import include.forms2._
 @import models.moneyservicebusiness._
 @import models.businessmatching._
 @import models.Country
@@ -6,200 +7,136 @@
 @(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices])(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.msb")
+    @heading("title.cya", "summary.msb")
 }
 
 @main(
-    title = Messages("summary.msb.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.msb"),
     heading = header
 ) {
 
-    <p>@Messages("summary.linetext")</p>
-
     @bmMsbServices.map{ services =>
         @model.throughput.map{ throughput =>
-            <table class="table--spaced-top">
-                <tr>
-                    <th>@Messages("msb.throughput.heading")</th>
-                    <td width="12"><a href="@controllers.msb.routes.ExpectedThroughputController.get(true)">@Messages("button.edit")</a></td>
-                </tr>
-
-                <tr>
-                    <td colspan="2">
-                        @throughput match {
-                            case ExpectedThroughput.First =>   {@Messages("msb.throughput.lbl.01")}
-                            case ExpectedThroughput.Second =>  {@Messages("msb.throughput.lbl.02")}
-                            case ExpectedThroughput.Third =>   {@Messages("msb.throughput.lbl.03")}
-                            case ExpectedThroughput.Fourth =>  {@Messages("msb.throughput.lbl.04")}
-                            case ExpectedThroughput.Fifth =>   {@Messages("msb.throughput.lbl.05")}
-                            case ExpectedThroughput.Sixth =>   {@Messages("msb.throughput.lbl.06")}
-                            case ExpectedThroughput.Seventh => {@Messages("msb.throughput.lbl.07")}
-                        }
-                    </td>
-                </tr>
-            </table>
+            @checkYourAnswers(
+                question = Messages("msb.throughput.title"),
+                editUrl = controllers.msb.routes.ExpectedThroughputController.get(true).toString
+            ) {
+                <p>@throughput match {
+                    case ExpectedThroughput.First => {@Messages("msb.throughput.lbl.01")}
+                    case ExpectedThroughput.Second => {@Messages("msb.throughput.lbl.02")}
+                    case ExpectedThroughput.Third => {@Messages("msb.throughput.lbl.03")}
+                    case ExpectedThroughput.Fourth => {@Messages("msb.throughput.lbl.04")}
+                    case ExpectedThroughput.Fifth => {@Messages("msb.throughput.lbl.05")}
+                    case ExpectedThroughput.Sixth => {@Messages("msb.throughput.lbl.06")}
+                    case ExpectedThroughput.Seventh => {@Messages("msb.throughput.lbl.07")}
+                }</p>
+            }
         }
 
         @model.branchesOrAgents.map { boa =>
-            <table class="table--spaced-top">
-                <tr>
-                    <th>@Messages("msb.branchesoragents.heading")</th>
-                    <td width="12"><a href="@controllers.msb.routes.BranchesOrAgentsController.get(true)">@Messages("button.edit")</a></td>
-                </tr>
+            @checkYourAnswers(
+                question = Messages("msb.branchesoragents.title"),
+                editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
+            ) {
                 @boa.branches.fold {
-                    <tr>
-                        <td colspan="2">
-                            @Messages("lbl.no")
-                        </td>
-                    </tr>
-                } { branches =>
-                    <tr>
-                        <td colspan="2">
-                            @Messages("lbl.yes")
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @branches.map {country =>
-                                @country <br/>
-                            }
-                        </td>
-                    </tr>
+                    <p>@Messages("lbl.no")</p>
+                    } { branches =>
+                    <ul class="list list--comma">
+                        @branches.map { country =>
+                        <li>@country</li>
+                        }
+                    </ul>
                 }
-            </table>
+            }
         }
 
         @model.identifyLinkedTransactions.map { ilt =>
-            <table class="table--spaced-top">
-                <tr>
-                    <th>@Messages("msb.linked.txn.heading")</th>
-                    <td width="12"><a href="@controllers.msb.routes.IdentifyLinkedTransactionsController.get(true)">@Messages("button.edit")</a></td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        @ilt.linkedTxn match {
-                            case true => {@Messages("lbl.yes")}
-                            case _ => {@Messages("lbl.no")}
-                        }
-                    </td>
-                </tr>
-            </table>
+            @checkYourAnswers(
+                question = Messages("msb.linked.txn.title"),
+                editUrl = controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).toString
+            ) {
+                <p>@ilt.linkedTxn match {
+                    case true => {@Messages("lbl.yes")}
+                    case _ => {@Messages("lbl.no")}
+                }</p>
+            }
         }
 
         @if(services.services.contains(TransmittingMoney)) {
-           @model.businessUseAnIPSP.map { ipsp =>
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("msb.ipsp.heading")</th>
-                        <td width="12"><a href="@controllers.msb.routes.BusinessUseAnIPSPController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
+            @model.businessUseAnIPSP.map { ipsp =>
+                @checkYourAnswers(
+                    question = Messages("msb.ipsp.title"),
+                    editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
+                ) {
                     @ipsp match {
-                        case BusinessUseAnIPSPNo => {
-                            <tr>
-                                <td colspan="2">
-                                    @Messages("lbl.no")
-                                </td>
-                            </tr>
-                        }
+                        case BusinessUseAnIPSPNo => {<p>@Messages("lbl.no")</p>}
                         case BusinessUseAnIPSPYes(name , reference) => {
-                            <tr>
-                                <td colspan="2">
-                                    @Messages("lbl.yes")
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    @Messages("msb.summary.ipsp-name") : @name
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    @Messages("msb.summary.ipsp-registration-number") : @reference
-                                </td>
-                            </tr>
+                        <ul class="list">
+                            <li>@Messages("msb.summary.ipsp-name"): @name</li>
+                            <li>@Messages("msb.summary.ipsp-registration-number"): @reference</li>
+                        </ul>
                         }
                     }
-                </table>
+                }
             }
 
             @model.fundsTransfer.map { ft =>
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("msb.fundstransfer.heading")</th>
-                        <td width="12"><a href="@controllers.msb.routes.FundsTransferController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @ft.transferWithoutFormalSystems match {
-                                case true => {@Messages("lbl.yes")}
-                                case _ => {@Messages("lbl.no")}
-                            }
-                        </td>
-                    </tr>
-                </table>
+                @checkYourAnswers(
+                    question = Messages("msb.fundstransfer.title"),
+                    editUrl = controllers.msb.routes.FundsTransferController.get(true).toString
+                ) {
+                    <p>@ft.transferWithoutFormalSystems match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }</p>
+                }
             }
 
             @model.transactionsInNext12Months.map{ trans =>
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("msb.transactions.expected.heading")</th>
-                        <td width="12"><a href="@controllers.msb.routes.TransactionsInNext12MonthsController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @trans.txnAmount
-                        </td>
-                    </tr>
-                </table>
+                @checkYourAnswers(
+                    question = Messages("msb.transactions.expected.title"),
+                    editUrl = controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString
+                ) {
+                    <p>@trans.txnAmount</p>
+                }
             }
 
             @model.sendMoneyToOtherCountry.map{ otherCountries =>
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("msb.send.money.heading")</th>
-                        <td width="12"><a href="@controllers.msb.routes.SendMoneyToOtherCountryController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @otherCountries.money match {
-                                case true => {@Messages("lbl.yes")}
-                                case _ => {@Messages("lbl.no")}
-                            }
-                        </td>
-                    </tr>
-                </table>
+                @checkYourAnswers(
+                    question = Messages("msb.send.money.title"),
+                    editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
+                ) {
+                    <p>@otherCountries.money match {
+                        case true => {@Messages("lbl.yes")}
+                        case _ => {@Messages("lbl.no")}
+                    }</p>
+                }
 
                 @if(otherCountries.money) {
                     @model.sendTheLargestAmountsOfMoney.map { lom =>
-                        <table class="table--spaced-top">
-                            <tr>
-                                <th>@Messages("msb.send.the.largest.amounts.of.money.heading")</th>
-                                <td width="12"><a href="@controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true)">@Messages("button.edit")</a></td>
-                            </tr>
-                            @lom.countryList.map { country =>
-                                <tr>
-                                    <td colspan="2">
-                                        @country.name
-                                    </td>
-                                </tr>
-                            }
-                        </table>
+                        @checkYourAnswers(
+                            question = Messages("msb.send.the.largest.amounts.of.money.title"),
+                            editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
+                        ) {
+                            <ul class="list list--comma">
+                                @lom.countryList.map { country =>
+                                <li>@country.name</li>
+                                }
+                            </ul>
+                        }
                     }
 
                     @model.mostTransactions.map { mt =>
-                        <table class="table--spaced-top">
-                            <tr>
-                                <th>@Messages("msb.most.transactions.heading")</th>
-                                <td width="12"><a href="@controllers.msb.routes.MostTransactionsController.get(true)">@Messages("button.edit")</a></td>
-                            </tr>
-                            @mt.countries.map { country =>
-                            <tr>
-                                <td colspan="2">
-                                    @country.name
-                                </td>
-                            </tr>
-                            }
-                        </table>
+                        @checkYourAnswers(
+                            question = Messages("msb.most.transactions.title"),
+                            editUrl = controllers.msb.routes.MostTransactionsController.get(true).toString
+                        ) {
+                            <ul class="list list--comma">
+                                @mt.countries.map { country =>
+                                <li>@country.name</li>
+                                }
+                            </ul>
+                        }
                     }
                 }
             }
@@ -207,60 +144,40 @@
 
         @if(services.services.contains(CurrencyExchange)) {
             @model.ceTransactionsInNext12Months.map{ trans =>
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("msb.ce.transactions.expected.in.12.months.heading")</th>
-                        <td width="12"><a href="@controllers.msb.routes.CETransactionsInNext12MonthsController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @trans.ceTransaction
-                        </td>
-                    </tr>
-                </table>
+                @checkYourAnswers(
+                    question = Messages("msb.ce.transactions.expected.in.12.months.title"),
+                    editUrl = controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString
+                ) {
+                    <p>@trans.ceTransaction</p>
+                }
             }
 
             @model.whichCurrencies.map { wc =>
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("msb.which_currencies.heading")</th>
-                        <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
-                    @wc.currencies.map { cur =>
-                        <tr>
-                            <td colspan="2">
-                                @cur
-                            </td>
-                        </tr>
+                @checkYourAnswers(
+                    question = Messages("msb.which_currencies.title"),
+                    editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
+                ) {
+                    <ul class="list list--comma">
+                        @wc.currencies.map { cur =>
+                        <li>@cur</li>
+                        }
+                    </ul>
+                    @checkYourAnswersExtra(
+                        question = Messages("msb.which_currencies.who")
+                    ) {
+                        <ul class="list">
+                        @wc.bankMoneySource.map { bms =>
+                            <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+                        }
+                        @wc.wholesalerMoneySource.map { wms =>
+                            <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
+                        }
+                        @if(wc.customerMoneySource) {
+                            <li>@Messages("msb.which_currencies.source.customers")</li>
+                        }
+                        </ul>
                     }
-                </table>
-                <table class="table--spaced-top">
-                    <tr>
-                        <th>@Messages("msb.which_currencies.who")</th>
-                        <td width="12"><a href="@controllers.msb.routes.WhichCurrenciesController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
-                    @wc.bankMoneySource.map {bms =>
-                        <tr>
-                            <td colspan="2">
-                                @Messages("msb.which_currencies.source.banks") : @bms.bankNames
-                            </td>
-                        </tr>
-                    }
-                    @wc.wholesalerMoneySource.map {wms =>
-                        <tr>
-                            <td colspan="2">
-                                @Messages("msb.which_currencies.source.wholesalers") : @wms.wholesalerNames
-                            </td>
-                        </tr>
-                    }
-                    @if(wc.customerMoneySource) {
-                        <tr>
-                            <td colspan="2">
-                                @Messages("msb.which_currencies.source.customers")
-                            </td>
-                        </tr>
-                    }
-                </table>
+                }
             }
         }
     }

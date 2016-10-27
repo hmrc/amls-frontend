@@ -6,18 +6,18 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.turnover.heading", "summary.businessactivities")
+    @heading("businessactivities.turnover.title", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.turnover.title"),
+    title = Messages("businessactivities.turnover.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
 
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
         <div class="form-field-group">
-            @Messages("businessactivities.turnover.subtitle") @businessTypes
+            <p>@businessTypes</p>
 
             @radioGroup(f("expectedAMLSTurnover")) {
                 @legend("businessactivities.turnover.title", jsHidden = true)

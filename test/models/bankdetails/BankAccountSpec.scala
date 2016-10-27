@@ -145,7 +145,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       )
 
       Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
-        (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.amx.length.bankdetails.account")))))
+        (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.max.length.bankdetails.account")))))
     }
 
     "Form Write validation for IBAN Non UK Account" in {

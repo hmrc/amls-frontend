@@ -72,7 +72,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           status(result) must be(OK)
 
           val htmlValue = Jsoup.parse(contentAsString(result))
-          htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title")
+          htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
           htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
 
           contentAsString(result) must include(Messages("submit.amendment.application"))
@@ -98,7 +98,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           status(result) must be(OK)
 
           val htmlValue = Jsoup.parse(contentAsString(result))
-          htmlValue.title mustBe Messages("declaration.who.is.registering.title")
+          htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
           htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
 
           contentAsString(result) must include(Messages("submit.registration"))
@@ -301,7 +301,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("declaration.who.is.registering.title")
+        htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
         htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
 
         contentAsString(result) must include(Messages("submit.registration"))

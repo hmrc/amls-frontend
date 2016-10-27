@@ -5,11 +5,11 @@
 @(index: Int, msbExists: Boolean)(implicit request: Request[_])
 
 @header = {
-    @heading("tradingpremises.whatyouneed.heading", "summary.tradingpremises")
+    @heading("title.wyn", "summary.tradingpremises")
 }
 
 @whatyouneed(
-    title = Messages("tradingpremises.whatyouneed.title"),
+    title = Messages("title.wyn") + " - " + Messages("summary.tradingpremises"),
     heading = header,
     sidebar = sidebar
 ) {

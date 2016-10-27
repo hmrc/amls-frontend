@@ -2,7 +2,7 @@
 
 @(name: String, status: Status, call: Call)(implicit request: Request[_], lang: Lang)
 
-<li role="menuitem">
+<li>
     @status match {
 
         case NotStarted => {

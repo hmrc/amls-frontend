@@ -7,11 +7,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("aboutthebusiness.contactingyou.heading", "summary.aboutbusiness")
+    @heading("aboutthebusiness.contactingyou.title", "summary.aboutbusiness")
 }
 
 @main(
-    title = Messages("aboutthebusiness.contactingyou.title"),
+    title = Messages("aboutthebusiness.contactingyou.title") + " - " + Messages("summary.aboutbusiness"),
     heading = header
 ) {
 

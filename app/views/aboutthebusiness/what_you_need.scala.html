@@ -2,11 +2,11 @@
 @()(implicit request: Request[_])
 
 @header = {
-    @heading("aboutthebusiness.whatyouneed.heading", "summary.aboutbusiness")
+    @heading("title.wyn", "summary.aboutbusiness")
 }
 
 @whatyouneed(
-    title = Messages("aboutthebusiness.whatyouneed.title"),
+    title = Messages("title.wyn") + " - " + Messages("summary.aboutbusiness"),
     heading = header,
     sidebar = sidebar
 ) {

@@ -21,7 +21,8 @@ object Account {
         case true =>
           (
             (__ \ "accountNumber").read(ukBankAccountNumberType) and
-              (__ \ "sortCode").read(sortCodeType)
+            (__ \ "sortCode").read(sortCodeType)
+
             ) (UKAccount.apply _)
         case false =>
           ((__ \ "IBANNumber").read(optionR(ibanType)) and

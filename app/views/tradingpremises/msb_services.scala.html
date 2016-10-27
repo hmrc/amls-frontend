@@ -6,18 +6,18 @@
 
 @header = {
     @errorSummary(f)
-    @heading("tradingpremises.msb.services.heading", "summary.tradingpremises")
+    @heading("tradingpremises.msb.services.title", "summary.tradingpremises")
 }
 
 @main(
-    title = Messages("tradingpremises.msb.services.title"),
+    title = Messages("tradingpremises.msb.services.title") + " - " + Messages("summary.tradingpremises"),
     heading = header
 ) {
 
     @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit)) {
 
       @radioGroup(f("msbServices")) {
-          @legend("msb.services.list.heading")
+          @legend("lbl.select.all")
           @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
           @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
           @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")

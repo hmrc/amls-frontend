@@ -5,24 +5,22 @@
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.person.registered.heading", "summary.responsiblepeople")
+    @heading("responsiblepeople.person.registered.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.person.registered.title"),
+    title = Messages("responsiblepeople.person.registered.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
     @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
-        <div class="panel-indent panel-border-wide">
+        <div class="panel-indent panel-indent--gutter panel-border-wide">
             @if(index <= 1){
                 <p>@Messages("responsiblepeople.have.registered.person.text", index) </p>
             } else {
                 <p>@Messages("responsiblepeople.have.registered.people.text", index) </p>
             }
         </div>
-        <br>
-        <br>
 
         @inlineRadioGroup(f("registerAnotherPerson")) {
             @legend("responsiblepeople.want.to.register.another.person")

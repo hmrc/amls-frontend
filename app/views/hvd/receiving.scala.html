@@ -9,11 +9,11 @@
 
 @header = {
   @errorSummary(f)
-  @heading("hvd.receiving.heading", "summary.hvd")
+  @heading("hvd.receiving.title", "summary.hvd")
 }
 
 @main(
-  title = Messages("hvd.receiving.title"),
+  title = Messages("hvd.receiving.title") + " - " + Messages("summary.hvd"),
   heading = header
 ) {
 
