@@ -41,7 +41,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       , 150.00, Some(100.0), 300.0, 550.0, Some("XA353523452345"), None,
       new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
-    val pageTitleSuffix = " - Your registration - Anti-money laundering registration - GOV.UK - Anti-money laundering supervision - GOV.UK"
+    val pageTitleSuffix = " - Your registration - Anti-money laundering supervision - GOV.UK"
 
 
     "load the status page" in new Fixture {

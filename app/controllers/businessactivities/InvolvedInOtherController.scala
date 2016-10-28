@@ -23,7 +23,7 @@ trait InvolvedInOtherController extends BaseController {
     implicit authContext => implicit request =>
       ControllerHelper.allowedToEdit flatMap {
         case true =>
-          dataCacheConnector.fetchAll flatMap {
+          dataCacheConnector.fetchAll map {
             optionalCache =>
               (for {
                 cache <- optionalCache
@@ -32,10 +32,10 @@ trait InvolvedInOtherController extends BaseController {
                 (for {
                   businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
                   involvedInOther <- businessActivities.involvedInOther
-                } yield Future.successful(Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther),
-                  edit, businessMatching, businessTypes(businessMatching)))))
-                  .getOrElse(Future.successful(Ok(involved_in_other_name(EmptyForm, edit, businessMatching, businessTypes(businessMatching)))))
-              }) getOrElse Future.successful(Ok(involved_in_other_name(EmptyForm, edit, None, None)))
+                } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther),
+                  edit, businessMatching, businessTypes(businessMatching))))
+                  .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching, businessTypes(businessMatching))))
+              }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None, None))
           }
         case false => Future.successful(NotFound(notFoundView))
       }
