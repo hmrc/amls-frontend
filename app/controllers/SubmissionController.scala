@@ -3,7 +3,7 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.AmlsConnector
 import models.SubmissionResponse
-import models.status.SubmissionReadyForReview
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import play.api.libs.json.Json
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -21,12 +21,12 @@ trait SubmissionController extends BaseController {
     implicit authContext => implicit request => {
       statusService.getStatus flatMap [SubmissionResponse]{
         case SubmissionReadyForReview => subscriptionService.update
+        case SubmissionDecisionApproved => subscriptionService.variation
         case _ => subscriptionService.subscribe
       }
     }.map {
       _ => Redirect(controllers.routes.ConfirmationController.get())
     }
-
   }
 }
 

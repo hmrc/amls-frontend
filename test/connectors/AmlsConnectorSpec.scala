@@ -154,4 +154,17 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       }
     }
   }
+
+  "variation" must {
+    "successfully submit variation" in {
+      when {
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/variation")
+          , eqTo(subscriptionRequest), any())(any(), any(), any())
+      }.thenReturn(Future.successful(amendmentResponse))
+
+      whenReady(AmlsConnector.variation(subscriptionRequest, amlsRegistrationNumber)) {
+        _ mustBe amendmentResponse
+      }
+    }
+  }
 }

@@ -2,7 +2,8 @@ package controllers
 
 import connectors.AmlsConnector
 import models.{AmendVariationResponse, SubscriptionResponse}
-import models.status.{SubmissionReady, SubmissionReadyForReview}
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsString
 import play.api.test.Helpers._
@@ -15,7 +16,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
+class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -75,6 +76,38 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+    }
+  }
+
+  it when {
+    "Submission is approved" must {
+      "call the variation method on the service" in new Fixture {
+        when {
+          controller.subscriptionService.variation(any(), any(), any())
+        } thenReturn Future.successful(mock[AmendVariationResponse])
+
+        when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.post()(request)
+
+        whenReady(result) { _ =>
+          verify(controller.subscriptionService).variation(any(), any(), any())
+        }
+      }
+
+
+      "Redirect to the correct confirmation page" in new Fixture{
+        when {
+          controller.subscriptionService.variation(any(), any(), any())
+        } thenReturn Future.successful(amendmentResponse)
+
+        when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe  Some(controllers.routes.ConfirmationController.get.url)
+      }
     }
   }
 }
