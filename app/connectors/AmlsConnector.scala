@@ -75,7 +75,7 @@ trait AmlsConnector {
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsConnector][view]"
-    Logger.debug(s"$prefix - Request : ${amlsRegistrationNumber}")
+    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
 
     httpGet.GET[ViewResponse](getUrl) map {
       response =>
@@ -92,11 +92,30 @@ trait AmlsConnector {
                                              resW: Writes[AmendVariationResponse],
                                              ac: AuthContext
   ): Future[AmendVariationResponse] = {
-
     val (accountType, accountId) = accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
+    Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
+    httpPost.POST[SubscriptionRequest, AmendVariationResponse](postUrl, updateRequest) map {
+      response =>
+        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        response
+    }
+  }
+
+  def variation(updateRequest: SubscriptionRequest,amlsRegistrationNumber: String)(implicit
+                                                                                headerCarrier: HeaderCarrier,
+                                                                                ec: ExecutionContext,
+                                                                                reqW: Writes[SubscriptionRequest],
+                                                                                resW: Writes[AmendVariationResponse],
+                                                                                ac: AuthContext
+  ): Future[AmendVariationResponse] = {
+
+    val (accountType, accountId) = accountTypeAndId
+
+    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
+    val prefix = "[AmlsConnector][variation]"
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
     httpPost.POST[SubscriptionRequest, AmendVariationResponse](postUrl, updateRequest) map {
       response =>

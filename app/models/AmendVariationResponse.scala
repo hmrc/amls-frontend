@@ -10,7 +10,12 @@ case class AmendVariationResponse (
                                     premiseFee: BigDecimal,
                                     totalFees: BigDecimal,
                                     paymentReference: Option[String],
-                                    difference: Option[BigDecimal]
+                                    difference: Option[BigDecimal],
+                                    addedResponsiblePeople: Int = 0,
+                                    addedResponsiblePeopleFitAndProper: Int = 0,
+                                    addedFullYearTradingPremises: Int = 0,
+                                    halfYearlyTradingPremises: Int = 0,
+                                    zeroRatedTradingPremises: Int = 0
                                   ) extends SubmissionResponse
 
 object AmendVariationResponse {
