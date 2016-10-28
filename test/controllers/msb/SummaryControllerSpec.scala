@@ -2,7 +2,6 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.Country
-import models.moneyservicebusiness._
 import models.businessmatching.{MoneyServiceBusiness=> BMMoneyServiceBusiness, _}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -141,13 +140,22 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("edit") must be(false)
         document.getElementsByTag("section").get(8).getElementsByTag("a").hasClass("edit") must be(false)
         document.getElementsByTag("section").get(9).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(10).getElementsByTag("a").hasClass("edit") must be(false)
       }
     }
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetch[MoneyServiceBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal))))))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeModel))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
