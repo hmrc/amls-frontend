@@ -24,9 +24,6 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFu
       override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
       override protected def authConnector: AuthConnector = self.authConnector
       override private[controllers] val statusService: StatusService = mock[StatusService]
-
-      println(s"AFFFFFGFGFGFFFGFFG >>>>>>>>>  ${subscriptionService}")
-
     }
   }
 
@@ -85,7 +82,6 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFu
   it when {
     "Submission is approved" must {
       "call the variation method on the service" in new Fixture {
-        println(s"&&&&&&&&&&&&&&&&&&&&& >>>>>>>>>  ${controller.subscriptionService}")
         when {
           controller.subscriptionService.variation(any(), any(), any())
         } thenReturn Future.successful(mock[AmendVariationResponse])
@@ -97,7 +93,6 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFu
         whenReady(result) { _ =>
           verify(controller.subscriptionService).variation(any(), any(), any())
         }
-        println(s"####################### >>>>>>>>>  ${controller.subscriptionService}")
       }
 
 
