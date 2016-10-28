@@ -55,6 +55,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your application")
+      contentAsString(result) must include("XA111123451111")
     }
 
     "notify user of amendment if application has already been submitted but not approved with difference" in new Fixture {
