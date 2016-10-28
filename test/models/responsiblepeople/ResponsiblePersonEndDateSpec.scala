@@ -1,4 +1,4 @@
-package models.tradingpremises
+package models.responsiblepeople
 
 import models.responsiblepeople.ResponsiblePersonEndDate
 import org.joda.time.LocalDate

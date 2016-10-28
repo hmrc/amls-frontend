@@ -212,6 +212,28 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
         }
 
+        "removing a responsible person from an application given a year which is too short" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "24",
+            "endDate.month" -> "2",
+            "endDate.year" -> "16"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+
+        }
+
         "removing a trading premises from an application with future date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
