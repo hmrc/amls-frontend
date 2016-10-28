@@ -62,7 +62,6 @@ trait LandingService {
                    ec: ExecutionContext
   ): Future[CacheMap] = {
     desConnector.view(amlsRefNumber) flatMap { viewResponse =>
-
       cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
         _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
           _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {
