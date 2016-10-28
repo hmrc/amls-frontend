@@ -183,6 +183,26 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       )))
     }
 
+    "fail to validate a date when fewer than 4 digits are provided for year" in {
+      localDateRule.validate(Map(
+        "day" -> Seq("24"),
+        "month" -> Seq("13"),
+        "year" -> Seq("16")
+      )) must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+      )))
+    }
+
+    "fail to validate a date when more than 4 digits are provided for year" in {
+      localDateRule.validate(Map(
+        "day" -> Seq("24"),
+        "month" -> Seq("13"),
+        "year" -> Seq("20166")
+      )) must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+      )))
+    }
+
     "fail to validate missing fields" in {
       localDateRule.validate(Map.empty) must
         be(Failure(Seq(
