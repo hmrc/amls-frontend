@@ -24,7 +24,7 @@ object Incomplete extends CompletionState {
 case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionState]) {
 
   def statusTitle(status: SubmissionStatus) = {
-    val combo = (status, statuses.get(status).get)
+    val combo = (status, statuses(status))
 
     combo match {
       case (NotCompleted, Incomplete) | (NotCompleted, Current) => Messages("status.incomplete")

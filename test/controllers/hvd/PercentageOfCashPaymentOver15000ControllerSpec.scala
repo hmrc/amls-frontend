@@ -1,6 +1,7 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -10,6 +11,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -23,6 +25,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends PlaySpec with OneAp
     val controller = new PercentageOfCashPaymentOver15000Controller {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -31,6 +34,9 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends PlaySpec with OneAp
   "PercentageOfCashPaymentOver15000Controller" must {
 
     "on get display the Percentage Of CashPayment Over 15000 page" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
@@ -42,6 +48,9 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends PlaySpec with OneAp
 
     "on get display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(controller.dataCacheConnector.fetch[Hvd](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
 
@@ -52,6 +61,16 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends PlaySpec with OneAp
       document.select("input[value=01]").hasAttr("checked") must be(true)
     }
 
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
+    }
 
     "on post with invalid data" in new Fixture {
 

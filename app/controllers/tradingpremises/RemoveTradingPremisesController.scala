@@ -48,7 +48,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
         } yield Redirect(routes.SummaryController.get(complete))
-        case SubmissionDecisionApproved => Form2[ActivityEndDate](request.body) match {
+        case _ => Form2[ActivityEndDate](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(remove_trading_premises(f, index, complete, tradingName, true)))
           case ValidForm(_, data) => {
