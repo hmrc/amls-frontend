@@ -18,6 +18,8 @@ trait SubmissionController extends BaseController {
 
   def post() = Authorised.async {
     implicit authContext => implicit request => {
+      println(s"*******************  >>>>>>>>>  ${subscriptionService}")
+
       statusService.getStatus flatMap {
         case SubmissionReadyForReview => subscriptionService.update
         case SubmissionDecisionApproved => subscriptionService.variation

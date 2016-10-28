@@ -3,6 +3,7 @@ package controllers
 import connectors.AmlsConnector
 import models.{AmendVariationResponse, SubscriptionResponse}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsString
 import play.api.test.Helpers._
@@ -15,7 +16,7 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
+class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -23,6 +24,9 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
       override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
       override protected def authConnector: AuthConnector = self.authConnector
       override private[controllers] val statusService: StatusService = mock[StatusService]
+
+      println(s"AFFFFFGFGFGFFFGFFG >>>>>>>>>  ${subscriptionService}")
+
     }
   }
 
@@ -81,6 +85,7 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
   it when {
     "Submission is approved" must {
       "call the variation method on the service" in new Fixture {
+        println(s"&&&&&&&&&&&&&&&&&&&&& >>>>>>>>>  ${controller.subscriptionService}")
         when {
           controller.subscriptionService.variation(any(), any(), any())
         } thenReturn Future.successful(mock[AmendVariationResponse])
@@ -89,7 +94,10 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite {
 
         val result = controller.post()(request)
 
-        verify(controller.subscriptionService).variation(any(), any(), any())
+        whenReady(result) { _ =>
+          verify(controller.subscriptionService).variation(any(), any(), any())
+        }
+        println(s"####################### >>>>>>>>>  ${controller.subscriptionService}")
       }
 
 
