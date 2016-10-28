@@ -1,7 +1,7 @@
 package controllers
 
 import config.AMLSAuthConnector
-import models.status.SubmissionReadyForReview
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import services.{StatusService, SubmissionService}
 
 import scala.concurrent.Future
@@ -17,13 +17,27 @@ trait ConfirmationController extends BaseController {
       statusService.getStatus flatMap {
         case SubmissionReadyForReview => {
           subscriptionService.getAmendment flatMap {
-            case Some((regNo, total, rows, difference)) =>
-              difference match {
-                case Some(currency) if currency.value > 0 => Future.successful(Ok(views.html.confirmation.confirm_amendment(regNo, total, rows, difference)))
-                case _ => Future.successful(Ok(views.html.confirmation.confirmation_amendment_no_fee(regNo)))
+            case Some((mlrRegNo, total, rows, difference)) => difference match {
+                case Some(currency) if currency.value > 0 => Future.successful(Ok(views.html.confirmation.confirm_amendment(mlrRegNo, total, rows, difference)))
+                case _ => {
+                  val content = ("confirmation.amendment.title", "confirmation.amendment.lede")
+                  Future.successful(Ok(views.html.confirmation.confirmation_no_fee(mlrRegNo, content)))
+                }
               }
-            case None =>
-              Future.failed(new Exception("Could not get AMLSRegNo"))
+            case None => Future.failed(new Exception("Cannot get data from amendment submission"))
+          }
+        }
+        case SubmissionDecisionApproved => {
+          subscriptionService.getVariation flatMap {
+            case Some((mlrRegNo, total, rows)) => {
+              if(total.value > 0)
+                Future.successful(Ok(views.html.confirmation.confirmation_variation(mlrRegNo, total, rows)))
+              else {
+                val content = ("confirmation.variation.title", "confirmation.variation.lede")
+                Future.successful(Ok(views.html.confirmation.confirmation_no_fee(mlrRegNo, content)))
+              }
+            }
+            case None => Future.failed(new Exception("Cannot get data from variation submission"))
           }
         }
         case _ => {
