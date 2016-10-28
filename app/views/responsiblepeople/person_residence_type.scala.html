@@ -38,6 +38,7 @@
                     @fieldset("lbl.passport.number", jsHidden = true, id = s"""${f("nonUKPassportNumber").id}-fieldset""") {
                         @input(f("nonUKPassportNumber"), "lbl.passport.number", bold = false)
                     }
+                    @radio(f("passportType"), "responsiblepeople.no.passport.lbl", "03")
                 }
                 @date(
                     f = f,
