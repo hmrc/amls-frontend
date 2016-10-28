@@ -30,7 +30,7 @@ trait AmlsConnector {
    ac: AuthContext
   ): Future[SubscriptionResponse] = {
 
-    val (accountType, accountId) = accountTypeAndId
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$safeId"
     val prefix = "[AmlsConnector][subscribe]"
@@ -50,11 +50,11 @@ trait AmlsConnector {
                                              ac: AuthContext
   ): Future[ReadStatusResponse] = {
 
-    val (accountType, accountId) = accountTypeAndId
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
     val prefix = "[AmlsConnector][status]"
-    Logger.debug(s"$prefix - Request : ${amlsRegistrationNumber}")
+    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
 
     httpGet.GET[ReadStatusResponse](getUrl) map {
       response =>
@@ -71,7 +71,7 @@ trait AmlsConnector {
            ac: AuthContext
           ): Future[ViewResponse] = {
 
-    val (accountType, accountId) = accountTypeAndId
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsConnector][view]"
@@ -92,7 +92,8 @@ trait AmlsConnector {
                                              resW: Writes[AmendVariationResponse],
                                              ac: AuthContext
   ): Future[AmendVariationResponse] = {
-    val (accountType, accountId) = accountTypeAndId
+
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
@@ -112,7 +113,7 @@ trait AmlsConnector {
                                                                                 ac: AuthContext
   ): Future[AmendVariationResponse] = {
 
-    val (accountType, accountId) = accountTypeAndId
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
     val prefix = "[AmlsConnector][variation]"
@@ -124,17 +125,6 @@ trait AmlsConnector {
     }
 
   }
-
-  protected[connectors] def accountTypeAndId(implicit ac: AuthContext): (String, String) = {
-    val accounts = ac.principal.accounts
-    accounts.ct orElse accounts.sa orElse accounts.org match {
-      case Some(OrgAccount(_, Org(ref))) => ("org", ref)
-      case Some(SaAccount(_, SaUtr(ref))) => ("sa", ref)
-      case Some(CtAccount(_, CtUtr(ref))) => ("ct", ref)
-      case _ => throw new IllegalArgumentException("authcontext does not contain any of the expected account types")
-    }
-  }
-
 }
 
 object AmlsConnector extends AmlsConnector {
