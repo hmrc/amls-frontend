@@ -2,6 +2,7 @@ package controllers
 
 import config.AMLSAuthConnector
 import connectors.AmlsConnector
+import models.SubmissionResponse
 import models.status.SubmissionReadyForReview
 import play.api.libs.json.Json
 import services.{StatusService, SubmissionService}
@@ -18,7 +19,7 @@ trait SubmissionController extends BaseController {
 
   def post() = Authorised.async {
     implicit authContext => implicit request => {
-      statusService.getStatus flatMap {
+      statusService.getStatus flatMap [SubmissionResponse]{
         case SubmissionReadyForReview => subscriptionService.update
         case _ => subscriptionService.subscribe
       }
