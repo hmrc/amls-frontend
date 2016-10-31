@@ -1,8 +1,9 @@
 @import include._
 @import forms2._
 @import models.businessactivities._
+@import models.businessmatching.{BusinessActivities => BMBusinessActivities}
 
-@(model: BusinessActivities, isEditable:Boolean)(implicit request: Request[_], lang: Lang)
+@(model: BusinessActivities, bmBusinessActivities:Option[BMBusinessActivities], isEditable:Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.businessactivities")
@@ -45,6 +46,15 @@
             question = Messages("businessactivities.turnover.title"),
             editUrl = if(isEditable){controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString} else ""
         ) {
+            <ul class="list list--comma">
+                @bmBusinessActivities.map { ba =>
+                    @ba.businessActivities.map {activity =>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                    }
+                }
+
+            </ul>
+
             <p>@turnover match {
                 case ExpectedAMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
                 case ExpectedAMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }

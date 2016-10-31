@@ -21,7 +21,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures{
+class ExpectedAMLSTurnoverControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
