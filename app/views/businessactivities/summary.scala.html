@@ -46,7 +46,7 @@
             question = Messages("businessactivities.turnover.title"),
             editUrl = if(isEditable){controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString} else ""
         ) {
-            <ul class="list list--comma">
+            <ul class="list list-bullet">
                 @bmBusinessActivities.map { ba =>
                     @ba.businessActivities.map {activity =>
                         <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
