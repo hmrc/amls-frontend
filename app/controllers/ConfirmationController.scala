@@ -17,10 +17,12 @@ trait ConfirmationController extends BaseController {
       statusService.getStatus flatMap {
         case SubmissionReadyForReview => {
           subscriptionService.getAmendment flatMap {
-            case Some((regNo, total, rows, difference)) =>
+            case Some((payRef, total, rows, difference)) =>
               difference match {
-                case Some(currency) if currency.value > 0 => Future.successful(Ok(views.html.confirmation.confirm_amendment(regNo, total, rows, difference)))
-                case _ => Future.successful(Ok(views.html.confirmation.confirmation_amendment_no_fee(regNo)))
+                case Some(currency) if currency.value > 0 => {
+                  Future.successful(Ok(views.html.confirmation.confirm_amendment(payRef.getOrElse(""), total, rows, difference)))
+                }
+                case _ => Future.successful(Ok(views.html.confirmation.confirmation_amendment_no_fee(payRef.getOrElse(""))))
               }
             case None =>
               Future.failed(new Exception("Could not get AMLSRegNo"))
@@ -28,8 +30,8 @@ trait ConfirmationController extends BaseController {
         }
         case _ => {
           subscriptionService.getSubscription flatMap {
-            case (mlrRegNo, total, rows) =>
-              Future.successful(Ok(views.html.confirmation.confirmation(mlrRegNo, total, rows)))
+            case (paymentRef, total, rows) =>
+              Future.successful(Ok(views.html.confirmation.confirmation(paymentRef, total, rows)))
           }
         }
       }

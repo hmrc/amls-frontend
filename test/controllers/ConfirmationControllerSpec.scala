@@ -28,6 +28,8 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       override val statusService: StatusService = mock[StatusService]
     }
 
+    val paymentRefNo = "XA111123451111"
+
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
       amlsRefNo = "",
@@ -35,13 +37,13 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       fpFee = None,
       premiseFee = 0,
       totalFees = 0,
-      paymentReference = ""
+      paymentReference = paymentRefNo
     )
 
     protected val mockCacheMap = mock[CacheMap]
 
     when(controller.subscriptionService.getSubscription(any(),any(),any()))
-      .thenReturn(Future.successful(("",Currency.fromInt(0),Seq())))
+      .thenReturn(Future.successful((paymentRefNo,Currency.fromInt(0),Seq())))
 
   }
 
@@ -55,7 +57,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("You’ve submitted your application")
-      contentAsString(result) must include("XA111123451111")
+      contentAsString(result) must include(paymentRefNo)
     }
 
     "notify user of amendment if application has already been submitted but not approved with difference" in new Fixture {
@@ -64,7 +66,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when(controller.subscriptionService.getAmendment(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(100)))))
+        .thenReturn(Future.successful(Some(Some(paymentRefNo),Currency.fromInt(0),Seq(), Some(Currency.fromInt(100)))))
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -72,6 +74,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       contentAsString(result) must include(Messages("confirmation.amendment.fee"))
       contentAsString(result) must include(Messages("confirmation.amendment.thankyou.p"))
       contentAsString(result) must include(Messages("confirmation.amendment.previousfees.p"))
+      contentAsString(result) must include(paymentRefNo)
     }
 
     "notify user of no fee if there is no difference(/Some(0))" in new Fixture {
@@ -80,7 +83,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when(controller.subscriptionService.getAmendment(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), Some(Currency.fromInt(0)))))
+        .thenReturn(Future.successful(Some(Some(paymentRefNo),Currency.fromInt(0),Seq(), Some(Currency.fromInt(0)))))
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -95,7 +98,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when(controller.subscriptionService.getAmendment(any(),any(),any()))
-        .thenReturn(Future.successful(Some("",Currency.fromInt(0),Seq(), None)))
+        .thenReturn(Future.successful(Some(Some(paymentRefNo),Currency.fromInt(0),Seq(), None)))
 
       val result = controller.get()(request)
       status(result) mustBe OK

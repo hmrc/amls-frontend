@@ -155,7 +155,7 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
+  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -165,18 +165,14 @@ trait SubmissionService extends DataCacheService {
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
         } yield {
           val subQuantity = subscriptionQuantity(amendment)
-          authEnrolmentsService.amlsRegistrationNumber flatMap {
-            case Some(mlrRegNo) => {
-              val total = amendment.totalFees
-              val difference = amendment.difference map Currency.fromBD
-              val rows = Seq(
-                BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-              ) ++ responsiblePeopleRows(people, amendment) ++
-                Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
-              Future.successful(Some((mlrRegNo, Currency.fromBD(total), rows, difference)))
-            }
-            case None => Future.successful(None)
-          }
+          val total = amendment.totalFees
+          val difference = amendment.difference map Currency.fromBD
+          val paymentRef = amendment.paymentReference
+          val rows = Seq(
+            BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
+          ) ++ responsiblePeopleRows(people, amendment) ++
+            Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, amendment.premiseFee))
+          Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
@@ -212,13 +208,13 @@ trait SubmissionService extends DataCacheService {
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
         } yield {
           val subQuantity = subscriptionQuantity(subscription)
-          val mlrRegNo = subscription.amlsRefNo
+          val paymentRef = subscription.paymentReference
           val total = subscription.totalFees
           val rows = Seq(
             BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
           ) ++ responsiblePeopleRows(people, subscription) ++
             Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, subscription.premiseFee))
-          Future.successful((mlrRegNo, Currency.fromBD(total), rows))
+          Future.successful((paymentRef, Currency.fromBD(total), rows))
           // TODO
         }) getOrElse Future.failed(new Exception("TODO"))
     }
