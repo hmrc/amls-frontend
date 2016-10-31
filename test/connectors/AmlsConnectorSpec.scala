@@ -155,58 +155,16 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     }
   }
 
+  "variation" must {
+    "successfully submit variation" in {
+      when {
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/variation")
+          , eqTo(subscriptionRequest), any())(any(), any(), any())
+      }.thenReturn(Future.successful(amendmentResponse))
 
-  "return sa account type and reference" in {
-    implicit val saAcct = AuthContext(
-      LoggedInUser(
-        "UserName",
-        None,
-        None,
-        None,
-        CredentialStrength.Weak,
-        ConfidenceLevel.L50),
-      Principal(
-        None,
-        Accounts(sa = Some(SaAccount("Link", SaUtr("saRef"))))),
-      None,
-      None,
-      None)
-    AmlsConnector.accountTypeAndId(saAcct) must be("sa","saRef")
-  }
-
-  "return ct account type and reference" in {
-    implicit val ctAcct = AuthContext(
-      LoggedInUser(
-        "UserName",
-        None,
-        None,
-        None,
-        CredentialStrength.Weak,
-        ConfidenceLevel.L50),
-      Principal(
-        None,
-        Accounts(ct = Some(CtAccount("Link", CtUtr("ctRef"))))),
-      None,
-      None,
-      None)
-    AmlsConnector.accountTypeAndId(ctAcct) must be("ct","ctRef")
-  }
-
-  "fail in not finding correct accountType" in {
-    implicit val ctAcct = AuthContext(
-      LoggedInUser(
-        "UserName",
-        None,
-        None,
-        None,
-        CredentialStrength.Weak,
-        ConfidenceLevel.L50),
-      Principal(
-        None,
-        Accounts(ct = None)),
-      None,
-      None,
-      None)
-    an[IllegalArgumentException] should be thrownBy AmlsConnector.accountTypeAndId(ctAcct)
+      whenReady(AmlsConnector.variation(subscriptionRequest, amlsRegistrationNumber)) {
+        _ mustBe amendmentResponse
+      }
+    }
   }
 }

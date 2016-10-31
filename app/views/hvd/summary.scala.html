@@ -4,7 +4,7 @@
 @import models.hvd.PercentageOfCashPaymentOver15000._
 @import utils.DateHelper
 
-@(model: Hvd)(implicit request: Request[_], lang: Lang)
+@(model: Hvd, isEditable:Boolean)(implicit request: Request[_], lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.hvd")
@@ -110,7 +110,7 @@
     @model.receiveCashPayments.map { rcp =>
         @checkYourAnswers(
             question = Messages("hvd.receiving.title"),
-            editUrl = controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString
+            editUrl = if(isEditable){controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString} else ""
         ) {
             @rcp.paymentMethods match {
                 case None => {<p>@Messages("lbl.no")</p>}
@@ -140,7 +140,7 @@
     @model.percentageOfCashPaymentOver15000.map { p =>
         @checkYourAnswers(
             question = Messages("hvd.percentage.title"),
-            editUrl = controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
+            editUrl = if(isEditable){controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString} else ""
         ) {
             <p>@p match {
                 case First => {@Messages("hvd.percentage.lbl.01")}

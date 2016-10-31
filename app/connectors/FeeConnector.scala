@@ -26,7 +26,7 @@ trait FeeConnector {
                                              ac: AuthContext
   ): Future[FeeResponse] = {
 
-    val (accountType, accountId) = accountTypeAndId
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[FeeConnector]"
@@ -37,17 +37,6 @@ trait FeeConnector {
         response
     }
   }
-
-  protected[connectors] def accountTypeAndId(implicit ac: AuthContext): (String, String) = {
-    val accounts = ac.principal.accounts
-    accounts.ct orElse accounts.sa orElse accounts.org match {
-      case Some(OrgAccount(_, Org(ref))) => ("org", ref)
-      case Some(SaAccount(_, SaUtr(ref))) => ("sa", ref)
-      case Some(CtAccount(_, CtUtr(ref))) => ("ct", ref)
-      case _ => throw new IllegalArgumentException("authcontext does not contain any of the expected account types")
-    }
-  }
-
 }
 
 object FeeConnector extends FeeConnector {
