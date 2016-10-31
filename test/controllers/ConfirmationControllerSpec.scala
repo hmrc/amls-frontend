@@ -115,7 +115,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         when(controller.subscriptionService.getVariation(any(), any(), any()))
-          .thenReturn(Future.successful(Some("", Currency.fromInt(0), Seq())))
+          .thenReturn(Future.successful(Some(Some(""), Currency.fromInt(0), Seq())))
 
         val result = controller.get()(request)
         status(result) mustBe OK

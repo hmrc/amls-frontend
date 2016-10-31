@@ -187,7 +187,8 @@ trait SubmissionService extends DataCacheService {
       val total = amendment.totalFees
       val difference = amendment.difference map Currency.fromBD
       val rows = getBreakdownRows(amendment, premises, people, subQuantity)
-      Future.successful(Some((Some(""), Currency.fromBD(total), rows, difference)))
+      val paymentRef = amendment.paymentReference
+      Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
     }
   }
 
@@ -196,7 +197,7 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(String, Currency, Seq[BreakdownRow])]] = {
+  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -208,7 +209,8 @@ trait SubmissionService extends DataCacheService {
           val fitAndProperDeduction: BigDecimal = getFitAndProperDeduction(variation)
           val totalFees: BigDecimal = peopleFee + fitAndProperDeduction + premisesFee
           val rows = getVariationBreakdown(variation, peopleFee)
-          Future.successful(Some(("", Currency(totalFees), rows)))
+          val paymentRef = variation.paymentReference
+          Future.successful(Some((paymentRef, Currency(totalFees), rows)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }

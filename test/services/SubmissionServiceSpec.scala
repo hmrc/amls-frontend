@@ -236,7 +236,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         fpFee = Some(0),
         premiseFee = 0,
         totalFees = 100,
-        paymentReference = Some(""),
+        paymentReference = Some("12345"),
         difference = Some(0),
         addedResponsiblePeople = 1,
         addedFullYearTradingPremises = 1,
@@ -276,7 +276,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         BreakdownRow("confirmation.tradingpremises", 1, Currency(115), Currency(tpFee))
       )
 
-      val response = Some("12345", Currency.fromBD(totalFee), rows)
+      val response = Some(Some("12345"), Currency.fromBD(totalFee), rows)
 
       whenReady(TestSubmissionService.getVariation) {
         result =>
@@ -284,39 +284,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
 
     }
-
-    "return None if data cannot be returned containing AMLS Reg No" in new Fixture {
-
-      when {
-        TestSubmissionService.cacheConnector.fetchAll(any(), any())
-      } thenReturn Future.successful(Some(cache))
-
-      when {
-        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-      } thenReturn Future.successful(None)
-
-      when {
-        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-      } thenReturn Some(Seq(TradingPremises()))
-
-      when {
-        cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-      } thenReturn Some(Seq(ResponsiblePeople()))
-
-      when {
-        TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
-      } thenReturn Future.successful(CacheMap("", Map.empty))
-
-      when {
-        TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
-      } thenReturn Future.successful(amendmentResponse)
-
-      whenReady(TestSubmissionService.getAmendment) {
-        result =>
-          result must equal(None)
-      }
-    }
-
+    
     "return failed future when no enrolment" in new Fixture {
 
       when {
