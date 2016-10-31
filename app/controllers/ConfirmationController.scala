@@ -18,7 +18,8 @@ trait ConfirmationController extends BaseController {
         case SubmissionReadyForReview => {
           subscriptionService.getAmendment flatMap {
             case Some((payRef, total, rows, difference)) => difference match {
-                case Some(currency) if currency.value > 0 => Future.successful(Ok(views.html.confirmation.confirm_amendment(payRef.getOrElse(""), total, rows, difference)))
+                case Some(currency) if currency.value > 0 =>
+                  Future.successful(Ok(views.html.confirmation.confirm_amendment(payRef.getOrElse(""), total, rows, difference)))
                 case _ => {
                   val content = ("confirmation.amendment.title", "confirmation.amendment.lede")
                   Future.successful(Ok(views.html.confirmation.confirmation_no_fee(payRef.getOrElse(""), content)))

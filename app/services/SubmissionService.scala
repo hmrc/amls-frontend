@@ -99,10 +99,10 @@ trait SubmissionService extends DataCacheService {
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
         } yield {
           val subQuantity = subscriptionQuantity(subscription)
-          val mlrRegNo = subscription.amlsRefNo
+          val paymentReference = subscription.paymentReference
           val total = subscription.totalFees
           val rows = getBreakdownRows(subscription, premises, people, subQuantity)
-          Future.successful((mlrRegNo, Currency.fromBD(total), rows))
+          Future.successful((paymentReference, Currency.fromBD(total), rows))
           // TODO
         }) getOrElse Future.failed(new Exception("TODO"))
     }
