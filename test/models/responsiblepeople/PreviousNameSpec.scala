@@ -147,9 +147,9 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
           Failure(Seq(
-            (Path \ "date") -> Seq(ValidationError("error.required.tp.date"),
+            (Path \ "date") -> Seq(ValidationError("error.required.tp.year"),
               ValidationError("error.required.tp.month"),
-              ValidationError("error.required.tp.year"))
+              ValidationError("error.required.tp.date"))
           ))
         )
     }
@@ -169,9 +169,9 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
         equal(
           Failure(Seq(
             (Path) -> Seq(ValidationError("error.rp.previous.invalid")),
-            (Path \ "date") -> Seq(ValidationError("error.invalid.tp.year")),
-            (Path \ "date") -> Seq(ValidationError("error.invalid.tp.month")),
-            (Path \ "date") -> Seq(ValidationError("error.invalid.tp.date"))
+            (Path \ "date") -> Seq(ValidationError("error.required.tp.year")),
+            (Path \ "date") -> Seq(ValidationError("error.required.tp.month")),
+            (Path \ "date") -> Seq(ValidationError("error.required.tp.date"))
           ))
         )
     }
