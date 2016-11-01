@@ -9,7 +9,7 @@ import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class ActivityEndDateSpec extends PlaySpec {
 
-  "ActivityStartDate" must {
+  "ActivityEndDate" must {
     "Form" must {
       "read successfully" in {
         val model =  Map (
@@ -22,14 +22,14 @@ class ActivityEndDateSpec extends PlaySpec {
 
       }
 
-      "throw error message when data entered is invalid" in {
+      "throw error message when day entered is invalid" in {
         val model =  Map (
           "endDate.day" -> Seq("2466"),
           "endDate.month" -> Seq("2"),
           "endDate.year" -> Seq("1990")
         )
         ActivityEndDate.formRule.validate(model) must be(Failure(Seq(Path \ "endDate" -> Seq(
-          ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          ValidationError("error.invalid.tp.date")))))
 
       }
 
@@ -39,8 +39,11 @@ class ActivityEndDateSpec extends PlaySpec {
           "endDate.month" -> Seq(""),
           "endDate.year" -> Seq("")
         )
-        ActivityEndDate.formRule.validate(model) must be(Failure(Seq(Path \ "endDate" -> Seq(
-          ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+        ActivityEndDate.formRule.validate(model) must be(Failure(Seq(
+          Path \ "endDate" -> Seq(ValidationError("error.required.tp.year")),
+          Path \ "endDate" -> Seq(ValidationError("error.required.tp.month")),
+          Path \ "endDate" -> Seq(ValidationError("error.required.tp.date"))
+          )))
 
       }
 

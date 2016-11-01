@@ -310,7 +310,9 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+          contentAsString(result) must include(Messages("error.required.tp.date"))
+          contentAsString(result) must include(Messages("error.required.tp.month"))
+          contentAsString(result) must include(Messages("error.required.tp.year"))
 
         }
 

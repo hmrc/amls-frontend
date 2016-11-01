@@ -369,7 +369,9 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.body().html() must include(Messages("error.expected.jodadate.format"))
+      document.body().html() must include(Messages("error.required.tp.date"))
+      document.body().html() must include(Messages("error.required.tp.month"))
+      document.body().html() must include(Messages("error.required.tp.year"))
     }
 
     "fail submission on invalid string" in new Fixture {

@@ -162,7 +162,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
     }
 
-    "on post with invalid data show error" in new Fixture {
+    "on post with missing day show error" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "acceptedAnyPayment" -> "true",
         "paymentDate.day" -> "",
@@ -174,7 +174,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+      contentAsString(result) must include(Messages("error.required.tp.date"))
 
     }
   }

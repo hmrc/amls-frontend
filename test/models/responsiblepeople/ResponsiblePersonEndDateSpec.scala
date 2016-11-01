@@ -44,7 +44,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.date")))))
       }
 
       "month entered is invalid" in {
@@ -55,7 +55,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.month")))))
       }
 
       "year entered is too long" in {
@@ -66,7 +66,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.year")))))
       }
 
       "year entered is too short" in {
@@ -77,7 +77,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.year")))))
       }
 
       "all fields are empty" in {
@@ -88,7 +88,9 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(noContentModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.required.tp.year")),
+          Path \ "endDate" -> Seq(ValidationError("error.required.tp.month")),
+          Path \ "endDate" -> Seq(ValidationError("error.required.tp.date")))))
       }
     }
   }
