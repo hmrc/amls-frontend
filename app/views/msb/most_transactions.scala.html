@@ -16,7 +16,7 @@
     @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
         <p>@Messages("lbl.list.upto.3.countries")</p>
         @radioGroup(
-            f("countries")
+            f("mostTransactionsCountries")
         ) {
             @legend("msb.most.transactions.list.countries", jsHidden = true)
             @country(f("mostTransactionsCountries[0]"))
