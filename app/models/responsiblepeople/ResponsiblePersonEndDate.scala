@@ -14,7 +14,7 @@ object ResponsiblePersonEndDate {
 
   implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonEndDate] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "endDate").read(localDateFutureRule) fmap ResponsiblePersonEndDate.apply
+    (__ \ "endDate").read(localDateRule) fmap ResponsiblePersonEndDate.apply
   }
 
   implicit val formWrites: Write[ResponsiblePersonEndDate, UrlFormEncoded] =

@@ -156,6 +156,38 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "yearType" must {
+    "successfully validate" in {
+
+      yearType.validate("1934") must
+        be(Success("1934"))
+    }
+
+    "fail to validate an empty string" in {
+
+      yearType.validate("") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.required.tp.year"))
+        )))
+    }
+
+    "fail to validate a string longer than 4 digits" in {
+
+      yearType.validate("19999") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.invalid.tp.year"))
+        )))
+    }
+
+    "fail to validate a string shorter than 4 digits" in {
+
+      yearType.validate("1") must
+        be(Failure(Seq(
+          Path -> Seq(ValidationError("error.invalid.tp.year"))
+        )))
+    }
+  }
+
   "localDateRule" must {
 
     import org.joda.time.LocalDate
@@ -173,33 +205,43 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Success(model))
     }
 
-    "fail to validate an invalid date" in {
+    "fail to validate an invalid month" in {
       localDateRule.validate(Map(
         "day" -> Seq("24"),
         "month" -> Seq("13"),
         "year" -> Seq("1990")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        Path -> Seq(ValidationError("error.invalid.tp.month"))
+      )))
+    }
+
+    "fail to validate an invalid day" in {
+      localDateRule.validate(Map(
+        "day" -> Seq("45"),
+        "month" -> Seq("11"),
+        "year" -> Seq("1990")
+      )) must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.invalid.tp.date"))
       )))
     }
 
     "fail to validate a date when fewer than 4 digits are provided for year" in {
       localDateRule.validate(Map(
         "day" -> Seq("24"),
-        "month" -> Seq("13"),
+        "month" -> Seq("11"),
         "year" -> Seq("16")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        Path -> Seq(ValidationError("error.invalid.tp.year"))
       )))
     }
 
     "fail to validate a date when more than 4 digits are provided for year" in {
       localDateRule.validate(Map(
         "day" -> Seq("24"),
-        "month" -> Seq("13"),
+        "month" -> Seq("11"),
         "year" -> Seq("20166")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        Path -> Seq(ValidationError("error.invalid.tp.year"))
       )))
     }
 
@@ -233,33 +275,43 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       )))
     }
 
-    "fail to validate an invalid date" in {
+    "fail to validate an invalid month" in {
       localDateFutureRule.validate(Map(
         "day" -> Seq("24"),
         "month" -> Seq("13"),
         "year" -> Seq("1990")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        Path -> Seq(ValidationError("error.invalid.tp.month"))
+      )))
+    }
+
+    "fail to validate an invalid day" in {
+      localDateFutureRule.validate(Map(
+        "day" -> Seq("45"),
+        "month" -> Seq("11"),
+        "year" -> Seq("1990")
+      )) must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.invalid.tp.date"))
       )))
     }
 
     "fail to validate a date when fewer than 4 digits are provided for year" in {
       localDateFutureRule.validate(Map(
         "day" -> Seq("24"),
-        "month" -> Seq("13"),
+        "month" -> Seq("11"),
         "year" -> Seq("16")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        Path -> Seq(ValidationError("error.invalid.tp.year"))
       )))
     }
 
     "fail to validate a date when more than 4 digits are provided for year" in {
       localDateFutureRule.validate(Map(
         "day" -> Seq("24"),
-        "month" -> Seq("13"),
-        "year" -> Seq("20166")
+        "month" -> Seq("11"),
+        "year" -> Seq("10166")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        Path -> Seq(ValidationError("error.invalid.tp.year"))
       )))
     }
 

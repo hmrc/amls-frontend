@@ -61,7 +61,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
       "year entered is too long" in {
         val errorDayModel = Map(
           "endDate.day" -> Seq("24"),
-          "endDate.month" -> Seq("29"),
+          "endDate.month" -> Seq("11"),
           "endDate.year" -> Seq("199000")
         )
 
@@ -72,7 +72,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
       "year entered is too short" in {
         val errorDayModel = Map(
           "endDate.day" -> Seq("24"),
-          "endDate.month" -> Seq("29"),
+          "endDate.month" -> Seq("11"),
           "endDate.year" -> Seq("16")
         )
 
