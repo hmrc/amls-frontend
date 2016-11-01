@@ -17,7 +17,7 @@
 
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
-            @radioGroup(f("transactions")) {
+            @radioGroup(f("serviceProviders")) {
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")

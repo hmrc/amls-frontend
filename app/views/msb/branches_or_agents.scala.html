@@ -1,6 +1,6 @@
 @import forms.{Form2, ValidField, InvalidField}
 @import include._
-@import include.forms2._
+@import forms2._
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
@@ -18,7 +18,7 @@
 
     @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
 
-        @inlineRadioGroup(f("hasCountries")) {
+        @inlineRadioGroup(f("countries")) {
           @radio(f("hasCountries"), "lbl.yes", "true", target = s"#hasCountries-fieldset")
           @radio(f("hasCountries"), "lbl.no", "false")
           @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset", data = Seq("data-toggle-new")) {
