@@ -2,8 +2,16 @@
 
 @(name: String, status: Status, hasChanged: Boolean, call: Call)(implicit request: Request[_], lang: Lang)
 
+@progressClass(status:Status) = {
+@status match{
+case Completed => {progress-step}
+case _ => {progress-step progress-step__started}
+}
+}
+
+
 <li>
-    <a href="@call.url" class="progress-step" aria-label="@Messages(s"progress.$name.name"). @Messages(s"progress.$name.description"). @Messages("progress.visuallyhidden.view.amend")">
+    <a href="@call.url" class="@{progressClass(status)}" aria-label="@Messages(s"progress.$name.name"). @Messages(s"progress.$name.description"). @Messages("progress.visuallyhidden.view.amend")">
         <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
             <h2 class="heading-small">@Messages(s"progress.$name.name")</h2>
             <p>@Messages(s"progress.$name.description")</p>

@@ -25,7 +25,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
         count <- getData[BankDetails].map(x => x.count(!_.status.contains(StatusConstants.Deleted)))
         allowedToEdit <- ControllerHelper.allowedToEdit(edit)
       } yield bankDetail match {
-        case Some(BankDetails(Some(data), _, _,_)) if allowedToEdit =>
+        case Some(BankDetails(Some(data), _, _,_,_)) if allowedToEdit =>
           Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
         case Some(_) if allowedToEdit =>
           Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index, count))
