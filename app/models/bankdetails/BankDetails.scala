@@ -43,7 +43,6 @@ object BankDetails {
     val messageKey = "bankdetails"
     cache.getEntry[Seq[BankDetails]](key).fold(Section(messageKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true)))
       {bds =>
-        println("############"+bds)
       bds.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == BankDetails()) match {
         case Nil => Section(messageKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get(true))
         case model if model.isEmpty => Section(messageKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))

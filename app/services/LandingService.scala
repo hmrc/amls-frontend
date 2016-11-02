@@ -92,10 +92,8 @@ trait LandingService {
 
   def writeEmptyBankDetails (bankDetailsSeq: Seq[BankDetails]) :Seq[BankDetails] = {
     val empty = Seq.empty[BankDetails]
-    println(s"#########$bankDetailsSeq")
     bankDetailsSeq match {
       case `empty` => {
-        println("#######hit")
         Seq(BankDetails(None,None,false,true,None))
       }
       case _ => bankDetailsSeq
