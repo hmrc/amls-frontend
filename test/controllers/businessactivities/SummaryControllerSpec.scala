@@ -156,7 +156,9 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementsByClass("list--comma").size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
+      val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
+      listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
+
     }
   }
 }
