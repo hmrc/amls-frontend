@@ -75,7 +75,7 @@ class ActivityStartDateControllerSpec extends PlaySpec with OneAppPerSuite with 
         redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
       }
 
-      "on post with invalid data show error" in new Fixture {
+      "show error with invalid" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "startDate.day" -> "",
           "startDate.month" -> "",
@@ -90,6 +90,34 @@ class ActivityStartDateControllerSpec extends PlaySpec with OneAppPerSuite with 
         contentAsString(result) must include(Messages("error.required.tp.month"))
         contentAsString(result) must include(Messages("error.required.tp.year"))
 
+      }
+
+      "show error with year field too short" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "startDate.day" -> "1",
+          "startDate.month" -> "3",
+          "startDate.year" -> "16"
+        )
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      }
+
+      "show error with year field too long" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "startDate.day" -> "1",
+          "startDate.month" -> "3",
+          "startDate.year" -> "19782"
+        )
+        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(Messages("error.invalid.tp.year"))
       }
     }
   }

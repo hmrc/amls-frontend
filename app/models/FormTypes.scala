@@ -135,7 +135,6 @@ object FormTypes {
   val yearType: Rule[String, String] = yearRequired compose yearPattern
 
   val localDateRule: Rule[UrlFormEncoded, LocalDate] =
-
     From[UrlFormEncoded] { __ =>
       (
         (__ \ "year").read(yearType) ~
