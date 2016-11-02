@@ -55,7 +55,7 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
   }
 
   private def resetAgentValues(tp:TradingPremises, data:BusinessStructure):TradingPremises = data match {
-    case UnincorporatedBody => tp.copy(agentName=None,agentCompanyName=None,agentPartnership=None)
+    case UnincorporatedBody => tp.copy(agentName=None,agentCompanyName=None,agentPartnership=None, hasChanged=true)
     case _ => tp.businessStructure(data)
   }
 

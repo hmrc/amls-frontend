@@ -4,22 +4,23 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @header = {
-@heading("businessactivities.tax.matters.heading", "summary.businessactivities")
+    @errorSummary(f)
+    @heading("businessactivities.tax.matters.title", "summary.businessactivities")
 }
 
 @main(
-title = Messages("businessactivities.tax.matters.title"),
-heading = header
+    title = Messages("businessactivities.tax.matters.title") + " - " + Messages("summary.businessactivities"),
+    heading = header
 ) {
 
 @form(f, controllers.businessactivities.routes.TaxMattersController.post(edit)) {
 
-<div class="form-field-group">
-    @inlineRadioGroup(f("manageYourTaxAffairs")) {
-    @radio(f("manageYourTaxAffairs"), "lbl.yes", "true")
-    @radio(f("manageYourTaxAffairs"), "lbl.no", "false")
+    <div class="form-field-group">
+        @inlineRadioGroup(f("manageYourTaxAffairs")) {
+            @radio(f("manageYourTaxAffairs"), "lbl.yes", "true")
+            @radio(f("manageYourTaxAffairs"), "lbl.no", "false")
+        }
+        @submit(edit)
+    </div>
     }
-    @submit(edit)
-</div>
-}
 }

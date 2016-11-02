@@ -5,13 +5,13 @@
 @(f: forms.Form2[_], edit: Boolean, index:Int)(implicit lang: Lang, request: Request[_])
 
 @target = @{
-s"""${f("accountNumber").id}-fieldset"""
-s"""${f("sortCode").id}-fieldset"""
+    s"""${f("accountNumber").id}-fieldset"""
+    s"""${f("sortCode").id}-fieldset"""
 }
 
 @target1 = @{
-s"""${f("nonUKAccountNumber").id}-fieldset"""
-s"""${f("IBANNumber").id}-fieldset"""
+    s"""${f("nonUKAccountNumber").id}-fieldset"""
+    s"""${f("IBANNumber").id}-fieldset"""
 }
 
 @header = {
@@ -20,7 +20,7 @@ s"""${f("IBANNumber").id}-fieldset"""
 }
 
 @main(
-    title = Messages("bankdetails.accountdetails.title"),
+    title = Messages("bankdetails.accountdetails.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
 
@@ -28,9 +28,9 @@ s"""${f("IBANNumber").id}-fieldset"""
 
     <div class="form-field-group">
         @input(
-        field = f("accountName"),
-        labelText = "bankdetails.bankaccount.accountname",
-        bold = false
+          field = f("accountName"),
+          labelText = "bankdetails.bankaccount.accountname",
+          bold = false
         )
     </div>
 
@@ -39,12 +39,12 @@ s"""${f("IBANNumber").id}-fieldset"""
         @legend("bankdetails.bankaccount.accounttype", jsHidden = false, bold = false)
         @radio(f("isUK"), "lbl.yes", "true", target = s"#$target")
         @radio(f("isUK"), "lbl.no", "false", target = s"#$target1")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "For example, 204266", bold = false)
-                @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", hintText = "For example, 12345678", bold = false)
+            @fieldset("bankdetails.bankaccount.accounttype.yes", jsHidden = true, id = target) {
+                @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "bankdetails.bankaccount.sortcode.hint", bold = false)
+                @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", hintText = "bankdetails.bankaccount.accountnumber.hint", bold = false)
 
             }
-            @fieldset("TODO", jsHidden = true, id = target1) {
+            @fieldset("bankdetails.bankaccount.accounttype.no", jsHidden = true, id = target1) {
                 @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
                 <p>or</p>
                 @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)

@@ -14,20 +14,22 @@ s"""${f("mlrRefNumber").id}-fieldset"""
 }
 
 @main(
-    title = Messages("tcsp.servicesOfAnotherTcsp.title"),
+    title = Messages("tcsp.servicesOfAnotherTcsp.title") + " - " + Messages("summary.tcsp"),
     heading = header
 ) {
 
     @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
         @inlineRadioGroup(f("servicesOfAnotherTCSP")) {
-               <span class="form-hint">
-                    @Messages("tcsp.servicesOfAnotherTcsp.other.hint")
-                </span>
+            @hint("tcsp.servicesOfAnotherTcsp.other.hint")
             @radio(f("servicesOfAnotherTCSP"), "lbl.yes", "true", target = s"#$target")
             @radio(f("servicesOfAnotherTCSP"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
-                @input(f("mlrRefNumber"), "tcsp.servicesOfAnotherTcsp.mlrregno.lbl", bold = false)
+            @fieldset("tcsp.servicesOfAnotherTcsp.mlrregno.lbl", jsHidden = true, id = target) {
+                @input(f("mlrRefNumber"),
+                    labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
+                    hintText = "hint.8.digits",
+                    bold = false
+                )
             }
         }
 

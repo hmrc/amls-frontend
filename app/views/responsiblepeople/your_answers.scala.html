@@ -1,36 +1,38 @@
 @import include._
+@import include.forms2._
 @import models.responsiblepeople.ResponsiblePeople
+@import utils.StatusConstants
 
 @(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
 
 @header = {
-    @heading("responsiblepeople.your_answers.heading", "summary.responsiblepeople")
+    @heading("title.ya", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.your_answers.title"),
+    title = Messages("title.ya") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    <div class="panel-indent panel-border-wide spacelarge">
+    <div class="panel-indent panel-border-wide">
         <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a>
     </div>
 
-    <table>
+    <ul class="list">
         @responsiblePeople.zipWithIndex.map { case (rp, index) =>
+            @if(!rp.status.contains(StatusConstants.Deleted)) {
+                @rp.personName.map { pn =>
+                    @checkYourAnswersListing(
+                        item = pn.fullName,
+                        editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).toString,
+                        removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, false).toString
+                    ) {
 
-            @rp.personName.map { pn =>
-            <tr>
-                <th class="summary-title" colspan="2">
-                @pn.fullName
-                </th>
-                <td><a href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1)">@Messages("button.edit")</a></td>
-            </tr>
+                    }
+                }
             }
         }
-    </table>
+    </ul>
 
-    <div class="form-field">
-        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
-    </div>
+    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

@@ -5,7 +5,7 @@
 @(content: (String,String), name: String)(implicit request: Request[_])
 
 @header = {
-    @heading("declaration.declaration.header", content._2)
+    @heading("declaration.declaration.title", content._2)
 }
 
 @main(
@@ -20,26 +20,22 @@
         <strong class="bold-small">@Messages("declaration.declaration.fullname") @name</strong>
     </div>
 
-    <p>
-        <p>@Messages("declaration.declaration.declare")</p>
-    </p>
+    <p>@Messages("declaration.declaration.declare")</p>
 
-        <ul class="list list-bullet">
+    <ul class="list list-bullet">
+        @if(Messages(content._2).equals(Messages("submit.amendment.application"))) {
+            <li>@Messages("declaration.declaration.amendment.correctinformation")</li>
+        } else {
             <li>@Messages("declaration.declaration.correctinformation")</li>
-            <li>@Messages("declaration.declaration.tellhmrc")</li>
-            <li>@Messages("declaration.declaration.noncompliance")</li>
-            <li>@Messages("declaration.declaration.confirm")
-                <a href="">@Messages("declaration.declaration.guidance")</a>
-            </li>
-        </ul>
+        }
+        <li>@Messages("declaration.declaration.tellhmrc")</li>
+        <li>@Messages("declaration.declaration.noncompliance")</li>
+        <li>@Messages("declaration.declaration.confirm") <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("declaration.declaration.guidance")</a></li>
+    </ul>
 
     @form(EmptyForm, controllers.routes.SubmissionController.post()) {
         <div class="form-group">
-            <input
-                type="submit"
-                name="submit"
-                class="button"
-                value="@Messages("button.confirmandsubmit")">
+            <input type="submit" name="submit" class="button" value="@Messages("button.confirmandsubmit")" />
         </div>
     }
 

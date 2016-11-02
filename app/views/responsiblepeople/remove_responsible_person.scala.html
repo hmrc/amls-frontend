@@ -1,0 +1,34 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+
+@(f: forms.Form2[_],index: Int, personName:String, complete:Boolean, showDateField:Boolean)(implicit request: Request[_], lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.remove.responsible.person.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    @form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete, personName)) {
+        <div class="panel-indent panel-border-wide">
+            <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
+        </div>
+
+        @if(showDateField) {
+            @date(
+                f = f,
+                p = "endDate",
+                labelText = "responsiblepeople.remove.responsible.person.enddate.lbl",
+                hintText = "",
+                true
+            )
+        }
+
+        @submit(false, Some(Messages("responsiblepeople.remove.responsible.person.btn")))
+    }
+}

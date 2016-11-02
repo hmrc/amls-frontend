@@ -6,11 +6,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("tcsp.provided_services.heading", "summary.tcsp")
+    @heading("tcsp.provided_services.title", "summary.tcsp")
 }
 
 @main(
-    title = Messages("tcsp.provided_services.title"),
+    title = Messages("tcsp.provided_services.title") + " - " + Messages("summary.tcsp"),
     heading = header
 ) {
 
@@ -18,6 +18,7 @@
 
     @form(f, controllers.tcsp.routes.ProvidedServicesController.post(edit)) {
         @radioGroup(f("services")) {
+            @legend("tcsp.provided_services.title", jsHidden = true)
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.01", "01")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.02", "02")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.03", "03")
@@ -26,7 +27,7 @@
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.06", "06")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.07", "07")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.08", "08", target = s"#${f("details").id}-fieldset")
-            @fieldset("TODO", jsHidden = true, id = s"""${f("details").id}-fieldset""") {
+            @fieldset("tcsp.provided_services.service.lbl.08", jsHidden = true, id = s"""${f("details").id}-fieldset""") {
                 @input(f("details"), "tcsp.provided_services.service.lbl.details", bold = false)
             }
         }

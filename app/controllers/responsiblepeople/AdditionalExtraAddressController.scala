@@ -24,9 +24,9 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _,_,_))
+            case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _,_,_, _))
               => Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_))
+            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _,_,_, _))
               => Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index))
             case _
               => NotFound(notFoundView)

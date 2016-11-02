@@ -13,17 +13,17 @@ s"""${f("utrNumber").id}-fieldset"""
 }
 
 @main(
-    title = Messages("responsiblepeople.registeredforselfassessment.title"),
+    title = Messages("responsiblepeople.registeredforselfassessment.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 )  {
 
     @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit)) {
 
         @inlineRadioGroup(f("saRegistered")) {
-            @legend("TODO", jsHidden = true)
+            @legend("responsiblepeople.registeredforselfassessment.heading", jsHidden = true)
             @radio(f("saRegistered"), "lbl.yes", "true", target = s"#$target")
             @radio(f("saRegistered"), "lbl.no", "false")
-            @fieldset("TODO", jsHidden = true, id = target) {
+            @fieldset("aboutthebusiness.registeredforcorporationtax.taxReferenceHint", jsHidden = true, id = target) {
                 @input(f("utrNumber"), "responsiblepeople.registeredforselfassessment.lbl.utrnumber", bold = false, hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint")
             }
         }

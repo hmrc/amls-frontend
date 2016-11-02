@@ -61,7 +61,6 @@ class ResponsiblePeopleAddControllerSpec extends WordSpecLike
         forAll(reasonableCounts, minSuccessful(requiredSuccess)) { currentCount: Int =>
           forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, expectedRedirect: Call) =>
             val testSeq  = buildTestSequence(currentCount)
-            println(s"currentCount = $currentCount")
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
               (any(), any(), any())).thenReturn(Future.successful(Some(testSeq)))

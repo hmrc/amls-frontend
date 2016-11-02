@@ -193,6 +193,28 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "localDateRuleFuture" must {
+    import org.joda.time.LocalDate
+    val data = Map(
+      "day" -> Seq("24"),
+      "month" -> Seq("2"),
+      "year" -> Seq("1990")
+    )
+
+    val model = new LocalDate(1990, 2, 24)
+
+    "fail to validate a future date" in {
+      localDateFutureRule.validate(Map(
+        "day" -> Seq("1"),
+        "month" -> Seq("1"),
+        "year" -> Seq("2020")
+      )) must be(Failure(Seq(
+        Path -> Seq(ValidationError("error.future.date"))
+      )))
+    }
+
+  }
+
   "localDateWrite" must {
 
     import org.joda.time.LocalDate
@@ -261,7 +283,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail validation when more than 8 characters are supplied" in {
       ukBankAccountNumberType.validate("1234567890") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxUKBankAccountNumberLength)))))
+        Failure(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
     }
   }
 
@@ -282,7 +304,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail validation if Non UK Account is longer than the permissible length" in {
       nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.amx.length.bankdetails.account")))))
+        Failure(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.account")))))
     }
 
   }

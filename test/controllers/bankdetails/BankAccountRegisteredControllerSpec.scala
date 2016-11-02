@@ -38,8 +38,12 @@ class BankAccountRegisteredControllerSpec extends PlaySpec with OneAppPerSuite w
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
+        val pageTitle = Messages("bankdetails.bank.account.registered.title") + " - " +
+          Messages("summary.bankdetails") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("bankdetails.bank.account.registered.title")
+        htmlValue.title mustBe pageTitle
       }
 
       "load the Bank account Registered page1" in new Fixture {

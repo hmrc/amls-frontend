@@ -57,7 +57,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             Future.successful {
               activities.contains(MoneyServiceBusiness) match {
                 case true => Redirect(routes.MSBServicesController.get(index))
-                case false => Redirect(routes.SummaryController.get())
+                case false => Redirect(routes.PremisesRegisteredController.get(index))
               }
             }
           } else {
@@ -99,7 +99,8 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                     tp.agentCompanyName,
                     tp.agentPartnership,
                     Some(data),
-                    None
+                    None,
+                    true
                   )
               } map {
                 _ => data.activities.contains(MoneyServiceBusiness) match {

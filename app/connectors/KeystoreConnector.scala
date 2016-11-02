@@ -36,5 +36,6 @@ trait KeystoreConnector {
 }
 
 object KeystoreConnector extends KeystoreConnector {
+  // $COVERAGE-OFF$
   override private[connectors] def dataCache: SessionCache = BusinessCustomerSessionCache
 }

@@ -77,7 +77,7 @@ GET         /trading-premises/premises-registered/:index                controll
 POST        /trading-premises/premises-registered/:index                controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
 
 GET         /trading-premises/remove/:index                             controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
-POST        /trading-premises/remove/:index                             controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String, showDateField: Boolean ?= false)
+POST        /trading-premises/remove/:index                             controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
 
 GET         /estate-agents/what-you-need                                controllers.estateagentbusiness.WhatYouNeedController.get()
 GET         /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
@@ -190,7 +190,7 @@ POST        /declaration/add-person                                     controll
 GET         /amend-application/add-person                               controllers.declaration.AddPersonController.getWithAmendment()
 
 GET         /declaration/declaration                                    controllers.declaration.DeclarationController.get()
-GET         /amend-application/declaration                              controllers.declaration.DeclarationController.getWithAmendment()
+GET         /update-information/declaration                             controllers.declaration.DeclarationController.getWithAmendment()
 
 GET         /confirmation                                               controllers.ConfirmationController.get()
 
@@ -223,6 +223,9 @@ POST        /responsible-people/additional-address/:index               controll
 GET         /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/position/:index                         controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/nominatedofficer/:index                 controllers.responsiblepeople.AreTheyNominatedOfficerController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/nominatedofficer/:index                 controllers.responsiblepeople.AreTheyNominatedOfficerController.post(index:Int, edit: Boolean ?= false)
+
 GET         /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/additional-extra-address/:index         controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false)
 
@@ -246,6 +249,9 @@ POST        /responsible-people/contacting-you/:index                   controll
 
 GET         /responsible-people/responsible-person-registered/:index    controllers.responsiblepeople.PersonRegisteredController.get(index:Int)
 POST        /responsible-people/responsible-person-registered/:index    controllers.responsiblepeople.PersonRegisteredController.post(index:Int)
+
+GET         /responsible-people/remove/:index                           controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean)
+POST        /responsible-people/remove/:index                           controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, personName: String)
 
 GET         /responsible-people/your-answers                            controllers.responsiblepeople.YourAnswersController.get()
 
@@ -292,7 +298,7 @@ GET         /money-service-business/anticipated-totals                  controll
 POST        /money-service-business/anticipated-totals                  controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/currency                            controllers.msb.WhichCurrenciesController.get(edit: Boolean ?= false)
-POST         /money-service-business/currency                            controllers.msb.WhichCurrenciesController.post(edit: Boolean ?= false)
+POST        /money-service-business/currency                            controllers.msb.WhichCurrenciesController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
 POST        /money-service-business/payment-service-provider            controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)

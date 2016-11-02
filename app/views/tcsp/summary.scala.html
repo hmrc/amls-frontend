@@ -1,101 +1,90 @@
 @import include._
+@import include.forms2._
 @import models.tcsp._
 
 @(model: Tcsp)(implicit request: Request[_], lang: Lang)
 
 @header = {
-    @heading("summary.checkyouranswers.title", "summary.tcsp")
+    @heading("title.cya", "summary.tcsp")
 }
 
 @main(
-    title = Messages("summary.checkyouranswers.title"),
+    title = Messages("title.cya") + " - " + Messages("summary.tcsp"),
     heading = header
 ) {
 
-    <table>
-        <tr>
-            <th>@Messages("tcsp.kind.of.service.provider.title")</th>
-            <td width="12"><a href="@controllers.tcsp.routes.TcspTypesController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        @model.tcspTypes.map {v =>
-            @v.serviceProviders.map { x=>
-            <tr>
-                <td colspan="2">
-                    @x match {
-                        case NomineeShareholdersProvider => {@Messages("tcsp.service.provider.lbl.01")}
-                        case TrusteeProvider => {@Messages("tcsp.service.provider.lbl.02")}
-                        case RegisteredOfficeEtc => {@Messages("tcsp.service.provider.lbl.03")}
-                        case CompanyDirectorEtc => {@Messages("tcsp.service.provider.lbl.04")}
-                        case CompanyFormationAgent(shelf, corp) => {@Messages("tcsp.service.provider.lbl.05")
-                            <tr>
-                                <td colspan="2">
-                                    @shelf match {
-                                    case true => {@Messages("tcsp.off-the-shelf.companies.lbl") @Messages("lbl.yes")}
-                                    case false => {@Messages("tcsp.off-the-shelf.companies.lbl") @Messages("lbl.no")}
-                                    }
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    @corp match {
-                                    case true => {@Messages("tcsp.create.complex.corporate.structures.lbl") @Messages("lbl.yes")}
-                                    case false => {@Messages("tcsp.create.complex.corporate.structures.lbl") @Messages("lbl.no")}
-                                    }
-                                </td>
-                            </tr>
+    @checkYourAnswers(
+        question = Messages("tcsp.kind.of.service.provider.title"),
+        editUrl = controllers.tcsp.routes.TcspTypesController.get(true).toString
+    ) {
+        @model.tcspTypes.map { v =>
+        <ul class="list list--semicolon">
+            @v.serviceProviders.map { x =>
+                <li>@x match {
+                    case NomineeShareholdersProvider => {@Messages("tcsp.service.provider.lbl.01")}
+                    case TrusteeProvider => {@Messages("tcsp.service.provider.lbl.02")}
+                    case RegisteredOfficeEtc => {@Messages("tcsp.service.provider.lbl.03")}
+                    case CompanyDirectorEtc => {@Messages("tcsp.service.provider.lbl.04")}
+                    case CompanyFormationAgent(_, _) => {@Messages("tcsp.service.provider.lbl.05")}
+                }</li>
+            }
+        </ul>
+        }
+        @model.tcspTypes.map { v =>
+            @v.serviceProviders.map { x =>
+                @x match {
+                    case CompanyFormationAgent(shelf, corp) => {
+                        @checkYourAnswersExtra(
+                            question = Messages("tcsp.off-the-shelf.companies.lbl")
+                        ) {
+                            @shelf match {
+                                case true => {<p>@Messages("lbl.yes")</p>}
+                                case false => {<p>@Messages("lbl.no")</p>}
                             }
                         }
-                </td>
-            </tr>
-            }
-        }
-    </table>
+                        @checkYourAnswersExtra(
+                            question = Messages("tcsp.create.complex.corporate.structures.lbl")
+                        ) {
+                            @corp match {
+                                case true => {<p>@Messages("lbl.yes")</p>}
+                                case false => {<p>@Messages("lbl.no")</p>}
+                            }
+                        }
+                    }
+                    case _ => {
 
-    @model.tcspTypes.map {v =>
-        @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
-        <table class="table--spaced-top">
-            <tr>
-                <th>@Messages("tcsp.provided_services.title")</th>
-                <td width="12"><a href="@controllers.tcsp.routes.ProvidedServicesController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            @model.providedServices.map {a=>
-
-                @a.services.map { x=>
-                    <tr>
-                        <td colspan="2">
-                             @x.getMessage
-                        </td>
-                    </tr>
+                    }
                 }
             }
-        </table>
         }
     }
 
-    <table class="table--spaced-top">
-        <tr>
-            <th>@Messages("tcsp.servicesOfAnotherTcsp.title")</th>
-            <td width="12"><a href="@controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true)">@Messages("button.edit")</a></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                @model.servicesOfAnotherTCSP.map {
-                    case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
-                    case ServicesOfAnotherTCSPYes(v) => { @Messages("lbl.yes") }
-                }
-            </td>
-        </tr>
-        @model.servicesOfAnotherTCSP.map {
-            case ServicesOfAnotherTCSPNo => {}
-            case ServicesOfAnotherTCSPYes(v) => {
-            <tr>
-                <td colspan="2">
-                @v
-                </td>
-            </tr>
+    @model.tcspTypes.map { v =>
+        @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
+            @checkYourAnswers(
+                question = Messages("tcsp.provided_services.title"),
+                editUrl = controllers.tcsp.routes.ProvidedServicesController.get(true).toString
+            ) {
+                <ul class="list list--comma">
+                    @model.providedServices.map { a =>
+                        @a.services.map { x =>
+                            <li>@x.getMessage</li>
+                        }
+                    }
+                </ul>
             }
         }
-    </table>
+    }
+
+    @checkYourAnswers(
+        question = Messages("tcsp.servicesOfAnotherTcsp.title"),
+        editUrl = controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true).toString
+    ) {
+        <p>@model.servicesOfAnotherTCSP.map {
+            case ServicesOfAnotherTCSPNo => { @Messages("lbl.no") }
+            case ServicesOfAnotherTCSPYes(v) => { @Messages("tcsp.cya.mlrregno"): @v }
+        }</p>
+    }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
 }

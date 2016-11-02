@@ -1,0 +1,19 @@
+@import include.main
+@import models.confirmation._
+@import config.ApplicationConfig
+
+@(title: String, heading: String)(implicit request: Request[_])
+
+@main(
+title = Messages(title)
+) {
+
+<div class="confirmation">
+    <h1 class="heading-large">@Messages(heading)</h1>
+</div>
+
+<p>@Messages("confirmation.no.fee")</p>
+
+<p>@Messages("confirmation.amendment.previousfees.p")</p>
+
+}

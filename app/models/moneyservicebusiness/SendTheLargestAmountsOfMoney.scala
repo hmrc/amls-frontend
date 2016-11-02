@@ -15,10 +15,11 @@ case class SendTheLargestAmountsOfMoney (
 
   def countryList = {
     this.productIterator.collect {
-      case Some(x: Country) => x
+      case Some(Country(name, code)) => Country(name, code)
       case x: Country => x
     }
   }
+
 }
 
 object SendTheLargestAmountsOfMoney {

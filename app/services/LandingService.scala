@@ -19,7 +19,7 @@ import models.tradingpremises.TradingPremises
 import play.api.libs.json.{Format, Writes}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,6 +49,12 @@ trait LandingService {
   ): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
 
+  def remove
+  (implicit
+   hc: HeaderCarrier
+  ): Future[HttpResponse] = {
+    cacheConnector.remove(BusinessMatching.key)}
+
   def refreshCache(amlsRefNumber: String)
                   (implicit
                    authContext: AuthContext,
@@ -56,7 +62,6 @@ trait LandingService {
                    ec: ExecutionContext
   ): Future[CacheMap] = {
     desConnector.view(amlsRefNumber) flatMap { viewResponse =>
-
       cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
         _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
           _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {

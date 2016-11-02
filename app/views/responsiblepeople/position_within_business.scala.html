@@ -10,7 +10,7 @@
 }
 
 @main(
-    title = Messages("responsiblepeople.position_within_business.title"),
+    title = Messages("responsiblepeople.position_within_business.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -38,6 +38,14 @@
                 }
             }
         }
+
+        @date(
+        f = f,
+        p = "startDate",
+        labelText = "responsiblepeople.position_within_business.startDate.lbl",
+        hintText = "responsiblepeople.position_within_business.startDate.hint",
+        false
+        )
 
         @submit()
     }

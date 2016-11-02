@@ -5,22 +5,28 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.{SendTheLargestAmountsOfMoney, MoneyServiceBusiness}
+import services.StatusService
+import utils.ControllerHelper
 import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
 trait SendTheLargestAmountsOfMoneyController extends BaseController {
   val dataCacheConnector: DataCacheConnector
+  implicit val statusService: StatusService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-        response =>
-          val form: Form2[SendTheLargestAmountsOfMoney] = (for {
-            msb <- response
-            amount <- msb.sendTheLargestAmountsOfMoney
-          } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
-          Ok(send_largest_amounts_of_money(form, edit))
+      ControllerHelper.allowedToEdit flatMap {
+        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+          response =>
+            val form: Form2[SendTheLargestAmountsOfMoney] = (for {
+              msb <- response
+              amount <- msb.sendTheLargestAmountsOfMoney
+            } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
+            Ok(send_largest_amounts_of_money(form, edit))
+        }
+        case false => Future.successful(NotFound(notFoundView))
       }
   }
 
@@ -50,4 +56,5 @@ object SendTheLargestAmountsOfMoneyController extends SendTheLargestAmountsOfMon
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override val statusService: StatusService = StatusService
 }

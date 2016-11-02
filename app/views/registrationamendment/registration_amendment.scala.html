@@ -6,12 +6,12 @@
 @(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_])
 
 @main2(
-    title = Messages("amendment.title")
+    title = Messages("amendment.title") + " - " + Messages("title.yapp")
 ) {
     @* Heading *@
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @heading("amendment.heading", "amendment.section-heading")
+            @heading("amendment.title", "amendment.section-heading")
             <p>@Messages("amendment.text.1")</p>
             <p>@Messages("amendment.text.2")</p>
         </div>

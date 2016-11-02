@@ -59,7 +59,7 @@ class NationalityControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         val result = controller.get(3)(request)
         status(result) must be(NOT_FOUND)
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.title must be("Not Found")
+        document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
 
       }
     }
@@ -152,6 +152,8 @@ class NationalityControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople1)))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
       val result = controller.post(1, true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
@@ -174,7 +176,7 @@ class NationalityControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       val result = controller.post(10, true)(newRequest)
       status(result) must be(NOT_FOUND)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.title must be("Not Found")
+      document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
     }
   }
 }

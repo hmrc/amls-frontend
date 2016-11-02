@@ -1,10 +1,10 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.businessmatching._
-import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
+import models.TradingPremisesSection
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -52,7 +52,10 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("tradingpremises.agent.premises.title")
+
+        val title = s"${Messages("tradingpremises.agent.premises.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+
+        htmlValue.title mustBe title
       }
 
       "load Yes when save4later returns true" in new Fixture {
@@ -132,7 +135,7 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
 
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("tradingpremises.agent.premises.heading"))
+        contentAsString(result) must include(Messages("tradingpremises.agent.premises.title"))
         contentAsString(result) must include(Messages("err.summary"))
       }
 
@@ -246,6 +249,35 @@ class RegisteringAgentPremisesControllerSpec extends PlaySpec with OneAppPerSuit
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
 
         }
+      }
+
+      "set the hasChanged flag to true" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "agentPremises" -> "false"
+        )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(1)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
+
+        verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+          any(),
+          meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+            hasChanged = true,
+            registeringAgentPremises = Some(RegisteringAgentPremises(false)),
+            agentName=None,
+            businessStructure=None,
+            agentCompanyName=None,
+            agentPartnership=None
+          ))))(any(), any(), any())
       }
 
     }

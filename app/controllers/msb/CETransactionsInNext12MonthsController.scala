@@ -5,7 +5,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.{CETransactionsInNext12Months, MoneyServiceBusiness}
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 import views.html.msb.ce_transaction_in_next_12_months
 
 import scala.concurrent.Future
@@ -13,16 +15,20 @@ import scala.concurrent.Future
 trait CETransactionsInNext12MonthsController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  implicit val statusService: StatusService
 
   def get(edit:Boolean = false) = Authorised.async {
    implicit authContext => implicit request =>
-     dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-       response =>
-         val form: Form2[CETransactionsInNext12Months] = (for {
-           msb <- response
-           transactions <- msb.ceTransactionsInNext12Months
-         } yield Form2[CETransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
-         Ok(ce_transaction_in_next_12_months(form, edit))
+     ControllerHelper.allowedToEdit flatMap {
+       case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+         response =>
+           val form: Form2[CETransactionsInNext12Months] = (for {
+             msb <- response
+             transactions <- msb.ceTransactionsInNext12Months
+           } yield Form2[CETransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
+           Ok(ce_transaction_in_next_12_months(form, edit))
+       }
+       case false => Future.successful(NotFound(notFoundView))
      }
   }
 
@@ -52,4 +58,5 @@ object CETransactionsInNext12MonthsController extends CETransactionsInNext12Mont
   // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector
+  override val statusService: StatusService = StatusService
 }

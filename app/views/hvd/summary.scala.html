@@ -1,190 +1,155 @@
 @import include._
+@import include.forms2._
 @import models.hvd._
 @import models.hvd.PercentageOfCashPaymentOver15000._
 @import utils.DateHelper
 
-@(model: Hvd)(implicit request: Request[_], lang: Lang)
+@(model: Hvd, isEditable:Boolean)(implicit request: Request[_], lang: Lang)
+
+@header = {
+    @heading("title.cya", "summary.hvd")
+}
 
 @main(
-title = Messages("summary.checkyouranswers.title")
+    title = Messages("title.cya") + " - " + Messages("summary.hvd"),
+    heading = header
 ) {
 
-    @heading("summary.checkyouranswers.title", "summary.hvd")
-
     @model.products.map { p =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.products.heading")</th>
-                <td width="12"><a href="@controllers.hvd.routes.ProductsController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @{p.sorted.map {
-                        case Alcohol => Messages("hvd.products.option.01")
-                        case Tobacco => Messages("hvd.products.option.02")
-                        case Antiques => Messages("hvd.products.option.03")
-                        case Cars => Messages("hvd.products.option.04")
-                        case OtherMotorVehicles => Messages("hvd.products.option.05")
-                        case Caravans => Messages("hvd.products.option.06")
-                        case Jewellery => Messages("hvd.products.option.07")
-                        case Gold => Messages("hvd.products.option.08")
-                        case ScrapMetals => Messages("hvd.products.option.09")
-                        case MobilePhones => Messages("hvd.products.option.10")
-                        case Clothing => Messages("hvd.products.option.11")
-                        case Other(x) => x
-                    }.mkString(", ")}
-                </td>
-            </tr>
-        </table>
+        @checkYourAnswers(
+            question = Messages("hvd.products.title"),
+            editUrl = controllers.hvd.routes.ProductsController.get(true).toString
+        ) {
+            <ul class="list list--comma">
+                @p.items.map { i =>
+                    <li>@i match {
+                        case Alcohol => {@Messages("hvd.products.option.01")}
+                        case Tobacco => {@Messages("hvd.products.option.02")}
+                        case Antiques => {@Messages("hvd.products.option.03")}
+                        case Cars => {@Messages("hvd.products.option.04")}
+                        case OtherMotorVehicles => {@Messages("hvd.products.option.05")}
+                        case Caravans => {@Messages("hvd.products.option.06")}
+                        case Jewellery => {@Messages("hvd.products.option.07")}
+                        case Gold => {@Messages("hvd.products.option.08")}
+                        case ScrapMetals => {@Messages("hvd.products.option.09")}
+                        case MobilePhones => {@Messages("hvd.products.option.10")}
+                        case Clothing => {@Messages("hvd.products.option.11")}
+                        case Other(x) => {@x}
+                    }</li>
+                }
+            </ul>
+        }
 
         @if(p.items.contains(Alcohol) | p.items.contains(Tobacco)) {
             @model.exciseGoods.map { eg =>
-                <table>
-                    <tr>
-                        <th>@Messages("hvd.excise.goods.heading")</th>
-                        <td width="12"><a href="@controllers.hvd.routes.ExciseGoodsController.get(true)">@Messages("button.edit")</a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @if(eg.exciseGoods) {
-                            @Messages("lbl.yes")
-                            } else {
-                            @Messages("lbl.no")
-                            }
-                        </td>
-                    </tr>
-                </table>
+                @checkYourAnswers(
+                    question = Messages("hvd.excise.goods.title"),
+                    editUrl = controllers.hvd.routes.ExciseGoodsController.get(true).toString
+                ) {
+                    <p>@if(eg.exciseGoods) {
+                        @Messages("lbl.yes")
+                    } else {
+                        @Messages("lbl.no")
+                    }</p>
+                }
             }
         }
     }
 
-
-
     @model.howWillYouSellGoods.map { goods =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.how-will-you-sell-goods.heading")</th>
-                <td width="12"><a href="@controllers.hvd.routes.HowWillYouSellGoodsController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @{goods.channels.map {
-                    case Retail => Messages("hvd.how-will-you-sell-goods.channels.retail")
-                    case Wholesale => Messages("hvd.how-will-you-sell-goods.channels.wholesale")
-                    case Auction => Messages("hvd.how-will-you-sell-goods.channels.auction")
-                    }.mkString(", ")}
-                </td>
-            </tr>
-        </table>
+        @checkYourAnswers(
+            question = Messages("hvd.how-will-you-sell-goods.title"),
+            editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString
+        ) {
+            <ul class="list list--comma">
+                @goods.channels.map { i =>
+                    <li>@i match {
+                    case Retail => {@Messages("hvd.how-will-you-sell-goods.channels.retail")}
+                    case Wholesale => {@Messages("hvd.how-will-you-sell-goods.channels.wholesale")}
+                    case Auction => {@Messages("hvd.how-will-you-sell-goods.channels.auction")}
+                    }</li>
+                }
+            </ul>
+        }
     }
 
     @model.cashPayment.map { cp =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.cash.payment.heading")</th>
-                <td width="12"><a href="@controllers.hvd.routes.CashPaymentController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
+        @checkYourAnswers(
+            question = Messages("hvd.cash.payment.title"),
+            editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString
+        ) {
             @cp match {
                 case CashPaymentYes(date) => {
-                        <tr>
-                            <td colspan="2">
-                                @Messages("lbl.yes")
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                @Messages("hvd.summary.payment.date.label") : @DateHelper.formatDate(date)
-                            </td>
-                        </tr>
+                    <p>@Messages("lbl.yes")</p>
+                    @checkYourAnswersExtra(
+                        question = Messages("hvd.summary.payment.date.label")
+                    ) {
+                        <p>@DateHelper.formatDate(date)</p>
+                    }
                 }
                 case CashPaymentNo => {
-                    <tr>
-                        <td colspan="2">
-                            @Messages("lbl.no")
-                        </td>
-                    </tr>
+                    <p>@Messages("lbl.no")</p>
                 }
             }
-
-        </table>
+        }
     }
 
     @model.linkedCashPayment.map { p =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.identify.linked.cash.payment.heading")</th>
-                <td width="12"><a href="@controllers.hvd.routes.LinkedCashPaymentsController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @if(p.linkedCashPayments) {
-                        @Messages("lbl.yes")
-                    } else {
-                        @Messages("lbl.no")
-                    }
-                </td>
-            </tr>
-        </table>
+        @checkYourAnswers(
+            question = Messages("hvd.identify.linked.cash.payment.title"),
+            editUrl = controllers.hvd.routes.LinkedCashPaymentsController.get(true).toString
+        ) {
+            <p>@if(p.linkedCashPayments) {
+                @Messages("lbl.yes")
+            } else {
+                @Messages("lbl.no")
+            }</p>
+        }
     }
 
     @model.receiveCashPayments.map { rcp =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.receiving.heading")</th>
-                <td width="12"><a href="@controllers.hvd.routes.ReceiveCashPaymentsController.get(true)">@Messages("button.edit")</a></td>
-            </tr>
+        @checkYourAnswers(
+            question = Messages("hvd.receiving.title"),
+            editUrl = if(isEditable){controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString} else ""
+        ) {
             @rcp.paymentMethods match {
-                case None => {
-                    <tr>
-                        <td colspan="2">
-                            @Messages("lbl.no")
-                        </td>
-                    </tr>
-                }
+                case None => {<p>@Messages("lbl.no")</p>}
                 case Some(pm:PaymentMethods) => {
-                    <tr>
-                        <td colspan="2">
-                            @Messages("lbl.yes")
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            @Messages("hvd.receiving.expect.to.receive")
-                            @pm match {
-                                case PaymentMethods(false, false, None)       => { Unknown }
-                                case PaymentMethods(false, false, Some(txt))  => { @txt }
-                                case PaymentMethods(false, true, None)        => { @Messages("hvd.receiving.option.02") }
-                                case PaymentMethods(false, true, Some(txt))   => { @Messages("hvd.receiving.option.02"), @txt }
-                                case PaymentMethods(true, false, None)        => { @Messages("hvd.receiving.option.01") }
-                                case PaymentMethods(true, false, Some(txt))   => { @Messages("hvd.receiving.option.01"), @txt }
-                                case PaymentMethods(true, true, None)         => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
-                                case PaymentMethods(true, true, Some(txt))    => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
-                            }
-                        </td>
-                    </tr>
+                    <p>@Messages("lbl.yes")</p>
+                    @checkYourAnswersExtra(
+                        question = Messages("hvd.receiving.expect.to.receive")
+                    ) {
+                        <ul class="list list--comma">
+                            <li>@pm match {
+                                case PaymentMethods(false, false, None) => { Unknown }
+                                case PaymentMethods(false, false, Some(txt)) => { @txt }
+                                case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                                case PaymentMethods(false, true, Some(txt)) => { @Messages("hvd.receiving.option.02"), @txt }
+                                case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                                case PaymentMethods(true, false, Some(txt)) => { @Messages("hvd.receiving.option.01"), @txt }
+                                case PaymentMethods(true, true, None) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02") }
+                                case PaymentMethods(true, true, Some(txt)) => { @Messages("hvd.receiving.option.01"), @Messages("hvd.receiving.option.02"), @txt }
+                            }</li>
+                        </ul>
+                    }
                 }
             }
-        </table>
+        }
     }
 
     @model.percentageOfCashPaymentOver15000.map { p =>
-        <table>
-            <tr>
-                <th>@Messages("hvd.percentage.title")</th>
-                <td width="12"><a href="@controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true)">@Messages("button.edit")</a></td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @p match {
-                        case First => {@Messages("hvd.percentage.lbl.01")}
-                        case Second => {@Messages("hvd.percentage.lbl.02")}
-                        case Third => {@Messages("hvd.percentage.lbl.03")}
-                        case Fourth => {@Messages("hvd.percentage.lbl.04")}
-                        case Fifth => {@Messages("hvd.percentage.lbl.05")}
-                    }
-                </td>
-            </tr>
-        </table>
+        @checkYourAnswers(
+            question = Messages("hvd.percentage.title"),
+            editUrl = if(isEditable){controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString} else ""
+        ) {
+            <p>@p match {
+                case First => {@Messages("hvd.percentage.lbl.01")}
+                case Second => {@Messages("hvd.percentage.lbl.02")}
+                case Third => {@Messages("hvd.percentage.lbl.03")}
+                case Fourth => {@Messages("hvd.percentage.lbl.04")}
+                case Fifth => {@Messages("hvd.percentage.lbl.05")}
+            }</p>
+        }
     }
 
     <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>

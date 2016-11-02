@@ -1,14 +1,14 @@
 package connectors
 
-import models.declaration.{AddPerson, BeneficialShareholder, RoleWithinBusiness}
+import models.declaration.{AddPerson, BeneficialShareholder}
 import models._
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import uk.gov.hmrc.domain.Org
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, ConfidenceLevel, CredentialStrength, OrgAccount}
+import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.domain.{CtUtr, SaUtr, Org}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -150,6 +150,19 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       }.thenReturn(Future.successful(amendmentResponse))
 
       whenReady(AmlsConnector.update(subscriptionRequest,amlsRegistrationNumber)){
+        _ mustBe amendmentResponse
+      }
+    }
+  }
+
+  "variation" must {
+    "successfully submit variation" in {
+      when {
+        AmlsConnector.httpPost.POST[SubscriptionRequest, AmendVariationResponse](eqTo(s"${AmlsConnector.url}/org/TestOrgRef/$amlsRegistrationNumber/variation")
+          , eqTo(subscriptionRequest), any())(any(), any(), any())
+      }.thenReturn(Future.successful(amendmentResponse))
+
+      whenReady(AmlsConnector.variation(subscriptionRequest, amlsRegistrationNumber)) {
         _ mustBe amendmentResponse
       }
     }

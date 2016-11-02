@@ -5,7 +5,7 @@ import models.ReadStatusResponse
 import models.declaration.{AddPerson, WhoIsRegistering}
 import models.responsiblepeople._
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
-import org.joda.time.LocalDateTime
+import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -43,7 +43,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
   "WhoIsRegisteringController" must {
 
     val personName = PersonName("Divya", Some("Envy"), "Tadisetti", None, Some("name"))
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant))
+    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val rp = ResponsiblePeople(
       personName = Some(personName),
       positions = Some(positions)
@@ -72,7 +72,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           status(result) must be(OK)
 
           val htmlValue = Jsoup.parse(contentAsString(result))
-          htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title")
+          htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
           htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
 
           contentAsString(result) must include(Messages("submit.amendment.application"))
@@ -98,7 +98,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           status(result) must be(OK)
 
           val htmlValue = Jsoup.parse(contentAsString(result))
-          htmlValue.title mustBe Messages("declaration.who.is.registering.title")
+          htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
           htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
 
           contentAsString(result) must include(Messages("submit.registration"))
@@ -270,7 +270,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
     val personName = PersonName("Divya", Some("Envy"), "Tadisetti", None, Some("name"))
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant))
+    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val rp = ResponsiblePeople(
       personName = Some(personName),
       positions = Some(positions)
@@ -301,7 +301,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("declaration.who.is.registering.title")
+        htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
         htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
 
         contentAsString(result) must include(Messages("submit.registration"))

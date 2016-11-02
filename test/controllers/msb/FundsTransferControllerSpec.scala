@@ -34,7 +34,7 @@ class FundsTransferControllerSpec extends PlaySpec with OneAppPerSuite with Mock
           (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.fundstransfer.heading"))
+      contentAsString(result) must include(Messages("msb.fundstransfer.title") + " - " + Messages("summary.msb") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
     }
 
     "on get, display the 'Do you transfer money without using formal banking systems?' page with pre populated data" in new Fixture {

@@ -3,11 +3,11 @@
 @()(implicit request: Request[_])
 
 @header = {
-    @heading("businessmatching.cannotcontinuewiththeapplication.heading", "summary.businessmatching")
+    @heading("businessmatching.cannotcontinuewiththeapplication.title", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("businessmatching.cannotcontinuewiththeapplication.title"),
+    title = Messages("businessmatching.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
 
@@ -17,10 +17,10 @@
 
     <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.third")</p>
 
-        <div class="form-group">
-            <a class="button" role="button" href="@appConfig.logoutUrl">
-            @Messages("button.logout")<span class="visuallyhidden"> @Messages("summary.businessmatching")</span>
-            </a>
-        </div>
+    <div class="form-group">
+        <a class="button" role="button" href="@appConfig.logoutUrl">
+        @Messages("button.logout")<span class="visuallyhidden"> @Messages("summary.businessmatching")</span>
+        </a>
+    </div>
 }
 

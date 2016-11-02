@@ -1,9 +1,10 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import models.TradingPremisesSection
 import models.tradingpremises._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -225,6 +226,33 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
       }
+    }
+
+    "set the hasChanged flag to true" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "msbServices[1]" -> "01",
+        "msbServices[2]" -> "02",
+        "msbServices[3]" -> "03"
+      )
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(1)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+        any(),
+        meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+          hasChanged = true,
+          msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)))
+        ))))(any(), any(), any())
     }
   }
 }
