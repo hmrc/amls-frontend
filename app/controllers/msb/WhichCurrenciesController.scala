@@ -8,17 +8,22 @@ import models.moneyservicebusiness._
 import play.api.Logger
 import play.api.mvc.Request
 import play.twirl.api.HtmlFormat
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 import views.html.msb.which_currencies
 
 import scala.concurrent.Future
 
 trait WhichCurrenciesController extends BaseController {
+
   def cache: DataCacheConnector
+  implicit val statusService: StatusService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      ControllerHelper.allowedToEdit flatMap {
+        case true => cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
           val form = (for {
             msb <- response
@@ -26,6 +31,8 @@ trait WhichCurrenciesController extends BaseController {
           } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
 
           Ok(views.html.msb.which_currencies(form, edit))
+      }
+        case false => Future.successful(NotFound(notFoundView))
       }
     }
   }
@@ -52,4 +59,5 @@ trait WhichCurrenciesController extends BaseController {
 object WhichCurrenciesController extends WhichCurrenciesController {
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override val cache = DataCacheConnector
+  override val statusService: StatusService = StatusService
 }
