@@ -2,6 +2,13 @@
 
 @import uk.gov.hmrc.play.views.html._
 @import include.main
-@main(title = Messages("unauthorised.title")) {
-<h1>@Messages("unauthorised.title")</h1>
+    @main(title = Messages("unauthorised.title")) {
+
+    <h1 class="heading-xlarge">@Messages("unauthorised.title")</h1>
+
+    <p>@Messages("unauthorised.text1")</p>
+    <p>@Messages("unauthorised.text2") <a href=https://www.tax.service.gov.uk/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend>@Messages("unauthorised.register.link.text")</a></p>
+
+    <!-- This should log you out and then take you back to the sign in page for Gov Gateway -->
+    <p><a class="button" href="https://www.tax.service.gov.uk/anti-money-laundering">@Messages("button.backtosignin")</a></p>
 }
