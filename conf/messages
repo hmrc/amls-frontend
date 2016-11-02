@@ -284,6 +284,7 @@ button.continue=Continue
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
+button.backtosignin = Back to sign in
 button.delete = Delete
 button.payfee = Pay registration fee
 
