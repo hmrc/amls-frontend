@@ -78,12 +78,42 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
     }
 
-    "Prepopulate UI with saved data" in new Fixture {
+    "show error with year field too long" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUKResidence" -> "false",
+        "dateOfBirth.day" -> "12",
+        "dateOfBirth.month" -> "12",
+        "dateOfBirth.year" -> "12345678",
+        "passportType" -> "01",
+        "ukPassportNumber" -> "12346464688",
+        "countryOfBirth" -> "GB",
+        "nationality" -> "GB"
+      )
+      val responsiblePeople = ResponsiblePeople()
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,
-        Some(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
-          Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))), None)))))
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(1)(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+    }
+
+    "Prepopulate UI with saved data" in new Fixture {
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
+          None,
+          Some(PersonResidenceType(
+            NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("12346464646")),
+            Country("United Kingdom", "GB"),
+            Some(Country("United Kingdom", "GB")))
+          ),
+          None)))))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
