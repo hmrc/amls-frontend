@@ -155,6 +155,32 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
           hstatus(result) must be(BAD_REQUEST)
 
         }
+
+        "date contains an invalid year too great in length" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "tradingName" -> "Trading Name",
+            "addressLine1" -> "Address 1",
+            "addressLine2" -> "Address 2",
+            "postcode" -> "NE98 1ZZ",
+            "isResidential" -> "true",
+            "startDate.day" -> "01",
+            "startDate.month" -> "02",
+            "startDate.year" -> "201345670"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(RecordId1, false)(newRequest)
+
+          hstatus(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.invalid.tp.year"))
+
+        }
       }
 
       "respond with NOT_FOUND" when {
