@@ -2,12 +2,14 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry, TransactionsInNext12Months}
+import models.status.{SubmissionDecisionRejected, SubmissionDecisionApproved, NotCompleted}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -22,6 +24,7 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPerSu
     val controller = new TransactionsInNext12MonthsController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
+      override val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -30,6 +33,9 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPerSu
   "TransactionsInNext12MonthsController" must {
 
     "load the page 'How many transactions do you expect in the next 12 months?'" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
@@ -41,6 +47,9 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPerSu
 
     "load the page 'How many transactions do you expect in the next 12 months?' with pre populated data" in new Fixture  {
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
         transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963"))))))
@@ -50,6 +59,29 @@ class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPerSu
       contentAsString(result) must include("12345678963")
 
     }
+
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
+    }
+
+    "redirect to Page not found" when {
+      "application is in variation mode and status is SubmissionDecisionRejected" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
+    }
+
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 

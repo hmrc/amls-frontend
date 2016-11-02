@@ -5,6 +5,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.{MoneyServiceBusiness, ExpectedThroughput}
+import services.StatusService
+import utils.ControllerHelper
 import views.html.msb.expected_throughput
 
 import scala.concurrent.Future
@@ -12,16 +14,20 @@ import scala.concurrent.Future
 trait ExpectedThroughputController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  implicit val statusService: StatusService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-        response =>
-          val form: Form2[ExpectedThroughput] = (for {
-            msb <- response
-            expectedThroughput <- msb.throughput
-          } yield Form2[ExpectedThroughput](expectedThroughput)).getOrElse(EmptyForm)
-          Ok(expected_throughput(form, edit))
+      ControllerHelper.allowedToEdit flatMap {
+        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+          response =>
+            val form: Form2[ExpectedThroughput] = (for {
+              msb <- response
+              expectedThroughput <- msb.throughput
+            } yield Form2[ExpectedThroughput](expectedThroughput)).getOrElse(EmptyForm)
+            Ok(expected_throughput(form, edit))
+        }
+        case false => Future.successful(NotFound(notFoundView))
       }
   }
 
@@ -48,4 +54,5 @@ object ExpectedThroughputController extends ExpectedThroughputController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override val statusService: StatusService = StatusService
 }
