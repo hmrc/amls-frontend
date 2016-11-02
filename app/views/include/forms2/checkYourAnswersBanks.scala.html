@@ -12,10 +12,10 @@
     @if(editUrl.nonEmpty){<footer class="check-your-answers__footer">
         <p>
         @if(canEdit) {
-            <a href="@editUrl">@Messages("button.edit")<span class="visuallyhidden"> @Messages("visuallyhidden.the.details.for") @question</span></a>
-            @if(removeUrl.nonEmpty){
-                @Messages("lbl.or") <a href="@removeUrl">@Messages("button.remove")<span class="visuallyhidden"> @question @Messages("visuallyhidden.from.your.application")</span></a>
+            <a href="@editUrl">@Messages("button.edit")<span class="visuallyhidden"> @Messages("visuallyhidden.the.details.for") @question</span></a> @Messages("lbl.or")
             }
+        @if(removeUrl.nonEmpty){
+            <a href="@removeUrl">@Messages("button.remove")<span class="visuallyhidden"> @question @Messages("visuallyhidden.from.your.application")</span></a>
         }
         </p>
     </footer>}

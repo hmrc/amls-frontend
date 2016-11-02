@@ -1,15 +1,18 @@
 package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessmatching._
-import models.moneyservicebusiness.MoneyServiceBusiness
+import models.Country
+import models.businessmatching.{MoneyServiceBusiness=> BMMoneyServiceBusiness, _}
+import models.moneyservicebusiness._
+import models.status.{NotCompleted, SubmissionDecisionApproved}
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -23,16 +26,30 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
     val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
   val mockCacheMap = mock[CacheMap]
 
   "Get" must {
 
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
+    val completeModel = MoneyServiceBusiness(
+      throughput = Some(ExpectedThroughput.Second),
+      businessUseAnIPSP = Some(BusinessUseAnIPSPYes("name", "123456789123456")),
+      identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
+      Some(WhichCurrencies(
+        Seq("USD", "GBP", "EUR"),
+        Some(BankMoneySource("bank names")),
+        Some(WholesalerMoneySource("Wholesaler Names")),
+        true)),
+      sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+      fundsTransfer = Some(FundsTransfer(true)),
+      branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
+      sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+      mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
+      ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))
+    )
 
     "load the summary page when section data is available" in new Fixture {
 
@@ -57,8 +74,8 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(model))
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -79,6 +96,9 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         )
       )
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
@@ -87,6 +107,67 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
+    }
+
+    "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
+      "application in variation mode" in new Fixture {
+
+        when(controller.dataCache.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal))))))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeModel))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(7).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(8).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(9).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(10).getElementsByTag("a").hasClass("edit") must be(false)
+      }
+    }
+
+    "show edit link" when {
+      "application not in variation mode" in new Fixture {
+        when(controller.dataCache.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
+            ChequeCashingNotScrapMetal,
+            ChequeCashingScrapMetal))))))
+
+        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+          .thenReturn(Some(completeModel))
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(NotCompleted))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        val document = Jsoup.parse(contentAsString(result))
+        val elements = document.getElementsByTag("section").iterator
+        while(elements.hasNext){
+          elements.next().getElementsByTag("a").hasClass("edit") must be(true)
+        }
+      }
     }
   }
 }
