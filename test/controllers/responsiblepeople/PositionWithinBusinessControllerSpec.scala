@@ -10,7 +10,7 @@ import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -23,7 +23,8 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class
+PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -301,6 +302,50 @@ class PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
+    }
+
+    "show error with year field too short" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "90")
+
+      val mockBusinessMatching : BusinessMatching = mock[BusinessMatching]
+      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(mockBusinessMatching)))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+
+      val mockCacheMap = mock[CacheMap]
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
+      val result = controller.post(RecordId)(newRequest)
+
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+    }
+
+    "show error with year field too long" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "19905")
+
+      val mockBusinessMatching : BusinessMatching = mock[BusinessMatching]
+      when(controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(mockBusinessMatching)))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+      val mockCacheMap = mock[CacheMap]
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+
+
+      val result = controller.post(RecordId)(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.invalid.tp.year"))
     }
 
     "submit with all other valid data types" in new Fixture {

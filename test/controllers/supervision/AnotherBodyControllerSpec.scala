@@ -106,6 +106,56 @@ class AnotherBodyControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
      status(result) must be(SEE_OTHER)
      redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
    }
+
+    "show error with year field too short" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "true",
+        "supervisorName" -> "Name",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990",
+        "endDate.day" -> "24",
+        "endDate.month" -> "2",
+        "endDate.year" -> "98",
+        "endingReason" -> "Reason"
+      )
+
+      when(controller.dataCacheConnector.fetch[Supervision](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[Supervision](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+    }
+
+    "show error with year field too long" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "true",
+        "supervisorName" -> "Name",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990",
+        "endDate.day" -> "24",
+        "endDate.month" -> "2",
+        "endDate.year" -> "19984",
+        "endingReason" -> "Reason"
+      )
+
+      when(controller.dataCacheConnector.fetch[Supervision](any())
+        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[Supervision](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+    }
   }
 }
 
