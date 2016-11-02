@@ -97,13 +97,13 @@ object Positions {
    w: Write[PositionWithinBusiness, String]
   ) = Write[Positions, UrlFormEncoded] { data =>
     Map("positions[]" -> data.positions.toSeq.map(w.writes)) ++ {
-      if (data.startDate.isDefined) {
-        localDateWrite.writes(data.startDate.get) map {
+      data.startDate match {
+        case Some(startDate) => localDateWrite.writes(startDate) map {
           case (key, value) =>
             s"startDate.$key" -> value
         }
+        case _ => Nil
       }
-      else Nil
     }
   }
 

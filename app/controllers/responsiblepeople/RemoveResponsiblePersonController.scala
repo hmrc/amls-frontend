@@ -49,7 +49,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
         } yield Redirect(routes.CheckYourAnswersController.get())
-        case SubmissionDecisionApproved => Form2[ResponsiblePersonEndDate](request.body) match {
+        case _ => Form2[ResponsiblePersonEndDate](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete,  true)))
           case ValidForm(_, data) => {

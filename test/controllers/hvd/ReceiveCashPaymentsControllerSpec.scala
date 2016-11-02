@@ -2,8 +2,10 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.Hvd
+import models.status.{SubmissionDecisionApproved, NotCompleted}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import services.StatusService
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -20,6 +22,7 @@ class ReceiveCashPaymentsControllerSpec extends PlaySpec with OneAppPerSuite wit
     val controller = new ReceiveCashPaymentsController {
       override val cacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService: StatusService = mock[StatusService]
     }
 
     when(controller.cacheConnector.fetch[Hvd](eqTo(Hvd.key))(any(), any(), any()))
@@ -33,10 +36,23 @@ class ReceiveCashPaymentsControllerSpec extends PlaySpec with OneAppPerSuite wit
 
     "load the page" in new Fixture {
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       val result = controller.get()(request)
       status(result) mustEqual OK
     }
 
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
+    }
     "show a bad request with an invalid request" in new Fixture {
 
       val result = controller.post()(request)

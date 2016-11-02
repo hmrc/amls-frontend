@@ -2,6 +2,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import models.businessactivities.{ExpectedBusinessTurnover, BusinessActivities}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -10,6 +11,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -25,6 +27,7 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneAppPerSuit
     val controller = new ExpectedBusinessTurnoverController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override implicit val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -37,12 +40,19 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneAppPerSuit
       when(controller.dataCacheConnector.fetch[ExpectedBusinessTurnover](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
+
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("businessactivities.business-turnover.title"))
     }
 
     "on get display the Expected Business Turnover page with pre populated data" in new Fixture {
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[BusinessActivities](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)))))
@@ -52,6 +62,17 @@ class ExpectedBusinessTurnoverControllerSpec extends PlaySpec with OneAppPerSuit
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[value=01]").hasAttr("checked") must be(true)
+    }
+
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
     }
 
     "on post with valid data" in new Fixture {

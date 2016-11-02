@@ -1,7 +1,7 @@
 package utils
 
 import models.businessmatching._
-import models.status.{NotCompleted, SubmissionReady}
+import models.status.{SubmissionReadyForReview, NotCompleted, SubmissionReady}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -45,10 +45,18 @@ object ControllerHelper {
     }
   }
 
+  //For repeating section
   def allowedToEdit(edit: Boolean)(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
     statusService.getStatus map {
       case SubmissionReady | NotCompleted => true
       case _ => !edit
+    }
+  }
+
+  def allowedToEdit(implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext): Future[Boolean] = {
+    statusService.getStatus map {
+      case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
+      case _ => false
     }
   }
 }

@@ -7,7 +7,9 @@ import forms._
 import models.businessactivities.{BusinessActivities, _}
 import models.businessmatching._
 import play.api.i18n.Messages
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 import views.html.businessactivities._
 
 import scala.concurrent.Future
@@ -15,21 +17,27 @@ import scala.concurrent.Future
 trait InvolvedInOtherController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  implicit val statusService: StatusService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetchAll map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-          } yield {
-            (for {
-              businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-              involvedInOther <- businessActivities.involvedInOther
-            } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching, businessTypes(businessMatching))))
-              .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching,  businessTypes(businessMatching))))
-          }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None, None))
+      ControllerHelper.allowedToEdit flatMap {
+        case true =>
+          dataCacheConnector.fetchAll map {
+            optionalCache =>
+              (for {
+                cache <- optionalCache
+                businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              } yield {
+                (for {
+                  businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
+                  involvedInOther <- businessActivities.involvedInOther
+                } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther),
+                  edit, businessMatching, businessTypes(businessMatching))))
+                  .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching, businessTypes(businessMatching))))
+              }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None, None))
+          }
+        case false => Future.successful(NotFound(notFoundView))
       }
   }
 
@@ -77,7 +85,7 @@ trait InvolvedInOtherController extends BaseController {
       }
     }
 
-    typesString match{
+    typesString match {
       case Some(types) => Some(typesString.getOrElse(Set()).mkString(", ") + ".")
       case None => None
     }
@@ -91,4 +99,5 @@ object InvolvedInOtherController extends InvolvedInOtherController {
   // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
+  override implicit val statusService: StatusService = StatusService
 }

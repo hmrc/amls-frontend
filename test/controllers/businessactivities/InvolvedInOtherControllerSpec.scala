@@ -3,6 +3,7 @@ package controllers.businessactivities
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BMActivities, _}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -12,6 +13,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -27,7 +29,8 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
      val controller = new InvolvedInOtherController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
-    }
+       override implicit val statusService: StatusService = mock[StatusService]
+     }
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -36,6 +39,8 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
     "on get display the is your involved in other page" in new Fixture {
       val mockCacheMap = mock[CacheMap]
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -56,6 +61,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(Some(BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))))
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching()))
 
@@ -68,6 +76,17 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
     }
 
+    "redirect to Page not found" when {
+      "application is in variation mode" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val result = controller.get()(request)
+        status(result) must be(NOT_FOUND)
+      }
+    }
+
     "on get display the business type is AccountancyServices" in new Fixture {
 
       val businessMatching = BusinessMatching(
@@ -75,6 +94,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       )
 
       val mockCacheMap = mock[CacheMap]
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
@@ -99,6 +121,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
       val mockCacheMap = mock[CacheMap]
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
 
@@ -121,6 +146,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       )
 
       val mockCacheMap = mock[CacheMap]
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
@@ -145,6 +173,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
       val mockCacheMap = mock[CacheMap]
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
 
@@ -167,6 +198,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       )
 
       val mockCacheMap = mock[CacheMap]
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
@@ -191,6 +225,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
       val mockCacheMap = mock[CacheMap]
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
 
@@ -213,6 +250,9 @@ class InvolvedInOtherControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       )
 
       val mockCacheMap = mock[CacheMap]
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
 
       when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
         .thenReturn(None)
