@@ -1,16 +1,10 @@
 package models.hvd
 
-import play.api.data.mapping
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
-import play.api.data.mapping.GenericRules._
-import play.api.libs.functional.Monoid
-import play.api.libs.json.{Writes, JsValue, Reads, Format}
-import play.libs.Json
-import utils.OptionValidators._
+import play.api.libs.json.{Writes, Reads}
 import utils.TraversableValidators
 import utils.MappingUtils.Implicits._
-import models._
 
 
 case class HowWillYouSellGoods(channels : Seq[SalesChannel])
@@ -23,10 +17,13 @@ trait HowWillYouSellGoods0 {
     (__ \ "salesChannels")
       .read(TraversableValidators.minLengthR[Seq[String]](1))
       .withMessage("error.required.hvd.how-will-you-sell-goods").fmap {s =>
-        HowWillYouSellGoods(s.map {
-          case "Retail" => Retail
-          case "Wholesale" => Wholesale
-          case "Auction" => Auction
+        HowWillYouSellGoods(s.map{str =>
+          val sc:SalesChannel = str match {
+            case "Retail" => Retail
+            case "Wholesale" => Wholesale
+            case "Auction" => Auction
+          }
+          sc
       })}
   }
 

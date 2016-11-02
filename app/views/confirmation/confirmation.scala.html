@@ -2,7 +2,7 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
+@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
 
 @main(
     title = Messages("confirmation.title")
@@ -27,7 +27,7 @@
             </div>
             <div class="grid-layout__column grid-layout__column--2-3">
                 @Messages("confirmation.sidebar.code")
-                <p class="heading-large">@Messages(mlrRegNo)</p>
+                <p class="heading-large">@Messages(paymentRef)</p>
             </div>
         </div>
     </div>

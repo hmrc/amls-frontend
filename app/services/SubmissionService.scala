@@ -99,10 +99,10 @@ trait SubmissionService extends DataCacheService {
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
         } yield {
           val subQuantity = subscriptionQuantity(subscription)
-          val mlrRegNo = subscription.amlsRefNo
+          val paymentReference = subscription.paymentReference
           val total = subscription.totalFees
           val rows = getBreakdownRows(subscription, premises, people, subQuantity)
-          Future.successful((mlrRegNo, Currency.fromBD(total), rows))
+          Future.successful((paymentReference, Currency.fromBD(total), rows))
           // TODO
         }) getOrElse Future.failed(new Exception("TODO"))
     }
@@ -170,9 +170,9 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(String, Currency, Seq[BreakdownRow], Option[Currency])]] = {
+  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow], Option[Currency])]] = {
     cacheConnector.fetchAll flatMap {
-        getDataForAmendment(_) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+      getDataForAmendment(_) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
 
@@ -184,15 +184,11 @@ trait SubmissionService extends DataCacheService {
       people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
     } yield {
       val subQuantity = subscriptionQuantity(amendment)
-      authEnrolmentsService.amlsRegistrationNumber flatMap {
-        case Some(mlrRegNo) => {
-          val total = amendment.totalFees
-          val difference = amendment.difference map Currency.fromBD
-          val rows = getBreakdownRows(amendment, premises, people, subQuantity)
-          Future.successful(Some((mlrRegNo, Currency.fromBD(total), rows, difference)))
-        }
-        case None => Future.successful(None)
-      }
+      val total = amendment.totalFees
+      val difference = amendment.difference map Currency.fromBD
+      val rows = getBreakdownRows(amendment, premises, people, subQuantity)
+      val paymentRef = amendment.paymentReference
+      Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
     }
   }
 
@@ -201,25 +197,21 @@ trait SubmissionService extends DataCacheService {
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[(String, Currency, Seq[BreakdownRow])]] = {
+  ): Future[Option[(Option[String], Currency, Seq[BreakdownRow])]] = {
     cacheConnector.fetchAll flatMap {
       option =>
-      (for {
-        cache <- option
-        variation <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
-      } yield {
-        authEnrolmentsService.amlsRegistrationNumber flatMap {
-          case Some(mlrRegNo) => {
-            val premisesFee: BigDecimal = getTotalPremisesFee(variation)
-            val peopleFee: BigDecimal = getPeopleFee(variation)
-            val fitAndProperDeduction: BigDecimal = getFitAndProperDeduction(variation)
-            val totalFees: BigDecimal = peopleFee + fitAndProperDeduction + premisesFee
-            val rows = getVariationBreakdown(variation, peopleFee)
-            Future.successful(Some((mlrRegNo, Currency(totalFees), rows)))
-          }
-          case None => Future.successful(None)
-        }
-      }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
+        (for {
+          cache <- option
+          variation <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
+        } yield {
+          val premisesFee: BigDecimal = getTotalPremisesFee(variation)
+          val peopleFee: BigDecimal = getPeopleFee(variation)
+          val fitAndProperDeduction: BigDecimal = getFitAndProperDeduction(variation)
+          val totalFees: BigDecimal = peopleFee + fitAndProperDeduction + premisesFee
+          val rows = getVariationBreakdown(variation, peopleFee)
+          val paymentRef = variation.paymentReference
+          Future.successful(Some((paymentRef, Currency(totalFees), rows)))
+        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
 
@@ -230,7 +222,7 @@ trait SubmissionService extends DataCacheService {
     def rpRow: Seq[BreakdownRow] = {
       val rp = variation.addedResponsiblePeople
       val fp = variation.addedResponsiblePeopleFitAndProper
-      if(rp > 0 || fp > 0) {
+      if (rp > 0 || fp > 0) {
         breakdownRows ++ Seq(BreakdownRow(People.message, rp + fp, People.feePer, Currency(peopleFee)))
       } else {
         Seq()
@@ -238,7 +230,7 @@ trait SubmissionService extends DataCacheService {
     }
 
     def fpRow: Seq[BreakdownRow] = {
-      if(variation.addedResponsiblePeopleFitAndProper > 0) {
+      if (variation.addedResponsiblePeopleFitAndProper > 0) {
         breakdownRows ++ Seq(BreakdownRow(UnpaidPeople.message, variation.addedResponsiblePeopleFitAndProper, UnpaidPeople.feePer, Currency(getFitAndProperDeduction(variation))))
       } else {
         Seq()
@@ -246,7 +238,7 @@ trait SubmissionService extends DataCacheService {
     }
 
     def tpFullYearRow: Seq[BreakdownRow] = {
-      if(variation.addedFullYearTradingPremises > 0) {
+      if (variation.addedFullYearTradingPremises > 0) {
         breakdownRows ++ Seq(BreakdownRow(Premises.message, variation.addedFullYearTradingPremises, Premises.feePer, Currency(getFullPremisesFee(variation))))
       } else {
         Seq()
@@ -254,7 +246,7 @@ trait SubmissionService extends DataCacheService {
     }
 
     def tpHalfYearRow: Seq[BreakdownRow] = {
-      if(variation.halfYearlyTradingPremises > 0) {
+      if (variation.halfYearlyTradingPremises > 0) {
         breakdownRows ++ Seq(BreakdownRow(PremisesHalfYear.message, variation.halfYearlyTradingPremises, PremisesHalfYear.feePer, Currency(getHalfYearPremisesFee(variation))))
       } else {
         Seq()
@@ -262,7 +254,7 @@ trait SubmissionService extends DataCacheService {
     }
 
     def tpZeroRow: Seq[BreakdownRow] = {
-      if(variation.zeroRatedTradingPremises > 0) {
+      if (variation.zeroRatedTradingPremises > 0) {
         breakdownRows ++ Seq(BreakdownRow(PremisesZero.message, variation.zeroRatedTradingPremises, PremisesZero.feePer, Currency(PremisesZero.feePer)))
       } else {
         Seq()

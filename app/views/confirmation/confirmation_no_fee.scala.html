@@ -2,34 +2,18 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(mlrRegNo: String, content: (String, String))(implicit request: Request[_])
+@(title: String, heading: String)(implicit request: Request[_])
 
 @main(
-title = Messages(content._1)
+title = Messages(title)
 ) {
 
 <div class="confirmation">
-    <h1 class="heading-large">@Messages(content._2)</h1>
+    <h1 class="heading-large">@Messages(heading)</h1>
 </div>
 
 <p>@Messages("confirmation.no.fee")</p>
 
 <p>@Messages("confirmation.amendment.previousfees.p")</p>
-
-<div class="notice">
-    <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
-    <strong class="bold-small">@Messages("confirmation.reference.notice")</strong>
-</div>
-
-<div class="panel-indent panel-indent--gutter panel-border-wide reg-online--pay-fee">
-    <div class="grid-row">
-        <div class="grid-layout__column grid-layout__column--2-3">
-            @Messages("confirmation.sidebar.code")
-            <p class="heading-large">@Messages(mlrRegNo)</p>
-        </div>
-    </div>
-</div>
-
-<p><a class="button" href="@controllers.routes.LandingController.get()">@Messages("button.finish")</a></p>
 
 }

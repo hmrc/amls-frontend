@@ -4,9 +4,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.responsiblepeople.{ResponsiblePeople, Training}
-import utils.{BooleanFormReadWrite, RepeatingSection}
-import play.api.Logger
+import models.responsiblepeople.ResponsiblePeople
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
