@@ -23,7 +23,7 @@
         <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
     }
     @if(field.hasErrors) {
-        <span class="error-notification">@field.error</span>
+        <span class="error-notification">@Messages("error.expected.jodadate.format")</span>
     }
     @input(
         labelText = "lbl.day",
