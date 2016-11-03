@@ -9,6 +9,7 @@ case class BankDetails (
                          bankAccountType: Option[BankAccountType] = None,
                          bankAccount: Option[BankAccount] = None,
                          hasChanged: Boolean = false,
+                         refreshedFromServer: Boolean = false,
                          status:Option[String] = None
                         ){
 
@@ -23,8 +24,8 @@ case class BankDetails (
   }
   def isComplete: Boolean =
     this match {
-      case BankDetails(Some(_), Some(_), _,status) => true
-      case BankDetails(None, None, _,_) => true //This code part of fix for the issue AMLS-1549 back button issue
+      case BankDetails(Some(_), Some(_), _, _, status) => true
+      case BankDetails(None, None, _,_,_) => true //This code part of fix for the issue AMLS-1549 back button issue
       case _ => false
     }
 }
@@ -67,6 +68,7 @@ object BankDetails {
     (__ \ "bankAccountType").readNullable[BankAccountType] and
       (__ \ "bankAccount").readNullable[BankAccount] and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "status").readNullable[String]
     ) (BankDetails.apply _)
 

@@ -2,7 +2,7 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, businessTypes: Option[String])(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, bmBusinessActivities:Option[BusinessActivities])(implicit lang: Lang, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -17,7 +17,13 @@
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
         <div class="form-field-group">
-            <p>@businessTypes</p>
+            <ul class="list list--comma">
+                @bmBusinessActivities.map { ba =>
+                    @ba.businessActivities.map {activity =>
+                        <li>@Messages("businessmatching.registerservices.servicename.lbl."+ba.getValue(activity))</li>
+                    }
+                }
+            </ul>
 
             @radioGroup(f("expectedAMLSTurnover")) {
                 @legend("businessactivities.turnover.title", jsHidden = true)
