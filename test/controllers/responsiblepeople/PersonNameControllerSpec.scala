@@ -150,7 +150,7 @@ class PersonNameControllerSpec extends PlaySpec with OneAppPerSuite with Mockito
 
       val result = personNameController.post(RecordId)(requestWithParams)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
     "show error with year field too long" in new Fixture {
@@ -167,7 +167,7 @@ class PersonNameControllerSpec extends PlaySpec with OneAppPerSuite with Mockito
 
       val result = personNameController.post(RecordId)(requestWithParams)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
   }

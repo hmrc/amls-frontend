@@ -129,7 +129,7 @@ class AnotherBodyControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
     "show error with year field too long" in new Fixture {
@@ -154,7 +154,7 @@ class AnotherBodyControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
   }
 }

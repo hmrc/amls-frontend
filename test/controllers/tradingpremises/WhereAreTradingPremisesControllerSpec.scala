@@ -178,7 +178,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
           val result = controller.post(RecordId1, false)(newRequest)
 
           hstatus(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.year"))
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
       }

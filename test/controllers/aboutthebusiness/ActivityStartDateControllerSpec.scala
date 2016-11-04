@@ -86,9 +86,7 @@ class ActivityStartDateControllerSpec extends PlaySpec with OneAppPerSuite with 
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.tp.date"))
-        contentAsString(result) must include(Messages("error.required.tp.month"))
-        contentAsString(result) must include(Messages("error.required.tp.year"))
+        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
       }
 
@@ -103,7 +101,7 @@ class ActivityStartDateControllerSpec extends PlaySpec with OneAppPerSuite with 
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.invalid.tp.year"))
+        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
       }
 
       "show error with year field too long" in new Fixture {
@@ -117,8 +115,7 @@ class ActivityStartDateControllerSpec extends PlaySpec with OneAppPerSuite with 
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.invalid.tp.year"))
-        //contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
       }
     }
   }
