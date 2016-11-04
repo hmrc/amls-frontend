@@ -23,7 +23,7 @@ class ActivityStartDateSpec extends PlaySpec {
 
       }
 
-      "throw error message when data entered is invalid" in {
+      "throw error message when day entered is invalid" in {
         val model =  Map (
           "startDate.day" -> Seq("2466"),
           "startDate.month" -> Seq("2"),
@@ -31,7 +31,6 @@ class ActivityStartDateSpec extends PlaySpec {
         )
         ActivityStartDate.formRule.validate(model) must be(Failure(Seq(Path \ "startDate" -> Seq(
           ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-
       }
 
       "throw error message when data entered is empty" in {
@@ -40,9 +39,9 @@ class ActivityStartDateSpec extends PlaySpec {
           "startDate.month" -> Seq(""),
           "startDate.year" -> Seq("")
         )
-        ActivityStartDate.formRule.validate(model) must be(Failure(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-
+        ActivityStartDate.formRule.validate(model) must be(Failure(Seq(
+          Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        )))
       }
 
       "successfully write the model" in {

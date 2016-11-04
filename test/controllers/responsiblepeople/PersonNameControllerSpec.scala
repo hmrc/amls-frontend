@@ -11,6 +11,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -133,6 +134,40 @@ class PersonNameControllerSpec extends PlaySpec with OneAppPerSuite with Mockito
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#lastName]").html() must include("This field is required")
+    }
+
+    "show error with year field too short" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "firstName" -> "John",
+        "lastName" -> "Doe",
+        "hasPreviousName" -> "true",
+        "hasOtherNames" -> "false",
+        "previous.date.year" -> "67",
+        "previous.date.month" -> "11",
+        "previous.date.day" -> "12"
+      )
+
+      val result = personNameController.post(RecordId)(requestWithParams)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+    }
+
+    "show error with year field too long" in new Fixture {
+
+      val requestWithParams = request.withFormUrlEncodedBody(
+        "firstName" -> "John",
+        "lastName" -> "Doe",
+        "hasPreviousName" -> "true",
+        "hasOtherNames" -> "false",
+        "previous.date.year" -> "19497",
+        "previous.date.month" -> "11",
+        "previous.date.day" -> "12"
+      )
+
+      val result = personNameController.post(RecordId)(requestWithParams)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
   }

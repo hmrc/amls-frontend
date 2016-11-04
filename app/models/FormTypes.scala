@@ -4,6 +4,7 @@ import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.libs.json.Reads
 import utils.DateHelper.localDateOrdering
 import scala.util.matching.Regex
 
@@ -122,24 +123,26 @@ object FormTypes {
   private val dayPattern = regexWithMsg(dayRegex, "error.invalid.tp.date")
 
   private val monthRequired = required("error.required.tp.month")
-  private val monthPattern = regexWithMsg(monthRegex, "error.invalid.tp.date")
+  private val monthPattern = regexWithMsg(monthRegex, "error.invalid.tp.month")
 
   private val yearRequired = required("error.required.tp.year")
-  private val yearPattern = regexWithMsg(yearRegex, "error.invalid.tp.date")
+  private val yearPattern = regexWithMsg(yearRegex, "error.invalid.tp.year")
 
   val phoneNumberType = phoneNumberRequired compose phoneNumberLength compose phoneNumberPattern
   val emailType = emailRequired compose emailLength compose emailPattern
   val dayType = dayRequired compose dayPattern
   val monthType = monthRequired compose monthPattern
-  val yearType = yearRequired compose yearPattern
+  val yearType: Rule[String, String] = yearRequired compose yearPattern
 
   val localDateRule: Rule[UrlFormEncoded, LocalDate] =
     From[UrlFormEncoded] { __ =>
       (
-        (__ \ "year").read[String] ~
-        (__ \ "month").read[String] ~
-        (__ \ "day").read[String]
-      )( (y, m, d) => s"$y-$m-$d" ) compose jodaLocalDateRule("yyyy-MM-dd")
+        (__ \ "year").read(yearType) ~
+        (__ \ "month").read(monthType) ~
+        (__ \ "day").read(dayType)
+      )( (y, m, d) => s"$y-$m-$d" ) orElse
+        Rule[UrlFormEncoded, String]( __ => Success("INVALID DATE STRING")) compose
+        jodaLocalDateRule("yyyy-MM-dd")
     }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =

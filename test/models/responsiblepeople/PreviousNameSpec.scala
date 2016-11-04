@@ -133,7 +133,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
         )
     }
 
-    "fail to validate with invalid date" in {
+    "fail to validate with missing date" in {
 
       val data: UrlFormEncoded = Map(
         "firstName" -> Seq(""),
@@ -167,8 +167,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
         equal(
           Failure(Seq(
             (Path) -> Seq(ValidationError("error.rp.previous.invalid")),
-            (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-          ))
+            (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
         )
     }
 

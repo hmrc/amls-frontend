@@ -68,12 +68,8 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map("anotherBody" -> Seq("true"))
       val expected = Failure(
         Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required")),
-        (Path \ "startDate") -> Seq(ValidationError("error.required")),
-        (Path \ "startDate") -> Seq(ValidationError("error.required")),
-        (Path \ "startDate") -> Seq(ValidationError("error.required")),
-        (Path \ "endDate") -> Seq(ValidationError("error.required")),
-        (Path \ "endDate") -> Seq(ValidationError("error.required")),
-        (Path \ "endDate") -> Seq(ValidationError("error.required")),
+        (Path \ "startDate") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
+        (Path \ "endDate") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
         (Path \ "endingReason") -> Seq(ValidationError("error.required")))
       )
       AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
