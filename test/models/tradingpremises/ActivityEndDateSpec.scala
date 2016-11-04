@@ -29,7 +29,7 @@ class ActivityEndDateSpec extends PlaySpec {
           "endDate.year" -> Seq("1990")
         )
         ActivityEndDate.formRule.validate(model) must be(Failure(Seq(Path \ "endDate" -> Seq(
-          ValidationError("error.invalid.tp.date")))))
+          ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
 
       }
 
@@ -40,9 +40,7 @@ class ActivityEndDateSpec extends PlaySpec {
           "endDate.year" -> Seq("")
         )
         ActivityEndDate.formRule.validate(model) must be(Failure(Seq(
-          Path \ "endDate" -> Seq(ValidationError("error.required.tp.year")),
-          Path \ "endDate" -> Seq(ValidationError("error.required.tp.month")),
-          Path \ "endDate" -> Seq(ValidationError("error.required.tp.date"))
+          Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
           )))
 
       }

@@ -53,7 +53,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPayment.formRule.validate(data) must
-          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.required.tp.date")))))
+          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "write correct data from enum value" in {

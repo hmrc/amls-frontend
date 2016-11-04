@@ -44,7 +44,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.date")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "month entered is invalid" in {
@@ -55,7 +55,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.month")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "year entered is too long" in {
@@ -66,7 +66,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.year")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "year entered is too short" in {
@@ -77,7 +77,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.invalid.tp.year")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "all fields are empty" in {
@@ -88,9 +88,8 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(noContentModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.required.tp.year")),
-          Path \ "endDate" -> Seq(ValidationError("error.required.tp.month")),
-          Path \ "endDate" -> Seq(ValidationError("error.required.tp.date")))))
+          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
+        )
       }
     }
   }
@@ -99,7 +98,8 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
 
     "Read and write successfully" in {
 
-      ResponsiblePersonEndDate.format.reads(ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)))) must be(
+      ResponsiblePersonEndDate.format.reads(
+        ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)))) must be(
         JsSuccess(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)), JsPath \ "endDate"))
 
     }

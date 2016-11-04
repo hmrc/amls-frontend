@@ -105,9 +105,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
           (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
           (Path \ "lastName") -> Seq(ValidationError("error.required.lastname")),
           (Path \ "previous") -> Seq(ValidationError("error.rp.previous.invalid")),
-          (Path \ "previous" \ "date") -> Seq(ValidationError("error.required.tp.year")),
-          (Path \ "previous" \ "date") -> Seq(ValidationError("error.required.tp.month")),
-          (Path \ "previous" \ "date") -> Seq(ValidationError("error.required.tp.date")),
+          (Path \ "previous" \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
           (Path \ "otherNames") -> Seq(ValidationError("error.required.rp.otherNames"))
         )))
     }

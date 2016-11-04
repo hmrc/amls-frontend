@@ -30,7 +30,7 @@ class ActivityStartDateSpec extends PlaySpec {
           "startDate.year" -> Seq("1990")
         )
         ActivityStartDate.formRule.validate(model) must be(Failure(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.invalid.tp.date")))))
+          ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "throw error message when data entered is empty" in {
@@ -40,9 +40,7 @@ class ActivityStartDateSpec extends PlaySpec {
           "startDate.year" -> Seq("")
         )
         ActivityStartDate.formRule.validate(model) must be(Failure(Seq(
-          Path \ "startDate" -> Seq(ValidationError("error.required.tp.year")),
-          Path \ "startDate" -> Seq(ValidationError("error.required.tp.month")),
-          Path \ "startDate" -> Seq(ValidationError("error.required.tp.date"))
+          Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
       }
 

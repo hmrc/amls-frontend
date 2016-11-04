@@ -211,7 +211,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("13"),
         "year" -> Seq("1990")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.month"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
@@ -221,7 +221,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("11"),
         "year" -> Seq("1990")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.date"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
@@ -231,7 +231,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("11"),
         "year" -> Seq("16")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.year"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
@@ -241,16 +241,14 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("11"),
         "year" -> Seq("20166")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.year"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
     "fail to validate missing fields" in {
       localDateRule.validate(Map.empty) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required")),
-          Path -> Seq(ValidationError("error.required")),
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
     }
   }
@@ -262,8 +260,6 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       "month" -> Seq("2"),
       "year" -> Seq("1990")
     )
-
-    val model = new LocalDate(1990, 2, 24)
 
     "fail to validate a future date" in {
       localDateFutureRule.validate(Map(
@@ -281,7 +277,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("13"),
         "year" -> Seq("1990")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.month"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
@@ -291,7 +287,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("11"),
         "year" -> Seq("1990")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.date"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
@@ -301,7 +297,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("11"),
         "year" -> Seq("16")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.year"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
@@ -311,16 +307,14 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "month" -> Seq("11"),
         "year" -> Seq("10166")
       )) must be(Failure(Seq(
-        Path -> Seq(ValidationError("error.invalid.tp.year"))
+        Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
     "fail to validate missing fields" in {
       localDateFutureRule.validate(Map.empty) must
         be(Failure(Seq(
-          Path -> Seq(ValidationError("error.required")),
-          Path -> Seq(ValidationError("error.required")),
-          Path -> Seq(ValidationError("error.required"))
+          Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
     }
 
