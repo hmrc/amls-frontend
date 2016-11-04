@@ -38,7 +38,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
       }
   }
 
-  def redirectAppropriatly(isYourAnswer: Boolean):Result = {
+  def redirectAppropriately(isYourAnswer: Boolean):Result = {
     isYourAnswer match {
       case true => Redirect(routes.YourAnswersController.get())
       case false => Redirect(routes.CheckYourAnswersController.get())
@@ -50,13 +50,13 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
 
       statusService.getStatus flatMap {
         case NotCompleted | SubmissionReady => removeDataStrict[ResponsiblePeople](index) map { _ =>
-          redirectAppropriatly(complete)
+          redirectAppropriately(complete)
         }
         case SubmissionReadyForReview => for {
           result <- updateDataStrict[ResponsiblePeople](index) { tp =>
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
-        } yield redirectAppropriatly(complete)
+        } yield redirectAppropriately(complete)
         case _ => Form2[ResponsiblePersonEndDate](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete,  true)))
@@ -65,7 +65,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
               result <- updateDataStrict[ResponsiblePeople](index) { tp =>
                 tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
               }
-            } yield redirectAppropriatly(complete)
+            } yield redirectAppropriately(complete)
           }
         }
       }
