@@ -5,6 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
+import play.api.mvc.Result
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{RepeatingSection, StatusConstants}
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
@@ -37,18 +38,25 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
       }
   }
 
+  def redirectAppropriatly(isYourAnswer: Boolean):Result = {
+    isYourAnswer match {
+      case true => Redirect(routes.YourAnswersController.get())
+      case false => Redirect(routes.CheckYourAnswersController.get())
+    }
+  }
+
   def remove(index: Int, complete: Boolean = false, personName: String) = Authorised.async {
     implicit authContext => implicit request =>
 
       statusService.getStatus flatMap {
         case NotCompleted | SubmissionReady => removeDataStrict[ResponsiblePeople](index) map { _ =>
-          Redirect(routes.CheckYourAnswersController.get())
+          redirectAppropriatly(complete)
         }
         case SubmissionReadyForReview => for {
           result <- updateDataStrict[ResponsiblePeople](index) { tp =>
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
-        } yield Redirect(routes.CheckYourAnswersController.get())
+        } yield redirectAppropriatly(complete)
         case _ => Form2[ResponsiblePersonEndDate](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete,  true)))
@@ -57,7 +65,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
               result <- updateDataStrict[ResponsiblePeople](index) { tp =>
                 tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
               }
-            } yield Redirect(routes.CheckYourAnswersController.get())
+            } yield redirectAppropriatly(complete)
           }
         }
       }
