@@ -324,7 +324,7 @@ PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite with M
       val result = controller.post(RecordId)(newRequest)
 
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
     "show error with year field too long" in new Fixture {
@@ -345,7 +345,7 @@ PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite with M
 
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
     "submit with all other valid data types" in new Fixture {
@@ -414,9 +414,7 @@ PositionWithinBusinessControllerSpec extends PlaySpec with OneAppPerSuite with M
       val result = controller.post(RecordId)(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.body().html() must include(Messages("error.required.tp.date"))
-      document.body().html() must include(Messages("error.required.tp.month"))
-      document.body().html() must include(Messages("error.required.tp.year"))
+      document.body().html() must include(Messages("error.expected.jodadate.format"))
     }
 
     "fail submission on invalid string" in new Fixture {

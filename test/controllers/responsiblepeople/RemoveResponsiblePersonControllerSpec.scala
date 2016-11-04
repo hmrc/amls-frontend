@@ -208,9 +208,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val result = controller.remove(1, true, "person Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.tp.date"))
-          contentAsString(result) must include(Messages("error.required.tp.month"))
-          contentAsString(result) must include(Messages("error.required.tp.year"))
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
 
@@ -232,7 +230,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val result = controller.remove(1, true, "person Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.year"))
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
 
@@ -254,7 +252,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
           val result = controller.remove(1, true, "person Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.year"))
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
 

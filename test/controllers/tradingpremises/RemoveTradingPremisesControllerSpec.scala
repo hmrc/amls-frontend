@@ -310,9 +310,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.tp.date"))
-          contentAsString(result) must include(Messages("error.required.tp.month"))
-          contentAsString(result) must include(Messages("error.required.tp.year"))
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
         "removing a trading premises from an application a year too great in length" in new Fixture {
@@ -333,7 +331,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.year"))
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
 

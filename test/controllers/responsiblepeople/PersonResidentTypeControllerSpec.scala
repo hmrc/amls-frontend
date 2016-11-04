@@ -100,7 +100,7 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.invalid.tp.year"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
     "Prepopulate UI with saved data" in new Fixture {

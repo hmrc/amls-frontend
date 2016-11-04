@@ -140,7 +140,9 @@ object FormTypes {
         (__ \ "year").read(yearType) ~
         (__ \ "month").read(monthType) ~
         (__ \ "day").read(dayType)
-      )( (y, m, d) => s"$y-$m-$d" ) compose jodaLocalDateRule("yyyy-MM-dd")
+      )( (y, m, d) => s"$y-$m-$d" ) orElse
+        Rule[UrlFormEncoded, String]( __ => Success("INVALID DATE STRING")) compose
+        jodaLocalDateRule("yyyy-MM-dd")
     }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =

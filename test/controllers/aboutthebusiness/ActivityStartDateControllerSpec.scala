@@ -118,6 +118,7 @@ class ActivityStartDateControllerSpec extends PlaySpec with OneAppPerSuite with 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("error.invalid.tp.year"))
+        //contentAsString(result) must include(Messages("error.expected.jodadate.format"))
       }
     }
   }
