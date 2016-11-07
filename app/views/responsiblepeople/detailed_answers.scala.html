@@ -205,6 +205,14 @@
             </ul>
         }
 
+        @detailedAnswers(
+            question = Messages("responsiblepeople.detailed_answers.position_start"),
+            editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true).toString(),
+            dataItem = person.positions
+        ) { pos =>
+            <p>@pos.startDate.map(DateHelper.formatDate(_))</p>
+        }
+
         @person.vatRegistered.map { vr =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
