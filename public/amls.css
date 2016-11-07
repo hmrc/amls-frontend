@@ -20,6 +20,11 @@ a.block-link {
     display: block;
 }
 
+.flash .heading-medium {
+  font-weight: bold;
+  margin: 0;
+}
+
 /* new-style page headers */
 .page-header {
   clear: both;
