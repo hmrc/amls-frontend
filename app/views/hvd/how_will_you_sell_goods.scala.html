@@ -1,5 +1,5 @@
 @import include._
-@import include.forms2._
+@import forms2._
 @import models.hvd._
 @import utils._
 
@@ -16,11 +16,11 @@
 ) {
 
     @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
-        @fieldset(
-            legend = "lbl.select.all",
-            panel = false,
-            classes = Seq("form-group")
+        @radioGroup(
+            f("salesChannels")
         ) {
+            @legend("hvd.how-will-you-sell-goods.title", jsHidden = true)
+            <p>@Messages("lbl.select.all")</p>
             @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.auction", "Auction")
             @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.retail" , "Retail" )
             @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.wholesale" , "Wholesale" )

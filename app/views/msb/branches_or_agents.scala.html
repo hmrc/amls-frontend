@@ -1,6 +1,6 @@
 @import forms.{Form2, ValidField, InvalidField}
 @import include._
-@import include.forms2._
+@import forms2._
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_])
 
@@ -23,15 +23,17 @@
           @radio(f("hasCountries"), "lbl.no", "false")
           @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset", data = Seq("data-toggle-new")) {
             <p class="form-hint">@Messages("msb.branchesoragents.hint")</p>
-            @addRemove("lbl.add.another.country") {
-              @for(i <- 0 until 10) {
-                @defining(
-                  f(s"countries[$i]")
-                ) { field =>
-                  @country(field, classes = field match {
-                    case f: ValidField => Seq("")
-                    case f: InvalidField => Seq("js-hidden")
-                  })
+            @errorGroup(f("countries")) {
+              @addRemove("lbl.add.another.country") {
+                @for(i <- 0 until 10) {
+                  @defining(
+                    f(s"countries[$i]")
+                  ) { field =>
+                    @country(field, classes = field match {
+                      case f: ValidField => Seq("")
+                      case f: InvalidField => Seq("js-hidden")
+                    })
+                  }
                 }
               }
             }

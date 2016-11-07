@@ -10,22 +10,21 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessactivities.involved.other.title", "summary.businessactivities")
+    @heading("businessactivities.involved.other.legend", "summary.businessactivities")
 }
 
 @main(
-    title = Messages("businessactivities.involved.other.title") + " - " + Messages("summary.businessactivities"),
+    title = Messages("businessactivities.involved.other.legend") + " - " + Messages("summary.businessactivities"),
     heading = header
 )  {
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
         <div class="form-field-group">
-            @Messages("bankdetails.confirm-activities.subtitle") @businessTypes @Messages("businessactivities.involved.other.legend")
+            <p>@Messages("bankdetails.confirm-activities.subtitle") @businessTypes @Messages("businessactivities.involved.other.legend")</p>
             @inlineRadioGroup(f("involvedInOther")) {
-                 <span class="form-hint">
-                    @Messages("businessactivities.involved.other.hint")
-                </span>
+                @legend("businessactivities.involved.other.title", jsHidden = true)
+                <p class="form-hint">@Messages("businessactivities.involved.other.hint")</p>
 
                 @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("involvedInOther"), "lbl.no", "false")
