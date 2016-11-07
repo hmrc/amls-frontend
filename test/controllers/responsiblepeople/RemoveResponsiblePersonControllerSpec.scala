@@ -136,6 +136,27 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
           )))(any(), any(), any())
         }
 
+        "removing a responsible person from an application with status SubmissionReady and redirect to your answers page" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReady))
+
+          val result = controller.remove(1, true, "John Envy Doe")(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourAnswersController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+            CompleteResponsiblePeople2,
+            CompleteResponsiblePeople3
+          )))(any(), any(), any())
+        }
+
         "removing a responsible person from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
@@ -197,6 +218,50 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
             "endDate.day" -> "",
             "endDate.month" -> "",
             "endDate.year" -> ""
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+
+        }
+
+        "removing a responsible person from an application given a year which is too short" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "24",
+            "endDate.month" -> "2",
+            "endDate.year" -> "16"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+
+        }
+
+        "removing a responsible person from an application given a year which is too long" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "24",
+            "endDate.month" -> "2",
+            "endDate.year" -> "10166"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

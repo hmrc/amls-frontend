@@ -162,7 +162,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
     }
 
-    "on post with invalid data show error" in new Fixture {
+    "on post with missing day show error" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "acceptedAnyPayment" -> "true",
         "paymentDate.day" -> "",
@@ -176,6 +176,44 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
+    }
+
+    "show error with year field too short" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "true",
+        "paymentDate.day" -> "12",
+        "paymentDate.month" -> "5",
+        "paymentDate.year" -> "99"
+      )
+
+      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+    }
+
+    "show error with year field too long" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "true",
+        "paymentDate.day" -> "12",
+        "paymentDate.month" -> "5",
+        "paymentDate.year" -> "19995"
+      )
+
+      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
   }
 }

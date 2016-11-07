@@ -17,7 +17,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
 
   val accountType = PersonalAccount
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false)
+  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false)
   val accountTypeNew = BelongsToBusiness
 
   val bankAccount = BankAccount("My Account", UKAccount("111111", "11-11-11"))
@@ -27,7 +27,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
     "isUK" -> true,
     "accountNumber" -> "111111",
     "sortCode" -> "11-11-11"),
-    "hasChanged" -> false)
+    "hasChanged" -> false,
+    "refreshedFromServer" -> false)
   val bankAccountNew = BankAccount("My Account", UKAccount("123456", "78-90-12"))
 
   val completeModel = BankDetails(Some(accountType), Some(bankAccount))
@@ -37,7 +38,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       "isUK" -> true,
       "accountNumber" -> "111111",
       "sortCode" -> "11-11-11"),
-    "hasChanged" -> false)
+    "hasChanged" -> false,
+    "refreshedFromServer" -> false)
   val completeModelChanged = BankDetails(Some(accountType), Some(bankAccount), true)
   val completeJsonChanged = Json.obj(
     "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
@@ -45,7 +47,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
       "isUK" -> true,
       "accountNumber" -> "111111",
       "sortCode" -> "11-11-11"),
-    "hasChanged" -> true)
+    "hasChanged" -> true,
+    "refreshedFromServer" -> false)
 
 
   "BankDetails with complete model" must {
@@ -148,7 +151,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
     }
 
     "return a completed Section when model is complete with No bankaccount option selected" in {
-      val noBankAcount = Seq(BankDetails(None, None, true, None))
+      val noBankAcount = Seq(BankDetails(None, None, true, false, None))
       val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
       when(cache.getEntry[Seq[BankDetails]](meq("bank-details"))(any())) thenReturn Some(noBankAcount)

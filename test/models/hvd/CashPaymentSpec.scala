@@ -43,7 +43,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
           )))
       }
 
-      "fail to validate given an `Yes` with no value" in {
+      "fail to validate given missing day" in {
 
         val data = Map(
           "acceptedAnyPayment" -> Seq("true"),
@@ -53,8 +53,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPayment.formRule.validate(data) must
-          be(Failure(Seq(Path \ "paymentDate" -> Seq(
-            ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "write correct data from enum value" in {

@@ -4,7 +4,7 @@
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
 
-@(model: Option[ResponsiblePeople], idx: Int)(implicit request: Request[_], lang: Lang)
+@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean)(implicit request: Request[_], lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
@@ -269,7 +269,15 @@
     }
 
     <div class="form-field">
-        <a class="button" href="@controllers.responsiblepeople.routes.YourAnswersController.get()">@Messages("button.confirmandcontinue")</a>
+        @fromYourAnswers match {
+            case true =>{
+                    <a class="button" href="@controllers.responsiblepeople.routes.YourAnswersController.get()">@Messages("button.confirmandcontinue")</a>
+                    }
+            case false =>{
+                    <a class="button" href="@controllers.responsiblepeople.routes.CheckYourAnswersController.get()">@Messages("button.confirmandcontinue")</a>
+                    }
+        }
+
     </div>
 
 }

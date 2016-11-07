@@ -313,6 +313,27 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
         }
+        "removing a trading premises from an application a year too great in length" in new Fixture {
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "1",
+            "endDate.month" -> "12",
+            "endDate.year" -> "123456789"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(tradingPremisesList)))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "trading Name")(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+
+        }
 
         "removing a trading premises from an application with future date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)

@@ -3,14 +3,16 @@ package controllers.businessactivities
 import connectors.DataCacheConnector
 import models.Country
 import models.businessactivities._
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.status.{SubmissionDecisionApproved, NotCompleted}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -29,6 +31,8 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
   "Get" must {
 
+    val mockCacheMap = mock[CacheMap]
+
     val completeModel = BusinessActivities(
       involvedInOther = Some(BusinessActivitiesValues.DefaultInvolvedInOther),
       expectedBusinessTurnover = Some(BusinessActivitiesValues.DefaultBusinessTurnover),
@@ -46,14 +50,22 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       hasChanged = false
     )
 
+    val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
+
     "load the summary page when section data is available" in new Fixture {
 
       val model = BusinessActivities(None)
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(model)))
+      when(controller.dataCache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
+
+      when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+        .thenReturn(Some(model))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -63,8 +75,15 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetch[BusinessActivities](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
+
+      when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+        .thenReturn(None)
+
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -72,8 +91,15 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
     "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
-        when(controller.dataCache.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
+
+        when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+          .thenReturn(Some(completeModel))
+
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -90,8 +116,14 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetch[BusinessActivities](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
+
+        when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+          .thenReturn(Some(completeModel))
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
@@ -104,6 +136,29 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("edit") must be(true)
         document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("edit") must be(true)
       }
+    }
+
+    "pre load Business matching business activities data in " +
+      "'How much total net profit does your business expect in the next 12 months, from the following activities?'" in new Fixture {
+
+      when(controller.dataCache.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
+
+      when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+        .thenReturn(Some(completeModel))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(NotCompleted))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+      val listElement = document.getElementsByTag("section").get(2).getElementsByClass("list-bullet").get(0)
+      listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
+
     }
   }
 }
