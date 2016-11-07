@@ -18,20 +18,22 @@
 
     @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
 
-        @inlineRadioGroup(f("countries")) {
+        @inlineRadioGroup(f("hasCountries")) {
           @radio(f("hasCountries"), "lbl.yes", "true", target = s"#hasCountries-fieldset")
           @radio(f("hasCountries"), "lbl.no", "false")
           @fieldset("msb.branchesoragents.legend", jsHidden = false, id = "hasCountries-fieldset", data = Seq("data-toggle-new")) {
             <p class="form-hint">@Messages("msb.branchesoragents.hint")</p>
-            @addRemove("lbl.add.another.country") {
-              @for(i <- 0 until 10) {
-                @defining(
-                  f(s"countries[$i]")
-                ) { field =>
-                  @country(field, classes = field match {
-                    case f: ValidField => Seq("")
-                    case f: InvalidField => Seq("js-hidden")
-                  })
+            @errorGroup(f("countries")) {
+              @addRemove("lbl.add.another.country") {
+                @for(i <- 0 until 10) {
+                  @defining(
+                    f(s"countries[$i]")
+                  ) { field =>
+                    @country(field, classes = field match {
+                      case f: ValidField => Seq("")
+                      case f: InvalidField => Seq("js-hidden")
+                    })
+                  }
                 }
               }
             }
