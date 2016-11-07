@@ -1061,6 +1061,7 @@ responsiblepeople.detailed_answers.at_this_address = at this address
 responsiblepeople.detailed_answers.position = Position
 responsiblepeople.detailed_answers.registered_for_vat = Registered for VAT
 responsiblepeople.detailed_answers.registered_for_sa = Registered for Self Assessment
+responsiblepeople.detailed_answers.position_start = When did this position start?
 responsiblepeople.detailed_answers.previous_experience = Previous Experience
 responsiblepeople.detailed_answers.training_in_anti_money_laundering = Training in anti-money laundering
 responsiblepeople.detailed_answers.already_passed_fit_and_proper = Already passed fit and proper test
