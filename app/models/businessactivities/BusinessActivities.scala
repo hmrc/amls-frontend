@@ -62,7 +62,6 @@ case class BusinessActivities(
 
 
   def isComplete: Boolean = {
-    Logger.debug(s"Testing isComplete for : $this")
     this match {
       case BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), Some(_),
