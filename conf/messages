@@ -909,6 +909,7 @@ declaration.addperson.firstname = First name
 declaration.addperson.middlename = Middle name (optional)
 declaration.addperson.lastname = Last name
 declaration.addperson.whatsyourrole = What’s your role within the business?
+declaration.addperson.amendment.title = What’s your name?
 declaration.declaration.header = Declaration
 declaration.addperson.lbl.01 = Beneficial shareholder
 declaration.addperson.lbl.02 = Director
