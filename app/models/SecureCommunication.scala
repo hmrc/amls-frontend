@@ -1,7 +1,7 @@
 package models
 
 import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import play.api.i18n.Messages
 
 case class SecureCommunication(
                                 status: Option[String],
@@ -9,8 +9,18 @@ case class SecureCommunication(
                                 referenceNumber: Option[String],
                                 isVariation: Boolean,
                                 dateReceived: LocalDate,
-                                isRead: Boolean)
+                                isRead: Boolean) {
+
+  def subject(): String = {
+    messageType match {
+      case Some(msg) => Messages(s"secure.communications.subject.$msg")
+      case None if isVariation => Messages("secure.communications.subject.approval.variation")
+      case _ => Messages("secure.communications.subject.failtopay")
+    }
+  }
+
+}
 
 object SecureCommunication{
-  implicit val format = Json.format[SecureCommunication]
+  
 }

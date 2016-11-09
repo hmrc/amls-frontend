@@ -1298,3 +1298,26 @@ hvd.percentage.lbl.02 = 21% to 40%
 hvd.percentage.lbl.03 = 41% to 60%
 hvd.percentage.lbl.04 = 61% to 80%
 hvd.percentage.lbl.05 = 81% to 100%
+
+###############################  Secure Communications ###############################
+
+secure.communications.subject.APA1 = Application Approval
+secure.communications.subject.approval.variation = Registration Variation Approval
+secure.communications.subject.APR1 = Renewal Approval
+
+secure.communications.subject.REJR = Application Rejection
+secure.communications.subject.failtopay = Application Auto-Rejection for Failure to Pay
+secure.communications.subject.REVR = Registration Revocation
+secure.communications.subject.EXPR = Registration Expiry
+
+secure.communications.subject.RPA1 = Reminder to Pay - Application
+secure.communications.subject.RPV1 = Reminder to Pay - Variation
+secure.communications.subject.RPR1 = Reminder to Pay - Renewal
+secure.communications.subject.RPM1 = Reminder to Pay - Manual Charge
+secure.communications.subject.RREM = Reminder to Renew
+
+secure.communications.subject.MTRJ = Rejection of Application being Considered
+secure.communications.subject.MTRV = Revocation of Registration being Considered
+secure.communications.subject.NMRJ = Rejection of Application no longer being Considered
+secure.communications.subject.NMRV = Revocation of Registration no longer being Considered
+secure.communications.subject.OTHR = Generic communication
