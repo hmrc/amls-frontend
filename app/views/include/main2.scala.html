@@ -29,7 +29,6 @@
 
 @head = {
     @uiLayouts.head(
-        assetsPrefix = appConfig.assetsPrefix,
         linkElem = Some(styles),
         headScripts = None
     )
@@ -53,7 +52,6 @@
     @uiLayouts.footer(
         analyticsToken = appConfig.analyticsToken,
         analyticsHost = appConfig.analyticsHost,
-        assetsPrefix = appConfig.assetsPrefix,
         ssoUrl = None,
         scriptElem = Some(scripts),
         gaCalls = None
