@@ -1,7 +1,7 @@
 package services
 
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
-import models.ViewResponse
+import models.{AmendVariationResponse, SubscriptionResponse, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -26,7 +26,9 @@ import scala.concurrent.{ExecutionContext, Future}
 trait LandingService {
 
   private[services] def cacheConnector: DataCacheConnector
+
   private[services] def keyStore: KeystoreConnector
+
   private[services] def desConnector: AmlsConnector
 
   @deprecated("fetch the cacheMap itself instead", "")
@@ -53,28 +55,31 @@ trait LandingService {
   (implicit
    hc: HeaderCarrier
   ): Future[HttpResponse] = {
-    cacheConnector.remove(BusinessMatching.key)}
+    cacheConnector.remove(BusinessMatching.key)
+  }
 
   def refreshCache(amlsRefNumber: String)
                   (implicit
                    authContext: AuthContext,
                    hc: HeaderCarrier,
                    ec: ExecutionContext
-  ): Future[CacheMap] = {
+                  ): Future[CacheMap] = {
     desConnector.view(amlsRefNumber) flatMap { viewResponse =>
-      cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
-        _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
-          _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {
-            _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection) flatMap {
-              _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
-                _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
-                  _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection) flatMap {
-                    _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, viewResponse.responsiblePeopleSection) flatMap {
-                      _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, viewResponse.tcspSection) flatMap {
-                        _ => cacheConnector.save[Option[Asp]](Asp.key, viewResponse.aspSection) flatMap {
-                          _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
-                            _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {
-                              _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection)
+      cacheConnector.remove(authContext.user.oid) flatMap {
+        _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
+          _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
+            _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {
+              _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection) flatMap {
+                _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
+                  _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
+                    _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection) flatMap {
+                      _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, viewResponse.responsiblePeopleSection) flatMap {
+                        _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, viewResponse.tcspSection) flatMap {
+                          _ => cacheConnector.save[Option[Asp]](Asp.key, viewResponse.aspSection) flatMap {
+                            _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
+                              _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {
+                                _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection)
+                              }
                             }
                           }
                         }
@@ -90,11 +95,11 @@ trait LandingService {
     }
   }
 
-  def writeEmptyBankDetails (bankDetailsSeq: Seq[BankDetails]) :Seq[BankDetails] = {
+  def writeEmptyBankDetails(bankDetailsSeq: Seq[BankDetails]): Seq[BankDetails] = {
     val empty = Seq.empty[BankDetails]
     bankDetailsSeq match {
       case `empty` => {
-        Seq(BankDetails(None,None,false,true,None))
+        Seq(BankDetails(None, None, false, true, None))
       }
       case _ => bankDetailsSeq
     }
@@ -130,7 +135,10 @@ trait LandingService {
 object LandingService extends LandingService {
   // $COVERAGE-OFF$
   override private[services] def cacheConnector = DataCacheConnector
+
   override private[services] def keyStore = KeystoreConnector
+
   override private[services] def desConnector = AmlsConnector
+
   // $COVERAGE-ON$
 }
