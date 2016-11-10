@@ -1,5 +1,6 @@
 package models
 
+import models.securecommunications.SecureCommunication
 import org.joda.time.LocalDate
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.specs2.mock.mockito.MockitoMatchers

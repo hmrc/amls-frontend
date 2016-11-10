@@ -1,4 +1,4 @@
-package models
+package models.securecommunications
 
 sealed trait MessageType
 

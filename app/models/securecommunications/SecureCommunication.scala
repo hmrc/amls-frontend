@@ -1,4 +1,4 @@
-package models
+package models.securecommunications
 
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
@@ -11,7 +11,7 @@ case class SecureCommunication(
                                 dateReceived: LocalDate,
                                 isRead: Boolean) {
 
-  def subject(): String = {
+  def subject: String = {
     messageType match {
       case Some(msg) => Messages(s"secure.communications.subject.$msg")
       case None if isVariation => Messages("secure.communications.subject.approval.variation")
