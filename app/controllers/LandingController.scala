@@ -1,7 +1,7 @@
 package controllers
 
 import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
-import models.SubscriptionResponse
+import models.{AmendVariationResponse, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -113,8 +113,9 @@ trait LandingController extends BaseController {
         case Some(cacheMap) => {
           //there is data in S4l
           if (dataHasChanged(cacheMap)) {
-            cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key) match {
-              case Some(_) => refreshAndRedirect(amlsRegistrationNumber)
+            (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),cacheMap.getEntry[AmendVariationResponse](AmendVariationResponse.key)) match {
+              case (Some(_),_) => refreshAndRedirect(amlsRegistrationNumber)
+              case (_,Some(_)) => refreshAndRedirect(amlsRegistrationNumber)
               case _ => Future.successful(Redirect(controllers.routes.StatusController.get()))
             }
           } else { //DataHasNotChanged
