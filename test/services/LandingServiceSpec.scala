@@ -24,8 +24,8 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.specs2.execute.ResultExecution.ExecutableResult
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
@@ -93,7 +93,10 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       when {
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
-
+      val user = mock[LoggedInUser]
+      when(ac.user).thenReturn(user)
+      when(user.oid).thenReturn("")
+      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(200)))
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, viewResponse.eabSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, TradingPremises.key, viewResponse.tradingPremisesSection)
