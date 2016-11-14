@@ -965,3 +965,57 @@ fieldset.panel-indent legend {
 .details__inner li {
   padding-bottom: 20px;
 }
+
+/* -- notifications -- */
+table.notifications thead th {
+    background-color: #005ea5;
+    color: #ffffff;
+}
+
+
+.unread td {
+  background-color: #F8F8F8;
+  font-weight: 700; }
+
+.message-unread {
+  width: 5%; }
+
+.message-type {
+  width: 20%; }
+
+.message-date {
+  width: 20%; }
+
+.circle {
+  display: none; }
+
+.unread .circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  font-size: 12px;
+  background: #00823B;
+  display: block;
+  margin-left: 10px; }
+
+.column-full {
+  padding: 0 15px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+@media (min-width: 641px) {
+  .column-full {
+    float: left;
+    width: 100%; } }
+
+.messaging {
+  padding: 10px;
+  padding-left: 20px;
+  background-color: #005EA5;
+  margin: 0;
+  text-align: left; }
+  .messaging .icon {
+    float: left; }
+  .messaging a:link, .messaging a:visited {
+    color: #fff; }
