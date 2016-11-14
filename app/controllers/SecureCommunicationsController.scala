@@ -20,12 +20,16 @@ trait SecureCommunicationsController extends BaseController {
           bm <- businessMatching
           rd <- bm.reviewDetails
         } yield {
-          Ok(views.html.securecommunications.your_messages(rd.businessName, getSecureComms))
+          Ok(views.html.securecommunications.your_messages(rd.businessName, getSecureComms()))
         }) getOrElse(throw new Exception("Cannot retrieve business name"))
       }
   }
 
-  def getSecureComms: List[SecureCommunication] = ???
+  def getSecureComms(secureComms: List[SecureCommunication] = List()): List[SecureCommunication] =
+    secureComms match {
+      case s :: sc => secureComms.sortWith((x,y) => x.timeReceived.isAfter(y.timeReceived))
+      case _ => secureComms
+    }
 
 }
 
