@@ -153,7 +153,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
           "currencies[2]" -> Seq("EUR")
         )
 
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
+        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
       }
     }
 
@@ -183,7 +183,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       "fail validation with both error messages" in {
         WhichCurrencies.formR.validate(formData) must be (Failure(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
-          (Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))
+          (Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))
         )))
       }
     }
