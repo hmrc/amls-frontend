@@ -43,7 +43,7 @@ private sealed trait WhichCurrencies0 {
     case x@(Some(_), _, _) => Success(x)
     case x@( _, Some(_), _) => Success(x)
     case x@( _, _, true) => Success(x)
-    case _ => Failure(Seq((Path \ "") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+    case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
   }
 
   private implicit def rule[A]
