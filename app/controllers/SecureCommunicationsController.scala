@@ -21,11 +21,11 @@ trait SecureCommunicationsController extends BaseController {
           rd <- bm.reviewDetails
         } yield {
           Ok(views.html.securecommunications.your_messages(rd.businessName, getSecureComms))
-        }) getOrElse Ok(views.html.securecommunications.your_messages("", getSecureComms))
+        }) getOrElse(throw new Exception("Cannot retrieve business name"))
       }
   }
 
-  private def getSecureComms: List[SecureCommunication] = ???
+  def getSecureComms: List[SecureCommunication] = ???
 
 }
 

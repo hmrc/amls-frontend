@@ -1,15 +1,9 @@
 package models.securecommunications
 
-import org.joda.time.LocalDate
+import org.joda.time.{DateTime, LocalDate}
 import play.api.i18n.Messages
 
-case class SecureCommunication(
-                                status: Option[String],
-                                messageType: Option[MessageType],
-                                referenceNumber: Option[String],
-                                isVariation: Boolean,
-                                dateReceived: LocalDate,
-                                isRead: Boolean) {
+case class SecureCommunication(status: Option[String], messageType: Option[MessageType], referenceNumber: Option[String], isVariation: Boolean, timeReceived: DateTime, isRead: Boolean) {
 
   def subject: String = {
     messageType match {
