@@ -67,6 +67,9 @@ class SecureCommunicationSpec extends PlaySpec with MockitoMatchers with OneAppP
         testSecureComms.copy(messageType = Some(OTHR)).subject mustBe "Generic communication"
       }
     }
+    "format the date for the table of messages" in {
+      testSecureComms.dateReceived mustBe "1 December 2017"
+    }
   }
 
 }

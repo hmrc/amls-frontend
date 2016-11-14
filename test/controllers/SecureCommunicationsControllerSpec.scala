@@ -29,7 +29,7 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
       referenceNumber = None,
       isVariation = false,
       timeReceived = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
-      isRead = false
+      isRead = true
     )
 
     val controller = new SecureCommunicationsController {
@@ -37,16 +37,16 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
 
       override def getSecureComms: List[SecureCommunication] = List(
-        testSecureComms.copy(messageType = Some(APA1)),
+        testSecureComms.copy(messageType = Some(APA1), isRead = false),
         testSecureComms.copy(isVariation = true),
-        testSecureComms.copy(messageType = Some(APR1)),
+        testSecureComms.copy(messageType = Some(APR1), isRead = false),
         testSecureComms.copy(messageType = Some(REJR)),
         testSecureComms,
         testSecureComms.copy(messageType = Some(REVR)),
         testSecureComms.copy(messageType = Some(EXPR)),
-        testSecureComms.copy(messageType = Some(RPA1)),
-        testSecureComms.copy(messageType = Some(RPV1)),
-        testSecureComms.copy(messageType = Some(RPR1)),
+        testSecureComms.copy(messageType = Some(RPA1), isRead = false),
+        testSecureComms.copy(messageType = Some(RPV1), isRead = false),
+        testSecureComms.copy(messageType = Some(RPR1), isRead = false),
         testSecureComms.copy(messageType = Some(RPM1)),
         testSecureComms.copy(messageType = Some(RREM)),
         testSecureComms.copy(messageType = Some(MTRJ)),

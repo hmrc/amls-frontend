@@ -3,48 +3,45 @@
 
 @(businessName: String, secureComms: List[SecureCommunication])(implicit request: Request[_])
 
-@main(
-title = Messages("secure.communications.header")
+@header = {
+@heading("secure.communications.header", "summary.status")
+}
+
+@messages_main(
+title = Messages("secure.communications.header"),
+heading = header
 ) {
-    <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--2-3">
-            <h1 class="heading-xlarge">
-                <span class="heading-secondary">
-                    @Messages("summary.status")
-                </span>
-                <span>@Messages("secure.communications.header")</span>
-            </h1>
-        </div>
-    </div>
 
-    <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--2-3">
-            <div class="panel-indent panel-indent--gutter">
-                <p><span class="heading-small">Your Business:</span>
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <div class="panel-indent panel-indent--gutter">
+            <p><span class="heading-small">Your Business:</span>
                 <br /><span>@businessName</span>
-                </p>
-            </div>
+            </p>
         </div>
     </div>
+</div>
 
-    <div class="full-width">
-        <table class="spacelarge">
-            <thead>
-            <tr>
-                <th class="message-unread"></th>
-                <th scope="col">@Messages("secure.communications.table.header.subject")</th>
-                <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
-                <th class="message-date" scope="col">@Messages("secure.communications.table.header.date")</th>
-            </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    <td><a href="#">@secureComms(0).subject</a></td>
-                    <!--<td></td>-->
-                    <td>@secureComms(0).timeReceived</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="full-width">
+    <table class="spacelarge notifications">
+        <thead>
+        <tr>
+            <th class="message-unread"></th>
+            <th scope="col">@Messages("secure.communications.table.header.subject")</th>
+            <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
+            <th class="message-date" scope="col">@Messages("secure.communications.table.header.date")</th>
+        </tr>
+        </thead>
+        <tbody>
+        @secureComms.map { comms =>
+        <tr class="@if(!comms.isRead){unread}">
+            <td>@if(!comms.isRead){<span class="circle"></span>}</td>
+            <td><a href="#">@comms.subject</a></td>
+            <!--<td></td>-->
+            <td>@comms.timeReceived</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+</div>
 }
