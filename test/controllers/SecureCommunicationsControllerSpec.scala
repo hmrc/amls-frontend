@@ -5,7 +5,7 @@ import models.Country
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.securecommunications._
-import org.joda.time.LocalDate
+import org.joda.time.{DateTime, DateTimeZone}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -28,7 +28,7 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
       messageType = None,
       referenceNumber = None,
       isVariation = false,
-      dateReceived = new LocalDate(1970, 1, 31),
+      timeReceived = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
       isRead = false
     )
 
@@ -36,7 +36,7 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
       override protected def authConnector: AuthConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
 
-      private def getSecureComms: List[SecureCommunication] = List(
+      override def getSecureComms: List[SecureCommunication] = List(
         testSecureComms.copy(messageType = Some(APA1)),
         testSecureComms.copy(isVariation = true),
         testSecureComms.copy(messageType = Some(APR1)),
@@ -58,7 +58,7 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
     }
   }
 
-  "SubmissionController" must {
+  "SecureCommunicationsController" must {
     "display the page with messages" in new Fixture {
 
       val mockBusinessMatching = mock[BusinessMatching]
@@ -83,7 +83,7 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
       val document = Jsoup.parse(content)
 
       status(result) mustBe 200
-      document.getElementsByClass("heading-small").html() must include(testBusinessName)
+      document.getElementsByClass("panel-indent").html() must include(testBusinessName)
       document.getElementsByTag("table").html() must include("Subject")
       document.getElementsByTag("table").html() must include("Date")
       document.getElementsByTag("table").html() must include("message-unread")

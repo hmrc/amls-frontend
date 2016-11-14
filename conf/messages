@@ -1323,6 +1323,7 @@ secure.communications.subject.NMRV = Revocation of Registration no longer being 
 secure.communications.subject.OTHR = Generic communication
 
 secure.communications.header = Your Messages
+secure.communications.unread = You have unread messages
 
 secure.communications.table.header.subject = Subject
 secure.communications.table.header.type = Type
