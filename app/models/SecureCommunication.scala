@@ -21,6 +21,4 @@ case class SecureCommunication(
 
 }
 
-object SecureCommunication{
-  
-}
+object SecureCommunication

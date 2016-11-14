@@ -55,6 +55,7 @@ trait ReceiveCashPaymentsController extends BaseController {
 }
 
 object ReceiveCashPaymentsController extends ReceiveCashPaymentsController {
+  // $COVERAGE-OFF$
   override val cacheConnector: DataCacheConnector = DataCacheConnector
   override protected val authConnector: AuthConnector = AMLSAuthConnector
   override val statusService: StatusService = StatusService
