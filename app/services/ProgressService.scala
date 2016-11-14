@@ -35,7 +35,7 @@ trait ProgressService {
           m + Asp.section + Supervision.section
         case EstateAgentBusinessService =>
           m + EstateAgentBusiness.section
-        case HighValueDealing if ApplicationConfig.hvdToggle =>
+        case HighValueDealing =>
           m + Hvd.section
         case MoneyServiceBusiness =>
           bm.msbServices.fold(m)(x => m + Msb.section)
@@ -52,17 +52,10 @@ trait ProgressService {
       AboutTheBusiness.section,
       BusinessActivities.section,
       BankDetails.section,
-      TradingPremises.section
+      TradingPremises.section,
+      ResponsiblePeople.section
     )
 
-  //TODO: Move this into mandatory sections once toggle is removed.
-  private def responsiblePeople(implicit cache: CacheMap): Seq[Section] =
-    ApplicationConfig.responsiblePeopleToggle match {
-      case true =>
-        Seq(ResponsiblePeople.section)
-      case _ =>
-        Seq.empty
-    }
 
   def sections
   (implicit
@@ -80,7 +73,6 @@ trait ProgressService {
 
   def sections(cache : CacheMap) : Seq[Section] = {
       mandatorySections(cache) ++
-      responsiblePeople(cache) ++
       dependentSections(cache)
   }
 }

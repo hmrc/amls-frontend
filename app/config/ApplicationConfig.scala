@@ -5,12 +5,9 @@ import uk.gov.hmrc.play.config.ServicesConfig
 import play.api.Play.current
 
 trait ApplicationConfig {
-  def hvdToggle : Boolean
-  def responsiblePeopleToggle : Boolean
   def enrolmentToggle : Boolean
-  def statusToggle : Boolean
-  def amendmentsToggle : Boolean
 }
+
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
@@ -54,33 +51,9 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFee = getConfigInt("amounts.people")
 
-  def hvdToggle: Boolean = {
-    val value = getConfBool("feature-toggle.hvd", false)
-    Logger.info("s[ApplicationConfig][hvd]")
-    value
-  }
-
-  def responsiblePeopleToggle: Boolean = {
-    val value = getConfBool("feature-toggle.responsible-people", false)
-    Logger.info(s"[ApplicationConfig][responsible-people] $value")
-    value
-  }
-
-  def enrolmentToggle: Boolean = {
+  override def enrolmentToggle: Boolean = {
     val value = getConfBool("feature-toggle.gg-enrolment", false)
     Logger.info(s"[ApplicationConfig][gg-enrolment] $value")
-    value
-  }
-
-  def statusToggle: Boolean = {
-    val value = getConfBool("feature-toggle.status-review", false)
-    Logger.info(s"[ApplicationConfig][status-review] $value")
-    value
-  }
-
-  def amendmentsToggle: Boolean = {
-    val value = getConfBool("feature-toggle.amendments", false)
-    Logger.info(s"[ApplicationConfig][amendments] $value")
     value
   }
 

@@ -20,7 +20,6 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), Empty)
 
   def get(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
@@ -32,10 +31,9 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
               => NotFound(notFoundView)
           }
       }
-    }
+
 
   def post(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request => {
           (Form2[ResponsiblePersonAddress](request.body) match {
@@ -57,7 +55,7 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
           }
         }
       }
-    }
+
 
   private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>

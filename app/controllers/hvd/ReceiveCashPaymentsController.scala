@@ -18,41 +18,37 @@ trait ReceiveCashPaymentsController extends BaseController {
 
   implicit val statusService: StatusService
 
-  def get(edit: Boolean = false) = HvdToggle {
-    Authorised.async {
-      implicit authContext => implicit request =>
-        ControllerHelper.allowedToEdit flatMap {
-          case true =>
-            cacheConnector.fetch[Hvd](Hvd.key) map {
-              response =>
-                val form: Form2[ReceiveCashPayments] = (for {
-                  hvd <- response
-                  receivePayments <- hvd.receiveCashPayments
-                } yield Form2[ReceiveCashPayments](receivePayments)).getOrElse(EmptyForm)
-                Ok(receiving(form, edit))
-            }
-          case false => Future.successful(NotFound(notFoundView))
-        }
-    }
+  def get(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      ControllerHelper.allowedToEdit flatMap {
+        case true =>
+          cacheConnector.fetch[Hvd](Hvd.key) map {
+            response =>
+              val form: Form2[ReceiveCashPayments] = (for {
+                hvd <- response
+                receivePayments <- hvd.receiveCashPayments
+              } yield Form2[ReceiveCashPayments](receivePayments)).getOrElse(EmptyForm)
+              Ok(receiving(form, edit))
+          }
+        case false => Future.successful(NotFound(notFoundView))
+      }
   }
 
-  def post(edit: Boolean = false) = HvdToggle {
-    Authorised.async {
-      implicit authContext => implicit request => {
-        Form2[ReceiveCashPayments](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(receiving(f, edit)))
-          case ValidForm(_, data) =>
-            for {
-              hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-              _ <- cacheConnector.save[Hvd](Hvd.key,
-                hvd.receiveCashPayments(data)
-              )
-            } yield edit match {
-              case true => Redirect(routes.SummaryController.get())
-              case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-            }
-        }
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request => {
+      Form2[ReceiveCashPayments](request.body) match {
+        case f: InvalidForm =>
+          Future.successful(BadRequest(receiving(f, edit)))
+        case ValidForm(_, data) =>
+          for {
+            hvd <- cacheConnector.fetch[Hvd](Hvd.key)
+            _ <- cacheConnector.save[Hvd](Hvd.key,
+              hvd.receiveCashPayments(data)
+            )
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get())
+            case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+          }
       }
     }
   }

@@ -14,7 +14,7 @@ trait ExciseGoodsController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = HvdToggle {
+  def get(edit: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Hvd](Hvd.key) map {
@@ -26,9 +26,9 @@ trait ExciseGoodsController extends BaseController {
             Ok(excise_goods(form, edit))
         }
     }
-  }
 
-  def post(edit: Boolean = false) = HvdToggle {
+
+  def post(edit: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
         Form2[ExciseGoods](request.body) match {
@@ -47,7 +47,6 @@ trait ExciseGoodsController extends BaseController {
         }
       }
     }
-  }
 }
 
 object ExciseGoodsController extends ExciseGoodsController {

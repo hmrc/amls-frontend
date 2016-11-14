@@ -11,19 +11,18 @@ import views.html.hvd.summary
 trait SummaryController extends BaseController {
 
   protected def dataCache: DataCacheConnector
+
   implicit val statusService: StatusService
 
-  def get = HvdToggle {
-    Authorised.async {
-      implicit authContext => implicit request =>
-        for {
-          hvd <- dataCache.fetch[Hvd](Hvd.key)
-          isEditable <- ControllerHelper.allowedToEdit
-        } yield hvd match {
-          case Some(data) => Ok(summary(data, isEditable))
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-        }
-    }
+  def get = Authorised.async {
+    implicit authContext => implicit request =>
+      for {
+        hvd <- dataCache.fetch[Hvd](Hvd.key)
+        isEditable <- ControllerHelper.allowedToEdit
+      } yield hvd match {
+        case Some(data) => Ok(summary(data, isEditable))
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      }
   }
 }
 
