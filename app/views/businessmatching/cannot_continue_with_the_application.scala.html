@@ -18,13 +18,10 @@
 
     <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.third")</p>
 
-    <div class="form-group">
-        @anchor(
-            attrHref = appConfig.logoutUrl.toString,
-            attrRole = true,
-            linkText = Messages("button.logout"),
-            visuallyhidden = Messages("summary.businessmatching")
-        )
-    </div>
+    @anchor(
+        attrHref = appConfig.logoutUrl.toString,
+        attrRole = true,
+        linkText = Messages("button.logout"),
+        visuallyhidden = Messages("summary.businessmatching")
+    )
 }
-
