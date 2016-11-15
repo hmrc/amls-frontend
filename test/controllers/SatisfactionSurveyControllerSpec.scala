@@ -47,26 +47,16 @@ class SatisfactionSurveyControllerSpec extends PlaySpec with OneAppPerSuite with
       contentAsString(result) must include(Messages("survey.satisfaction.lbl.05"))
     }
 
-    "on post with valid data" in new Fixture {
+    "on post with valid data go to the progress page" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "expectedAMLSTurnover" -> "01"
+        "satisfaction" -> "01",
+        "details" -> ""
       )
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.BusinessFranchiseController.get().url))
-    }
-
-    "on post with valid data go to ???" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "expectedAMLSTurnover" -> "01"
-      )
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
