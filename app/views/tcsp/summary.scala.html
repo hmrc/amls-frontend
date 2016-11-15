@@ -1,5 +1,5 @@
 @import include._
-@import include.forms2._
+@import forms2._
 @import models.tcsp._
 
 @(model: Tcsp)(implicit request: Request[_], lang: Lang)
@@ -86,5 +86,9 @@
         }</p>
     }
 
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
 }

@@ -1,6 +1,6 @@
 @import forms.Form2
 @import include._
-@import include.forms2._
+@import forms2._
 
 @()(implicit request: Request[_])
 
@@ -24,11 +24,12 @@
         <li>@Messages("supervision.whatyouneed.requiredinfo.text.5")</li>
     </ul>
 
-    <div class="form-group">
-        <a class="button" role="button" href="@controllers.supervision.routes.AnotherBodyController.get()">
-            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.supervision")</span>
-        </a>
-    </div>
+    @anchor(
+        attrHref = controllers.supervision.routes.AnotherBodyController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.supervision")
+    )
 
 }
 
