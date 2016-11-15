@@ -24,5 +24,6 @@ trait GovernmentGatewayService {
 }
 
 object GovernmentGatewayService extends GovernmentGatewayService {
+  // $COVERAGE-OFF$
   override val ggConnector = GovernmentGatewayConnector
 }

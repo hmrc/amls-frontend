@@ -12,7 +12,6 @@ trait YourAnswersController extends RepeatingSection with BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get() =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
@@ -20,7 +19,6 @@ trait YourAnswersController extends RepeatingSection with BaseController {
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
       }
-    }
 }
 
 object YourAnswersController extends YourAnswersController {

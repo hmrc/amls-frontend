@@ -20,15 +20,19 @@ import scala.concurrent.Future
 trait RegistrationProgressController extends BaseController {
 
   protected[controllers] def service: ProgressService
-  protected[controllers] def dataCache : DataCacheConnector
-  protected[controllers] def enrolmentsService : AuthEnrolmentsService
+
+  protected[controllers] def dataCache: DataCacheConnector
+
+  protected[controllers] def enrolmentsService: AuthEnrolmentsService
 
   private def declarationAvailable(seq: Seq[Section]): Boolean =
-    seq forall { _.status == Completed }
+    seq forall {
+      _.status == Completed
+    }
 
-  private def amendmentDeclarationAvailable(sections : Seq[Section]) = {
+  private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
 
-    sections.foldLeft((true, false)) {(acc, s) =>
+    sections.foldLeft((true, false)) { (acc, s) =>
       (acc._1 && s.status == Completed,
         acc._2 || s.hasChanged)
     } match {
@@ -39,16 +43,8 @@ trait RegistrationProgressController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-     if (AmendmentsToggle.feature) {
-       getWithAmendments
-     } else {
-       getWithoutAmendments
-     }
-  }
-
-  private def getWithAmendments(implicit hc : HeaderCarrier, ac : AuthContext, r : Request[_]) = {
-    val x = dataCache.fetchAll
-    x.flatMap { cacheMapO =>
+      val x = dataCache.fetchAll
+      x.flatMap { cacheMapO =>
         cacheMapO.map { cacheMap: CacheMap =>
           val sections = service.sections(cacheMap)
           preApplicationComplete(cacheMap) map {
@@ -59,18 +55,11 @@ trait RegistrationProgressController extends BaseController {
             case None => Redirect(controllers.routes.LandingController.get())
           }
         }.getOrElse(Future.successful(Ok(registration_progress(Seq.empty[Section], false))))
-    }
+      }
   }
 
-  private def getWithoutAmendments(implicit hc : HeaderCarrier, ac : AuthContext, r : Request[_]) =
-      service.sections map {
-        sections => {
-          Ok(registration_progress(sections, declarationAvailable(sections)))
-        }
-      }
-
-  private def preApplicationComplete(cache: CacheMap)(implicit hc : HeaderCarrier, ac : AuthContext): Future[Option[Boolean]] = {
-    (for{
+  private def preApplicationComplete(cache: CacheMap)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Boolean]] = {
+    (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
     } yield bm.isComplete match {
       case (true) => {
@@ -80,7 +69,7 @@ trait RegistrationProgressController extends BaseController {
           case None => Some(false)
         }
       }
-      case _ =>  Future.successful(None)
+      case _ => Future.successful(None)
     }).getOrElse(Future.successful(None))
   }
 

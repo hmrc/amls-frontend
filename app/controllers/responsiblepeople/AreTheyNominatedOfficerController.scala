@@ -37,52 +37,49 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
 
   def get(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
-      Authorised {
-        implicit authContext => implicit request =>
+    Authorised {
+      implicit authContext => implicit request =>
 
-          Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index))
-      }
+        Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index))
     }
 
 
   def post(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
-      Authorised.async {
-        import play.api.data.mapping.forms.Rules._
-        implicit authContext => implicit request =>
-          Form2[Boolean](request.body) match {
-            case f: InvalidForm =>
+    Authorised.async {
+      import play.api.data.mapping.forms.Rules._
+      implicit authContext => implicit request =>
+        Form2[Boolean](request.body) match {
+          case f: InvalidForm =>
 
-              Future.successful(BadRequest(are_they_nominated_officer(f, edit, index)))
+            Future.successful(BadRequest(are_they_nominated_officer(f, edit, index)))
 
-            case ValidForm(_, data) => {
+          case ValidForm(_, data) => {
 
-              for {
-                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+            for {
+              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
 
-                  rp.positions match {
-                    case Some(pos) if (data & !rp.isNominatedOfficer) =>
-                      rp.positions(pos.copy(pos.positions + NominatedOfficer, pos.startDate))
-                    case _ => rp
-                  }
-                }
-                rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-              } yield {
-                rpSeqOption match {
-                  case Some(rpSeq) => personalTaxRouter(index, edit, rpSeq)
-                  case _ => NotFound(notFoundView)
+                rp.positions match {
+                  case Some(pos) if (data & !rp.isNominatedOfficer) =>
+                    rp.positions(pos.copy(pos.positions + NominatedOfficer, pos.startDate))
+                  case _ => rp
                 }
               }
-
-            }.recoverWith {
-              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+              rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+            } yield {
+              rpSeqOption match {
+                case Some(rpSeq) => personalTaxRouter(index, edit, rpSeq)
+                case _ => NotFound(notFoundView)
+              }
             }
+
+          }.recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-      }
+        }
     }
 
-  private def personalTaxRouter(index: Int, edit: Boolean, rpSeq: Seq[ResponsiblePeople])(implicit request:Request[_]): Result = {
+
+  private def personalTaxRouter(index: Int, edit: Boolean, rpSeq: Seq[ResponsiblePeople])(implicit request: Request[_]): Result = {
     rpSeq.lift(index - 1) match {
       case Some(x) => (isPersonalTax(x), edit) match {
         case (false, false) => Redirect(routes.ExperienceTrainingController.get(index))

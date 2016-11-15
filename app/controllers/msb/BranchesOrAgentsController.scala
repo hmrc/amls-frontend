@@ -51,6 +51,7 @@ trait BranchesOrAgentsController extends BaseController {
 }
 
 object BranchesOrAgentsController extends BranchesOrAgentsController {
+  // $COVERAGE-OFF$
   override val cache: DataCacheConnector = DataCacheConnector
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
