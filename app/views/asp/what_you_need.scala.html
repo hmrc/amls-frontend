@@ -1,4 +1,5 @@
 @import include._
+@import forms2._
 @()(implicit request: Request[_])
 
 @header = {
@@ -19,11 +20,12 @@
         <li>@Messages("asp.whatyouneed.line_3")</li>
     </ul>
 
-    <div class="form-group">
-        <a class="button" role="button" href="@controllers.asp.routes.ServicesOfBusinessController.get()">
-            @Messages("button.continue") <span class="visuallyhidden"> @Messages("summary.asp")</span>
-        </a>
-    </div>
+    @anchor(
+        attrHref = controllers.asp.routes.ServicesOfBusinessController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.asp")
+    )
 
 }
 
