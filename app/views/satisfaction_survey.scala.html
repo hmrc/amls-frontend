@@ -1,0 +1,43 @@
+@import include._
+@import forms2._
+@import models.businessmatching._
+
+@(f: forms.Form2[_])(implicit lang: Lang, request: Request[_])
+
+@header = {
+@errorSummary(f)
+@heading("survey.satisfaction.title", "survey.satisfaction.heading")
+}
+
+@main(
+title = Messages("survey.satisfaction.title") + " - " + Messages("survey.satisfaction.heading"),
+heading = header
+) {
+
+@form(f, controllers.routes.SatisfactionSurveyController.post()) {
+
+<legend class="heading-medium">@Messages("survey.satisfaction.text.1")</legend>
+
+<div class="form-field-group">
+    @radioGroup(f("satisfactionSurvey")) {
+        @legend("", jsHidden = true)
+        @radio(f("satisfactionSurvey"), "survey.satisfaction.lbl.01", "01")
+        @radio(f("satisfactionSurvey"), "survey.satisfaction.lbl.02", "02")
+        @radio(f("satisfactionSurvey"), "survey.satisfaction.lbl.03", "03")
+        @radio(f("satisfactionSurvey"), "survey.satisfaction.lbl.04", "04")
+        @radio(f("satisfactionSurvey"), "survey.satisfaction.lbl.05", "05")
+    }
+</div>
+
+<div class="form-group">
+    <legend class="heading-medium">@Messages("survey.satisfaction.text.2")</legend>
+    @textarea(
+        f("information"),
+        bold = false,
+        hintText = "survey.satisfaction.hint"
+    )
+</div>
+
+<input type="submit" name="submit" class="button" value="@Messages("button.send.feedback")" />
+}
+}

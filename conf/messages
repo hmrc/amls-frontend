@@ -304,6 +304,7 @@ button.payfee = Pay registration fee
 button.amendment.payfee = Pay amendment fee
 button.logout = Log out
 button.finish = Finish
+button.send.feedback = Send feedback
 
 visuallyhidden.you.have.registered = You have registered
 visuallyhidden.the.details.for = the details for
@@ -1321,3 +1322,18 @@ secure.communications.subject.MTRV = Revocation of Registration being Considered
 secure.communications.subject.NMRJ = Rejection of Application no longer being Considered
 secure.communications.subject.NMRV = Revocation of Registration no longer being Considered
 secure.communications.subject.OTHR = Generic communication
+
+############################### Survey ###############################
+
+survey.satisfaction.heading = Give feedback
+survey.satisfaction.title = Satisfaction survey
+
+survey.satisfaction.text.1 = Overall, how did you feel about using the service?
+survey.satisfaction.text.2 = How could we improve this service?
+survey.satisfaction.hint = Please don't include any personal or financial information.
+
+survey.satisfaction.lbl.01 = Very satisifed
+survey.satisfaction.lbl.02 = Satisfied
+survey.satisfaction.lbl.03 = Neither satisfied or dissatisfied
+survey.satisfaction.lbl.04 = Dissatisfied
+survey.satisfaction.lbl.05 = Very dissatisfied
