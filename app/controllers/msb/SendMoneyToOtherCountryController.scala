@@ -84,6 +84,5 @@ trait SendMoneyToOtherCountryController extends BaseController {
 object SendMoneyToOtherCountryController extends SendMoneyToOtherCountryController {
   // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }

@@ -17,7 +17,6 @@ trait FitAndProperController extends RepeatingSection with BaseController {
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME)
 
   def get(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
@@ -29,10 +28,8 @@ trait FitAndProperController extends RepeatingSection with BaseController {
               => NotFound(notFoundView)
           }
       }
-    }
 
   def post(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request => {
           Form2[Boolean](request.body) match {
@@ -53,7 +50,6 @@ trait FitAndProperController extends RepeatingSection with BaseController {
           }
         }
       }
-    }
 
 }
 

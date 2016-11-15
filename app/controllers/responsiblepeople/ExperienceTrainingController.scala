@@ -35,46 +35,42 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
   }
 
   def get(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
-      Authorised.async {
-        implicit authContext => implicit request =>
-          businessActivitiesData flatMap {
-            activities =>
-              getData[ResponsiblePeople](index) map {
-                case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _,_, _))
-                  => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index))
-                case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-                  => Ok(experience_training(EmptyForm, activities, edit, index))
-                case _
-                  => NotFound(notFoundView)
-              }
-          }
-      }
+    Authorised.async {
+      implicit authContext => implicit request =>
+        businessActivitiesData flatMap {
+          activities =>
+            getData[ResponsiblePeople](index) map {
+              case Some(ResponsiblePeople(_, _, _, _, _, _, _, Some(experienceTraining), _, _, _, _, _, _))
+              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index))
+              case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
+              => Ok(experience_training(EmptyForm, activities, edit, index))
+              case _
+              => NotFound(notFoundView)
+            }
+        }
     }
 
   def post(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
-      Authorised.async {
-        implicit authContext => implicit request => {
-          businessActivitiesData flatMap {
-            activities =>
-              Form2[ExperienceTraining](request.body) match {
-                case f: InvalidForm =>
-                  Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index)))
-                case ValidForm(_, data) => {
-                  for {
-                    result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                      rp.experienceTraining(data)
-                    }
-                  } yield edit match {
-                    case true => Redirect(routes.DetailedAnswersController.get(index))
-                    case false => Redirect(routes.TrainingController.get(index, edit))
+    Authorised.async {
+      implicit authContext => implicit request => {
+        businessActivitiesData flatMap {
+          activities =>
+            Form2[ExperienceTraining](request.body) match {
+              case f: InvalidForm =>
+                Future.successful(BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index)))
+              case ValidForm(_, data) => {
+                for {
+                  result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.experienceTraining(data)
                   }
-                }.recoverWith {
-                  case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+                } yield edit match {
+                  case true => Redirect(routes.DetailedAnswersController.get(index))
+                  case false => Redirect(routes.TrainingController.get(index, edit))
                 }
+              }.recoverWith {
+                case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
               }
-          }
+            }
         }
       }
     }

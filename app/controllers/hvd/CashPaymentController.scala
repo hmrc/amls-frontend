@@ -13,7 +13,7 @@ trait CashPaymentController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(edit: Boolean = false) = HvdToggle {
+  def get(edit: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Hvd](Hvd.key) map {
@@ -25,10 +25,9 @@ trait CashPaymentController extends BaseController {
             Ok(cash_payment(form, edit))
         }
     }
-  }
 
 
-  def post(edit: Boolean = false) = HvdToggle {
+  def post(edit: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request => {
         Form2[CashPayment](request.body) match {
@@ -47,8 +46,8 @@ trait CashPaymentController extends BaseController {
         }
       }
     }
-  }
 }
+
 
 object CashPaymentController extends CashPaymentController {
   // $COVERAGE-OFF$

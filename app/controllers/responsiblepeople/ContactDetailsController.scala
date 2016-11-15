@@ -15,44 +15,40 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
-      Authorised.async {
-        implicit authContext => implicit request =>
-          getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(_, _, Some(name), _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(contact_details(Form2[ContactDetails](name), edit, index))
-            case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
-              => Ok(contact_details(EmptyForm, edit, index))
-            case _
-              => NotFound(notFoundView)
-          }
-      }
+    Authorised.async {
+      implicit authContext => implicit request =>
+        getData[ResponsiblePeople](index) map {
+          case Some(ResponsiblePeople(_, _, Some(name), _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(contact_details(Form2[ContactDetails](name), edit, index))
+          case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(contact_details(EmptyForm, edit, index))
+          case _
+          => NotFound(notFoundView)
+        }
     }
 
   def post(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
-      Authorised.async {
-        implicit authContext => implicit request => {
+    Authorised.async {
+      implicit authContext => implicit request => {
 
-          Form2[ContactDetails](request.body) match {
-            case f: InvalidForm =>
-              Future.successful(BadRequest(views.html.responsiblepeople.contact_details(f, edit, index)))
-            case ValidForm(_, data) => {
-              for {
-                result <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.contactDetails(data)
-                }
-              } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.CurrentAddressController.get(index, edit))
+        Form2[ContactDetails](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.responsiblepeople.contact_details(f, edit, index)))
+          case ValidForm(_, data) => {
+            for {
+              result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                rp.contactDetails(data)
               }
-            }.recoverWith {
-              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            } yield edit match {
+              case true => Redirect(routes.DetailedAnswersController.get(index))
+              case false => Redirect(routes.CurrentAddressController.get(index, edit))
             }
+          }.recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
-
       }
+
     }
 }
 

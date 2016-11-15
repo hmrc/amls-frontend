@@ -15,7 +15,6 @@ trait NationalityController extends RepeatingSection with BaseController {
   def dataCacheConnector: DataCacheConnector
 
   def get(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
@@ -30,10 +29,8 @@ trait NationalityController extends RepeatingSection with BaseController {
             => NotFound(notFoundView)
           }
       }
-    }
 
   def post(index: Int, edit: Boolean = false) =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
 
@@ -54,7 +51,6 @@ trait NationalityController extends RepeatingSection with BaseController {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
           }
-      }
     }
 }
 

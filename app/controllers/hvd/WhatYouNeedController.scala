@@ -8,11 +8,9 @@ import scala.concurrent.Future
 
 trait WhatYouNeedController extends BaseController {
 
-  def get = HvdToggle {
-    Authorised.async {
-      implicit authContext => implicit request =>
-        Future.successful(Ok(what_you_need()))
-    }
+  def get = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(what_you_need()))
   }
 }
 
