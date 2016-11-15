@@ -24,9 +24,7 @@ case class SecureCommunication(
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
     timeReceived.toString(fmt)
   }
-
 }
 
-object SecureCommunication{
-  
+object SecureCommunication {
 }

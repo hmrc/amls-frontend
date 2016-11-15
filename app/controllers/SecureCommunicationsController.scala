@@ -31,6 +31,10 @@ trait SecureCommunicationsController extends BaseController {
       case _ => secureComms
     }
 
+  def messageDetails(id: String) = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.securecommunications.message_details()))
+  }
 }
 
 object SecureCommunicationsController extends SecureCommunicationsController {
