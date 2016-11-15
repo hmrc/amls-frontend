@@ -1,4 +1,5 @@
 @import include._
+@import forms2._
 @import config.{ApplicationConfig => appConfig}
 @()(implicit request: Request[_])
 
@@ -18,9 +19,12 @@
     <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.third")</p>
 
     <div class="form-group">
-        <a class="button" role="button" href="@appConfig.logoutUrl">
-        @Messages("button.logout")<span class="visuallyhidden"> @Messages("summary.businessmatching")</span>
-        </a>
+        @anchor(
+            attrHref = appConfig.logoutUrl.toString,
+            attrRole = true,
+            linkText = Messages("button.logout"),
+            visuallyhidden = Messages("summary.businessmatching")
+        )
     </div>
 }
 

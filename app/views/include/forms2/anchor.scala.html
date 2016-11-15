@@ -1,0 +1,9 @@
+@(
+    attrRole: Boolean = false,
+    attrHref: String,
+    linkText: String,
+    visuallyhidden: String = ""
+)(implicit lang: Lang)
+
+<a href="@attrHref"@if(attrRole){ class="button"}@if(attrRole){ role="button"}>@linkText@if(visuallyhidden){ <span class="visuallyhidden">@visuallyhidden</span>}</a>
+
