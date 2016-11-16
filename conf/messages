@@ -1332,8 +1332,13 @@ survey.satisfaction.text.1 = Overall, how did you feel about using the service?
 survey.satisfaction.text.2 = How could we improve this service?
 survey.satisfaction.hint = Please don't include any personal or financial information.
 
-survey.satisfaction.lbl.01 = Very satisifed
+survey.satisfaction.lbl.01 = Very satisfied
 survey.satisfaction.lbl.02 = Satisfied
 survey.satisfaction.lbl.03 = Neither satisfied or dissatisfied
 survey.satisfaction.lbl.04 = Dissatisfied
 survey.satisfaction.lbl.05 = Very dissatisfied
+
+survey.satisfaction.beforeyougo = Before you go
+survey.satisfaction.please = Please
+survey.satisfaction.answer = answer some questions
+survey.satisfaction.helpus = to help us improve the service.
