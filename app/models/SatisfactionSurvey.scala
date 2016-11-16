@@ -19,12 +19,12 @@ object SatisfactionSurvey {
   import utils.MappingUtils.Implicits._
 
   val maxDetailsLength = 255
-  val detailsRule = maxLength(maxDetailsLength).withMessage("error.invalid")
+  val detailsRule = maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255")
 
   implicit val formRule: Rule[UrlFormEncoded, SatisfactionSurvey] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "satisfaction").read[String].withMessage("error.invalid") flatMap {
+    (__ \ "satisfaction").read[String].withMessage("error.required") flatMap {
       case "01" => (__ \ "details").read(optionR(detailsRule)) fmap First.apply
       case "02" => (__ \ "details").read(optionR(detailsRule)) fmap Second.apply
       case "03" => (__ \ "details").read(optionR(detailsRule)) fmap Third.apply
