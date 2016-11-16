@@ -105,5 +105,17 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
 
   }
 
+  "write the correct value" in {
+
+    Json.toJson(Fifth(None)) must
+      be(Json.obj("satisfaction" -> "05", "details" -> ""))
+
+    Json.toJson(Fifth(Some("123"))) must
+      be(Json.obj(
+        "satisfaction" -> "05",
+        "details" -> "123"
+      ))
+  }
+
 
 }

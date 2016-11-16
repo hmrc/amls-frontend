@@ -1,21 +1,18 @@
 package controllers
 
-import connectors.DataCacheConnector
-import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
-import models.businessmatching.{BusinessActivities => Activities, _}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
+import org.mockito.Matchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.audit.http.connector.{AuditResult, AuditConnector}
 import utils.AuthorisedFixture
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
@@ -26,6 +23,7 @@ class SatisfactionSurveyControllerSpec extends PlaySpec with OneAppPerSuite with
 
     val controller = new SatisfactionSurveyController {
       override val authConnector = self.authConnector
+      override val auditConnector = mock[AuditConnector]
     }
 
     def model: Option[BusinessActivities] = None
@@ -47,7 +45,24 @@ class SatisfactionSurveyControllerSpec extends PlaySpec with OneAppPerSuite with
       contentAsString(result) must include(Messages("survey.satisfaction.lbl.05"))
     }
 
-    "on post with valid data go to the progress page" in new Fixture {
+    "on post with valid data go to the status page with answers audited" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "satisfaction" -> "01",
+        "details" -> ""
+      )
+
+      when(controller.auditConnector.sendEvent(Matchers.any())(Matchers.any(), Matchers.any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+    }
+
+    "on post with valid data go to the status page when audit fails" in new Fixture {
+
+      when(controller.auditConnector.sendEvent(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.failed(new Exception()))
 
       val newRequest = request.withFormUrlEncodedBody(
         "satisfaction" -> "01",
@@ -58,6 +73,7 @@ class SatisfactionSurveyControllerSpec extends PlaySpec with OneAppPerSuite with
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
     }
+
 
     "on post with invalid data" in new Fixture {
 
