@@ -1,4 +1,5 @@
 @import include._
+@import forms2._
 @()(implicit request: Request[_])
 
 @header = {
@@ -29,11 +30,12 @@
         <li>@Messages("aboutthebusiness.whatyouneed.line_8")</li>
     </ul>
 
-    <div class="form-field">
-        <a class="button" role="button" href="@controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get()">
-            @Messages("button.continue") <span class="visuallyhidden"> @Messages("summary.aboutbusiness")</span>
-        </a>
-    </div>
+    @anchor(
+        attrHref = controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.aboutbusiness")
+    )
 
 }
 

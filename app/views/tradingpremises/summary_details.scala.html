@@ -119,4 +119,9 @@
             @Messages("button.confirmandcontinue")
         </a>
     </div>
+    @anchor(
+        attrHref = controllers.tradingpremises.routes.SummaryController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.button.confirmandcontinue")
+    )
 }

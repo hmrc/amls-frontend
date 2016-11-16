@@ -1,5 +1,5 @@
 @import include._
-@import include.forms2._
+@import forms2._
 @import models.responsiblepeople._
 @import utils.StatusConstants
 
@@ -15,31 +15,31 @@
 ) {
 
     @if(model.isEmpty || model.count(!_.status.contains(StatusConstants.Deleted)) == 0) {
-    <div class="panel-indent panel-border-wide spacelarge">
-        <p>@Messages("responsiblepeople.summary.no.responsible.people")</p>
-        <p><a href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
-    </div>
+        <div class="panel-indent panel-border-wide spacelarge">
+            <p>@Messages("responsiblepeople.summary.no.responsible.people")</p>
+            <p><a href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
+        </div>
     } else {
+        <ul class="list">
+            @model.zipWithIndex.map { case (responsiblePerson, idx) =>
+                @if(!responsiblePerson.status.contains(StatusConstants.Deleted)) {
+                    @responsiblePerson.personName.map { personDetails =>
+                        @checkYourAnswersListing(
+                            item = personDetails.fullName,
+                            editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1, false).toString,
+                            removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false).toString
+                        ) {
 
-    <ul class="list">
-        @model.zipWithIndex.map { case (responsiblePerson, idx) =>
-            @if(!responsiblePerson.status.contains(StatusConstants.Deleted)) {
-                @responsiblePerson.personName.map { personDetails =>
-                    @checkYourAnswersListing(
-                        item = personDetails.fullName,
-                        editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(idx + 1, false).toString,
-                        removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(idx + 1, false).toString
-                    ) {
-
+                        }
                     }
                 }
             }
-        }
-    </ul>
+        </ul>
+    }
 
-}
-
-    <div class="form-field">
-        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.checkyouranswers.acceptandcomplete")</a>
-    </div>
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
 }
