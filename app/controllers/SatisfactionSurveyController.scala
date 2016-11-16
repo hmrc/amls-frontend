@@ -5,7 +5,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.SatisfactionSurvey
 import play.api.Logger
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-
+import audit.SurveyEvent
 import scala.concurrent.Future
 
 trait SatisfactionSurveyController extends BaseController {
@@ -23,6 +23,10 @@ trait SatisfactionSurveyController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.satisfaction_survey(f)))
         case ValidForm(_, data) => {
+          val surveyResult = auditConnector.sendEvent(SurveyEvent(data))
+          surveyResult.onFailure {
+            case e: Throwable => Logger.error(s"[SatisfactionSurveyController][post] ${e.getMessage}", e)
+          }
           Future.successful(Redirect(routes.LandingController.get()))
         }
       }
