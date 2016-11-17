@@ -112,6 +112,7 @@ error.required.bankdetails.register.another.bank = Select yes or no to the quest
 ###############################  Business Activities ###############################
 error.required.ba.involved.in.other = Select yes or no to the question: is your business involved in any other activities?
 error.required.ba.involved.in.other.text = Enter information about what other anti-money laundering activities your business carries out
+error.invalid.ba.involved.in.other.text = You can’t enter more than 255 characters
 error.required.ba.business.turnover = Select how much total turnover you expect in the next 12 months.
 error.required.ba.turnover.from.mlr = Select how much turnover you expect in the next 12 months, from activities related to anti-money laundering supervision.
 error.required.ba.is.your.franchise = Select yes or no to the question: is your business a franchise?
@@ -228,6 +229,7 @@ error.required.supervision.supervisor = Enter the name of your last supervisor
 error.required.supervision.reason = Enter a reason why the supervision ended
 error.required.supervision.anotherbody = Select yes or no to the question: has this business ever been registered with another supervising body?
 error.invalid.supervision.supervisor = You can’t enter more than 140 characters
+error.invalid.supervision.reason = You can’t enter more than 255 characters
 error.required.supervision.business.a.member = Select yes or no to the question: is this business a member of a professional body?
 error.required.supervision.one.professional.body = Select at least one professional body
 error.required.supervision.business.details = Enter the name of the professional body
@@ -268,6 +270,7 @@ error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 
 error.required.hvd.linked.cash.payment = Select yes or no to the question: are you able to automatically identify linked cash payments which come to €15,000 or more?
 error.required.hvd.receive.cash.payments = Select yes or no to the question: do you expect to receive cash payments over €15,000 from customers you’ve not met in person?
 error.required.hvd.describe = Please describe how you expect to receive these payments.
+error.maxlength.hvd.describe = You can’t enter more than 255 characters.
 error.required.hvd.choose.option = Please choose at least one option.
 error.required.hvd.excise.goods = Select yes or no to the question: will you be buying or selling duty-suspended excise goods?.
 error.required.hvd.percentage = Select how much of your turnover you expect to come from cash payments over €15,000.
@@ -303,7 +306,6 @@ button.payfee = Pay registration fee
 button.amendment.payfee = Pay amendment fee
 button.logout = Log out
 button.finish = Finish
-button.send.feedback = Send feedback
 
 visuallyhidden.you.have.registered = You have registered
 visuallyhidden.the.details.for = the details for
@@ -1321,6 +1323,13 @@ secure.communications.subject.MTRV = Revocation of Registration being Considered
 secure.communications.subject.NMRJ = Rejection of Application no longer being Considered
 secure.communications.subject.NMRV = Revocation of Registration no longer being Considered
 secure.communications.subject.OTHR = Generic communication
+
+secure.communications.header = Your Messages
+secure.communications.unread = You have unread messages
+
+secure.communications.table.header.subject = Subject
+secure.communications.table.header.type = Type
+secure.communications.table.header.date = Date
 
 ############################### Survey ###############################
 

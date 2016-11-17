@@ -42,13 +42,19 @@
 
     <div class="form-group">
         @if(msbExists) {
-           <a class="button" role="button" href= "@controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index)">
-               @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.tradingpremises")</span>
-           </a>
+            @anchor(
+                attrHref = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index).toString,
+                attrRole = true,
+                linkText = Messages("button.continue"),
+                visuallyhidden = Messages("summary.tradingpremises")
+            )
         } else {
-           <a class="button" role="button" href= "@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false)">
-               @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.tradingpremises")</span>
-           </a>
+            @anchor(
+                attrHref = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, false).toString,
+                attrRole = true,
+                linkText = Messages("button.continue"),
+                visuallyhidden = Messages("summary.tradingpremises")
+            )
         }
     </div>
 

@@ -1,4 +1,5 @@
 @import include._
+@import forms2._
 @(index: Int)(implicit request: Request[_])
 
 @header = {
@@ -17,11 +18,12 @@
         <li>@Messages("responsiblepeople.whomustregister.line_3")</li>
     </ul>
 
-    <div class="form-group">
-        <a id="who-must-register-continue" class="button" role="button" href="@controllers.responsiblepeople.routes.WhatYouNeedController.get(index)">
-          @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.responsiblepeople")</span>
-        </a>
-    </div>
+    @anchor(
+        attrHref = controllers.responsiblepeople.routes.WhatYouNeedController.get(index).toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.responsiblepeople")
+    )
 
 }
 

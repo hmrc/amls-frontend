@@ -1,7 +1,7 @@
 @import include._
+@import forms2._
 @import models.bankdetails._
 @import utils.StatusConstants
-@import forms2._
 
 @(model: Seq[BankDetails], complete: Boolean, hasBankAccount: Boolean, canEdit: Boolean)(implicit request: Request[_], lang: Lang)
 
@@ -98,8 +98,16 @@
     </ul>
 
     @if(complete) {
-        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.confirmandcontinue")</a>
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.confirmandcontinue")
+        )
     } else {
-        <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.summary.acceptandcomplete")
+        )
     }
 }

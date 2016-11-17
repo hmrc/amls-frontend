@@ -44,8 +44,8 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       val result = controller.get(false)(request)
 
       status(result) must be(OK)
-      contentAsString(result) must include("<a class=\"button\" href=\"/anti-money-laundering/registration-progress\">Accept and complete section</a>")
-      contentAsString(result) mustNot include("<a class=\"button\" href=\"/anti-money-laundering/registration-progress\">Confirm and continue</a>")
+      contentAsString(result) must include("Accept and complete section")
+      contentAsString(result) mustNot include("Confirm and continue")
     }
 
 
@@ -61,8 +61,8 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       val result = controller.get(true)(request)
 
       status(result) must be(OK)
-      contentAsString(result) must include("<a class=\"button\" href=\"/anti-money-laundering/registration-progress\">Confirm and continue</a>")
-      contentAsString(result) mustNot include("<a class=\"button\" href=\"/anti-money-laundering/registration-progress\">Accept and complete section</a>")
+      contentAsString(result) must include("Confirm and continue")
+      contentAsString(result) mustNot include("Accept and complete section")
     }
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {

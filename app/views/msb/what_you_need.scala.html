@@ -1,4 +1,5 @@
 @import include._
+@import forms2._
 @()(implicit request: Request[_])
 
 @header = {
@@ -35,11 +36,12 @@
         <li>@Messages("msb.whatyouneed.possiblerequiredinfo.line_6")</li>
     </ul>
 
-    <div class="form-group">
-        <a class="button" role="button" href="@controllers.msb.routes.ExpectedThroughputController.get()">
-            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.msb")</span>
-        </a>
-    </div>
+    @anchor(
+        attrHref = controllers.msb.routes.ExpectedThroughputController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.msb")
+    )
 
 }
 

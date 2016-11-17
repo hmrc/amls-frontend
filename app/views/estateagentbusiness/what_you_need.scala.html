@@ -1,4 +1,5 @@
 @import include._
+@import forms2._
 @()(implicit request: Request[_])
 
 @header = {
@@ -19,11 +20,12 @@
         <li>@Messages("estateagentbusiness.whatyouneed.line_3")</li>
     </ul>
 
-    <div class="form-group">
-        <a class="button" role="button" href="@controllers.estateagentbusiness.routes.BusinessServicesController.get()">
-            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.estateagentbusiness")</span>
-        </a>
-    </div>
+    @anchor(
+        attrHref = controllers.estateagentbusiness.routes.BusinessServicesController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.estateagentbusiness")
+    )
 
 }
 

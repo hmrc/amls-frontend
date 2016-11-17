@@ -34,10 +34,15 @@ heading = header
     @textarea(
         f("details"),
         bold = false,
-        hintText = "survey.satisfaction.hint"
+        hintText = "survey.satisfaction.hint",
+        classes = Seq("textarea--fullwidth")
     )
 </div>
 
 <input type="submit" name="submit" class="button" value="@Messages("button.send.feedback")" />
 }
 }
+
+$('input:radio').click(function(){
+ga('send', 'event', this.id, 'click');
+});
