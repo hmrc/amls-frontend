@@ -5,25 +5,27 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.i18n.Messages
 
 case class Notification(
-                                status: Option[String],
-                                messageType: Option[MessageType],
-                                referenceNumber: Option[String],
-                                isVariation: Boolean,
-                                timeReceived: DateTime,
-                                isRead: Boolean) {
+                         status: Option[String],
+                         contactType: Option[ContactType],
+                         contactNumber: Option[String],
+                         isVariation: Boolean,
+                         receivedAt: DateTime
+                         ) {
 
   def subject: String = {
-    messageType match {
+    contactType match {
       case Some(msg) => Messages(s"notifications.subject.$msg")
-      case None if isVariation => Messages("notifications.subject.approval.variation")
-      case _ => Messages("notifications.subject.failtopay")
+      case None if isVariation => Messages("notifications.subject.Approval.Variation")
+      case _ => Messages("notifications.subject.FailToPay")
     }
   }
 
   def dateReceived = {
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
-    timeReceived.toString(fmt)
+    receivedAt.toString(fmt)
   }
+
+  def isRead: Boolean = false
 
 }
 

@@ -25,11 +25,10 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
     val testNotifications = Notification(
       status = None,
-      messageType = None,
-      referenceNumber = None,
+      contactType = None,
+      contactNumber = None,
       isVariation = false,
-      timeReceived = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
-      isRead = true
+      receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)
     )
 
     val controller = new NotificationsController {
@@ -71,29 +70,29 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
     "get messages in chronological order (newest first)" in new Fixture {
       val testList = List(
-        testNotifications.copy(messageType = Some(APA1), isRead = false, timeReceived = new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(isVariation = true, timeReceived = new DateTime(1976, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(APR1), isRead = false, timeReceived = new DateTime(2016, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(REJR), timeReceived = new DateTime(2001, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(ApplicationApproval), receivedAt = new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(isVariation = true, receivedAt = new DateTime(1976, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(RenewalApproval), receivedAt = new DateTime(2016, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(RejectionReasons), receivedAt = new DateTime(2001, 12, 1, 1, 3, DateTimeZone.UTC)),
         testNotifications,
-        testNotifications.copy(messageType = Some(REVR), timeReceived = new DateTime(1998, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(EXPR), timeReceived = new DateTime(2017, 11, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(RPA1), isRead = false, timeReceived = new DateTime(2012, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(RPV1), isRead = false, timeReceived = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(RPR1), isRead = false, timeReceived = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(RPM1), timeReceived = new DateTime(2007, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(RREM), timeReceived = new DateTime(1991, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(MTRJ), timeReceived = new DateTime(1971, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(MTRV), timeReceived = new DateTime(2017, 10, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(NMRJ), timeReceived = new DateTime(2003, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(NMRV), timeReceived = new DateTime(2002, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testNotifications.copy(messageType = Some(OTHR), timeReceived = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+        testNotifications.copy(contactType = Some(RevocationReasons), receivedAt = new DateTime(1998, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(AutoExpiryOfRegistration), receivedAt = new DateTime(2017, 11, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(ReminderToPayForApplication),receivedAt = new DateTime(2012, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(ReminderToPayForVariation), receivedAt = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(ReminderToPayForRenewal), receivedAt = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(ReminderToPayForManualCharges), receivedAt = new DateTime(2007, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(RenewalReminder), receivedAt = new DateTime(1991, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(MindedToReject), receivedAt = new DateTime(1971, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(MindedToRevoke), receivedAt = new DateTime(2017, 10, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(NoLongerMindedToReject), receivedAt = new DateTime(2003, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(NoLongerMindedToRevoke), receivedAt = new DateTime(2002, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(contactType = Some(Others), receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
       )
 
       val result = controller.getNotificationRecords(testList)
 
-      result.head.timeReceived.isAfter(result.drop(1).head.timeReceived) mustBe true
-      result.last.timeReceived.isBefore(result.init.last.timeReceived) mustBe true
+      result.head.receivedAt.isAfter(result.drop(1).head.receivedAt) mustBe true
+      result.last.receivedAt.isBefore(result.init.last.receivedAt) mustBe true
 
     }
   }

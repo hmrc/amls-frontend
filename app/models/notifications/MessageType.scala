@@ -1,22 +1,22 @@
 package models.notifications
 
-sealed trait MessageType
+sealed trait ContactType
 
-case object APA1 extends MessageType
-case object APR1 extends MessageType
+case object ApplicationApproval extends ContactType
+case object RenewalApproval extends ContactType
 
-case object REJR extends MessageType
-case object REVR extends MessageType
-case object EXPR extends MessageType
+case object RejectionReasons extends ContactType
+case object RevocationReasons extends ContactType
+case object AutoExpiryOfRegistration extends ContactType
 
-case object RPA1 extends MessageType
-case object RPV1 extends MessageType
-case object RPR1 extends MessageType
-case object RPM1 extends MessageType
-case object RREM extends MessageType
+case object ReminderToPayForApplication extends ContactType
+case object ReminderToPayForRenewal extends ContactType
+case object ReminderToPayForVariation extends ContactType
+case object ReminderToPayForManualCharges extends ContactType
+case object RenewalReminder extends ContactType
 
-case object MTRJ extends MessageType
-case object MTRV extends MessageType
-case object NMRJ extends MessageType
-case object NMRV extends MessageType
-case object OTHR extends MessageType
+case object MindedToReject extends ContactType
+case object MindedToRevoke extends ContactType
+case object NoLongerMindedToReject extends ContactType
+case object NoLongerMindedToRevoke extends ContactType
+case object Others extends ContactType
