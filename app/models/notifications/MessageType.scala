@@ -1,4 +1,4 @@
-package models.securecommunications
+package models.notifications
 
 sealed trait MessageType
 
