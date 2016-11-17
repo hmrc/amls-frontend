@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.i18n.Messages
 
-case class NotificationRecord(
+case class Notification(
                                 status: Option[String],
                                 messageType: Option[MessageType],
                                 referenceNumber: Option[String],
@@ -27,4 +27,4 @@ case class NotificationRecord(
 
 }
 
-object NotificationRecord
+object Notification

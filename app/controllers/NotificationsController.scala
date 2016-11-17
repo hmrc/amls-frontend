@@ -25,7 +25,7 @@ trait NotificationsController extends BaseController {
       }
   }
 
-  def getNotificationRecords(notifications: List[NotificationRecord] = List()): List[NotificationRecord] =
+  def getNotificationRecords(notifications: List[Notification] = List()): List[Notification] =
     notifications match {
       case s :: sc => notifications.sortWith((x,y) => x.timeReceived.isAfter(y.timeReceived))
       case _ => notifications

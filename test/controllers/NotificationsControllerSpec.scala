@@ -23,7 +23,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val testNotifications = NotificationRecord(
+    val testNotifications = Notification(
       status = None,
       messageType = None,
       referenceNumber = None,

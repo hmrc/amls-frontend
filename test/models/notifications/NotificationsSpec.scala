@@ -6,7 +6,7 @@ import org.specs2.mock.mockito.MockitoMatchers
 
 class NotificationsSpec extends PlaySpec with MockitoMatchers with OneAppPerSuite {
 
-  val testNotifications = NotificationRecord(None, None, None, false, new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC), false)
+  val testNotifications = Notification(None, None, None, false, new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC), false)
 
   "Secure Communication" must {
     "retrieve the corresponding subject from messages" when {
