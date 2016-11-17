@@ -12,7 +12,7 @@ GET         /registration-progress                                      controll
 
 GET         /application-status                                         controllers.StatusController.get()
 
-GET         /your-registration/your-messages                            controllers.SecureCommunicationsController.getMessages()
+GET         /your-registration/your-messages                            controllers.NotificationsController.getMessages()
 
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
