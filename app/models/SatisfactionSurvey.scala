@@ -18,8 +18,8 @@ object SatisfactionSurvey {
 
   import utils.MappingUtils.Implicits._
 
-  val maxDetailsLength = 255
-  val detailsRule = maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.255")
+  val maxDetailsLength = 1200
+  val detailsRule = maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.1200")
 
   implicit val formRule: Rule[UrlFormEncoded, SatisfactionSurvey] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._

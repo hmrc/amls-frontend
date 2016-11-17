@@ -68,25 +68,25 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
     }
 
     "fail to validate details over max value" in {
-      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("01"),"details" -> Seq("zzxczxczx"*50))) must
+      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("01"),"details" -> Seq("zzxczxczx"*150))) must
         be(Failure(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
-      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("02"),"details" -> Seq("zzxczxczx"*50))) must
+      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("02"),"details" -> Seq("zzxczxczx"*150))) must
         be(Failure(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
-      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("03"),"details" -> Seq("zzxczxczx"*50))) must
+      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("03"),"details" -> Seq("zzxczxczx"*150))) must
         be(Failure(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
-      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("04"),"details" -> Seq("zzxczxczx"*50))) must
+      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("04"),"details" -> Seq("zzxczxczx"*150))) must
         be(Failure(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
-      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("05"),"details" -> Seq("zzxczxczx"*50))) must
+      SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("05"),"details" -> Seq("zzxczxczx"*150))) must
         be(Failure(Seq(
-          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.255"))
+          (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
     }
 

@@ -68,6 +68,7 @@ error.not-found.heading = Item not found
 error.not-found.message = Please check that you have entered the correct web address.
 
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
+error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
 
 ########################################################################################################################
@@ -306,6 +307,7 @@ button.payfee = Pay registration fee
 button.amendment.payfee = Pay amendment fee
 button.logout = Log out
 button.finish = Finish
+button.send.feedback = Send feedback
 
 visuallyhidden.you.have.registered = You have registered
 visuallyhidden.the.details.for = the details for
@@ -344,6 +346,7 @@ lbl.vat.reg.number = VAT registration number:
 lbl.add.another.country = Add another country
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
+lbl.1200.character.limit=1200 character limit
 
 lbl.give.details = Please give details
 

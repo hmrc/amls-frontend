@@ -23,8 +23,7 @@ trait SatisfactionSurveyController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.satisfaction_survey(f)))
         case ValidForm(_, data) => {
-          val surveyResult = auditConnector.sendEvent(SurveyEvent(data))
-          surveyResult.onFailure {
+          auditConnector.sendEvent(SurveyEvent(data)).onFailure {
             case e: Throwable => Logger.error(s"[SatisfactionSurveyController][post] ${e.getMessage}", e)
           }
           Future.successful(Redirect(routes.LandingController.get()))
