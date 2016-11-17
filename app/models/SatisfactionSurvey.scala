@@ -24,7 +24,7 @@ object SatisfactionSurvey {
   implicit val formRule: Rule[UrlFormEncoded, SatisfactionSurvey] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     import models.FormTypes._
-    (__ \ "satisfaction").read[String].withMessage("error.required") flatMap {
+    (__ \ "satisfaction").read[String].withMessage("error.survey.satisfaction.required") flatMap {
       case "01" => (__ \ "details").read(optionR(detailsRule)) fmap First.apply
       case "02" => (__ \ "details").read(optionR(detailsRule)) fmap Second.apply
       case "03" => (__ \ "details").read(optionR(detailsRule)) fmap Third.apply

@@ -56,14 +56,14 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
       )
       SatisfactionSurvey.formRule.validate(data) must
         be(Failure(Seq(
-          (Path \ "satisfaction") -> Seq(ValidationError("error.required"))
+          (Path \ "satisfaction") -> Seq(ValidationError("error.survey.satisfaction.required"))
         )))
     }
 
     "fail to validate empty data" in {
       SatisfactionSurvey.formRule.validate(Map.empty) must
         be(Failure(Seq(
-          (Path \ "satisfaction") -> Seq(ValidationError("error.required"))
+          (Path \ "satisfaction") -> Seq(ValidationError("error.survey.satisfaction.required"))
         )))
     }
 

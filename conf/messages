@@ -70,6 +70,8 @@ error.not-found.message = Please check that you have entered the correct web add
 error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 
+error.survey.satisfaction.required = Select one option to answer the question: how did you feel about using the service?
+
 
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
