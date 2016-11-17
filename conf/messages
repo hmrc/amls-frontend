@@ -1299,32 +1299,32 @@ hvd.percentage.lbl.03 = 41% to 60%
 hvd.percentage.lbl.04 = 61% to 80%
 hvd.percentage.lbl.05 = 81% to 100%
 
-###############################  Secure Communications ###############################
+###############################  Notifications ###############################
 
-secure.communications.subject.APA1 = Application Approval
-secure.communications.subject.approval.variation = Registration Variation Approval
-secure.communications.subject.APR1 = Renewal Approval
+notifications.subject.APA1 = Application Approval
+notifications.subject.approval.variation = Registration Variation Approval
+notifications.subject.APR1 = Renewal Approval
 
-secure.communications.subject.REJR = Application Rejection
-secure.communications.subject.failtopay = Application Auto-Rejection for Failure to Pay
-secure.communications.subject.REVR = Registration Revocation
-secure.communications.subject.EXPR = Registration Expiry
+notifications.subject.REJR = Application Rejection
+notifications.subject.failtopay = Application Auto-Rejection for Failure to Pay
+notifications.subject.REVR = Registration Revocation
+notifications.subject.EXPR = Registration Expiry
 
-secure.communications.subject.RPA1 = Reminder to Pay - Application
-secure.communications.subject.RPV1 = Reminder to Pay - Variation
-secure.communications.subject.RPR1 = Reminder to Pay - Renewal
-secure.communications.subject.RPM1 = Reminder to Pay - Manual Charge
-secure.communications.subject.RREM = Reminder to Renew
+notifications.subject.RPA1 = Reminder to Pay - Application
+notifications.subject.RPV1 = Reminder to Pay - Variation
+notifications.subject.RPR1 = Reminder to Pay - Renewal
+notifications.subject.RPM1 = Reminder to Pay - Manual Charge
+notifications.subject.RREM = Reminder to Renew
 
-secure.communications.subject.MTRJ = Rejection of Application being Considered
-secure.communications.subject.MTRV = Revocation of Registration being Considered
-secure.communications.subject.NMRJ = Rejection of Application no longer being Considered
-secure.communications.subject.NMRV = Revocation of Registration no longer being Considered
-secure.communications.subject.OTHR = Generic communication
+notifications.subject.MTRJ = Rejection of Application being Considered
+notifications.subject.MTRV = Revocation of Registration being Considered
+notifications.subject.NMRJ = Rejection of Application no longer being Considered
+notifications.subject.NMRV = Revocation of Registration no longer being Considered
+notifications.subject.OTHR = Generic communication
 
-secure.communications.header = Your Messages
-secure.communications.unread = You have unread messages
+notifications.header = Your Messages
+notifications.unread = You have unread messages
 
-secure.communications.table.header.subject = Subject
-secure.communications.table.header.type = Type
-secure.communications.table.header.date = Date
+notifications.table.header.subject = Subject
+notifications.table.header.type = Type
+notifications.table.header.date = Date

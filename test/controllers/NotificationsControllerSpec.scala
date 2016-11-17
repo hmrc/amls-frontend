@@ -4,7 +4,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businesscustomer.{Address, ReviewDetails}
-import models.securecommunications._
+import models.notifications._
 import org.joda.time.{DateTime, DateTimeZone}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -18,12 +18,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with ScalaFutures {
+class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val testSecureComms = SecureCommunication(
+    val testNotifications = NotificationRecord(
       status = None,
       messageType = None,
       referenceNumber = None,
@@ -32,13 +32,13 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
       isRead = true
     )
 
-    val controller = new SecureCommunicationsController {
+    val controller = new NotificationsController {
       override protected def authConnector: AuthConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
     }
   }
 
-  "SecureCommunicationsController" must {
+  "NotificationsController" must {
     "display the page with messages" in new Fixture {
 
       val mockBusinessMatching = mock[BusinessMatching]
@@ -71,26 +71,26 @@ class SecureCommunicationsControllerSpec extends PlaySpec with MockitoSugar with
 
     "get messages in chronological order (newest first)" in new Fixture {
       val testList = List(
-        testSecureComms.copy(messageType = Some(APA1), isRead = false, timeReceived = new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(isVariation = true, timeReceived = new DateTime(1976, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(APR1), isRead = false, timeReceived = new DateTime(2016, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(REJR), timeReceived = new DateTime(2001, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms,
-        testSecureComms.copy(messageType = Some(REVR), timeReceived = new DateTime(1998, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(EXPR), timeReceived = new DateTime(2017, 11, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(RPA1), isRead = false, timeReceived = new DateTime(2012, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(RPV1), isRead = false, timeReceived = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(RPR1), isRead = false, timeReceived = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(RPM1), timeReceived = new DateTime(2007, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(RREM), timeReceived = new DateTime(1991, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(MTRJ), timeReceived = new DateTime(1971, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(MTRV), timeReceived = new DateTime(2017, 10, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(NMRJ), timeReceived = new DateTime(2003, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(NMRV), timeReceived = new DateTime(2002, 12, 1, 1, 3, DateTimeZone.UTC)),
-        testSecureComms.copy(messageType = Some(OTHR), timeReceived = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+        testNotifications.copy(messageType = Some(APA1), isRead = false, timeReceived = new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(isVariation = true, timeReceived = new DateTime(1976, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(APR1), isRead = false, timeReceived = new DateTime(2016, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(REJR), timeReceived = new DateTime(2001, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications,
+        testNotifications.copy(messageType = Some(REVR), timeReceived = new DateTime(1998, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(EXPR), timeReceived = new DateTime(2017, 11, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(RPA1), isRead = false, timeReceived = new DateTime(2012, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(RPV1), isRead = false, timeReceived = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(RPR1), isRead = false, timeReceived = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(RPM1), timeReceived = new DateTime(2007, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(RREM), timeReceived = new DateTime(1991, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(MTRJ), timeReceived = new DateTime(1971, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(MTRV), timeReceived = new DateTime(2017, 10, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(NMRJ), timeReceived = new DateTime(2003, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(NMRV), timeReceived = new DateTime(2002, 12, 1, 1, 3, DateTimeZone.UTC)),
+        testNotifications.copy(messageType = Some(OTHR), timeReceived = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
       )
 
-      val result = controller.getSecureComms(testList)
+      val result = controller.getNotificationRecords(testList)
 
       result.head.timeReceived.isAfter(result.drop(1).head.timeReceived) mustBe true
       result.last.timeReceived.isBefore(result.init.last.timeReceived) mustBe true

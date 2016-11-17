@@ -1,14 +1,14 @@
 @import include._
-@import models.securecommunications._
+@import models.notifications._
 
-@(businessName: String, secureComms: List[SecureCommunication])(implicit request: Request[_])
+@(businessName: String, notifications: List[NotificationRecord])(implicit request: Request[_])
 
 @header = {
-@heading("secure.communications.header", "summary.status")
+@heading("notifications.header", "summary.status")
 }
 
 @all_messages(
-title = Messages("secure.communications.header"),
+title = Messages("notifications.header"),
 heading = header
 ) {
 
@@ -27,13 +27,13 @@ heading = header
         <thead>
         <tr>
             <th class="message-unread"></th>
-            <th scope="col">@Messages("secure.communications.table.header.subject")</th>
+            <th scope="col">@Messages("notifications.table.header.subject")</th>
             <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
-            <th class="message-date" scope="col">@Messages("secure.communications.table.header.date")</th>
+            <th class="message-date" scope="col">@Messages("notifications.table.header.date")</th>
         </tr>
         </thead>
         <tbody>
-        @secureComms.map { comms =>
+        @notifications.map { comms =>
         <tr class="@if(!comms.isRead){unread}">
             <td>@if(!comms.isRead){<span class="circle"></span>}</td>
             <td><a href="#">@comms.subject</a></td>
