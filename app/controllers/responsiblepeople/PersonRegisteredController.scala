@@ -15,7 +15,6 @@ trait PersonRegisteredController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get(index: Int) =
-  ResponsiblePeopleToggle {
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
@@ -27,11 +26,9 @@ trait PersonRegisteredController extends BaseController {
             Ok(person_registered(EmptyForm, count))
           case _ => Ok(person_registered(EmptyForm, index))
         }
-    }
   }
 
   def post(index: Int) =
-    ResponsiblePeopleToggle {
       Authorised.async {
         implicit authContext => implicit request =>
           Form2[PersonRegistered](request.body) match {
@@ -44,7 +41,6 @@ trait PersonRegisteredController extends BaseController {
               }
           }
       }
-    }
 }
 
 object PersonRegisteredController extends PersonRegisteredController {

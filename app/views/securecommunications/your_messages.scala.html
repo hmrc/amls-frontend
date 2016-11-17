@@ -1,0 +1,47 @@
+@import include._
+@import models.securecommunications._
+
+@(businessName: String, secureComms: List[SecureCommunication])(implicit request: Request[_])
+
+@header = {
+@heading("secure.communications.header", "summary.status")
+}
+
+@all_messages(
+title = Messages("secure.communications.header"),
+heading = header
+) {
+
+<div class="grid-layout">
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <div class="panel-indent panel-indent--gutter">
+            <p><span class="heading-small">Your Business:</span>
+                <br /><span>@businessName</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="full-width">
+    <table class="spacelarge notifications">
+        <thead>
+        <tr>
+            <th class="message-unread"></th>
+            <th scope="col">@Messages("secure.communications.table.header.subject")</th>
+            <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
+            <th class="message-date" scope="col">@Messages("secure.communications.table.header.date")</th>
+        </tr>
+        </thead>
+        <tbody>
+        @secureComms.map { comms =>
+        <tr class="@if(!comms.isRead){unread}">
+            <td>@if(!comms.isRead){<span class="circle"></span>}</td>
+            <td><a href="#">@comms.subject</a></td>
+            <!--<td></td>-->
+            <td>@comms.dateReceived</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+</div>
+}

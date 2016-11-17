@@ -10,9 +10,12 @@ import play.api.test.Helpers._
 
 class FeatureToggleSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
+
+
   trait TestController {
     self: BaseController =>
-    lazy val get = ResponsiblePeopleToggle {
+    def TestToggle:FeatureToggle
+    lazy val get = TestToggle {
       Action {
         Ok("Success")
       }
@@ -21,12 +24,12 @@ class FeatureToggleSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   object ToggleOnController extends BaseController with TestController {
     override protected val authConnector: AuthConnector = mock[AuthConnector]
-    override protected val ResponsiblePeopleToggle = FeatureToggle(true)
+    override val TestToggle = FeatureToggle(true)
   }
 
   object ToggleOffController extends BaseController with TestController {
     override protected val authConnector = mock[AuthConnector]
-    override protected val ResponsiblePeopleToggle = FeatureToggle(false)
+    override val TestToggle = FeatureToggle(false)
   }
 
   "ToggleOnController" must {

@@ -1,5 +1,5 @@
 @import include._
-@import include.forms2._
+@import forms2._
 @import models.responsiblepeople._
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
@@ -276,16 +276,21 @@
 
     }
 
-    <div class="form-field">
-        @fromYourAnswers match {
-            case true =>{
-                    <a class="button" href="@controllers.responsiblepeople.routes.YourAnswersController.get()">@Messages("button.confirmandcontinue")</a>
-                    }
-            case false =>{
-                    <a class="button" href="@controllers.responsiblepeople.routes.CheckYourAnswersController.get()">@Messages("button.confirmandcontinue")</a>
-                    }
+    @fromYourAnswers match {
+        case true => {
+            @anchor(
+                attrHref = controllers.responsiblepeople.routes.YourAnswersController.get().toString,
+                attrRole = true,
+                linkText = Messages("button.confirmandcontinue")
+            )
         }
-
-    </div>
+        case false => {
+            @anchor(
+                attrHref = controllers.responsiblepeople.routes.CheckYourAnswersController.get().toString,
+                attrRole = true,
+                linkText = Messages("button.confirmandcontinue")
+            )
+        }
+    }
 
 }

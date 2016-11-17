@@ -32,7 +32,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
 
   "Get" must {
 
-    "load the summary page when section data is available" in new Fixture {
+    "load the summary page with the correct link text when the section is incomplete" in new Fixture {
 
       val model = BankDetails(None, None)
 
@@ -41,9 +41,28 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       when(controller.statusService.getStatus(any(),any(),any()))
         .thenReturn(Future.successful(SubmissionReady))
 
-      val result = controller.get()(request)
+      val result = controller.get(false)(request)
 
       status(result) must be(OK)
+      contentAsString(result) must include("Accept and complete section")
+      contentAsString(result) mustNot include("Confirm and continue")
+    }
+
+
+    "load the summary page with the correct link text when the section is complete" in new Fixture {
+
+      val model = BankDetails(None, None)
+
+      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(model))))
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionReady))
+
+      val result = controller.get(true)(request)
+
+      status(result) must be(OK)
+      contentAsString(result) must include("Confirm and continue")
+      contentAsString(result) mustNot include("Accept and complete section")
     }
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {

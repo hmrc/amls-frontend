@@ -57,6 +57,7 @@ trait WhichCurrenciesController extends BaseController {
 }
 
 object WhichCurrenciesController extends WhichCurrenciesController {
+  // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override val cache = DataCacheConnector
   override val statusService: StatusService = StatusService

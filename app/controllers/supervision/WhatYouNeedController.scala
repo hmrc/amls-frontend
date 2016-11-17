@@ -10,11 +10,9 @@ import scala.concurrent.Future
 trait WhatYouNeedController extends BaseController {
 
   def get() =
-    ResponsiblePeopleToggle {
-      Authorised.async {
-        implicit authContext => implicit request =>
-          Future.successful(Ok(what_you_need()))
-      }
+    Authorised.async {
+      implicit authContext => implicit request =>
+        Future.successful(Ok(what_you_need()))
     }
 }
 
