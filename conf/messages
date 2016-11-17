@@ -67,6 +67,11 @@ error.not-found.title = Not Found
 error.not-found.heading = Item not found
 error.not-found.message = Please check that you have entered the correct web address.
 
+error.invalid.maxlength.255 = You can’t enter more than 255 characters
+error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
+
+error.survey.satisfaction.required = Select one option to answer the question: how did you feel about using the service?
+
 
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
@@ -304,6 +309,7 @@ button.payfee = Pay registration fee
 button.amendment.payfee = Pay amendment fee
 button.logout = Log out
 button.finish = Finish
+button.send.feedback = Send feedback
 
 visuallyhidden.you.have.registered = You have registered
 visuallyhidden.the.details.for = the details for
@@ -342,6 +348,7 @@ lbl.vat.reg.number = VAT registration number:
 lbl.add.another.country = Add another country
 lbl.residential = Residential
 lbl.nonresidential = Non-Residential
+lbl.1200.character.limit=1200 character limit
 
 lbl.give.details = Please give details
 
@@ -1328,3 +1335,23 @@ notifications.unread = You have unread messages
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
+
+############################### Survey ###############################
+
+survey.satisfaction.heading = Give feedback
+survey.satisfaction.title = Satisfaction survey
+
+survey.satisfaction.text.1 = Overall, how did you feel about using the service?
+survey.satisfaction.text.2 = How could we improve this service?
+survey.satisfaction.hint = Please don't include any personal or financial information.
+
+survey.satisfaction.lbl.01 = Very satisfied
+survey.satisfaction.lbl.02 = Satisfied
+survey.satisfaction.lbl.03 = Neither satisfied or dissatisfied
+survey.satisfaction.lbl.04 = Dissatisfied
+survey.satisfaction.lbl.05 = Very dissatisfied
+
+survey.satisfaction.beforeyougo = Before you go
+survey.satisfaction.please = Please
+survey.satisfaction.answer = answer some questions
+survey.satisfaction.helpus = to help us improve the service.
