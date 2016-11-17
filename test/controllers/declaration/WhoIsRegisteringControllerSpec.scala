@@ -18,7 +18,7 @@ import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.AuthorisedFixture
+import utils.{StatusConstants, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -42,12 +42,20 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
   "WhoIsRegisteringController" must {
 
-    val personName = PersonName("Divya", Some("Envy"), "Tadisetti", None, Some("name"))
+    val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-    val rp = ResponsiblePeople(
+    val rp = ResponsiblePeople (
       personName = Some(personName),
-      positions = Some(positions)
+      positions = Some(positions),
+      status = None
     )
+    val rp1 = ResponsiblePeople(
+      personName = Some(personName),
+      positions = Some(positions),
+      status = Some(StatusConstants.Deleted)
+    )
+    val responsiblePeoples = Seq(rp, rp1)
+
 
     "Get Option:" must {
 
@@ -63,7 +71,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(rp)))
+            .thenReturn(Some(responsiblePeoples))
 
           when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
             .thenReturn(None)
@@ -73,7 +81,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
           val htmlValue = Jsoup.parse(contentAsString(result))
           htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-          htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+          htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
 
           contentAsString(result) must include(Messages("submit.amendment.application"))
         }
@@ -89,7 +97,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
             .thenReturn(Future.successful(SubmissionReady))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(rp)))
+            .thenReturn(Some(responsiblePeoples))
 
           when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
             .thenReturn(None)
@@ -99,7 +107,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
 
           val htmlValue = Jsoup.parse(contentAsString(result))
           htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-          htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+          htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
 
           contentAsString(result) must include(Messages("submit.registration"))
         }
@@ -122,7 +130,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           when(controller.statusService.getStatus(any(),any(),any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(responsiblePeoples))
 
           when(controller.dataCacheConnector.save[AddPerson](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -146,7 +154,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           when(controller.statusService.getStatus(any(),any(),any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(responsiblePeoples))
 
           when(controller.dataCacheConnector.save[AddPerson](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -176,7 +184,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(responsiblePeoples))
 
         when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
@@ -213,7 +221,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(responsiblePeoples))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -233,7 +241,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(responsiblePeoples))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -269,12 +277,20 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, false)
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, false)
-    val personName = PersonName("Divya", Some("Envy"), "Tadisetti", None, Some("name"))
+    val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val rp = ResponsiblePeople(
       personName = Some(personName),
       positions = Some(positions)
     )
+
+    val rp1 = ResponsiblePeople(
+      personName = Some(personName),
+      positions = Some(positions),
+      status = Some(StatusConstants.Deleted)
+    )
+    val responsiblePeoples = Seq(rp, rp1)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -292,7 +308,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
           .thenReturn(Future.successful(SubmissionReadyForReview))
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(rp)))
+          .thenReturn(Some(responsiblePeoples))
 
         when(mockCacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
           .thenReturn(None)
@@ -302,18 +318,19 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
 
         val htmlValue = Jsoup.parse(contentAsString(result))
         htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-        htmlValue.getElementById("person-DivyaTadisetti").`val`() must be("DivyaTadisetti")
+        htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
 
         contentAsString(result) must include(Messages("submit.registration"))
       }
     }
+
     "redirect to the declaration page" when {
       "status is pending" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody("person" -> "dfsf")
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(responsiblePeoples))
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -342,7 +359,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(rp)))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(responsiblePeoples))
 
         when(controller.dataCacheConnector.save[AddPerson](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(emptyCache))
