@@ -1,0 +1,7 @@
+@(
+question: String = ""
+)(content: Html)(implicit lang: Lang)
+
+<h3 class="heading-small">@question</h3>
+<span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
+@content

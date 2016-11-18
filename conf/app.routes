@@ -12,6 +12,9 @@ GET         /registration-progress                                      controll
 
 GET         /application-status                                         controllers.StatusController.get()
 
+GET         /satisfaction-survey                                        controllers.SatisfactionSurveyController.get()
+POST        /satisfaction-survey                                        controllers.SatisfactionSurveyController.post()
+
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 

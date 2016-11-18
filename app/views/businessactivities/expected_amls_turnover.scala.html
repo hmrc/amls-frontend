@@ -5,6 +5,7 @@
 @(f: forms.Form2[_], edit: Boolean, activities: Set[BusinessActivity])(implicit lang: Lang, request: Request[_])
 
 @header = {
+    @errorSummary(f)
     @heading("businessactivities.turnover.heading", "summary.businessactivities")
 }
 

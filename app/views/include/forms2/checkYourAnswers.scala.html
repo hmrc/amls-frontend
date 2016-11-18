@@ -1,0 +1,15 @@
+@(
+question: String = "",
+classes: Seq[String] = Seq.empty,
+editUrl: String = "",
+removeUrl: String = ""
+)(content: Html)(implicit lang: Lang)
+
+<section class="check-your-answers @classes.mkString(" ")">
+@if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
+<span class="visuallyhidden">@Messages("summary.visuallyhidden.answer"): </span>
+@content
+@if(editUrl.nonEmpty){<footer class="group">
+    <p><a href="@editUrl" class="edit">@Messages("button.edit")<span class="visuallyhidden"> @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a></p>
+</footer>}
+</section>

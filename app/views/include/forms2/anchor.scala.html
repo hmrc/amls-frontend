@@ -1,0 +1,14 @@
+@(
+attrRole: Boolean = false,
+attrHref: String,
+linkText: String,
+visuallyhidden: String = ""
+)(implicit lang: Lang)
+
+@*  Current use suggests we only use the one class on anchors: button;
+may need refactoring at a later date if more are required *@
+
+<a href="@attrHref"
+   @if(attrRole){ class="button"}
+   @if(attrRole){ role="button"}>@linkText@if(visuallyhidden){
+    <span class="visuallyhidden">@visuallyhidden</span>}</a>
