@@ -3,12 +3,15 @@ package models.notifications
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.specs2.mock.mockito.MockitoMatchers
+import ContactType._
+import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsError, JsPath, JsString, JsSuccess}
 
 class NotificationsSpec extends PlaySpec with MockitoMatchers with OneAppPerSuite {
 
   val testNotifications = Notification(None, None, None, false, new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
-  "Secure Communication" must {
+  "Notification Contact types" must {
     "retrieve the corresponding subject from messages" when {
       "message type is APA1" in {
         testNotifications.copy(contactType = Some(ApplicationApproval)).subject mustBe "Application Approval"
@@ -67,6 +70,29 @@ class NotificationsSpec extends PlaySpec with MockitoMatchers with OneAppPerSuit
         testNotifications.copy(contactType = Some(Others)).subject mustBe "Generic communication"
       }
     }
+
+    "read/write Json successfully" in {
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RejectionReasons)) must be(JsSuccess(ContactType.RejectionReasons))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RevocationReasons)) must be(JsSuccess(ContactType.RevocationReasons))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.MindedToReject)) must be(JsSuccess(ContactType.MindedToReject))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.NoLongerMindedToReject)) must be(JsSuccess(ContactType.NoLongerMindedToReject))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.MindedToRevoke)) must be(JsSuccess(ContactType.MindedToRevoke))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.NoLongerMindedToRevoke)) must be(JsSuccess(ContactType.NoLongerMindedToRevoke))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.Others)) must be(JsSuccess(ContactType.Others))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ApplicationApproval)) must be(JsSuccess(ContactType.ApplicationApproval))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RenewalApproval)) must be(JsSuccess(ContactType.RenewalApproval))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.AutoExpiryOfRegistration)) must be(JsSuccess(ContactType.AutoExpiryOfRegistration))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RenewalReminder)) must be(JsSuccess(ContactType.RenewalReminder))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForApplication)) must be(JsSuccess(ContactType.ReminderToPayForApplication))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForRenewal)) must be(JsSuccess(ContactType.ReminderToPayForRenewal))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForVariation)) must be(JsSuccess(ContactType.ReminderToPayForVariation))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForManualCharges)) must be(JsSuccess(ContactType.ReminderToPayForManualCharges))
+    }
+
+//    "fail with error when status value is passed incorrectly" in {
+//      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath  \"contact_type",List(ValidationError(List("error.invalid")))))))
+//    }
+
     "format the date for the table of messages" in {
       testNotifications.dateReceived mustBe "1 December 2017"
     }
