@@ -50,7 +50,7 @@ sealed trait PaymentMethods0 {
 
       val detailsR: Rule[String, String] =
         (minLengthR(minLength) withMessage "error.required.hvd.describe") compose
-          (maxLengthR(maxLength) withMessage "error.maxlength.hvd.describe")
+          (maxLengthR(maxLength) withMessage "error.invalid.maxlength.255")
 
       val booleanR = b andThen { _ fmap { case Some(b) => b; case None => false } }
 

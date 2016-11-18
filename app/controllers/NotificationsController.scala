@@ -3,12 +3,12 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
-import models.securecommunications._
+import models.notifications._
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 
 import scala.concurrent.Future
 
-trait SecureCommunicationsController extends BaseController {
+trait NotificationsController extends BaseController {
 
   protected[controllers] val dataCacheConnector: DataCacheConnector
 
@@ -20,15 +20,15 @@ trait SecureCommunicationsController extends BaseController {
           bm <- businessMatching
           rd <- bm.reviewDetails
         } yield {
-          Ok(views.html.securecommunications.your_messages(rd.businessName, getSecureComms()))
+          Ok(views.html.notifications.your_messages(rd.businessName, getNotificationRecords()))
         }) getOrElse(throw new Exception("Cannot retrieve business name"))
       }
   }
 
-  def getSecureComms(secureComms: List[SecureCommunication] = List()): List[SecureCommunication] =
-    secureComms match {
-      case s :: sc => secureComms.sortWith((x,y) => x.timeReceived.isAfter(y.timeReceived))
-      case _ => secureComms
+  def getNotificationRecords(notifications: List[NotificationRecord] = List()): List[NotificationRecord] =
+    notifications match {
+      case s :: sc => notifications.sortWith((x,y) => x.timeReceived.isAfter(y.timeReceived))
+      case _ => notifications
     }
 
   def messageDetails(id: String) = Authorised.async {
@@ -37,7 +37,7 @@ trait SecureCommunicationsController extends BaseController {
   }
 }
 
-object SecureCommunicationsController extends SecureCommunicationsController {
+object NotificationsController extends NotificationsController {
   override protected[controllers] val dataCacheConnector = DataCacheConnector
   override protected val authConnector = AMLSAuthConnector
 }

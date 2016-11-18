@@ -1,4 +1,5 @@
 @import include._
+@import forms2._
 @(index:Int)(implicit request: Request[_])
 
 @header = {
@@ -21,11 +22,12 @@
         <li>@Messages("bankdetails.whatyouneed.line_5")</li>
     </ul>
 
-     <div class="form-field">
-        <a class="button" role="button" href="@controllers.bankdetails.routes.BankAccountTypeController.get(index)">
-            @Messages("button.continue")<span class="visuallyhidden"> @Messages("summary.bankdetails")</span>
-        </a>
-     </div>
+    @anchor(
+        attrHref = controllers.bankdetails.routes.BankAccountTypeController.get(index).toString,
+        attrRole = true,
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.bankdetails")
+    )
 }
 
 @sidebar = {

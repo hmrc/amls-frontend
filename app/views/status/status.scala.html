@@ -73,7 +73,7 @@ case _ => { None }
                 @if(text.equals("status.amendment.edit")){
                     <div class="govuk-box-highlight messaging">
                         <!-- <i class="icon icon-information"></i>  -->
-                        <a href="@controllers.routes.SecureCommunicationsController.getMessages()">You have unread messages</a>
+                        <a href="@controllers.routes.NotificationsController.getMessages()">You have unread messages</a>
                     </div>
                 }
                 <div class="grid-row statusblock declaration">
@@ -113,8 +113,19 @@ case _ => { None }
         </div>
 
     </div>
+
 </div>
 
-
+@completionState.currentState match {
+case SubmissionReadyForReview | SubmissionDecisionApproved | SubmissionDecisionRejected => {
+<div class="grid-row">
+    <div class="column-two-thirds">
+        <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
+        <p>@Messages("survey.satisfaction.please") <a href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
+    </div>
+</div>
+}
+case _ => {}
+}
 
 }

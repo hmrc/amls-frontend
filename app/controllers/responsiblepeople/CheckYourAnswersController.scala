@@ -11,14 +11,12 @@ trait CheckYourAnswersController extends BaseController {
   val dataCacheConnector: DataCacheConnector
 
   def get =
-    ResponsiblePeopleToggle {
-      Authorised.async {
-        implicit authContext => implicit request =>
-          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
-            case Some(data) => Ok(check_your_answers(data))
-            case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-          }
-      }
+    Authorised.async {
+      implicit authContext => implicit request =>
+        dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+          case Some(data) => Ok(check_your_answers(data))
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        }
     }
 }
 

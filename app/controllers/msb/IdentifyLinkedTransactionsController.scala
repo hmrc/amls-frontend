@@ -97,6 +97,5 @@ trait IdentifyLinkedTransactionsController extends BaseController {
 object IdentifyLinkedTransactionsController extends IdentifyLinkedTransactionsController {
   // $COVERAGE-OFF$
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 }

@@ -226,5 +226,9 @@
         }
     }
 
-    <a class="button" href="@controllers.routes.RegistrationProgressController.get()">@Messages("button.summary.acceptandcomplete")</a>
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.checkyouranswers.acceptandcomplete")
+    )
 }

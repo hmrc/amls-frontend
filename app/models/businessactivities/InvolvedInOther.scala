@@ -19,7 +19,7 @@ object InvolvedInOther {
   val maxOtherBusinessActivityTypeLength = 255
   val OtherBusinessActivityType = notEmptyStrip compose
                                   notEmpty.withMessage("error.required.ba.involved.in.other.text") compose
-                                  maxLength(maxOtherBusinessActivityTypeLength).withMessage("error.invalid.ba.involved.in.other.text")
+                                  maxLength(maxOtherBusinessActivityTypeLength).withMessage("error.invalid.maxlength.255")
 
 
   implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>

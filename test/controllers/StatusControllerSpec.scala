@@ -392,6 +392,8 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
         document.getElementsByClass("statusblock").first().html() must include(Messages("status.submissionready.changelink1"))
 
+        document.html() must not include(Messages("survey.satisfaction.beforeyougo"))
+
       }
 
       "application is in review" in new Fixture {
@@ -414,6 +416,11 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
         document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
 
+        document.html() must include(Messages("survey.satisfaction.beforeyougo"))
+        document.html() must include(Messages("survey.satisfaction.please"))
+        document.html() must include(Messages("survey.satisfaction.answer"))
+        document.html() must include(Messages("survey.satisfaction.helpus"))
+
       }
 
       "application has been approved" in new Fixture {
@@ -435,6 +442,11 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         document.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
         document.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
+
+        document.html() must include(Messages("survey.satisfaction.beforeyougo"))
+        document.html() must include(Messages("survey.satisfaction.please"))
+        document.html() must include(Messages("survey.satisfaction.answer"))
+        document.html() must include(Messages("survey.satisfaction.helpus"))
 
       }
     }
