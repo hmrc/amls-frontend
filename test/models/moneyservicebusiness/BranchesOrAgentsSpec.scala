@@ -133,7 +133,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
     }
 
     "the list of countries has entries" must {
-      "set hasCountries to true and populate the countrie list" in {
+      "set hasCountries to true and populate the countries list" in {
         BranchesOrAgents.formW.writes(BranchesOrAgents(Some(Seq(Country("TESTCOUNTRY1", "TC1"), Country("TESTCOUNTRY2", "TC2"))))) must be (Map(
         "hasCountries" -> Seq("true"),
         "countries[0]" -> Seq("TC1"),
