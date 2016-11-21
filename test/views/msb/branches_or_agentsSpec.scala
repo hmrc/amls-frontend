@@ -20,7 +20,6 @@ class branches_or_agentsSpec extends WordSpec with MustMatchers with OneAppPerSu
         val view = views.html.msb.branches_or_agents(Form2(model), false)
         val dom = Jsoup.parse(view.body)
         val noRadio = dom.select("input[id=hasCountries-false]")
-        println(s"############# -- $noRadio")
         noRadio.hasAttr("checked") must be (true)
       }
     }
@@ -31,13 +30,9 @@ class branches_or_agentsSpec extends WordSpec with MustMatchers with OneAppPerSu
 
         val model= BranchesOrAgents(Some(Seq(Country("COUNTRTY NAME", "CODE"))))
         val form = Form2(model)
-        println("=====================================")
-        println(s"form = $form")
-        println("=====================================")
         val view = views.html.msb.branches_or_agents(form, false)
         val dom = Jsoup.parse(view.body)
         val yesRadio = dom.select("input[id=hasCountries-true]")
-        println(s"@@@@@@@@@@@@ --- $yesRadio")
         yesRadio.hasAttr("checked") must be (true)
       }
     }
