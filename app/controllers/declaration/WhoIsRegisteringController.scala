@@ -12,6 +12,7 @@ import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.StatusConstants
 import views.html.declaration.who_is_registering
 
 import scala.concurrent.Future
@@ -29,7 +30,7 @@ trait WhoIsRegisteringController extends BaseController {
           (for {
             cache <- optionalCache
             responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-          } yield whoIsRegisteringView(Ok, EmptyForm, responsiblePeople)
+          } yield whoIsRegisteringView(Ok, EmptyForm, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted)))
           ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
@@ -83,7 +84,7 @@ trait WhoIsRegisteringController extends BaseController {
                     redirectToAddPersonPage
                   }
                   case _ => {
-                    getAddPerson(data, responsiblePeople) map { addPerson =>
+                    getAddPerson(data, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted))) map { addPerson =>
                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
                     redirectToDeclarationPage
