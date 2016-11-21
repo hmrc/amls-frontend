@@ -7,9 +7,19 @@ import ContactType._
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsString, JsSuccess}
 
-class NotificationsSpec extends PlaySpec with MockitoMatchers with OneAppPerSuite {
+class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSuite {
 
-  val testNotifications = Notification(None, None, None, false, new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+  val testNotifications = NotificationRow(
+    Some(
+      Status(Some(StatusType.Revoked),
+        Some(RevokedReason.RevokedCeasedTrading))
+    ),
+    None,
+    None,
+    false,
+    new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
+    IDType("1234567")
+  )
 
   "Notification Contact types" must {
     "retrieve the corresponding subject from messages" when {
@@ -17,7 +27,7 @@ class NotificationsSpec extends PlaySpec with MockitoMatchers with OneAppPerSuit
         testNotifications.copy(contactType = Some(ApplicationApproval)).subject mustBe "Application Approval"
       }
       "message type is not given and variation is true" in {
-        testNotifications.copy(isVariation = true).subject mustBe "Registration Variation Approval"
+        testNotifications.copy(variation = true).subject mustBe "Registration Variation Approval"
       }
       "message type is not given and variation is false" in {
         testNotifications.subject mustBe "Application Auto-Rejection for Failure to Pay"
@@ -89,12 +99,16 @@ class NotificationsSpec extends PlaySpec with MockitoMatchers with OneAppPerSuit
       ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForManualCharges)) must be(JsSuccess(ContactType.ReminderToPayForManualCharges))
     }
 
-//    "fail with error when status value is passed incorrectly" in {
-//      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath  \"contact_type",List(ValidationError(List("error.invalid")))))))
-//    }
+    "fail with error when status value is passed incorrectly" in {
+      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath  \"contact_type",List(ValidationError("error.invalid"))))))
+    }
 
     "format the date for the table of messages" in {
       testNotifications.dateReceived mustBe "1 December 2017"
+    }
+
+    "read and write json successfully"  in {
+      NotificationRow.format.reads(NotificationRow.format.writes(testNotifications)) must be(JsSuccess(testNotifications))
     }
   }
 

@@ -1,39 +1,52 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import connectors.{AmlsNotificationConnector, AmlsNotificationsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.notifications._
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import services.AuthEnrolmentsService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 trait NotificationsController extends BaseController {
 
   protected[controllers] val dataCacheConnector: DataCacheConnector
+  protected[controllers] def authEnrolmentsService: AuthEnrolmentsService
+  protected[controllers] val amlsNotificationConnector: AmlsNotificationConnector
 
   def getMessages() = Authorised.async {
     implicit authContext => implicit request =>
-      val fetchBusinessMatching = dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-      fetchBusinessMatching map { businessMatching =>
-        (for {
-          bm <- businessMatching
-          rd <- bm.reviewDetails
-        } yield {
-          Ok(views.html.notifications.your_messages(rd.businessName, getNotificationRecords()))
-        }) getOrElse(throw new Exception("Cannot retrieve business name"))
+      authEnrolmentsService.amlsRegistrationNumber flatMap {
+        case Some(amlsRegNo) => {
+          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { businessMatching =>
+            (for {
+              bm <- businessMatching
+              rd <- bm.reviewDetails
+            } yield {
+              getNotificationRecords(amlsRegNo) map { records =>
+                Ok(views.html.notifications.your_messages(rd.businessName,records))
+              }
+            }) getOrElse(throw new Exception("Cannot retrieve business name"))
+          }
+        }
+        case _ => throw new Exception("amlsRegNo does not exist")
       }
   }
 
-  def getNotificationRecords(notifications: List[Notification] = List()): List[Notification] =
-    notifications match {
-      case s :: sc => notifications.sortWith((x,y) => x.receivedAt.isAfter(y.receivedAt))
-      case _ => notifications
+  def getNotificationRecords(amlsRegNo: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] =
+    amlsNotificationConnector.fetchAllByAmlsRegNo(amlsRegNo) map { notifications =>
+      notifications match {
+        case s :: sc => notifications.sortWith((x,y) => x.receivedAt.isAfter(y.receivedAt))
+        case _ => notifications
+      }
     }
-
 }
 
 object NotificationsController extends NotificationsController {
   override protected[controllers] val dataCacheConnector = DataCacheConnector
+  override protected[controllers] val amlsNotificationConnector = AmlsNotificationConnector
+  override protected[controllers] val authEnrolmentsService = AuthEnrolmentsService
   override protected val authConnector = AMLSAuthConnector
 }
