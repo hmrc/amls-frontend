@@ -1,12 +1,13 @@
 package models.moneyservicebusiness
 
 import models.Country
+import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 
-class BranchesOrAgentsSpec extends PlaySpec {
+class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
   "MsbServices" must {
 
@@ -110,6 +111,34 @@ class BranchesOrAgentsSpec extends PlaySpec {
       rule.validate(form) mustBe Success(BranchesOrAgents(Some(Seq(
         Country("United Kingdom", "GB")
       ))))
+    }
+  }
+
+  "BranchesOrAgents form writes" when {
+    "there is no list of countries" must {
+      "set hasCountries to false" in {
+        BranchesOrAgents.formW.writes(BranchesOrAgents(None)) must be (Map(
+                    "hasCountries" -> Seq("false")
+                    )
+          )
+      }
+    }
+
+    "the list of countries is empty" must {
+      "set hasCountries to false" in {
+        BranchesOrAgents.formW.writes(BranchesOrAgents(Some(Seq.empty[Country]))) must be (Map(
+          "hasCountries" -> Seq("false")
+        ))
+      }
+    }
+
+    "the list of countries has entries" must {
+      "set hasCountries to true and populate the countrie list" in {
+        BranchesOrAgents.formW.writes(BranchesOrAgents(Some(Seq(Country("TESTCOUNTRY1", "TC1"), Country("TESTCOUNTRY2", "TC2"))))) must be (Map(
+        "hasCountries" -> Seq("true"),
+        "countries[0]" -> Seq("TC1"),
+        "countries[1]" -> Seq("TC2")
+      ))}
     }
   }
 }
