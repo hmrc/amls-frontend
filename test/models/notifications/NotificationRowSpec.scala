@@ -5,7 +5,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.specs2.mock.mockito.MockitoMatchers
 import ContactType._
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsString, JsSuccess}
+import play.api.libs.json._
 
 class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSuite {
 
@@ -17,7 +17,7 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
     None,
     None,
     false,
-    new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
+    DateTime.now(),
     IDType("1234567")
   )
 
@@ -108,7 +108,26 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
     }
 
     "read and write json successfully"  in {
-      NotificationRow.format.reads(NotificationRow.format.writes(testNotifications)) must be(JsSuccess(testNotifications))
+      val model = NotificationRow(
+        Some(
+          Status(
+            Some(StatusType.Revoked),
+            Some(RevokedReason.RevokedCeasedTrading)
+          )),
+        Some(ContactType.MindedToRevoke),
+        None,
+        false,
+        new DateTime(1479730062573L, DateTimeZone.UTC),
+        new IDType("5832e38e01000001005ca3ff"
+        ))
+
+      val json = Json.parse(
+        """
+          |{"status":{"status_type":"08","status_reason":"02"},"contactType":"MTRV","variation":false,"receivedAt":{"$date":1479730062573},"_id":{"$oid":"5832e38e01000001005ca3ff"}}
+          |
+        """.stripMargin)
+
+      NotificationRow.format.reads(json) must be(JsSuccess(model))
     }
   }
 

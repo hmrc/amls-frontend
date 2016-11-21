@@ -1,6 +1,6 @@
 package models.notifications
 
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.i18n.Messages
 import play.api.libs.json.{JsValue, Writes, _}
@@ -32,6 +32,16 @@ case class NotificationRow(
 }
 
 object NotificationRow {
+  implicit val dateTimeRead: Reads[DateTime] = {
+    (__ \ "$date").read[Long].map { dateTime =>
+      new DateTime(dateTime, DateTimeZone.UTC)
+    }
+  }
+  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
+    def writes(dateTime: DateTime): JsValue = Json.obj(
+      "$date" -> dateTime.getMillis
+    )
+  }
   implicit val format = Json.format[NotificationRow]
 }
 

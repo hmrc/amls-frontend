@@ -1,17 +1,14 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models._
 import models.notifications.NotificationRow
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.http.{HeaderCarrier, _}
-import scala.concurrent.ExecutionContext.Implicits.global
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait AmlsNotificationConnector {
 
@@ -32,7 +29,7 @@ trait AmlsNotificationConnector {
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     httpGet.GET[Seq[NotificationRow]](getUrl) map {
       response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        Logger.debug(s"$prefix - Response Body: $response")
         response
     }
   }

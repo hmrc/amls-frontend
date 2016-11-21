@@ -17,6 +17,8 @@ trait NotificationsController extends BaseController {
   protected[controllers] def authEnrolmentsService: AuthEnrolmentsService
   protected[controllers] val amlsNotificationConnector: AmlsNotificationConnector
 
+  def messageDetails(id: String) = getMessages()
+
   def getMessages() = Authorised.async {
     implicit authContext => implicit request =>
       authEnrolmentsService.amlsRegistrationNumber flatMap {
