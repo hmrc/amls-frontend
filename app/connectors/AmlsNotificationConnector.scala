@@ -9,6 +9,7 @@ import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.http.{HeaderCarrier, _}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,12 +23,11 @@ trait AmlsNotificationConnector {
 
   def fetchAllByAmlsRegNo(amlsRegistrationNumber: String)(implicit
                                                           headerCarrier: HeaderCarrier,
-                                                          ec: ExecutionContext,
                                                           reqW: Writes[Seq[NotificationRow]],
                                                           ac: AuthContext
   ): Future[Seq[NotificationRow]] = {
 
-    val getUrl = s"$url/secure-comms/reg-number/$amlsRegistrationNumber"
+    val getUrl = s"$url/reg-number/$amlsRegistrationNumber"
     val prefix = "[AmlsNotificationsConnector][fetchAllByAmlsRegNo]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     httpGet.GET[Seq[NotificationRow]](getUrl) map {
@@ -42,5 +42,5 @@ object AmlsNotificationConnector extends AmlsNotificationConnector {
   // $COVERAGE-OFF$
   override private[connectors] val httpPost = WSHttp
   override private[connectors] val httpGet = WSHttp
-  override private[connectors] val url = ApplicationConfig.feePaymentUrl
+  override private[connectors] val url = ApplicationConfig.allNotificationsUrl
 }

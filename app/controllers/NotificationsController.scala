@@ -1,12 +1,13 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.{AmlsNotificationConnector, AmlsNotificationsConnector, DataCacheConnector}
+import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.notifications._
 import services.AuthEnrolmentsService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -35,13 +36,14 @@ trait NotificationsController extends BaseController {
       }
   }
 
-  def getNotificationRecords(amlsRegNo: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] =
+  def getNotificationRecords(amlsRegNo: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] = {
     amlsNotificationConnector.fetchAllByAmlsRegNo(amlsRegNo) map { notifications =>
       notifications match {
-        case s :: sc => notifications.sortWith((x,y) => x.receivedAt.isAfter(y.receivedAt))
+        case s :: sc => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
         case _ => notifications
       }
     }
+  }
 }
 
 object NotificationsController extends NotificationsController {

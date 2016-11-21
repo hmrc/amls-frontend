@@ -1,10 +1,11 @@
 package controllers
 
-import connectors.{AmlsNotificationConnector, AmlsNotificationsConnector, DataCacheConnector}
+import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.Country
-import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businesscustomer.{Address, ReviewDetails}
-import models.notifications._
+import models.businessmatching.{BusinessType, _}
+import models.notifications.ContactType._
+import models.notifications.{IDType, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -13,12 +14,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
-import models.notifications.ContactType._
 import services.AuthEnrolmentsService
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.AuthorisedFixture
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with ScalaFutures {
 
@@ -55,7 +56,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
     )
 
     val controller = new NotificationsController {
-      override protected def authConnector: AuthConnector = self.authConnector
+      override val authConnector = self.authConnector
       override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
       override protected[controllers] val amlsNotificationConnector = mock[AmlsNotificationConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
@@ -85,7 +86,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
         .thenReturn(Future.successful(Some("")))
 
-      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any(),any()))
+      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
         .thenReturn(Future.successful(testList))
 
       val result = controller.getMessages()(request)
@@ -101,13 +102,10 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
     "get messages in chronological order (newest first)" in new Fixture {
 
-      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
-        .thenReturn(Future.successful(Some("")))
-
-      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any(),any()))
+      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
         .thenReturn(Future.successful(testList))
 
-      val result = await(controller.getNotificationRecords("")(any(),any()))
+      val result = await(controller.getNotificationRecords("")(mock[HeaderCarrier],mock[AuthContext]))
 
       result.head.receivedAt.isAfter(result.drop(1).head.receivedAt) mustBe true
       result.last.receivedAt.isBefore(result.init.last.receivedAt) mustBe true
