@@ -61,24 +61,24 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       override protected[controllers] val amlsNotificationConnector = mock[AmlsNotificationConnector]
       override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
+
+    val mockBusinessMatching = mock[BusinessMatching]
+    val mockReviewDetails = mock[ReviewDetails]
+
+    val testBusinessName = "Ubunchews Accountancy Services"
+    val testReviewDetails = ReviewDetails(
+      testBusinessName,
+      Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
+      "XE0001234567890"
+    )
+    val testBusinessMatch = BusinessMatching(
+      reviewDetails = Some(testReviewDetails)
+    )
   }
 
   "NotificationsController" must {
     "display the page with messages" in new Fixture {
-
-      val mockBusinessMatching = mock[BusinessMatching]
-      val mockReviewDetails = mock[ReviewDetails]
-
-      val testBusinessName = "Ubunchews Accountancy Services"
-      val testReviewDetails = ReviewDetails(
-        testBusinessName,
-        Some(BusinessType.LimitedCompany),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
-        "XE0001234567890"
-      )
-      val testBusinessMatch = BusinessMatching(
-        reviewDetails = Some(testReviewDetails)
-      )
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
         .thenReturn(Future.successful(Some(testBusinessMatch)))
@@ -110,6 +110,42 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       result.head.receivedAt.isAfter(result.drop(1).head.receivedAt) mustBe true
       result.last.receivedAt.isBefore(result.init.last.receivedAt) mustBe true
 
+    }
+
+    "throw an expection" when {
+      "business name cannot be retrieved" in new Fixture {
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+          .thenReturn(Future.successful(Some("")))
+
+        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
+          .thenReturn(Future.successful(testList))
+
+        val result = intercept[Exception] {
+          await(controller.getMessages()(request))
+        }
+
+        result.getMessage mustBe "Cannot retrieve business name"
+
+      }
+      "enrolment does not exist" in new Fixture {
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
+          .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+        when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
+          .thenReturn(Future.successful(testList))
+
+        val result = intercept[Exception] {
+          await(controller.getMessages()(request))
+        }
+
+        result.getMessage mustBe "amlsRegNo does not exist"
+      }
     }
   }
 
