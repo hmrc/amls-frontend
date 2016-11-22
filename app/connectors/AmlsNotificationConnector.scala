@@ -25,7 +25,7 @@ trait AmlsNotificationConnector {
   ): Future[Seq[NotificationRow]] = {
 
     val getUrl = s"$url/reg-number/$amlsRegistrationNumber"
-    val prefix = "[AmlsNotificationsConnector][fetchAllByAmlsRegNo]"
+    val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     httpGet.GET[Seq[NotificationRow]](getUrl) map {
       response =>
