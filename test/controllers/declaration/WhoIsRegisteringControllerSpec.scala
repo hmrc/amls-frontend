@@ -200,7 +200,7 @@ class WhoIsRegisteringControllerSpec extends PlaySpec with OneAppPerSuite with M
           val newRequest = request.withFormUrlEncodedBody()
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq.empty)))
+            .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           when(controller.statusService.getStatus(any(),any(),any()))
             .thenReturn(Future.successful(SubmissionReady))

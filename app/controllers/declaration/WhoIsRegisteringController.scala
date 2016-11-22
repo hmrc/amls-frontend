@@ -68,7 +68,7 @@ trait WhoIsRegisteringController extends BaseController {
       Form2[WhoIsRegistering](request.body) match {
         case f: InvalidForm =>
           dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-            case Some(data) => whoIsRegisteringView(BadRequest, f, data)
+            case Some(data) => whoIsRegisteringView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
             case None => whoIsRegisteringView(BadRequest, f, Seq.empty)
           }
         case ValidForm(_, data) =>
