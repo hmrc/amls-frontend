@@ -104,7 +104,7 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
     }
 
     "format the date for the table of messages" in {
-      testNotifications.dateReceived mustBe "1 December 2017"
+      testNotifications.copy(receivedAt = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)).dateReceived mustBe "1 December 2017"
     }
 
     "read and write json successfully"  in {
