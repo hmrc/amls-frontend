@@ -30,7 +30,12 @@ trait StatusController extends BaseController {
     (mlrRegNumber, submissionStatus) match {
       case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
         feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
-          case AmendOrVariationResponseType if x.difference.isEmpty => None
+          case AmendOrVariationResponseType => {
+            x.difference match {
+              case Some(difference) if difference > 0 =>  Some(x)
+              case _ => None
+            }
+          }
           case _ => Some(x)
         })
       }.recoverWith {
