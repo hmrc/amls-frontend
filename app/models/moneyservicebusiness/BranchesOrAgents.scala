@@ -59,7 +59,8 @@ sealed trait BranchesOrAgents0 {
   ): Write[BranchesOrAgents, A] =
     To[A] { __ =>
       (
-        (__ \ "hasCountries").write[Boolean].contramap[Option[_]] {
+        (__ \ "hasCountries").write[Boolean].contramap[Option[Seq[_]]] {
+          case Some(x) if x.size == 0 => false
           case Some(_) => true
           case None => false
         } and
