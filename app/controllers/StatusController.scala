@@ -3,7 +3,7 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.FeeConnector
 import models.FeeResponse
-import models.ResponseType.AmendOrVariationResponseType
+import models.ResponseType.{SubscriptionResponseType, AmendOrVariationResponseType}
 
 import models.businessmatching.BusinessMatching
 import models.status.{SubmissionStatus, SubmissionDecisionApproved, SubmissionReadyForReview, CompletionStateViewModel}
@@ -30,13 +30,9 @@ trait StatusController extends BaseController {
     (mlrRegNumber, submissionStatus) match {
       case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
         feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
-          case AmendOrVariationResponseType => {
-            x.difference match {
-              case Some(difference) if difference > 0 =>  Some(x)
-              case _ => None
-            }
-          }
-          case _ => Some(x)
+          case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0)=> Some(x)
+          case SubscriptionResponseType if x.totalFees > 0 => Some(x)
+          case _ => None
         })
       }.recoverWith {
         case _: NotFoundException => Future.successful(None)
