@@ -32,9 +32,9 @@
         </fieldset>
 
         @inlineRadioGroup(f("isUK")) {
-            @legend("businessactivities.whoisyouraccountant.address.location", jsHidden = true)
-            @radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}-field")
-            @radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}-field")
+            @legend("businessactivities.whoisyouraccountant.address.location")
+            @radio(f("isUK"), "lbl.yes", "true", target = s"#${f("postCode").id}-field")
+            @radio(f("isUK"), "lbl.no", "false", target = s"#${f("country").id}-field")
         }
 
         @fieldset(

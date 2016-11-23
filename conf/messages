@@ -900,6 +900,7 @@ businessactivities.involved.other.hint = For example: you would select ’yes’
 businessactivities.whoisyouraccountant.name = Name
 businessactivities.whoisyouraccountant.tradingName = Trading name (if different)
 businessactivities.whoisyouraccountant.address = Address
+businessactivities.whoisyouraccountant.address.location = Do they have a UK address?
 businessactivities.whoisyouraccountant.ukAddress = This is a UK address
 businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas address
 businessactivities.whoisyouraccountant.country = Country
