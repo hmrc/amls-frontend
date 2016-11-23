@@ -30,7 +30,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
   object AmlsNotificationConnector extends AmlsNotificationConnector {
     override private[connectors] val httpGet: HttpGet = mock[HttpGet]
     override private[connectors] val httpPost: HttpPost = mock[HttpPost]
-    override private[connectors] val url: String = "amls-notification/secure-comms"
+    override private[connectors] val url: String = "amls-notification/"
   }
 
   val safeId = "SAFEID"
@@ -57,7 +57,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       "given amlsRegNo" in {
         val amlsRegistrationNumber = "XAML00000567890"
         val response = Seq(NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), IDType("")))
-        val url = s"${AmlsNotificationConnector.url}/reg-number/$amlsRegistrationNumber"
+        val url = s"${AmlsNotificationConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"
 
         when {
           AmlsNotificationConnector.httpGet.GET[Seq[NotificationRow]](eqTo(url))(any(), any())

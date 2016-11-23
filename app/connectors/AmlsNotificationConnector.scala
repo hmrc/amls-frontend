@@ -24,7 +24,9 @@ trait AmlsNotificationConnector {
                                                           ac: AuthContext
   ): Future[Seq[NotificationRow]] = {
 
-    val getUrl = s"$url/reg-number/$amlsRegistrationNumber"
+    val (accountType, accountId) = ConnectorHelper.accountTypeAndId
+
+    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     httpGet.GET[Seq[NotificationRow]](getUrl) map {
