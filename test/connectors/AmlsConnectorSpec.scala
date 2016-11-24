@@ -65,7 +65,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     etmpFormBundleNumber = "",
     amlsRefNo = "",
     registrationFee = 0,
-    fpFee = None,
+    fPFee = None,
     premiseFee = 0,
     totalFees = 0,
     paymentReference = ""
@@ -75,7 +75,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
-    fpFee = Some(0),
+    fPFee = Some(0),
     premiseFee = 0,
     totalFees = 0,
     paymentReference = Some(""),
