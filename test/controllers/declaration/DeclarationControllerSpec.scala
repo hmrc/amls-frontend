@@ -37,7 +37,7 @@ class DeclarationControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       etmpFormBundleNumber = "",
       amlsRefNo = "",
       registrationFee = 0,
-      fpFee = None,
+      fPFee = None,
       premiseFee = 0,
       totalFees = 0,
       paymentReference = ""

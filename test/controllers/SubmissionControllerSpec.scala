@@ -31,7 +31,7 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFu
     etmpFormBundleNumber = "",
     amlsRefNo = "",
     registrationFee = 0,
-    fpFee = None,
+    fPFee = None,
     premiseFee = 0,
     totalFees = 0,
     paymentReference = ""
@@ -41,7 +41,7 @@ class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFu
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
-    fpFee = Some(0),
+    fPFee = Some(0),
     premiseFee = 0,
     totalFees = 0,
     paymentReference = Some(""),

@@ -6,7 +6,7 @@ case class AmendVariationResponse (
                                     processingDate: String,
                                     etmpFormBundleNumber: String,
                                     registrationFee: BigDecimal,
-                                    fpFee: Option[BigDecimal],
+                                    fPFee: Option[BigDecimal],
                                     premiseFee: BigDecimal,
                                     totalFees: BigDecimal,
                                     paymentReference: Option[String],
