@@ -6,6 +6,7 @@ import play.api.Play.current
 
 trait ApplicationConfig {
   def enrolmentToggle : Boolean
+  def notificationsToggle : Boolean
 }
 
 
@@ -38,6 +39,9 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   lazy val feePaymentUrl = s"$amlsUrl/amls/payment"
 
+  lazy val notificationsUrl = baseUrl("amls-notification")
+  lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
+
   lazy val authUrl = baseUrl("auth")
 
   def businessCustomerUrl = getConfigString("business-customer.url")
@@ -52,6 +56,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val regFee = getConfigInt("amounts.registration")
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFee = getConfigInt("amounts.people")
+
+  override def notificationsToggle = getConfBool("feature-toggle.notifications", false)
 
   override def enrolmentToggle: Boolean = {
     val value = getConfBool("feature-toggle.gg-enrolment", false)

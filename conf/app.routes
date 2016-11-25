@@ -18,6 +18,9 @@ GET         /your-registration/your-messages                            controll
 GET         /satisfaction-survey                                        controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                        controllers.SatisfactionSurveyController.post()
 
+GET         /your-registration/your-messages/:id                        controllers.NotificationsController.messageDetails(id : String)
+GET         /your-registration/your-messages                            controllers.NotificationsController.getMessages()
+
 GET         /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                          controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
@@ -330,7 +333,6 @@ POST        /money-service-business/transfers                           controll
 GET         /money-service-business/largest-amounts                     controllers.msb.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
 POST        /money-service-business/largest-amounts                     controllers.msb.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
-
 GET         /money-service-business/transfers-b                         controllers.msb.CETransactionsInNext12MonthsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transfers-b                         controllers.msb.CETransactionsInNext12MonthsController.post(edit: Boolean ?= false)
 
@@ -359,4 +361,3 @@ POST        /high-value-dealer/percentage                               controll
 
 GET         /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
-
