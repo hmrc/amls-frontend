@@ -326,7 +326,7 @@ trait SubmissionService extends DataCacheService {
   private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
     people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
       case (b, a) =>
-        Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
+        Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fPFee.getOrElse(0)))) ++
           (if (b.nonEmpty) {
             Seq(BreakdownRow(UnpaidPeople.message, b.size, UnpaidPeople.feePer, Currency.fromBD(UnpaidPeople.feePer)))
           } else {
