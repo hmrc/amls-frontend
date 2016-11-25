@@ -5,7 +5,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessType, _}
 import models.notifications.ContactType._
-import models.notifications.{IDType, NotificationRow}
+import models.notifications.{NotificationDetails, IDType, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -152,11 +152,16 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
   "messageDetails" must {
     "display the message view given the message id" in new Fixture {
-      val result = controller.messageDetails("")(request)
-      val content = contentAsString(result)
-      val document = Jsoup.parse(content)
+      when (controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("Registration Number")))
+
+      when (controller.amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(NotificationDetails(None,None,Some("Message Text"), false))))
+
+      val result = controller.messageDetails("dfgdhsjk")(request)
 
       status(result) mustBe 200
+      contentAsString(result) must include ("Message Text")
     }
   }
 

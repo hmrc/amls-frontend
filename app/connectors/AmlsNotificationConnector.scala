@@ -1,7 +1,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.notifications.{NotificationResponse, NotificationRow}
+import models.notifications.{NotificationDetails, NotificationResponse, NotificationRow}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,12 +35,12 @@ trait AmlsNotificationConnector {
   }
 
   def getMessageDetails(amlsRegistrationNumber: String, contactNumber: String)
-                       (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext) : Future[Option[NotificationResponse]]= {
+                       (implicit hc : HeaderCarrier, ec : ExecutionContext, ac: AuthContext) : Future[Option[NotificationDetails]]= {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
     val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/contact-number/$contactNumber"
-    httpGet.GET[NotificationResponse](url)
+    httpGet.GET[NotificationDetails](url)
       .map {Some(_)}
       .recover {
         case _:NotFoundException => None

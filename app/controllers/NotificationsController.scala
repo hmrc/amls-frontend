@@ -4,6 +4,7 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.notifications._
+import play.api.i18n.Messages
 import services.AuthEnrolmentsService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -53,7 +54,7 @@ trait NotificationsController extends BaseController {
       authEnrolmentsService.amlsRegistrationNumber flatMap {
         case Some(regNo) => {
           amlsNotificationConnector.getMessageDetails(regNo, id) map {
-            case Some(msg) => Ok(views.html.notifications.message_details("fghgk", msg.messageText))
+            case Some(msg) => Ok(views.html.notifications.message_details(msg.subject, msg.messageText.getOrElse(Messages(msg.subject))))
             case None => NotFound(notFoundView)
           }
         }
