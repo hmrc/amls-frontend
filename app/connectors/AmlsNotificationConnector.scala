@@ -1,14 +1,14 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
-import models.notifications.NotificationRow
+import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, _}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait AmlsNotificationConnector {
 
@@ -34,6 +34,11 @@ trait AmlsNotificationConnector {
         Logger.debug(s"$prefix - Response Body: $response")
         response
     }
+  }
+
+  def getMessageDetails(amlsRegistrationNumber: String, contactNumber: String)
+                       (implicit hc : HeaderCarrier, ec : ExecutionContext) : Future[Option[NotificationDetails]]= {
+    ???
   }
 }
 

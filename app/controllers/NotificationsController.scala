@@ -14,9 +14,7 @@ import scala.concurrent.Future
 trait NotificationsController extends BaseController {
 
   protected[controllers] val dataCacheConnector: DataCacheConnector
-
   protected[controllers] def authEnrolmentsService: AuthEnrolmentsService
-
   protected[controllers] val amlsNotificationConnector: AmlsNotificationConnector
 
   def getMessages() = Authorised.async {
@@ -52,7 +50,16 @@ trait NotificationsController extends BaseController {
 
   def messageDetails(id: String) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.notifications.message_details()))
+      authEnrolmentsService.amlsRegistrationNumber flatMap {
+        case Some(regNo) => {
+          amlsNotificationConnector.getMessageDetails(regNo, id) map {
+            case Some(msg) => Ok(views.html.notifications.message_details("fghgk", msg.messageText))
+            case None => NotFound(notFoundView)
+          }
+        }
+        case _ => Future.successful(BadRequest)
+      }
+
   }
 
 }
