@@ -29,7 +29,7 @@ trait NotificationsController extends BaseController {
                 bm <- businessMatching
                 rd <- bm.reviewDetails
               } yield {
-                getNotificationRecords(amlsRegNo) map { records =>
+                getNotificationRows(amlsRegNo) map { records =>
                   Ok(views.html.notifications.your_messages(rd.businessName, records))
                 }
               }) getOrElse (throw new Exception("Cannot retrieve business name"))
@@ -42,7 +42,7 @@ trait NotificationsController extends BaseController {
       }
   }
 
-  def getNotificationRecords(amlsRegNo: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] = {
+  def getNotificationRows(amlsRegNo: String)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[NotificationRow]] = {
     amlsNotificationConnector.fetchAllByAmlsRegNo(amlsRegNo) map { notifications =>
       notifications match {
         case s :: sc => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))

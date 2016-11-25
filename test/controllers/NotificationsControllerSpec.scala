@@ -106,7 +106,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
         .thenReturn(Future.successful(testList))
 
-      val result = await(controller.getNotificationRecords("")(mock[HeaderCarrier],mock[AuthContext]))
+      val result = await(controller.getNotificationRows("")(mock[HeaderCarrier],mock[AuthContext]))
 
       result.head.receivedAt.isAfter(result.drop(1).head.receivedAt) mustBe true
       result.last.receivedAt.isBefore(result.init.last.receivedAt) mustBe true
