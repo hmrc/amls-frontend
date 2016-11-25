@@ -1,14 +1,14 @@
 package controllers
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsNotificationConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import models.notifications._
 import services.AuthEnrolmentsService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait NotificationsController extends BaseController {
@@ -21,20 +21,24 @@ trait NotificationsController extends BaseController {
 
   def getMessages() = Authorised.async {
     implicit authContext => implicit request =>
-      authEnrolmentsService.amlsRegistrationNumber flatMap {
-        case Some(amlsRegNo) => {
-          dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { businessMatching =>
-            (for {
-              bm <- businessMatching
-              rd <- bm.reviewDetails
-            } yield {
-              getNotificationRecords(amlsRegNo) map { records =>
-                Ok(views.html.notifications.your_messages(rd.businessName,records))
-              }
-            }) getOrElse(throw new Exception("Cannot retrieve business name"))
+      if (ApplicationConfig.notificationsToggle) {
+        authEnrolmentsService.amlsRegistrationNumber flatMap {
+          case Some(amlsRegNo) => {
+            dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { businessMatching =>
+              (for {
+                bm <- businessMatching
+                rd <- bm.reviewDetails
+              } yield {
+                getNotificationRecords(amlsRegNo) map { records =>
+                  Ok(views.html.notifications.your_messages(rd.businessName, records))
+                }
+              }) getOrElse (throw new Exception("Cannot retrieve business name"))
+            }
           }
+          case _ => throw new Exception("amlsRegNo does not exist")
         }
-        case _ => throw new Exception("amlsRegNo does not exist")
+      } else {
+        Future.successful(NotFound(notFoundView))
       }
   }
 

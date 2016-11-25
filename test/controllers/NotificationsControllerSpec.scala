@@ -13,6 +13,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.AuthEnrolmentsService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -112,7 +113,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
     }
 
-    "throw an expection" when {
+    "throw an exception" when {
       "business name cannot be retrieved" in new Fixture {
         when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))
@@ -146,6 +147,64 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
         result.getMessage mustBe "amlsRegNo does not exist"
       }
+    }
+  }
+
+}
+
+class NotificationsControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val controller = new NotificationsController {
+      override val authConnector = self.authConnector
+      override protected[controllers] val dataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val amlsNotificationConnector = mock[AmlsNotificationConnector]
+      override protected[controllers] val authEnrolmentsService = mock[AuthEnrolmentsService]
+    }
+
+    val mockBusinessMatching = mock[BusinessMatching]
+    val mockReviewDetails = mock[ReviewDetails]
+
+    val testBusinessName = "Ubunchews Accountancy Services"
+    val testReviewDetails = ReviewDetails(
+      testBusinessName,
+      Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
+      "XE0001234567890"
+    )
+    val testBusinessMatch = BusinessMatching(
+      reviewDetails = Some(testReviewDetails)
+    )
+  }
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
+
+  "NotificationsControllerWithoutNotificationsSpec" must {
+    "respond with not found when toggle is off" in new Fixture {
+
+      val testNotification = NotificationRow(
+        status = None,
+        contactType = None,
+        contactNumber = None,
+        variation = false,
+        receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
+        IDType("132456")
+      )
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
+        .thenReturn(Future.successful(Some(testBusinessMatch)))
+
+      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
+        .thenReturn(Future.successful(Some("")))
+
+      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
+        .thenReturn(Future.successful(Seq(testNotification)))
+
+      val result = controller.getMessages()(request)
+
+      status(result) mustBe 404
     }
   }
 

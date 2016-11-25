@@ -4,7 +4,6 @@ import connectors.{AmlsNotificationConnector, FeeConnector}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.notifications.NotificationRow
 import models.status._
 import models.{AmendVariationResponse, Country, FeeResponse, ReadStatusResponse, SubscriptionResponse}
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
@@ -15,6 +14,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
       override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
       override private[controllers] val statusService: StatusService = mock[StatusService]
       override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
-      override protected[controllers] val amlsNotificationConnector = mock[AmlsNotificationConnector]
     }
   }
 
@@ -198,9 +197,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
 
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-          .thenReturn(Future.successful(Seq(mock[NotificationRow])))
-
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -245,9 +241,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.failed(new NotFoundException("")))
-
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-          .thenReturn(Future.successful(Seq(mock[NotificationRow])))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -296,9 +289,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
 
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-          .thenReturn(Future.successful(Seq(mock[NotificationRow])))
-
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -339,9 +329,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
 
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-          .thenReturn(Future.successful(Seq(mock[NotificationRow])))
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, false)
 
@@ -432,9 +419,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(authConnector.currentAuthority(any()))
           .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-          .thenReturn(Future.successful(Seq(mock[NotificationRow])))
-
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Rejected", None, None, None, false)
 
         when(controller.statusService.getStatus(any(), any(), any()))
@@ -510,9 +494,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
 
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-          .thenReturn(Future.successful(Seq(mock[NotificationRow])))
-
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -544,9 +525,6 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
 
-        when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-          .thenReturn(Future.successful(Seq(mock[NotificationRow])))
-
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -563,6 +541,55 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
         document.getElementsByClass("messaging").size() mustBe 1
 
       }
+    }
+  }
+}
+
+class StatusControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
+  val cacheMap = mock[CacheMap]
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+    val controller = new StatusController {
+      override private[controllers] val landingService: LandingService = mock[LandingService]
+      override val authConnector = self.authConnector
+      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override private[controllers] val statusService: StatusService = mock[StatusService]
+      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
+    }
+  }
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
+
+  "StatusControllerWithoutNotificationsSpec" must {
+    "hide notifications when notifications toggle is off" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+      when(controller.landingService.cacheMap(any(), any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
+
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("XAML00000567890")))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+        .thenReturn(Future.successful(mock[FeeResponse]))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+
+      document.getElementsByClass("messaging").size() mustBe 0
+
     }
   }
 }
