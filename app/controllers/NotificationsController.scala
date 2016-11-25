@@ -52,7 +52,7 @@ trait NotificationsController extends BaseController {
 
   def messageDetails(id: String) = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.notifications.message_details()))
+      Future.successful(Ok(views.html.notifications.message_details("","")))
   }
 
 }

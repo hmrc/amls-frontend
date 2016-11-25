@@ -78,7 +78,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
     )
   }
 
-  "NotificationsController" must {
+  "getMessages" must {
     "display the page with messages" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
@@ -147,6 +147,16 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
         result.getMessage mustBe "amlsRegNo does not exist"
       }
+    }
+  }
+
+  "messageDetails" must {
+    "display the message view given the message id" in new Fixture {
+      val result = controller.messageDetails("")(request)
+      val content = contentAsString(result)
+      val document = Jsoup.parse(content)
+
+      status(result) mustBe 200
     }
   }
 

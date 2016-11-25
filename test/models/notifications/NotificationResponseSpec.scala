@@ -1,4 +1,4 @@
-package models.securecommunications
+package models.notifications
 
 import org.joda.time.LocalDateTime
 import org.scalatest.WordSpec
