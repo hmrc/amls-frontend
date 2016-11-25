@@ -1,37 +1,22 @@
 package connectors
 
-import java.time.LocalDateTime
-
-import models.ResponseType.SubscriptionResponseType
-import models._
-import models.notifications.{IDType, NotificationRow}
-import org.joda.time.{DateTime, DateTimeZone}
+import models.notifications.{IDType, NotificationResponse, NotificationRow}
+import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
+import uk.gov.hmrc.domain.Org
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
+import uk.gov.hmrc.play.http._
+import org.joda.time.{DateTimeZone, LocalDateTime}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
-
-  object FeeConnector extends FeeConnector {
-    override private[connectors] val httpPost: HttpPost = mock[HttpPost]
-    override private[connectors] val url: String = "amls-notification"
-    override private[connectors] val httpGet: HttpGet = mock[HttpGet]
-  }
-
-  object AmlsNotificationConnector extends AmlsNotificationConnector {
-    override private[connectors] val httpGet: HttpGet = mock[HttpGet]
-    override private[connectors] val httpPost: HttpPost = mock[HttpPost]
-    override private[connectors] val url: String = "amls-notification/"
-  }
 
   val safeId = "SAFEID"
   val amlsRegistrationNumber = "AMLSREGNO"
@@ -52,21 +37,66 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     None,
     None)
 
+  private trait Fixture {
+    val mockConnector =  mock[HttpGet](withSettings().verboseLogging())
+
+    val connector = new AmlsNotificationConnector {
+      override private[connectors] def httpGet: HttpGet = mockConnector
+      override private[connectors] def httpPost: HttpPost = mock[HttpPost]
+      override private[connectors] def baseUrl: String = "amls-notification"
+    }
+  }
+
   "AmlsNotificationConnector" must {
     "retrieve notifications" when {
-      "given amlsRegNo" in {
+      "given amlsRegNo" in new Fixture {
         val amlsRegistrationNumber = "XAML00000567890"
         val response = Seq(NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), IDType("")))
-        val url = s"${AmlsNotificationConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"
+        val url = s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber"
 
         when {
-          AmlsNotificationConnector.httpGet.GET[Seq[NotificationRow]](eqTo(url))(any(), any())
+          connector.httpGet.GET[Seq[NotificationRow]](eqTo(url))(any(), any())
         } thenReturn Future.successful(response)
 
-        whenReady(AmlsNotificationConnector.fetchAllByAmlsRegNo(amlsRegistrationNumber)) {
+        whenReady(connector.fetchAllByAmlsRegNo(amlsRegistrationNumber)) {
           _ mustBe response
         }
       }
     }
+
+    "the call to notification service is successful" must {
+      "return the response" in new Fixture {
+        when(connector.httpGet.GET[NotificationResponse](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/contact-number/CONTACTNUMBER"))(any(), any()))
+          .thenReturn(Future.successful(NotificationResponse(LocalDateTime.parse("2015-6-6"), "Text of the message")))
+
+        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "CONTACTNUMBER")) { result =>
+          result must be (Some(NotificationResponse(LocalDateTime.parse("2015-6-6"), "Text of the message")))
+        }
+      }
+    }
+
+    "the call to notification service returns a Bad Request" must {
+      "Fail the future with an upstream 5xx exception" in new Fixture {
+        when(connector.httpGet.GET[NotificationResponse](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/contact-number/CONTACTNUMBER"))(any(), any()))
+          .thenReturn(Future.failed(new BadRequestException("GET of blah returned status 400.")))
+
+        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "CONTACTNUMBER").failed) { exception =>
+
+          exception mustBe a[BadRequestException]
+        }
+      }
+    }
+
+    "the call to notification service returns Not Found" must {
+      "return a None" in new Fixture {
+        when(connector.httpGet.GET[NotificationResponse](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/contact-number/CONTACTNUMBER"))(any(), any()))
+          .thenReturn(Future.failed(new NotFoundException("GET of blah returned status 404.")))
+
+        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "CONTACTNUMBER")) { result =>
+          result must be (None)
+        }
+      }
+    }
+
   }
 }

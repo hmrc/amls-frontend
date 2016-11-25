@@ -1,1 +1,15 @@
-hello world
+@import include._
+@import forms2._
+
+@(msgTitle: String, msgContent: String)(implicit request: Request[_])
+
+@header = {
+@heading(msgTitle, "summary.status")
+}
+
+@main(
+title = Messages(msgTitle) + " - " + Messages("summary.status"),
+heading = header
+)  {
+    <p>@msgContent</p>
+}
