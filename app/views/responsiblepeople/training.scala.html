@@ -29,7 +29,11 @@
             @inlineRadioGroup(f("training")) {
                 @radio(f("training"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("training"), "lbl.no", "false")
-                @fieldset("responsiblepeople.training.information", jsHidden = false, id = target) {
+                @fieldset(
+                    legend = "responsiblepeople.training.information",
+                    jsHidden = false,
+                    id = target
+                ) {
                     @textarea(f("information"), bold = false)
                 }
             }

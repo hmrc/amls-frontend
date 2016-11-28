@@ -27,7 +27,12 @@
             @radio(f("anotherBody"), "lbl.yes", "true", target = s"#$target")
             @radio(f("anotherBody"), "lbl.no", "false")
 
-            @fieldset("supervision.another_body.lbl.supervisor", jsHidden = true, classes = Seq("visuallyhidden-legend"), id = target) {
+            @fieldset(
+                legend = "supervision.another_body.lbl.supervisor",
+                jsHidden = true,
+                classes = Seq("visuallyhidden-legend"),
+                id = target
+            ) {
                 @input(f("supervisorName"), "supervision.another_body.lbl.supervisor", bold = false)
 
                 @date(

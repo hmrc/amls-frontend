@@ -31,12 +31,21 @@
 
         <div class="form-field">
             @inlineRadioGroup(f("penalisedUnderEstateAgentsAct")) {
-                @legend("TODO", jsHidden = true)
+                @legend("estateagentbusiness.penalisedunderestateagentsact.title", jsHidden = true)
                 @radio(f("penalisedUnderEstateAgentsAct"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("penalisedUnderEstateAgentsAct"), "lbl.no", "false")
 
-                @fieldset("TODO", jsHidden = true, id = target) {
-                    @textarea(f("penalisedUnderEstateAgentsActDetails"), "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl", hintText = "Enter 255 characters or less." ,bold = false)
+                @fieldset(
+                    legend = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                    jsHidden = true,
+                    id = target
+                ) {
+                    @textarea(
+                        f("penalisedUnderEstateAgentsActDetails"),
+                        labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                        hintText = "hint.255.chars",
+                        bold = false
+                    )
                 }
             }
         </div>

@@ -19,22 +19,22 @@
             @Messages("estateagentbusiness.registered.redress.text")
         </span>
         @inlineRadioGroup(f("isRedress")) {
-            @legend("TODO", jsHidden = true)
+            @legend("estateagentbusiness.registered.redress.title", jsHidden = true)
             @radio(f("isRedress"), "lbl.yes", "true", target = s"#${f("propertyRedress").id}-fieldset")
             @radio(f("isRedress"), "lbl.no", "false")
         }
 
-        @fieldset("TODO", jsHidden = true, id = s"""${f("propertyRedress").id}-fieldset""") {
-            <span class="form-label">
-                @Messages("estateagentbusiness.which.redress.scheme.lbl")
-            </span>
+        @fieldset(
+            legend = "estateagentbusiness.which.redress.scheme.lbl",
+            id = s"""${f("propertyRedress").id}-fieldset"""
+        ) {
             @radioGroup(f("propertyRedressScheme")) {
                 @legend("TODO", jsHidden = true)
                 @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.01", "01")
                 @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.02", "02")
                 @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.03", "03")
                 @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.04", "04", target = s"#${f("other").id}-fieldset")
-                @fieldset("TODO", jsHidden = true, id = s"""${f("other").id}-fieldset""") {
+                @fieldset("estateagentbusiness.redress.lbl.04", jsHidden = true, id = s"""${f("other").id}-fieldset""") {
                     @input(f("other"), "lbl.pleasespecify", bold = false)
                 }
             }

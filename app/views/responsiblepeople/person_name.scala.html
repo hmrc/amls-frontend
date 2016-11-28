@@ -38,14 +38,16 @@
             @radio(f("hasPreviousName"), "lbl.yes", "true", target = "#previous-fieldset")
             @radio(f("hasPreviousName"), "lbl.no", "false")
 
-            @fieldset("responsiblepeople.personName.isknownbyothernames", jsHidden = true, id = "previous-fieldset") {
-
+            @fieldset(
+                legend = "responsiblepeople.personName.isknownbyothernames",
+                jsHidden = true,
+                id = "previous-fieldset"
+            ) {
                 @errorGroup(f("previous")) {
                     @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
                     @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
                     @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
                 }
-
                 @date(f, "previous.date", "responsiblepeople.personName.previous.date.lbl")
             }
         }
@@ -57,7 +59,11 @@
             @radio(f("hasOtherNames"), "lbl.yes", "true", target = "#otherNames-fieldset")
             @radio(f("hasOtherNames"), "lbl.no", "false")
 
-            @fieldset("responsiblepeople.personName.hasOtherNames", jsHidden = true, id = "otherNames-fieldset") {
+            @fieldset(
+                legend = "responsiblepeople.personName.hasOtherNames",
+                jsHidden = true,
+                id = "otherNames-fieldset"
+            ) {
                 @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
             }
         }

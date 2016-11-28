@@ -21,7 +21,11 @@
             @radio(f("isAMember"), "lbl.no", "false")
         }
 
-        @fieldset("lbl.select.all", classes = Seq("form-field-group-end"), id = s"""${f("businessType").id}-fieldset""") {
+        @fieldset(
+            legend = "lbl.select.all",
+            classes = Seq("form-field-group-end"),
+            id = s"""${f("businessType").id}-fieldset"""
+        ) {
 
             @radioGroup(f("businessType")) {
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
@@ -39,7 +43,11 @@
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#${f("specifyOtherBusiness").id}-fieldset")
 
-                @fieldset("lbl.pleasespecify", jsHidden = true, id = s"""${f("specifyOtherBusiness").id}-fieldset""") {
+                @fieldset(
+                    legend = "lbl.pleasespecify",
+                    jsHidden = true,
+                    id = s"""${f("specifyOtherBusiness").id}-fieldset"""
+                ) {
                     @input(f("specifyOtherBusiness"), "lbl.pleasespecify", bold = false)
                 }
             }

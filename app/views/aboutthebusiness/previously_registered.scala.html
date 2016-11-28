@@ -25,7 +25,10 @@
             @legend("aboutthebusiness.registeredformlr.title", jsHidden = true)
             @radio(f("previouslyRegistered"), "lbl.yes", "true", target = s"#$target")
             @radio(f("previouslyRegistered"), "lbl.no", "false")
-            @fieldset("aboutthebusiness.registeredformlr.mlrregno.lbl", id = target) {
+            @fieldset(
+                legend = "aboutthebusiness.registeredformlr.mlrregno.lbl",
+                id = target
+            ) {
                 @input(f("prevMLRRegNo"),
                 hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
                 bold = false)

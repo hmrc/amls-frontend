@@ -39,12 +39,20 @@
         @legend("bankdetails.bankaccount.accounttype", jsHidden = false, bold = false)
         @radio(f("isUK"), "lbl.yes", "true", target = s"#$target")
         @radio(f("isUK"), "lbl.no", "false", target = s"#$target1")
-            @fieldset("bankdetails.bankaccount.accounttype.yes", jsHidden = true, id = target) {
+            @fieldset(
+                legend = "bankdetails.bankaccount.accounttype.yes",
+                jsHidden = true,
+                id = target
+            ) {
                 @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "bankdetails.bankaccount.sortcode.hint", bold = false)
                 @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", hintText = "bankdetails.bankaccount.accountnumber.hint", bold = false)
 
             }
-            @fieldset("bankdetails.bankaccount.accounttype.no", jsHidden = true, id = target1) {
+            @fieldset(
+                legend = "bankdetails.bankaccount.accounttype.no",
+                jsHidden = true,
+                id = target1
+            ) {
                 @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
                 <p>or</p>
                 @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)

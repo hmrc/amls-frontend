@@ -23,7 +23,11 @@
             @legend("businessmatching.psr.number.title", jsHidden = true)
             @radio(f("appliedFor"), "lbl.yes", "true", target = s"#$target")
             @radio(f("appliedFor"), "lbl.no", "false")
-            @fieldset("businessmatching.psr.number.lbl", jsHidden = true, id = target) {
+            @fieldset(
+                legend = "businessmatching.psr.number.lbl",
+                jsHidden = true,
+                id = target
+            ) {
                 @input(
                     field = f("regNumber"),
                     bold = false,

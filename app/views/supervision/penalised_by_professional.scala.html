@@ -37,7 +37,11 @@
                 @radio(f("penalised"), "lbl.yes", "true", target = s"#$target")
                 @radio(f("penalised"), "lbl.no", "false")
 
-                @fieldset("supervision.penalisedbyprofessional.details.lbl", jsHidden = true, id = target) {
+                @fieldset(
+                    legend = "supervision.penalisedbyprofessional.details.lbl",
+                    jsHidden = true,
+                    id = target
+                ) {
                     @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false)
                 }
             }

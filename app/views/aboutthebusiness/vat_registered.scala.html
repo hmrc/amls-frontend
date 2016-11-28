@@ -23,7 +23,11 @@
             @legend("aboutthebusiness.registeredforvat.title", jsHidden = true)
             @radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
             @radio(f("registeredForVAT"), "lbl.no", "false")
-            @fieldset("", jsHidden = true, id = target) {
+            @fieldset(
+                legend = "aboutthebusiness.registeredforvat.lbl.vatNumber",
+                jsHidden = true,
+                id = target
+            ) {
                 @input(f("vrnNumber"),
                     "aboutthebusiness.registeredforvat.lbl.vatNumber",
                     hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",

@@ -26,7 +26,11 @@ s"""${f("paymentDate").id}-fieldset"""
         @inlineRadioGroup(f("acceptedAnyPayment")) {
             @radio(f("acceptedAnyPayment"), "lbl.yes", "true", target = s"#$target")
             @radio(f("acceptedAnyPayment"), "lbl.no", "false")
-            @fieldset("hvd.cash.payment.data.text", jsHidden = true, id = target) {
+            @fieldset(
+                legend = "hvd.cash.payment.data.text",
+                jsHidden = true,
+                id = target
+            ) {
                 @date(
                     f = f,
                     p = "paymentDate",

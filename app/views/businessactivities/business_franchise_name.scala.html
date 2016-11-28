@@ -26,7 +26,11 @@ s"""${f("franchiseName").id}-fieldset"""
             @legend("businessactivities.businessfranchise.title", jsHidden = true)
             @radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
             @radio(f("businessFranchise"), "lbl.no", "false")
-            @fieldset("businessactivities.businessfranchise.lbl.franchisename", jsHidden = true, id = target) {
+            @fieldset(
+                legend = "businessactivities.businessfranchise.lbl.franchisename",
+                jsHidden = true,
+                id = target
+            ) {
                 @input(f("franchiseName"), "businessactivities.businessfranchise.lbl.franchisename", bold = false)
             }
         </div>

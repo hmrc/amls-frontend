@@ -23,7 +23,11 @@
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-fieldset")
-                @fieldset("tcsp.service.provider.lbl.05", jsHidden = true, id = s"""${f("agent").id}-fieldset""") {
+                @fieldset(
+                    legend = "tcsp.service.provider.lbl.05",
+                    jsHidden = true,
+                    id = s"""${f("agent").id}-fieldset"""
+                ) {
                     @inlineRadioGroup(f("onlyOffTheShelfCompsSold")) {
                         @legend("tcsp.off-the-shelf.companies.lbl", false, bold = false)
                         @radio(f("onlyOffTheShelfCompsSold"), "lbl.yes", "true")

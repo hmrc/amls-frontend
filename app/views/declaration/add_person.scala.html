@@ -45,7 +45,11 @@
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
-            @fieldset("declaration.addperson.lbl.08", jsHidden = true, id = target) {
+            @fieldset(
+                legend = "declaration.addperson.lbl.08",
+                jsHidden = true,
+                id = target
+            ) {
                 @input(f("roleWithinBusinessOther"), "lbl.pleasespecify", bold = false)
             }
 
