@@ -255,7 +255,41 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       whenReady(TestSubmissionService.getAmendment) { result => result foreach {
         case (_, _, rows, _) => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
-      }}
+      }
+      }
+
+    }
+
+    "not show negative fees for responsible people who have already been paid for" in new Fixture {
+
+      val people = Seq(
+        ResponsiblePeople(Some(PersonName("Unfit", Some("and"), "Unproper", None, None)), hasAlreadyPassedFitAndProper = Some(false)),
+        ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper", None, None)), hasAlreadyPassedFitAndProper = Some(true))
+      )
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(Seq(TradingPremises()))
+
+      when {
+        cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+      } thenReturn Some(amendmentResponse)
+
+      when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
+
+      val result = await(TestSubmissionService.getAmendment)
+
+      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
+        case (_, _, rows, _) =>
+          val unpaidRow = rows.filter(_.label == "confirmation.unpaidpeople").head
+          unpaidRow.perItm.value mustBe 0
+          unpaidRow.total.value mustBe 0
+      }
+      }
 
     }
 

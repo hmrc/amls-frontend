@@ -325,11 +325,14 @@ trait SubmissionService extends DataCacheService {
     if (subscription.registrationFee == 0) 0 else 1
 
   private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
+
+    val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
+
     people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
       case (b, a) =>
         Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
           (if (b.nonEmpty) {
-            Seq(BreakdownRow(UnpaidPeople.message, b.size, UnpaidPeople.feePer, Currency.fromBD(UnpaidPeople.feePer)))
+            Seq(BreakdownRow(UnpaidPeople.message, b.size, max(0, UnpaidPeople.feePer), Currency.fromBD(max(0, UnpaidPeople.feePer))))
           } else {
             Seq.empty
           })
