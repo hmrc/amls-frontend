@@ -19,8 +19,12 @@
 
         </div>
 
-        @inlineRadioGroup(f("registerAnotherPremises")) {
-            @legend("tradingpremises.want.to.register.another.premises")
+        @fieldset(
+            "tradingpremises.want.to.register.another.premises",
+            f = f("registerAnotherPremises"),
+            panel = false,
+            inline = true
+        ) {
             @radio(f("registerAnotherPremises"), "lbl.yes", "true")
             @radio(f("registerAnotherPremises"), "lbl.no", "false")
         }
