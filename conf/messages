@@ -1310,26 +1310,26 @@ hvd.percentage.lbl.05 = 81% to 100%
 
 ###############################  Notifications ###############################
 
-notifications.subject.APA1 = Application Approval
-notifications.subject.approval.variation = Registration Variation Approval
-notifications.subject.APR1 = Renewal Approval
+notifications.subject.ApplicationApproval = Application Approval
+notifications.subject.Approval.Variation = Registration Variation Approval
+notifications.subject.RenewalApproval = Renewal Approval
 
-notifications.subject.REJR = Application Rejection
-notifications.subject.failtopay = Application Auto-Rejection for Failure to Pay
-notifications.subject.REVR = Registration Revocation
-notifications.subject.EXPR = Registration Expiry
+notifications.subject.RejectionReasons = Application Rejection
+notifications.subject.FailToPay = Application Auto-Rejection for Failure to Pay
+notifications.subject.RevocationReasons = Registration Revocation
+notifications.subject.AutoExpiryOfRegistration = Registration Expiry
 
-notifications.subject.RPA1 = Reminder to Pay - Application
-notifications.subject.RPV1 = Reminder to Pay - Variation
-notifications.subject.RPR1 = Reminder to Pay - Renewal
-notifications.subject.RPM1 = Reminder to Pay - Manual Charge
-notifications.subject.RREM = Reminder to Renew
+notifications.subject.ReminderToPayForApplication = Reminder to Pay - Application
+notifications.subject.ReminderToPayForVariation = Reminder to Pay - Variation
+notifications.subject.ReminderToPayForRenewal = Reminder to Pay - Renewal
+notifications.subject.ReminderToPayForManualCharges = Reminder to Pay - Manual Charge
+notifications.subject.RenewalReminder = Reminder to Renew
 
-notifications.subject.MTRJ = Rejection of Application being Considered
-notifications.subject.MTRV = Revocation of Registration being Considered
-notifications.subject.NMRJ = Rejection of Application no longer being Considered
-notifications.subject.NMRV = Revocation of Registration no longer being Considered
-notifications.subject.OTHR = Generic communication
+notifications.subject.MindedToReject = Rejection of Application being Considered
+notifications.subject.MindedToRevoke = Revocation of Registration being Considered
+notifications.subject.NoLongerMindedToReject = Rejection of Application no longer being Considered
+notifications.subject.NoLongerMindedToRevoke = Revocation of Registration no longer being Considered
+notifications.subject.Others = Generic communication
 
 notifications.header = Your Messages
 notifications.unread = You have unread messages
@@ -1345,7 +1345,7 @@ survey.satisfaction.title = Satisfaction survey
 
 survey.satisfaction.text.1 = Overall, how did you feel about using the service?
 survey.satisfaction.text.2 = How could we improve this service?
-survey.satisfaction.hint = Please don't include any personal or financial information.
+survey.satisfaction.hint = Please don’t include any personal or financial information.
 
 survey.satisfaction.lbl.01 = Very satisfied
 survey.satisfaction.lbl.02 = Satisfied

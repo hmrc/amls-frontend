@@ -1,3 +1,5 @@
+@import play.api.data.mapping.forms.{PM, UrlFormEncoded}
+
 @(
     legend: String,
     jsHidden: Boolean = false,
@@ -6,7 +8,8 @@
     classes: Seq[String] = Seq.empty,
     data: Seq[String] = Seq.empty,
     bold: Boolean = false,
-    hint: String = ""
+    hint: String = "",
+    f: forms.Field = forms.ValidField(PM.asPath(""), Seq())
 )(content: Html)(implicit lang: Lang)
 
 <fieldset
