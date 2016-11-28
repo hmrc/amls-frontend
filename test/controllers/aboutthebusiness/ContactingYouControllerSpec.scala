@@ -20,7 +20,7 @@ import scala.concurrent.Future
 class ContactingYouControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
-  val contactingYou = Some(ContactingYou("1234567890", "test@test.com"))
+  val contactingYou = Some(ContactingYou("+44 (0)123 456-7890", "test@test.com"))
   val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
   val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou, registeredOffice = Some(ukAddress))
 
@@ -76,7 +76,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneAppPerSuite with Mock
       "on post of valid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "1234567890",
+          "phoneNumber" -> "+44 (0)123 456-7890",
           "email" -> "test@test.com",
           "website" -> "website",
           "letterToThisAddress" -> "true"
@@ -97,7 +97,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneAppPerSuite with Mock
       "on post of incomplete data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "1234567890"
+          "phoneNumber" -> "+44 (0)123 456-7890"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -114,7 +114,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneAppPerSuite with Mock
       "on post of incomplete data with no response from data cache" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "1234567890"
+          "phoneNumber" -> "+44 (0)123 456-7890"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -131,7 +131,7 @@ class ContactingYouControllerSpec extends PlaySpec with OneAppPerSuite with Mock
       "load the page with valid data and letterToThisAddress set to false" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "1234567890",
+          "phoneNumber" -> "+44 (0)123 456-7890",
           "email" -> "test@test.com",
           "website" -> "website",
           "letterToThisAddress" -> "false"
