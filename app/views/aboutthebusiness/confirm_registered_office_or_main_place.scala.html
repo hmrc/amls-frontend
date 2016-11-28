@@ -19,13 +19,16 @@
 
         @registered_office_helper(model)
 
-        <div class="form-field">
-        @inlineRadioGroup(f("isRegOfficeOrMainPlaceOfBusiness")) {
-            @legend("aboutthebusiness.confirmingyouraddress.title", jsHidden = true)
+        @fieldset(
+            f = f("isRegOfficeOrMainPlaceOfBusiness"),
+            legend = "aboutthebusiness.confirmingyouraddress.title",
+            legendHidden = true,
+            panel = false,
+            inline = true
+        ) {
             @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.yes", "true")
             @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.no", "false")
         }
-        </div>
 
         @submit(edit)
     }

@@ -2,6 +2,7 @@
 
 @(
     legend: String,
+    legendHidden: Boolean = false,
     jsHidden: Boolean = false,
     panel: Boolean = true,
     id: String = "",
@@ -9,14 +10,20 @@
     data: Seq[String] = Seq.empty,
     bold: Boolean = false,
     hint: String = "",
-    f: forms.Field = forms.ValidField(PM.asPath(""), Seq())
+    inline: Boolean = false,
+    f: forms.Field = forms.ValidField(PM.asPath("/default/path"), Seq("defaultVal"))
 )(content: Html)(implicit lang: Lang)
 
 <fieldset
   @if(id.nonEmpty) {id="@id"}
   @data.mkString(" ")
-  class="@if(panel) {panel-indent} @if(jsHidden) {amls-js-hidden} @classes.mkString(" ")"
+  class="form-field-group @if(panel) {panel-indent} @if(f.hasErrors){form-field--error} @if(jsHidden) {amls-js-hidden} @classes.mkString(" ")"
   >
-    @include.forms2.legend(legend, jsHidden, bold, hint)
+    @include.forms2.legend(legend, legendHidden, bold, hint)
+    @if(f.hasErrors) {
+        <span class="error-notification">@f.error</span>
+    }
+    @if(inline) {<div class="form-field inline">}
     @content
+    @if(inline) {</div>}
 </fieldset>
