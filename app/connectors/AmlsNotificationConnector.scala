@@ -39,7 +39,7 @@ trait AmlsNotificationConnector {
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
-    val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/contact-number/$contactNumber"
+    val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
     httpGet.GET[NotificationDetails](url)
       .map {Some(_)}
       .recover {
