@@ -187,7 +187,8 @@ trait SubmissionService extends DataCacheService {
       val subQuantity = subscriptionQuantity(amendment)
       val total = amendment.totalFees
       val difference = amendment.difference map Currency.fromBD
-      val rows = getBreakdownRows(amendment, premises, people, subQuantity)
+      val filteredPremises = premises.filter(!_.status.contains(StatusConstants.Deleted))
+      val rows = getBreakdownRows(amendment, filteredPremises, people, subQuantity)
       val paymentRef = amendment.paymentReference
       Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
     }

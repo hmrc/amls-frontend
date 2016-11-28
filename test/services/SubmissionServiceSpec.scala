@@ -293,6 +293,38 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     }
 
+    "not include deleted premises in the amendment confirmation table" in new Fixture {
+
+      val premises = Seq(
+        TradingPremises(status = Some(StatusConstants.Deleted)),
+        TradingPremises()
+      )
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(premises)
+
+      when {
+        cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+      } thenReturn Some(amendmentResponse)
+
+      when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(Seq(ResponsiblePeople()))
+
+      val result = await(TestSubmissionService.getAmendment)
+
+      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
+        case (_, _, rows, _) =>
+          rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
+      }
+      }
+
+    }
+
+
     "retrieve data from variation submission" in new Fixture {
 
       val variationResponse = AmendVariationResponse(
