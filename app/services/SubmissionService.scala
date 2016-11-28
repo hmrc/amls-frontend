@@ -178,16 +178,12 @@ trait SubmissionService extends DataCacheService {
   }
 
   private def getDataForAmendment(option: Option[CacheMap])(implicit authContent: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
-    println(s"Cache: ${option.get}")
     for {
       cache <- option
       amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
       premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
       people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
     } yield {
-      println(s"Amendment: $amendment")
-      println(s"Premises: $premises")
-      println(s"People: $people")
       val subQuantity = subscriptionQuantity(amendment)
       val total = amendment.totalFees
       val difference = amendment.difference map Currency.fromBD
@@ -329,7 +325,7 @@ trait SubmissionService extends DataCacheService {
     if (subscription.registrationFee == 0) 0 else 1
 
   private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
-    people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
+    people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
       case (b, a) =>
         Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fpFee.getOrElse(0)))) ++
           (if (b.nonEmpty) {

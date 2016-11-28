@@ -223,11 +223,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       val response = Some(Some("XA111123451111"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
-      /*whenReady(TestSubmissionService.
+      whenReady(TestSubmissionService.
         getAmendment) {
         result =>
           result must equal(response)
-      }*/
+      }
     }
 
     "not include responsible people who have been deleted" in new Fixture {
