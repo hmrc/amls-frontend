@@ -18,6 +18,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
+import play.api.Logger
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -177,12 +178,16 @@ trait SubmissionService extends DataCacheService {
   }
 
   private def getDataForAmendment(option: Option[CacheMap])(implicit authContent: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
+    println(s"Cache: ${option.get}")
     for {
       cache <- option
       amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
       premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
       people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
     } yield {
+      println(s"Amendment: $amendment")
+      println(s"Premises: $premises")
+      println(s"People: $people")
       val subQuantity = subscriptionQuantity(amendment)
       val total = amendment.totalFees
       val difference = amendment.difference map Currency.fromBD
