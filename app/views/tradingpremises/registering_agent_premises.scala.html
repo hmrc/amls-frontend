@@ -18,8 +18,13 @@
         <p>@Messages("tradingpremises.agent.premises.text")</p>
 
         <div class="form-field-group">
-            @inlineRadioGroup(f("agentPremises")) {
-                @legend("tradingpremises.agent.premises.title", jsHidden = true)
+            @fieldset(
+                "tradingpremises.agent.premises.title",
+                f = f("agentPremises"),
+                legendHidden = true,
+                inline = true,
+                panel = false
+            ) {
                 @radio(f("agentPremises"), "lbl.yes", "true")
                 @radio(f("agentPremises"), "lbl.no", "false")
             }
