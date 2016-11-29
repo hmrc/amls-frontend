@@ -37,8 +37,12 @@
             )
         }
 
-        @inlineRadioGroup(f("isResidential")) {
-            @legend("tradingpremises.yourtradingpremises.isresidential", false, false)
+        @fieldset(
+            "tradingpremises.yourtradingpremises.isresidential",
+            f = f("isResidential"),
+            panel = false,
+            inline = true
+        ) {
             @radio(f("isResidential"), "lbl.yes", "true")
             @radio(f("isResidential"), "lbl.no", "false")
         }
