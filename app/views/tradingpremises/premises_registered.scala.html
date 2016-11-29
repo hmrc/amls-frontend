@@ -21,13 +21,21 @@
         @fieldset(
             "tradingpremises.want.to.register.another.premises",
             f = f("registerAnotherPremises"),
-            panel = false,
-            inline = true
+            panel = false
         ) {
-            @radio(f("registerAnotherPremises"), "lbl.yes", "true")
-            @radio(f("registerAnotherPremises"), "lbl.no", "false")
+            @radio(
+                f = f("registerAnotherPremises"),
+                labelText = "lbl.yes",
+                inline = true,
+                value = "true"
+            )
+            @radio(
+                f = f("registerAnotherPremises"),
+                labelText = "lbl.no",
+                inline = true,
+                value = "false"
+            )
         }
-
         @submit()
     }
 }
