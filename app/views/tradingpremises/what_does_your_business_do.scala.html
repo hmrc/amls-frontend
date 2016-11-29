@@ -17,9 +17,11 @@
 ) {
 
     @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(index, edit)) {
-        @radioGroup(f("activities")) {
-            @legend("lbl.select.all", jsHidden = false)
-
+        @fieldset(
+            "lbl.select.all",
+            f = f("activities"),
+            panel = false
+        ) {
             @model.businessActivities.map { ba =>
                 @checkbox(f("activities[]"), Messages("businessmatching.registerservices.servicename.lbl."+model.getValue(ba)), model.getValue(ba))
             }
