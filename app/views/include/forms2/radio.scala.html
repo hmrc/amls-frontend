@@ -2,10 +2,11 @@
     f: forms.Field,
     labelText: String,
     value: String,
-    target: String = ""
+    target: String = "",
+    inline: Boolean = false
 )(implicit lang: Lang)
 
-<label class="block-label" for="@{f.id}-@value">
+<label class="block-label@if(inline){ block-label--inline}" for="@{f.id}-@value">
     <input
             type="radio"
             name="@f.name"
@@ -13,6 +14,6 @@
             value="@value"
             @if(f.value.contains(value)) {checked="checked"}
             @if(target.nonEmpty) {data-toggle="@target"}
-    >
+    />
     @Messages(labelText)
 </label>

@@ -19,18 +19,48 @@
 
         <p>@Messages("lbl.select.all")</p>
 
-        <div class="form-field-group">
-            @radioGroup(f("businessActivities")) {
-                @legend("businessmatching.registerservices.title", jsHidden = true)
-                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.01", "01")
-                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.02", "02")
-                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.03", "03")
-                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.04", "04")
-                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.05", "05")
-                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.06", "06")
-                @checkbox(f("businessActivities[]"), "businessmatching.registerservices.servicename.lbl.07", "07")
-            }
-        </div>
+        @fieldset(
+            f = f("businessActivities"),
+            legend = "businessmatching.registerservices.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @checkbox(
+                f = f("businessActivities[]"),
+                labelText = "businessmatching.registerservices.servicename.lbl.01",
+                value = "01"
+            )
+            @checkbox(
+                f = f("businessActivities[]"),
+                labelText = "businessmatching.registerservices.servicename.lbl.02",
+                value = "02"
+            )
+            @checkbox(
+                f = f("businessActivities[]"),
+                labelText = "businessmatching.registerservices.servicename.lbl.03",
+                value = "03"
+            )
+            @checkbox(
+                f = f("businessActivities[]"),
+                labelText = "businessmatching.registerservices.servicename.lbl.04",
+                value = "04"
+            )
+            @checkbox(
+                f = f("businessActivities[]"),
+                labelText = "businessmatching.registerservices.servicename.lbl.05",
+                value = "05"
+            )
+            @checkbox(
+                f = f("businessActivities[]"),
+                labelText = "businessmatching.registerservices.servicename.lbl.06",
+                value = "06"
+            )
+            @checkbox(
+                f = f("businessActivities[]"),
+                labelText = "businessmatching.registerservices.servicename.lbl.07",
+                value = "07"
+            )
+        }
 
         <details class="details">
             <summary class="summary">@Messages("businessmatching.registerservices.details")</summary>
