@@ -18,6 +18,7 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
     None,
     false,
     DateTime.now(),
+    false,
     IDType("1234567")
   )
 
@@ -59,12 +60,21 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
         None,
         false,
         new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
         new IDType("5832e38e01000001005ca3ff"
         ))
 
       val json = Json.parse(
         """
-          |{"status":{"status_type":"08","status_reason":"02"},"contactType":"MTRV","variation":false,"receivedAt":{"$date":1479730062573},"_id":{"$oid":"5832e38e01000001005ca3ff"}}
+          |{
+          | "status":{
+          |   "status_type":"08",
+          |   "status_reason":"02"},
+          | "contactType":"MTRV",
+          | "variation":false,
+          | "receivedAt":{"$date":1479730062573},
+          | "isRead":false,
+          | "_id":{"$oid":"5832e38e01000001005ca3ff"}}
           |
         """.stripMargin)
 

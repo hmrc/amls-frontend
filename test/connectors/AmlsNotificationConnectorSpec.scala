@@ -51,7 +51,9 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     "retrieve notifications" when {
       "given amlsRegNo" in new Fixture {
         val amlsRegistrationNumber = "XAML00000567890"
-        val response = Seq(NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), IDType("")))
+        val response = Seq(
+          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, IDType(""))
+        )
         val url = s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber"
 
         when {
@@ -66,7 +68,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
 
     "the call to notification service is successful" must {
       "return the response" in new Fixture {
-        when(connector.httpGet.GET[NotificationDetails](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/contact-number/CONTACTNUMBER"))
+        when(connector.httpGet.GET[NotificationDetails](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/NOTIFICATIONID"))
           (any(), any()))
           .thenReturn(Future.successful(NotificationDetails(
             Some(ContactType.MindedToReject),
@@ -74,7 +76,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
             Some(RejectedReason.FailedToPayCharges))),
             Some("Text of the message"), false)))
 
-        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "CONTACTNUMBER")) { result =>
+        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "NOTIFICATIONID")) { result =>
           result must be (Some(NotificationDetails(
             Some(ContactType.MindedToReject),
             Some(Status(Some(StatusType.Approved),
@@ -86,10 +88,10 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
 
     "the call to notification service returns a Bad Request" must {
       "Fail the future with an upstream 5xx exception" in new Fixture {
-        when(connector.httpGet.GET[NotificationDetails](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/contact-number/CONTACTNUMBER"))(any(), any()))
+        when(connector.httpGet.GET[NotificationDetails](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/NOTIFICATIONID"))(any(), any()))
           .thenReturn(Future.failed(new BadRequestException("GET of blah returned status 400.")))
 
-        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "CONTACTNUMBER").failed) { exception =>
+        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "NOTIFICATIONID").failed) { exception =>
 
           exception mustBe a[BadRequestException]
         }
@@ -98,10 +100,10 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
 
     "the call to notification service returns Not Found" must {
       "return a None" in new Fixture {
-        when(connector.httpGet.GET[NotificationDetails](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/contact-number/CONTACTNUMBER"))(any(), any()))
+        when(connector.httpGet.GET[NotificationDetails](eqTo(s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber/NOTIFICATIONID"))(any(), any()))
           .thenReturn(Future.failed(new NotFoundException("GET of blah returned status 404.")))
 
-        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "CONTACTNUMBER")) { result =>
+        whenReady(connector.getMessageDetails(amlsRegistrationNumber, "NOTIFICATIONID")) { result =>
           result must be (None)
         }
       }

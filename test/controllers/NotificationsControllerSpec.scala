@@ -33,6 +33,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       contactNumber = None,
       variation = false,
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
+      false,
       IDType("132456")
     )
 
