@@ -29,10 +29,10 @@
             id = s"""${f("postCode").id}-fieldset"""
         ) {
             <div class="form-field-group">
-                @input(f("addressLine1"))
-                @input(f("addressLine2"), requiredField = false)
-                @input(f("addressLine3"), requiredField = false)
-                @input(f("addressLine4"), requiredField = false)
+                @input(field = f("addressLine1"), labelText= "lbl.address.line1")
+                @input(field = f("addressLine2"), labelText= "lbl.address.line2")
+                @input(field = f("addressLine3"), labelText= "lbl.address.line3", requiredField = false)
+                @input(field = f("addressLine4"), labelText= "lbl.address.line4", requiredField = false)
             </div>
             <div class="form-field-group">
                 @input(
@@ -50,10 +50,10 @@
             id = s"""${f("country").id}-fieldset"""
         ) {
             <div class="form-field-group">
-                @input(f("addressLineNonUK1"))
-                @input(f("addressLineNonUK2"))
-                @input(f("addressLineNonUK3"))
-                @input(f("addressLineNonUK4"))
+                @input(field = f("addressLineNonUK1"), labelText= "lbl.address.line1")
+                @input(field = f("addressLineNonUK2"), labelText= "lbl.address.line2")
+                @input(field = f("addressLineNonUK3"), labelText= "lbl.address.line3", requiredField = false)
+                @input(field = f("addressLineNonUK4"), labelText= "lbl.address.line4", requiredField = false)
             </div>
 
             <div class="form-field-group">

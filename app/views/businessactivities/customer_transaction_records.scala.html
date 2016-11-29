@@ -17,19 +17,19 @@
 
         <div class="form-field-group">
             @inlineRadioGroup(f("isRecorded")) {
-                @legend("businessactivities.keep.customer.records.title", jsHidden = true)
-                @radio(f("isRecorded"), "lbl.yes", "true", target = s"#${f("transactions").id}-fieldset")
-                @radio(f("isRecorded"), "lbl.no", "false")
+                @legend(legend = "businessactivities.keep.customer.records.title", jsHidden = true)
+                @radio(f("isRecorded"), labelText = "lbl.yes", value = "true", target = s"#${f("transactions").id}-fieldset")
+                @radio(f("isRecorded"), labelText = "lbl.no", value = "false")
             }
 
             @fieldset("businessactivities.keep.customer.records.line1.text", bold = true, id = s"""${f("transactions").id}-fieldset""") {
                 @radioGroup(f("transactions")) {
                     @legend("businessactivities.do.keep.records", true, bold = true, "lbl.select.all")
-                    @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.01", "01")
-                    @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.02", "02")
-                    @checkbox(f("transactions[]"), "businessactivities.transactiontype.lbl.03", "03", target = s"#${f("name").id}-fieldset")
-                    @fieldset("businessactivities.name.software.pkg.lbl", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
-                        @input(f("name"), "businessactivities.name.software.pkg.lbl", bold = false)
+                    @checkbox(f("transactions[]"), labelText = "businessactivities.transactiontype.lbl.01", value = "01")
+                    @checkbox(f("transactions[]"), labelText = "businessactivities.transactiontype.lbl.02", value = "02")
+                    @checkbox(f("transactions[]"), labelText = "businessactivities.transactiontype.lbl.03", value = "03", target = s"#${f("name").id}-fieldset")
+                    @fieldset(legend = "businessactivities.name.software.pkg.lbl", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
+                        @input(f("name"), labelText = "businessactivities.name.software.pkg.lbl")
                     }
                 }
             }

@@ -33,8 +33,18 @@
 
         @inlineRadioGroup(f("isUK")) {
             @legend("businessactivities.whoisyouraccountant.address.location", jsHidden = true)
-            @radio(f("isUK"), "businessactivities.whoisyouraccountant.ukAddress", "true", target = s"#${f("postCode").id}-field")
-            @radio(f("isUK"), "businessactivities.whoisyouraccountant.nonUkAddress", "false", target = s"#${f("country").id}-field")
+            @radio(
+                f = f("isUK"),
+                labelText = "businessactivities.whoisyouraccountant.ukAddress",
+                value = "true",
+                target = s"#${f("postCode").id}-field"
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "businessactivities.whoisyouraccountant.nonUkAddress",
+                value = "false",
+                target = s"#${f("country").id}-field"
+            )
         }
 
         @fieldset(
@@ -42,10 +52,10 @@
             panel = false
         ) {
             <div class="form-field-group">
-                @input(f("addressLine1"), labelText = "lbl.address.line1", labelHidden = true)
-                @input(f("addressLine2"), labelText = "lbl.address.line2", labelHidden = true)
-                @input(f("addressLine3"), labelText = "lbl.address.line3", labelHidden = true)
-                @input(f("addressLine4"), labelText = "lbl.address.line4", labelHidden = true)
+                @input(f("addressLine1"), labelText = "lbl.address.line1")
+                @input(f("addressLine2"), labelText = "lbl.address.line2")
+                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
+                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
                 @fieldset(
                     id = s"${f("postCode").id}-field",
                     legend = "businessactivities.whoisyouraccountant.postCode",
