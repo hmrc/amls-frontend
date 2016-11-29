@@ -17,8 +17,12 @@
     <p>@Messages("lbl.select.all")</p>
 
     @form(f, controllers.tcsp.routes.ProvidedServicesController.post(edit)) {
-        @radioGroup(f("services")) {
-            @legend("tcsp.provided_services.title", jsHidden = true)
+
+        @fieldset(
+            "tcsp.provided_services.title",
+            f = f("services"),
+            panel = false
+        ) {
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.01", "01")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.02", "02")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.03", "03")
@@ -29,6 +33,7 @@
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.08", "08", target = s"#${f("details").id}-fieldset")
             @fieldset(
                 legend = "tcsp.provided_services.service.lbl.08",
+                f = f(s"${f("details").id}-fieldset"),
                 jsHidden = true,
                 id = s"""${f("details").id}-fieldset"""
             ) {
