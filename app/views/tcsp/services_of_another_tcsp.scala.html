@@ -20,21 +20,25 @@ s"""${f("mlrRefNumber").id}-fieldset"""
 
     @form(f, controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
-        @inlineRadioGroup(f("servicesOfAnotherTCSP")) {
-            @hint("tcsp.servicesOfAnotherTcsp.other.hint")
-            @radio(f("servicesOfAnotherTCSP"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("servicesOfAnotherTCSP"), "lbl.no", "false")
-            @fieldset(
-                legend = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
-                jsHidden = true,
-                id = target
-            ) {
-                @input(f("mlrRefNumber"),
-                    labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
-                    hintText = "hint.8.digits",
-                    bold = false
-                )
-            }
+        @fieldset(
+            "tcsp.servicesOfAnotherTcsp.title",
+            hint = "tcsp.servicesOfAnotherTcsp.other.hint",
+            f = f("servicesOfAnotherTCSP"),
+            panel = false
+        ) {
+            @radio(
+                f = f("servicesOfAnotherTCSP"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("servicesOfAnotherTCSP"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(edit)
