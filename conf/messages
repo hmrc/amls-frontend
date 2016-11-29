@@ -1336,6 +1336,8 @@ notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
 
+notifications.backToYourMessages = Back to your messages
+
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
