@@ -41,6 +41,60 @@
                 }
             }
 
+            @fieldset(
+                "lbl.select.all",
+                f = f("serviceProviders"),
+                panel = false
+            ) {
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-fieldset")
+                @fieldset(
+                    "tcsp.service.provider.lbl.05",
+                    f = f(s"""${f("agent").id}-fieldset"""),
+                    jsHidden = true
+                ) {
+                    @fieldset(
+                        "tcsp.off-the-shelf.companies.lbl",
+                        f = f("onlyOffTheShelfCompsSold"),
+                        panel = false
+                    ) {
+                        @radio(
+                            f = f("onlyOffTheShelfCompsSold"),
+                            labelText = "lbl.yes",
+                            value = "true",
+                            inline = true
+                        )
+                        @radio(
+                            f = f("onlyOffTheShelfCompsSold"),
+                            labelText = "lbl.no",
+                            value = "false",
+                            inline = true
+                        )
+                    }
+                    @fieldset(
+                        "tcsp.create.complex.corporate.structures.lbl",
+                        f = f("complexCorpStructureCreation"),
+                        panel = false
+                    ) {
+                        @radio(
+                            f = f("complexCorpStructureCreation"),
+                            labelText = "lbl.yes",
+                            value = "true",
+                            inline = true
+                        )
+                        @radio(
+                            f = f("complexCorpStructureCreation"),
+                            labelText = "lbl.no",
+                            value = "false",
+                            inline = true
+                        )
+                    }
+                }
+            }
+
         @submit(false)
     }
 }
