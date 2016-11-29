@@ -18,6 +18,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
+import play.api.Logger
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
@@ -186,7 +187,8 @@ trait SubmissionService extends DataCacheService {
       val subQuantity = subscriptionQuantity(amendment)
       val total = amendment.totalFees
       val difference = amendment.difference map Currency.fromBD
-      val rows = getBreakdownRows(amendment, premises, people, subQuantity)
+      val filteredPremises = premises.filter(!_.status.contains(StatusConstants.Deleted))
+      val rows = getBreakdownRows(amendment, filteredPremises, people, subQuantity)
       val paymentRef = amendment.paymentReference
       Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
     }
@@ -324,11 +326,14 @@ trait SubmissionService extends DataCacheService {
     if (subscription.registrationFee == 0) 0 else 1
 
   private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
-    people.partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
+
+    val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
+
+    people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
       case (b, a) =>
         Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fPFee.getOrElse(0)))) ++
           (if (b.nonEmpty) {
-            Seq(BreakdownRow(UnpaidPeople.message, b.size, UnpaidPeople.feePer, Currency.fromBD(UnpaidPeople.feePer)))
+            Seq(BreakdownRow(UnpaidPeople.message, b.size, max(0, UnpaidPeople.feePer), Currency.fromBD(max(0, UnpaidPeople.feePer))))
           } else {
             Seq.empty
           })
