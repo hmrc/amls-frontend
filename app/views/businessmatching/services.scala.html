@@ -16,12 +16,34 @@
 
     @form(f, controllers.businessmatching.routes.ServicesController.post(edit)) {
 
-      @radioGroup(f("msbServices")) {
-          @legend("lbl.select.all")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
+      <p>@Messages("lbl.select.all")</p>
+
+      @fieldset(
+        f = f("msbServices"),
+        legend = "msb.services.title",
+        legendHidden = true,
+        panel = false
+      ) {
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "msb.services.list.lbl.01",
+            value = "01"
+          )
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "msb.services.list.lbl.02",
+            value = "02"
+          )
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "msb.services.list.lbl.03",
+            value = "03"
+          )
+          @checkbox(
+            f = f("msbServices[]"),
+            labelText = "msb.services.list.lbl.04",
+            value = "04"
+          )
       }
 
       @submit(edit)

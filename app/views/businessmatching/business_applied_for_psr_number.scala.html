@@ -13,29 +13,49 @@
 }
 
 @main(
-   title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 )  {
 
-        @form(f, controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.post(edit)) {
+    @form(f, controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
-        @inlineRadioGroup(f("appliedFor")) {
-            @legend("businessmatching.psr.number.title", jsHidden = true)
-            @radio(f("appliedFor"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("appliedFor"), "lbl.no", "false")
-            @fieldset(
-                legend = "businessmatching.psr.number.lbl",
-                jsHidden = true,
-                id = target
-            ) {
-                @input(
-                    field = f("regNumber"),
-                    bold = false,
-                    labelText = "businessmatching.psr.number.lbl",
-                    hintText = "businessmatching.psr.number.hint"
-                )
-            }
+        @fieldset(
+            f = f("appliedFor"),
+            legend = "businessmatching.psr.number.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("appliedFor"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("appliedFor"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
+
+        @fieldset(
+            f = f("regNumber-fieldset"),
+            legend = "businessmatching.psr.number.lbl",
+            legendHidden = true,
+            jsHidden = true,
+            id = target,
+            panel = false
+        ) {
+            @input(
+                field = f("regNumber"),
+                bold = false,
+                labelText = "businessmatching.psr.number.lbl",
+                hintText = "businessmatching.psr.number.hint"
+            )
+        }
+
         @submit(edit)
    }
 }

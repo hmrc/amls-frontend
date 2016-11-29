@@ -17,16 +17,38 @@
 
     @form(f, controllers.businessmatching.routes.BusinessTypeController.post()) {
 
-        <div class="form-field-group">
-            @radioGroup(f("businessType")) {
-                @legend("businessmatching.businessType.title", jsHidden = true)
-                @radio(f("businessType"), "businessmatching.businessType.lbl.01", "01")
-                @radio(f("businessType"), "businessmatching.businessType.lbl.02", "02")
-                @radio(f("businessType"), "businessmatching.businessType.lbl.03", "03")
-                @radio(f("businessType"), "businessmatching.businessType.lbl.04", "04")
-                @radio(f("businessType"), "businessmatching.businessType.lbl.05", "05")
-            }
-        </div>
+        @fieldset(
+            f = f("businessType"),
+            legend = "businessmatching.businessType.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("businessType"),
+                labelText = "businessmatching.businessType.lbl.01",
+                value = "01"
+            )
+            @radio(
+                f = f("businessType"),
+                labelText = "businessmatching.businessType.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("businessType"),
+                labelText = "businessmatching.businessType.lbl.03",
+                value = "03"
+            )
+            @radio(
+                f = f("businessType"),
+                labelText = "businessmatching.businessType.lbl.04",
+                value = "04"
+            )
+            @radio(
+                f = f("businessType"),
+                labelText = "businessmatching.businessType.lbl.05",
+                value = "05"
+            )
+        }
 
         @submit(false)
     }

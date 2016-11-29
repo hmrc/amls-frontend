@@ -6,9 +6,7 @@
     legendHidden: Boolean = false
 )(implicit lang: Lang)
 
-<legend class="form-label@if(bold){-bold}">
-    <span class="@if(legendHidden) {visuallyhidden}">@Messages(legend)</span>
-    @if(hint.nonEmpty) {
-        <span class="form-hint">@Messages(hint)</span>
-    }
+<legend class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
+    @Messages(legend)
+    @if(hint.nonEmpty) {<span class="form-hint">@Messages(hint)</span>}
 </legend>
