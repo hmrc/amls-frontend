@@ -11,6 +11,7 @@ case class NotificationRow(
                             contactNumber: Option[String],
                             variation: Boolean,
                             receivedAt: DateTime,
+                            isRead: Boolean,
                             _id: IDType
                          ) extends SubjectBuilder {
 
@@ -18,9 +19,6 @@ case class NotificationRow(
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
     receivedAt.toString(fmt)
   }
-
-  def isRead: Boolean = false
-
 }
 
 object NotificationRow {
