@@ -21,39 +21,54 @@
 
     @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
 
-        @inlineRadioGroup(f("anotherBody")) {
+        @fieldset(
+            legend = "supervision.another_body.title",
+            f = f("anotherBody"),
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("anotherBody"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("anotherBody"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
 
-            @legend("supervision.another_body.title", jsHidden = true)
-            @radio(f("anotherBody"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("anotherBody"), "lbl.no", "false")
+        @fieldset(
+            legend = "supervision.another_body.lbl.supervisor",
+            legendHidden = true,
+            classes = Seq("visuallyhidden-legend"),
+            f = f(target)
+        ) {
 
-            @fieldset(
-                legend = "supervision.another_body.lbl.supervisor",
-                jsHidden = true,
-                classes = Seq("visuallyhidden-legend"),
-                id = target
-            ) {
-                @input(f("supervisorName"), "supervision.another_body.lbl.supervisor", bold = false)
+            @input(f("supervisorName"), "supervision.another_body.lbl.supervisor", bold = false)
 
-                @date(
-                    f = f,
-                    p = "startDate",
-                    labelText = "supervision.another_body.startDate.lbl",
-                    hintText = "supervision.another_body.startDate.hint",
-                    false
-                )
+            @date(
+                f = f,
+                p = "startDate",
+                labelText = "supervision.another_body.startDate.lbl",
+                hintText = "supervision.another_body.startDate.hint",
+                false
+            )
 
-                @date(
-                    f = f,
-                    p = "endDate",
-                    labelText = "supervision.another_body.endDate.lbl",
-                    hintText = "supervision.another_body.endDate.hint",
-                    false
-                )
+            @date(
+                f = f,
+                p = "endDate",
+                labelText = "supervision.another_body.endDate.lbl",
+                hintText = "supervision.another_body.endDate.hint",
+                false
+            )
 
-                @textarea(f("endingReason"), "supervision.another_body.endingReason.lbl", bold = false)
+            @textarea(f("endingReason"), "supervision.another_body.endingReason.lbl", bold = false)
 
-            }
         }
 
         @submit(edit)

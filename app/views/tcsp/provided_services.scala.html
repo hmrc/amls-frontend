@@ -31,14 +31,15 @@
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.06", "06")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.07", "07")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.08", "08", target = s"#${f("details").id}-fieldset")
-            @fieldset(
-                legend = "tcsp.provided_services.service.lbl.08",
-                f = f(s"${f("details").id}-fieldset"),
-                jsHidden = true,
-                id = s"""${f("details").id}-fieldset"""
-            ) {
-                @input(f("details"), "tcsp.provided_services.service.lbl.details", bold = false)
-            }
+        }
+
+        @fieldset(
+            legend = "tcsp.provided_services.service.lbl.08",
+            f = f(s"${f("details").id}-fieldset"),
+            legendHidden = true,
+            id = s"""${f("details").id}-fieldset"""
+        ) {
+            @input(f("details"), "tcsp.provided_services.service.lbl.details", bold = false)
         }
 
         @submit(edit)
