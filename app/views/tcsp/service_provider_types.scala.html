@@ -26,14 +26,10 @@
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-fieldset")
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-options")
             }
 
-            @fieldset(
-                "tcsp.service.provider.lbl.05",
-                f = f(s"""${f("agent").id}-fieldset"""),
-                legendHidden = true
-            ) {
+            <div id="@{s"""${f("agent").id}-options"""}" class="panel-indent">
                 @fieldset(
                     "tcsp.off-the-shelf.companies.lbl",
                     f = f("onlyOffTheShelfCompsSold"),
@@ -70,7 +66,7 @@
                         inline = true
                     )
                 }
-            }
+            </div>
 
         @submit(false)
     }
