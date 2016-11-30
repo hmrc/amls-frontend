@@ -15,19 +15,32 @@
 
     @form(f, controllers.supervision.routes.ProfessionalBodyMemberController.post(edit)) {
 
-        @inlineRadioGroup(f("isAMember")) {
-            @legend("supervision.memberofprofessionalbody.title", jsHidden = true)
-            @radio(f("isAMember"), "lbl.yes", "true", target = s"#${f("businessType").id}-fieldset")
-            @radio(f("isAMember"), "lbl.no", "false")
+        @fieldset(
+            legend = "supervision.memberofprofessionalbody.title",
+            f = f("isAMember"),
+            panel = false
+        ) {
+            @radio(
+                f = f("isAMember"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#${f("businessType").id}-options",
+                inline = true
+            )
+            @radio(
+                f = f("isAMember"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
-        @fieldset(
-            legend = "lbl.select.all",
-            classes = Seq("form-field-group-end"),
-            id = s"""${f("businessType").id}-fieldset"""
-        ) {
+        <div id="@{s"""${f("businessType").id}-options"""}">
 
-            @radioGroup(f("businessType")) {
+            @fieldset(
+                legend = "lbl.select.all",
+                f = f("businessType")
+            ) {
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
@@ -42,15 +55,15 @@
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#${f("specifyOtherBusiness").id}-fieldset")
-
-                @fieldset(
-                    legend = "lbl.pleasespecify",
-                    jsHidden = true,
-                    id = s"""${f("specifyOtherBusiness").id}-fieldset"""
-                ) {
-                    @input(f("specifyOtherBusiness"), "lbl.pleasespecify", bold = false)
-                }
             }
+        </div>
+
+        @fieldset(
+            legend = "lbl.pleasespecify",
+            legendHidden = true,
+            f = f(s"""${f("specifyOtherBusiness").id}-fieldset""")
+        ) {
+            @input(f("specifyOtherBusiness"), "lbl.pleasespecify", bold = false)
         }
 
         @submit(edit)
