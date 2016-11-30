@@ -99,20 +99,20 @@ trait WhoIsRegisteringController extends BaseController {
   private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePeople])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview =>
+      case SubmissionReadyForReview if AmendmentsToggle.feature =>
         status(who_is_registering(("declaration.who.is.registering.amendment.title","submit.amendment.application"), form, rp))
       case _ => status(who_is_registering(("declaration.who.is.registering.title","submit.registration"), form, rp))
     }
 
   private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
+      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
       case _ => Redirect(routes.DeclarationController.get())
     }
 
   private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview => Redirect(routes.AddPersonController.getWithAmendment())
+      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.AddPersonController.getWithAmendment())
       case _ => Redirect(routes.AddPersonController.get())
     }
 
