@@ -19,29 +19,42 @@
 
     @form(f, controllers.aboutthebusiness.routes.ContactingYouController.post(edit)) {
 
-        <div class="form-field-group">
-        @input(
-            field = f("phoneNumber"),
-            labelText = Messages("aboutthebusiness.contactingyou.phone.lbl")
-        )
+        @fieldset(
+            legend = "aboutthebusiness.contactingyou.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @input(
+                field = f("phoneNumber"),
+                labelText = "aboutthebusiness.contactingyou.phone.lbl"
+            )
 
-        @input(
-            field = f("email"),
-            labelText = Messages("aboutthebusiness.contactingyou.email.lbl")
-        )
-        </div>
-
+            @input(
+                field = f("email"),
+                labelText = "aboutthebusiness.contactingyou.email.lbl"
+            )
+        }
 
         @registered_office_helper(model)
 
-        <div class="form-field">
-            <span class="form-label">@Messages("aboutthebusiness.contactingyou.sendletter.lbl")</span>
-            @inlineRadioGroup(f("letterToThisAddress")) {
-                @legend("aboutthebusiness.contactingyou.sendletter.lbl", jsHidden = true)
-                @radio(f("letterToThisAddress"), "lbl.yes", "true")
-                @radio(f("letterToThisAddress"), "lbl.no", "false")
-            }
-        </div>
+        @fieldset(
+            f = f("letterToThisAddress"),
+            legend = "aboutthebusiness.contactingyou.sendletter.lbl",
+            panel = false
+        ) {
+            @radio(
+                f = f("letterToThisAddress"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("letterToThisAddress"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
 
         @submit()
     }

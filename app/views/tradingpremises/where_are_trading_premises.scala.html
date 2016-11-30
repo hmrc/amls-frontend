@@ -38,13 +38,22 @@
         }
 
         @fieldset(
-            "tradingpremises.yourtradingpremises.isresidential",
+            legend = "tradingpremises.yourtradingpremises.isresidential",
             f = f("isResidential"),
-            panel = false,
-            inline = true
+            panel = false
         ) {
-            @radio(f("isResidential"), "lbl.yes", "true")
-            @radio(f("isResidential"), "lbl.no", "false")
+            @radio(
+                f = f("isResidential"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("isResidential"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @date(

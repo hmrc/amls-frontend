@@ -21,64 +21,107 @@
 
     @form(f, controllers.aboutthebusiness.routes.CorrespondenceAddressController.post(edit)) {
 
-
-        @inlineRadioGroup(f("isUK")) {
-            @legend("aboutthebusiness.correspondenceaddress.title", jsHidden = true)
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
+        @fieldset(
+            legend = "aboutthebusiness.correspondenceaddress.contact.info",
+            legendHidden = true,
+            panel = false
+        ) {
+            @input(
+                field = f("yourName"),
+                labelText = "aboutthebusiness.correspondenceaddress.yourName"
+            )
+            @input(
+                field = f("businessName"),
+                labelText = "aboutthebusiness.correspondenceaddress.businessName"
+            )
         }
 
-        <div class="form-field-group">
-        @input(
-            field = f("yourName"),
-            labelText = "aboutthebusiness.correspondenceaddress.yourName"
-        )
-
-        @input(
-            field = f("businessName"),
-            labelText = "aboutthebusiness.correspondenceaddress.businessName"
-        )
-        </div>
+        @fieldset(
+            f = f("isUK"),
+            legend = "aboutthebusiness.correspondenceaddress.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("isUK"),
+                labelText = "aboutthebusiness.correspondenceaddress.ukAddress",
+                value = "true",
+                target = s"#${f("postCode").id}-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "aboutthebusiness.correspondenceaddress.nonUkAddress",
+                value = "false",
+                target = s"#${f("country").id}-fieldset",
+                inline = true
+            )
+        }
 
         @fieldset(
+            f = f("postCode-fieldset"),
             legend = "aboutthebusiness.correspondenceaddress.address",
-            jsHidden = false,
             panel = false,
             id = s"""${f("postCode").id}-fieldset"""
         ) {
-            <div class="form-field-group">
-                @input(f("addressLine1"))
-                @input(f("addressLine2"))
-                @input(f("addressLine3"))
-                @input(f("addressLine4"))
-            </div>
-            <div class="form-field-group">
+            @input(
+                field = f("addressLine1"),
+                labelText = "lbl.address.line1",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine2"),
+                labelText = "lbl.address.line2",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine3"),
+                labelText = "lbl.address.line3",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine4"),
+                labelText = "lbl.address.line4",
+                labelHidden = true
+            )
             @input(
                 field = f("postCode"),
                 labelText = "aboutthebusiness.correspondenceaddress.postCode",
                 classes = Seq("postcode")
             )
-            </div>
         }
 
         @fieldset(
+            f = f("country-fieldset"),
             legend = "aboutthebusiness.correspondenceaddress.address",
             jsHidden = false,
             panel = false,
             id = s"""${f("country").id}-fieldset"""
         ) {
-            <div class="form-field-group">
-                @input(f("addressLineNonUK1"))
-                @input(f("addressLineNonUK2"))
-                @input(f("addressLineNonUK3"))
-                @input(f("addressLineNonUK4"))
-            </div>
-            <div class="form-field-group">
+            @input(
+                field = f("addressLineNonUK1"),
+                labelText = "lbl.address.line1",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLineNonUK2"),
+                labelText = "lbl.address.line2",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLineNonUK3"),
+                labelText = "lbl.address.line3",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLineNonUK4"),
+                labelText = "lbl.address.line4",
+                labelHidden = true
+            )
             @country(
                 field = f("country"),
                 labelText = "aboutthebusiness.correspondenceaddress.country"
             )
-            </div>
         }
 
         @submit(edit)

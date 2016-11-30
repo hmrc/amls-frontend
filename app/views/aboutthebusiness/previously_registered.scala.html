@@ -21,18 +21,36 @@
 
     @form(f, controllers.aboutthebusiness.routes.PreviouslyRegisteredController.post(edit)) {
 
-        @inlineRadioGroup(f("previouslyRegistered")) {
-            @legend("aboutthebusiness.registeredformlr.title", jsHidden = true)
-            @radio(f("previouslyRegistered"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("previouslyRegistered"), "lbl.no", "false")
-            @fieldset(
-                legend = "aboutthebusiness.registeredformlr.mlrregno.lbl",
-                id = target
-            ) {
-                @input(f("prevMLRRegNo"),
+        @fieldset(
+            legend = "aboutthebusiness.registeredformlr.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("previouslyRegistered"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true)
+            @radio(
+                f = f("previouslyRegistered"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @fieldset(
+            f = f("prevMLRRegNo-fieldset"),
+            legend = "aboutthebusiness.registeredformlr.mlrregno.lbl",
+            jsHidden = true,
+            id = target
+        ) {
+            @input(
+                field = f("prevMLRRegNo"),
                 hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
-                bold = false)
-            }
+                bold = false
+            )
         }
 
         @submit(false)

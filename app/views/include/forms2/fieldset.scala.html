@@ -10,7 +10,6 @@
     data: Seq[String] = Seq.empty,
     bold: Boolean = false,
     hint: String = "",
-    inline: Boolean = false,
     f: forms.Field = forms.ValidField(PM.asPath("/default/path"), Seq("defaultVal"))
 )(content: Html)(implicit lang: Lang)
 
@@ -21,7 +20,5 @@
     @if(f.hasErrors) {
         <span class="error-notification">@f.error</span>
     }
-    @if(inline) {<div class="form-field inline">}
-        @content
-    @if(inline) {</div>}
+    @content
 </fieldset>

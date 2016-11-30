@@ -23,11 +23,20 @@
             f = f("isRegOfficeOrMainPlaceOfBusiness"),
             legend = "aboutthebusiness.confirmingyouraddress.title",
             legendHidden = true,
-            panel = false,
-            inline = true
+            panel = false
         ) {
-            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.yes", "true")
-            @radio(f("isRegOfficeOrMainPlaceOfBusiness"), "lbl.no", "false")
+            @radio(
+                f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(edit)
