@@ -13,10 +13,12 @@
     heading = header
 ) {
 
+    <p>@Messages("lbl.select.all")</p>
+
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
             @fieldset(
-                "lbl.select.all",
+                "tcsp.kind.of.service.provider.title",
                 f = f("serviceProviders"),
                 panel = false
             ) {
