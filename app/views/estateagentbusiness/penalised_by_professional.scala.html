@@ -9,48 +9,64 @@ s"""${f("professionalBody").id}-fieldset"""
 }
 
 @header = {
-    @errorSummary(f)
-    @heading("estateagentbusiness.penalisedbyprofessional.title", "summary.estateagentbusiness")
+@errorSummary(f)
+@heading("estateagentbusiness.penalisedbyprofessional.title", "summary.estateagentbusiness")
 }
 
 @main(
-    title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
-    heading = header
+title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + Messages("summary.estateagentbusiness"),
+heading = header
 ) {
 
-    <div class="form-field">
-        @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
-    </div>
+<div class="form-field">
+    @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
+</div>
 
-    @form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
+@form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
 
-        <ul class="list list-bullet form-group">
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
-            <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
-        </ul>
+    <ul class="list list-bullet form-group">
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_2")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_3")</li>
+        <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
+    </ul>
 
-        <div class="form-field">
-            @inlineRadioGroup(f("penalised")) {
-                @legend("estateagentbusiness.penalisedbyprofessional.title", jsHidden = true)
-                @radio(f("penalised"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("penalised"), "lbl.no", "false")
-                @fieldset(
-                    legend = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-                    jsHidden = true,
-                    id = target
-                ) {
-                    @textarea(
-                        f("professionalBody"),
-                        labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-                        hintText = "hint.255.chars",
-                        bold = false
-                    )
-                }
-            }
-        </div>
-        @submit(edit)
-
+    @fieldset(
+        f = f("penalised"),
+        legend = "estateagentbusiness.penalisedbyprofessional.title",
+        panel = false
+    ){
+        @radio(
+            f = f("penalised"),
+            labelText = "lbl.yes",
+            value = "true",
+            inline = true,
+            target = s".professionalBody-fieldset"
+        )
+        @radio(
+            f = f("penalised"),
+            labelText = "lbl.no",
+            value = "false",
+            inline = true
+        )
     }
+
+    @fieldset(
+        legend = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
+        legendHidden = true,
+        jsHidden = true,
+        classes = Seq("professionalBody-fieldset"),
+        id = target
+    ) {
+        @textarea(
+            field = f("professionalBody"),
+            labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
+            hintText = "hint.255.chars",
+            bold = false
+        )
+    }
+
+@submit(edit)
+
+}
 }
