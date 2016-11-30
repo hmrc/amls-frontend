@@ -28,7 +28,7 @@
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.07", "07")
             @checkbox(f("services[]"), "tcsp.provided_services.service.lbl.08", "08", target = s"#${f("details").id}-fieldset")
             @fieldset("tcsp.provided_services.service.lbl.08", jsHidden = true, id = s"""${f("details").id}-fieldset""") {
-                @input(f("details"), "tcsp.provided_services.service.lbl.details", bold = false)
+                @input(field = f("details"), labelText = "tcsp.provided_services.service.lbl.details")
             }
         }
 
