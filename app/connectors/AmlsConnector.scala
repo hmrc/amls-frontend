@@ -42,7 +42,6 @@ trait AmlsConnector {
     }
   }
 
-
   def status(amlsRegistrationNumber: String)(implicit
                                              headerCarrier: HeaderCarrier,
                                              ec: ExecutionContext,
