@@ -15,7 +15,7 @@
 
 <fieldset
   @if(f.id.nonEmpty){ id="@f.id"}
-  class="form-field-group@if(panel){ panel-indent}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden}@classes.mkString(" ")" @data.mkString(" ")>
+  class="form-field-group@if(panel){ panel-indent}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
     @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden)
     @if(f.hasErrors) {
         <span class="error-notification">@f.error</span>
