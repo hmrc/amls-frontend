@@ -108,6 +108,5 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
         }
       }
     }
-
   }
 }
