@@ -14,76 +14,62 @@
     heading = header
 ) {
 
-    @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index,edit)) {
+            <p class="form-hint">@Messages("responsiblepeople.wherepersonlives.need.to.know")</p>
+            @fieldset(
+                f = f("isUK"),
+                legend = "responsiblepeople.wherepersonlives.is.uk",
+                panel=false) {
+                @radio(f("isUK"), "responsiblepeople.wherepersonlives.ukAddress", "true", target = ".ukAddress-fieldset", inline=true)
+                @radio(f("isUK"), "responsiblepeople.wherepersonlives.nonUkAddress", "false", target = ".nonUkAddress-fieldset", inline=true)
+            }
 
-        @inlineRadioGroup(f("isUK")) {
-            @legend("responsiblepeople.wherepersonlives.need.to.know")
-            @radio(f("isUK"), "responsiblepeople.wherepersonlives.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "responsiblepeople.wherepersonlives.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
-        }
-
-        @fieldset(
-            legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("postCode").id}-fieldset"""
-        ) {
             @fieldset(
                 legend = "responsiblepeople.wherepersonlives.address",
-                jsHidden = false,
+                jsHidden = true,
                 panel = false,
-                id = s"""${f("address").id}-fieldset"""
+                classes = Seq("ukAddress-fieldset")
             ) {
-                @input(f("addressLine1"), labelText = "lbl.address.line1")
-                @input(f("addressLine2"), labelText = "lbl.address.line2")
-                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
-                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
+                @input(f("addressLine1"))
+                @input(f("addressLine2"))
+                @input(f("addressLine3"), requiredField = false)
+                @input(f("addressLine4"), requiredField = false)
                 @input(
                     field = f("postCode"),
                     labelText = "responsiblepeople.wherepersonlives.postcode",
                     classes = Seq("postCode")
                 )
             }
-        }
 
-        @fieldset(
-            legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("country").id}-fieldset"""
-        ) {
             @fieldset(
                 legend = "responsiblepeople.wherepersonlives.address",
-                jsHidden = false,
+                jsHidden = true,
                 panel = false,
-                id = s"""${f("address-overseas").id}-fieldset"""
+                classes = Seq("nonUkAddress-fieldset")
             ) {
-                @input(f("addressLineNonUK1"), labelText = "lbl.address.line1")
-                @input(f("addressLineNonUK2"), labelText = "lbl.address.line2")
-                @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", requiredField = false)
-                @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", requiredField = false)
+                @input(f("addressLineNonUK1"))
+                @input(f("addressLineNonUK2"))
+                @input(f("addressLineNonUK3"), requiredField = false)
+                @input(f("addressLineNonUK4"), requiredField = false)
                 @country(
                     field = f("country"),
                     labelText = "responsiblepeople.wherepersonlives.country"
                 )
             }
-        }
 
-        @fieldset(
-            legend = "responsiblepeople.wherepersonlives.address_history",
-            jsHidden = false,
-            panel = false,
-            id = s"""${f("address-history").id}-fieldset"""
-        ) {
-            @radioGroup(f("timeAtAddress")) {
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.11_months_history", "02")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.3_years_history", "03")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.more_years_history", "04")
+            @fieldset(
+                legend = "responsiblepeople.wherepersonlives.address_history",
+                jsHidden = false,
+                panel = false,
+                id = s"""${f("address-history").id}-fieldset"""
+            ) {
+                @radioGroup(f("timeAtAddress")) {
+                    @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
+                    @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.11_months_history", "02")
+                    @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.3_years_history", "03")
+                    @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.more_years_history", "04")
+                }
             }
-        }
 
-        @submit(edit, Some("button.saveandcontinue"))
-    }
-
+            @submit(edit, Some("button.saveandcontinue"))
 }
+
