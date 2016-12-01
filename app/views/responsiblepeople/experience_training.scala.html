@@ -6,10 +6,6 @@
 
 @(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
 
-@target = @{
-    s"""${f("information").id}-fieldset"""
-}
-
 @header = {
     @errorSummary(f)
     @heading("responsiblepeople.experiencetraining.title", "summary.responsiblepeople")
@@ -30,19 +26,24 @@
 
     @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit)) {
 
-        <div class="form-group">
-            @inlineRadioGroup(f("experienceTraining")) {
-                @radio(f("experienceTraining"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("experienceTraining"), "lbl.no", "false")
-                @fieldset(
-                    legend = "responsiblepeople.experiencetraining.information",
-                    jsHidden = false,
-                    id = target
-                ) {
-                    @textarea(f("experienceInformation"), bold = false)
-                }
-            }
-        </div>
+        @fieldset(
+            f = f("experienceTraining"),
+            legend = "responsiblepeople.experiencetraining.title",
+            legendHidden=true,
+            panel=false) {
+
+            @radio(f("experienceTraining"), "lbl.yes", "true", target = ".more-information", inline=true)
+            @radio(f("experienceTraining"), "lbl.no", "false", inline=true)
+
+        }
+
+        @fieldset(
+            legend = "responsiblepeople.experiencetraining.information",
+            jsHidden = false,
+            classes=Seq("more-information")
+        ) {
+            @textarea(f("experienceInformation"), bold = false)
+        }
 
         @submit(edit)
     }
