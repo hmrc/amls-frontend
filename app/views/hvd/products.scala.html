@@ -14,31 +14,36 @@
 ) {
 
     @form(f, controllers.hvd.routes.ProductsController.post(edit)) {
+        @fieldset(
+            f = f("products"),
+            legend = "lbl.select.all",
+            panel = false
+        ) {
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.01", value = "01")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.02", value = "02")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.03", value = "03")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.04", value = "04")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.05", value = "05")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.06", value = "06")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.07", value = "07")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.08", value = "08")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.09", value = "09")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.10", value = "10")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.11", value = "11")
+            @checkbox(f = f("products[]"), labelText = "hvd.products.option.12", value = "12", target = s".otherDetails-fieldset")
 
-        <div class="form-field-group">
-            @radioGroup(f("products")) {
-                @legend("lbl.select.all", bold = false)
-                @checkbox(f("products[]"), "hvd.products.option.01", "01")
-                @checkbox(f("products[]"), "hvd.products.option.02", "02")
-                @checkbox(f("products[]"), "hvd.products.option.03", "03")
-                @checkbox(f("products[]"), "hvd.products.option.04", "04")
-                @checkbox(f("products[]"), "hvd.products.option.05", "05")
-                @checkbox(f("products[]"), "hvd.products.option.06", "06")
-                @checkbox(f("products[]"), "hvd.products.option.07", "07")
-                @checkbox(f("products[]"), "hvd.products.option.08", "08")
-                @checkbox(f("products[]"), "hvd.products.option.09", "09")
-                @checkbox(f("products[]"), "hvd.products.option.10", "10")
-                @checkbox(f("products[]"), "hvd.products.option.11", "11")
-                @checkbox(f("products[]"), "hvd.products.option.12", "12", target = s"#${f("otherDetails").id}-fieldset")
-                @fieldset(
-                    legend = "lbl.give.details",
-                    jsHidden = true,
-                    id = s"""${f("otherDetails").id}-fieldset"""
-                ) {
-                    @input(f("otherDetails"), "lbl.give.details", bold = false)
-                }
+            @fieldset(
+                legend = "lbl.give.details",
+                jsHidden = true,
+                classes = Seq("otherDetails-fieldset")
+            ) {
+                @input(
+                    field = f("otherDetails"),
+                    labelText = "lbl.give.details"
+                )
             }
-        </div>
+        }
+
         @submit()
     }
 }
