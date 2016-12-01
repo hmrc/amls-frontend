@@ -40,7 +40,7 @@
                 @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#${f("specifyOtherBusiness").id}-fieldset")
 
                 @fieldset("lbl.pleasespecify", jsHidden = true, id = s"""${f("specifyOtherBusiness").id}-fieldset""") {
-                    @input(f("specifyOtherBusiness"), "lbl.pleasespecify", bold = false)
+                    @input(field = f("specifyOtherBusiness"), labelText = "lbl.pleasespecify")
                 }
             }
         }
