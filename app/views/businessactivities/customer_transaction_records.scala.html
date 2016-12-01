@@ -28,7 +28,7 @@
                 f = f("isRecorded"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target",
+                target = s".transactions-fieldset",
                 inline = true
             )
             @radio(
@@ -41,7 +41,8 @@
 
         @fieldset(
             f = f("transactions"),
-            legend = "businessactivities.do.keep.records"
+            legend = "businessactivities.do.keep.records",
+            classes = Seq("transactions-fieldset")
         ) {
             @checkbox(
                 f = f("transactions[]"),
@@ -57,20 +58,23 @@
                 f = f("transactions[]"),
                 labelText = "businessactivities.transactiontype.lbl.03",
                 value = "03",
-                target = s"#${f("name").id}-fieldset"
+                target = s".name-fieldset"
             )
+
+            @fieldset(
+                legend = "businessactivities.name.software.pkg.lbl",
+                legendHidden = true,
+                panel = false,
+                classes = Seq("name-fieldset")
+            ) {
+                @input(
+                    field = f("name"),
+                    labelText = "businessactivities.name.software.pkg.lbl"
+                )
+            }
         }
 
-        @fieldset(
-            f = f(s"""${f("name").id}-fieldset"""),
-            legend = "businessactivities.name.software.pkg.lbl",
-            legendHidden = true
-        ) {
-            @input(
-                field = f("name"), "businessactivities.name.software.pkg.lbl",
-                bold = false
-            )
-        }
+
 
         @submit(edit)
     }

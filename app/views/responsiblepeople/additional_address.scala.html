@@ -16,71 +16,74 @@
 
     @form(f, controllers.responsiblepeople.routes.AdditionalAddressController.post(index, edit)) {
 
-        @inlineRadioGroup(f("isUK")) {
-            @legend("responsiblepeople.wherepersonlives.need.to.know", jsHidden = true)
-            @radio(f("isUK"), "responsiblepeople.additional_address.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "responsiblepeople.additional_address.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
-        }
-
         @fieldset(
             legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("postCode").id}-fieldset"""
+            f = f("isUK"),
+            panel = false
         ) {
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#${f("postCode").id}-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.no",
+                value = "false",
+                target = s"#${f("country").id}-fieldset",
+                inline = true
+            )
+        }
+
+        <div id="@{s"""${f("postCode").id}-fieldset"""}">
+
             @fieldset(
                 legend = "responsiblepeople.additional_address.address",
-                jsHidden = false,
+                legendHidden = false,
                 panel = false,
-                id = s"""${f("address").id}-fieldset"""
+                f = f(s"""${f("address").id}-fieldset""")
             ) {
-                @input(f("addressLine1"), labelText = "lbl.address.line1")
-                @input(f("addressLine2"), labelText = "lbl.address.line2")
-                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
-                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
+                @input(f("addressLine1"), labelText = "lbl.address.line1", labelHidden = true)
+                @input(f("addressLine2"), labelText = "lbl.address.line2", labelHidden = true)
+                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false, labelHidden = true)
+                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false, labelHidden = true)
                 @input(
                     field = f("postCode"),
                     labelText = "responsiblepeople.additional_address.postCode",
                     classes = Seq("postcode")
                 )
             }
-        }
+        </div>
 
-        @fieldset(
-            legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("country").id}-fieldset"""
-        ) {
+        <div id="@{s"""${f("country").id}-fieldset"""}">
             @fieldset(
                 legend = "responsiblepeople.additional_address.address",
                 jsHidden = false,
                 panel = false,
-                id = s"""${f("address-overseas").id}-fieldset"""
+                f = f(s"""${f("address-overseas").id}-fieldset""")
             ) {
-                @input(f("addressLineNonUK1"), labelText = "lbl.address.line1")
-                @input(f("addressLineNonUK2"), labelText = "lbl.address.line2")
-                @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", requiredField = false)
-                @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", requiredField = false)
+                @input(f("addressLineNonUK1"), labelText = "lbl.address.line1", labelHidden = true)
+                @input(f("addressLineNonUK2"), labelText = "lbl.address.line2", labelHidden = true)
+                @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", requiredField = false, labelHidden = true)
+                @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", requiredField = false, labelHidden = true)
                 @country(
                     field = f("country"),
                     labelText = "responsiblepeople.additional_address.country"
                 )
             }
-        }
+        </div>
 
         @fieldset(
+            f = f("timeAtAddress"),
             legend = "responsiblepeople.additional_address.how_long",
-            jsHidden = false,
-            panel = false,
-            id = s"""${f("address-history").id}-fieldset"""
+            panel = false
         ) {
-            @radioGroup(f("timeAtAddress")) {
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
-                @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
-            }
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
         }
 
         @submit(edit, Some("button.saveandcontinue"))
