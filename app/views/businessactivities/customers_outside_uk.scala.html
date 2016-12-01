@@ -16,32 +16,51 @@
 
     @form(f, controllers.businessactivities.routes.CustomersOutsideUKController.post(edit)) {
 
-        @inlineRadioGroup(f("isOutside")) {
-            @radio(f("isOutside"), "lbl.yes", "true", target = s"#isOutside-fieldset")
-            @radio(f("isOutside"), "lbl.no", "false")
-                @fieldset(
-                    legend = "businessactivities.hight.value.customer.lbl",
-                    jsHidden = false,
-                    id = "isOutside-fieldset",
-                    data = Seq("data-toggle-new")
-                ) {
-                    <p class="form-field--hint">@Messages("businessactivities.hight.value.customer.lbl.hint")</p>
-                    @errorGroup(f("countries")) {
-                        @addRemove("lbl.add.another.country") {
-                            @for(i <- 0 until 10) {
-                                @defining(
-                                    f(s"countries[$i]")
-                                ) { field =>
-                                @country(field, classes = field match {
-                                    case f: ValidField => Seq("")
-                                    case f: InvalidField => Seq("js-hidden")
-                                })
-                            }
+        @fieldset(
+            legend = "businessactivities.customer.outside.uk.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("isOutside"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#isOutside-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("isOutside"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @fieldset(
+            f = f(s"isOutside-fieldset"),
+            legend = "businessactivities.hight.value.customer.lbl",
+            panel = false,
+            data = Seq("data-toggle-new")
+        ) {
+            @hint(
+                hint = "businessactivities.hight.value.customer.lbl.hint"
+            )
+            @errorGroup(f("countries")) {
+                @addRemove("lbl.add.another.country") {
+                    @for(i <- 0 until 10) {
+                        @defining(
+                            f(s"countries[$i]")
+                        ) { field =>
+                        @country(field, classes = field match {
+                            case f: ValidField => Seq("")
+                            case f: InvalidField => Seq("js-hidden")
+                            })
                         }
                     }
                 }
             }
         }
+
         @submit(edit)
     }
 
