@@ -9,6 +9,8 @@
     @heading("responsiblepeople.additional_address.title", "summary.responsiblepeople")
 }
 
+
+
 @main(
     title = Messages("responsiblepeople.additional_address.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
@@ -16,23 +18,34 @@
 
     @form(f, controllers.responsiblepeople.routes.AdditionalAddressController.post(index, edit)) {
 
-        @inlineRadioGroup(f("isUK")) {
-            @legend("responsiblepeople.wherepersonlives.need.to.know", jsHidden = true)
-            @radio(f("isUK"), "responsiblepeople.additional_address.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "responsiblepeople.additional_address.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
-        }
-
         @fieldset(
             legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("postCode").id}-fieldset"""
+            f = f("isUK"),
+            panel = false
         ) {
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#${f("postCode").id}-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.no",
+                value = "false",
+                target = s"#${f("country").id}-fieldset",
+                inline = true
+            )
+        }
+
+        <div id="@{s"""${f("postCode").id}-fieldset"""}">
+
             @fieldset(
                 legend = "responsiblepeople.additional_address.address",
-                jsHidden = false,
+                legendHidden = false,
                 panel = false,
-                id = s"""${f("address").id}-fieldset"""
+                f = f(s"""${f("address").id}-fieldset""")
             ) {
                 @input(f("addressLine1"))
                 @input(f("addressLine2"))
@@ -44,19 +57,14 @@
                     classes = Seq("postcode")
                 )
             }
-        }
+        </div>
 
-        @fieldset(
-            legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("country").id}-fieldset"""
-        ) {
+        <div id="@{s"""${f("country").id}-fieldset"""}">
             @fieldset(
                 legend = "responsiblepeople.additional_address.address",
                 jsHidden = false,
                 panel = false,
-                id = s"""${f("address-overseas").id}-fieldset"""
+                f = f(s"""${f("address-overseas").id}-fieldset""")
             ) {
                 @input(f("addressLineNonUK1"))
                 @input(f("addressLineNonUK2"))
@@ -67,20 +75,17 @@
                     labelText = "responsiblepeople.additional_address.country"
                 )
             }
-        }
+        </div>
 
         @fieldset(
+            f = f("timeAtAddress"),
             legend = "responsiblepeople.additional_address.how_long",
-            jsHidden = false,
-            panel = false,
-            id = s"""${f("address-history").id}-fieldset"""
+            panel = false
         ) {
-            @radioGroup(f("timeAtAddress")) {
-                @radio(f("timeAtAddress"), "responsiblepeople.additional_address.0_5_months", "01")
-                @radio(f("timeAtAddress"), "responsiblepeople.additional_address.6_11_months", "02")
-                @radio(f("timeAtAddress"), "responsiblepeople.additional_address.1_3_years", "03")
-                @radio(f("timeAtAddress"), "responsiblepeople.additional_address.more_3_years", "04")
-            }
+            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.0_5_months", "01")
+            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.6_11_months", "02")
+            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.1_3_years", "03")
+            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.more_3_years", "04")
         }
 
         @submit(edit, Some("button.saveandcontinue"))
