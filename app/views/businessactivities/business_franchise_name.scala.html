@@ -21,19 +21,38 @@ s"""${f("franchiseName").id}-fieldset"""
 
         <p class="form-hint">@Messages("businessactivities.businessfranchise.subtitle")</p>
 
-        <div class="form-field-group">
-        @inlineRadioGroup(f("businessFranchise")) {
-            @legend("businessactivities.businessfranchise.title", jsHidden = true)
-            @radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("businessFranchise"), "lbl.no", "false")
-            @fieldset(
-                legend = "businessactivities.businessfranchise.lbl.franchisename",
-                jsHidden = true,
-                id = target
-            ) {
-                @input(f("franchiseName"), "businessactivities.businessfranchise.lbl.franchisename", bold = false)
-            }
-        </div>
+        @fieldset(
+            f = f("businessFranchise"),
+            legend = "businessactivities.businessfranchise.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("businessFranchise"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("businessFranchise"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @fieldset(
+            f = f(s"$target"),
+            legend = "businessactivities.businessfranchise.lbl.franchisename",
+            legendHidden = true,
+            id = target
+        ) {
+            @input(
+                field = f("franchiseName"),
+                labelText = "businessactivities.businessfranchise.lbl.franchisename",
+                bold = false
+            )
         }
 
         @submit(edit)

@@ -29,8 +29,8 @@
                 f = f("registeredForCorporationTax"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#$target",
-                inline = true
+                inline = true,
+                target = s"#$target"
             )
             @radio(
                 f = f("registeredForCorporationTax"),
@@ -41,11 +41,10 @@
         }
 
         @fieldset(
-            f = f("corporationTaxReference-fieldset"),
+            f = f(s"$target"),
             legend = "aboutthebusiness.registeredforcorporationtax.taxReference",
             legendHidden = true,
-            jsHidden = true,
-            id = target
+            jsHidden = true
         ) {
             @input(
                 field = f("corporationTaxReference"),

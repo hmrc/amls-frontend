@@ -15,18 +15,34 @@
 
     @form(f, controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 
-        @inlineRadioGroup(f("useAnIPSP")) {
-            @legend("msb.ipsp.text", jsHidden = false)
-            @radio(f("useAnIPSP"), "lbl.yes", "true", target = s"#${f("name").id}-fieldset")
-            @radio(f("useAnIPSP"), "lbl.no", "false")
-            @fieldset(
-                legend = "msb.ipsp.text",
-                jsHidden = true,
-                id = s"""${f("name").id}-fieldset"""
-            ) {
-                @input(f("name"), "msb.ipsp.name.lbl", bold = false)
-                @input(f("referenceNumber"), "msb.ipsp.referenceNumber.lbl", bold = false)
-            }
+        @fieldset(
+            legend = "msb.ipsp.text",
+            f = f("useAnIPSP"),
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("useAnIPSP"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#${f("name").id}-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("useAnIPSP"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @fieldset(
+            legend = "msb.ipsp.text",
+            legendHidden = true,
+            f = f(s"""${f("name").id}-fieldset""")
+        ) {
+            @input(f("name"), "msb.ipsp.name.lbl", bold = false)
+            @input(f("referenceNumber"), "msb.ipsp.referenceNumber.lbl", bold = false)
         }
 
         @submit(edit)

@@ -17,8 +17,8 @@
     @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit)) {
 
         @fieldset(
-            "lbl.select.all",
             f = f("msbServices"),
+            legend = "lbl.select.all",
             panel = false
         ) {
             @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")

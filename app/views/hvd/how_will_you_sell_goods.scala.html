@@ -16,14 +16,28 @@
 ) {
 
     @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
-        @radioGroup(
-            f("salesChannels")
+        @fieldset(
+            f = f("salesChannels"),
+            legend = "hvd.how-will-you-sell-goods.title",
+            legendHidden = true,
+            panel = false
         ) {
-            @legend("hvd.how-will-you-sell-goods.title", jsHidden = true)
             <p>@Messages("lbl.select.all")</p>
-            @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.auction", "Auction")
-            @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.retail" , "Retail" )
-            @checkbox(f("salesChannels[]"), "hvd.how-will-you-sell-goods.channels.wholesale" , "Wholesale" )
+            @checkbox(
+                f = f("salesChannels[]"),
+                labelText = "hvd.how-will-you-sell-goods.channels.auction",
+                value = "Auction"
+            )
+            @checkbox(
+                f = f("salesChannels[]"),
+                labelText = "hvd.how-will-you-sell-goods.channels.retail" ,
+                value = "Retail"
+            )
+            @checkbox(
+                f = f("salesChannels[]"),
+                labelText = "hvd.how-will-you-sell-goods.channels.wholesale" ,
+                value = "Wholesale"
+            )
         }
 
         @submit(edit)

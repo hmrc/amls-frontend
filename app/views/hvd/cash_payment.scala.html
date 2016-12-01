@@ -3,10 +3,6 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@target = @{
-s"""${f("paymentDate").id}-fieldset"""
-}
-
 @header = {
     @errorSummary(f)
     @heading("hvd.cash.payment.title", "summary.hvd")
@@ -22,25 +18,42 @@ s"""${f("paymentDate").id}-fieldset"""
 
         <p>@Messages("hvd.cash.payment.convert.currency.text")</p>
 
-        <div class="form-field-group">
-        @inlineRadioGroup(f("acceptedAnyPayment")) {
-            @radio(f("acceptedAnyPayment"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("acceptedAnyPayment"), "lbl.no", "false")
-            @fieldset(
-                legend = "hvd.cash.payment.data.text",
-                jsHidden = true,
-                id = target
-            ) {
-                @date(
-                    f = f,
-                    p = "paymentDate",
-                    labelText = "hvd.cash.payment.data.text",
-                    hintText = "hvd.cash.payment.date.example",
-                    false
-                )
-            }
-        </div>
+        @fieldset(
+            f = f("acceptedAnyPayment"),
+            legend = "hvd.cash.payment.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("acceptedAnyPayment"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true,
+                target = s".paymentDate-fieldset"
+            )
+            @radio(
+                f = f("acceptedAnyPayment"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
+
+        @fieldset(
+            legend = "hvd.cash.payment.data.text",
+            legendHidden = true,
+            jsHidden = true,
+            classes = Seq("paymentDate-fieldset")
+        ) {
+            @date(
+                f = f,
+                p = "paymentDate",
+                labelText = "hvd.cash.payment.data.text",
+                hintText = "hvd.cash.payment.date.example",
+                example = false
+            )
+        }
+
         @submit(edit)
    }
 }

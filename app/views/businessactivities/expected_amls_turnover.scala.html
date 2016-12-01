@@ -16,7 +16,6 @@
 
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
-        <div class="form-field-group">
             <ul class="list list--comma">
                 @bmBusinessActivities.map { ba =>
                     @ba.businessActivities.map {activity =>
@@ -25,17 +24,48 @@
                 }
             </ul>
 
-            @radioGroup(f("expectedAMLSTurnover")) {
-                @legend("businessactivities.turnover.title", jsHidden = true)
-                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.01", "01")
-                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.02", "02")
-                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.03", "03")
-                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.04", "04")
-                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.05", "05")
-                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.06", "06")
-                @radio(f("expectedAMLSTurnover"), "businessactivities.turnover.lbl.07", "07")
+            @fieldset(
+                f = f("expectedAMLSTurnover"),
+                legend = "businessactivities.turnover.title",
+                legendHidden = true,
+                panel = false
+            ) {
+                @radio(
+                    f = f("expectedAMLSTurnover"),
+                    labelText = "businessactivities.turnover.lbl.01",
+                    value = "01"
+                )
+                @radio(
+                    f = f("expectedAMLSTurnover"),
+                    labelText = "businessactivities.turnover.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("expectedAMLSTurnover"),
+                    labelText = "businessactivities.turnover.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("expectedAMLSTurnover"),
+                    labelText = "businessactivities.turnover.lbl.04",
+                    value = "04"
+                )
+                @radio(
+                    f = f("expectedAMLSTurnover"),
+                    labelText = "businessactivities.turnover.lbl.05",
+                    value = "05"
+                )
+                @radio(
+                    f = f("expectedAMLSTurnover"),
+                    labelText = "businessactivities.turnover.lbl.06",
+                    value = "06"
+                )
+                @radio(
+                    f = f("expectedAMLSTurnover"),
+                    labelText = "businessactivities.turnover.lbl.07",
+                    value = "07"
+                )
             }
-        </div>
 
         @submit(edit)
     }

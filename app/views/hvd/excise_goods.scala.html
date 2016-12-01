@@ -15,6 +15,23 @@
 
     @form(f, controllers.hvd.routes.ExciseGoodsController.post(edit)) {
 
+        @fieldset(
+            f = f("exciseGoods"),
+            legend = "hvd.excise.goods.title",
+            panel = false
+        ) {
+            @radio(
+                f = f("exciseGoods"),
+                labelText = "lbl.yes",
+                value = "true"
+            )
+            @radio(
+                f = f("exciseGoods"),
+                labelText = "lbl.no",
+                value = "false"
+            )
+        }
+
         <div class="form-field-group">
             @inlineRadioGroup(f("exciseGoods")) {
                 @legend("hvd.excise.goods.title", jsHidden = true)

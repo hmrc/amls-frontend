@@ -11,24 +11,14 @@ case class NotificationRow(
                             contactNumber: Option[String],
                             variation: Boolean,
                             receivedAt: DateTime,
+                            isRead: Boolean,
                             _id: IDType
-                         ) {
-
-  def subject: String = {
-    contactType match {
-      case Some(msg) => Messages(s"notifications.subject.$msg")
-      case None if variation => Messages("notifications.subject.Approval.Variation")
-      case _ => Messages("notifications.subject.FailToPay")
-    }
-  }
+                         ) extends SubjectBuilder {
 
   def dateReceived = {
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
     receivedAt.toString(fmt)
   }
-
-  def isRead: Boolean = false
-
 }
 
 object NotificationRow {
