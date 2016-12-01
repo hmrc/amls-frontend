@@ -355,8 +355,8 @@ lbl.give.details = Please give details
 legend.address = Address
 lbl.address.line1 = Address line 1
 lbl.address.line2 = Address line 2
-lbl.address.line3 = Town / City
-lbl.address.line4 = County
+lbl.address.line3 = Address line 3
+lbl.address.line4 = Address line 4
 lbl.address.postcode = Postcode
 
 businessType.lbl.02 = Limited company
@@ -1339,6 +1339,8 @@ notifications.unread = You have unread messages
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
+
+notifications.backToYourMessages = Back to your messages
 
 ############################### Survey ###############################
 

@@ -5,7 +5,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessType, _}
 import models.notifications.ContactType._
-import models.notifications.{IDType, NotificationRow}
+import models.notifications.{NotificationDetails, IDType, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -33,6 +33,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       contactNumber = None,
       variation = false,
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
+      false,
       IDType("132456")
     )
 
@@ -78,8 +79,8 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
     )
   }
 
-  "NotificationsController" must {
-    "display the page with messages" in new Fixture {
+  "getMessages" must {
+    "display the page with messages in chronological order (newest first)" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
         .thenReturn(Future.successful(Some(testBusinessMatch)))
@@ -93,24 +94,19 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
       val result = controller.getMessages()(request)
       val content = contentAsString(result)
       val document = Jsoup.parse(content)
+      val table = document.getElementsByTag("table")
+      val rows = table.select("tbody").select("tr")
 
       status(result) mustBe 200
+
       document.getElementsByClass("panel-indent").html() must include(testBusinessName)
-      document.getElementsByTag("table").html() must include("Subject")
-      document.getElementsByTag("table").html() must include("Date")
-      document.getElementsByTag("table").html() must include("message-unread")
-    }
 
-    "get messages in chronological order (newest first)" in new Fixture {
+      table.html() must include("Subject")
+      table.html() must include("Date")
+      table.html() must include("message-unread")
 
-      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-        .thenReturn(Future.successful(testList))
-
-      val result = await(controller.getNotificationRows("")(mock[HeaderCarrier],mock[AuthContext]))
-
-      result.head.receivedAt.isAfter(result.drop(1).head.receivedAt) mustBe true
-      result.last.receivedAt.isBefore(result.init.last.receivedAt) mustBe true
-
+      rows.first().children().last().text() mustBe "3 December 2017"
+      rows.last().children().last().text() mustBe "1 December 1971"
     }
 
     "throw an exception" when {
@@ -150,6 +146,21 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
     }
   }
 
+  "messageDetails" must {
+    "display the message view given the message id" in new Fixture {
+      when (controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("Registration Number")))
+
+      when (controller.amlsNotificationConnector.getMessageDetails(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(NotificationDetails(None,None,Some("Message Text"), false))))
+
+      val result = controller.messageDetails("dfgdhsjk")(request)
+
+      status(result) mustBe 200
+      contentAsString(result) must include ("Message Text")
+    }
+  }
+
 }
 
 class NotificationsControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
@@ -182,30 +193,13 @@ class NotificationsControllerWithoutNotificationsSpec extends PlaySpec with OneA
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
 
   "NotificationsControllerWithoutNotificationsSpec" must {
-    "respond with not found when toggle is off" in new Fixture {
-
-      val testNotification = NotificationRow(
-        status = None,
-        contactType = None,
-        contactNumber = None,
-        variation = false,
-        receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
-        IDType("132456")
-      )
-
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any())(any(),any(),any()))
-        .thenReturn(Future.successful(Some(testBusinessMatch)))
-
-      when(controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any()))
-        .thenReturn(Future.successful(Some("")))
-
-      when(controller.amlsNotificationConnector.fetchAllByAmlsRegNo(any())(any(),any(),any()))
-        .thenReturn(Future.successful(Seq(testNotification)))
-
-      val result = controller.getMessages()(request)
-
-      status(result) mustBe 404
+    "respond with not found when toggle is off" when {
+      "viewing a list of messages" in new Fixture {
+        status(controller.getMessages()(request)) mustBe 404
+      }
+      "viewing an individual message" in new Fixture {
+        status(controller.messageDetails("")(request)) mustBe 404
+      }
     }
   }
-
 }
