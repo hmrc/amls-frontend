@@ -20,23 +20,46 @@
 
     @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
-        <div class="form-field-group">
-            <p>@Messages("bankdetails.confirm-activities.subtitle") @businessTypes @Messages("businessactivities.involved.other.legend")</p>
-            @inlineRadioGroup(f("involvedInOther")) {
-                @legend("businessactivities.involved.other.title", jsHidden = true)
-                <p class="form-hint">@Messages("businessactivities.involved.other.hint")</p>
+        <p>@Messages("bankdetails.confirm-activities.subtitle") @businessTypes</p>
 
-                @radio(f("involvedInOther"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("involvedInOther"), "lbl.no", "false")
-                @fieldset(
-                    legend = "businessactivities.confirm-activities.line1.text",
-                    jsHidden = true,
-                    id = target
-                ) {
-                    @textarea(f("details"), "businessactivities.confirm-activities.lbl.details", bold = false)
-                }
-            }
-        </div>
+        @hint(
+            hint = "businessactivities.involved.other.hint"
+        )
+
+        @fieldset(
+            f = f("involvedInOther"),
+            legend = "businessactivities.involved.other.title",
+            legendHidden = true,
+            panel = false,
+            hint = "businessactivities.involved.other.hint"
+        ) {
+            @radio(
+                f = f("involvedInOther"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("involvedInOther"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @fieldset(
+            f = f(s"$target"),
+            legend = "businessactivities.confirm-activities.line1.text",
+            legendHidden = true,
+            id = target
+        ) {
+            @textarea(
+                field = f("details"),
+                labelText = "businessactivities.confirm-activities.lbl.details",
+                bold = false
+            )
+        }
 
         @submit(false)
 

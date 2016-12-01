@@ -13,17 +13,34 @@
     heading = header
 ) {
 
-@form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
 
-    <p class="form-hint">@Messages("businessactivities.ncaRegistered.subtitle")</p>
 
-    <div class="form-field-group">
-        @inlineRadioGroup(f("ncaRegistered")) {
-            @radio(f("ncaRegistered"), "lbl.yes", "true")
-            @radio(f("ncaRegistered"), "lbl.no", "false")
+        @hint(
+            hint = "businessactivities.ncaRegistered.subtitle"
+        )
+
+        @fieldset(
+            f = f("ncaRegistered"),
+            legend = "businessactivities.ncaRegistered.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("ncaRegistered"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("ncaRegistered"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
-    </div>
-    @submit(edit)
+
+        @submit(edit)
 
     }
 }
