@@ -18,25 +18,62 @@
         <span class="form-hint">
             @Messages("estateagentbusiness.registered.redress.text")
         </span>
-        @inlineRadioGroup(f("isRedress")) {
-            @legend("estateagentbusiness.registered.redress.title", jsHidden = true)
-            @radio(f("isRedress"), "lbl.yes", "true", target = s"#${f("propertyRedress").id}-fieldset")
-            @radio(f("isRedress"), "lbl.no", "false")
+
+        @fieldset(
+            f = f("isRedress"),
+            legend = "estateagentbusiness.registered.redress.title",
+            panel = false
+        ){
+            @radio(
+                f = f("isRedress"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true,
+                target = s".propertyRedress-fieldset"
+            )
+            @radio(
+                f = f("isRedress"),
+                labelText = "lbl.no",
+                inline = true,
+                value = "false"
+            )
         }
 
         @fieldset(
             legend = "estateagentbusiness.which.redress.scheme.lbl",
-            id = s"""${f("propertyRedress").id}-fieldset"""
+            classes = Seq("propertyRedress-fieldset")
         ) {
-            @radioGroup(f("propertyRedressScheme")) {
-                @legend("TODO", jsHidden = true)
-                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.01", "01")
-                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.02", "02")
-                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.03", "03")
-                @radio(f("propertyRedressScheme"), "estateagentbusiness.redress.lbl.04", "04", target = s"#${f("other").id}-fieldset")
-                @fieldset("estateagentbusiness.redress.lbl.04", jsHidden = true, id = s"""${f("other").id}-fieldset""") {
-                    @input(f("other"), "lbl.pleasespecify", bold = false)
-                }
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.01",
+                value = "01"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.03",
+                value = "03"
+            )
+            @radio(
+                f = f("propertyRedressScheme"),
+                labelText = "estateagentbusiness.redress.lbl.04",
+                value = "04",
+                target = s".other-fieldset"
+            )
+
+            @fieldset(
+                legend = "estateagentbusiness.redress.lbl.04",
+                jsHidden = true,
+                classes = Seq("other-fieldset")
+            ) {
+                @input(
+                    field = f("other"),
+                    labelText = "lbl.pleasespecify"
+                )
             }
         }
 
