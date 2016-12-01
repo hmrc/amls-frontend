@@ -41,9 +41,9 @@
             @fieldset("responsiblepeople.personName.isknownbyothernames", jsHidden = true, id = "previous-fieldset") {
 
                 @errorGroup(f("previous")) {
-                    @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
-                    @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
-                    @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
+                    @input(f("previous.firstName"), labelText = "responsiblepeople.personName.otherfirstnames")
+                    @input(f("previous.middleName"), labelText = "responsiblepeople.personName.othermiddlenames")
+                    @input(f("previous.lastName"), labelText = "responsiblepeople.personName.otherlastnames")
                 }
 
                 @date(f, "previous.date", "responsiblepeople.personName.previous.date.lbl")
@@ -58,7 +58,7 @@
             @radio(f("hasOtherNames"), "lbl.no", "false")
 
             @fieldset("responsiblepeople.personName.hasOtherNames", jsHidden = true, id = "otherNames-fieldset") {
-                @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
+                @input(f("otherNames"), labelText = "responsiblepeople.personName.alternativeName")
             }
         }
 

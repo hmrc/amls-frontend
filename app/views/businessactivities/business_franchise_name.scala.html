@@ -27,7 +27,7 @@ s"""${f("franchiseName").id}-fieldset"""
             @radio(f("businessFranchise"), "lbl.yes", "true", target = s"#$target")
             @radio(f("businessFranchise"), "lbl.no", "false")
             @fieldset("businessactivities.businessfranchise.lbl.franchisename", jsHidden = true, id = target) {
-                @input(f("franchiseName"), "businessactivities.businessfranchise.lbl.franchisename", bold = false)
+                @input(f("franchiseName"), labelText = "businessactivities.businessfranchise.lbl.franchisename")
             }
         </div>
         }
