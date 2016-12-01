@@ -34,10 +34,10 @@
                 panel = false,
                 id = s"""${f("address").id}-fieldset"""
             ) {
-                @input(f("addressLine1"))
-                @input(f("addressLine2"))
-                @input(f("addressLine3"))
-                @input(f("addressLine4"))
+                @input(f("addressLine1"), labelText = "lbl.address.line1")
+                @input(f("addressLine2"), labelText = "lbl.address.line2")
+                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
+                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
                 @input(
                     field = f("postCode"),
                     labelText = "responsiblepeople.additional_extra_address.postCode",
@@ -58,10 +58,10 @@
                 panel = false,
                 id = s"""${f("address-overseas").id}-fieldset"""
             ) {
-                @input(f("addressLineNonUK1"))
-                @input(f("addressLineNonUK2"))
-                @input(f("addressLineNonUK3"))
-                @input(f("addressLineNonUK4"))
+                @input(f("addressLineNonUK1"), labelText = "lbl.address.line1")
+                @input(f("addressLineNonUK2"), labelText = "lbl.address.line2")
+                @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", requiredField = false)
+                @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", requiredField = false)
                 @country(
                     field = f("country"),
                     labelText = "responsiblepeople.additional_extra_address.country"

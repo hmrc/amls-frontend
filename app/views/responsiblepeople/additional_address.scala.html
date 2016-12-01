@@ -9,8 +9,6 @@
     @heading("responsiblepeople.additional_address.title", "summary.responsiblepeople")
 }
 
-
-
 @main(
     title = Messages("responsiblepeople.additional_address.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
@@ -47,10 +45,10 @@
                 panel = false,
                 f = f(s"""${f("address").id}-fieldset""")
             ) {
-                @input(f("addressLine1"))
-                @input(f("addressLine2"))
-                @input(f("addressLine3"))
-                @input(f("addressLine4"))
+                @input(f("addressLine1"), labelText = "lbl.address.line1")
+                @input(f("addressLine2"), labelText = "lbl.address.line2")
+                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
+                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
                 @input(
                     field = f("postCode"),
                     labelText = "responsiblepeople.additional_address.postCode",
@@ -66,10 +64,10 @@
                 panel = false,
                 f = f(s"""${f("address-overseas").id}-fieldset""")
             ) {
-                @input(f("addressLineNonUK1"))
-                @input(f("addressLineNonUK2"))
-                @input(f("addressLineNonUK3"))
-                @input(f("addressLineNonUK4"))
+                @input(f("addressLineNonUK1"), labelText = "lbl.address.line1")
+                @input(f("addressLineNonUK2"), labelText = "lbl.address.line2")
+                @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", requiredField = false)
+                @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", requiredField = false)
                 @country(
                     field = f("country"),
                     labelText = "responsiblepeople.additional_address.country"
@@ -82,10 +80,10 @@
             legend = "responsiblepeople.additional_address.how_long",
             panel = false
         ) {
-            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.0_5_months", "01")
-            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.6_11_months", "02")
-            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.1_3_years", "03")
-            @radio(f("timeAtAddress"), "responsiblepeople.additional_address.more_3_years", "04")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.0_5_months", value = "01")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.6_11_months", value = "02")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.1_3_years", value = "03")
+            @radio(f("timeAtAddress"), labelText = "responsiblepeople.additional_address.more_3_years", value = "04")
         }
 
         @submit(edit, Some("button.saveandcontinue"))

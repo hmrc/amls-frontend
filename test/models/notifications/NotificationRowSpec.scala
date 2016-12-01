@@ -18,69 +18,11 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
     None,
     false,
     DateTime.now(),
+    false,
     IDType("1234567")
   )
 
   "Notification Contact types" must {
-    "retrieve the corresponding subject from messages" when {
-      "message type is APA1" in {
-        testNotifications.copy(contactType = Some(ApplicationApproval)).subject mustBe "Application Approval"
-      }
-      "message type is not given and variation is true" in {
-        testNotifications.copy(variation = true).subject mustBe "Registration Variation Approval"
-      }
-      "message type is not given and variation is false" in {
-        testNotifications.subject mustBe "Application Auto-Rejection for Failure to Pay"
-      }
-      "message type is APR1" in {
-        testNotifications.copy(contactType = Some(RenewalApproval)).subject mustBe "Renewal Approval"
-      }
-      "message type is REJR" in {
-        testNotifications.copy(contactType = Some(RejectionReasons)).subject mustBe "Application Rejection"
-      }
-
-      "message type is REVR" in {
-        testNotifications.copy(contactType = Some(RevocationReasons)).subject mustBe "Registration Revocation"
-      }
-
-      "message type is EXPR" in {
-        testNotifications.copy(contactType = Some(AutoExpiryOfRegistration)).subject mustBe "Registration Expiry"
-      }
-
-      "message type is RPA1" in {
-        testNotifications.copy(contactType = Some(ReminderToPayForApplication)).subject mustBe "Reminder to Pay - Application"
-      }
-
-      "message type is RPV1" in {
-        testNotifications.copy(contactType = Some(ReminderToPayForVariation)).subject mustBe "Reminder to Pay - Variation"
-      }
-
-      "message type is RPR1" in {
-        testNotifications.copy(contactType = Some(ReminderToPayForRenewal)).subject mustBe "Reminder to Pay - Renewal"
-      }
-      "message type is RPM1" in {
-        testNotifications.copy(contactType = Some(ReminderToPayForManualCharges)).subject mustBe "Reminder to Pay - Manual Charge"
-      }
-      "message type is RREM" in {
-        testNotifications.copy(contactType = Some(RenewalReminder)).subject mustBe "Reminder to Renew"
-      }
-      "message type is MTRJ" in {
-        testNotifications.copy(contactType = Some(MindedToReject)).subject mustBe "Rejection of Application being Considered"
-      }
-      "message type is MTRV" in {
-        testNotifications.copy(contactType = Some(MindedToRevoke)).subject mustBe "Revocation of Registration being Considered"
-      }
-      "message type is NMRJ" in {
-        testNotifications.copy(contactType = Some(NoLongerMindedToReject)).subject mustBe "Rejection of Application no longer being Considered"
-      }
-      "message type is NMRV" in {
-        testNotifications.copy(contactType = Some(NoLongerMindedToRevoke)).subject mustBe "Revocation of Registration no longer being Considered"
-      }
-      "message type is OTHR" in {
-        testNotifications.copy(contactType = Some(Others)).subject mustBe "Generic communication"
-      }
-    }
-
     "read/write Json successfully" in {
       ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RejectionReasons)) must be(JsSuccess(ContactType.RejectionReasons))
       ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RevocationReasons)) must be(JsSuccess(ContactType.RevocationReasons))
@@ -118,12 +60,21 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
         None,
         false,
         new DateTime(1479730062573L, DateTimeZone.UTC),
+        false,
         new IDType("5832e38e01000001005ca3ff"
         ))
 
       val json = Json.parse(
         """
-          |{"status":{"status_type":"08","status_reason":"02"},"contactType":"MTRV","variation":false,"receivedAt":{"$date":1479730062573},"_id":{"$oid":"5832e38e01000001005ca3ff"}}
+          |{
+          | "status":{
+          |   "status_type":"08",
+          |   "status_reason":"02"},
+          | "contactType":"MTRV",
+          | "variation":false,
+          | "receivedAt":{"$date":1479730062573},
+          | "isRead":false,
+          | "_id":{"$oid":"5832e38e01000001005ca3ff"}}
           |
         """.stripMargin)
 

@@ -12,6 +12,9 @@ GET         /registration-progress                                      controll
 
 GET         /application-status                                         controllers.StatusController.get()
 
+GET         /your-registration/your-messages/:id                        controllers.NotificationsController.messageDetails(id : String)
+GET         /your-registration/your-messages                            controllers.NotificationsController.getMessages()
+
 GET         /satisfaction-survey                                        controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                        controllers.SatisfactionSurveyController.post()
 
