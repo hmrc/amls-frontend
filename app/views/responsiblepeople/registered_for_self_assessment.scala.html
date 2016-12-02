@@ -18,19 +18,37 @@ s"""${f("utrNumber").id}-fieldset"""
 )  {
 
     @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit)) {
-
-        @inlineRadioGroup(f("saRegistered")) {
-            @legend("responsiblepeople.registeredforselfassessment.heading", jsHidden = true)
-            @radio(f("saRegistered"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("saRegistered"), "lbl.no", "false")
-            @fieldset(
-                legend = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
-                jsHidden = true,
-                id = target
-            ) {
-                @input(f("utrNumber"), "responsiblepeople.registeredforselfassessment.lbl.utrnumber", bold = false, hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint")
-            }
+        @fieldset(
+            f = f("saRegistered"),
+            legend = "responsiblepeople.registeredforselfassessment.heading",
+            panel=false
+        ) {
+            @radio(
+                f = f("saRegistered"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true,
+                target = s".saRegistered-fieldset"
+            )
+            @radio(
+                f = f("saRegistered"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
+
+        @fieldset(
+            legend = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+            jsHidden = true,
+            classes = Seq("saRegistered-fieldset")
+        ) {
+            @input(
+                field = f("utrNumber"),
+                labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber",
+                hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint")
+        }
+
 
     @submit(edit)
     }
