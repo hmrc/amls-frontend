@@ -97,6 +97,17 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
 
   "JSON" must {
 
+    "Read correctly from JSON when the MiddleName is missing" in {
+      val json = Json.obj(
+        "firstName" -> "FNAME",
+        "lastName" -> "LNAME",
+        "roleWithinBusiness" -> "02"
+      )
+
+      AddPerson.jsonReads.reads(json) must be(JsSuccess(AddPerson("FNAME", None, "LNAME", Director)))
+    }
+
+
     "Read the json and return the AddPerson domain object successfully" in {
 
       val json = Json.obj(
