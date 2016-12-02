@@ -18,9 +18,20 @@
         @fieldset(
             f = f("otherBusinessTaxMatters"),
             legend = "asp.other.business.tax.matters.lbl",
-            panel = false) {
-            @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", inline = true)
-            @radio(f("otherBusinessTaxMatters"), "lbl.no", "false", inline = true)
+            panel = false
+        ) {
+            @radio(
+                f = f("otherBusinessTaxMatters"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("otherBusinessTaxMatters"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit(edit)

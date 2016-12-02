@@ -7,14 +7,16 @@
     hintText: String = "",
     example: Boolean = true,
     hintId: String = "",
-    jsHidden: Boolean = false
+    jsHidden: Boolean = false,
+    legendHidden: Boolean = false
 )(implicit lang: Lang)
 
 @field = @{ f(p) }
 
 <fieldset class="form-field form-date @if(field.hasErrors) {form-field--error}" id="@field.id">
     @legend(
-        legend = labelText
+        legend = labelText,
+        legendHidden = legendHidden
     )
     @if(hintText.nonEmpty) {
         <span class="form-field--hint">@Messages(hintText)</span>

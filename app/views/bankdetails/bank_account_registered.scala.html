@@ -16,7 +16,8 @@
     @form(f, controllers.bankdetails.routes.BankAccountRegisteredController.post(index)) {
 
         @panel(
-            wide = true
+            wide = true,
+            jsHidden = false
         ) {
             @if(index <= 1) {
                 <p>@Messages("bankdetails.have.registered.account.text", index)</p>

@@ -13,12 +13,9 @@
     heading = header
 ) {
 
-    <div class="notice spacelarge">
-        <i class="icon icon-important">
-            <span class="visuallyhidden">Warning</span>
-        </i>
-        <strong class="bold-small">@Messages("declaration.declaration.fullname") @name</strong>
-    </div>
+    @notice(
+        notice = Messages("declaration.declaration.fullname") + " " + s"$name"
+    )
 
     <p>@Messages("declaration.declaration.declare")</p>
 

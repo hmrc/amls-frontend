@@ -43,8 +43,16 @@
             @hint(
                 hint = "lbl.select.all"
             )
-            @checkbox(f("riskassessments[]"), "businessactivities.RiskAssessmentType.lbl.01", "01")
-            @checkbox(f("riskassessments[]"), "businessactivities.RiskAssessmentType.lbl.02", "02")
+            @checkbox(
+                f = f("riskassessments[]"),
+                labelText = "businessactivities.RiskAssessmentType.lbl.01",
+                value = "01"
+            )
+            @checkbox(
+                f = f("riskassessments[]"),
+                labelText = "businessactivities.RiskAssessmentType.lbl.02",
+                value = "02"
+            )
         }
 
         @submit(edit)

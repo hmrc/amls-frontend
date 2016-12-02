@@ -16,7 +16,8 @@
     @form(f, controllers.bankdetails.routes.RemoveBankDetailsController.remove(index, complete)) {
 
         @panel(
-            wide = true
+            wide = true,
+            jsHidden = false
         ) {
             <p>@Messages("bankdetails.remove.bank.account.text", accountName)</p>
         }

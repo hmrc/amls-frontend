@@ -14,9 +14,14 @@
     heading = header
 ) {
     @form(f, controllers.declaration.routes.WhoIsRegisteringController.post()) {
-        <p class="panel-indent panel-border-wide panel-indent--gutter">
-            @Messages("declaration.who.is.registering.text")
-        </p>
+
+        @panel(
+            wide = true,
+            jsHidden = false
+        ) {
+            <p>@Messages("declaration.who.is.registering.text")</p>
+        }
+
         @fieldset(
             f = f("person"),
             legend = "declaration.who.is.registering.title",

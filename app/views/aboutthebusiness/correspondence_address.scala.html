@@ -1,6 +1,6 @@
 @import forms.Form2
 @import include._
-@import include.forms2._
+@import forms2._
 
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
 
@@ -14,10 +14,12 @@
     heading = header
 ) {
 
-    <div class="panel-indent panel-indent--gutter panel-wide">
-        @Messages("aboutthebusiness.correspondenceaddress.p")
-    </div>
-
+    @panel(
+        wide = true,
+        jsHidden = false
+    ) {
+        <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
+    }
 
     @form(f, controllers.aboutthebusiness.routes.CorrespondenceAddressController.post(edit)) {
 
