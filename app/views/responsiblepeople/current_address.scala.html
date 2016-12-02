@@ -20,7 +20,8 @@
         @fieldset(
             f = f("isUK"),
             legend = "responsiblepeople.wherepersonlives.is.uk",
-            panel=false) {
+            panel=false
+        ) {
             @radio(f("isUK"), "responsiblepeople.wherepersonlives.ukAddress", "true", target = ".ukAddress-fieldset", inline=true)
             @radio(f("isUK"), "responsiblepeople.wherepersonlives.nonUkAddress", "false", target = ".nonUkAddress-fieldset", inline=true)
         }
@@ -31,10 +32,10 @@
             panel = false,
             classes = Seq("ukAddress-fieldset")
         ) {
-            @input(f("addressLine1"))
-            @input(f("addressLine2"))
-            @input(f("addressLine3"), requiredField = false)
-            @input(f("addressLine4"), requiredField = false)
+            @input(f("addressLine1"), labelText = "lbl.address.line1", labelHidden = true)
+            @input(f("addressLine2"), labelText = "lbl.address.line2", labelHidden = true)
+            @input(f("addressLine3"), labelText = "lbl.address.line3", labelHidden = true, requiredField = false)
+            @input(f("addressLine4"), labelText = "lbl.address.line4", labelHidden = true, requiredField = false)
             @input(
                 field = f("postCode"),
                 labelText = "responsiblepeople.wherepersonlives.postcode",
@@ -48,10 +49,10 @@
             panel = false,
             classes = Seq("nonUkAddress-fieldset")
         ) {
-            @input(f("addressLineNonUK1"))
-            @input(f("addressLineNonUK2"))
-            @input(f("addressLineNonUK3"), requiredField = false)
-            @input(f("addressLineNonUK4"), requiredField = false)
+            @input(f("addressLineNonUK1"), labelText = "lbl.address.line1", labelHidden = true)
+            @input(f("addressLineNonUK2"), labelText = "lbl.address.line2", labelHidden = true)
+            @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", labelHidden = true, requiredField = false)
+            @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", labelHidden = true, requiredField = false)
             @country(
                 field = f("country"),
                 labelText = "responsiblepeople.wherepersonlives.country"
@@ -59,17 +60,16 @@
         }
 
         @fieldset(
+            f = f("timeAtAddress"),
             legend = "responsiblepeople.wherepersonlives.address_history",
             jsHidden = false,
             panel = false,
             id = s"""${f("address-history").id}-fieldset"""
         ) {
-            @radioGroup(f("timeAtAddress")) {
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.11_months_history", "02")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.3_years_history", "03")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.more_years_history", "04")
-            }
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.11_months_history", "02")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.3_years_history", "03")
+            @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.more_years_history", "04")
         }
 
         @submit(edit, Some("button.saveandcontinue"))
