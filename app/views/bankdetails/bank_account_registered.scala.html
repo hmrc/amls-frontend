@@ -14,18 +14,34 @@
 ) {
 
     @form(f, controllers.bankdetails.routes.BankAccountRegisteredController.post(index)) {
-        <div class="panel-indent panel-border-wide">
-            @if(index <= 1){
-            <p>@Messages("bankdetails.have.registered.account.text", index) </p>
-            } else {
-            <p>@Messages("bankdetails.have.registered.accounts.text", index) </p>
-            }
-        </div>
 
-        @inlineRadioGroup(f("registerAnotherBank")) {
-            @legend("bankdetails.want.to.register.another.account")
-            @radio(f("registerAnotherBank"), "lbl.yes", "true")
-            @radio(f("registerAnotherBank"), "lbl.no", "false")
+        @panel(
+            wide = true
+        ) {
+            @if(index <= 1) {
+                <p>@Messages("bankdetails.have.registered.account.text", index)</p>
+            } else {
+                <p>@Messages("bankdetails.have.registered.accounts.text", index)</p>
+            }
+        }
+
+        @fieldset(
+            f = f("registerAnotherBank"),
+            legend = "bankdetails.want.to.register.another.account",
+            panel = false
+        ) {
+            @radio(
+                f = f("registerAnotherBank"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("registerAnotherBank"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit()

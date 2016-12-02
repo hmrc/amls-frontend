@@ -26,42 +26,65 @@
 
     @form(f, controllers.bankdetails.routes.BankAccountController.post(index, edit)) {
 
-    <div class="form-field-group">
         @input(
-          field = f("accountName"),
-          labelText = "bankdetails.bankaccount.accountname",
-          bold = false
+            field = f("accountName"),
+            labelText = "bankdetails.bankaccount.accountname",
+            bold = false
         )
-    </div>
 
-    <div class="form-field-group">
-        @inlineRadioGroup(f("isUK")) {
-        @legend("bankdetails.bankaccount.accounttype", jsHidden = false, bold = false)
-        @radio(f("isUK"), "lbl.yes", "true", target = s"#$target")
-        @radio(f("isUK"), "lbl.no", "false", target = s"#$target1")
-            @fieldset(
-                legend = "bankdetails.bankaccount.accounttype.yes",
-                jsHidden = true,
-                id = target
+        @fieldset(
+            f = f("isUK"),
+            legend = "bankdetails.bankaccount.accounttype",
+            panel = false
+        ) {
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true,
+                target = s"#$target"
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true,
+                target = s"#$target1"
+            )
+            @panel(
+                f = f(s"$target")
             ) {
-                @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "bankdetails.bankaccount.sortcode.hint", bold = false)
-                @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", hintText = "bankdetails.bankaccount.accountnumber.hint", bold = false)
-
+                @input(
+                    field = f("sortCode"),
+                    labelText = "bankdetails.bankaccount.sortcode",
+                    hintText = "bankdetails.bankaccount.sortcode.hint",
+                    bold = false
+                )
+                @input(
+                    field = f("accountNumber"),
+                    labelText = "bankdetails.bankaccount.accountnumber",
+                    hintText = "bankdetails.bankaccount.accountnumber.hint",
+                    bold = false
+                )
             }
-            @fieldset(
-                legend = "bankdetails.bankaccount.accounttype.no",
-                jsHidden = true,
-                id = target1
+            @panel(
+                f = f(s"$target1")
             ) {
-                @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
+                @input(
+                    field = f("IBANNumber"),
+                    labelText = "bankdetails.bankaccount.iban",
+                    bold = false
+                )
                 <p>or</p>
-                @input(f("nonUKAccountNumber"), "bankdetails.bankaccount.accountnumber", bold = false)
-
+                @input(
+                    field = f("nonUKAccountNumber"),
+                    labelText = "bankdetails.bankaccount.accountnumber",
+                    bold = false
+                )
             }
         }
-    </div>
 
-    @submit(edit)
-}
+        @submit(edit)
+    }
 
 }
