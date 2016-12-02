@@ -15,15 +15,36 @@
 
     @form(f, controllers.bankdetails.routes.BankAccountTypeController.post(index, edit, count)) {
 
-        @radioGroup(f("bankAccountType")) {
-            @legend("bankdetails.accounttype.title", jsHidden = true)
-            @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.01", "01")
-            @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.02", "02")
-            @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.03", "03")
+        @fieldset(
+            f = f("bankAccountType"),
+            legend = "bankdetails.accounttype.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("bankAccountType"),
+                labelText = "bankdetails.accounttype.lbl.01",
+                value = "01"
+            )
+            @radio(
+                f = f("bankAccountType"),
+                labelText = "bankdetails.accounttype.lbl.02",
+                value = "02"
+            )
+            @radio(
+                f = f("bankAccountType"),
+                labelText = "bankdetails.accounttype.lbl.03",
+                value = "03"
+            )
             @if(count <= 1) {
-                @radio(f("bankAccountType"), "bankdetails.accounttype.lbl.04", "04")
+                @radio(
+                    f = f("bankAccountType"),
+                    labelText = "bankdetails.accounttype.lbl.04",
+                    value = "04"
+                )
             }
         }
+
         @submit(false)
     }
 }
