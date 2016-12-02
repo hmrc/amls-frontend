@@ -3,10 +3,6 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@target = @{
-    s"""${f("agentRegNo").id}-fieldset"""
-}
-
 @header = {
     @errorSummary(f)
     @heading("asp.other.business.tax.matters.title", "summary.asp")
@@ -19,10 +15,12 @@
 
     @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
-        @inlineRadioGroup(f("otherBusinessTaxMatters")) {
-            @legend("asp.other.business.tax.matters.lbl")
-            @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("otherBusinessTaxMatters"), "lbl.no", "false")
+        @fieldset(
+            f = f("otherBusinessTaxMatters"),
+            legend = "asp.other.business.tax.matters.lbl",
+            panel = false) {
+            @radio(f("otherBusinessTaxMatters"), "lbl.yes", "true", inline = true)
+            @radio(f("otherBusinessTaxMatters"), "lbl.no", "false", inline = true)
         }
 
         @submit(edit)
