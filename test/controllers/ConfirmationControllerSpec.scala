@@ -34,7 +34,7 @@ class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
       etmpFormBundleNumber = "",
       amlsRefNo = "",
       registrationFee = 0,
-      fpFee = None,
+      fPFee = None,
       premiseFee = 0,
       totalFees = 0,
       paymentReference = paymentRefNo

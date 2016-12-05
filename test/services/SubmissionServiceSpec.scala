@@ -9,7 +9,7 @@ import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, SubscriptionResponse}
@@ -19,6 +19,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Logger
 import play.api.http.Status._
 import play.api.test.FakeApplication
 import play.api.test.Helpers.{OK => _, _}
@@ -27,6 +28,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import utils.StatusConstants
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -58,7 +60,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       etmpFormBundleNumber = "",
       amlsRefNo = "amlsRef",
       registrationFee = 0,
-      fpFee = None,
+      fPFee = None,
       premiseFee = 0,
       totalFees = 0,
       paymentReference = ""
@@ -68,7 +70,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fpFee = Some(0),
+      fPFee = Some(0),
       premiseFee = 0,
       totalFees = 100,
       paymentReference = Some("XA111123451111"),
@@ -221,11 +223,107 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       val response = Some(Some("XA111123451111"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
-      whenReady(TestSubmissionService.getAmendment) {
+      whenReady(TestSubmissionService.
+        getAmendment) {
         result =>
           result must equal(response)
       }
     }
+
+    "not include responsible people who have been deleted" in new Fixture {
+
+      val people = Seq(
+        ResponsiblePeople(Some(PersonName("Valid", None, "Person", None, None))),
+        ResponsiblePeople(Some(PersonName("Deleted", None, "Person", None, None)), status = Some(StatusConstants.Deleted))
+      )
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(Seq(TradingPremises()))
+
+      when {
+        cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+      } thenReturn Some(amendmentResponse)
+
+      when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
+
+      val result = await(TestSubmissionService.getAmendment)
+
+      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
+        case (_, _, rows, _) => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
+      }
+      }
+
+    }
+
+    "not show negative fees for responsible people who have already been paid for" in new Fixture {
+
+      val people = Seq(
+        ResponsiblePeople(Some(PersonName("Unfit", Some("and"), "Unproper", None, None)), hasAlreadyPassedFitAndProper = Some(false)),
+        ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper", None, None)), hasAlreadyPassedFitAndProper = Some(true))
+      )
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(Seq(TradingPremises()))
+
+      when {
+        cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+      } thenReturn Some(amendmentResponse)
+
+      when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
+
+      val result = await(TestSubmissionService.getAmendment)
+
+      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
+        case (_, _, rows, _) =>
+          val unpaidRow = rows.filter(_.label == "confirmation.unpaidpeople").head
+          unpaidRow.perItm.value mustBe 0
+          unpaidRow.total.value mustBe 0
+      }
+      }
+
+    }
+
+    "not include deleted premises in the amendment confirmation table" in new Fixture {
+
+      val premises = Seq(
+        TradingPremises(status = Some(StatusConstants.Deleted)),
+        TradingPremises()
+      )
+
+      when {
+        TestSubmissionService.cacheConnector.fetchAll(any(), any())
+      } thenReturn Future.successful(Some(cache))
+
+      when {
+        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+      } thenReturn Some(premises)
+
+      when {
+        cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+      } thenReturn Some(amendmentResponse)
+
+      when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(Seq(ResponsiblePeople()))
+
+      val result = await(TestSubmissionService.getAmendment)
+
+      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
+        case (_, _, rows, _) =>
+          rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
+      }
+      }
+
+    }
+
 
     "retrieve data from variation submission" in new Fixture {
 
@@ -233,7 +331,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         processingDate = "",
         etmpFormBundleNumber = "",
         registrationFee = 100,
-        fpFee = Some(0),
+        fPFee = Some(0),
         premiseFee = 0,
         totalFees = 100,
         paymentReference = Some("12345"),
@@ -246,7 +344,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       val rpFee: BigDecimal = 100
       val tpFee: BigDecimal = 115
-      val tpHalfFee: BigDecimal = tpFee/2
+      val tpHalfFee: BigDecimal = tpFee / 2
       val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
       val totalFee: BigDecimal = rpFee + tpTotalFee
 
@@ -284,7 +382,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
 
     }
-    
+
     "return failed future when no enrolment" in new Fixture {
 
       when {
@@ -306,7 +404,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       val rpFee: BigDecimal = 100
       val tpFee: BigDecimal = 115
-      val tpHalfFee: BigDecimal = tpFee/2
+      val tpHalfFee: BigDecimal = tpFee / 2
       val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
       val totalFee: BigDecimal = rpFee + tpTotalFee
 
@@ -314,7 +412,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         processingDate = "",
         etmpFormBundleNumber = "",
         registrationFee = 100,
-        fpFee = Some(0),
+        fPFee = Some(0),
         premiseFee = 0,
         totalFees = 100,
         paymentReference = Some(""),
@@ -328,7 +426,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "a Trading Premises has been added with a full year fee" in new Fixture {
 
         val variationResponse = testVariationResponse.copy(
-        addedFullYearTradingPremises = 1
+          addedFullYearTradingPremises = 1
         )
 
         when {
@@ -348,7 +446,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Some(variationResponse)
 
         whenReady(TestSubmissionService.getVariation) {
-          case Some((_,_,breakdownRows)) =>
+          case Some((_, _, breakdownRows)) =>
             breakdownRows.head.label mustBe "confirmation.tradingpremises"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(tpFee)
@@ -379,7 +477,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Some(variationResponse)
 
         whenReady(TestSubmissionService.getVariation) {
-          case Some((_,_,breakdownRows)) =>
+          case Some((_, _, breakdownRows)) =>
             breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(tpHalfFee)
@@ -410,7 +508,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Some(variationResponse)
 
         whenReady(TestSubmissionService.getVariation) {
-          case Some((_,_,breakdownRows)) =>
+          case Some((_, _, breakdownRows)) =>
             breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(0)
@@ -441,7 +539,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Some(variationResponse)
 
         whenReady(TestSubmissionService.getVariation) {
-          case Some((_,_,breakdownRows)) =>
+          case Some((_, _, breakdownRows)) =>
             breakdownRows.head.label mustBe "confirmation.responsiblepeople"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(rpFee)
@@ -472,7 +570,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Some(variationResponse)
 
         whenReady(TestSubmissionService.getVariation) {
-          case Some((_,_,breakdownRows)) =>
+          case Some((_, _, breakdownRows)) =>
             breakdownRows.head.label mustBe "confirmation.responsiblepeople"
             breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(rpFee)
@@ -512,7 +610,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Some(variationResponse)
 
         whenReady(TestSubmissionService.getVariation) {
-          case Some((_,_,breakdownRows)) =>
+          case Some((_, _, breakdownRows)) =>
 
             breakdownRows.head.label mustBe "confirmation.responsiblepeople"
             breakdownRows.head.quantity mustBe 2

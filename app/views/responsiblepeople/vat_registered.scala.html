@@ -24,7 +24,7 @@
             @radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
             @radio(f("registeredForVAT"), "lbl.no", "false")
             @fieldset("responsiblepeople.registeredforvat.lbl.vatNumber", jsHidden = true, id = target) {
-                @input(f("vrnNumber"), "responsiblepeople.registeredforvat.lbl.vatNumber", bold = false)
+                @input(field = f("vrnNumber"), labelText = "responsiblepeople.registeredforvat.lbl.vatNumber")
             }
         }
         @submit()

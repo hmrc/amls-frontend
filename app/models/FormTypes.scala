@@ -33,7 +33,7 @@ object FormTypes {
   /** Regex **/
 
   val vrnTypeRegex = "^[0-9]{9}$".r
-  val phoneNumberRegex = "[0-9]+".r
+  val phoneNumberRegex = "[0-9()+\\- ]+".r
   val emailRegex = ("^.+" +                    //Any character 1 or more times
                     "@" +                     //@ symbol
                     "(" +                     //start of DNS label group

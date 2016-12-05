@@ -44,7 +44,7 @@ object AddPerson {
     import play.api.libs.json._
     (
       (__ \ "firstName").read[String] and
-        (__ \ "middleName").read[Option[String]] and
+        (__ \ "middleName").readNullable[String] and
         (__ \ "lastName").read[String] and
         (__.read[RoleWithinBusiness])
       ) (AddPerson.apply _)

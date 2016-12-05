@@ -26,7 +26,9 @@
             @radio(f("previouslyRegistered"), "lbl.yes", "true", target = s"#$target")
             @radio(f("previouslyRegistered"), "lbl.no", "false")
             @fieldset("aboutthebusiness.registeredformlr.mlrregno.lbl", id = target) {
-                @input(f("prevMLRRegNo"),
+                @input(
+                field = f("prevMLRRegNo"),
+                labelText = "aboutthebusiness.registeredformlr.mlrregno.lbl",
                 hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
                 bold = false)
             }

@@ -7,7 +7,7 @@ case class SubscriptionResponse(
                                  etmpFormBundleNumber: String,
                                  amlsRefNo: String,
                                  registrationFee: BigDecimal,
-                                 fpFee: Option[BigDecimal],
+                                 fPFee: Option[BigDecimal],
                                  premiseFee: BigDecimal,
                                  totalFees: BigDecimal,
                                  paymentReference: String

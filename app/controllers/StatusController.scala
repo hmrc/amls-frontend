@@ -1,15 +1,14 @@
 package controllers
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.FeeConnector
 import models.FeeResponse
-import models.ResponseType.AmendOrVariationResponseType
-
+import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.BusinessMatching
-import models.status.{SubmissionStatus, SubmissionDecisionApproved, SubmissionReadyForReview, CompletionStateViewModel}
+import models.status.{CompletionStateViewModel, SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionStatus}
 import services.{AuthEnrolmentsService, LandingService, _}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.{NotFoundException, HeaderCarrier}
+import uk.gov.hmrc.play.http.{HeaderCarrier, NotFoundException}
 import views.html.status.status
 
 import scala.concurrent.Future
@@ -30,8 +29,9 @@ trait StatusController extends BaseController {
     (mlrRegNumber, submissionStatus) match {
       case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
         feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
-          case AmendOrVariationResponseType if x.difference.isEmpty => None
-          case _ => Some(x)
+          case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0)=> Some(x)
+          case SubscriptionResponseType if x.totalFees > 0 => Some(x)
+          case _ => None
         })
       }.recoverWith {
         case _: NotFoundException => Future.successful(None)
@@ -43,6 +43,7 @@ trait StatusController extends BaseController {
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
+        val notificationsToggle = ApplicationConfig.notificationsToggle
         val businessName = landingService.cacheMap map {
           case Some(cache) => {
             val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -58,7 +59,7 @@ trait StatusController extends BaseController {
           businessNameOption <- businessName
           feeResponse <- getFeeResponse(mlrRegNumber, submissionStatus)
         } yield {
-          Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus), feeResponse))
+          Ok(status(mlrRegNumber.getOrElse(""), businessNameOption, CompletionStateViewModel(submissionStatus), feeResponse, notificationsToggle))
         }
 
   }

@@ -25,10 +25,10 @@ s"""${f("mlrRefNumber").id}-fieldset"""
             @radio(f("servicesOfAnotherTCSP"), "lbl.yes", "true", target = s"#$target")
             @radio(f("servicesOfAnotherTCSP"), "lbl.no", "false")
             @fieldset("tcsp.servicesOfAnotherTcsp.mlrregno.lbl", jsHidden = true, id = target) {
-                @input(f("mlrRefNumber"),
+                @input(
+                    field = f("mlrRefNumber"),
                     labelText = "tcsp.servicesOfAnotherTcsp.mlrregno.lbl",
-                    hintText = "hint.8.digits",
-                    bold = false
+                    hintText = "hint.8.digits"
                 )
             }
         }

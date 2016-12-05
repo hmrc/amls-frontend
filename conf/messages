@@ -183,9 +183,9 @@ error.required.rp.birth.country = Enter a country of birth.
 error.required.rp.nationality = Enter a nationality.
 error.required.rp.passport.option = Select whether this person has a UK passport, a non-UK passport, or doesn’t have a passport.
 error.required.rp.register.another.person = Select yes or no to the question: Do you want to register another responsible person?
-error.required.rp.phone = Enter a phone number.
-error.invalid.rp.phone = Enter only numbers. Do not enter letters, punctuation or other characters.
-error.max.length.rp.phone = You can’t enter more than 30 digits for the person’s phone number.
+error.required.rp.phone = Enter a contact phone number.
+error.invalid.rp.phone = You’ve used an invalid character in this phone number. You can only use numbers, spaces, brackets, plus(+)  and dash(-) .
+error.max.length.rp.phone = You can’t enter more than 24 characters for the phone number.
 error.required.rp.email = Enter an email address.
 error.invalid.rp.email = Enter a valid email address. It must be in the format myname@example.com.
 error.max.length.rp.email = You can’t enter more than 100 characters for the person’s email address.
@@ -355,8 +355,8 @@ lbl.give.details = Please give details
 legend.address = Address
 lbl.address.line1 = Address line 1
 lbl.address.line2 = Address line 2
-lbl.address.line3 = Town / City
-lbl.address.line4 = County
+lbl.address.line3 = Address line 3
+lbl.address.line4 = Address line 4
 lbl.address.postcode = Postcode
 
 businessType.lbl.02 = Limited company
@@ -1309,26 +1309,26 @@ hvd.percentage.lbl.05 = 81% to 100%
 
 ###############################  Notifications ###############################
 
-notifications.subject.APA1 = Application Approval
-notifications.subject.approval.variation = Registration Variation Approval
-notifications.subject.APR1 = Renewal Approval
+notifications.subject.ApplicationApproval = Application Approval
+notifications.subject.Approval.Variation = Registration Variation Approval
+notifications.subject.RenewalApproval = Renewal Approval
 
-notifications.subject.REJR = Application Rejection
-notifications.subject.failtopay = Application Auto-Rejection for Failure to Pay
-notifications.subject.REVR = Registration Revocation
-notifications.subject.EXPR = Registration Expiry
+notifications.subject.RejectionReasons = Application Rejection
+notifications.subject.FailToPay = Application Auto-Rejection for Failure to Pay
+notifications.subject.RevocationReasons = Registration Revocation
+notifications.subject.AutoExpiryOfRegistration = Registration Expiry
 
-notifications.subject.RPA1 = Reminder to Pay - Application
-notifications.subject.RPV1 = Reminder to Pay - Variation
-notifications.subject.RPR1 = Reminder to Pay - Renewal
-notifications.subject.RPM1 = Reminder to Pay - Manual Charge
-notifications.subject.RREM = Reminder to Renew
+notifications.subject.ReminderToPayForApplication = Reminder to Pay - Application
+notifications.subject.ReminderToPayForVariation = Reminder to Pay - Variation
+notifications.subject.ReminderToPayForRenewal = Reminder to Pay - Renewal
+notifications.subject.ReminderToPayForManualCharges = Reminder to Pay - Manual Charge
+notifications.subject.RenewalReminder = Reminder to Renew
 
-notifications.subject.MTRJ = Rejection of Application being Considered
-notifications.subject.MTRV = Revocation of Registration being Considered
-notifications.subject.NMRJ = Rejection of Application no longer being Considered
-notifications.subject.NMRV = Revocation of Registration no longer being Considered
-notifications.subject.OTHR = Generic communication
+notifications.subject.MindedToReject = Rejection of Application being Considered
+notifications.subject.MindedToRevoke = Revocation of Registration being Considered
+notifications.subject.NoLongerMindedToReject = Rejection of Application no longer being Considered
+notifications.subject.NoLongerMindedToRevoke = Revocation of Registration no longer being Considered
+notifications.subject.Others = Generic communication
 
 notifications.header = Your Messages
 notifications.unread = You have unread messages
@@ -1337,6 +1337,8 @@ notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
 
+notifications.backToYourMessages = Back to your messages
+
 ############################### Survey ###############################
 
 survey.satisfaction.heading = Give feedback
@@ -1344,7 +1346,7 @@ survey.satisfaction.title = Satisfaction survey
 
 survey.satisfaction.text.1 = Overall, how did you feel about using the service?
 survey.satisfaction.text.2 = How could we improve this service?
-survey.satisfaction.hint = Please don't include any personal or financial information.
+survey.satisfaction.hint = Please don’t include any personal or financial information.
 
 survey.satisfaction.lbl.01 = Very satisfied
 survey.satisfaction.lbl.02 = Satisfied
