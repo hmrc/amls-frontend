@@ -34,11 +34,184 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
+class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+    val controller = new LandingController {
+      override val enrolmentsService = mock[AuthEnrolmentsService]
+      override val landingService = mock[LandingService]
+      override val authConnector = self.authConnector
+      override val shortLivedCache = mock[ShortLivedCache]
+    }
+  }
+
+  "LandingController" must {
+
+    "load the correct view after calling get" when {
+
+      "the landing service has a saved form and " when {
+        "the form has not been submitted" in new Fixture {
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+
+          val complete = mock[BusinessMatching]
+          val emptyCacheMap = mock[CacheMap]
+
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
+          when(complete.isComplete) thenReturn true
+          when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+        }
+
+        "the form has been submitted" in new Fixture {
+          val cacheMap = mock[CacheMap]
+
+          val complete = mock[BusinessMatching]
+
+          when(complete.isComplete) thenReturn true
+          when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+            .thenReturn(Some(SubscriptionResponse("", "", 1.00, None, 1.00, 1.00, "")))
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+        }
+      }
+
+
+      "the landing service has no saved form and " when {
+
+        "the landing service has valid review details" in new Fixture {
+
+          val details = Some(ReviewDetails(businessName = "Test",
+            businessType = None,
+            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("United Kingdom", "GB")),
+            safeId = ""))
+
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
+          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(details))
+          when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
+        }
+
+        "the landing service has no valid review details" in new Fixture {
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
+          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(None))
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
+        }
+
+        "the user has an AMLS enrolment" in new Fixture {
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
+          when(controller.landingService.reviewDetails(any(), any())).thenReturn(Future.successful(None))
+          when(controller.enrolmentsService.amlsRegistrationNumber(any(),any(),any())).thenReturn(Future.successful(Some("amlsRegNo")))
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+        }
+
+      }
+
+      "go to the beginning of pre-application" when {
+        "there is no data in BusinessMatching" in new Fixture {
+
+          val emptyCacheMap = mock[CacheMap]
+
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
+          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
+          //when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(None)
+
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe  Some(controllers.routes.LandingController.get().url)
+
+        }
+      }
+
+      "go to the beginning of pre-application" when {
+        "there is data in BusinessMatching but the pre-application is incomplete" in new Fixture {
+
+          val testBusinessMatching = BusinessMatching()
+
+          val emptyCacheMap = mock[CacheMap]
+
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
+          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
+
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+
+        }
+      }
+
+      "pre application must remove save4later" when {
+        "the business matching is incomplete" in new Fixture {
+          val cachmap = mock[CacheMap]
+          val httpResponse = mock[HttpResponse]
+
+          val complete = mock[BusinessMatching]
+
+          when(httpResponse.status) thenReturn(NO_CONTENT)
+
+          when(controller.shortLivedCache.remove(any())(any())) thenReturn Future.successful(httpResponse)
+
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
+          when(complete.isComplete) thenReturn false
+          when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+
+        }
+      }
+
+      "pre application must throw an exception" when {
+        "the business matching is incomplete" in new Fixture {
+          val cachmap = mock[CacheMap]
+          val httpResponse = mock[HttpResponse]
+
+          val complete = mock[BusinessMatching]
+
+          when(httpResponse.status) thenReturn(BAD_REQUEST)
+
+          when(controller.shortLivedCache.remove(any())(any())) thenReturn Future.successful(httpResponse)
+
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
+          when(complete.isComplete) thenReturn false
+          when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+
+          a[Exception] must be thrownBy {
+            await(controller.get()(request))
+          }
+        }
+      }
+    }
+  }
+}
+
+class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
 
   val businessCustomerUrl = "TestUrl"
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.amendments" -> true,
     "Test.microservice.services.business-customer.url" -> businessCustomerUrl
   ))
 

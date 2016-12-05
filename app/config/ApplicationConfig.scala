@@ -5,14 +5,18 @@ import uk.gov.hmrc.play.config.ServicesConfig
 import play.api.Play.current
 
 trait ApplicationConfig {
-  def enrolmentToggle : Boolean
-  def notificationsToggle : Boolean
+  def enrolmentToggle: Boolean
+
+  def notificationsToggle: Boolean
+
+  def amendmentsToggle: Boolean
 }
 
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
+
   private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   lazy val contactHost = baseUrl("contact-frontend")
@@ -56,6 +60,12 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val peopleFee = getConfigInt("amounts.people")
 
   override def notificationsToggle = getConfBool("feature-toggle.notifications", false)
+
+  def amendmentsToggle: Boolean = {
+    val value = getConfBool("feature-toggle.amendments", false)
+    Logger.info(s"[ApplicationConfig][amendments] $value")
+    value
+  }
 
   override def enrolmentToggle: Boolean = {
     val value = getConfBool("feature-toggle.gg-enrolment", false)

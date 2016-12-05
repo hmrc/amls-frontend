@@ -320,7 +320,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
         htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
         htmlValue.getElementById("person-firstNamelastName").`val`() must be("firstNamelastName")
 
-        contentAsString(result) must include(Messages("submit.amendment.application"))
+        contentAsString(result) must include(Messages("submit.registration"))
       }
     }
 
@@ -343,7 +343,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
+        redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
       }
     }
     "successfully redirect next page when user selects the option 'Someone else'" when {
@@ -369,7 +369,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends PlaySpec with OneA
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.AddPersonController.getWithAmendment().url))
+        redirectLocation(result) must be(Some(routes.AddPersonController.get().url))
       }
     }
   }

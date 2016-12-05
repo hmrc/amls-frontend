@@ -233,7 +233,8 @@ trait SubmissionService extends DataCacheService {
 
     def fpRow: Seq[BreakdownRow] = {
       if (variation.addedResponsiblePeopleFitAndProper > 0) {
-        breakdownRows ++ Seq(BreakdownRow(UnpaidPeople.message, variation.addedResponsiblePeopleFitAndProper, UnpaidPeople.feePer, Currency(getFitAndProperDeduction(variation))))
+        breakdownRows ++ Seq(BreakdownRow(UnpaidPeople.message, variation.addedResponsiblePeopleFitAndProper, UnpaidPeople.feePer,
+          Currency(getFitAndProperDeduction(variation))))
       } else {
         Seq()
       }
@@ -249,7 +250,8 @@ trait SubmissionService extends DataCacheService {
 
     def tpHalfYearRow: Seq[BreakdownRow] = {
       if (variation.halfYearlyTradingPremises > 0) {
-        breakdownRows ++ Seq(BreakdownRow(PremisesHalfYear.message, variation.halfYearlyTradingPremises, PremisesHalfYear.feePer, Currency(getHalfYearPremisesFee(variation))))
+        breakdownRows ++ Seq(BreakdownRow(PremisesHalfYear.message, variation.halfYearlyTradingPremises, PremisesHalfYear.feePer,
+          Currency(getHalfYearPremisesFee(variation))))
       } else {
         Seq()
       }
