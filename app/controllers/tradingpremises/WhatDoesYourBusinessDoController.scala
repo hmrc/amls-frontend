@@ -100,7 +100,10 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                     tp.agentPartnership,
                     Some(data),
                     None,
-                    true
+                    true,
+                    tp.lineId,
+                    tp.status,
+                    tp.endDate
                   )
               } map {
                 _ => data.activities.contains(MoneyServiceBusiness) match {
