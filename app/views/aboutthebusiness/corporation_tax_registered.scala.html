@@ -3,10 +3,6 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
-@target = @{
-    s"""${f("corporationTaxReference").id}-fieldset"""
-}
-
 @header = {
     @errorSummary(f)
     @heading("aboutthebusiness.registeredforcorporationtax.title", "summary.aboutbusiness")
@@ -30,7 +26,7 @@
                 labelText = "lbl.yes",
                 value = "true",
                 inline = true,
-                target = s"#$target"
+                target = s".corporationTaxReference-fieldset"
             )
             @radio(
                 f = f("registeredForCorporationTax"),
@@ -41,10 +37,10 @@
         }
 
         @fieldset(
-            f = f(s"$target"),
             legend = "aboutthebusiness.registeredforcorporationtax.taxReference",
             legendHidden = true,
-            jsHidden = true
+            jsHidden = true,
+            classes = Seq("corporationTaxReference-fieldset")
         ) {
             @input(
                 field = f("corporationTaxReference"),
