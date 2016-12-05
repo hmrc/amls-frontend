@@ -637,9 +637,6 @@ class StatusControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuite
 
       val document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("statusblock").html() must not include(Messages("status.amendment.edit"))
-
-      document.getElementsByClass("messaging").size() mustBe 0
-
     }
   }
 }
