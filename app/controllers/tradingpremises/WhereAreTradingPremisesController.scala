@@ -39,7 +39,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             _ <- updateDataStrict[TradingPremises](index) { tp =>
                 TradingPremises(tp.registeringAgentPremises,
                   Some(ytp), tp.businessStructure,tp.agentName,tp.agentCompanyName,
-                  tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true)
+                  tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))

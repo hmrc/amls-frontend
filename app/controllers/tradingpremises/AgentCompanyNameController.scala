@@ -41,7 +41,7 @@ import scala.concurrent.Future
                 TradingPremises(tp.registeringAgentPremises,
                   tp.yourTradingPremises,
                   tp.businessStructure, None, Some(data) , None, tp.whatDoesYourBusinessDoAtThisAddress,
-                  tp.msbServices, true)
+                  tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
             }
           } yield edit match {
             case true => Redirect(routes.SummaryController.getIndividual(index))
