@@ -35,4 +35,32 @@ class CompletionStateSpec  extends PlaySpec with MockitoSugar{
 
   }
 
+  it when {
+    "current state is Incomplete" must {
+      "Make notifications unavailable" in {
+        CompletionStateViewModel(NotCompleted).notificationsAvailable must be(false)
+      }
+    }
+    "current state is NotSubmitted" must {
+      "Make notifications unavailable" in {
+        CompletionStateViewModel(SubmissionReady).notificationsAvailable must be(false)
+      }
+    }
+    "current state is Pending" must {
+      "Make notifications available" in {
+        CompletionStateViewModel(SubmissionReadyForReview).notificationsAvailable must be(true)
+      }
+    }
+    "current state is Approved" must {
+      "Make notifications available" in {
+        CompletionStateViewModel(SubmissionDecisionApproved).notificationsAvailable must be(true)
+      }
+    }
+    "current state is Rejected" must {
+      "Make notifications available" in {
+        CompletionStateViewModel(SubmissionDecisionRejected).notificationsAvailable must be(true)
+      }
+    }
+  }
+
 }
