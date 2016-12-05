@@ -593,3 +593,53 @@ class StatusControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSu
     }
   }
 }
+
+class StatusControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
+  val cacheMap = mock[CacheMap]
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+    val controller = new StatusController {
+      override private[controllers] val landingService: LandingService = mock[LandingService]
+      override val authConnector = self.authConnector
+      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+      override private[controllers] val statusService: StatusService = mock[StatusService]
+      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
+    }
+  }
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+
+  "StatusController" must {
+    "hide amendment/variation link when amendments toggle is off" in new Fixture {
+
+      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+        Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+      when(controller.landingService.cacheMap(any(), any(), any()))
+        .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        .thenReturn(Some(BusinessMatching(Some(reviewDtls), None)))
+
+      when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(Some("XAML00000567890")))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
+      when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+        .thenReturn(Future.successful(mock[FeeResponse]))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("statusblock").html() must not include(Messages("status.amendment.edit"))
+
+      document.getElementsByClass("messaging").size() mustBe 0
+
+    }
+  }
+}

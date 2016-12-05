@@ -7,6 +7,7 @@
 @import models.status.SubmissionDecisionApproved
 @import models.status.SubmissionDecisionRejected
 @import models.status.{Current,SubmissionReady}
+@import config.ApplicationConfig
 
 @(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel, feeResponse: Option[FeeResponse], notifications: Boolean)(implicit request: Request[_])
 @borderClass(entry:(SubmissionStatus,CompletionState)) = {
@@ -29,7 +30,7 @@ case _ => {Messages("status.incomplete.heading")}
 
 @changeLink = @{completionState.currentState match {
 case SubmissionReady => { Some("status.submissionready.changelink1") }
-case SubmissionReadyForReview | SubmissionDecisionApproved => { Some("status.amendment.edit") }
+case (SubmissionReadyForReview | SubmissionDecisionApproved) if(ApplicationConfig.amendmentsToggle) => { Some("status.amendment.edit") }
 case _ => { None }
 }}
 

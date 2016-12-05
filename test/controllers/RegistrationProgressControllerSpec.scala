@@ -39,7 +39,7 @@ trait Fixture extends AuthorisedFixture {
 
 class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite with MockitoSugar{
 
-  implicit override lazy val app = FakeApplication()
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   "RegistrationProgressController" when {
     "the user is enrolled into the AMLS Account" must {
@@ -227,3 +227,26 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
   }
 }
 
+class RegistrationProgressControllerWithoutAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite{
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+
+  "RegistrationProgressController" when {
+    "there has already been a submission" must {
+      "show the registration progress page" in new Fixture {
+        when(controller.service.sections(any[HeaderCarrier], any[AuthContext], any[ExecutionContext]))
+          .thenReturn(Future.successful(Seq(
+            Section("TESTSECTION1", Completed, false, mock[Call]),
+            Section("TESTSECTION2", Completed, false, mock[Call])
+          )))
+
+        val responseF = controller.get()(request)
+        status(responseF) must be (OK)
+        val pageTitle = Messages("progress.title") + " - " +
+          Messages("title.yapp") + " - " +
+          Messages("title.amls") + " - " + Messages("title.gov")
+        Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
+      }
+    }
+  }
+}
