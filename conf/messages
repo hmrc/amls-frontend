@@ -1331,12 +1331,11 @@ notifications.subject.Others = Generic communication
 
 notifications.header = Your Messages
 notifications.unread = You have unread messages
+notifications.youHaveMessages = View your messages
 
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
-
-notifications.backToYourMessages = Back to your messages
 
 ############################### Survey ###############################
 
