@@ -23,7 +23,8 @@ s"""${f("mlrRefNumber").id}-fieldset"""
         @fieldset(
             legend = "tcsp.servicesOfAnotherTcsp.title",
             f = f("servicesOfAnotherTCSP"),
-            panel = false
+            panel = false,
+            legendHidden = true
         ) {
             @hint("tcsp.servicesOfAnotherTcsp.other.hint")
             @radio(
