@@ -1,21 +1,26 @@
 package models.hvd
 
+import controllers.hvd.routes.javascript
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
+import org.scalatest.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsUndefined, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 class HvdSpec extends PlaySpec with MockitoSugar{
 
-  // scalastyle:off
   val DefaultCashPayment = CashPaymentYes(new LocalDate(1956, 2, 15))
   private val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
   private val DefaultReceiveCashPayments = ReceiveCashPayments(Some(paymentMethods))
 
   val NewCashPayment = CashPaymentNo
+
+  val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
+    None,None,None,None,
+    receiveCashPayments = Some(DefaultReceiveCashPayments))
 
   "hvd" must {
 
@@ -35,9 +40,7 @@ class HvdSpec extends PlaySpec with MockitoSugar{
       "hasChanged" -> false
     )
 
-    val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
-      None,None,None,None,
-      receiveCashPayments = Some(DefaultReceiveCashPayments))
+
 
 
     "Serialise as expected" in {
@@ -58,7 +61,16 @@ class HvdSpec extends PlaySpec with MockitoSugar{
       sut.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))) must be (expectedModel)
     }
   }
-  
+
+  "Hvd Serialisation" when {
+    "recieveCashPayments is missing" must {
+      "skip the field in the resulting Json" in {
+        val res = Json.toJson(completeModel.copy(receiveCashPayments = None))
+        res \ "receiveCashPayments" mustBe a[JsUndefined]
+      }
+    }
+  }
+
   "Section"  must {
     "have a mongo key that" must {
       "be correctly set" in {
@@ -89,7 +101,6 @@ class HvdSpec extends PlaySpec with MockitoSugar{
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(complete)
 
         Hvd.section must be(completedSection)
-
       }
 
       "return a Started Section when model is incomplete" in {
