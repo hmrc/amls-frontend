@@ -903,6 +903,7 @@ businessactivities.involved.other.hint = For example: you would select ’yes’
 businessactivities.whoisyouraccountant.name = Name
 businessactivities.whoisyouraccountant.tradingName = Trading name (if different)
 businessactivities.whoisyouraccountant.address = Address
+businessactivities.whoisyouraccountant.address.location = Do they have a UK address?
 businessactivities.whoisyouraccountant.ukAddress = This is a UK address
 businessactivities.whoisyouraccountant.nonUkAddress = This is an overseas address
 businessactivities.whoisyouraccountant.country = Country
@@ -1335,12 +1336,11 @@ notifications.subject.Others = Generic communication
 
 notifications.header = Your Messages
 notifications.unread = You have unread messages
+notifications.youHaveMessages = View your messages
 
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
 notifications.table.header.date = Date
-
-notifications.backToYourMessages = Back to your messages
 
 ############################### Survey ###############################
 

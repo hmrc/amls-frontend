@@ -46,6 +46,9 @@ case class CompletionStateViewModel(statuses: Map[SubmissionStatus, CompletionSt
     }).getOrElse(NotCompleted)
   }
 
+  def notificationsAvailable : Boolean = {
+    Seq(SubmissionReadyForReview, SubmissionDecisionApproved, SubmissionDecisionRejected).contains(currentState)
+  }
 }
 
 object CompletionStateViewModel {
@@ -57,13 +60,15 @@ object CompletionStateViewModel {
       SubmissionDecisionApproved -> Complete,
       SubmissionDecisionRejected -> Complete)
 
-    val updatedStatuses = statuses.span(s => s._1 != current)._1 ++ Map(current -> Current) ++ statuses.span(s => s._1 != current)._2.drop(1).map {
-      status => (status._1, Incomplete)
-    }
+    val (prefix, suffix) = statuses.span(s => s._1 != current)
+    val updatedStatuses = prefix ++
+                          Map(current -> Current) ++
+                          suffix.tail.mapValues(_ => Incomplete)
 
-    val filterStatuses = current match{
+
+    val filterStatuses = current match {
       case SubmissionDecisionRejected => updatedStatuses.filterNot(m => m._1 == SubmissionDecisionApproved)
-      case _ => updatedStatuses.filterNot(m => m._1 == SubmissionDecisionRejected)
+      case _ => updatedStatuses.filterNot (m => m._1 == SubmissionDecisionRejected)
     }
 
     CompletionStateViewModel(filterStatuses)

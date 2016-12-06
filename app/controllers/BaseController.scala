@@ -11,6 +11,7 @@ import utils.{FeatureToggle, JsonMapping}
 trait BaseController extends FrontendController with Actions {
 
   protected def Authorised = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence)
+  protected def AmendmentsToggle = FeatureToggle(ApplicationConfig.amendmentsToggle)
 
   def notFoundView(implicit request: Request[_]) = {
     views.html.error(Messages("error.not-found.title"),
