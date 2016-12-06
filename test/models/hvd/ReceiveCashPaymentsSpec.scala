@@ -3,7 +3,7 @@ package models.hvd
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.JsSuccess
+import play.api.libs.json.{Json, JsSuccess}
 
 class ReceiveCashPaymentsSpec extends PlaySpec {
 
@@ -33,6 +33,18 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
       )
       ReceiveCashPayments.formR.validate(data)
         .mustEqual(Failure(Seq((Path \ "paymentMethods") -> Seq(ValidationError("error.required.hvd.choose.option")))))
+    }
+  }
+
+  "RecieveCashPayments Serialisation" when {
+    "paymentsMethods is empty" must {
+      "set the receivePayments to false and the payment methods to an empty object" in {
+        val res = Json.toJson(ReceiveCashPayments(None))
+        res mustBe Json.obj(
+          "receivePayments" -> false,
+          "paymentMethods" -> Json.obj()
+        )
+      }
     }
   }
 }
