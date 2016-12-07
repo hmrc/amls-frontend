@@ -13,7 +13,7 @@
     heading = header
 ) {
 
-    @Messages("aboutthebusiness.activity.start.date.text")
+    <p>@Messages("aboutthebusiness.activity.start.date.text")</p>
 
     @form(f, controllers.aboutthebusiness.routes.ActivityStartDateController.post(edit)) {
 
@@ -21,8 +21,8 @@
             f = f,
             p = "startDate",
             labelText = "aboutthebusiness.activity.start.date.title",
-            hintText = "",
-            true
+            example = true,
+            legendHidden = true
         )
 
         @submit(edit)

@@ -1,11 +1,12 @@
-@import include.main
+@import include._
+@import forms2._
 @import models.confirmation._
 @import config.ApplicationConfig
 
 @(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
 
 @main(
-title = Messages("confirmation.variation.title")
+    title = Messages("confirmation.variation.title")
 ) {
 
 <div class="confirmation">
@@ -16,10 +17,9 @@ title = Messages("confirmation.variation.title")
 
 <p>@Messages("confirmation.amendment.previousfees.p")</p>
 
-<div class="notice">
-    <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
-    <strong class="bold-small">@Messages("confirmation.notice")</strong>
-</div>
+    @notice(
+        notice = Messages("confirmation.notice")
+    )
 
 <div class="panel-indent panel-indent--gutter panel-border-wide reg-online--pay-fee">
     <div class="grid-layout">

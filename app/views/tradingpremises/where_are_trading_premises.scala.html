@@ -24,7 +24,9 @@
 
         @fieldset(
             legend = "legend.address",
-            panel = false
+            legendHidden = true,
+            panel = false,
+            f = f("address-fieldset")
         ) {
             @input(field = f("addressLine1"), labelText = "lbl.address.line1")
             @input(field = f("addressLine2"), labelText = "lbl.address.line2")
@@ -37,10 +39,23 @@
             )
         }
 
-        @inlineRadioGroup(f("isResidential")) {
-            @legend("tradingpremises.yourtradingpremises.isresidential", false, false)
-            @radio(f("isResidential"), "lbl.yes", "true")
-            @radio(f("isResidential"), "lbl.no", "false")
+        @fieldset(
+            legend = "tradingpremises.yourtradingpremises.isresidential",
+            f = f("isResidential"),
+            panel = false
+        ) {
+            @radio(
+                f = f("isResidential"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("isResidential"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @date(

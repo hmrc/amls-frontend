@@ -3,6 +3,10 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
 
+@target = @{
+    s"""${f("transactions").id}"""
+}
+
 @header = {
     @errorSummary(f)
     @heading("businessactivities.keep.customer.records.title", "summary.businessactivities")
@@ -15,25 +19,65 @@
 
     @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
 
-        <div class="form-field-group">
-            @inlineRadioGroup(f("isRecorded")) {
-                @legend(legend = "businessactivities.keep.customer.records.title", jsHidden = true)
-                @radio(f("isRecorded"), labelText = "lbl.yes", value = "true", target = s"#${f("transactions").id}-fieldset")
-                @radio(f("isRecorded"), labelText = "lbl.no", value = "false")
-            }
+        @fieldset(
+            legend = "businessactivities.keep.customer.records.title",
+            legendHidden = true,
+            panel = false,
+            f = f("isRecorded")
+        ) {
+            @radio(
+                f = f("isRecorded"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s".transactions-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("isRecorded"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
 
-            @fieldset("businessactivities.keep.customer.records.line1.text", bold = true, id = s"""${f("transactions").id}-fieldset""") {
-                @radioGroup(f("transactions")) {
-                    @legend("businessactivities.do.keep.records", true, bold = true, "lbl.select.all")
-                    @checkbox(f("transactions[]"), labelText = "businessactivities.transactiontype.lbl.01", value = "01")
-                    @checkbox(f("transactions[]"), labelText = "businessactivities.transactiontype.lbl.02", value = "02")
-                    @checkbox(f("transactions[]"), labelText = "businessactivities.transactiontype.lbl.03", value = "03", target = s"#${f("name").id}-fieldset")
-                    @fieldset(legend = "businessactivities.name.software.pkg.lbl", jsHidden = true, id = s"""${f("name").id}-fieldset""") {
-                        @input(f("name"), labelText = "businessactivities.name.software.pkg.lbl")
-                    }
-                }
+        @fieldset(
+            f = f("transactions"),
+            legend = "businessactivities.do.keep.records",
+            classes = Seq("transactions-fieldset")
+        ) {
+            @checkbox(
+                f = f("transactions[]"),
+                labelText = "businessactivities.transactiontype.lbl.01",
+                value = "01"
+            )
+            @checkbox(
+                f = f("transactions[]"),
+                labelText = "businessactivities.transactiontype.lbl.02",
+                value = "02"
+            )
+            @checkbox(
+                f = f("transactions[]"),
+                labelText = "businessactivities.transactiontype.lbl.03",
+                value = "03",
+                target = s".name-fieldset"
+            )
+
+            @fieldset(
+                legend = "businessactivities.name.software.pkg.lbl",
+                legendHidden = true,
+                panel = false,
+                classes = Seq("name-fieldset"),
+                f = f("name")
+            ) {
+                @input(
+                    field = f("name"),
+                    labelText = "businessactivities.name.software.pkg.lbl"
+                )
             }
-        </div>
+        }
+
+
+
         @submit(edit)
     }
 }

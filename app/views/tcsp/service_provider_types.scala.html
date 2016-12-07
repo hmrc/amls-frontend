@@ -17,25 +17,57 @@
 
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
-            @radioGroup(f("serviceProviders")) {
+            @fieldset(
+                "tcsp.kind.of.service.provider.title",
+                f = f("serviceProviders"),
+                panel = false,
+                legendHidden = true
+            ) {
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
                 @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-fieldset")
-                @fieldset("tcsp.service.provider.lbl.05", jsHidden = true, id = s"""${f("agent").id}-fieldset""") {
-                    @inlineRadioGroup(f("onlyOffTheShelfCompsSold")) {
-                        @legend("tcsp.off-the-shelf.companies.lbl", false, bold = false)
-                        @radio(f("onlyOffTheShelfCompsSold"), "lbl.yes", "true")
-                        @radio(f("onlyOffTheShelfCompsSold"), "lbl.no", "false")
-                    }
-                    @inlineRadioGroup(f("complexCorpStructureCreation")) {
-                        @legend("tcsp.create.complex.corporate.structures.lbl", false, bold = false)
-                        @radio(f("complexCorpStructureCreation"), "lbl.yes", "true")
-                        @radio(f("complexCorpStructureCreation"), "lbl.no", "false")
-                    }
-                }
+                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-options")
             }
+
+            <div id="@{s"""${f("agent").id}-options"""}" class="panel-indent">
+                @fieldset(
+                    "tcsp.off-the-shelf.companies.lbl",
+                    f = f("onlyOffTheShelfCompsSold"),
+                    panel = false
+                ) {
+                    @radio(
+                        f = f("onlyOffTheShelfCompsSold"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("onlyOffTheShelfCompsSold"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        inline = true
+                    )
+                }
+                @fieldset(
+                    "tcsp.create.complex.corporate.structures.lbl",
+                    f = f("complexCorpStructureCreation"),
+                    panel = false
+                ) {
+                    @radio(
+                        f = f("complexCorpStructureCreation"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("complexCorpStructureCreation"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        inline = true
+                    )
+                }
+            </div>
 
         @submit(false)
     }

@@ -16,15 +16,26 @@
     @form(f, controllers.tradingpremises.routes.PremisesRegisteredController.post(index)) {
         <div class="panel-indent panel-border-wide">
             <p>@Messages("tradingpremises.have.registered.premises.text", index) </p>
-
         </div>
 
-        @inlineRadioGroup(f("registerAnotherPremises")) {
-            @legend("tradingpremises.want.to.register.another.premises")
-            @radio(f("registerAnotherPremises"), "lbl.yes", "true")
-            @radio(f("registerAnotherPremises"), "lbl.no", "false")
+        @fieldset(
+            f = f("registerAnotherPremises"),
+            legend = "tradingpremises.want.to.register.another.premises",
+            panel = false
+        ) {
+            @radio(
+                f = f("registerAnotherPremises"),
+                labelText = "lbl.yes",
+                inline = true,
+                value = "true"
+            )
+            @radio(
+                f = f("registerAnotherPremises"),
+                labelText = "lbl.no",
+                inline = true,
+                value = "false"
+            )
         }
-
         @submit()
     }
 }

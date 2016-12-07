@@ -17,8 +17,12 @@
 
     @form(f, controllers.msb.routes.ExpectedThroughputController.post(edit)) {
 
-        @radioGroup(f("throughput")) {
-            @legend("msb.throughput.heading", jsHidden = true)
+        @fieldset(
+            legend = "msb.throughput.heading",
+            f = f("throughput"),
+            legendHidden = true,
+            panel = false
+        ) {
             @radio(f("throughput"), "msb.throughput.lbl.01", "01")
             @radio(f("throughput"), "msb.throughput.lbl.02", "02")
             @radio(f("throughput"), "msb.throughput.lbl.03", "03")
@@ -26,8 +30,8 @@
             @radio(f("throughput"), "msb.throughput.lbl.05", "05")
             @radio(f("throughput"), "msb.throughput.lbl.06", "06")
             @radio(f("throughput"), "msb.throughput.lbl.07", "07")
-
         }
+
         @submit(edit)
     }
 }

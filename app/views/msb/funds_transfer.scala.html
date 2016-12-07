@@ -14,11 +14,27 @@
 ) {
 
     @form(f, controllers.msb.routes.FundsTransferController.post(edit)) {
-        @inlineRadioGroup(f("transferWithoutFormalSystems")) {
-            @legend("msb.fundstransfer.hint", jsHidden = true)
-            @radio(f("transferWithoutFormalSystems"), "lbl.yes", "true")
-            @radio(f("transferWithoutFormalSystems"), "lbl.no", "false")
+
+        @fieldset(
+            f = f("transferWithoutFormalSystems"),
+            legend = "msb.fundstransfer.hint",
+            legendHidden = true,
+            panel = false
+        ){
+            @radio(
+                f = f("transferWithoutFormalSystems"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("transferWithoutFormalSystems"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
+
         @submit()
     }
 }

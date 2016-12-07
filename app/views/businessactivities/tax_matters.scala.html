@@ -13,14 +13,29 @@
     heading = header
 ) {
 
-@form(f, controllers.businessactivities.routes.TaxMattersController.post(edit)) {
+    @form(f, controllers.businessactivities.routes.TaxMattersController.post(edit)) {
 
-    <div class="form-field-group">
-        @inlineRadioGroup(f("manageYourTaxAffairs")) {
-            @radio(f("manageYourTaxAffairs"), "lbl.yes", "true")
-            @radio(f("manageYourTaxAffairs"), "lbl.no", "false")
+        @fieldset(
+            f = f("manageYourTaxAffairs"),
+            legend = "businessactivities.tax.matters.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("manageYourTaxAffairs"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("manageYourTaxAffairs"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
+
         @submit(edit)
-    </div>
+
     }
 }

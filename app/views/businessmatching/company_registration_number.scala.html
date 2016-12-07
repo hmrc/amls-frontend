@@ -18,12 +18,11 @@
     @form(f, controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit)) {
         <div class="form-field-group">
             @input(
-            field = f("companyRegistrationNumber"),
-            labelText = "businessmatching.registrationnumber.title",
-            hintText = "businessmatching.registrationnumber.example"
+                field = f("companyRegistrationNumber"),
+                hintText = "businessmatching.registrationnumber.example",
+                bold = false
             )
         </div>
-
         @submit(edit)
     }
 }

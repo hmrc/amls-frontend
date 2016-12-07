@@ -15,13 +15,25 @@
 
     @form(f, controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
 
-        <div class="form-field-group">
-            @inlineRadioGroup(f("linkedCashPayments")) {
-                @legend("hvd.identify.linked.cash.payments.subtitle")
-                @radio(f("linkedCashPayments"), "lbl.yes", "true")
-                @radio(f("linkedCashPayments"), "lbl.no", "false")
-            }
-        </div>
+        @fieldset(
+            f = f("linkedCashPayments"),
+            legend = "hvd.identify.linked.cash.payments.subtitle",
+            panel = false
+        ) {
+            @radio(
+                f = f("linkedCashPayments"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("linkedCashPayments"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
         @submit(edit)
 
     }
