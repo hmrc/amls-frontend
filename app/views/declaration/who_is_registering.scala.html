@@ -14,11 +14,20 @@
     heading = header
 ) {
     @form(f, controllers.declaration.routes.WhoIsRegisteringController.post()) {
-        <p class="panel-indent panel-border-wide panel-indent--gutter">
-            @Messages("declaration.who.is.registering.text")
-        </p>
-        @radioGroup(f("person")) {
-            @legend("", jsHidden = false)
+
+        @panel(
+            wide = true,
+            jsHidden = false
+        ) {
+            <p>@Messages("declaration.who.is.registering.text")</p>
+        }
+
+        @fieldset(
+            f = f("person"),
+            legend = "declaration.who.is.registering.title",
+            legendHidden = true,
+            panel = false
+        ) {
             @model.map { people =>
                 @people.personName.map { obj =>
                     @radio(f("person"), obj.firstName+" "+obj.lastName, obj.firstName+obj.lastName)

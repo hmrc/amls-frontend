@@ -16,13 +16,16 @@
 
     @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit)) {
 
-      @radioGroup(f("msbServices")) {
-          @legend("lbl.select.all")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
-          @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
-      }
+        @fieldset(
+            f = f("msbServices"),
+            legend = "lbl.select.all",
+            panel = false
+        ) {
+            @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
+            @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
+            @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
+            @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
+        }
 
       @submit(edit)
 

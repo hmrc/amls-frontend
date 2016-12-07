@@ -961,61 +961,76 @@ fieldset.panel-indent legend {
 }
 
 /* Temp override */
-
 .details__inner li {
-  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.details__inner .panel-indent,
+.details__inner li:last-of-type {
+  margin-bottom: 0;
 }
 
 /* -- notifications -- */
 table.notifications thead th {
-    background-color: #005ea5;
-    color: #ffffff;
+  background-color: #005ea5;
+  color: #fff;
 }
 
-
 .unread td {
-  background-color: #F8F8F8;
-  font-weight: 700; }
+  background-color: #f8f8f8;
+  font-weight: 700;
+}
 
 .message-unread {
-  width: 5%; }
+  width: 5%;
+}
 
-.message-type {
-  width: 20%; }
-
+.message-type,
 .message-date {
-  width: 20%; }
+  width: 20%;
+}
 
 .circle {
-  display: none; }
+  display: none;
+}
 
 .unread .circle {
-  width: 12px;
-  height: 12px;
+  background: #00823b;
   border-radius: 50%;
-  font-size: 12px;
-  background: #00823B;
   display: block;
-  margin-left: 10px; }
+  font-size: 12px;
+  height: 12px;
+  margin-left: 10px;
+  width: 12px;
+}
 
 .column-full {
-  padding: 0 15px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  padding: 0 15px;
+}
 
 @media (min-width: 641px) {
   .column-full {
     float: left;
-    width: 100%; } }
+    width: 100%;
+  }
+}
 
 .messaging {
-  padding: 10px;
-  padding-left: 20px;
-  background-color: #005EA5;
+  background-color: #005ea5;
   margin: 0;
-  text-align: left; }
-  .messaging .icon {
-    float: left; }
-  .messaging a:link, .messaging a:visited {
-    color: #fff; }
+  padding-left: 20px;
+  padding: 10px;
+  text-align: left;
+}
+
+.messaging .icon {
+  float: left;
+}
+
+.messaging a:link,
+.messaging a:visited {
+  color: #fff;
+}

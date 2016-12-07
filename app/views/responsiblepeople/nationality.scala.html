@@ -17,15 +17,43 @@
 )  {
 
     @form(f, controllers.responsiblepeople.routes.NationalityController.post(index, edit)) {
-          @radioGroup(f("nationality")) {
-                @radio(f("nationality"), "responsiblepeople.nationality.selection.british", "01")
-                @radio(f("nationality"), "responsiblepeople.nationality.selection.irish", "02")
-                @radio(f("nationality"), "responsiblepeople.nationality.selection.other", "03", target = s"#$target")
-                @fieldset("responsiblepeople.nationality.selection.other.name", jsHidden = true, id = target) {
-                    @country(f("otherCountry"), labelText = "responsiblepeople.nationality.selection.other.name")
-                }
 
-          }
+        @fieldset(
+            f = f("nationality"),
+            legend = "responsiblepeople.nationality.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("nationality"),
+                labelText = "responsiblepeople.nationality.selection.british",
+                value = "01"
+            )
+            @radio(
+                f = f("nationality"),
+                labelText = "responsiblepeople.nationality.selection.irish",
+                value = "02"
+            )
+            @radio(
+                f = f("nationality"),
+                labelText = "responsiblepeople.nationality.selection.other",
+                value = "03",
+                target = s"#$target"
+            )
+        }
+
+        @fieldset(
+            f = f(s"$target"),
+            legend = "responsiblepeople.nationality.selection.other.name",
+            legendHidden = true,
+            jsHidden = true,
+            id = target
+        ) {
+            @country(
+                field = f("otherCountry"),
+                labelText = "responsiblepeople.nationality.selection.other.name"
+            )
+        }
 
         @submit(edit)
     }

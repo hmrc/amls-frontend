@@ -16,74 +16,121 @@
 
     @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index,edit)) {
 
-        @inlineRadioGroup(f("isUK")) {
-            @legend("responsiblepeople.wherepersonlives.need.to.know")
-            @radio(f("isUK"), "responsiblepeople.wherepersonlives.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "responsiblepeople.wherepersonlives.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
-        }
-
+        <p class="form-hint">@Messages("responsiblepeople.wherepersonlives.need.to.know")</p>
         @fieldset(
+            f = f("isUK"),
             legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
-            panel = false,
-            id = s"""${f("postCode").id}-fieldset"""
+            panel=false
         ) {
-            @fieldset(
-                legend = "responsiblepeople.wherepersonlives.address",
-                jsHidden = false,
-                panel = false,
-                id = s"""${f("address").id}-fieldset"""
-            ) {
-                @input(f("addressLine1"), labelText = "lbl.address.line1")
-                @input(f("addressLine2"), labelText = "lbl.address.line2")
-                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
-                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
-                @input(
-                    field = f("postCode"),
-                    labelText = "responsiblepeople.wherepersonlives.postcode",
-                    classes = Seq("postCode")
-                )
-            }
+            @radio(
+                f = f("isUK"),
+                labelText = "responsiblepeople.wherepersonlives.ukAddress",
+                value = "true",
+                target = ".ukAddress-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "responsiblepeople.wherepersonlives.nonUkAddress",
+                value = "false",
+                target = ".nonUkAddress-fieldset",
+                inline = true
+            )
         }
 
         @fieldset(
-            legend = "responsiblepeople.wherepersonlives.is.uk",
-            jsHidden = true,
+            legend = "responsiblepeople.wherepersonlives.title",
+            legendHidden = true,
             panel = false,
-            id = s"""${f("country").id}-fieldset"""
+            classes = Seq("ukAddress-fieldset"),
+            f = f("ukAddress-fieldset")
         ) {
-            @fieldset(
-                legend = "responsiblepeople.wherepersonlives.address",
-                jsHidden = false,
-                panel = false,
-                id = s"""${f("address-overseas").id}-fieldset"""
-            ) {
-                @input(f("addressLineNonUK1"), labelText = "lbl.address.line1")
-                @input(f("addressLineNonUK2"), labelText = "lbl.address.line2")
-                @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", requiredField = false)
-                @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", requiredField = false)
-                @country(
-                    field = f("country"),
-                    labelText = "responsiblepeople.wherepersonlives.country"
-                )
-            }
+            @input(
+                field = f("addressLine1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLine2"),
+                labelText = "lbl.address.line2"
+            )
+            @input(
+                field = f("addressLine3"),
+                labelText = "lbl.address.line3",
+                requiredField = false
+            )
+            @input(
+                field = f("addressLine4"),
+                labelText = "lbl.address.line4",
+                requiredField = false
+            )
+            @input(
+                field = f("postCode"),
+                labelText = "responsiblepeople.wherepersonlives.postcode",
+                classes = Seq("postcode")
+            )
         }
 
         @fieldset(
+            legend = "responsiblepeople.wherepersonlives.title",
+            legendHidden = true,
+            panel = false,
+            classes = Seq("nonUkAddress-fieldset"),
+            f = f("nonUkAddress-fieldset")
+        ) {
+            @input(
+                field = f("addressLineNonUK1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLineNonUK2"),
+                labelText = "lbl.address.line2"
+            )
+            @input(
+                field = f("addressLineNonUK3"),
+                labelText = "lbl.address.line3",
+                requiredField = false
+            )
+            @input(
+                field = f("addressLineNonUK4"),
+                labelText = "lbl.address.line4",
+                requiredField = false
+            )
+            @country(
+                field = f("country"),
+                labelText = "responsiblepeople.wherepersonlives.country"
+            )
+        }
+
+        @fieldset(
+            f = f("timeAtAddress"),
             legend = "responsiblepeople.wherepersonlives.address_history",
             jsHidden = false,
             panel = false,
             id = s"""${f("address-history").id}-fieldset"""
         ) {
-            @radioGroup(f("timeAtAddress")) {
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.5_months_history", "01")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.11_months_history", "02")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.3_years_history", "03")
-                @radio(f("timeAtAddress"), "responsiblepeople.wherepersonlives.more_years_history", "04")
-            }
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.wherepersonlives.5_months_history",
+                value = "01"
+            )
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.wherepersonlives.11_months_history",
+                value = "02"
+            )
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.wherepersonlives.3_years_history",
+                value = "03"
+            )
+            @radio(
+                f = f("timeAtAddress"),
+                labelText = "responsiblepeople.wherepersonlives.more_years_history",
+                value = "04"
+            )
         }
 
         @submit(edit, Some("button.saveandcontinue"))
     }
-
 }
+

@@ -6,7 +6,7 @@
 @(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_])
 
 @main2(
-    title = Messages("progress.title") + " - " + Messages("title.yapp")
+title = Messages("progress.title") + " - " + Messages("title.yapp")
 ) {
 
     @* Heading *@
@@ -26,7 +26,7 @@
         @* Main section *@
         <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
             @sections.map { case Section(name, status, _, call) =>
-                @section(name, status, call)
+            @section(name, status, call)
             }
         </ul>
 
@@ -34,12 +34,8 @@
         <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
             <div class="application-submit">
                 <form method="get" action="@controllers.declaration.routes.WhoIsRegisteringController.get.url">
-                    @fieldset(
-                        legend = "progress.submit",
-                        jsHidden = false,
-                        panel = false,
-                        bold = true
-                    ) {
+                    <fieldset class="form-field-group">
+                        @include.forms2.legend("progress.submit", false, true, "", false)
                         <p>
                             @if(declarationAvailable) {
                                 @Messages("progress.declarationavailable")
@@ -47,8 +43,10 @@
                                 @Messages("progress.declarationunavailable")
                             }
                         </p>
-                        <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>@Messages("progress.submit")</button>
-                    }
+                        <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
+                            @Messages("progress.submit")
+                        </button>
+                    </fieldset>
                 </form>
             </div>
         </div>

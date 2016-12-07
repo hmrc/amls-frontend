@@ -19,13 +19,23 @@ s"""${f("franchiseName").id}-fieldset"""
 
     @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
 
-        <div class="form-field-group">
-            @input(field = f("employeeCount"), labelText= "businessactivities.employees.line1.text")
-        </div>
-
-        <div class="form-field-group">
-            @input(field = f("employeeCountAMLSSupervision"), labelText= "businessactivities.employees.line2.text")
-        </div>
+        @fieldset(
+            f = f("employees"),
+            legend = "businessactivities.employees.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @input(
+                field = f("employeeCount"),
+                labelText = "businessactivities.employees.line1.text",
+                bold = false
+            )
+            @input(
+                field = f("employeeCountAMLSSupervision"),
+                labelText = "businessactivities.employees.line2.text",
+                bold = false
+            )
+        }
 
         @submit(edit)
 
