@@ -1,6 +1,7 @@
 package models.tradingpremises
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.libs.json.{Format, JsArray, Json, Writes}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
