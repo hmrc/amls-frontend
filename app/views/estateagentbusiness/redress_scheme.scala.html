@@ -22,7 +22,8 @@
         @fieldset(
             f = f("isRedress"),
             legend = "estateagentbusiness.registered.redress.title",
-            panel = false
+            panel = false,
+            legendHidden = true
         ){
             @radio(
                 f = f("isRedress"),
@@ -72,7 +73,8 @@
             legend = "estateagentbusiness.redress.lbl.04",
             legendHidden = true,
             classes = Seq("other-fieldset"),
-            f = f("other-fieldset")
+            f = f("other-fieldset"),
+            panel = false
         ) {
             @input(
                 field = f("other"),

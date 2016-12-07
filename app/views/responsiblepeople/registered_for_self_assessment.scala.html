@@ -20,8 +20,9 @@ s"""${f("utrNumber").id}-fieldset"""
     @form(f, controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.post(index, edit)) {
         @fieldset(
             f = f("saRegistered"),
-            legend = "responsiblepeople.registeredforselfassessment.heading",
-            panel=false
+            legend = "responsiblepeople.registeredforselfassessment.title",
+            panel=false,
+            legendHidden = true
         ) {
             @radio(
                 f = f("saRegistered"),
@@ -40,7 +41,7 @@ s"""${f("utrNumber").id}-fieldset"""
 
         @fieldset(
             legend = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
-            jsHidden = true,
+            legendHidden = true,
             classes = Seq("saRegistered-fieldset"),
             f = f("utrNumber-fieldset")
         ) {
