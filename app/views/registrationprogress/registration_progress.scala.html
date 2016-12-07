@@ -38,9 +38,9 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
                         @include.forms2.legend("progress.submit", false, true, "", false)
                         <p>
                             @if(declarationAvailable) {
-                            @Messages("progress.declarationavailable")
+                                @Messages("progress.declarationavailable")
                             } else {
-                            @Messages("progress.declarationunavailable")
+                                @Messages("progress.declarationunavailable")
                             }
                         </p>
                         <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
