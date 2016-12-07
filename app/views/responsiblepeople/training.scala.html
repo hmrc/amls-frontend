@@ -19,25 +19,42 @@
 ) {
 
     @form(f, controllers.responsiblepeople.routes.TrainingController.post(index, edit)) {
+
         @fieldset(
-            classes = Seq("visuallyhidden-legend"),
+            f = f("training"),
             legend = "responsiblepeople.training.title",
+            legendHidden = true,
             hint = "responsiblepeople.training.hinttext",
-            jsHidden = false,
             panel = false
         ) {
-            @inlineRadioGroup(f("training")) {
-                @radio(f("training"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("training"), "lbl.no", "false")
-                @fieldset(
-                    legend = "responsiblepeople.training.information",
-                    jsHidden = false,
-                    id = target
-                ) {
-                    @textarea(f("information"), bold = false)
-                }
-            }
+            @radio(
+                f = f("training"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true,
+                target = s"#$target"
+            )
+            @radio(
+                f = f("training"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
-    @submit(edit)
-  }
+
+        @fieldset(
+            f = f(s"$target"),
+            legend = "responsiblepeople.training.information",
+            jsHidden = false
+        ) {
+            @textarea(
+                field = f("information"),
+                bold = false
+            )
+        }
+
+        @submit(edit)
+
+    }
+
 }

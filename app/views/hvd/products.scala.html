@@ -34,8 +34,10 @@
 
             @fieldset(
                 legend = "lbl.give.details",
+                legendHidden = true,
                 jsHidden = true,
-                classes = Seq("otherDetails-fieldset")
+                classes = Seq("otherDetails-fieldset"),
+                f = f("otherDetails-fieldset")
             ) {
                 @input(
                     field = f("otherDetails"),

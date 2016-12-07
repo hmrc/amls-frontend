@@ -14,13 +14,36 @@
 ) {
 
     @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
-        @radioGroup(f("services")) {
-            @legend("lbl.select.all")
-            @checkbox(f("services[]"), "asp.service.lbl.01", "01")
-            @checkbox(f("services[]"), "asp.service.lbl.02", "02")
-            @checkbox(f("services[]"), "asp.service.lbl.03", "03")
-            @checkbox(f("services[]"), "asp.service.lbl.04", "04")
-            @checkbox(f("services[]"), "asp.service.lbl.05", "05")
+        @fieldset(
+            f = f("services"),
+            legend = "lbl.select.all",
+            panel = false
+        ) {
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.01",
+                value = "01"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.02",
+                value = "02"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.03",
+                value = "03"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.04",
+                value = "04"
+            )
+            @checkbox(
+                f = f("services[]"),
+                labelText = "asp.service.lbl.05",
+                value = "05"
+            )
         }
         @submit(edit)
     }

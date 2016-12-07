@@ -42,7 +42,7 @@
         @fieldset(
             legend = "responsiblepeople.personName.isknownbyothernames",
             jsHidden = true,
-            id = "previous-fieldset",
+            f = f("previous-fieldset"),
             legendHidden = true,
             classes = Seq("previous-fieldset")
         ) {
@@ -68,7 +68,8 @@
             legend = "responsiblepeople.personName.hasOtherNames",
             jsHidden = true,
             legendHidden = true,
-            classes = Seq("otherNames-fieldset")
+            classes = Seq("otherNames-fieldset"),
+            f = f("otherNames-fieldset")
         ) {
             @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
         }

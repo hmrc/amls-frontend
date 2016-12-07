@@ -14,6 +14,7 @@
 ) {
 
     @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
+
         <div class="panel-indent panel-indent--gutter panel-border-wide">
             @if(index <= 1){
                 <p>@Messages("responsiblepeople.have.registered.person.text", index) </p>
@@ -22,10 +23,23 @@
             }
         </div>
 
-        @inlineRadioGroup(f("registerAnotherPerson")) {
-            @legend("responsiblepeople.want.to.register.another.person")
-            @radio(f("registerAnotherPerson"), "lbl.yes", "true")
-            @radio(f("registerAnotherPerson"), "lbl.no", "false")
+        @fieldset(
+            f = f("registerAnotherPerson"),
+            legend = "responsiblepeople.want.to.register.another.person",
+            panel = false
+        ) {
+            @radio(
+                f = f("registerAnotherPerson"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true
+            )
+            @radio(
+                f = f("registerAnotherPerson"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
         }
 
         @submit()

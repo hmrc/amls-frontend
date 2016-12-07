@@ -18,27 +18,22 @@
         @fieldset(
             f = f("exciseGoods"),
             legend = "hvd.excise.goods.title",
+            legendHidden = true,
             panel = false
         ) {
             @radio(
                 f = f("exciseGoods"),
                 labelText = "lbl.yes",
-                value = "true"
+                value = "true",
+                inline = true
             )
             @radio(
                 f = f("exciseGoods"),
                 labelText = "lbl.no",
-                value = "false"
+                value = "false",
+                inline = true
             )
         }
-
-        <div class="form-field-group">
-            @inlineRadioGroup(f("exciseGoods")) {
-                @legend("hvd.excise.goods.title", jsHidden = true)
-                @radio(f("exciseGoods"), "lbl.yes", "true")
-                @radio(f("exciseGoods"), "lbl.no", "false")
-            }
-        </div>
 
         @submit(edit)
 

@@ -1,0 +1,8 @@
+@(
+    notice: String = ""
+)(implicit lang: Lang)
+
+<div class="notice">
+    <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
+    <strong class="bold-small">@Messages(notice)</strong>
+</div>

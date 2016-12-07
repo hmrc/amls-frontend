@@ -19,7 +19,8 @@
     @form(f, controllers.tcsp.routes.ProvidedServicesController.post(edit)) {
 
         @fieldset(
-            "tcsp.provided_services.title",
+            legend = "tcsp.provided_services.title",
+            legendHidden = true,
             f = f("services"),
             panel = false
         ) {

@@ -17,6 +17,7 @@
 
         @fieldset(
             legend = "supervision.memberofprofessionalbody.title",
+            legendHidden = true,
             f = f("isAMember"),
             panel = false
         ) {
@@ -24,7 +25,7 @@
                 f = f("isAMember"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s"#${f("businessType").id}-options",
+                target = s".businessType-fieldset",
                 inline = true
             )
             @radio(
@@ -35,36 +36,42 @@
             )
         }
 
-        <div id="@{s"""${f("businessType").id}-options"""}">
-
-            @fieldset(
-                legend = "lbl.select.all",
-                f = f("businessType")
-            ) {
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.04", "04")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.05", "05")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.06", "06")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.07", "07")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.08", "08")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.09", "09")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.10", "10")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.11", "11")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#${f("specifyOtherBusiness").id}-fieldset")
-            }
-        </div>
 
         @fieldset(
-            legend = "lbl.pleasespecify",
-            legendHidden = true,
-            f = f(s"""${f("specifyOtherBusiness").id}-fieldset""")
+            legend = "lbl.select.all",
+            f = f("businessType"),
+            classes = Seq("businessType-fieldset")
         ) {
-            @input(f("specifyOtherBusiness"), "lbl.pleasespecify", bold = false)
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.04", "04")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.05", "05")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.06", "06")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.07", "07")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.08", "08")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.09", "09")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.10", "10")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.11", "11")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s".specifyOtherBusiness-fieldset")
+
+            @fieldset(
+                legend = "lbl.pleasespecify",
+                legendHidden = true,
+                classes = Seq("specifyOtherBusiness-fieldset"),
+                f = f("specifyOtherBusiness-fieldset")
+            ) {
+                @input(
+                    field = f("specifyOtherBusiness"),
+                    labelText = "lbl.pleasespecify"
+                )
+            }
         }
+
+
+
 
         @submit(edit)
     }
