@@ -455,6 +455,10 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Success("AB123456B"))
     }
 
+    "successfully validate disregarding case" in {
+      ninoType.validate("ab123456c") mustBe Success("ab123456c")
+    }
+
     "fail to validate an empty string" in {
 
       ninoType.validate("") must
