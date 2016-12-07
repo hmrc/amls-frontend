@@ -22,7 +22,8 @@
         @fieldset(
             legend = "businessactivities.keep.customer.records.title",
             legendHidden = true,
-            panel = false
+            panel = false,
+            f = f("isRecorded")
         ) {
             @radio(
                 f = f("isRecorded"),
@@ -65,7 +66,8 @@
                 legend = "businessactivities.name.software.pkg.lbl",
                 legendHidden = true,
                 panel = false,
-                classes = Seq("name-fieldset")
+                classes = Seq("name-fieldset"),
+                f = f("name")
             ) {
                 @input(
                     field = f("name"),

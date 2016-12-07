@@ -20,6 +20,7 @@
     @form(f, controllers.aboutthebusiness.routes.ContactingYouController.post(edit)) {
 
         @fieldset(
+            f = f("contactingyou-fieldset"),
             legend = "aboutthebusiness.contactingyou.title",
             legendHidden = true,
             panel = false

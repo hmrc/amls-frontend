@@ -10,7 +10,7 @@
     data: Seq[String] = Seq.empty,
     bold: Boolean = false,
     hint: String = "",
-    f: forms.Field = forms.ValidField(PM.asPath("/default/path"), Seq("defaultVal"))
+    f: forms.Field
 )(content: Html)(implicit lang: Lang)
 
 <fieldset

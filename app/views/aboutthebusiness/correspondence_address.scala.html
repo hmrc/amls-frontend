@@ -24,7 +24,8 @@
         @fieldset(
             legend = "aboutthebusiness.correspondenceaddress.contact.info",
             legendHidden = true,
-            panel = false
+            panel = false,
+            f = f("correspondenceaddress-fieldset")
         ) {
             @input(
                 field = f("yourName"),
@@ -92,11 +93,10 @@
         }
 
         @fieldset(
-            f = f("country-fieldset"),
             legend = "aboutthebusiness.correspondenceaddress.address",
             jsHidden = false,
             panel = false,
-            id = s"""${f("country").id}-fieldset"""
+            f = f(s"""${f("country").id}-fieldset""")
         ) {
             @input(
                 field = f("addressLineNonUK1"),

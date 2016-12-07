@@ -42,7 +42,7 @@
             @fieldset(
                 legend = "bankdetails.bankaccount.accounttype.yes",
                 jsHidden = true,
-                id = target
+                f = f(target)
             ) {
                 @input(f("sortCode"), "bankdetails.bankaccount.sortcode", hintText = "bankdetails.bankaccount.sortcode.hint", bold = false)
                 @input(f("accountNumber"), "bankdetails.bankaccount.accountnumber", hintText = "bankdetails.bankaccount.accountnumber.hint", bold = false)
@@ -51,7 +51,7 @@
             @fieldset(
                 legend = "bankdetails.bankaccount.accounttype.no",
                 jsHidden = true,
-                id = target1
+                f = f(target1)
             ) {
                 @input(f("IBANNumber"), "bankdetails.bankaccount.iban", bold = false)
                 <p>or</p>

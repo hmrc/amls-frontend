@@ -41,7 +41,8 @@
 
         @fieldset(
             legend = "estateagentbusiness.which.redress.scheme.lbl",
-            classes = Seq("propertyRedress-fieldset")
+            classes = Seq("propertyRedress-fieldset"),
+            f = f("propertyRedressScheme")
         ) {
             @radio(
                 f = f("propertyRedressScheme"),
@@ -65,16 +66,17 @@
                 target = s".other-fieldset"
             )
 
-            @fieldset(
-                legend = "estateagentbusiness.redress.lbl.04",
-                jsHidden = true,
-                classes = Seq("other-fieldset")
-            ) {
-                @input(
-                    field = f("other"),
-                    labelText = "lbl.pleasespecify"
-                )
-            }
+        }
+
+        @fieldset(
+            legend = "estateagentbusiness.redress.lbl.04",
+            jsHidden = true,
+            classes = Seq("other-fieldset")
+        ) {
+            @input(
+                field = f("other"),
+                labelText = "lbl.pleasespecify"
+            )
         }
 
         @submit(edit)
