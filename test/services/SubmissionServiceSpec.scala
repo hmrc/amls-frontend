@@ -10,16 +10,13 @@ import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
-import models.status.SubmissionDecisionApproved
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationResponse, SubscriptionResponse}
-import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Logger
 import play.api.http.Status._
 import play.api.test.FakeApplication
 import play.api.test.Helpers.{OK => _, _}
@@ -435,8 +432,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getSubscription)
 
         result match {
-          case (_, _, rows) => rows foreach {
-            _.label must not equal "confirmation.responsiblepeople"
+          case (_, _, rows) => rows foreach { row =>
+            row.label must not equal "confirmation.responsiblepeople"
+            row.label must not equal "confirmation.unpaidpeople"
           }
         }
       }
@@ -462,8 +460,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getAmendment)
 
         result match {
-          case Some((_, _, rows, _)) => rows foreach {
-            _.label must not equal "confirmation.responsiblepeople"
+          case Some((_, _, rows, _)) => rows foreach { row =>
+            row.label must not equal "confirmation.responsiblepeople"
+            row.label must not equal "confirmation.unpaidpeople"
           }
         }
 
@@ -490,8 +489,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getVariation)
 
         result match {
-          case Some((_, _, rows)) => rows foreach {
-            _.label must not equal "confirmation.responsiblepeople"
+          case Some((_, _, rows)) => rows foreach { row =>
+            row.label must not equal "confirmation.responsiblepeople"
+            row.label must not equal "confirmation.unpaidpeople"
           }
         }
       }
@@ -500,7 +500,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     "notify user of subscription fees to pay in breakdown" when {
 
-      "there is a Responsible Persons fee to pay" in new Fixture {
+      "there is a Responsible People fee to pay" in new Fixture {
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -521,7 +521,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getSubscription)
 
         result match {
-          case (_, _, rows) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+          case (_, _, rows) => {
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+          }
         }
       }
 
@@ -550,7 +553,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getSubscription)
 
         result match {
-          case (_, _, rows) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+          case (_, _, rows) => {
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+          }
         }
 
       }
@@ -580,7 +586,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getSubscription)
 
         result match {
-          case (_, _, rows) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+          case (_, _, rows) => {
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+          }
         }
 
       }
@@ -614,6 +623,8 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
             breakdownRows.head.perItm mustBe Currency(rpFee)
             breakdownRows.head.total mustBe Currency(rpFee)
             breakdownRows.length mustBe 1
+
+            breakdownRows.count(row => row.label.equals("confirmation.unpaidpeople")) mustBe 0
           case _ => false
         }
       }
@@ -643,7 +654,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getAmendment)
 
         result match {
-          case Some((_, _, rows, _)) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+          case Some((_, _, rows, _)) => {
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+          }
         }
 
       }
@@ -673,7 +687,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getAmendment)
 
         result match {
-          case Some((_, _, rows, _)) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+          case Some((_, _, rows, _)) => {
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.unpaidpeople")) must be(0)
+          }
         }
 
       }
@@ -794,6 +811,8 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
             breakdownRows.head.perItm mustBe Currency(rpFee)
             breakdownRows.head.total mustBe Currency(rpFee)
             breakdownRows.length mustBe 1
+
+            breakdownRows.count(row => row.label.equals("confirmation.unpaidpeople")) mustBe 0
           case _ => false
         }
       }
@@ -828,7 +847,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         result match {
           case Some((_, _, rows)) => {
-            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
             rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
           }
         }
@@ -865,7 +884,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         result match {
           case Some((_, _, rows)) => {
-            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
             rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
           }
         }
