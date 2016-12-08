@@ -46,6 +46,12 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       override private[services] val authEnrolmentsService = mock[AuthEnrolmentsService]
     }
 
+    val rpFee: BigDecimal = 100
+    val tpFee: BigDecimal = 115
+    val tpHalfFee: BigDecimal = tpFee / 2
+    val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
+    val totalFee: BigDecimal = rpFee + tpTotalFee
+
     implicit val authContext = mock[AuthContext]
     val principle = Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
     when {
@@ -75,6 +81,21 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       totalFees = 100,
       paymentReference = Some("XA111123451111"),
       difference = Some(0)
+    )
+
+    val variationResponse = AmendVariationResponse(
+      processingDate = "",
+      etmpFormBundleNumber = "",
+      registrationFee = 100,
+      fPFee = Some(100),
+      premiseFee = 0,
+      totalFees = 100,
+      paymentReference = Some(""),
+      difference = Some(0),
+      addedResponsiblePeople = 0,
+      addedFullYearTradingPremises = 0,
+      halfYearlyTradingPremises = 0,
+      zeroRatedTradingPremises = 0
     )
 
     val safeId = "safeId"
@@ -248,7 +269,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
       } thenReturn Some(amendResponseWithRPFees)
 
-      when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
+      when {
+        cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+      } thenReturn Some(people)
 
       val result = await(TestSubmissionService.getAmendment)
 
@@ -295,27 +318,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     "retrieve data from variation submission" in new Fixture {
 
-      val variationResponse = AmendVariationResponse(
-        processingDate = "",
-        etmpFormBundleNumber = "",
-        registrationFee = 100,
-        fPFee = Some(0),
-        premiseFee = 0,
-        totalFees = 100,
-        paymentReference = Some("12345"),
-        difference = Some(0),
-        addedResponsiblePeople = 1,
-        addedFullYearTradingPremises = 1,
-        halfYearlyTradingPremises = 3,
-        zeroRatedTradingPremises = 1
-      )
-
-      val rpFee: BigDecimal = 100
-      val tpFee: BigDecimal = 115
-      val tpHalfFee: BigDecimal = tpFee / 2
-      val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
-      val totalFee: BigDecimal = rpFee + tpTotalFee
-
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
@@ -330,7 +332,13 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       when {
         cache.getEntry[AmendVariationResponse](any())(any())
-      } thenReturn Some(variationResponse)
+      } thenReturn Some(variationResponse.copy(
+        paymentReference = Some("12345"),
+        addedResponsiblePeople = 1,
+        addedFullYearTradingPremises = 1,
+        halfYearlyTradingPremises = 3,
+        zeroRatedTradingPremises = 1
+      ))
 
       val rows = Seq(
         BreakdownRow("confirmation.responsiblepeople", 1, Currency(100), Currency(rpFee))
@@ -373,7 +381,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "they have been deleted" in new Fixture {
 
         val people = Seq(
-          ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper", None, None)), hasAlreadyPassedFitAndProper = Some(true)),
+          ResponsiblePeople(Some(PersonName("Valid", None, "Person", None, None))),
           ResponsiblePeople(Some(PersonName("Deleted", None, "Person", None, None)), status = Some(StatusConstants.Deleted))
         )
 
@@ -401,7 +409,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       }
 
-      "there is no fee returned in a subscription response and business type is not msb or tcsp" in new Fixture {
+      "there is no fee returned in a subscription response because business type is not msb or tcsp" in new Fixture {
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -428,7 +436,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         }
       }
 
-      "there is no fee returned in a amendment response and business type is not msb or tcsp" in new Fixture {
+      "there is no fee returned in a amendment response because business type is not msb or tcsp" in new Fixture {
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -456,7 +464,38 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       }
 
-      "there is no fee returned in a variation response and business type is not msb or tcsp" in new Fixture {
+      "there is no fee returned in a variation response because business type is not msb or tcsp" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+        } thenReturn Some(variationResponse.copy(fPFee = None))
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        val result = await(TestSubmissionService.getVariation)
+
+        result match {
+          case Some((_, _, rows)) => rows foreach {
+            _.label must not equal "confirmation.responsiblepeople"
+          }
+        }
+      }
+
+    }
+
+    "notify user of subscription fees to pay in breakdown" when {
+
+      "there is a Responsible Persons fee to pay" in new Fixture {
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -483,168 +522,8 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         }
       }
 
-    }
-
-    "notify user of variation fees to pay" when {
-
-      val rpFee: BigDecimal = 100
-      val tpFee: BigDecimal = 115
-      val tpHalfFee: BigDecimal = tpFee / 2
-      val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
-      val totalFee: BigDecimal = rpFee + tpTotalFee
-
-      val testVariationResponse = AmendVariationResponse(
-        processingDate = "",
-        etmpFormBundleNumber = "",
-        registrationFee = 100,
-        fPFee = Some(100),
-        premiseFee = 0,
-        totalFees = 100,
-        paymentReference = Some(""),
-        difference = Some(0),
-        addedResponsiblePeople = 0,
-        addedFullYearTradingPremises = 0,
-        halfYearlyTradingPremises = 0,
-        zeroRatedTradingPremises = 0
-      )
-
-      "a Trading Premises has been added with a full year fee" in new Fixture {
-
-        val variationResponse = testVariationResponse.copy(
-          addedFullYearTradingPremises = 1
-        )
-
-        when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        } thenReturn Future.successful(Some("12345"))
-
-        when {
-          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
-
-        when {
-          cache.getEntry[AmendVariationResponse](any())(any())
-        } thenReturn Some(variationResponse)
-
-        whenReady(TestSubmissionService.getVariation) {
-          case Some((_, _, breakdownRows)) =>
-            breakdownRows.head.label mustBe "confirmation.tradingpremises"
-            breakdownRows.head.quantity mustBe 1
-            breakdownRows.head.perItm mustBe Currency(tpFee)
-            breakdownRows.head.total mustBe Currency(tpFee)
-            breakdownRows.length mustBe 1
-          case _ => false
-        }
-      }
-
-      "a Trading Premises has been added with a half year fee" in new Fixture {
-        val variationResponse = testVariationResponse.copy(
-          halfYearlyTradingPremises = 1
-        )
-
-        when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        } thenReturn Future.successful(Some("12345"))
-
-        when {
-          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
-
-        when {
-          cache.getEntry[AmendVariationResponse](any())(any())
-        } thenReturn Some(variationResponse)
-
-        whenReady(TestSubmissionService.getVariation) {
-          case Some((_, _, breakdownRows)) =>
-            breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
-            breakdownRows.head.quantity mustBe 1
-            breakdownRows.head.perItm mustBe Currency(tpHalfFee)
-            breakdownRows.head.total mustBe Currency(tpHalfFee)
-            breakdownRows.length mustBe 1
-          case _ => false
-        }
-      }
-
-      "a Trading Premises has been added with a zero fee" in new Fixture {
-        val variationResponse = testVariationResponse.copy(
-          zeroRatedTradingPremises = 1
-        )
-
-        when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        } thenReturn Future.successful(Some("12345"))
-
-        when {
-          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
-
-        when {
-          cache.getEntry[AmendVariationResponse](any())(any())
-        } thenReturn Some(variationResponse)
-
-        whenReady(TestSubmissionService.getVariation) {
-          case Some((_, _, breakdownRows)) =>
-            breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
-            breakdownRows.head.quantity mustBe 1
-            breakdownRows.head.perItm mustBe Currency(0)
-            breakdownRows.head.total mustBe Currency(0)
-            breakdownRows.length mustBe 1
-          case _ => false
-        }
-      }
-
-      "there is a Responsible Persons fee to pay" in new Fixture {
-
-        val variationResponse = testVariationResponse.copy(
-          addedResponsiblePeople = 1
-        )
-
-        when {
-          TestSubmissionService.cacheConnector.fetchAll(any(), any())
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        } thenReturn Future.successful(Some("12345"))
-
-        when {
-          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
-
-        when {
-          cache.getEntry[AmendVariationResponse](any())(any())
-        } thenReturn Some(variationResponse)
-
-        whenReady(TestSubmissionService.getVariation) {
-          case Some((_, _, breakdownRows)) =>
-            breakdownRows.head.label mustBe "confirmation.responsiblepeople"
-            breakdownRows.head.quantity mustBe 1
-            breakdownRows.head.perItm mustBe Currency(rpFee)
-            breakdownRows.head.total mustBe Currency(rpFee)
-            breakdownRows.length mustBe 1
-          case _ => false
-        }
-      }
-
       "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from a subscription" in new Fixture {
 
-        val variationResponse = testVariationResponse.copy(
-          addedResponsiblePeopleFitAndProper = 1,
-          fPFee = None
-        )
-
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
         } thenReturn Future.successful(Some(cache))
@@ -659,7 +538,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           cache.getEntry[AmendVariationResponse](any())(any())
-        } thenReturn Some(variationResponse)
+        } thenReturn Some(variationResponse.copy(addedResponsiblePeopleFitAndProper = 1, fPFee = None))
 
         whenReady(TestSubmissionService.getVariation) {
           case Some((_, _, breakdownRows)) =>
@@ -677,18 +556,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         }
       }
 
-      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an amendment" in new Fixture {}
+    }
 
-      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {}
+    "notify user of amendment fees to pay in breakdown" when {
 
-      "each of the categorised fees are in the response" in new Fixture {
-        val variationResponse = testVariationResponse.copy(
-          addedResponsiblePeople = 1,
-          addedResponsiblePeopleFitAndProper = 1,
-          addedFullYearTradingPremises = 1,
-          halfYearlyTradingPremises = 1,
-          zeroRatedTradingPremises = 1
-        )
+      "there is a Responsible Persons fee to pay" in new Fixture {
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -704,7 +576,166 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           cache.getEntry[AmendVariationResponse](any())(any())
-        } thenReturn Some(variationResponse)
+        } thenReturn Some(variationResponse.copy(addedResponsiblePeople = 1))
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_, _, breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.responsiblepeople"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(rpFee)
+            breakdownRows.head.total mustBe Currency(rpFee)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+
+      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an amendment" in new Fixture {}
+
+    }
+
+    "notify user of variation fees to pay" when {
+
+      "a Trading Premises has been added with a full year fee" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse.copy(addedFullYearTradingPremises = 1))
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_, _, breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.tradingpremises"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(tpFee)
+            breakdownRows.head.total mustBe Currency(tpFee)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+
+      "a Trading Premises has been added with a half year fee" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse.copy(halfYearlyTradingPremises = 1))
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_, _, breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(tpHalfFee)
+            breakdownRows.head.total mustBe Currency(tpHalfFee)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+
+      "a Trading Premises has been added with a zero fee" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse.copy(zeroRatedTradingPremises = 1))
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_, _, breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(0)
+            breakdownRows.head.total mustBe Currency(0)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+
+      "there is a Responsible Persons fee to pay" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse.copy(addedResponsiblePeople = 1))
+
+        whenReady(TestSubmissionService.getVariation) {
+          case Some((_, _, breakdownRows)) =>
+            breakdownRows.head.label mustBe "confirmation.responsiblepeople"
+            breakdownRows.head.quantity mustBe 1
+            breakdownRows.head.perItm mustBe Currency(rpFee)
+            breakdownRows.head.total mustBe Currency(rpFee)
+            breakdownRows.length mustBe 1
+          case _ => false
+        }
+      }
+
+      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {}
+
+      "each of the categorised fees are in the response" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        } thenReturn Future.successful(Some("12345"))
+
+        when {
+          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
+        } thenReturn Future.successful(CacheMap("", Map.empty))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse.copy(
+          addedResponsiblePeople = 1,
+          addedResponsiblePeopleFitAndProper = 1,
+          addedFullYearTradingPremises = 1,
+          halfYearlyTradingPremises = 1,
+          zeroRatedTradingPremises = 1
+        ))
 
         whenReady(TestSubmissionService.getVariation) {
           case Some((_, _, breakdownRows)) =>

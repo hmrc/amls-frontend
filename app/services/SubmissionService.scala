@@ -292,9 +292,8 @@ trait SubmissionService extends DataCacheService {
    premises: Seq[TradingPremises],
    people: Seq[ResponsiblePeople],
    subQuantity: Int): Seq[BreakdownRow] = {
-    Seq(
-      BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-    ) ++ responsiblePeopleRows(people, submission) ++
+    Seq(BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)) ++
+      responsiblePeopleRows(people, submission) ++
       Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, submission.premiseFee))
   }
 
