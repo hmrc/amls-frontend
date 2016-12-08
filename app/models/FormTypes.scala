@@ -2,10 +2,9 @@ package models
 
 import org.joda.time.LocalDate
 import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.libs.json.Reads
 import utils.DateHelper.localDateOrdering
+
 import scala.util.matching.Regex
 
 object FormTypes {
@@ -70,6 +69,10 @@ object FormTypes {
 
   val notEmptyStrip = Rule.zero[String] fmap {
     _.trim
+  }
+
+  val transformUppercase = Rule.zero[String] fmap {
+    _.toUpperCase
   }
 
   implicit class RegexHelpers(regex: Regex) {
@@ -211,7 +214,6 @@ object FormTypes {
 
   private val ninoRequired = required("error.required.nino")
   private val ninoPattern = regexWithMsg(ninoRegex, "error.invalid.nino")
-  private val insensitiveNinoPattern = regexWithMsg(ninoRegex.insensitive, "error.invalid.nino")
 
   private val passportRequired = required("error.required.uk.passport")
   private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
@@ -219,7 +221,7 @@ object FormTypes {
   private val nonUKPassportRequired = required("error.required.non.uk.passport")
   private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
 
-  val ninoType = ninoRequired compose insensitiveNinoPattern
+  val ninoType = transformUppercase compose ninoRequired compose ninoPattern
   val ukPassportType = passportRequired compose passportPattern
   val noUKPassportType = nonUKPassportRequired compose nonUkPassportLength
 }

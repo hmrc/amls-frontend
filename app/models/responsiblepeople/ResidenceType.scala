@@ -23,7 +23,7 @@ object ResidenceType {
     import play.api.data.mapping.forms.Rules._
     (__ \ "isUKResidence").read[Boolean].withMessage("error.required.rp.is.uk.resident") flatMap {
       case true =>
-        (__ \ "nino").read(ninoType).fmap(nino => UKResidence.apply(nino.toUpperCase))
+        (__ \ "nino").read(ninoType).fmap(UKResidence.apply)
       case false =>
         (
           (__ \ "dateOfBirth").read(localDateRule) and
