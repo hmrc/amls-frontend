@@ -2,10 +2,11 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.Country
-import models.responsiblepeople.{UKPassport, NonUKResidence, PersonResidenceType, ResponsiblePeople}
+import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.mockito.ArgumentCaptor
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
@@ -164,6 +165,42 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
       val result = controller.post(1, false)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.NationalityController.get(1).url))
+    }
+
+    "submit with valid UK data, transforming the NINO to uppercase" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUKResidence" -> "true",
+        "nino" -> "aa346464b",
+        "countryOfBirth" -> "GB",
+        "nationality" -> "GB"
+      )
+
+      val responsiblePeople = ResponsiblePeople()
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(1, edit = false)(newRequest)
+      status(result) must be(SEE_OTHER)
+
+      val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePeople]])
+      verify(controller.dataCacheConnector).save(any(), captor.capture())(any(), any(), any())
+
+      captor.getValue must have size 1
+
+      (for {
+        person <- captor.getValue.headOption
+        residence <- person.personResidenceType
+        nino <- residence.isUKResidence match {
+          case UKResidence(n) => Some(n)
+          case _ => None
+        }
+      } yield nino) map { _ mustBe "AA346464B" }
+
     }
 
     "throw error message when data is not valid" in new Fixture {

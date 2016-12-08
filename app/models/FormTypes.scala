@@ -72,6 +72,10 @@ object FormTypes {
     _.trim
   }
 
+  implicit class RegexHelpers(regex: Regex) {
+    def insensitive = s"(?i)${regex.pattern}".r
+  }
+
   /** Name Rules **/
 
   private val firstNameRequired = required("error.required.firstname")
@@ -207,6 +211,7 @@ object FormTypes {
 
   private val ninoRequired = required("error.required.nino")
   private val ninoPattern = regexWithMsg(ninoRegex, "error.invalid.nino")
+  private val insensitiveNinoPattern = regexWithMsg(ninoRegex.insensitive, "error.invalid.nino")
 
   private val passportRequired = required("error.required.uk.passport")
   private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
@@ -214,7 +219,7 @@ object FormTypes {
   private val nonUKPassportRequired = required("error.required.non.uk.passport")
   private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
 
-  val ninoType = ninoRequired compose ninoPattern
+  val ninoType = ninoRequired compose insensitiveNinoPattern
   val ukPassportType = passportRequired compose passportPattern
   val noUKPassportType = nonUKPassportRequired compose nonUkPassportLength
 }
