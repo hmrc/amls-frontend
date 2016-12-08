@@ -70,7 +70,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fPFee = Some(0),
+      fPFee = None,
       premiseFee = 0,
       totalFees = 100,
       paymentReference = Some("XA111123451111"),
@@ -117,7 +117,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
   "SubmissionService" must {
 
-    "successfully subscribe and enrol" in new Fixture {
+    "subscribe and enrol" in new Fixture {
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -141,7 +141,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
     }
 
-    "successfully submit amendment" in new Fixture {
+    "submit amendment" in new Fixture {
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -166,7 +166,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
     }
 
-    "successfully submit variation" in new Fixture {
+    "submit variation" in new Fixture {
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -191,7 +191,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
     }
 
-    "successfully submit amendment returning submission data" in new Fixture {
+    "submit amendment returning submission data" in new Fixture {
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -216,48 +216,15 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       val rows = Seq(
         BreakdownRow("confirmation.submission", 1, 100, 100)
       ) ++ Seq(
-        BreakdownRow("confirmation.responsiblepeople", 1, 100, 0)
-      ) ++ Seq(
         BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
       )
 
       val response = Some(Some("XA111123451111"), Currency.fromBD(100), rows, Some(Currency.fromBD(0)))
 
-      whenReady(TestSubmissionService.
-        getAmendment) {
+      whenReady(TestSubmissionService.getAmendment) {
         result =>
           result must equal(response)
       }
-    }
-
-    "not include responsible people who have been deleted" in new Fixture {
-
-      val people = Seq(
-        ResponsiblePeople(Some(PersonName("Valid", None, "Person", None, None))),
-        ResponsiblePeople(Some(PersonName("Deleted", None, "Person", None, None)), status = Some(StatusConstants.Deleted))
-      )
-
-      when {
-        TestSubmissionService.cacheConnector.fetchAll(any(), any())
-      } thenReturn Future.successful(Some(cache))
-
-      when {
-        cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-      } thenReturn Some(Seq(TradingPremises()))
-
-      when {
-        cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
-      } thenReturn Some(amendmentResponse)
-
-      when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
-
-      val result = await(TestSubmissionService.getAmendment)
-
-      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
-        case (_, _, rows, _) => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
-      }
-      }
-
     }
 
     "not show negative fees for responsible people who have already been paid for" in new Fixture {
@@ -267,6 +234,8 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper", None, None)), hasAlreadyPassedFitAndProper = Some(true))
       )
 
+      val amendResponseWithRPFees = amendmentResponse.copy(fPFee = Some(100))
+
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
       } thenReturn Future.successful(Some(cache))
@@ -277,18 +246,18 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       when {
         cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
-      } thenReturn Some(amendmentResponse)
+      } thenReturn Some(amendResponseWithRPFees)
 
       when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
 
       val result = await(TestSubmissionService.getAmendment)
 
-      whenReady(TestSubmissionService.getAmendment) { result => result foreach {
-        case (_, _, rows, _) =>
-          val unpaidRow = rows.filter(_.label == "confirmation.unpaidpeople").head
-          unpaidRow.perItm.value mustBe 0
-          unpaidRow.total.value mustBe 0
-      }
+      whenReady(TestSubmissionService.getAmendment) { _ foreach {
+          case (_, _, rows, _) =>
+            val unpaidRow = rows.filter(_.label == "confirmation.unpaidpeople").head
+            unpaidRow.perItm.value mustBe 0
+            unpaidRow.total.value mustBe 0
+        }
       }
 
     }
@@ -323,7 +292,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
 
     }
-
 
     "retrieve data from variation submission" in new Fixture {
 
@@ -400,6 +368,123 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       }
     }
 
+    "not include responsible people in breakdown" when {
+
+      "they have been deleted" in new Fixture {
+
+        val people = Seq(
+          ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper", None, None)), hasAlreadyPassedFitAndProper = Some(true)),
+          ResponsiblePeople(Some(PersonName("Deleted", None, "Person", None, None)), status = Some(StatusConstants.Deleted))
+        )
+
+        val amendResponseWithRPFees = amendmentResponse.copy(fPFee = Some(100))
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+        } thenReturn Some(amendResponseWithRPFees)
+
+        when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
+
+        val result = await(TestSubmissionService.getAmendment)
+
+        whenReady(TestSubmissionService.getAmendment)(_ foreach {
+          case (_, _, rows, _) => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
+        })
+
+      }
+
+      "there is no fee returned in a subscription response and business type is not msb or tcsp" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
+        } thenReturn Some(subscriptionResponse)
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        val result = await(TestSubmissionService.getSubscription)
+
+        result match {
+          case (_, _, rows) => rows foreach {
+            _.label must not equal "confirmation.responsiblepeople"
+          }
+        }
+      }
+
+      "there is no fee returned in a amendment response and business type is not msb or tcsp" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+        } thenReturn Some(amendmentResponse)
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        val result = await(TestSubmissionService.getAmendment)
+
+        result match {
+          case Some((_, _, rows, _)) => rows foreach {
+            _.label must not equal "confirmation.responsiblepeople"
+          }
+        }
+
+      }
+
+      "there is no fee returned in a variation response and business type is not msb or tcsp" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
+        } thenReturn Some(subscriptionResponse)
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        val result = await(TestSubmissionService.getSubscription)
+
+        result match {
+          case (_, _, rows) => rows foreach {
+            _.label must not equal "confirmation.responsiblepeople"
+          }
+        }
+      }
+
+    }
+
     "notify user of variation fees to pay" when {
 
       val rpFee: BigDecimal = 100
@@ -412,7 +497,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         processingDate = "",
         etmpFormBundleNumber = "",
         registrationFee = 100,
-        fPFee = Some(0),
+        fPFee = Some(100),
         premiseFee = 0,
         totalFees = 100,
         paymentReference = Some(""),
@@ -455,6 +540,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case _ => false
         }
       }
+
       "a Trading Premises has been added with a half year fee" in new Fixture {
         val variationResponse = testVariationResponse.copy(
           halfYearlyTradingPremises = 1
@@ -486,6 +572,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case _ => false
         }
       }
+
       "a Trading Premises has been added with a zero fee" in new Fixture {
         val variationResponse = testVariationResponse.copy(
           zeroRatedTradingPremises = 1
@@ -517,7 +604,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case _ => false
         }
       }
-      "a Responsible Person has been added" in new Fixture {
+
+      "there is a Responsible Persons fee to pay" in new Fixture {
+
         val variationResponse = testVariationResponse.copy(
           addedResponsiblePeople = 1
         )
@@ -548,9 +637,12 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case _ => false
         }
       }
-      "a Responsible Person Fit and Proper has been added" in new Fixture {
+
+      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from a subscription" in new Fixture {
+
         val variationResponse = testVariationResponse.copy(
-          addedResponsiblePeopleFitAndProper = 1
+          addedResponsiblePeopleFitAndProper = 1,
+          fPFee = None
         )
 
         when {
@@ -584,6 +676,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case _ => false
         }
       }
+
+      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an amendment" in new Fixture {}
+
+      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {}
+
       "each of the categorised fees are in the response" in new Fixture {
         val variationResponse = testVariationResponse.copy(
           addedResponsiblePeople = 1,
@@ -640,6 +737,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case _ => false
         }
       }
+
     }
   }
 }
