@@ -96,9 +96,11 @@ case class UKAccount(
                       sortCode: String
                     ) extends Account {
   def displaySortCode:String = {
+    // scalastyle:off magic.number
     val pair1 = sortCode.substring(0,2)
     val pair2 = sortCode.substring(2,4)
     val pair3 = sortCode.substring(4,6)
+    // scalastyle:on magic.number
     pair1 + "-" + pair2 + "-" + pair3
   }
 }
