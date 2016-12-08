@@ -612,6 +612,7 @@ fieldset .panel-indent {
 
 .check-your-answers {
   margin-bottom: 20px;
+  word-break: break-word;
 }
 
 .check-your-answers__listing {
