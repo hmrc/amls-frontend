@@ -87,7 +87,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fPFee = Some(100),
+      fPFee = None,
       premiseFee = 0,
       totalFees = 100,
       paymentReference = Some(""),
@@ -648,6 +648,35 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
       }
 
+      "the business type is TCSP and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+        } thenReturn Some(amendmentResponse)
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        when {
+          activities.businessActivities
+        } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
+
+        val result = await(TestSubmissionService.getAmendment)
+
+        result match {
+          case Some((_, _, rows, _)) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+        }
+
+      }
 
     }
 
@@ -769,7 +798,79 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         }
       }
 
-      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {}
+      "the business type is MSB and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+        } thenReturn Some(variationResponse.copy(fPFee = None))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse.copy(addedResponsiblePeopleFitAndProper = 1))
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        when {
+          activities.businessActivities
+        } thenReturn Set[BusinessActivity](MoneyServiceBusiness)
+
+        val result = await(TestSubmissionService.getVariation)
+
+        result match {
+          case Some((_, _, rows)) => {
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
+          }
+        }
+
+      }
+
+      "the business type is TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+        } thenReturn Some(variationResponse.copy(fPFee = None))
+
+        when {
+          cache.getEntry[AmendVariationResponse](any())(any())
+        } thenReturn Some(variationResponse.copy(addedResponsiblePeopleFitAndProper = 1))
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        when {
+          activities.businessActivities
+        } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
+
+        val result = await(TestSubmissionService.getVariation)
+
+        result match {
+          case Some((_, _, rows)) => {
+            rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+            rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
+          }
+        }
+
+      }
 
       "each of the categorised fees are in the response" in new Fixture {
 
