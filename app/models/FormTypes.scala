@@ -222,6 +222,7 @@ object FormTypes {
 
   private val ninoRequired = required("error.required.nino")
   private val ninoPattern = regexWithMsg(ninoRegex, "error.invalid.nino")
+  private val ninoTransforms = removeSpacesRule compose removeDashRule compose transformUppercase
 
   private val passportRequired = required("error.required.uk.passport")
   private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
@@ -229,7 +230,7 @@ object FormTypes {
   private val nonUKPassportRequired = required("error.required.non.uk.passport")
   private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
 
-  val ninoType = transformUppercase compose ninoRequired compose ninoPattern
+  val ninoType = ninoTransforms compose ninoRequired compose ninoPattern
   val ukPassportType = passportRequired compose passportPattern
   val noUKPassportType = nonUKPassportRequired compose nonUkPassportLength
 }

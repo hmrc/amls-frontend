@@ -203,6 +203,41 @@ class PersonResidentTypeControllerSpec extends PlaySpec with OneAppPerSuite with
 
     }
 
+    "submit with valid UK data, removing spaces and dashes" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUKResidence" -> "true",
+        "nino" -> "AA 34 64- 64 B",
+        "countryOfBirth" -> "GB",
+        "nationality" -> "GB"
+      )
+
+      val responsiblePeople = ResponsiblePeople()
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(1, edit = false)(newRequest)
+      status(result) must be(SEE_OTHER)
+
+      val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePeople]])
+      verify(controller.dataCacheConnector).save(any(), captor.capture())(any(), any(), any())
+
+      captor.getValue must have size 1
+
+      (for {
+        person <- captor.getValue.headOption
+        residence <- person.personResidenceType
+        nino <- residence.isUKResidence match {
+          case UKResidence(n) => Some(n)
+          case _ => None
+        }
+      } yield nino) map { _ mustBe "AA346464B" }
+
+    }
     "throw error message when data is not valid" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
