@@ -3,7 +3,7 @@ package models
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{BusinessMatching}
+import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.asp.Asp
@@ -13,7 +13,9 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, Json, Writes}
+
+import scala.collection.Seq
 
 case class SubscriptionRequest(
                                 businessMatchingSection: Option[BusinessMatching],
@@ -28,9 +30,22 @@ case class SubscriptionRequest(
                                 aspSection: Option[Asp],
                                 msbSection: Option[MoneyServiceBusiness],
                                 hvdSection: Option[Hvd],
-                                supervisionSection:Option[Supervision]
+                                supervisionSection: Option[Supervision]
                               )
 
 object SubscriptionRequest {
+
+  implicit def tpSequenceWrites(implicit tradingPremisesWrites: Writes[TradingPremises]): Writes[Seq[TradingPremises]] = {
+    Writes(x => JsArray(x.filterNot(_ == TradingPremises()).map {
+      tp => tradingPremisesWrites.writes(tp)
+    }))
+  }
+
+  implicit def rpSequenceWrites(implicit responsiblePeopleWrites: Writes[ResponsiblePeople]): Writes[Seq[ResponsiblePeople]] = {
+    Writes(x => JsArray(x.filterNot(_ == ResponsiblePeople()).map {
+      rp => responsiblePeopleWrites.writes(rp)
+    }))
+  }
+
   implicit val format = Json.format[SubscriptionRequest]
 }

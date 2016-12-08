@@ -374,6 +374,25 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     }
   }
 
+  "removeCharacterRule" must {
+    "strip the character from the incoming string" in {
+      val inputStr = "=AAAA==BBBB==CCCC=="
+      removeCharacterRule('=').validate(inputStr)  must be (Success("AAAABBBBCCCC"))
+    }
+  }
+
+  "removeDashRule" must {
+    "strip dashes from the incoming string" in {
+      val inputStr = "-AAAA---BBBB--CCCC---"
+      removeDashRule.validate(inputStr)  must be (Success("AAAABBBBCCCC"))
+    }
+  }
+
+  "removeSpacesRule" must {
+    "strip space s from the incoming string" in {
+      val inputStr = " AAAA   BBBB CCCC  "
+      removeSpacesRule.validate(inputStr)  must be (Success("AAAABBBBCCCC"))    }
+  }
 
   "UK Bank Account must successfully" must {
 
@@ -453,6 +472,10 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       ninoType.validate("AB123456B") must
         be(Success("AB123456B"))
+    }
+
+    "successfully validate disregarding case" in {
+      ninoType.validate("ab123456c") mustBe Success("ab123456c")
     }
 
     "fail to validate an empty string" in {
