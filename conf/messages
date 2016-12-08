@@ -100,7 +100,6 @@ error.bankdetails.accounttype = Select one kind of bank account that your busine
 error.bankdetails.accountname = Enter a bank account name
 error.invalid.bankdetails.accountname = You can’t enter more than 40 characters for the account name.
 error.bankdetails.ukbankaccount = Select yes or no to the question: is this a UK bank account?
-error.bankdetails.sortcode = Enter the sort code.
 error.invalid.bankdetails.sortcode = Enter a valid sort code
 error.bankdetails.accountnumber = Enter the account number
 error.invalid.bankdetails.accountnumber = Enter a valid account number. It must be 8 numbers long. Do not enter letters, punctuation or other characters.
