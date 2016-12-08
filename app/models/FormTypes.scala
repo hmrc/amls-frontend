@@ -178,7 +178,7 @@ object FormTypes {
     .compose(notEmpty.withMessage("error.bankdetails.accountname"))
     .compose(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
 
-  val sortCodeType = notEmpty
+  val sortCodeType = (removeDashRule compose removeSpacesRule compose notEmpty)
     .withMessage("error.bankdetails.sortcode")
     .compose(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
 
