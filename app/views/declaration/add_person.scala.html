@@ -35,8 +35,12 @@
             labelText = Messages("declaration.addperson.lastname")
         )
 
-        @radioGroup(f("roleWithinBusiness")) {
-            @legend("declaration.addperson.whatsyourrole", jsHidden = false, bold = true)
+        @fieldset(
+            f = f("roleWithinBusiness"),
+            legend = "declaration.addperson.whatsyourrole",
+            bold = true,
+            panel = false
+        ) {
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.01", "01")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.02", "02")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.03", "03")
@@ -45,11 +49,16 @@
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
-            @fieldset("declaration.addperson.lbl.08", jsHidden = true, id = target) {
-                @input(f("roleWithinBusinessOther"), "lbl.pleasespecify", bold = false)
-            }
+        }
 
-    }
-    @submit()
+        @fieldset(
+            legend = "declaration.addperson.lbl.08",
+            legendHidden = true,
+            f = f(target)
+        ) {
+            @input(f("roleWithinBusinessOther"), "lbl.pleasespecify", bold = false)
+        }
+
+        @submit()
   }
 }

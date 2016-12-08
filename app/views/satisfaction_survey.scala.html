@@ -16,31 +16,37 @@ heading = header
 
 @form(f, controllers.routes.SatisfactionSurveyController.post()) {
 
-<legend class="heading-medium">@Messages("survey.satisfaction.text.1")</legend>
-
-<div class="form-field-group">
-    @radioGroup(f("satisfaction")) {
-        @legend("", jsHidden = true)
-        @radio(f("satisfaction"), "survey.satisfaction.lbl.01", "01")
-        @radio(f("satisfaction"), "survey.satisfaction.lbl.02", "02")
-        @radio(f("satisfaction"), "survey.satisfaction.lbl.03", "03")
-        @radio(f("satisfaction"), "survey.satisfaction.lbl.04", "04")
-        @radio(f("satisfaction"), "survey.satisfaction.lbl.05", "05")
+    @fieldset(
+        legend = "survey.satisfaction.text.1",
+        f = f("satisfaction"),
+        panel = false,
+        bold = true
+    ) {
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.01", value = "01")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.02", value = "02")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.03", value = "03")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.04", value = "04")
+        @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.05", value = "05")
     }
-</div>
 
-<div class="form-group">
-
-    <legend class="heading-medium">@Messages("survey.satisfaction.text.2")</legend>
-
-    <p>@Messages("survey.satisfaction.hint")</p>
-
-    <div class="char-counter" data-char-counter>
-        <textarea data-char-field cols="50" rows="6" maxLength="1200" name="details">@f("details").value</textarea>
-        <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>
-    </div>
-
-</div>
+    @fieldset(
+        legend = "survey.satisfaction.text.2",
+        f = f("details"),
+        panel = false,
+        classes = Seq("heading-medium"),
+        bold = true
+    ) {
+        @textarea(
+            field = f("details"),
+            labelText = "lbl.pleasespecify",
+            labelHidden = true,
+            hintText = "survey.satisfaction.hint",
+            cols = "50",
+            rows = "6",
+            maxLength = "1200",
+            charCount = true
+        )
+    }
 
 <input type="submit" name="submit" class="button" value="@Messages("button.send.feedback")" />
 }

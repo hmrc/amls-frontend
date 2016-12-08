@@ -32,14 +32,32 @@
         <p>@Messages("supervision.penalisedbyprofessional.details")</p>
 
         <div class="form-group">
-            @inlineRadioGroup(f("penalised")) {
-                @legend("supervision.penalisedbyprofessional.title", jsHidden = true)
-                @radio(f("penalised"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("penalised"), "lbl.no", "false")
-
-                @fieldset("supervision.penalisedbyprofessional.details.lbl", jsHidden = true, id = target) {
-                    @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false)
-                }
+            @fieldset(
+                legend = "supervision.penalisedbyprofessional.title",
+                legendHidden = true,
+                f = f("penalised"),
+                panel = false
+            ) {
+                @radio(
+                    f = f("penalised"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("penalised"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+            @fieldset(
+                legend = "supervision.penalisedbyprofessional.details.lbl",
+                f = f(target),
+                legendHidden = true
+            ) {
+                @textarea(f("professionalBody"), "supervision.penalisedbyprofessional.details.lbl", bold = false)
             }
         </div>
         @submit(edit)

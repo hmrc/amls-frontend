@@ -19,16 +19,39 @@
 
     @form(f, controllers.aboutthebusiness.routes.VATRegisteredController.post(edit)) {
 
-        @inlineRadioGroup(f("registeredForVAT")) {
-            @legend("aboutthebusiness.registeredforvat.title", jsHidden = true)
-            @radio(f("registeredForVAT"), "lbl.yes", "true", target = s"#$target")
-            @radio(f("registeredForVAT"), "lbl.no", "false")
-            @fieldset("", jsHidden = true, id = target) {
-                @input(f("vrnNumber"),
-                    labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",
-                    hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
-                    bold = false)
-            }
+        @fieldset(
+            f = f("registeredForVAT"),
+            legend = "aboutthebusiness.registeredforvat.title",
+            panel = false
+        ) {
+            @radio(
+                f = f("registeredForVAT"),
+                labelText = "lbl.yes",
+                value = "true",
+                target = s"#$target",
+                inline = true
+            )
+            @radio(
+                f = f("registeredForVAT"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
+
+        @fieldset(
+            f = f("vrnNumber-fieldset"),
+            legend = "aboutthebusiness.registeredforvat.lbl.vatNumber",
+            legendHidden = true,
+            jsHidden = true,
+            id = target
+        ) {
+            @input(
+                field = f("vrnNumber"),
+                labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",
+                hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
+                bold = false
+            )
         }
 
         @submit(false)

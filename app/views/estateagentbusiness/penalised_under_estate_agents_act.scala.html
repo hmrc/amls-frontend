@@ -4,9 +4,6 @@
 
 @(f: Form2[_], edit: Boolean = false)(implicit request: Request[_], lang: Lang)
 
-@target = @{
-    s"""${f("penalisedUnderEstateAgentsActDetails").id}-fieldset"""
-}
 
 @header = {
     @errorSummary(f)
@@ -29,17 +26,40 @@
             <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
         </ul>
 
-        <div class="form-field">
-            @inlineRadioGroup(f("penalisedUnderEstateAgentsAct")) {
-                @legend("TODO", jsHidden = true)
-                @radio(f("penalisedUnderEstateAgentsAct"), "lbl.yes", "true", target = s"#$target")
-                @radio(f("penalisedUnderEstateAgentsAct"), "lbl.no", "false")
+        @fieldset(
+            f = f("penalisedUnderEstateAgentsAct"),
+            legend = "estateagentbusiness.penalisedunderestateagentsact.title",
+            panel = false
+        ){
+            @radio(
+                f = f("penalisedUnderEstateAgentsAct"),
+                labelText = "lbl.yes",
+                value = "true",
+                inline = true,
+                target = s".professionalBodyAct-fieldset"
+            )
+            @radio(
+                f = f("penalisedUnderEstateAgentsAct"),
+                labelText = "lbl.no",
+                value = "false",
+                inline = true
+            )
+        }
 
-                @fieldset("TODO", jsHidden = true, id = target) {
-                    @textarea(f("penalisedUnderEstateAgentsActDetails"), "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl", hintText = "Enter 255 characters or less." ,bold = false)
-                }
-            }
-        </div>
+        @fieldset(
+            legend = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+            legendHidden = true,
+            jsHidden = true,
+            classes = Seq("professionalBodyAct-fieldset"),
+            f = f("penalisedUnderEstateAgentsActDetails-fieldset")
+        ) {
+            @textarea(
+                f("penalisedUnderEstateAgentsActDetails"),
+                labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                hintText = "hint.255.chars",
+                bold = false
+            )
+        }
 
         @submit(edit)
     }

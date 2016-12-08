@@ -16,9 +16,12 @@
 
     @form(f, controllers.businessactivities.routes.WhoIsYourAccountantController.post(edit)) {
 
-        <fieldset>
-            @legend("businessactivities.whoisyouraccountant.title", jsHidden = true)
-            <div class="form-field-group">
+        @fieldset(
+            legend = "businessactivities.whoisyouraccountant.title",
+            legendHidden = true,
+            panel = false,
+            f = f("whoisyouraccountant-fieldset")
+        ) {
                 @input(
                     field = f("name"),
                     labelText = "businessactivities.whoisyouraccountant.name"
@@ -28,61 +31,75 @@
                     field = f("tradingName"),
                     labelText = "businessactivities.whoisyouraccountant.tradingName"
                 )
-            </div>
-        </fieldset>
+        }
 
-        @inlineRadioGroup(f("isUK")) {
-            @legend("businessactivities.whoisyouraccountant.address.location", jsHidden = true)
+        @fieldset(
+            f = f("isUK"),
+            legend = "businessactivities.whoisyouraccountant.address.location",
+            panel = false
+        ) {
             @radio(
                 f = f("isUK"),
-                labelText = "businessactivities.whoisyouraccountant.ukAddress",
+                labelText = "lbl.yes",
                 value = "true",
+                inline = true,
                 target = s"#${f("postCode").id}-field"
             )
             @radio(
                 f = f("isUK"),
-                labelText = "businessactivities.whoisyouraccountant.nonUkAddress",
+                labelText = "lbl.no",
                 value = "false",
+                inline = true,
                 target = s"#${f("country").id}-field"
             )
         }
 
         @fieldset(
             legend = "businessactivities.whoisyouraccountant.address",
-            panel = false
+            legendHidden = true,
+            panel = false,
+            f = f("whoisyouraccountant-address-fieldset")
         ) {
-            <div class="form-field-group">
-                @input(f("addressLine1"), labelText = "lbl.address.line1")
-                @input(f("addressLine2"), labelText = "lbl.address.line2")
-                @input(f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
-                @input(f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
-                @fieldset(
-                    id = s"${f("postCode").id}-field",
-                    legend = "businessactivities.whoisyouraccountant.postCode",
-                    jsHidden = true,
-                    panel = false
-                ) {
-                    @input(
-                        field = f("postCode"),
-                        labelText = "businessactivities.whoisyouraccountant.postCode",
-                        classes = Seq("postcode")
-                    )
-                }
-                @fieldset(
-                    id = s"${f("country").id}-field",
-                    legend = "businessactivities.whoisyouraccountant.country",
-                    jsHidden = true,
-                    panel = false
-                ) {
-                    @country(
-                        field = f("country"),
-                        labelText = "businessactivities.whoisyouraccountant.country"
-                    )
-                }
-            </div>
+            @input(
+                field = f("addressLine1"),
+                labelText = "lbl.address.line1"
+            )
+            @input(
+                field = f("addressLine2"),
+                labelText = "lbl.address.line2"
+            )
+            @input(
+                field = f("addressLine3"),
+                labelText = "lbl.address.line3",
+                requiredField = false
+            )
+            @input(
+                field = f("addressLine4"),
+                labelText = "lbl.address.line4",
+                requiredField = false
+            )
+            @panel(
+                f = f(s"${f("postCode").id}-field"),
+                panel = false
+            ) {
+                @input(
+                    field = f("postCode"),
+                    labelText = "businessactivities.whoisyouraccountant.postCode",
+                    classes = Seq("postcode")
+                )
+            }
+            @panel(
+                f = f(s"${f("country").id}-field"),
+                panel = false
+            ) {
+                @country(
+                    field = f("country"),
+                    labelText = "businessactivities.whoisyouraccountant.country"
+                )
+            }
         }
 
-    @submit(edit)
+        @submit(edit)
 
     }
 }

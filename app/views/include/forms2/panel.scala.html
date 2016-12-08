@@ -1,0 +1,20 @@
+@import play.api.data.mapping.forms.{PM, UrlFormEncoded}
+
+@(
+    panel: Boolean = true,
+    jsHidden: Boolean = true,
+    id: String = "",
+    classes: Seq[String] = Seq.empty,
+    data: Seq[String] = Seq.empty,
+    wide: Boolean = false,
+    f: forms.Field = forms.ValidField(PM.asPath("/default/path"), Seq("defaultVal"))
+)(content: Html)(implicit lang: Lang)
+
+<div
+  @if(f.id.nonEmpty){ id="@f.id"}
+  class="@if(panel){ panel-indent}@if(wide){ panel-border-wide}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
+    @if(f.hasErrors) {
+        <span class="error-notification">@f.error</span>
+    }
+    @content
+</div>

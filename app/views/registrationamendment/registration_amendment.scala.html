@@ -33,17 +33,13 @@
         <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
             <div class="application-submit">
                 <form method="get" action="@controllers.declaration.routes.WhoIsRegisteringController.getWithAmendment.url">
-                    @fieldset(
-                        legend = "amendment.sidebar.heading",
-                        jsHidden = false,
-                        panel = false,
-                        bold = true
-                    ) {
+                    <fieldset>
+                        @include.forms2.legend("amendment.sidebar.heading", false, true, "", false)
                         <p>
                             @Messages("amendment.sidebar.text")
                         </p>
                         <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>@Messages("amendment.sidebar.button.text")</button>
-                    }
+                    </fieldset>
                 </form>
             </div>
         </div>

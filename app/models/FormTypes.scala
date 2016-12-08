@@ -79,6 +79,14 @@ object FormTypes {
     def insensitive = s"(?i)${regex.pattern}".r
   }
 
+  def removeCharacterRule(c : Char) = Rule.zero[String] fmap {
+    _.replace(c.toString, "")
+  }
+
+  val removeSpacesRule : Rule[String,String]= removeCharacterRule(' ')
+  val removeDashRule : Rule[String,String]= removeCharacterRule('-')
+
+
   /** Name Rules **/
 
   private val firstNameRequired = required("error.required.firstname")

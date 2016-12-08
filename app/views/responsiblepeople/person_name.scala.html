@@ -13,7 +13,6 @@
     title = Messages("responsiblepeople.personName.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
-
     @form(f, controllers.responsiblepeople.routes.PersonNameController.post(index, edit)) {
 
         @input(
@@ -31,37 +30,50 @@
             labelText = Messages("responsiblepeople.personName.lastname")
         )
 
-        @inlineRadioGroup(f("hasPreviousName")) {
-
-            @legend("responsiblepeople.personName.isknownbyothernames")
-
-            @radio(f("hasPreviousName"), "lbl.yes", "true", target = "#previous-fieldset")
-            @radio(f("hasPreviousName"), "lbl.no", "false")
-
-            @fieldset("responsiblepeople.personName.isknownbyothernames", jsHidden = true, id = "previous-fieldset") {
-
-                @errorGroup(f("previous")) {
-                    @input(f("previous.firstName"), labelText = "responsiblepeople.personName.otherfirstnames")
-                    @input(f("previous.middleName"), labelText = "responsiblepeople.personName.othermiddlenames")
-                    @input(f("previous.lastName"), labelText = "responsiblepeople.personName.otherlastnames")
-                }
-
-                @date(f, "previous.date", "responsiblepeople.personName.previous.date.lbl")
-            }
+        @fieldset(
+            f = f("hasPreviousName"),
+            legend = "responsiblepeople.personName.isknownbyothernames",
+            panel=false
+        ) {
+            @radio(f("hasPreviousName"), "lbl.yes", "true", target = ".previous-fieldset", inline=true)
+            @radio(f("hasPreviousName"), "lbl.no", "false", inline=true)
         }
 
-        @inlineRadioGroup(f("hasOtherNames")) {
-
-            @legend("responsiblepeople.personName.hasOtherNames")
-
-            @radio(f("hasOtherNames"), "lbl.yes", "true", target = "#otherNames-fieldset")
-            @radio(f("hasOtherNames"), "lbl.no", "false")
-
-            @fieldset("responsiblepeople.personName.hasOtherNames", jsHidden = true, id = "otherNames-fieldset") {
-                @input(f("otherNames"), labelText = "responsiblepeople.personName.alternativeName")
+        @fieldset(
+            legend = "responsiblepeople.personName.isknownbyothernames",
+            jsHidden = true,
+            f = f("previous-fieldset"),
+            legendHidden = true,
+            classes = Seq("previous-fieldset")
+        ) {
+            @errorGroup(f("previous")) {
+                @input(f("previous.firstName"), "responsiblepeople.personName.otherfirstnames")
+                @input(f("previous.middleName"), "responsiblepeople.personName.othermiddlenames")
+                @input(f("previous.lastName"), "responsiblepeople.personName.otherlastnames")
             }
+            @date(f, "previous.date", "responsiblepeople.personName.previous.date.lbl")
         }
 
-    @submit(edit)
-  }
+        @fieldset(
+            f = f("hasOtherNames"),
+            legend = "responsiblepeople.personName.hasOtherNames",
+            panel = false
+
+        ) {
+            @radio(f("hasOtherNames"), "lbl.yes", "true", target = ".otherNames-fieldset", inline=true)
+            @radio(f("hasOtherNames"), "lbl.no", "false", inline=true)
+        }
+
+        @fieldset(
+            legend = "responsiblepeople.personName.hasOtherNames",
+            jsHidden = true,
+            legendHidden = true,
+            classes = Seq("otherNames-fieldset"),
+            f = f("otherNames-fieldset")
+        ) {
+            @input(f("otherNames"), "responsiblepeople.personName.alternativeName")
+        }
+
+        @submit(edit)
+    }
 }

@@ -1,6 +1,6 @@
 @import forms.Form2
 @import include._
-@import include.forms2._
+@import forms2._
 @import models.FeeResponse
 
 @(feeResponse: Option[FeeResponse])(implicit request: Request[_], lang: Lang)
@@ -10,8 +10,8 @@
 
 @feeResponse.map {fee =>
     @detailsSummary(
-        details = Messages("status.fee.link")
-    ){
+        summary = Messages("status.fee.link")
+    ) {
        @include.status.fee_details(fee)
     }
 

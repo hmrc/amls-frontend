@@ -16,52 +16,99 @@
 
     @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.post(edit)) {
 
-        @inlineRadioGroup(f("isUK")) {
-            @legend("aboutthebusiness.registeredoffice.title", jsHidden = true)
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.ukAddress", "true", target = s"#${f("postCode").id}-fieldset")
-            @radio(f("isUK"), "aboutthebusiness.correspondenceaddress.nonUkAddress", "false", target = s"#${f("country").id}-fieldset")
+        @fieldset(
+            f = f("isUK"),
+            legend = "aboutthebusiness.registeredoffice.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @radio(
+                f = f("isUK"),
+                labelText = "aboutthebusiness.correspondenceaddress.ukAddress",
+                value = "true",
+                target = s"#${f("postCode").id}-fieldset",
+                inline = true
+            )
+            @radio(
+                f = f("isUK"),
+                labelText = "aboutthebusiness.correspondenceaddress.nonUkAddress",
+                value = "false",
+                target = s"#${f("country").id}-fieldset",
+                inline = true
+            )
         }
 
         @fieldset(
+            f = f("postCode-fieldset"),
             legend = "aboutthebusiness.correspondenceaddress.address",
             jsHidden = false,
             panel = false,
             id = s"""${f("postCode").id}-fieldset"""
         ) {
-            <div class="form-field-group">
-                @input(field = f("addressLine1"), labelText= "lbl.address.line1")
-                @input(field = f("addressLine2"), labelText= "lbl.address.line2")
-                @input(field = f("addressLine3"), labelText= "lbl.address.line3", requiredField = false)
-                @input(field = f("addressLine4"), labelText= "lbl.address.line4", requiredField = false)
-            </div>
-            <div class="form-field-group">
-                @input(
-                    field = f("postCode"),
-                    labelText = "aboutthebusiness.correspondenceaddress.postCode",
-                    classes = Seq("postcode")
-                )
-            </div>
+            @input(
+                field = f("addressLine1"),
+                labelText = "lbl.address.line1",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine2"),
+                labelText = "lbl.address.line2",
+                labelHidden = true
+            )
+            @input(
+                field = f("addressLine3"),
+                labelText = "lbl.address.line3",
+                labelHidden = true,
+                requiredField = false
+            )
+            @input(
+                field = f("addressLine4"),
+                labelText = "lbl.address.line4",
+                labelHidden = true,
+                requiredField = false
+            )
+            @input(
+                field = f("postCode"),
+                labelText = "aboutthebusiness.correspondenceaddress.postCode",
+                classes = Seq("postcode")
+            )
         }
 
         @fieldset(
+            f = f("country-fieldset"),
             legend = "aboutthebusiness.correspondenceaddress.address",
-            jsHidden = false,
+            jsHidden = true,
             panel = false,
             id = s"""${f("country").id}-fieldset"""
         ) {
-            <div class="form-field-group">
-                @input(field = f("addressLineNonUK1"), labelText= "lbl.address.line1")
-                @input(field = f("addressLineNonUK2"), labelText= "lbl.address.line2")
-                @input(field = f("addressLineNonUK3"), labelText= "lbl.address.line3", requiredField = false)
-                @input(field = f("addressLineNonUK4"), labelText= "lbl.address.line4", requiredField = false)
-            </div>
-
-            <div class="form-field-group">
-                @country(
-                    field = f("country"),
-                    labelText = "aboutthebusiness.correspondenceaddress.country"
-                )
-            </div>
+            @input(
+                field = f("addressLineNonUK1"),
+                labelText = "lbl.address.line1",
+                labelHidden = true,
+                requiredField = false
+            )
+            @input(
+                field = f("addressLineNonUK2"),
+                labelText = "lbl.address.line2",
+                labelHidden = true,
+                requiredField = false
+            )
+            @input(
+                field = f("addressLineNonUK3"),
+                labelText = "lbl.address.line3",
+                labelHidden = true,
+                requiredField = false
+            )
+            @input(
+                field = f("addressLineNonUK4"),
+                labelText = "lbl.address.line4",
+                labelHidden = true,
+                requiredField = false
+            )
+            @country(
+                field = f("country"),
+                labelText = "aboutthebusiness.correspondenceaddress.country"
+            )
         }
 
         @submit(edit)
