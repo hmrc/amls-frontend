@@ -5,7 +5,7 @@ import exceptions.NoEnrolmentException
 import models.aboutthebusiness.AboutTheBusiness
 import models.bankdetails.BankDetails
 import models.businesscustomer.ReviewDetails
-import models.businessmatching.BusinessMatching
+import models.businessmatching._
 import models.businessmatching.BusinessType.SoleProprietor
 import models.confirmation.{BreakdownRow, Currency}
 import models.estateagentbusiness.EstateAgentBusiness
@@ -103,6 +103,9 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     val businessType = SoleProprietor
 
     val reviewDetails = mock[ReviewDetails]
+    val activities = mock[BusinessActivities]
+    val businessMatching = mock[BusinessMatching]
+    val cache = mock[CacheMap]
 
     when {
       reviewDetails.safeId
@@ -111,13 +114,15 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       reviewDetails.businessType
     } thenReturn Some(businessType)
 
-    val businessMatching = mock[BusinessMatching]
-
     when {
       businessMatching.reviewDetails
     } thenReturn Some(reviewDetails)
-
-    val cache = mock[CacheMap]
+    when {
+      businessMatching.activities
+    } thenReturn Some(activities)
+    when {
+      activities.businessActivities
+    } thenReturn Set[BusinessActivity]()
 
     when {
       cache.getEntry[BusinessMatching](BusinessMatching.key)
@@ -503,7 +508,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
-        } thenReturn Some(subscriptionResponse)
+        } thenReturn Some(subscriptionResponse.copy(fPFee = Some(100)))
 
         when {
           cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
@@ -516,44 +521,68 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         val result = await(TestSubmissionService.getSubscription)
 
         result match {
-          case (_, _, rows) => rows foreach {
-            _.label must not equal "confirmation.responsiblepeople"
-          }
+          case (_, _, rows) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
         }
       }
 
-      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from a subscription" in new Fixture {
+      "the business type is MSB and there is not a Responsible Persons fee to pay from a subscription" in new Fixture {
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
         } thenReturn Future.successful(Some(cache))
 
         when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-        } thenReturn Future.successful(Some("12345"))
+          cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
+        } thenReturn Some(subscriptionResponse)
 
         when {
-          TestSubmissionService.cacheConnector.save[AmendVariationResponse](eqTo(AmendVariationResponse.key), any())(any(), any(), any())
-        } thenReturn Future.successful(CacheMap("", Map.empty))
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
 
         when {
-          cache.getEntry[AmendVariationResponse](any())(any())
-        } thenReturn Some(variationResponse.copy(addedResponsiblePeopleFitAndProper = 1, fPFee = None))
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
 
-        whenReady(TestSubmissionService.getVariation) {
-          case Some((_, _, breakdownRows)) =>
-            breakdownRows.head.label mustBe "confirmation.responsiblepeople"
-            breakdownRows.head.quantity mustBe 1
-            breakdownRows.head.perItm mustBe Currency(rpFee)
-            breakdownRows.head.total mustBe Currency(rpFee)
-            breakdownRows.length mustBe 2
-            breakdownRows(1).label mustBe "confirmation.unpaidpeople"
-            breakdownRows(1).quantity mustBe 1
-            breakdownRows(1).perItm mustBe Currency(0 - rpFee)
-            breakdownRows(1).total mustBe Currency(0 - rpFee)
-            breakdownRows.length mustBe 2
-          case _ => false
+        when {
+          activities.businessActivities
+        } thenReturn Set[BusinessActivity](MoneyServiceBusiness)
+
+        val result = await(TestSubmissionService.getSubscription)
+
+        result match {
+          case (_, _, rows) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
         }
+
+      }
+
+      "the business type is TCSP and there is not a Responsible Persons fee to pay from a subscription" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
+        } thenReturn Some(subscriptionResponse)
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        when {
+          activities.businessActivities
+        } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
+
+        val result = await(TestSubmissionService.getSubscription)
+
+        result match {
+          case (_, _, rows) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+        }
+
       }
 
     }
@@ -589,7 +618,36 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         }
       }
 
-      "the business type is MSB or TCSP and there is not a Responsible Persons fee to pay from an amendment" in new Fixture {}
+      "the business type is MSB and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
+
+        when {
+          TestSubmissionService.cacheConnector.fetchAll(any(), any())
+        } thenReturn Future.successful(Some(cache))
+
+        when {
+          cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
+        } thenReturn Some(amendmentResponse)
+
+        when {
+          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+        } thenReturn Some(Seq(TradingPremises()))
+
+        when {
+          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+        } thenReturn Some(Seq(ResponsiblePeople()))
+
+        when {
+          activities.businessActivities
+        } thenReturn Set[BusinessActivity](MoneyServiceBusiness)
+
+        val result = await(TestSubmissionService.getAmendment)
+
+        result match {
+          case Some((_, _, rows, _)) => rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+        }
+
+      }
+
 
     }
 
