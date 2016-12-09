@@ -367,6 +367,13 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
     }
 
+    "pass validation when dashes are used to seperate number groups" in {
+      sortCodeType.validate("65-43-21") must be(Success("654321"))
+    }
+    "pass validation when spaces are used to seperate number groups" in {
+      sortCodeType.validate("65 43 21") must be(Success("654321"))
+    }
+
     "fail validation for sort code with any other pattern" in {
       sortCodeType.validate("8712341241431243124124654321") must be(
         Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
@@ -473,7 +480,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       ninoType.validate("AB123456B") must
         be(Success("AB123456B"))
     }
-
+    
     "successfully validate disregarding case" in {
       ninoType.validate("ab123456c") mustBe Success("AB123456C")
     }
