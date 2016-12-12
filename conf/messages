@@ -208,6 +208,7 @@ error.required.timeAtAddress = Select how long this person lived at this address
 error.required.positionWithinBusiness = Select at least one position within the business.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
+error.expected.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 
 ############################### Trust and company service providers ###############################
 

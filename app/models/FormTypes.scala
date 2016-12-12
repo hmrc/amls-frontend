@@ -181,10 +181,11 @@ object FormTypes {
 
   val peopleEndDateRule = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    ((__ \ "positionStartDate").read(localDateRule) ~
-      (__ \ "endDate").read(localDateFutureRule)).tupled.compose(Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
-      case (d1, d2) if d1.isAfter(d2) => Success(d1)
-      case (startDate, _) => Failure(Seq(ValidationError(s"The date must be after (user name) started as a responsible person, which was $startDate")))
+    ((__ \ "positionStartDate").read(jodaLocalDateRule("yyyy-MM-dd")) ~
+      (__ \ "endDate").read(localDateFutureRule) ~
+    ( __ \ "userName").read[String]).tupled.compose(Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate]{
+      case (d1, d2, un) if d2.isAfter(d1) => Success(d2)
+      case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.date.after.start", userName, startDate)))
     })
   }
 

@@ -60,12 +60,13 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
         case _ =>
           getData[ResponsiblePeople](index) flatMap { people =>
             val extraFields = Map(
-              "positionStartDate" -> Seq(people.get.positions.get.startDate.get.toString),
-              "username" -> Seq("steve")
+              "positionStartDate" -> Seq(people.get.positions.get.startDate.get.toString("yyyy-MM-dd")),
+              "userName" -> Seq(personName)
             )
 
             Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
               case f: InvalidForm =>
+                println("fffffffffffffffffffffffff" + f);
                 Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true)))
               case ValidForm(_, data) => {
                 for {
