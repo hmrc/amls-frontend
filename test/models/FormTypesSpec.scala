@@ -515,4 +515,17 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   }
 
+  "Uk passport number" must {
+    "successfully validate numbers" in {
+      ukPassportType.validate("123456789") mustBe Success("123456789")
+    }
+
+    "fail when the passport number includes letters" in {
+      ukPassportType.validate("123abc789") mustBe Failure(
+        Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
+      )
+    }
+
+  }
+
 }

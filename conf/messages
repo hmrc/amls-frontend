@@ -52,8 +52,8 @@ error.invalid.name.of.business = You can’t enter more than 120 characters for 
 error.required.nino = Enter a valid National Insurance number
 error.invalid.nino = Enter a valid National Insurance number
 
-error.required.uk.passport = Enter the UK passport number.
-error.invalid.uk.passport = Enter a valid UK passport number. It must be 9 characters long, and can only be numbers or letters. Do not enter punctuation or other characters.
+error.required.uk.passport = Enter a valid passport number
+error.invalid.uk.passport = Enter a valid passport number
 error.required.non.uk.passport = Enter the non-UK passport number.
 error.invalid.non.uk.passport = Enter a valid non-UK passport number. You can’t enter more than 40 characters.
 
