@@ -299,7 +299,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
 
         }
 
-        "removing a trading premises from an application with end date before position start date" in new Fixture {
+        "removing a responsible person from an application with end date before position start date" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 

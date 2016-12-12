@@ -2,6 +2,7 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 import org.specs2.mock.mockito.MockitoMatchers
+import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 
@@ -250,6 +251,34 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
+    }
+
+    "successfully validate a date which should be after another date" in {
+
+      val date1 = new LocalDate(1999, 1, 1)
+      val date2 = new LocalDate(2000, 1, 1)
+
+      val result = FormTypes.isDateAfterRule.validate((date1, date2))
+
+      result mustBe Failure(Seq(Path -> Seq(ValidationError("Hello"))))
+
+    }
+
+    "successfully validate a form with 2 dates which should be after one another" in {
+
+      val form: UrlFormEncoded = Map(
+        "positionStartDate.day" -> Seq("1"),
+        "positionStartDate.month" -> Seq("1"),
+        "positionStartDate.year" -> Seq("2000"),
+        "endDate.day" -> Seq("1"),
+        "endDate.month" -> Seq("1"),
+        "endDate.year" -> Seq("2000")
+      )
+
+      val result = FormTypes.peopleEndDateRule.validate(form)
+
+      result mustBe Failure(Seq(Path -> Seq(ValidationError("Hello"))))
+
     }
   }
 
