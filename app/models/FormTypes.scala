@@ -2,7 +2,7 @@ package models
 
 import org.joda.time.LocalDate
 import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.mapping.forms.{Rules, UrlFormEncoded}
 import play.api.data.validation.Invalid
 import utils.DateHelper.localDateOrdering
 
@@ -174,14 +174,19 @@ object FormTypes {
   val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
   val localDateFutureRule = localDateRule compose futureDateRule
 
-  val peopleEndDateRule : Rule[UrlFormEncoded, LocalDate] =
-    From[UrlFormEncoded] { __ =>
-      (
-        (__ \  "positionStartDate").read(jodaLocalDate) ~
-          (__ \ "endDate").read(localDateFutureRule)
-        )((startDate, endDate) => if(endDate.isAfter(startDate)) endDate else new LocalDate(1900,1,1)) orElse
-        Rule[UrlFormEncoded, LocalDate](__ => Failure(Seq(Path -> Seq(ValidationError("Failure")))))
-    }.repath(_ => Path)
+//  val isDateAfterRule : Rule[(LocalDate, LocalDate), LocalDate] = Rule.fromMapping {
+//    case (d1, d2) if d1.isAfter(d2) => Success(d1)
+//    case _ => Failure(Seq(ValidationError("Date 1 is not after date 2")))
+//  }
+
+  val peopleEndDateRule = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    ((__ \ "positionStartDate").read(localDateRule) ~
+      (__ \ "endDate").read(localDateFutureRule)).tupled.compose(Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
+      case (d1, d2) if d1.isAfter(d2) => Success(d1)
+      case (startDate, _) => Failure(Seq(ValidationError(s"The date must be after (user name) started as a responsible person, which was $startDate")))
+    })
+  }
 
   /** Bank details Rules **/
 
