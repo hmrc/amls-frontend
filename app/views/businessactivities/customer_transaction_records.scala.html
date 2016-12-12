@@ -59,21 +59,14 @@
                 f = f("transactions[]"),
                 labelText = "businessactivities.transactiontype.lbl.03",
                 value = "03",
-                target = s".name-fieldset"
+                target = s".form-group:has(*[name='name'])"
             )
 
-            @fieldset(
-                legend = "businessactivities.name.software.pkg.lbl",
-                legendHidden = true,
-                panel = false,
-                classes = Seq("name-fieldset"),
-                f = f("name")
-            ) {
-                @input(
-                    field = f("name"),
-                    labelText = "businessactivities.name.software.pkg.lbl"
-                )
-            }
+            @input(
+                field = f("name"),
+                labelText = "businessactivities.name.software.pkg.lbl",
+                jsHidden = true
+            )
         }
 
 
