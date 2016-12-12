@@ -3,6 +3,7 @@ package models
 import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.validation.Invalid
 import utils.DateHelper.localDateOrdering
 
 import scala.util.matching.Regex
@@ -172,6 +173,15 @@ object FormTypes {
 
   val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
   val localDateFutureRule = localDateRule compose futureDateRule
+
+  val peopleEndDateRule : Rule[UrlFormEncoded, LocalDate] =
+    From[UrlFormEncoded] { __ =>
+      (
+        (__ \  "positionStartDate").read(jodaLocalDate) ~
+          (__ \ "endDate").read(localDateFutureRule)
+        )((startDate, endDate) => if(endDate.isAfter(startDate)) endDate else new LocalDate(1900,1,1)) orElse
+        Rule[UrlFormEncoded, LocalDate](__ => Failure(Seq(Path -> Seq(ValidationError("Failure")))))
+    }.repath(_ => Path)
 
   /** Bank details Rules **/
 
