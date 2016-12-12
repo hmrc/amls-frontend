@@ -847,6 +847,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         result match {
           case Some((_, _, rows)) => {
+            println(rows)
             rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
             rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
           }
@@ -919,14 +920,14 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           case Some((_, _, breakdownRows)) =>
 
             breakdownRows.head.label mustBe "confirmation.responsiblepeople"
-            breakdownRows.head.quantity mustBe 2
+            breakdownRows.head.quantity mustBe 1
             breakdownRows.head.perItm mustBe Currency(rpFee)
-            breakdownRows.head.total mustBe Currency(rpFee + rpFee)
+            breakdownRows.head.total mustBe Currency(rpFee)
 
             breakdownRows(1).label mustBe "confirmation.unpaidpeople"
             breakdownRows(1).quantity mustBe 1
-            breakdownRows(1).perItm mustBe Currency(0 - rpFee)
-            breakdownRows(1).total mustBe Currency(0 - rpFee)
+            breakdownRows(1).perItm mustBe Currency(0)
+            breakdownRows(1).total mustBe Currency(0)
 
             breakdownRows(2).label mustBe "confirmation.tradingpremises.zero"
             breakdownRows(2).quantity mustBe 1

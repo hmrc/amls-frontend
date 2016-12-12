@@ -64,7 +64,7 @@ trait SubmissionService extends DataCacheService {
 
   private object UnpaidPeople {
     val message = "confirmation.unpaidpeople"
-    val feePer: BigDecimal = 0 - ApplicationConfig.peopleFee
+    val feePer: BigDecimal = 0
   }
 
   def subscribe
@@ -212,8 +212,7 @@ trait SubmissionService extends DataCacheService {
         } yield {
           val premisesFee: BigDecimal = getTotalPremisesFee(variation)
           val peopleFee: BigDecimal = getPeopleFee(variation)
-          val fitAndProperDeduction: BigDecimal = getFitAndProperDeduction(variation)
-          val totalFees: BigDecimal = peopleFee + fitAndProperDeduction + premisesFee
+          val totalFees: BigDecimal = peopleFee + premisesFee
           val rows = getVariationBreakdown(variation, peopleFee)
           val paymentRef = variation.paymentReference
           Future.successful(Some((paymentRef, Currency(totalFees), rows)))
@@ -227,9 +226,8 @@ trait SubmissionService extends DataCacheService {
 
     def rpRow: Seq[BreakdownRow] = {
       val rp = variation.addedResponsiblePeople
-      val fp = variation.addedResponsiblePeopleFitAndProper
-      if (rp > 0 || fp > 0) {
-        breakdownRows ++ Seq(BreakdownRow(People.message, rp + fp, People.feePer, Currency(peopleFee)))
+      if (rp > 0) {
+        breakdownRows ++ Seq(BreakdownRow(People.message, rp, People.feePer, Currency(getPeopleFee(variation))))
       } else {
         Seq()
       }
@@ -286,10 +284,9 @@ trait SubmissionService extends DataCacheService {
   }
 
   private def getPeopleFee(variation: AmendVariationResponse): BigDecimal =
-    People.feePer * (variation.addedResponsiblePeople + variation.addedResponsiblePeopleFitAndProper)
+    People.feePer * variation.addedResponsiblePeople
 
-  private def getFitAndProperDeduction(variation: AmendVariationResponse): BigDecimal =
-    0 - (People.feePer * variation.addedResponsiblePeopleFitAndProper)
+  private def getFitAndProperDeduction(variation: AmendVariationResponse): BigDecimal = 0
 
   private def getBreakdownRows
   (submission: SubmissionResponse,
