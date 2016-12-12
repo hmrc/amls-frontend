@@ -57,17 +57,22 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
         } yield redirectAppropriately(complete)
-        case _ => Form2[ResponsiblePersonEndDate](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete,  true)))
-          case ValidForm(_, data) => {
-            for {
-              result <- updateDataStrict[ResponsiblePeople](index) { tp =>
-                tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+        case _ =>
+          getData[ResponsiblePeople](index) flatMap { people =>
+            val extraFields = Map("positionStartDate" -> Seq(people.get.positions.get.startDate.get.toString))
+            Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
+              case f: InvalidForm =>
+                Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true)))
+              case ValidForm(_, data) => {
+                for {
+                  result <- updateDataStrict[ResponsiblePeople](index) { tp =>
+                    tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                  }
+                } yield redirectAppropriately(complete)
               }
-            } yield redirectAppropriately(complete)
+            }
+
           }
-        }
       }
   }
 }

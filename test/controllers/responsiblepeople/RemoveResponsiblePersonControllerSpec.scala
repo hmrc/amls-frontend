@@ -298,6 +298,32 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
           contentAsString(result) must include(Messages("error.expected.future.date"))
 
         }
+
+        "removing a trading premises from an application with end date before position start date" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          val position = Positions(Set(InternalAccountant), Some(new LocalDate(1999, 5, 1)))
+          val peopleList = Seq(CompleteResponsiblePeople1.copy(positions = Some(position)))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "endDate.day" -> "15",
+            "endDate.month" -> "1",
+            "endDate.year" -> "1998"
+          )
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(peopleList)))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = controller.remove(1, true, "person Name")(newRequest)
+          status(result) must be(BAD_REQUEST)
+          contentAsString(result) must include(Messages("error.expected.future.date.after.start"))
+
+        }
       }
 
     }
