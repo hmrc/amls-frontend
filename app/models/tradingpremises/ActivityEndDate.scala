@@ -14,7 +14,6 @@ object ActivityEndDate {
 
   implicit val formRule: Rule[UrlFormEncoded, ActivityEndDate] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    premisesEndDateRule
     __.read(premisesEndDateRule) fmap ActivityEndDate.apply
   }
 

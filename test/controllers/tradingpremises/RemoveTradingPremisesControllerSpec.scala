@@ -263,7 +263,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
           val newRequest = request.withFormUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "1",
-            "endDate.year" -> "1990"
+            "endDate.year" -> "2001"
           )
 
           when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
@@ -284,7 +284,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
             completeTradingPremises1.copy(
               status = Some(StatusConstants.Deleted),
               hasChanged = true,
-              endDate = Some(ActivityEndDate(new LocalDate(1990, 1, 1)))),
+              endDate = Some(ActivityEndDate(new LocalDate(2001, 1, 1)))),
             completeTradingPremises2,
             completeTradingPremises3
           )))(any(), any(), any())
@@ -366,7 +366,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
           val newRequest = request.withFormUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
-            "endDate.year" -> "1998"
+            "endDate.year" -> "1989"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -378,7 +378,7 @@ class RemoveTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite w
 
           val result = controller.remove(1, true, "trading Name")(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.future.date.after.start"))
+          contentAsString(result) must include(Messages("error.expected.tp.date.after.start", "1990-02-24"))
 
         }
       }

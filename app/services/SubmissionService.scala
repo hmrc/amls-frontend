@@ -7,7 +7,7 @@ import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{BusinessMatching, BusinessType}
+import models.businessmatching.{BusinessMatching, TrustAndCompanyServices, BusinessActivities => BusinessSevices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
@@ -38,8 +38,8 @@ trait SubmissionService extends DataCacheService {
 
   private object Submission {
     val message = "confirmation.submission"
-    val quantity = 1
     val feePer: BigDecimal = ApplicationConfig.regFee
+    val quantity = 1
   }
 
   private object Premises {
@@ -98,11 +98,13 @@ trait SubmissionService extends DataCacheService {
           subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
           premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
         } yield {
           val subQuantity = subscriptionQuantity(subscription)
           val paymentReference = subscription.paymentReference
           val total = subscription.totalFees
-          val rows = getBreakdownRows(subscription, premises, people, subQuantity)
+          val rows = getBreakdownRows(subscription, premises, people, businessActivities, subQuantity)
           Future.successful((paymentReference, Currency.fromBD(total), rows))
           // TODO
         }) getOrElse Future.failed(new Exception("TODO"))
@@ -183,12 +185,14 @@ trait SubmissionService extends DataCacheService {
       amendment <- cache.getEntry[AmendVariationResponse](AmendVariationResponse.key)
       premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
       people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+      businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+      businessActivities <- businessMatching.activities
     } yield {
       val subQuantity = subscriptionQuantity(amendment)
       val total = amendment.totalFees
       val difference = amendment.difference map Currency.fromBD
       val filteredPremises = premises.filter(!_.status.contains(StatusConstants.Deleted))
-      val rows = getBreakdownRows(amendment, filteredPremises, people, subQuantity)
+      val rows = getBreakdownRows(amendment, filteredPremises, people, businessActivities, subQuantity)
       val paymentRef = amendment.paymentReference
       Future.successful(Some((paymentRef, Currency.fromBD(total), rows, difference)))
     }
@@ -291,10 +295,10 @@ trait SubmissionService extends DataCacheService {
   (submission: SubmissionResponse,
    premises: Seq[TradingPremises],
    people: Seq[ResponsiblePeople],
+   businessActivities: BusinessSevices,
    subQuantity: Int): Seq[BreakdownRow] = {
-    Seq(
-      BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)
-    ) ++ responsiblePeopleRows(people, submission) ++
+    Seq(BreakdownRow(Submission.message, subQuantity, Submission.feePer, subQuantity * Submission.feePer)) ++
+      responsiblePeopleRows(people, submission, businessActivities) ++
       Seq(BreakdownRow(Premises.message, premises.size, Premises.feePer, submission.premiseFee))
   }
 
@@ -327,19 +331,34 @@ trait SubmissionService extends DataCacheService {
   private def subscriptionQuantity(subscription: SubmissionResponse): Int =
     if (subscription.registrationFee == 0) 0 else 1
 
-  private def responsiblePeopleRows(people: Seq[ResponsiblePeople], subscription: SubmissionResponse): Seq[BreakdownRow] = {
+  private def responsiblePeopleRows(
+                                     people: Seq[ResponsiblePeople],
+                                     subscription: SubmissionResponse,
+                                     businessActivities: BusinessSevices
+                                   ): Seq[BreakdownRow] = {
 
-    val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
-
-    people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
-      case (b, a) =>
-        Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fPFee.getOrElse(0)))) ++
-          (if (b.nonEmpty) {
-            Seq(BreakdownRow(UnpaidPeople.message, b.size, max(0, UnpaidPeople.feePer), Currency.fromBD(max(0, UnpaidPeople.feePer))))
-          } else {
-            Seq.empty
-          })
+    val showBreakdown = subscription.fPFee match {
+      case None => businessActivities.businessActivities.exists(act => act == MSB || act == TrustAndCompanyServices)
+      case _ => true
     }
+
+    if(showBreakdown){
+
+      val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
+
+      people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false)) match {
+        case (b, a) =>
+          Seq(BreakdownRow(People.message, a.size, People.feePer, Currency.fromBD(subscription.fPFee.getOrElse(0)))) ++
+            (if (b.nonEmpty) {
+              Seq(BreakdownRow(UnpaidPeople.message, b.size, max(0, UnpaidPeople.feePer), Currency.fromBD(max(0, UnpaidPeople.feePer))))
+            } else {
+              Seq.empty
+            })
+      }
+    } else {
+      Seq.empty
+    }
+
   }
 
 }

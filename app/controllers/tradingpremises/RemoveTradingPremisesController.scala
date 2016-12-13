@@ -53,7 +53,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
             val extraFields = Map(
               "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.toString("yyyy-MM-dd"))
             )
-            Form2[ActivityEndDate](request.body) match {
+            Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
               case f: InvalidForm =>
                 Future.successful(BadRequest(remove_trading_premises(f, index, complete, tradingName, true)))
               case ValidForm(_, data) => {
