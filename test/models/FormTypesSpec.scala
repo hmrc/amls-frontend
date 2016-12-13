@@ -256,7 +256,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate trading premises removal when end date is before start date" in {
 
       val form: UrlFormEncoded = Map(
-        "positionStartDate" -> Seq("1999-01-01"),
+        "premisesStartDate" -> Seq("1999-01-01"),
         "endDate.day" -> Seq("1"),
         "endDate.month" -> Seq("1"),
         "endDate.year" -> Seq("2000")

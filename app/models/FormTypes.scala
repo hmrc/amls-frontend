@@ -173,6 +173,15 @@ object FormTypes {
   val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
   val localDateFutureRule = localDateRule compose futureDateRule
 
+  val premisesEndDateRule = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    ((__ \ "premisesStartDate").read(jodaLocalDateRule("yyyy-MM-dd")) ~
+      (__ \ "endDate").read(localDateFutureRule)).tupled.compose(Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
+      case (d1, d2) if d2.isAfter(d1) => Success(d2)
+      case (startDate, _) => Failure(Seq(ValidationError("error.expected.date.after.start", startDate)))
+    })
+  }
+
   /** Bank details Rules **/
 
   //TODO: Add error messages
