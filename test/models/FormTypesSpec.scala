@@ -2,6 +2,7 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 import org.specs2.mock.mockito.MockitoMatchers
+import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 
@@ -250,6 +251,21 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         be(Failure(Seq(
           Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
+    }
+
+    "fail to validate trading premises removal when end date is before start date" in {
+
+      val form: UrlFormEncoded = Map(
+        "positionStartDate" -> Seq("1999-01-01"),
+        "endDate.day" -> Seq("1"),
+        "endDate.month" -> Seq("1"),
+        "endDate.year" -> Seq("2000")
+      )
+
+      val result = FormTypes.premisesEndDateRule.validate(form)
+
+      result mustBe Failure(Seq(Path -> Seq(ValidationError("Hello"))))
+
     }
   }
 
