@@ -2,8 +2,7 @@ package models
 
 import org.joda.time.LocalDate
 import play.api.data.mapping._
-import play.api.data.mapping.forms.{Rules, UrlFormEncoded}
-import play.api.data.validation.Invalid
+import play.api.data.mapping.forms.UrlFormEncoded
 import utils.DateHelper.localDateOrdering
 
 import scala.util.matching.Regex
@@ -34,19 +33,19 @@ object FormTypes {
 
   val vrnTypeRegex = "^[0-9]{9}$".r
   val phoneNumberRegex = "[0-9()+\\- ]+".r
-  val emailRegex = ("^.+" +                    //Any character 1 or more times
-                    "@" +                     //@ symbol
-                    "(" +                     //start of DNS label group
-                      "(?!\\-)" +             //does not start with hyphen
-                      "[a-zA-Z0-9\\-]+" +     //one or more alphanumerics or hyphen
-                      "(?<!\\-)" +            //does not end with a hyphen
-                      "\\." +                 //dot
-                    ")*" +                    //zero or more dns labels followed by dot
-                    "(" +                     //start of Top level dns label (same as a DNS label but not dot after it)
-                      "(?!\\-)" +
-                      "[a-zA-Z0-9\\-]+" +
-                      "(?<!\\-)" +
-                    ")$").r
+  val emailRegex = ("^.+" + //Any character 1 or more times
+    "@" + //@ symbol
+    "(" + //start of DNS label group
+    "(?!\\-)" + //does not start with hyphen
+    "[a-zA-Z0-9\\-]+" + //one or more alphanumerics or hyphen
+    "(?<!\\-)" + //does not end with a hyphen
+    "\\." + //dot
+    ")*" + //zero or more dns labels followed by dot
+    "(" + //start of Top level dns label (same as a DNS label but not dot after it)
+    "(?!\\-)" +
+    "[a-zA-Z0-9\\-]+" +
+    "(?<!\\-)" +
+    ")$").r
   val dayRegex = "(0?[1-9]|[12][0-9]|3[01])".r
   val monthRegex = "(0?[1-9]|1[012])".r
   val yearRegex = "((19|20)\\d\\d)".r
@@ -80,12 +79,12 @@ object FormTypes {
     def insensitive = s"(?i)${regex.pattern}".r
   }
 
-  def removeCharacterRule(c : Char) = Rule.zero[String] fmap {
+  def removeCharacterRule(c: Char) = Rule.zero[String] fmap {
     _.replace(c.toString, "")
   }
 
-  val removeSpacesRule : Rule[String,String]= removeCharacterRule(' ')
-  val removeDashRule : Rule[String,String]= removeCharacterRule('-')
+  val removeSpacesRule: Rule[String, String] = removeCharacterRule(' ')
+  val removeDashRule: Rule[String, String] = removeCharacterRule('-')
 
 
   /** Name Rules **/
@@ -154,39 +153,36 @@ object FormTypes {
     From[UrlFormEncoded] { __ =>
       (
         (__ \ "year").read(yearType) ~
-        (__ \ "month").read(monthType) ~
-        (__ \ "day").read(dayType)
-      )( (y, m, d) => s"$y-$m-$d" ) orElse
-        Rule[UrlFormEncoded, String]( __ => Success("INVALID DATE STRING")) compose
+          (__ \ "month").read(monthType) ~
+          (__ \ "day").read(dayType)
+        ) ((y, m, d) => s"$y-$m-$d") orElse
+        Rule[UrlFormEncoded, String](__ => Success("INVALID DATE STRING")) compose
         jodaLocalDateRule("yyyy-MM-dd")
     }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
-     import play.api.data.mapping.forms.Writes._
-     (
-       (__ \ "year").write[String] ~
-       (__ \ "month").write[String] ~
-       (__ \ "day").write[String]
-     )( d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
-   }
+      import play.api.data.mapping.forms.Writes._
+      (
+        (__ \ "year").write[String] ~
+          (__ \ "month").write[String] ~
+          (__ \ "day").write[String]
+        ) (d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
+    }
 
   val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
   val localDateFutureRule = localDateRule compose futureDateRule
 
-//  val isDateAfterRule : Rule[(LocalDate, LocalDate), LocalDate] = Rule.fromMapping {
-//    case (d1, d2) if d1.isAfter(d2) => Success(d1)
-//    case _ => Failure(Seq(ValidationError("Date 1 is not after date 2")))
-//  }
+  val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
+    case (d1, d2, un) if d2.isAfter(d1) => Success(d2)
+    case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.date.after.start", userName, startDate)))
+  }
 
   val peopleEndDateRule = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     ((__ \ "positionStartDate").read(jodaLocalDateRule("yyyy-MM-dd")) ~
       (__ \ "endDate").read(localDateFutureRule) ~
-    ( __ \ "userName").read[String]).tupled.compose(Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate]{
-      case (d1, d2, un) if d2.isAfter(d1) => Success(d2)
-      case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.date.after.start", userName, startDate)))
-    })
+      (__ \ "userName").read[String]).tupled.compose(peopleEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
   /** Bank details Rules **/

@@ -41,6 +41,9 @@ case class InvalidForm(
     errors.toMap.getOrElse(path, Seq.empty)
 
   override def apply(path: Path): Field = {
+    println(path)
+    println(data)
+    println(errors)
     val v = data.getOrElse(PM.asKey(path), Seq.empty)
     val e = errors.toMap.getOrElse(path, Seq.empty)
     InvalidField(path, v, e)

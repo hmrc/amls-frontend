@@ -256,8 +256,11 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "successfully validate a form with 2 dates which should be after one another" in {
 
+      val startDate = new LocalDate(2001, 1, 1)
+
       val form: UrlFormEncoded = Map(
-        "positionStartDate" -> Seq("1999-01-01"),
+        "positionStartDate" -> Seq(startDate.toString("yyyy-MM-dd")),
+        "userName" -> Seq("User 1"),
         "endDate.day" -> Seq("1"),
         "endDate.month" -> Seq("1"),
         "endDate.year" -> Seq("2000")
@@ -265,13 +268,12 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       val result = FormTypes.peopleEndDateRule.validate(form)
 
-      result mustBe Failure(Seq(Path -> Seq(ValidationError("Hello"))))
+      result mustBe Failure(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.date.after.start", "User 1", startDate))))
 
     }
   }
 
   "localDateFutureRule" must {
-    import org.joda.time.LocalDate
     val data = Map(
       "day" -> Seq("24"),
       "month" -> Seq("2"),

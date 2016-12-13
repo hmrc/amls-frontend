@@ -186,7 +186,7 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
           val newRequest = request.withFormUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "1",
-            "endDate.year" -> "1990"
+            "endDate.year" -> "2006"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -197,13 +197,13 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
-          val result = controller.remove(1, false, "John Envy Doe")(newRequest)
+          val result = controller.remove(1, complete = false, "John Envy Doe")(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CheckYourAnswersController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true,
-              endDate = Some(ResponsiblePersonEndDate(new LocalDate(1990, 1, 1)))),
+              endDate = Some(ResponsiblePersonEndDate(new LocalDate(2006, 1, 1)))),
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
@@ -346,7 +346,9 @@ class RemoveResponsiblePersonControllerSpec extends WordSpecLike
   val vatRegistered = VATRegisteredNo
   val training = TrainingYes("test")
   val experienceTraining = ExperienceTrainingYes("Some training")
-  val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(new LocalDate()))
+
+  //scalastyle:off magic.number
+  val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(new LocalDate(2005, 3, 15)))
 
   val CompleteResponsiblePeople1 = ResponsiblePeople(
     Some(personName),
