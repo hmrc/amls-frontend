@@ -73,15 +73,7 @@ object BankDetails {
       (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "status").readNullable[String]
     )(BankDetails.apply _)
-
-
-//    (
-//    (__).readNullable[BankAccountType] and
-//      (__).readNullable[BankAccount] and
-//      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
-//      (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) and
-//      (__ \ "status").readNullable[String]
-//    ) (BankDetails.apply _)
+  
 
   implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]
 
