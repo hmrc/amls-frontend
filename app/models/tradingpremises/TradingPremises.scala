@@ -97,7 +97,6 @@ object TradingPremises {
   implicit val reads: Reads[TradingPremises] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
-    //((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read[Option[BankAccount]])
 
     def backCompatibleReads[T](fieldName : String)(implicit rds:Reads[T]) = {
       (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read[Option[T]]
