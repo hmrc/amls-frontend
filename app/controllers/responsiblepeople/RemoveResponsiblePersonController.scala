@@ -66,7 +66,6 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
 
             Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
               case f: InvalidForm =>
-                println("fffffffffffffffffffffffff" + f);
                 Future.successful(BadRequest(remove_responsible_person(f, index, personName, complete, true)))
               case ValidForm(_, data) => {
                 for {

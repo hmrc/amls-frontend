@@ -186,7 +186,7 @@ object FormTypes {
 
   val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
     case (d1, d2, un) if d2.isAfter(d1) => Success(d2)
-    case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.date.after.start", userName, startDate)))
+    case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.rp.date.after.start", userName, startDate)))
   }
 
   val peopleEndDateRule = From[UrlFormEncoded] { __ =>
@@ -207,6 +207,7 @@ object FormTypes {
   val sortCodeType = (removeDashRule compose removeSpacesRule compose notEmpty)
     .withMessage("error.invalid.bankdetails.sortcode")
     .compose(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
+
 
   val ukBankAccountNumberType = notEmpty
     .withMessage("error.bankdetails.accountnumber")
