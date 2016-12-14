@@ -175,7 +175,7 @@ object FormTypes {
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
     case (d1, d2) if d2.isAfter(d1) => Success(d2)
-    case (startDate, _) => Failure(Seq(ValidationError("error.expected.tp.date.after.start", startDate)))
+    case (startDate, _) => Failure(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }
 
   val premisesEndDateRule = From[UrlFormEncoded] { __ =>
@@ -186,7 +186,7 @@ object FormTypes {
 
   val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
     case (d1, d2, un) if d2.isAfter(d1) => Success(d2)
-    case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.rp.date.after.start", userName, startDate)))
+    case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.rp.date.after.start", userName, startDate.toString("dd-MM-yyyy"))))
   }
 
   val peopleEndDateRule = From[UrlFormEncoded] { __ =>
