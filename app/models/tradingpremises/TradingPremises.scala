@@ -97,15 +97,21 @@ object TradingPremises {
   implicit val reads: Reads[TradingPremises] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
+    //((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read[Option[BankAccount]])
+
+    def backCompatibleReads[T](fieldName : String)(implicit rds:Reads[T]) = {
+      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read[Option[T]]
+    }
+
     (
-      (__ \ "registeringAgentPremises").readNullable[RegisteringAgentPremises] and
-        (__ \ "yourTradingPremises").readNullable[YourTradingPremises] and
-        (__ \ "businessStructure").readNullable[BusinessStructure] and
-        (__ \ "agentName").readNullable[AgentName] and
-        (__ \ "agentCompanyName").readNullable[AgentCompanyName] and
-        (__ \ "agentPartnership").readNullable[AgentPartnership] and
-        (__ \ "whatDoesYourBusinessDoAtThisAddress").readNullable[WhatDoesYourBusinessDo] and
-        (__ \ "msbServices").readNullable[MsbServices] and
+      backCompatibleReads[RegisteringAgentPremises]("registeringAgentPremises") and
+        backCompatibleReads[YourTradingPremises]("yourTradingPremises") and
+        backCompatibleReads[BusinessStructure]("businessStructure") and
+        backCompatibleReads[AgentName]("agentName") and
+        backCompatibleReads[AgentCompanyName]("agentCompanyName") and
+        backCompatibleReads[AgentPartnership]("agentPartnership") and
+        backCompatibleReads[WhatDoesYourBusinessDo]("whatDoesYourBusinessDoAtThisAddress") and
+        backCompatibleReads[MsbServices]("msbServices") and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
         (__ \ "lineId").readNullable[Int] and
         (__ \ "status").readNullable[String] and

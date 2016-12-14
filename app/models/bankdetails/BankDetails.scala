@@ -73,7 +73,7 @@ object BankDetails {
       (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "status").readNullable[String]
     )(BankDetails.apply _)
-  
+
 
   implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]
 
