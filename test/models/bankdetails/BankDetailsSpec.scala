@@ -5,7 +5,7 @@ import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
@@ -331,6 +331,33 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar {
           res.hasChanged must be(true)
           res.bankAccount must be(Some(bankAccountNew))
         }
+      }
+    }
+  }
+
+  "Bankdetails deserialisation" when {
+    "presented with Json written by version 2.4.4 of the service" must {
+      "Deserialise as expected" in {
+        val input = Json.parse(
+          """
+            |{
+            | "bankAccountType":"01",
+            | "accountName":"sadfjkl",
+            | "isUK":true,
+            | "accountNumber":"12345678",
+            | "sortCode":"123456"
+            |}
+          """.stripMargin)
+
+        BankDetails.reads.reads(input) must be (JsSuccess(
+          BankDetails(
+            Some(PersonalAccount),
+            Some(BankAccount("sadfjkl", UKAccount("12345678", "123456"))),
+            false,
+            false,
+            None
+          )
+        ))
       }
     }
   }
