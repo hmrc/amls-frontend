@@ -1,6 +1,7 @@
 package models.bankdetails
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.Logger
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -41,6 +42,7 @@ object BankDetails {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "bankdetails"
+    Logger.debug(s"[BankDetails][section] $cache")
     cache.getEntry[Seq[BankDetails]](key).fold(Section(messageKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true)))
       {bds =>
       bds.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == BankDetails()) match {
@@ -65,12 +67,13 @@ object BankDetails {
   }
 
   implicit val reads: Reads[BankDetails] = (
-    (__ \ "bankAccountType").readNullable[BankAccountType] and
-      (__ \ "bankAccount").readNullable[BankAccount] and
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
-      (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) and
+      ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read[Option[BankAccountType]]) ~
+      ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read[Option[BankAccount]]) ~
+      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
+      (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "status").readNullable[String]
-    ) (BankDetails.apply _)
+    )(BankDetails.apply _)
+
 
   implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]
 
