@@ -2,6 +2,7 @@ package models
 
 import org.scalatestplus.play.PlaySpec
 import org.specs2.mock.mockito.MockitoMatchers
+import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 
@@ -251,10 +252,45 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
           Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
     }
+
+    "fail to validate trading premises removal when end date is before start date" in {
+
+      val startDate = new LocalDate(1999, 1, 1)
+
+      val form: UrlFormEncoded = Map(
+        "premisesStartDate" -> Seq(startDate.toString("yyyy-MM-dd")),
+        "endDate.day" -> Seq("1"),
+        "endDate.month" -> Seq("1"),
+        "endDate.year" -> Seq("1998")
+      )
+
+      val result = FormTypes.premisesEndDateRule.validate(form)
+
+      result mustBe Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.tp.date.after.start", startDate))))
+
+    }
+
+
+    "successfully validate a form with 2 dates which should be after one another" in {
+
+      val startDate = new LocalDate(2001, 1, 1)
+
+      val form: UrlFormEncoded = Map(
+        "positionStartDate" -> Seq(startDate.toString("yyyy-MM-dd")),
+        "userName" -> Seq("User 1"),
+        "endDate.day" -> Seq("1"),
+        "endDate.month" -> Seq("1"),
+        "endDate.year" -> Seq("2000")
+      )
+
+      val result = FormTypes.peopleEndDateRule.validate(form)
+
+      result mustBe Failure(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.rp.date.after.start", "User 1", startDate))))
+
+    }
   }
 
   "localDateFutureRule" must {
-    import org.joda.time.LocalDate
     val data = Map(
       "day" -> Seq("24"),
       "month" -> Seq("2"),
@@ -480,7 +516,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
       ninoType.validate("AB123456B") must
         be(Success("AB123456B"))
     }
-    
+
     "successfully validate disregarding case" in {
       ninoType.validate("ab123456c") mustBe Success("AB123456C")
     }

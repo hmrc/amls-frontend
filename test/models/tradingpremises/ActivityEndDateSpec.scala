@@ -9,21 +9,24 @@ import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class ActivityEndDateSpec extends PlaySpec {
 
+  val startDateField = Map("premisesStartDate" -> Seq("1989-01-01"))
+
   "ActivityEndDate" must {
     "Form" must {
       "read successfully" in {
-        val model =  Map (
+        val model =  startDateField ++ Map (
             "endDate.day" -> Seq("24"),
             "endDate.month" -> Seq("2"),
             "endDate.year" -> Seq("1990")
         )
+
         // scalastyle:off
         ActivityEndDate.formRule.validate(model) must be (Success(ActivityEndDate(new LocalDate(1990, 2, 24))))
 
       }
 
       "throw error message when day entered is invalid" in {
-        val model =  Map (
+        val model =  startDateField ++ Map (
           "endDate.day" -> Seq("2466"),
           "endDate.month" -> Seq("2"),
           "endDate.year" -> Seq("1990")
@@ -34,7 +37,7 @@ class ActivityEndDateSpec extends PlaySpec {
       }
 
       "throw error message when data entered is empty" in {
-        val model =  Map (
+        val model =  startDateField ++ Map (
           "endDate.day" -> Seq(""),
           "endDate.month" -> Seq(""),
           "endDate.year" -> Seq("")
