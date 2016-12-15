@@ -266,7 +266,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       val result = FormTypes.premisesEndDateRule.validate(form)
 
-      result mustBe Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.tp.date.after.start", startDate))))
+      result mustBe Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy")))))
 
     }
 
@@ -285,7 +285,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       val result = FormTypes.peopleEndDateRule.validate(form)
 
-      result mustBe Failure(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.rp.date.after.start", "User 1", startDate))))
+      result mustBe Failure(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.rp.date.after.start", "User 1", startDate.toString("dd-MM-yyyy")))))
 
     }
   }
