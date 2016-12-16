@@ -14,9 +14,17 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
   val validDay = 24
   val validMonth = 2
 
+  val standardExtraData = Map(
+    "positionStartDate" -> Seq("1990-12-01"),
+    "userName" -> Seq("User 1")
+  )
+
   "ResponsiblePersonEndDate Form" must {
     "successfully read the model" in {
+
       val validModel = Map(
+        "positionStartDate" -> Seq("1988-12-01"),
+        "userName" -> Seq("User 1"),
         "endDate.day" -> Seq("24"),
         "endDate.month" -> Seq("2"),
         "endDate.year" -> Seq("1990")
@@ -37,7 +45,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
 
     "throw error message" when {
       "day entered is invalid" in {
-        val errorDayModel = Map(
+        val errorDayModel = standardExtraData ++ Map(
           "endDate.day" -> Seq("2466"),
           "endDate.month" -> Seq("2"),
           "endDate.year" -> Seq("1990")
@@ -48,7 +56,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
       }
 
       "month entered is invalid" in {
-        val errorDayModel = Map(
+        val errorDayModel = standardExtraData ++ Map(
           "endDate.day" -> Seq("24"),
           "endDate.month" -> Seq("29"),
           "endDate.year" -> Seq("1990")
@@ -59,7 +67,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
       }
 
       "year entered is too long" in {
-        val errorDayModel = Map(
+        val errorDayModel = standardExtraData ++ Map(
           "endDate.day" -> Seq("24"),
           "endDate.month" -> Seq("11"),
           "endDate.year" -> Seq("199000")
@@ -70,7 +78,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
       }
 
       "year entered is too short" in {
-        val errorDayModel = Map(
+        val errorDayModel = standardExtraData ++ Map(
           "endDate.day" -> Seq("24"),
           "endDate.month" -> Seq("11"),
           "endDate.year" -> Seq("16")
@@ -81,7 +89,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
       }
 
       "all fields are empty" in {
-        val noContentModel = Map(
+        val noContentModel = standardExtraData ++ Map(
           "endDate.day" -> Seq(""),
           "endDate.month" -> Seq(""),
           "endDate.year" -> Seq("")

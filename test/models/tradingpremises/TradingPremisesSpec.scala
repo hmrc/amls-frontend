@@ -1,6 +1,6 @@
 package models.tradingpremises
 
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
@@ -8,7 +8,7 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
@@ -271,6 +271,108 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
       "at least one BankDetails within the sequence has changed" in {
         val res = TradingPremises.anyChanged(originalBankDetailsChanged)
         res must be(true)
+      }
+    }
+  }
+
+  "TradingPremises deserialisation" when {
+    "presented with Json written by version 2.4.4 of the service " when {
+      "the premises is not an agents presmises " must {
+        "Deserialise as expected" in {
+          val input = Json.parse(
+            """
+              |{
+              | "agentPremises":false,
+              | "tradingName":"trading1.1",
+              | "addressLine1":"add",
+              | "addressLine2":"add",
+              | "addressLine3":"add",
+              | "addressLine4":"add",
+              | "postcode":"PP2 3PP",
+              | "isResidential":true,
+              | "startDate":"1991-01-01",
+              | "activities":["03","06"]
+              |}
+            """.stripMargin)
+
+          TradingPremises.reads.reads(input) must be(JsSuccess(
+            TradingPremises(
+              Some(RegisteringAgentPremises(false)),
+              Some(YourTradingPremises(
+                "trading1.1",
+                Address("add", "add", Some("add"), Some("add"), "PP2 3PP"),
+                true,
+                new LocalDate(1991, 1, 1)
+              )),
+              None,
+              None,
+              None,
+              None,
+              Some(WhatDoesYourBusinessDo(Set(EstateAgentBusinessService, TrustAndCompanyServices))),
+              None,
+              false,
+              None,
+              None,
+              None
+            )
+          ))
+        }
+      }
+
+      "the premises is and agent's premises" must {
+        "deserialise as expected" in {
+          val input = Json.parse(
+            """
+              |{
+              | "agentPremises":true,
+              | "tradingName":"trading name",
+              | "addressLine1":"hfgdhfg",
+              | "addressLine2":"jhh",
+              | "addressLine4":"fjjghghjgh",
+              | "postcode":"hgjgh",
+              | "isResidential":false,
+              | "startDate":"1967-02-01",
+              | "agentsBusinessStructure":"02",
+              | "agentCompanyName":"REG Name Ltd.",
+              | "activities":["03","07","02","05","01","06","04"],
+              | "msbServices":["01","02","03","04"]}
+            """.stripMargin)
+
+          TradingPremises.reads.reads(input) must be(JsSuccess(
+            TradingPremises(
+              Some(RegisteringAgentPremises(true)),
+              Some(YourTradingPremises(
+                "trading name",
+                Address("hfgdhfg", "jhh", None, Some("fjjghghjgh"), "hgjgh"),
+                false,
+                new LocalDate(1967, 2, 1)
+              )),
+              Some(LimitedLiabilityPartnership),
+              None,
+              Some(AgentCompanyName("REG Name Ltd.")),
+              None,
+              Some(WhatDoesYourBusinessDo(Set(
+                    AccountancyServices,
+                    BillPaymentServices,
+                    EstateAgentBusinessService,
+                    HighValueDealing,
+                    MoneyServiceBusiness,
+                    TrustAndCompanyServices,
+                    TelephonePaymentService
+              ))),
+              Some(MsbServices(Set(
+                TransmittingMoney,
+                CurrencyExchange,
+                ChequeCashingNotScrapMetal,
+                ChequeCashingScrapMetal
+              ))),
+              false,
+              None,
+              None,
+              None
+            )
+          ))
+        }
       }
     }
   }

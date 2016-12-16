@@ -163,6 +163,7 @@ error.invalid.tp.agent.name = You can’t enter more than 140 characters for the
 error.required.tp.agent.partnership = Enter your agent’s partners.
 error.invalid.tp.agent.partnership = You can’t enter more than 140 characters for the agent’s partners.
 error.required.tp.register.another.premises = Select yes or no to the question: do you want to register another trading premises?
+error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 
 ###############################  Estate Agent Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
@@ -207,6 +208,7 @@ error.required.timeAtAddress = Select how long this person lived at this address
 error.required.positionWithinBusiness = Select at least one position within the business.
 error.required.rp.wherepersonlives.howlonglived = Select how long this person has lived at this address.
 error.expected.future.date = Enter a valid date. The date cannot be in the future.
+error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 
 ############################### Trust and company service providers ###############################
 
