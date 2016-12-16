@@ -15,8 +15,22 @@ $(function () {
 
   $.widget('hmrc.auto', {
     _create: function () {
-
       var options, _select, _change, input, value;
+      var _this = this
+
+      function addOption(value) {
+        $("<option data-added='true'>")
+              .attr("value", value)
+              .text(value)
+              .prop("selected", true)
+              .appendTo(_this.element)
+      }
+
+
+       console.log(this)
+      if (this.element[0].hasAttribute("data-invalid-value")) {
+        addOption(this.element.attr("data-invalid-value"))
+      }
 
       value = this.element.find('option:selected').text();
 
@@ -45,6 +59,10 @@ $(function () {
         options.forEach(function (e) {
           e.option.selected = e.label.toLowerCase() === input.val().toLowerCase();
         });
+
+        if (_this.element.find('option:selected')[0].text == "" && input.val() != "") {
+            addOption(input.val())
+        }
       };
 
       input = $('<input>')
