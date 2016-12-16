@@ -73,7 +73,9 @@ class WhichCurrencyControllerSpec extends WordSpec
       "data is valid" should {
         "redirect to check your answers" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody (
-            "currencies[]" -> "USD,GBP,EUR",
+            "currencies[0]" -> "USD",
+            "currencies[1]" -> "GBP",
+            "currencies[2]" -> "BOB",
             "bankMoneySource" ->"Yes",
             "bankNames" ->"Bank names",
             "wholesalerMoneySource" -> "Yes",
