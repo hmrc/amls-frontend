@@ -29,43 +29,18 @@ import scala.concurrent.{ExecutionContext, Future}
 trait SubmissionService extends DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
-
   private[services] def amlsConnector: AmlsConnector
-
   private[services] def ggService: GovernmentGatewayService
-
   private[services] def authEnrolmentsService: AuthEnrolmentsService
 
-  private object Submission {
-    val message = "confirmation.submission"
-    val feePer: BigDecimal = ApplicationConfig.regFee
-    val quantity = 1
-  }
+  private case class RowEntity(message: String, feePer: BigDecimal)
 
-  private object Premises {
-    val message = "confirmation.tradingpremises"
-    val feePer: BigDecimal = ApplicationConfig.premisesFee
-  }
-
-  private object PremisesHalfYear {
-    val message = "confirmation.tradingpremises.half"
-    val feePer: BigDecimal = Premises.feePer / 2
-  }
-
-  private object PremisesZero {
-    val message = "confirmation.tradingpremises.zero"
-    val feePer: BigDecimal = 0
-  }
-
-  private object People {
-    val message = "confirmation.responsiblepeople"
-    val feePer: BigDecimal = ApplicationConfig.peopleFee
-  }
-
-  private object UnpaidPeople {
-    val message = "confirmation.unpaidpeople"
-    val feePer: BigDecimal = 0 - ApplicationConfig.peopleFee
-  }
+  private val Submission = RowEntity("confirmation.submission", ApplicationConfig.regFee)
+  private val Premises = RowEntity("confirmation.tradingpremises", ApplicationConfig.premisesFee)
+  private val PremisesHalfYear = RowEntity("confirmation.tradingpremises.half", Premises.feePer / 2)
+  private val PremisesZero = RowEntity("confirmation.tradingpremises.zero", 0)
+  private val People = RowEntity("confirmation.responsiblepeople", ApplicationConfig.peopleFee)
+  private val UnpaidPeople = RowEntity("confirmation.unpaidpeople", 0)
 
   def subscribe
   (implicit
@@ -212,8 +187,7 @@ trait SubmissionService extends DataCacheService {
         } yield {
           val premisesFee: BigDecimal = getTotalPremisesFee(variation)
           val peopleFee: BigDecimal = getPeopleFee(variation)
-          val fitAndProperDeduction: BigDecimal = getFitAndProperDeduction(variation)
-          val totalFees: BigDecimal = peopleFee + fitAndProperDeduction + premisesFee
+          val totalFees: BigDecimal = peopleFee + premisesFee
           val rows = getVariationBreakdown(variation, peopleFee)
           val paymentRef = variation.paymentReference
           Future.successful(Some((paymentRef, Currency(totalFees), rows)))
@@ -225,71 +199,40 @@ trait SubmissionService extends DataCacheService {
 
     val breakdownRows = Seq()
 
-    def rpRow: Seq[BreakdownRow] = {
-      val rp = variation.addedResponsiblePeople
-      val fp = variation.addedResponsiblePeopleFitAndProper
-      if (rp > 0 || fp > 0) {
-        breakdownRows ++ Seq(BreakdownRow(People.message, rp + fp, People.feePer, Currency(peopleFee)))
+    def variationRow(count: Int, rowEntity: RowEntity, total: AmendVariationResponse => BigDecimal): Seq[BreakdownRow] = {
+      if (count > 0) {
+        breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(variation))))
       } else {
         Seq()
       }
     }
 
-    def fpRow: Seq[BreakdownRow] = {
-      if (variation.addedResponsiblePeopleFitAndProper > 0) {
-        breakdownRows ++ Seq(BreakdownRow(UnpaidPeople.message, variation.addedResponsiblePeopleFitAndProper, UnpaidPeople.feePer,
-          Currency(getFitAndProperDeduction(variation))))
-      } else {
-        Seq()
-      }
-    }
+    def rpRow: Seq[BreakdownRow] = variationRow(variation.addedResponsiblePeople, People, getPeopleFee)
+    def fpRow: Seq[BreakdownRow] = variationRow(variation.addedResponsiblePeopleFitAndProper, UnpaidPeople, getFitAndProperDeduction)
 
-    def tpFullYearRow: Seq[BreakdownRow] = {
-      if (variation.addedFullYearTradingPremises > 0) {
-        breakdownRows ++ Seq(BreakdownRow(Premises.message, variation.addedFullYearTradingPremises, Premises.feePer, Currency(getFullPremisesFee(variation))))
-      } else {
-        Seq()
-      }
-    }
-
-    def tpHalfYearRow: Seq[BreakdownRow] = {
-      if (variation.halfYearlyTradingPremises > 0) {
-        breakdownRows ++ Seq(BreakdownRow(PremisesHalfYear.message, variation.halfYearlyTradingPremises, PremisesHalfYear.feePer,
-          Currency(getHalfYearPremisesFee(variation))))
-      } else {
-        Seq()
-      }
-    }
-
-    def tpZeroRow: Seq[BreakdownRow] = {
-      if (variation.zeroRatedTradingPremises > 0) {
-        breakdownRows ++ Seq(BreakdownRow(PremisesZero.message, variation.zeroRatedTradingPremises, PremisesZero.feePer, Currency(PremisesZero.feePer)))
-      } else {
-        Seq()
-      }
-    }
+    def tpFullYearRow: Seq[BreakdownRow] = variationRow(variation.addedFullYearTradingPremises, Premises, getFullPremisesFee)
+    def tpHalfYearRow: Seq[BreakdownRow] = variationRow(variation.halfYearlyTradingPremises, PremisesHalfYear, getHalfYearPremisesFee)
+    def tpZeroRow: Seq[BreakdownRow] = variationRow(variation.zeroRatedTradingPremises, PremisesZero, getZeroPremisesFee)
 
     rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
 
   }
 
-  private def getTotalPremisesFee(variation: AmendVariationResponse): BigDecimal = {
+  private def getTotalPremisesFee(variation: AmendVariationResponse): BigDecimal =
     (Premises.feePer * variation.addedFullYearTradingPremises) + getHalfYearPremisesFee(variation)
-  }
 
-  private def getFullPremisesFee(variation: AmendVariationResponse): BigDecimal = {
+  private def getFullPremisesFee(variation: AmendVariationResponse): BigDecimal =
     Premises.feePer * variation.addedFullYearTradingPremises
-  }
 
-  private def getHalfYearPremisesFee(variation: AmendVariationResponse): BigDecimal = {
+  private def getHalfYearPremisesFee(variation: AmendVariationResponse): BigDecimal =
     PremisesHalfYear.feePer * variation.halfYearlyTradingPremises
-  }
+
+  private def getZeroPremisesFee(variation: AmendVariationResponse): BigDecimal = 0
 
   private def getPeopleFee(variation: AmendVariationResponse): BigDecimal =
-    People.feePer * (variation.addedResponsiblePeople + variation.addedResponsiblePeopleFitAndProper)
+    People.feePer * variation.addedResponsiblePeople
 
-  private def getFitAndProperDeduction(variation: AmendVariationResponse): BigDecimal =
-    0 - (People.feePer * variation.addedResponsiblePeopleFitAndProper)
+  private def getFitAndProperDeduction(variation: AmendVariationResponse): BigDecimal = 0
 
   private def getBreakdownRows
   (submission: SubmissionResponse,
