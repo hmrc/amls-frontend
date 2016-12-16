@@ -26,8 +26,6 @@ $(function () {
               .appendTo(_this.element)
       }
 
-
-       console.log(this)
       if (this.element[0].hasAttribute("data-invalid-value")) {
         addOption(this.element.attr("data-invalid-value"))
       }
@@ -90,7 +88,7 @@ $(function () {
         var children = $this.children();
 
         children
-          .filter(':not(:first):not(:has(option[selected]))')
+          .filter(':not(:first):not(:has(option[selected])):not(.form-field--error)')
           .addClass('js-hidden');
         var $button = $('<a href="#">' + text + '</a>').click(function (e) {
           e.preventDefault();

@@ -13,7 +13,6 @@
     title = Messages("businessactivities.customer.outside.uk.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
-
     @form(f, controllers.businessactivities.routes.CustomersOutsideUKController.post(edit)) {
 
         @fieldset(
@@ -48,16 +47,7 @@
             )
             @errorGroup(f("countries")) {
                 @addRemove("lbl.add.another.country") {
-                    @for(i <- 0 until 10) {
-                        @defining(
-                            f(s"countries[$i]")
-                        ) { field =>
-                        @country(field, classes = field match {
-                            case f: ValidField => Seq("")
-                            case f: InvalidField => Seq("js-hidden")
-                            })
-                        }
-                    }
+                    @for(i <- 0 until 10) {@country(f(s"countries[$i]"))}
                 }
             }
         }
