@@ -42,6 +42,13 @@ object OptionValidators {
   }
 }
 
+object GenericValidators {
+  def inList[A](validItems : Traversable[A]) : Rule[A, A] = Rule.fromMapping { item =>
+    if (validItems.exists(x => x == item)) {Success(item)}
+    else {Failure(List(ValidationError("error.not.in.list")))}
+  }
+}
+
 trait MappingUtils {
 
   /**

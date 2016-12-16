@@ -9,7 +9,7 @@ import play.api.data.mapping.GenericRules._
 import play.api.libs.functional.Monoid
 import play.api.libs.json.{Writes, JsValue, Reads, Format}
 import utils.OptionValidators._
-import utils.TraversableValidators
+import utils.{GenericValidators, TraversableValidators}
 import utils.MappingUtils.Implicits._
 import models._
 
@@ -33,9 +33,10 @@ private sealed trait WhichCurrencies0 {
       maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long")
   }
 
-  private val currencyType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
+  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
                               TraversableValidators.flattenR[String] compose
-                              TraversableValidators.minLengthR[Seq[String]](1)
+                              TraversableValidators.minLengthR[Seq[String]](1) compose
+                              GenericRules.traversableR(GenericValidators.inList(currencies))
 
   private val validateMoneySources : ValidationRule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] =
     Rule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean),
@@ -54,7 +55,7 @@ private sealed trait WhichCurrencies0 {
       c: Path => RuleLike[A, Boolean]
     ) : Rule[A, WhichCurrencies] = From[A] {__ =>
 
-        val currencies = (__ \ "currencies").read(currencyType).withMessage("error.invalid.msb.wc.currencies")
+        val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
 
         val bankMoneySource : Rule[A, Option[BankMoneySource]]=
             (__ \ "bankMoneySource").read[Option[String]] flatMap {
@@ -78,9 +79,9 @@ private sealed trait WhichCurrencies0 {
           }
 
       (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
-        .apply {(a:Seq[String], b:(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)) =>
+        .apply {(a:Traversable[String], b:(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)) =>
           (a, b) match {
-            case (c, (bms, wms, cms)) => WhichCurrencies(c, bms, wms, cms)
+            case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, bms, wms, cms)
           }
     }
 }
