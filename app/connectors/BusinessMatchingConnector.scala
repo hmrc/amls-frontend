@@ -1,6 +1,7 @@
 package connectors
 
 import config.WSHttp
+import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
@@ -52,8 +53,14 @@ trait BusinessMatchingConnector extends ServicesConfig {
   def getReviewDetails(implicit hc: HeaderCarrier): Future[ReviewDetails] = {
 
     val url = s"$businessMatchingUrl/fetch-review-details/$serviceName"
+    val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"
 
-    httpGet.GET[ReviewDetails](url)
+    Logger.debug(s"$logPrefix Fetching $url..")
+
+    httpGet.GET[ReviewDetails](url) map { result =>
+      Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
+      result
+    }
   }
 
 }
