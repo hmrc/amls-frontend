@@ -98,7 +98,9 @@ $(function () {
           }
         });
 
-        $this.append($button.hide().fadeIn(1000));
+        if ($this.find('div.js-hidden').size() > 0) {
+          $this.append($button.show());
+        }
       }
     });
     $('*[data-add-one]').addOne({});
