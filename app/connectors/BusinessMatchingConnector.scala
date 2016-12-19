@@ -3,17 +3,18 @@ package connectors
 import config.WSHttp
 import models.businesscustomer.ReviewDetails
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 trait BusinessMatchingConnector extends ServicesConfig {
 
   val http = WSHttp
-  val baseUrl = baseUrl("business-matching")
+  val businessMatchingUrl = baseUrl("business-matching")
   val serviceName = "amls"
 
-  def getReviewDetails: Future[ReviewDetails] = {
-    val url = s"$baseUrl/fetch-review-details/$serviceName"
+  def getReviewDetails(implicit hc: HeaderCarrier): Future[ReviewDetails] = {
+    val url = s"$businessMatchingUrl/fetch-review-details/$serviceName"
 
     http.GET[ReviewDetails](url)
   }
