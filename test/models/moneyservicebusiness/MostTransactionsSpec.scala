@@ -4,7 +4,8 @@ import models.Country
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsPath, JsError, JsSuccess, Json}
 
 class MostTransactionsSpec extends PlaySpec {
 
@@ -50,6 +51,42 @@ class MostTransactionsSpec extends PlaySpec {
       rule.validate(form) mustEqual Failure(
         Seq((Path \ "mostTransactionsCountries") -> Seq(ValidationError("error.maxLength", 3)))
       )
+    }
+  }
+
+  "Most Transactions Form Reads" when {
+    "all countries are valid" must {
+      "Successfully read from the form" in {
+
+        MostTransactions.formR.validate(
+          Map(
+            "mostTransactionsCountries[0]" -> Seq("GB"),
+            "mostTransactionsCountries[1]" -> Seq("MK"),
+            "mostTransactionsCountries[2]" -> Seq("JO")
+          )
+        ) must be(Success(MostTransactions(Seq(
+          Country("United Kingdom", "GB"),
+          Country("Macedonia, the Former Yugoslav Republic of", "MK"),
+          Country("Jordan", "JO")
+        ))))
+      }
+    }
+
+    "the second country is invalid" must {
+      "fail validation" in {
+        import utils.MappingUtils.Implicits.RichRule
+        import utils.TraversableValidators
+        import TraversableValidators._
+
+        val x: VA[MostTransactions] = MostTransactions.formR.validate(
+          Map(
+            "mostTransactionsCountries[0]" -> Seq("GB"),
+            "mostTransactionsCountries[1]" -> Seq("hjjkhjkjh"),
+            "mostTransactionsCountries[2]" -> Seq("MK")
+          )
+        )
+        x must be (Failure(Seq((Path \ "mostTransactionsCountries" \ 1) -> Seq(ValidationError("error.invalid.country")))))
+      }
     }
   }
 }
