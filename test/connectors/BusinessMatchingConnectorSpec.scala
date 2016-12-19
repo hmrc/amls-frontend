@@ -1,34 +1,92 @@
 package connectors
 
-import models.Country
-import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.BusinessType.LimitedCompany
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.play.http.HeaderCarrier
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.libs.json.Json
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+import utils.AuthorisedFixture
 
-class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures {
+import scala.concurrent.Future
 
-  val expectedDetails = ReviewDetails("Test Business", Some(LimitedCompany), Address("1 Test Street", "Test Town", None, None, None, Country("UK", "UK")), "some id")
+class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneAppPerSuite {
 
-    implicit val headerCarrier = HeaderCarrier()
+  implicit val headerCarrier = HeaderCarrier()
 
-  object TestBusinessMatchingConnector extends BusinessMatchingConnector {
+  val validReviewDetailsJson =
+    """
+      |{
+      |  "businessName": "Test Business",
+      |  "businessAddress": {
+      |    "line_1": "1 Test Street",
+      |    "line_2": "Test Town",
+      |    "country": "UK"
+      |  },
+      |  "sapNumber": "A number",
+      |  "safeId": "An id",
+      |  "isAGroup": false,
+      |  "directMatch": false,
+      |  "agentReferenceNumber": "agent reference",
+      |  "firstName": "First Name",
+      |  "lastName": "Last Name",
+      |  "utr": "123456789",
+      |  "identification": {
+      |    "idNumber": "id",
+      |    "issuingInstitution": "institution",
+      |    "issuingCountryCode": "UK"
+      |  },
+      |  "isBusinessDetailsEditable": false
+      |}
+    """.stripMargin
 
+  trait Fixture extends AuthorisedFixture { self =>
+
+    object TestBusinessMatchingConnector extends BusinessMatchingConnector {
+      override val httpGet = mock[HttpGet]
+    }
+
+    val address = BusinessMatchingConnector.Address("1 Test Street", "Test Town", None, None, None, "UK")
+
+    val validResponseDetail = BusinessMatchingConnector.ReviewDetails(
+      businessName = "Test Business",
+      businessType = None,
+      businessAddress = address,
+      sapNumber = "A number",
+      safeId = "An id",
+      isAGroup = false,
+      directMatch = false,
+      agentReferenceNumber = Some("agent reference"),
+      firstName = Some("First Name"),
+      lastName = Some("Last Name"),
+      utr = Some("123456789"),
+      identification = Some(BusinessMatchingConnector.Identification("id", "institution", "UK")),
+      isBusinessDetailsEditable = false
+    )
 
   }
 
   "The business matching connector" should {
 
+    "get the review details" in new Fixture {
 
-    "get the review details" in {
+      when(TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingConnector.ReviewDetails](any())(any(), any()))
+        .thenReturn(Future.successful(validResponseDetail))
 
       whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
-
+        result mustBe validResponseDetail
       }
 
     }
 
+  }
+
+  "The business matching review details object" should {
+    "deserialize into the object properly" in {
+
+      Json.parse(validReviewDetailsJson).as[BusinessMatchingConnector.ReviewDetails]
+
+    }
   }
 
 }
