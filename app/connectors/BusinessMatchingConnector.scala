@@ -5,8 +5,8 @@ import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
-
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait BusinessMatchingConnector extends ServicesConfig {
 
@@ -24,6 +24,10 @@ trait BusinessMatchingConnector extends ServicesConfig {
 
   case class Identification(idNumber: String, issuingInstitution: String, issuingCountryCode: String)
 
+  object Identification {
+    implicit val formats = Json.format[Identification]
+  }
+
   case class ReviewDetails(businessName: String,
                            businessType: Option[String],
                            businessAddress: Address,
@@ -37,10 +41,6 @@ trait BusinessMatchingConnector extends ServicesConfig {
                            utr: Option[String] = None,
                            identification: Option[Identification] = None,
                            isBusinessDetailsEditable: Boolean = false)
-
-  object Identification {
-    implicit val formats = Json.format[Identification]
-  }
 
   object ReviewDetails {
     implicit val formats = Json.format[ReviewDetails]
