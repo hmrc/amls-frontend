@@ -1,0 +1,14 @@
+@import include._
+
+@()(implicit request: Request[_])
+
+@header = {
+    @heading("", "")
+}
+
+@main(
+    title = "",
+    heading = header
+) {
+    <a class="button button-start" href="@controllers.routes.LandingController.get()" role="button">Start now</a>
+}

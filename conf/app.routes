@@ -2,7 +2,9 @@
 
 GET         /assets/*file                                               controllers.AssetsController.at(path="/public", file)
 
-GET         /                                                           controllers.LandingController.get()
+GET         /                                                           controllers.LandingController.start()
+
+GET         /start                                                      controllers.LandingController.get()
 
 POST        /subscribe                                                  controllers.SubmissionController.post()
 
