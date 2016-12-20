@@ -12,7 +12,6 @@
     title = Messages("msb.most.transactions.title") + " - " + Messages("summary.msb"),
     heading = header
 ) {
-
     @form(f, controllers.msb.routes.MostTransactionsController.post(edit)) {
         <p>@Messages("lbl.list.upto.3.countries")</p>
         @fieldset(
