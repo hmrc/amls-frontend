@@ -384,6 +384,20 @@ unauthorised.text1 = To use this service you should sign in with an ’organisat
 unauthorised.text2 = If you don’t have an organisation account you can
 unauthorised.register.link.text = register for a new one.
 
+
+############################### Start Page ###############################
+start.title = Register for anti-money laundering supervision
+start.line1 = Use this service to register with HM Revenue and Customs (HMRC) for supervision under the Money Laundering regulations.
+start.line2 = If you're already registered you can update your information, de-register or renew your registration.
+start.button.text = Start now
+start.before.heading = Before you start
+start.before.line1 = You'll need some details about your business, including your:
+start.utr.heading = Unique Tax Reference (UTR) number
+start.utr.line1 = You'll find it in the header of any letter issued by HMRC. It may be labelled 'Tax Reference', 'UTR' or 'Official Use'.
+start.crn.heading = Company registration number
+start.crn.line1 = You'll find it on your Certificate of Incorporation, on official letters from Companies House, or you can
+start.crn.link.text = search for it online
+
 ############################### Status page ###############################
 status.title = Your registration
 status.business = Your business:
