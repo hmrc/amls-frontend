@@ -3,12 +3,20 @@
 @()(implicit request: Request[_])
 
 @header = {
-    @heading("", "")
+    @heading("start.title", "summary.start")
 }
 
 @main(
-    title = "",
+    title = Messages("start.title") + " - " + Messages("summary.start"),
     heading = header
 ) {
-    <a class="button button-start" href="@controllers.routes.LandingController.get()" role="button">Start now</a>
+    <p>@Messages("start.line1")</p>
+    <p>@Messages("start.line2")</p>
+    <a class="button button--get-started" href="@controllers.routes.LandingController.get()" role="button">@Messages("start.button.text")</a>
+    <p class="heading-medium">@Messages("start.before.heading")</p>
+    <p>@Messages("start.before.line1")</p>
+    <p class="heading-small">@Messages("start.utr.heading")</p>
+    <p>@Messages("start.utr.line1")</p>
+    <p class="heading-small">@Messages("start.crn.heading")</p>
+    <p>@Messages("start.crn.line1") <a href="https://beta.companieshouse.gov.uk/">@Messages("start.crn.link.text")</a></p>
 }
