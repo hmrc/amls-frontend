@@ -1,7 +1,7 @@
 package controllers.aboutthebusiness
 
-import connectors.DataCacheConnector
-import models.aboutthebusiness.{CorporationTaxRegisteredYes, AboutTheBusiness}
+import connectors.{BusinessMatchingConnector, BusinessMatchingReviewDetails, DataCacheConnector}
+import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegisteredYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -24,6 +24,7 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
     val controller = new CorporationTaxRegisteredController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val businessMatchingConnector = mock[BusinessMatchingConnector]
     }
   }
 
@@ -32,6 +33,9 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
   "CorporationTaxRegisteredController" must {
 
     "on get display the registered for corporation tax page" in new Fixture {
+
+      when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(None)
+
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
@@ -51,6 +55,27 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
       val document = Jsoup.parse(contentAsString(result))
       document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
       document.getElementById("corporationTaxReference").`val` must be("1234567890")
+    }
+
+    "on get, retrieve the corporation tax reference from business customer api if no previous entry" in new Fixture {
+
+      val reviewDetailsModel = mock[BusinessMatchingReviewDetails]
+      when(reviewDetailsModel.utr) thenReturn Some("0987654321")
+
+      when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(Some(reviewDetailsModel))
+
+      val data = AboutTheBusiness(corporationTaxRegistered = None)
+
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+
+      val result = controller.get()(request)
+
+      status(result) must be(OK)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
+      document.getElementById("corporationTaxReference").`val` must be("0987654321")
     }
 
     "on post with valid data and edit false continue to registered office page" in new Fixture {

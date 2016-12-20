@@ -46,9 +46,9 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
       override val httpGet = mock[HttpGet]
     }
 
-    val address = BusinessMatchingConnector.Address("1 Test Street", "Test Town", None, None, None, "UK")
+    val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
 
-    val validResponseDetail = BusinessMatchingConnector.ReviewDetails(
+    val validResponseDetail = BusinessMatchingReviewDetails(
       businessName = "Test Business",
       businessType = None,
       businessAddress = address,
@@ -60,7 +60,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
       firstName = Some("First Name"),
       lastName = Some("Last Name"),
       utr = Some("123456789"),
-      identification = Some(BusinessMatchingConnector.Identification("id", "institution", "UK")),
+      identification = Some(BusinessMatchingIdentification("id", "institution", "UK")),
       isBusinessDetailsEditable = false
     )
 
@@ -70,7 +70,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
 
     "get the review details" in new Fixture {
 
-      when(TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingConnector.ReviewDetails](any())(any(), any()))
+      when(TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingReviewDetails](any())(any(), any()))
         .thenReturn(Future.successful(validResponseDetail))
 
       whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
@@ -84,7 +84,7 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
   "The business matching review details object" should {
     "deserialize into the object properly" in {
 
-      Json.parse(validReviewDetailsJson).as[BusinessMatchingConnector.ReviewDetails]
+      Json.parse(validReviewDetailsJson).as[BusinessMatchingReviewDetails]
 
     }
   }
