@@ -39,7 +39,6 @@ private sealed trait MostTransactions0 {
    a: Path => WriteLike[Seq[Country], A]
   ): Write[MostTransactions, A] =
     To[A] { __ =>
-
       import play.api.libs.functional.syntax.unlift
       (__ \ "mostTransactionsCountries").write[Seq[Country]] contramap unlift(MostTransactions.unapply)
     }
@@ -57,6 +56,7 @@ private sealed trait MostTransactions0 {
 
   val formW: Write[MostTransactions, UrlFormEncoded] = {
     import play.api.data.mapping.forms.Writes._
+    import utils.MappingUtils.spm
     implicitly
   }
 

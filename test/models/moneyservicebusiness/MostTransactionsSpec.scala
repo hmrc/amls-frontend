@@ -54,6 +54,24 @@ class MostTransactionsSpec extends PlaySpec {
     }
   }
 
+  "MostTransactions Form Writes" when {
+    "an item is repeated" must {
+      "serialise all items correctly" in {
+        MostTransactions.formW.writes(MostTransactions(List(
+          Country("Country2", "BB"),
+          Country("Country1", "AA"),
+          Country("Country1", "AA")
+        ))) must be (
+          Map(
+            "mostTransactionsCountries[0]" -> List("BB"),
+            "mostTransactionsCountries[1]" -> List("AA"),
+            "mostTransactionsCountries[2]" -> List("AA")
+          )
+        )
+      }
+    }
+  }
+
   "Most Transactions Form Reads" when {
     "all countries are valid" must {
       "Successfully read from the form" in {

@@ -1,11 +1,12 @@
 package utils
 
 import play.api.data.mapping._
+import play.api.data.mapping.forms.PM.PM
 import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
 import play.api.data.mapping.GenericRules
-import play.api.data.mapping.forms.PM.PM
+import play.api.data.mapping.forms.PM._
 
 import scala.collection.{GenTraversableOnce, TraversableLike}
 
@@ -83,6 +84,24 @@ trait MappingUtils {
 
     toM(PM.repathPM(w.writes(i), path ++ _))
   }
+
+  /**
+    * This is an overloaded version of spm from the validation library that will allow
+    * duplicates in the Seq that is being written
+    *
+    * @param w a WriteLike that can write an single item of Type O
+    * @tparam O the type of the sequence that this write will be able to handle
+    */
+  implicit def spm[O](implicit w: WriteLike[O, PM]) =
+    Write[Seq[O], PM] { os =>
+      os.zipWithIndex
+        .map(_.swap)
+        .toMap
+        .flatMap {
+          case (i, o) =>
+            repathPM(w.writes(o), (Path \ i) ++ _)
+        }
+    }
 
   object Implicits {
 
