@@ -15,12 +15,14 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{Country, SubscriptionResponse}
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
@@ -48,16 +50,6 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
   }
 
   "LandingController" must {
-
-    "show landing page without authorisation" in new Fixture {
-      val result = controller.start()(FakeRequest().withSession())
-      status(result) must be (OK)
-    }
-
-    "direc to the service when authorised" in new Fixture {
-      val result = controller.start()(request)
-      status(result) must be (SEE_OTHER)
-    }
 
     "load the correct view after calling get" when {
 
@@ -236,6 +228,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
     when(controller.landingService.refreshCache(any())(any(),any(),any())).thenReturn(Future.successful(mock[CacheMap]))
   }
 
+
   def setUpMocksForNoEnrolment(controller : LandingController) = {
     when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.successful(None))
@@ -319,6 +312,22 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
     }
 
     result
+  }
+
+  "show landing page without authorisation" in new Fixture {
+    val pageTitleSuffix = " - Pre-application - Anti-money laundering supervision - GOV.UK"
+
+    val result = controller.start()(FakeRequest().withSession())
+    status(result) must be (OK)
+
+    val document = Jsoup.parse(contentAsString(result))
+    document.title() must be(Messages("start.title") + pageTitleSuffix)
+
+  }
+
+  "direct to the service when authorised" in new Fixture {
+    val result = controller.start()(request)
+    status(result) must be (SEE_OTHER)
   }
 
   "Landing Controller" when {
