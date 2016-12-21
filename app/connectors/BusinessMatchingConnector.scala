@@ -61,6 +61,10 @@ trait BusinessMatchingConnector extends ServicesConfig {
     httpGet.GET[BusinessMatchingReviewDetails](url) map { result =>
       Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
       Some(result)
+    } recover {
+      case ex =>
+        Logger.error(s"$logPrefix Failed to fetch review details: ${ex.getMessage}")
+        None
     }
   }
 

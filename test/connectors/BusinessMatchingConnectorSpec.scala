@@ -74,9 +74,18 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
         .thenReturn(Future.successful(validResponseDetail))
 
       whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
-        result mustBe validResponseDetail
+        result mustBe Some(validResponseDetail)
       }
 
+    }
+
+    "return None when no details were found, or the http stack throws an exception" in new Fixture {
+      when(TestBusinessMatchingConnector.httpGet.GET[BusinessMatchingReviewDetails](any())(any(), any()))
+        .thenReturn(Future.failed(new Exception("Could not find any details")))
+
+      whenReady(TestBusinessMatchingConnector.getReviewDetails) { result =>
+        result mustBe None
+      }
     }
 
   }
