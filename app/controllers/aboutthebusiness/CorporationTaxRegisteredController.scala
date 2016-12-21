@@ -1,6 +1,6 @@
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -21,11 +21,14 @@ trait CorporationTaxRegisteredController extends BaseController {
         case Some(response) if response.corporationTaxRegistered.isDefined =>
           Future.successful(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get))
 
-        case _ =>
+        case _ if ApplicationConfig.businessMatchingDetailsToggle =>
           businessMatchingConnector.getReviewDetails map {
             case Some(details) if details.utr.isDefined => Form2[CorporationTaxRegistered](CorporationTaxRegisteredYes(details.utr.get))
             case _ => EmptyForm
           }
+
+        case _ => Future.successful(EmptyForm)
+
       } map { form =>
         Ok(corporation_tax_registered(form, edit))
       }

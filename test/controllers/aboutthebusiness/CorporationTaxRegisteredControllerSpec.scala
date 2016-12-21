@@ -3,13 +3,13 @@ package controllers.aboutthebusiness
 import connectors.{BusinessMatchingConnector, BusinessMatchingReviewDetails, DataCacheConnector}
 import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegisteredYes}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -38,7 +38,9 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
 
       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
+
       val result = controller.get()(request)
+
       status(result) must be(OK)
       contentAsString(result) must include(Messages("aboutthebusiness.registeredforcorporationtax.title"))
     }
@@ -57,12 +59,7 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
       document.getElementById("corporationTaxReference").`val` must be("1234567890")
     }
 
-    "on get, retrieve the corporation tax reference from business customer api if no previous entry" in new Fixture {
-
-      val reviewDetailsModel = mock[BusinessMatchingReviewDetails]
-      when(reviewDetailsModel.utr) thenReturn Some("0987654321")
-
-      when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(Some(reviewDetailsModel))
+    "on get display an empty form when no previous entry" in new Fixture {
 
       val data = AboutTheBusiness(corporationTaxRegistered = None)
 
@@ -74,8 +71,8 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
-      document.getElementById("corporationTaxReference").`val` must be("0987654321")
+      document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(false)
+      document.getElementById("corporationTaxReference").`val` must be("")
     }
 
     "on post with valid data and edit false continue to registered office page" in new Fixture {
@@ -150,6 +147,32 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
       status(result) must be(BAD_REQUEST)
       val document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#corporationTaxReference]").html() must include(Messages("error.invalid.atb.corporation.tax.number"))
+    }
+
+    "on get retrieve the corporation tax reference from business customer api if no previous entry and feature flag is high" in new Fixture {
+
+      running(FakeApplication(additionalConfiguration = Map(
+        "Test.microservice.services.feature-toggle.business-matching-details-lookup" -> true
+      ))) {
+
+        val reviewDetailsModel = mock[BusinessMatchingReviewDetails]
+        when(reviewDetailsModel.utr) thenReturn Some("0987654321")
+
+        when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(Some(reviewDetailsModel))
+
+        val data = AboutTheBusiness(corporationTaxRegistered = None)
+
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(data)))
+
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
+        document.getElementById("corporationTaxReference").`val` must be("0987654321")
+      }
     }
 
   }

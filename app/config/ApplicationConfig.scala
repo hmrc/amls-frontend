@@ -10,6 +10,8 @@ trait ApplicationConfig {
   def notificationsToggle: Boolean
 
   def amendmentsToggle: Boolean
+
+  def businessMatchingDetailsToggle: Boolean
 }
 
 
@@ -70,6 +72,12 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def enrolmentToggle: Boolean = {
     val value = getConfBool("feature-toggle.gg-enrolment", false)
     Logger.info(s"[ApplicationConfig][gg-enrolment] $value")
+    value
+  }
+
+  override def businessMatchingDetailsToggle: Boolean = {
+    val value = getConfBool("feature-toggle.business-matching-details-lookup", defBool = false)
+    Logger.info(s"s[ApplicationConfig][business-matching-details-lookup] $value")
     value
   }
 
