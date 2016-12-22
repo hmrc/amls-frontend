@@ -14,7 +14,7 @@ import play.api.test.FakeRequest
 
 
 
-trait ViewFixture {
+trait HowWillYouSellGoodsViewFixture {
   implicit val request : Request[_] = FakeRequest()
 
   val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Seq(Retail))), false)
@@ -26,22 +26,22 @@ trait ViewFixture {
 class how_will_you_sell_goodsSpec extends WordSpec with MustMatchers with MockitoSugar with OneAppPerSuite{
   "how will you sell goods view" should {
     "contain a form" which {
-      "posts it's data" in new ViewFixture {
+      "posts it's data" in new HowWillYouSellGoodsViewFixture {
         form.attr("method") must be("POST")
       }
 
-      "targets the correct route" in new ViewFixture {
+      "targets the correct route" in new HowWillYouSellGoodsViewFixture {
         val x = new URI(form.attr("action")).getPath
         x must endWith ("how-will-you-sell")
       }
 
-      "maintains the edit flag" in new ViewFixture {
+      "maintains the edit flag" in new HowWillYouSellGoodsViewFixture {
           override val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Seq(Retail))), true)
           new URI(form.attr("action")).getQuery must include ("edit=true")
       }
     }
 
-    "contain 3 checkboxes" in new ViewFixture {
+    "contain 3 checkboxes" in new HowWillYouSellGoodsViewFixture {
       form.select("input[type=checkbox]").size() must be (3)
     }
   }
