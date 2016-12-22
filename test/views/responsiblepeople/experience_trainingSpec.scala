@@ -38,7 +38,6 @@ class experience_trainingSpec extends WordSpec with MustMatchers with OneAppPerS
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {
-
       val businessActivities = BusinessActivities(Set(AccountancyServices))
       val messageKey1 = "definitely not a message key"
       val messageKey2 = "also not a message key"

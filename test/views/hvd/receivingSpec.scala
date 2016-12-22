@@ -20,7 +20,6 @@ class receivingSpec extends WordSpec with MustMatchers with OneAppPerSuite {
       def view = views.html.hvd.receiving(form2, true)
 
       doc.title must startWith (Messages("hvd.receiving.title") + " - " + Messages("summary.hvd"))
-
     }
 
     "have correct headings" in new ViewFixture {
@@ -54,5 +53,4 @@ class receivingSpec extends WordSpec with MustMatchers with OneAppPerSuite {
       doc.getElementById("paymentMethods-details-fieldset").html() must include("third not a message Key")
     }
   }
-
 }

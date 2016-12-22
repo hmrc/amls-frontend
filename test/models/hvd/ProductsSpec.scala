@@ -23,19 +23,31 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
 
     }
 
-    "fail validation when field is recorded not selected" in {
+    "fail validation when 'Other' is selected but no details are provided" when {
+      "represented by an empty string" in {
+        val model = Map("products[]" -> Seq("12"),
+                        "otherDetails" -> Seq(""))
 
-      val model = Map(
-        "products[]" -> Seq("01", "02" ,"12"),
-        "otherDetails" -> Seq("")
-      )
+        Products.formRule.validate(model) must
+          be(Failure(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
+      }
 
-      Products.formRule.validate(model) must
-        be(Failure(List(( Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
+      "represented by a sequence of whitespace" in {
+        val model = Map("products[]" -> Seq("12"),
+          "otherDetails" -> Seq("  \t"))
 
+        Products.formRule.validate(model) must
+          be(Failure(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
+      }
+
+      "represented by a missing field" in {
+        val model = Map("products[]" -> Seq("12"))
+        Products.formRule.validate(model) must
+          be(Failure(List((Path \ "otherDetails", Seq(ValidationError("error.required"))))))
+      }
     }
 
-    "fail validation when field is otherDetails exceed max length" in {
+    "fail validation when field otherDetails exceeds maximum length" in {
 
       val model = Map(
         "products[]" -> Seq("01", "02" ,"03", "04", "05", "12"),
@@ -45,18 +57,21 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
         be(Failure(List(( Path \ "otherDetails", Seq(ValidationError("error.invalid.hvd.business.sell.other.details"))))))
     }
 
-    "fail validation when none of the check boxes selected" in {
 
-      val model = Map(
-        "products[]" -> Seq(),
-        "otherDetails" -> Seq("test")
-      )
-      Products.formRule.validate(model) must
-        be(Failure(List(( Path \ "products", Seq(ValidationError("error.required.hvd.business.sell.atleast"))))))
+    "fail validation when none of the check boxes are selected" when {
+      List(
+        "empty list" -> Map("products[]" -> Seq(),"otherDetails" -> Seq("test")),
+        "missing field" -> Map.empty[String, Seq[String]]
+      ).foreach { x =>
+        val (rep, model) = x
+        s"represented by $rep" in {
+          Products.formRule.validate(model) must
+            be(Failure(List((Path \ "products", List(ValidationError("error.required.hvd.business.sell.atleast"))))))
+        }
+      }
     }
 
     "fail to validate  invalid data" in {
-
       val model = Map(
         "products[]" -> Seq("01, 15")
       )
@@ -73,7 +88,7 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
       )
 
       val model = Products(Set(Other("test"), Gold))
-     Products.formWrites.writes(model) must be (map)
+      Products.formWrites.writes(model) must be (map)
     }
 
     "validate form write for option Yes" in {
