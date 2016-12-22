@@ -34,15 +34,24 @@ class receivingSpec extends WordSpec with MustMatchers with OneAppPerSuite {
 
     }
 
-    "show errors in the correct locations" in {
-
-      val messageKey1 = "not a message Key"
-      val messageKey2 = "also not a message Key"
-      val receivePaymentsPath = "receivePayments"
+    "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq((Path \ receivePaymentsPath, Seq(ValidationError(messageKey1)))))
+        Seq(
+          (Path \ "receivePayments") -> Seq(ValidationError("not a message Key")),
+          (Path \ "paymentMethods") -> Seq(ValidationError("second not a message Key")),
+          (Path \ "paymentMethods" \ "details") -> Seq(ValidationError("third not a message Key"))
+        ))
 
+      def view = views.html.hvd.receiving(form2, true)
+
+      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
+      errorSummary.html() must include("third not a message Key")
+
+      doc.getElementById("receivePayments").html() must include("not a message Key")
+      doc.getElementById("paymentMethods").html() must include("second not a message Key")
+      doc.getElementById("paymentMethods-details-fieldset").html() must include("third not a message Key")
     }
   }
 

@@ -23,7 +23,6 @@ sealed trait ReceiveCashPayments0 {
 
       (__ \ "receivePayments").read(booleanR).flatMap[Option[PaymentMethods]] {
         case true =>
-          // Ideally compose would repath here
           (__ \ "paymentMethods").read[A] compose paymentMethodsR.repath((Path \ "paymentMethods") ++ _) fmap Some.apply
         case false =>
           Rule(_ => Success(None))
