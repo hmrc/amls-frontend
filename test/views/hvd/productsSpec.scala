@@ -32,7 +32,7 @@ class productsSpec extends WordSpec with MustMatchers with OneAppPerSuite {
 
     }
 
-    "show errors in the error summary section" in new ViewFixture {
+    "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
@@ -40,10 +40,16 @@ class productsSpec extends WordSpec with MustMatchers with OneAppPerSuite {
           (Path \ "otherDetails") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.hvd.receiving(form2, true)
+      def view = views.html.hvd.products(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
+
+      doc.getElementById("products")
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
+      doc.getElementById("otherDetails-fieldset")
+        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
     }
   }
 }
