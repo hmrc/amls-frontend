@@ -37,7 +37,9 @@
 }
 
 @navLinks = {
-    <li><a href="@appConfig.logoutUrl">Sign out</a></li>
+    @if(userLoggedIn) {
+        <li><a href="@appConfig.logoutUrl">Sign out</a></li>
+    }
 }
 
 @insideHeader = {
