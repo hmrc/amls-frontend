@@ -8,6 +8,33 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
 
+  "Bank account types form" must {
+    "fail to validate" when {
+      "an invalid selectiion is made for the type of bank account the business uses" in {
+        val urlFormEncoded = Map(
+          "bankAccountType" -> Seq("")
+        )
+
+        BankAccountType.formReads.validate(urlFormEncoded) must
+          be(Failure(Seq(
+            (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
+          )))
+      }
+
+      "no selection is made for the type of bank account the business uses" in {
+        val urlFormEncoded = Map(
+          "bankAccountType" -> Seq()
+        )
+
+        BankAccountType.formReads.validate(urlFormEncoded) must
+          be(Failure(Seq(
+            (Path \ "bankAccountType") -> Seq(ValidationError("error.bankdetails.accounttype"))
+          )))
+      }
+
+    }
+  }
+
   "BankAccountType" must {
 
     "successfully validate form Read" in {
