@@ -43,7 +43,7 @@ class linked_cash_paymentsSpec extends WordSpec with MustMatchers with OneAppPer
       def view = views.html.hvd.linked_cash_payments(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      
+
       doc.getElementById("linkedCashPayments")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
