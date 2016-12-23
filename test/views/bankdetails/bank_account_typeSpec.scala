@@ -27,7 +27,7 @@ class bank_account_typeSpec extends WordSpec with MustMatchers with OneAppPerSui
 
       val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_details(form2, false, 0)
+      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0, 0)
 
       heading.html() must be(Messages("bankdetails.accounttype.title"))
     }
@@ -49,11 +49,11 @@ class bank_account_typeSpec extends WordSpec with MustMatchers with OneAppPerSui
       Seq((Path \ bankAccountTypeField, Seq(ValidationError(messageKey1)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_details(form2, false, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0, 0)
 
     errorSummary.html() must include(messageKey1)
 
-    doc.getElementByID("bankAccountType").html() must include(messageKey1)
+    doc.getElementById(bankAccountTypeField).html() must include(messageKey1)
 
   }
 }
