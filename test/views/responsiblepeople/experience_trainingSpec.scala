@@ -19,7 +19,7 @@ class experience_trainingSpec extends WordSpec with MustMatchers with OneAppPerS
       val businessActivities = BusinessActivities(Set(AccountancyServices))
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      override def view: _root_.play.twirl.api.HtmlFormat.Appendable =
+      def view: _root_.play.twirl.api.HtmlFormat.Appendable =
         views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0)
 
       doc.title() must startWith(Messages("responsiblepeople.experiencetraining.title") + " - " + Messages("summary.responsiblepeople"))
@@ -31,14 +31,13 @@ class experience_trainingSpec extends WordSpec with MustMatchers with OneAppPerS
       val businessActivities = BusinessActivities(Set(AccountancyServices))
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      override def view: _root_.play.twirl.api.HtmlFormat.Appendable =
+      def view: _root_.play.twirl.api.HtmlFormat.Appendable =
         views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0)
 
       heading.html() must be(Messages("responsiblepeople.experiencetraining.title"))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {
-
       val businessActivities = BusinessActivities(Set(AccountancyServices))
       val messageKey1 = "definitely not a message key"
       val messageKey2 = "also not a message key"
@@ -48,7 +47,7 @@ class experience_trainingSpec extends WordSpec with MustMatchers with OneAppPerS
         Seq((Path \ experienceTrainingField, Seq(ValidationError(messageKey1))),
           (Path \ experienceInformationField, Seq(ValidationError(messageKey2)))))
 
-      override def view: _root_.play.twirl.api.HtmlFormat.Appendable =
+      def view: _root_.play.twirl.api.HtmlFormat.Appendable =
         views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0)
 
       errorSummary.html() must include(messageKey1)
@@ -58,5 +57,4 @@ class experience_trainingSpec extends WordSpec with MustMatchers with OneAppPerS
       doc.getElementById(experienceInformationField + "-fieldset").html() must include(messageKey2)
     }
   }
-
 }

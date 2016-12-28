@@ -34,6 +34,27 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
       ReceiveCashPayments.formR.validate(data)
         .mustEqual(Failure(Seq((Path \ "paymentMethods") -> Seq(ValidationError("error.required.hvd.choose.option")))))
     }
+
+    "fail to validate when no text is entered in the details field" in {
+      val data = Map(
+        "receivePayments" -> Seq("true"),
+        "paymentMethods.other" -> Seq("true")
+      )
+
+      ReceiveCashPayments.formR.validate(data)
+        .mustEqual(Failure(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.required")))))
+    }
+
+    "fail to validate when more than 255 characters are entered in the details field" in {
+      val data = Map(
+        "receivePayments" -> Seq("true"),
+        "paymentMethods.other" -> Seq("true"),
+        "paymentMethods.details" -> Seq("a" * 260)
+      )
+
+      ReceiveCashPayments.formR.validate(data)
+        .mustEqual(Failure(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.invalid.maxlength.255")))))
+    }
   }
 
   "RecieveCashPayments Serialisation" when {

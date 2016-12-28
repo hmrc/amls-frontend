@@ -27,8 +27,7 @@ class LinkedCashPaymentsSpec extends PlaySpec {
         LinkedCashPayments.formRule.validate(map) must be(Success(LinkedCashPayments(false)))
       }
 
-      "throw error message on invalid data" in {
-
+      "fail validation when no option selected" in {
         LinkedCashPayments.formRule.validate(Map.empty) must be(Failure(
           Seq(Path \ "linkedCashPayments" -> Seq(ValidationError("error.required.hvd.linked.cash.payment")))))
 
