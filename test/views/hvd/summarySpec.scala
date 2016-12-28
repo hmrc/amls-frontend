@@ -1,14 +1,12 @@
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
+import models.hvd.PercentageOfCashPaymentOver15000.Third
 import models.hvd._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
@@ -56,27 +54,27 @@ class summarySpec extends WordSpec with MustMatchers with OneAppPerSuite with Ta
     val sectionChecks = Table[String, Element=>Boolean](
       ("title key", "check"),
       ("hvd.cash.payment.title",checkElementTextIncludes(_, "lbl.yes", "20 June 2012")),
-      ("hvd.products.title", checkListContainsItems(_, fullProductSet))
+      ("hvd.products.title", checkListContainsItems(_, fullProductSet)),
+      ("hvd.excise.goods.title", checkElementTextIncludes(_, "lbl.yes")),
+      ("hvd.how-will-you-sell-goods.title", checkListContainsItems(_, Set("Retail", "Auction", "Wholesale"))),
+      ("hvd.percentage.title", checkElementTextIncludes(_, "hvd.percentage.lbl.03")),
+      ("hvd.receiving.title", checkElementTextIncludes(_, "hvd.receiving.option.01", "hvd.receiving.option.02", "Other payment method")),
+      ("hvd.identify.linked.cash.payment.title", checkElementTextIncludes(_, "lbl.yes"))
     )
 
     "include the provided data" in new ViewFixture {
       def view = {
         val testdata = Hvd(
           cashPayment = Some(CashPaymentYes(LocalDate.parse("2012-6-20"))),
-          products = Some(Products(Set(
-            Alcohol,
-            Tobacco,
-            Antiques,
-            Cars,
-            OtherMotorVehicles,
-            Caravans,
-            Jewellery,
-            Gold,
-            ScrapMetals,
-            MobilePhones,
-            Clothing,
-            Other("Other Product")
-          )))
+          products = Some(Products(Set(Alcohol,Tobacco,Antiques,Cars,OtherMotorVehicles,
+                          Caravans,Jewellery,Gold,ScrapMetals,MobilePhones,Clothing,
+                          Other("Other Product")
+                        ))),
+          exciseGoods = Some(ExciseGoods(true)),
+          howWillYouSellGoods = Some(HowWillYouSellGoods(List(Retail, Wholesale, Auction))),
+          percentageOfCashPaymentOver15000 = Some(Third),
+          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("Other payment method"))))),
+          linkedCashPayment = Some(LinkedCashPayments(true))
         )
 
         views.html.hvd.summary(testdata, true)
