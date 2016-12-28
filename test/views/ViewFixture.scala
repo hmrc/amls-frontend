@@ -1,11 +1,13 @@
 package views
 
 import org.jsoup.Jsoup
+import org.scalatest.MustMatchers
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 
-trait ViewFixture {
+
+trait ViewFixture extends MustMatchers{
   implicit val request : Request[_] = FakeRequest()
 
   def view: HtmlFormat.Appendable
