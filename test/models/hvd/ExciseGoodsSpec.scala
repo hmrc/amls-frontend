@@ -27,7 +27,7 @@ class ExciseGoodsSpec extends PlaySpec {
         ExciseGoods.formRule.validate(map) must be(Success(ExciseGoods(false)))
       }
 
-      "throw error message on invalid data" in {
+      "fail when neither option has been selected" in {
 
         ExciseGoods.formRule.validate(Map.empty) must be(Failure(
           Seq(Path \ "exciseGoods" -> Seq(ValidationError("error.required.hvd.excise.goods")))))

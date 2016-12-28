@@ -10,7 +10,6 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 class CashPaymentSpec extends PlaySpec with MockitoSugar {
 
   "CashPaymentSpec" should {
-    // scalastyle:off
     val DefaultCashPaymentYes = CashPaymentYes(new LocalDate(1990, 2, 24))
 
     "Form Validation" must {
@@ -34,13 +33,24 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
           be(Success(CashPaymentYes(new LocalDate(1956, 2, 15))))
       }
 
-
-      "fail to validate given missing mandatory field" in {
-
+      "fail to validate when neither 'Yes' nor 'No' is selected" in {
         CashPayment.formRule.validate(Map.empty) must
           be(Failure(Seq(
             (Path \ "acceptedAnyPayment") -> Seq(ValidationError("error.required.hvd.accepted.cash.payment"))
           )))
+      }
+
+      "fail to validate given an invalid date" in {
+
+        val data = Map(
+          "acceptedAnyPayment" -> Seq("true"),
+          "paymentDate.day" -> Seq("30"),
+          "paymentDate.month" -> Seq("2"),
+          "paymentDate.year" -> Seq("1956")
+        )
+
+        CashPayment.formRule.validate(data) must
+          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "fail to validate given missing day" in {
@@ -50,6 +60,32 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
           "paymentDate.day" -> Seq(""),
           "paymentDate.month" -> Seq("2"),
           "paymentDate.year" -> Seq("1956")
+        )
+
+        CashPayment.formRule.validate(data) must
+          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+      }
+
+      "fail to validate given missing month" in {
+
+        val data = Map(
+          "acceptedAnyPayment" -> Seq("true"),
+          "paymentDate.day" -> Seq("2"),
+          "paymentDate.month" -> Seq(""),
+          "paymentDate.year" -> Seq("1956")
+        )
+
+        CashPayment.formRule.validate(data) must
+          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+      }
+
+      "fail to validate given missing year" in {
+
+        val data = Map(
+          "acceptedAnyPayment" -> Seq("true"),
+          "paymentDate.day" -> Seq("1"),
+          "paymentDate.month" -> Seq("2"),
+          "paymentDate.year" -> Seq("")
         )
 
         CashPayment.formRule.validate(data) must
