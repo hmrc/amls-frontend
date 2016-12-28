@@ -17,6 +17,7 @@ class bank_accountSpec extends WordSpec with MustMatchers with OneAppPerSuite{
 
       val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
 
+
       override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_details(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.accountdetails.title") + " - " + Messages("summary.bankdetails"))

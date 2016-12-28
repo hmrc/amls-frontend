@@ -13,5 +13,6 @@ trait ViewFixture {
   lazy val doc = Jsoup.parse(html)
   lazy val form = doc.getElementsByTag("form").first()
   lazy val heading = doc.getElementsByTag("h1").first()
+  lazy val subHeading = doc.getElementsByClass("heading-secondary").first()
   lazy val errorSummary = doc.getElementsByClass("amls-error-summary").first()
 }
