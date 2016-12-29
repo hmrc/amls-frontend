@@ -18,12 +18,34 @@ class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         ConfirmRegisteredOffice.formRule.validate(data) must
           be(Success(ConfirmRegisteredOffice(true)))
       }
+
+      "given a 'false' value" in {
+
+        val data = Map(
+          "isRegOfficeOrMainPlaceOfBusiness" -> Seq("false")
+        )
+
+        ConfirmRegisteredOffice.formRule.validate(data) must
+          be(Success(ConfirmRegisteredOffice(false)))
+      }
     }
 
     "fail validation" when {
       "given missing data represented by an empty Map" in {
 
         ConfirmRegisteredOffice.formRule.validate(Map.empty) must
+          be(Failure(Seq(
+            (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required.atb.confirm.office"))
+          )))
+      }
+
+      "given missing data represented by an empty string" in {
+
+        val data = Map(
+          "isRegOfficeOrMainPlaceOfBusiness" -> Seq("")
+        )
+
+        ConfirmRegisteredOffice.formRule.validate(data) must
           be(Failure(Seq(
             (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required.atb.confirm.office"))
           )))
