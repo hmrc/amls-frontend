@@ -51,6 +51,55 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           )))
       }
 
+      "given missing data represented by an empty string" in {
+        val data = Map(
+          "isUK" -> Seq("")
+        )
+
+        RegisteredOffice.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
+          )))
+      }
+
+      "given an isUK value of 'false' and" when {
+        "given missing data represented by an empty String" in {
+          val data = Map(
+            "isUK" -> Seq("false"),
+            "addressLineNonUK1" -> Seq(""),
+            "addressLineNonUK2" -> Seq(""),
+            "country" -> Seq("")
+          )
+
+          RegisteredOffice.formRule.validate(data) must
+            be(Failure(Seq(
+              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
+              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
+              (Path \ "country") -> Seq(ValidationError("error.required.country"))
+            )))
+        }
+
+        "given invalid data containing too many characters" in {
+          val data = Map(
+            "isUK" -> Seq("false"),
+            "addressLineNonUK1" -> Seq("a" * 36),
+            "addressLineNonUK2" -> Seq("a" * 36),
+            "addressLineNonUK3" -> Seq("a" * 36),
+            "addressLineNonUK4" -> Seq("a" * 36),
+            "country" -> Seq("UK" * 12)
+          )
+
+          RegisteredOffice.formRule.validate(data) must
+            be(Failure(Seq(
+              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line")),
+              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
+            )))
+        }
+      }
+
       "given an isUK value of 'true' and" when {
         "given missing data represented by an empty String" in {
           val data = Map(
@@ -87,6 +136,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
             )))
         }
       }
+
 
     }
 
