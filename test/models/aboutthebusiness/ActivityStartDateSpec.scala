@@ -48,6 +48,13 @@ class ActivityStartDateSpec extends PlaySpec {
           Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
       }
+
+      "given missing data represented by an empty Map" in {
+
+        ActivityStartDate.formRule.validate(Map.empty) must be(Failure(Seq(
+          Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+        )))
+      }
     }
 
     "successfully write the model" in {
