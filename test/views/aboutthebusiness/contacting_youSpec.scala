@@ -15,7 +15,7 @@ class contacting_youSpec extends WordSpec with MustMatchers with OneAppPerSuite 
   "contacting_you view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[ContactingYouForm] = Form2(ContactingYouForm("123456789789","test@test.com",true))
+      val form2: ValidForm[ContactingYou] = Form2(ContactingYouForm("123456789789","test@test.com",true))
 
       def view = {
         val testRegisteredOffice = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
@@ -27,7 +27,7 @@ class contacting_youSpec extends WordSpec with MustMatchers with OneAppPerSuite 
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[ContactingYouForm] = Form2(ContactingYouForm("123456789789","test@test.com",true))
+      val form2: ValidForm[ContactingYou] = Form2(ContactingYouForm("123456789789","test@test.com",true))
 
       def view = {
         val testRegisteredOffice = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
