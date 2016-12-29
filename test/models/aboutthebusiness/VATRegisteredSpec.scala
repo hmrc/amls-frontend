@@ -37,6 +37,18 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
           )))
       }
 
+      "given missing mandatory field represented by an empty string" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("")
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
+          )))
+      }
+
       "given a 'true' value with a missing vrn number represented by an empty string" in {
 
         val data = Map(
@@ -47,6 +59,70 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
         VATRegistered.formRule.validate(data) must
           be(Failure(Seq(
             (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
+          )))
+      }
+
+      "given a 'true' value with a missing vrn number represented by a missing field" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("true")
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.required"))
+          )))
+      }
+
+      "given a 'true' value with a missing vrn number represented by a sequence of whitespace" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("true"),
+          "vrnNumber" -> Seq("      \t")
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
+          )))
+      }
+
+      "given a 'true' value with a vrn number with more than 9 characters" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("true"),
+          "vrnNumber" -> Seq("1" * 10)
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
+          )))
+      }
+
+      "given a 'true' value with a vrn number with fewer than 9 characters" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("true"),
+          "vrnNumber" -> Seq("1" * 8)
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
+          )))
+      }
+
+      "given a 'true' value with a vrn number containing non-numeric characters" in {
+
+        val data = Map(
+          "registeredForVAT" -> Seq("true"),
+          "vrnNumber" -> Seq("1ab2cd3ef")
+        )
+
+        VATRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
           )))
       }
     }
