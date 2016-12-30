@@ -10,32 +10,119 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
 
-    "successfully validate given an false value" in {
-      CorporationTaxRegistered.formRule.validate(Map("registeredForCorporationTax" -> Seq("false"))) must
-        be(Success(CorporationTaxRegisteredNo))
+    "successfully validate" when {
+      "given a 'false' value" in {
+
+        val data = Map("registeredForCorporationTax" -> Seq("false"))
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Success(CorporationTaxRegisteredNo))
+      }
+
+      "given a 'true' value and a valid corporation tax reference" in {
+
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("true"),
+          "corporationTaxReference" -> Seq("1234567890")
+        )
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Success(CorporationTaxRegisteredYes("1234567890")))
+      }
     }
 
-    "successfully validate given an `true` value" in {
+    "fail validation" when {
+      "no option is selected - represented by an empty Map" in {
 
-      val data = Map(
-        "registeredForCorporationTax" -> Seq("true"),
-        "corporationTaxReference" -> Seq("1234567890")
-      )
+        CorporationTaxRegistered.formRule.validate(Map.empty) must
+          be(Failure(Seq(
+            (Path \ "registeredForCorporationTax") -> Seq(ValidationError("error.required.atb.corporation.tax"))
+          )))
+      }
 
-      CorporationTaxRegistered.formRule.validate(data) must
-        be(Success(CorporationTaxRegisteredYes("1234567890")))
-    }
+      "no option is selected - represented by an empty string" in {
 
-    "fail to validate given an `Yes` with no value" in {
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("")
+        )
 
-      val data = Map(
-        "registeredForCorporationTax" -> Seq("true")
-      )
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "registeredForCorporationTax") -> Seq(ValidationError("error.required.atb.corporation.tax"))
+          )))
+      }
 
-      CorporationTaxRegistered.formRule.validate(data) must
-        be(Failure(Seq(
-          (Path \ "corporationTaxReference") -> Seq(ValidationError("error.required"))
-        )))
+      "given a 'true' value and a corporation tax reference containing too many characters" in {
+
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("true"),
+          "corporationTaxReference" -> Seq("1" * 15)
+        )
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
+          )))
+      }
+      "given a 'true' value and a corporation tax reference containing too few characters" in {
+
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("true"),
+          "corporationTaxReference" -> Seq("1" * 3)
+        )
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
+          )))
+      }
+      "given a 'true' value and a corporation tax reference containing non-numeric characters" in {
+
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("true"),
+          "corporationTaxReference" -> Seq("12abcdefg")
+        )
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
+          )))
+      }
+      "given a 'true' value and a missing corporation tax reference represented by a missing field" in {
+
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("true")
+        )
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "corporationTaxReference") -> Seq(ValidationError("error.required"))
+          )))
+      }
+      "given a 'true' value and a missing corporation tax reference represented by an empty string" in {
+
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("true"),
+          "corporationTaxReference" -> Seq("")
+        )
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "corporationTaxReference") -> Seq(ValidationError("error.required.atb.corporation.tax.number"))
+          )))
+      }
+      "given a 'true' value and a missing corporation tax reference represented by a sequence of whitespace" in {
+
+        val data = Map(
+          "registeredForCorporationTax" -> Seq("true"),
+          "corporationTaxReference" -> Seq("      ")
+        )
+
+        CorporationTaxRegistered.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
+          )))
+      }
     }
 
     "write correct data from enum value" in {
@@ -61,7 +148,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an `Yes` value" in {
 
-      val json = Json.obj("registeredForCorporationTax" -> true, "corporationTaxReference" ->"1234567890")
+      val json = Json.obj("registeredForCorporationTax" -> true, "corporationTaxReference" -> "1234567890")
 
       Json.fromJson[CorporationTaxRegistered](json) must
         be(JsSuccess(CorporationTaxRegisteredYes("1234567890"), JsPath \ "registeredForCorporationTax" \ "corporationTaxReference"))
