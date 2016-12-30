@@ -8,11 +8,11 @@ import play.api.libs.json._
 
 
 class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
+  import play.api.data.mapping.forms.Rules._
 
   "BusinessActivitiesSpec" must {
     "successfully validate" when {
       "a few check boxes are selected" in {
-
         val model1 = Map("businessActivities[]" -> Seq("03", "01", "02"))
 
         BusinessActivities.formReads.validate(model1) must
