@@ -10,7 +10,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import views.ViewFixture
 
-class bank_accountSpec extends WordSpec with MustMatchers with OneAppPerSuite{
+class bank_account_detailsSpec extends WordSpec with MustMatchers with OneAppPerSuite{
 
   "bank_account view " must{
     "have correct title" in new ViewFixture {
