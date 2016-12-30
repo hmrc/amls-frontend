@@ -42,6 +42,22 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
           )))
       }
 
+      "fields are missing represented by empty strings" in {
+
+        val urlFormEncoded = Map(
+          "firstName" -> Seq(""),
+          "middleName" -> Seq(""),
+          "lastName" -> Seq(""),
+          "roleWithinBusiness" -> Seq("")
+        )
+        AddPerson.formRule.validate(urlFormEncoded) must
+          be(Failure(Seq(
+            (Path \ "firstName") -> Seq(ValidationError("error.required")),
+            (Path \ "lastName") -> Seq(ValidationError("error.required")),
+            (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
+          )))
+      }
+
       "first name is missing" in {
 
         val urlFormEncoded = Map(
