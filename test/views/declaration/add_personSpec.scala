@@ -63,6 +63,7 @@ class add_personSpec extends WordSpec with MustMatchers with OneAppPerSuite {
         .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
       doc.getElementById("roleWithinBusinessOther")
+        .parent()
         .getElementsByClass("error-notification").first().html() must include("fourth not a message Key")
 
     }
