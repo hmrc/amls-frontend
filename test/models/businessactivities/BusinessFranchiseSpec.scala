@@ -25,20 +25,32 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
         be(Success(BusinessFranchiseYes("test test")))
     }
 
-    "fail to validate given an `Yes` with no value" in {
+    "fail to validate given an `Yes` with no value" when {
+      "represented by an empty string" in {
+        val data = Map(
+          "businessFranchise" -> Seq("true"),
+          "franchiseName" -> Seq("")
+        )
 
-      val data = Map(
-        "businessFranchise" -> Seq("true"),
-        "franchiseName" -> Seq("")
-      )
+        BusinessFranchise.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "franchiseName") -> Seq(ValidationError("error.required.ba.franchise.name"))
+          )))
+      }
 
-      BusinessFranchise.formRule.validate(data) must
-        be(Failure(Seq(
-          (Path \ "franchiseName") -> Seq(ValidationError("error.required.ba.franchise.name"))
-        )))
+      "represented by a missing field" in {
+        val data = Map(
+          "businessFranchise" -> Seq("true")
+        )
+
+        BusinessFranchise.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "franchiseName") -> Seq(ValidationError("error.required"))
+          )))
+      }
     }
 
-    "fail to validate given an `Yes` with max value" in {
+    "fail to validate given a franchise name that is too long" in {
 
       val data = Map(
         "businessFranchise" -> Seq("true"),
@@ -51,6 +63,25 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
         )))
     }
 
+    "fail to validate when neither 'yes' nor 'no' are selected" when {
+      val reps = Seq[(String, Map[String, Seq[String]])] (
+        "missing field" -> Map.empty[String, Seq[String]],
+        "empty string" -> Map("businessFranchise" -> Seq("")),
+        "invalid data" -> Map("businessFranchise" -> Seq("NOTVALID"))
+      )
+
+      reps.foreach {
+        case (desc, rep) =>
+        s"represented by $desc" in {
+          val data = rep
+            BusinessFranchise.formRule.validate(data) must
+              be(Failure(Seq(
+                (Path \ "businessFranchise") -> Seq(ValidationError("error.required.ba.is.your.franchise"))
+              )))
+        }
+      }
+    }
+
     "write correct data from enum value" in {
 
       BusinessFranchise.formWrites.writes(BusinessFranchiseNo) must
@@ -59,7 +90,6 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
     }
 
     "write correct data from `Yes` value" in {
-
       BusinessFranchise.formWrites.writes(BusinessFranchiseYes("test test")) must
         be(Map("businessFranchise" -> Seq("true"), "franchiseName" -> Seq("test test")))
     }
