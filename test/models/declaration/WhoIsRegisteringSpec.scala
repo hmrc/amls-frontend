@@ -11,7 +11,7 @@ class WhoIsRegisteringSpec extends PlaySpec {
   "Form Validation" must {
 
     "successfully validate" when {
-      "successfully validate given an true value" in {
+      "successfully validate given a valid person name" in {
         val data = Map("person" -> Seq("PersonName"))
         val result = WhoIsRegistering.formRule.validate(data)
         result mustBe Success(WhoIsRegistering("PersonName"))
@@ -19,7 +19,7 @@ class WhoIsRegisteringSpec extends PlaySpec {
     }
 
     "fail validation" when {
-      "fail validation for empty data" in {
+      "fail validation for missing data represented by an empty Map" in {
         val result = WhoIsRegistering.formRule.validate(Map.empty)
         result mustBe Failure(Seq((Path \ "person", Seq(ValidationError("error.required.declaration.who.is.registering")))))
       }
