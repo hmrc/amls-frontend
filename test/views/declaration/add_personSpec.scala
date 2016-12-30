@@ -45,7 +45,6 @@ class add_personSpec extends WordSpec with MustMatchers with OneAppPerSuite {
 
       def view = views.html.declaration.add_person(("string1", "string2"), form2)
 
-//      html must be("jhsgpwre")
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
       errorSummary.html() must include("third not a message Key")
