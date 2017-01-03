@@ -11,33 +11,68 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
 
     "Form Validation" must {
 
-      "Successfully read form data for the option yes" in {
+      "successfully read form data" when {
+        "given the option yes with a valid psr number" in {
 
-        val map = Map("appliedFor" -> Seq("true"),
-        "regNumber" -> Seq("123789"))
+          val map = Map("appliedFor" -> Seq("true"),
+            "regNumber" -> Seq("123789"))
 
-        BusinessAppliedForPSRNumber.formRule.validate(map) must be(Success(BusinessAppliedForPSRNumberYes("123789")))
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Success(BusinessAppliedForPSRNumberYes("123789")))
+        }
+
+        "given the option no" in {
+
+          val map = Map("appliedFor" -> Seq("false"))
+
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Success(BusinessAppliedForPSRNumberNo))
+        }
       }
 
-      "Successfully read form data for the option no" in {
+      "fail validation" when {
+        "given missing data represented by an empty Map" in {
 
-        val map = Map("appliedFor" -> Seq("false"))
+          BusinessAppliedForPSRNumber.formRule.validate(Map.empty) must be(Failure(Seq((Path \ "appliedFor",
+            Seq(ValidationError("error.required.msb.psr.options"))))))
+        }
 
-        BusinessAppliedForPSRNumber.formRule.validate(map) must be(Success(BusinessAppliedForPSRNumberNo))
-      }
+        "given a 'yes' value with a missing psr number respresented by an empty string" in {
+          val map = Map("appliedFor" -> Seq("true"),
+            "regNumber" -> Seq(""))
 
-      "fail validation when user has not selected the radio button" in {
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+            Seq(ValidationError("error.invalid.msb.psr.number"))))))
+        }
 
-        BusinessAppliedForPSRNumber.formRule.validate(Map.empty) must be(Failure(Seq((Path \ "appliedFor",
-          Seq(ValidationError("error.required.msb.psr.options"))))))
-      }
+        "given a 'yes' value with a missing psr number respresented by a missing field" in {
+          val map = Map("appliedFor" -> Seq("true"))
 
-      "fail validation when user has not filled PSR registration number" in {
-        val map = Map("appliedFor" -> Seq("true"),
-          "regNumber" -> Seq(""))
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+            Seq(ValidationError("error.required"))))))
+        }
 
-        BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
-          Seq(ValidationError("error.invalid.msb.psr.number"))))))
+        "given a 'yes' value with an invalid psr number with too many numbers" in {
+          val map = Map("appliedFor" -> Seq("true"),
+            "regNumber" -> Seq("1" * 7))
+
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+            Seq(ValidationError("error.invalid.msb.psr.number"))))))
+        }
+
+        "given a 'yes' value with an invalid psr number with too few numbers" in {
+          val map = Map("appliedFor" -> Seq("true"),
+            "regNumber" -> Seq("1" * 5))
+
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+            Seq(ValidationError("error.invalid.msb.psr.number"))))))
+        }
+
+        "given a 'yes' value with an invalid psr number of the correct length but containing non-numeric characters" in {
+          val map = Map("appliedFor" -> Seq("true"),
+            "regNumber" -> Seq("12ab34"))
+
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+            Seq(ValidationError("error.invalid.msb.psr.number"))))))
+        }
       }
 
       "Successfully write form data" in {
