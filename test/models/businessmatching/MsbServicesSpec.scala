@@ -26,6 +26,12 @@ class MsbServicesSpec extends PlaySpec {
     }
 
     "fail validation" when {
+      "the Map is empty" in {
+
+        implicitly[Rule[UrlFormEncoded, MsbServices]].validate(Map.empty)
+          .mustEqual(Failure(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.msb.services")))))
+      }
+
       "the set is empty" in {
 
         val data: UrlFormEncoded = Map(
