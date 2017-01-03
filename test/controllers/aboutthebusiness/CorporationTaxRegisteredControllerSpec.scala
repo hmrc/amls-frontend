@@ -28,6 +28,10 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
     }
   }
 
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.business-matching-details-lookup" -> false
+  ))
+
   val emptyCache = CacheMap("", Map.empty)
 
   "CorporationTaxRegisteredController" must {
