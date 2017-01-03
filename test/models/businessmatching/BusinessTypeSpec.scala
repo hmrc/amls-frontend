@@ -26,7 +26,21 @@ class BusinessTypeSpec extends PlaySpec with MockitoSugar {
 
       BusinessType.formR.validate(Map("businessType" -> Seq("05"))) must
         be(Success(UnincorporatedBody))
+    }
 
+    "fail validation when given invalid data" in {
+      BusinessType.formR.validate(Map("businessType" -> Seq("20"))) must
+        be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.invalid"))))))
+    }
+
+    "fail validation when given missing data represented by an empty Map" in {
+      BusinessType.formR.validate(Map.empty) must
+        be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.required"))))))
+    }
+
+    "fail validation when given missing data represented by an empty string" in {
+      BusinessType.formR.validate(Map("businessType" -> Seq(""))) must
+        be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.required"))))))
     }
 
     "write correct data from enum value" in {
@@ -45,12 +59,6 @@ class BusinessTypeSpec extends PlaySpec with MockitoSugar {
 
       BusinessType.formW.writes(UnincorporatedBody) must
         be(Map("businessType" -> Seq("05")))
-
-    }
-
-    "throw error on invalid data" in {
-      BusinessType.formR.validate(Map("businessType" -> Seq("20"))) must
-        be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.invalid"))))))
     }
   }
 }
