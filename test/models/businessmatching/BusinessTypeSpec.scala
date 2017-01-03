@@ -11,7 +11,7 @@ class BusinessTypeSpec extends PlaySpec with MockitoSugar {
   "Form Validation" must {
 
     "successfully validate" when {
-      "successfully validate given an enum value" in {
+      "successfully validate given a valid enum value" in {
 
         BusinessType.formR.validate(Map("businessType" -> Seq("01"))) must
           be(Success(LimitedCompany))
