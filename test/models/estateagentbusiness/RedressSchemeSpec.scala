@@ -78,6 +78,24 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
         )))
     }
 
+    "fail to validate given an empty form post" in {
+      val data = Map[String, Seq[String]]()
+
+      RedressScheme.formRedressRule.validate(data) must be(Failure(Seq(
+        (Path \ "isRedress") -> Seq(ValidationError("error.required.eab.redress.scheme"))
+      )))
+    }
+
+    "fail to validate given an empty value for 'propertyRedressScheme'" in {
+      val data = Map(
+        "isRedress" -> Seq("true")
+      )
+
+      RedressScheme.formRedressRule.validate(data) must be(Failure(Seq(
+        (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.required.eab.which.redress.scheme"))
+      )))
+    }
+
     "write correct data from enum value" in {
 
       RedressScheme.formRedressWrites.writes(ThePropertyOmbudsman) must
