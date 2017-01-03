@@ -52,7 +52,7 @@
                 target = s"#$target1"
             )
             @panel(
-                f = f(s"$target")
+                field = Some(f(s"$target"))
             ) {
                 @input(
                     field = f("sortCode"),
@@ -68,7 +68,7 @@
                 )
             }
             @panel(
-                f = f(s"$target1")
+                field = Some(f(s"$target1"))
             ) {
                 @input(
                     field = f("IBANNumber"),
