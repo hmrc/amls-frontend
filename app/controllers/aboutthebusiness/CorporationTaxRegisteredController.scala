@@ -32,33 +32,6 @@ trait CorporationTaxRegisteredController extends BaseController {
       } map { form =>
         Ok(corporation_tax_registered(form, edit))
       }
-
-//        f
-
-
-     /* dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-          response =>
-
-
-
-            val form: Form2[CorporationTaxRegistered] = (for {
-            aboutTheBusiness <- response
-            corporationTaxRegistered <- aboutTheBusiness.corporationTaxRegistered
-          } yield Form2[CorporationTaxRegistered](corporationTaxRegistered)).getOrElse {
-
-//              (for {
-//                details <- businessMatchingConnector.getReviewDetails
-//                unwrappedDetails <- details
-//                utr <- unwrappedDetails.utr
-//              } yield Form2[CorporationTaxRegistered](CorporationTaxRegisteredYes(utr)))
-//
-
-
-
-            }
-
-          Ok(corporation_tax_registered(form, edit))
-      }*/
   }
 
   def post(edit: Boolean = false) = Authorised.async {
