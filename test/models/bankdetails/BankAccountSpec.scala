@@ -10,15 +10,157 @@ import play.api.libs.json.{JsSuccess, JsPath, Json}
 
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
+  "Account details form" must{
+    "fail to validate" when {
+      "account name is given an empty string" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq(""),
+          "isUK" -> Seq("true"),
+          "accountNumber" -> Seq("12345678"),
+          "sortCode" -> Seq("112233")
+        )
 
-  "displaySortCode" must {
-    "return the sort code formatted for display" in {
+        BankAccount.formRule.validate(urlFormEncoded) must
+          be(Failure(Seq(
+            (Path \ "accountName") -> Seq(ValidationError("error.bankdetails.accountname"))
+          )))
+      }
+      "account name is given a value greater than max length" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("A" * 41),
+          "isUK" -> Seq("true"),
+          "accountNumber" -> Seq("12345678"),
+          "sortCode" -> Seq("112233")
+        )
 
-      val account = UKAccount("12341234","123456")
+        BankAccount.formRule.validate(urlFormEncoded) must
+          be(Failure(Seq(
+            (Path \ "accountName") -> Seq(ValidationError("error.invalid.bankdetails.accountname"))
+          )))
+      }
+      "no selection is made for an account type" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("")
+        )
 
-      account.displaySortCode must be("12-34-56")
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "isUK") -> Seq(ValidationError("error.bankdetails.ukbankaccount")))))
+      }
+      "a UK account is selected and an empty account number is provided" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("true"),
+          "accountNumber" -> Seq(""),
+          "sortCode" -> Seq("112233")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "accountNumber") -> Seq(ValidationError("error.bankdetails.accountnumber")))))
+      }
+      "a UK account is selected and the account number given is longer than the max length" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("true"),
+          "accountNumber" -> Seq("1" * 9),
+          "sortCode" -> Seq("112233")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "accountNumber") -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
+      }
+      "a UK account is selected and the account number has an incorrect pattern" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("true"),
+          "accountNumber" -> Seq("A2345678"),
+          "sortCode" -> Seq("112233")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "accountNumber") -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
+      }
+      "a UK account is selected and the sort code given is empty" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("true"),
+          "accountNumber" -> Seq("12345678"),
+          "sortCode" -> Seq("")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "sortCode") -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+      }
+      "a UK account is selected and the value given has an incorrect pattern" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("true"),
+          "accountNumber" -> Seq("12345678"),
+          "sortCode" -> Seq("AABB23")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "sortCode") -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+      }
+      "a non UK account is selected and both the IBAN and non UK account number are empty" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("false"),
+          "IBANNumber" -> Seq(""),
+          "nonUKAccountNumber" -> Seq("")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "IBANNumber") -> Seq(ValidationError("error.required.bankdetails.iban.account")))))
+      }
+      "a non UK account is selected and the IBAN given is greater than the max length permitted" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("false"),
+          "nonUKAccountNumber" -> Seq(""),
+          "IBANNumber" -> Seq("12334623784623648236482364872364726384762384762384623874554787876868")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "IBANNumber") -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
+      }
+      "a non UK account is selected and the IBAN given has an incorrect pattern" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("false"),
+          "nonUKAccountNumber" -> Seq(""),
+          "IBANNumber" -> Seq("12345678--")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "IBANNumber") -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
+      }
+      "a non UK account is selected and the non UK account number is greater than the max length permitted" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("false"),
+          "nonUKAccountNumber" -> Seq("A" * 41),
+          "IBANNumber" -> Seq("")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.max.length.bankdetails.account")))))
+      }
+      "a non UK account is selected and the non UK account number given has an incorrect pattern" in {
+        val urlFormEncoded = Map(
+          "accountName" -> Seq("test"),
+          "isUK" -> Seq("false"),
+          "nonUKAccountNumber" -> Seq("12345678--"),
+          "IBANNumber" -> Seq("")
+        )
+
+        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+          (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.invalid.bankdetails.account")))))
+      }
+
     }
   }
+
 
   "For the Account" must {
 
@@ -33,11 +175,14 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       Account.formRead.validate(urlFormEncoded) must be(Success(UKAccount("12345678", "112233")))
     }
 
-    "fail on invalid selection" in {
-      Account.formRead.validate(Map("accountName" -> Seq("test"), "isUK" -> Seq("false"), "nonUKAccountNumber" -> Seq(""))) must be(Failure(Seq(
-        (Path \ "IBANNumber") -> Seq(ValidationError("error.required.bankdetails.iban.account")))))
-    }
+    "displaySortCode" must {
+      "return the sort code formatted for display" in {
 
+        val account = UKAccount("12341234","123456")
+
+        account.displaySortCode must be("12-34-56")
+      }
+    }
 
     "Form Rule validation is successful for UKAccount1" in {
       val urlFormEncoded = Map(
@@ -124,28 +269,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
     "Form Rule validation for Non UKAccount IBAN Number" in {
 
-      val urlFormEncoded = Map(
-        "accountName" -> Seq("test"),
-        "isUK" -> Seq("false"),
-        "nonUKAccountNumber" -> Seq(""),
-        "IBANNumber" -> Seq("12334623784623648236482364872364726384762384762384623874554787876868")
-      )
 
-      Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
-        (Path \ "IBANNumber") -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
-    }
-
-    "Form Rule validation for Non UKAccount Account Number" in {
-
-      val urlFormEncoded = Map(
-        "accountName" -> Seq("test"),
-        "isUK" -> Seq("false"),
-        "IBANNumber" -> Seq(""),
-        "nonUKAccountNumber" -> Seq("12334623784623648236482364872364726384762384762384623874554787876868")
-      )
-
-      Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
-        (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.max.length.bankdetails.account")))))
     }
 
     "Form Write validation for IBAN Non UK Account" in {

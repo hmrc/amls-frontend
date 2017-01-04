@@ -19,7 +19,7 @@ class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
         be(Success(BankAccountRegistered(true)))
     }
 
-    "successfully validate given a data model" in {
+    "successfully validate given a data model containing true" in {
 
       val data = Map(
         "registerAnotherBank" -> Seq("true")
@@ -27,6 +27,16 @@ class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
 
       BankAccountRegistered.formRule.validate(data) must
         be(Success(BankAccountRegistered(true)))
+    }
+
+    "successfully validate given a data model containing false" in {
+
+      val data = Map(
+        "registerAnotherBank" -> Seq("false")
+      )
+
+      BankAccountRegistered.formRule.validate(data) must
+        be(Success(BankAccountRegistered(false)))
     }
 
     "fail to validate when given invalid data" in {

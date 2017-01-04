@@ -40,7 +40,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
         be(Success(ExperienceTrainingNo))
     }
 
-    "successfully validate given an `Yes` value" in {
+    "successfully validate given a `Yes` value" in {
       val data = Map(
         "experienceTraining" -> Seq("true"),
         "experienceInformation" -> Seq("0123456789")
@@ -49,7 +49,15 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       ExperienceTraining.formRule.validate(data) must be(Success(ExperienceTrainingYes("0123456789")))
     }
 
-    "fail to validate given an `Yes` with no value" in {
+    "successfully validate given a `No` value" in {
+      val data = Map(
+        "experienceTraining" -> Seq("false")
+      )
+
+      ExperienceTraining.formRule.validate(data) must be(Success(ExperienceTrainingNo))
+    }
+
+    "fail to validate given a `Yes` with no value" in {
 
       val data = Map(
         "experienceTraining" -> Seq("true")
@@ -58,6 +66,16 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       ExperienceTraining.formRule.validate(data) must
         be(Failure(Seq(
           (Path \ "experienceInformation") -> Seq(ValidationError("error.required"))
+        )))
+    }
+
+    "fail to validate given neither 'Yes' nor 'No' value" in {
+
+      val data: Map[String, Seq[String]] = Map.empty[String, Seq[String]]
+
+      ExperienceTraining.formRule.validate(data) must
+        be(Failure(Seq(
+          (Path \ "experienceTraining") -> Seq(ValidationError("error.required.rp.experiencetraining"))
         )))
     }
 
