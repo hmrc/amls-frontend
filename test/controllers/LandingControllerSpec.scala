@@ -315,13 +315,9 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
   }
 
   "show landing page without authorisation" in new Fixture {
-    val pageTitleSuffix = " - Pre-application - Anti-money laundering supervision - GOV.UK"
 
     val result = controller.start()(FakeRequest().withSession())
     status(result) must be (OK)
-
-    val document = Jsoup.parse(contentAsString(result))
-    document.title() must be(Messages("start.title") + pageTitleSuffix)
 
   }
 
