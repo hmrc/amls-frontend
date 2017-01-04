@@ -23,7 +23,8 @@ trait AuthorisedFixture extends MockitoSugar {
   implicit val request = FakeRequest().withSession(
     SessionKeys.sessionId -> "SessionId",
     SessionKeys.token -> "Token",
-    SessionKeys.userId -> "Test User"
+    SessionKeys.userId -> "Test User",
+    SessionKeys.authToken -> ""
   )
 
   when(authConnector.currentAuthority(any())) thenReturn Future.successful(Some(authority))
