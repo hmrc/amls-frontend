@@ -2,9 +2,9 @@ package models.businessmatching
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
 
@@ -12,45 +12,53 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
 
     "Form Validation" must {
 
-      "successfully validate given a correct numeric value" in {
-        val data = Map("companyRegistrationNumber" -> Seq("12345678"))
-        val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Success(CompanyRegistrationNumber("12345678"))
+      "successfully validate" when {
+        "given a correct numeric value with 8 digits" in {
+          val data = Map("companyRegistrationNumber" -> Seq("12345678"))
+          val result = CompanyRegistrationNumber.formReads.validate(data)
+          result mustBe Success(CompanyRegistrationNumber("12345678"))
+        }
+
+
+        "given a correct upper case alphanumeric value with 8 digits" in {
+          val data = Map("companyRegistrationNumber" -> Seq("AB78JC12"))
+          val result = CompanyRegistrationNumber.formReads.validate(data)
+          result mustBe Success(CompanyRegistrationNumber("AB78JC12"))
+        }
       }
 
-      "successfully validate given a correct lower case alphanumeric value" in {
-        val data = Map("companyRegistrationNumber" -> Seq("AB765BHD"))
-        val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Success(CompanyRegistrationNumber("AB765BHD"))
-      }
+      "fail validation" when {
+        "missing a mandatory field represented by an empty string" in {
+          val result = CompanyRegistrationNumber.formReads.validate(Map("companyRegistrationNumber" -> Seq("")))
+          result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.required.bm.registration.number"))))
+        }
+        "missing a mandatory field represented by an empty Map" in {
+          val result = CompanyRegistrationNumber.formReads.validate(Map.empty)
+          result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.required"))))
+        }
 
-      "successfully validate given a correct upper case alphanumeric value" in {
-        val data = Map("companyRegistrationNumber" -> Seq("AB78JC12"))
-        val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Success(CompanyRegistrationNumber("AB78JC12"))
-      }
+        "given an alphanumeric value with 8 digits containing lower case letters" in {
+          val data = Map("companyRegistrationNumber" -> Seq("ab765bhd"))
+          val result = CompanyRegistrationNumber.formReads.validate(data)
+          result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        }
+        "given a value with length greater than 8" in {
+          val data = Map("companyRegistrationNumber" -> Seq("1" * 9))
+          val result = CompanyRegistrationNumber.formReads.validate(data)
+          result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        }
 
-      "validate with a failure on missing mandatory field" in {
-        val result = CompanyRegistrationNumber.formReads.validate(Map("companyRegistrationNumber" -> Seq("")))
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.required.bm.registration.number"))))
-      }
+        "given a value with length less than 8" in {
+          val data = Map("companyRegistrationNumber" -> Seq("1" * 7))
+          val result = CompanyRegistrationNumber.formReads.validate(data)
+          result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        }
 
-      "validate with a failure given a value with length greater than 8" in {
-        val data = Map("companyRegistrationNumber" -> Seq("1234567890"))
-        val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
-      }
-
-      "validate with a failure given a value with length less than 8" in {
-        val data = Map("companyRegistrationNumber" -> Seq("1290"))
-        val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
-      }
-
-      "validate with a failure given a value containing non-alphanumeric characters" in {
-        val data = Map("companyRegistrationNumber" -> Seq("1234567!"))
-        val result = CompanyRegistrationNumber.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        "given a value containing non-alphanumeric characters" in {
+          val data = Map("companyRegistrationNumber" -> Seq("1234567!"))
+          val result = CompanyRegistrationNumber.formReads.validate(data)
+          result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        }
       }
 
       "write correct data from correct value" in {
