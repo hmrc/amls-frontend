@@ -25,11 +25,7 @@ class DateOfChangeSpec extends PlaySpec {
     "read from JSON correctly" in {
 
       val json = Json.obj(
-        "dateOfChange" -> Json.obj(
-          "day" -> 24,
-          "month" -> 2,
-          "year" -> 2016
-        )
+        "dateOfChange" -> "2016-02-24"
       )
 
       val result = Json.fromJson[DateOfChange](json)
@@ -40,11 +36,7 @@ class DateOfChangeSpec extends PlaySpec {
 
       val date = DateOfChange(new LocalDate(2016,2,24))
       val json = Json.obj(
-        "dateOfChange" -> Json.obj(
-          "day" -> 24,
-          "month" -> 2,
-          "year" -> 2016
-        )
+        "dateOfChange" -> "2016-02-24"
       )
 
       val result = Json.toJson(date)

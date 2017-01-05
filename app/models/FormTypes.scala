@@ -174,9 +174,9 @@ object FormTypes {
   val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
   val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRule compose futureDateRule
 
-//  val dateOfChangeMapping = Rule.fromMapping[LocalDate, DateOfChange] {
-//    case date => DateOfChange
-//  }
+  val dateOfChangeMapping = Rule.fromMapping[LocalDate, DateOfChange] {
+    case date => Success(DateOfChange(date))
+  }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
     case (d1, d2) if d2.isAfter(d1) => Success(d2)
