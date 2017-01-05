@@ -22,7 +22,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLine3" -> Seq("street"),
           "addressLine4" -> Seq("Longbenton"),
           "postCode" -> Seq("NE7 7DX"),
-          "dateOfChange" -> Seq("12-01-2016")
+          "dateOfChange" -> Seq("2016-01-12")
         )
 
         RegisteredOffice.formRule.validate(ukModel) must
@@ -43,7 +43,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLineNonUK3" -> Seq("street"),
           "addressLineNonUK4" -> Seq("Area"),
           "country" -> Seq("GB"),
-          "dateOfChange" -> Seq("12-01-2016")
+          "dateOfChange" -> Seq("2016-01-12")
         )
 
         RegisteredOffice.formRule.validate(nonUKModel) must
@@ -114,6 +114,32 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
             )))
         }
+
+        "given an invalid date of change date" in {
+          val data = Map(
+            "isUK" -> Seq("false"),
+            "addressLine1" -> Seq("a" * 20),
+            "addressLine2" -> Seq("a" * 20),
+            "country" -> Seq("UK"),
+            "dateOfChange" -> Seq("kjhbfp9832")
+          )
+          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
+            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.jodadate.format"))
+          )))
+        }
+
+        "given a future date of change date" in {
+          val data = Map(
+            "isUK" -> Seq("false"),
+            "addressLine1" -> Seq("a" * 20),
+            "addressLine2" -> Seq("a" * 20),
+            "country" -> Seq("UK"),
+            "dateOfChange" -> Seq(LocalDate.now.plusDays(5).toString("yyyy-MM-dd"))
+          )
+          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
+            (Path \ "dateOfChange") -> Seq(ValidationError("error.future.date"))
+          )))
+        }
       }
 
       "given an isUK value of 'true' and" when {
@@ -150,6 +176,32 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
             )))
+        }
+
+        "given an invalid date of change date" in {
+          val data = Map(
+            "isUK" -> Seq("true"),
+            "addressLine1" -> Seq("a" * 20),
+            "addressLine2" -> Seq("a" * 20),
+            "postCode" -> Seq("AB12CD"),
+            "dateOfChange" -> Seq("kjhbfp9832")
+          )
+          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
+            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.jodadate.format"))
+          )))
+        }
+
+        "given a future date of change date" in {
+          val data = Map(
+            "isUK" -> Seq("true"),
+            "addressLine1" -> Seq("a" * 20),
+            "addressLine2" -> Seq("a" * 20),
+            "postCode" -> Seq("AB12CD"),
+            "dateOfChange" -> Seq(LocalDate.now.plusDays(5).toString("yyyy-MM-dd"))
+          )
+          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
+            (Path \ "dateOfChange") -> Seq(ValidationError("error.future.date"))
+          )))
         }
       }
 
