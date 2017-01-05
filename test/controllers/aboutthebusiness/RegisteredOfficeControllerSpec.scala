@@ -142,7 +142,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
 
     "return view for Date of Change" in new Fixture {
 
-      val result = controller.dateOfChange()(FakeRequest())
+      val result = controller.dateOfChange()(request)
       status(result) must be(OK)
 
     }

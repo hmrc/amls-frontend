@@ -55,7 +55,8 @@ trait RegisteredOfficeController extends BaseController  {
   }
 
   def dateOfChange = Authorised.async{
-    ???
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.aboutthebusiness.date_of_change()))
   }
 }
 
