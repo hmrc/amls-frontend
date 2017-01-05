@@ -2,16 +2,19 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{RegisteredOfficeUK, AboutTheBusiness}
+import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
+import services.StatusService
 
 import scala.concurrent.Future
 
@@ -24,6 +27,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
     val controller = new RegisteredOfficeController () {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -67,8 +71,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
 
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None))))
+      when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None))))
 
       val result = controller.get(true)(request)
       status(result) must be(OK)
@@ -76,9 +82,13 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
     }
 
     "successfully submit form and navigate to target page" in new Fixture {
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
 
-      when(controller.dataCacheConnector.fetch(any())(any(), any(), any())).thenReturn(Future.successful(None))
-      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.fetch(any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val newRequest = request.withFormUrlEncodedBody(
         "isUK"-> "true",
@@ -110,6 +120,30 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
     }
 
     "when it's a variation, go to the date of change page" in new Fixture {
+      when(controller.dataCacheConnector.fetch(any())(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "isUK"-> "true",
+        "addressLine1"->"line1",
+        "addressLine2"->"line2",
+        "addressLine3"->"",
+        "addressLine4"->"",
+        "postCode"->"NE7 7DS")
+      val result = controller.post()(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.RegisteredOfficeController.dateOfChange().url))
+    }
+
+    "return view for Date of Change" in new Fixture {
+
+      val result = controller.dateOfChange()(FakeRequest())
+      status(result) must be(OK)
 
     }
   }
