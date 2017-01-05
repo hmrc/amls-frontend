@@ -36,7 +36,7 @@ case class RegisteredOfficeUK(
                                addressLine3: Option[String] = None,
                                addressLine4: Option[String] = None,
                                postCode: String,
-                               dateOfChange: Option[LocalDate] = None
+                               dateOfChange: Option[DateOfChange] = None
                              ) extends RegisteredOffice
 
 case class RegisteredOfficeNonUK(
@@ -45,7 +45,7 @@ case class RegisteredOfficeNonUK(
                                   addressLine3: Option[String] = None,
                                   addressLine4: Option[String] = None,
                                   country: Country,
-                                  dateOfChange: Option[LocalDate] = None
+                                  dateOfChange: Option[DateOfChange] = None
                                 ) extends RegisteredOffice
 
 object RegisteredOffice {
@@ -109,7 +109,7 @@ object RegisteredOffice {
             (__ \ "addressLine3").readNullable[String] and
             (__ \ "addressLine4").readNullable[String] and
             (__ \ "postCode").read[String] and
-            (__ \ "dateOfChange").readNullable[LocalDate]
+            (__ \ "dateOfChange").readNullable[DateOfChange]
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
@@ -118,7 +118,7 @@ object RegisteredOffice {
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
           (__ \ "country").read[Country] and
-          (__ \ "dateOfChange").readNullable[LocalDate]
+          (__ \ "dateOfChange").readNullable[DateOfChange]
         ) (RegisteredOfficeNonUK.apply _)
   }
 

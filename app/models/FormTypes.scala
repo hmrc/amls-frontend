@@ -1,5 +1,6 @@
 package models
 
+import models.aboutthebusiness.DateOfChange
 import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -170,8 +171,12 @@ object FormTypes {
         ) (d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
     }
 
-  val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
-  val localDateFutureRule = localDateRule compose futureDateRule
+  val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
+  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRule compose futureDateRule
+
+//  val dateOfChangeMapping = Rule.fromMapping[LocalDate, DateOfChange] {
+//    case date => DateOfChange
+//  }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
     case (d1, d2) if d2.isAfter(d1) => Success(d2)
