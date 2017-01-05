@@ -107,10 +107,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
             "addressLineNonUK2" -> Seq("a" * 36),
             "addressLineNonUK3" -> Seq("a" * 36),
             "addressLineNonUK4" -> Seq("a" * 36),
-            "country" -> Seq("UK" * 12),
-            "dateOfChange.day" -> Seq("133"),
-            "dateOfChange.month" -> Seq("13454"),
-            "dateOfChange.year" -> Seq("201689374")
+            "country" -> Seq("UK" * 12)
           )
 
           RegisteredOffice.formRule.validate(data) must
@@ -119,41 +116,10 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line")),
-              (Path \ "country") -> Seq(ValidationError("error.invalid.country")),
-              (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
             )))
         }
 
-        "given a day month and year containing letters" in {
-          val data = Map(
-            "isUK" -> Seq("false"),
-            "addressLineNonUK1" -> Seq("a" * 20),
-            "addressLineNonUK2" -> Seq("a" * 20),
-            "country" -> Seq("GB"),
-            "dateOfChange.day" -> Seq("ab"),
-            "dateOfChange.month" -> Seq("cd"),
-            "dateOfChange.year" -> Seq("ef")
-          )
-          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
-            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
-          )))
-        }
-
-        "given a future date of change date" in {
-          val data = Map(
-            "isUK" -> Seq("false"),
-            "addressLineNonUK1" -> Seq("a" * 20),
-            "addressLineNonUK2" -> Seq("a" * 20),
-            "country" -> Seq("GB"),
-            "dateOfChange.day" -> Seq("1"),
-            "dateOfChange.month" -> Seq("1"),
-            "dateOfChange.year" -> Seq(LocalDate.now().plusYears(1).getYear.toString)
-//            "dateOfChange" -> Seq(LocalDate.now.plusDays(5).toString("yyyy-MM-dd"))
-          )
-          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
-            (Path \ "dateOfChange") -> Seq(ValidationError("error.future.date", "yyyy-MM-dd"))
-          )))
-        }
       }
 
       "given an isUK value of 'true' and" when {
@@ -192,33 +158,27 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
             )))
         }
 
-        "given an invalid date of change date" in {
-          val data = Map(
-            "isUK" -> Seq("true"),
-            "addressLine1" -> Seq("a" * 20),
-            "addressLine2" -> Seq("a" * 20),
-            "postCode" -> Seq("AB12CD"),
-            "dateOfChange" -> Seq("kjhbfp9832")
-          )
-          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
-            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.jodadate.format"))
-          )))
-        }
-
-        "given a future date of change date" in {
-          val data = Map(
-            "isUK" -> Seq("true"),
-            "addressLine1" -> Seq("a" * 20),
-            "addressLine2" -> Seq("a" * 20),
-            "postCode" -> Seq("AB12CD"),
-            "dateOfChange" -> Seq(LocalDate.now.plusDays(5).toString("yyyy-MM-dd"))
-          )
-          RegisteredOffice.formRule.validate(data) must be(Failure(Seq(
-            (Path \ "dateOfChange") -> Seq(ValidationError("error.future.date"))
-          )))
-        }
       }
 
+      "given a dateOfChange before business activity start date" in {
+
+        val data = Map(
+          "isUK" -> Seq("false"),
+          "addressLineNonUK1" -> Seq("38B"),
+          "addressLineNonUK2" -> Seq("building"),
+          "addressLineNonUK3" -> Seq("street"),
+          "addressLineNonUK4" -> Seq("Area"),
+          "country" -> Seq("GB"),
+          "dateOfChange.day" -> Seq("12"),
+          "dateOfChange.month" -> Seq("1"),
+          "dateOfChange.year" -> Seq("2016"),
+          "activityStartDate" -> Seq("2017-1-1")
+        )
+        RegisteredOffice.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate"))
+          )))
+      }
 
     }
 

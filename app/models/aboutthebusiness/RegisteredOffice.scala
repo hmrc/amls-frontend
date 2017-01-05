@@ -62,7 +62,7 @@ object RegisteredOffice {
             (__ \ "addressLine3").read(optionR(validateAddress)) and
             (__ \ "addressLine4").read(optionR(validateAddress)) and
             (__ \ "postCode").read(postcodeType) and
-            (__ \ "dateOfChange").read(optionR(localDateFutureRule compose dateOfChangeMapping))
+            (__ \ "dateOfChange").read(optionR(registeredOfficeDateOfChangeRule compose dateOfChangeMapping))
           ) (RegisteredOfficeUK.apply _)
       case false =>
         (
@@ -71,7 +71,7 @@ object RegisteredOffice {
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) and
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) and
             (__ \ "country").read[Country] and
-          (__ \ "dateOfChange").read(optionR(localDateFutureRule compose dateOfChangeMapping))
+          (__ \ "dateOfChange").read(optionR(registeredOfficeDateOfChangeRule compose dateOfChangeMapping))
           ) (RegisteredOfficeNonUK.apply _)
     }
   }

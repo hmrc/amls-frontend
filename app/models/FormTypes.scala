@@ -178,6 +178,18 @@ object FormTypes {
     case date => Success(DateOfChange(date))
   }
 
+  val registeredOfficeDateOfChangeRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
+    case (d1, d2) if d2.isAfter(d1) => Success(d2)
+    case (activityStartDate, _) => Failure(Seq(
+      ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", activityStartDate.toString("dd-MM-yyyy"))))
+  }
+
+  val registeredOfficeDateOfChangeRule = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    ((__ \ "activityStartDate").read(jodaLocalDateRule("yyyy-MM-dd")) ~
+      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.compose(registeredOfficeDateOfChangeRuleMapping).repath(_ => Path \ "dateOfChange")
+  }
+
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
     case (d1, d2) if d2.isAfter(d1) => Success(d2)
     case (startDate, _) => Failure(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
