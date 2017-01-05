@@ -2,6 +2,7 @@ package models.aboutthebusiness
 
 import models.Country
 import models.businesscustomer.Address
+import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -20,11 +21,18 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLine2" -> Seq("building"),
           "addressLine3" -> Seq("street"),
           "addressLine4" -> Seq("Longbenton"),
-          "postCode" -> Seq("NE7 7DX")
+          "postCode" -> Seq("NE7 7DX"),
+          "dateOfChange" -> Seq("12-01-2016")
         )
 
         RegisteredOffice.formRule.validate(ukModel) must
-          be(Success(RegisteredOfficeUK("38B", "building", Some("street"), Some("Longbenton"), "NE7 7DX")))
+          be(Success(RegisteredOfficeUK(
+            "38B",
+            "building",
+            Some("street"),
+            Some("Longbenton"),
+            "NE7 7DX",
+            Some(new LocalDate(2016, 1, 12)))))
       }
 
       "given a valid non UK address" in {
@@ -34,11 +42,19 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLineNonUK2" -> Seq("building"),
           "addressLineNonUK3" -> Seq("street"),
           "addressLineNonUK4" -> Seq("Area"),
-          "country" -> Seq("GB")
+          "country" -> Seq("GB"),
+          "dateOfChange" -> Seq("12-01-2016")
         )
 
         RegisteredOffice.formRule.validate(nonUKModel) must
-          be(Success(RegisteredOfficeNonUK("38B", "building", Some("street"), Some("Area"), Country("United Kingdom", "GB"))))
+          be(Success(
+            RegisteredOfficeNonUK(
+              "38B",
+              "building",
+              Some("street"),
+              Some("Area"),
+              Country("United Kingdom", "GB"),
+              Some(new LocalDate(2016, 1, 12)))))
       }
     }
 

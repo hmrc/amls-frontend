@@ -108,5 +108,9 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
       contentAsString(result) must include(Messages("err.summary"))
 
     }
+
+    "when it's a variation, go to the date of change page" in new Fixture {
+
+    }
   }
 }
