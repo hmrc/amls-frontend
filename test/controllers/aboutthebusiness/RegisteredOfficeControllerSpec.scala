@@ -218,5 +218,27 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
       }
     }
 
+    "redirect to the SummaryController route when saving the date of change, and edit = true" in new Fixture {
+
+      val postRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.year" -> "2010",
+        "dateOfChange.month" -> "10",
+        "dateOfChange.day" -> "01"
+      )
+
+      val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+      val business = AboutTheBusiness(registeredOffice = Some(office))
+
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+        thenReturn(Future.successful(Some(business)))
+
+      when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
+        thenReturn(Future.successful(mock[CacheMap]))
+
+      val result = controller.saveDateOfChange(true)(postRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+    }
   }
 }
