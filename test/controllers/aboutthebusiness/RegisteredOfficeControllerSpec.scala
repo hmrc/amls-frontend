@@ -2,19 +2,23 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
+import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOffice, RegisteredOfficeUK}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.data.mapping.Format
 import play.api.i18n.Messages
-import play.api.test.FakeRequest
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
+import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
@@ -141,9 +145,45 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
     }
 
     "return view for Date of Change" in new Fixture {
-
       val result = controller.dateOfChange()(request)
       status(result) must be(OK)
+    }
+
+    "handle the date of change form post" when {
+
+      "given valid data for a UK address and edit mode = false" in new Fixture {
+
+        val postRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.year" -> "2010",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.day" -> "01"
+        )
+
+        val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+        val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+        val business = AboutTheBusiness(registeredOffice = Some(office))
+
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+          thenReturn(Future.successful(Some(business)))
+
+        when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
+          thenReturn(Future.successful(mock[CacheMap]))
+
+        val result = controller.saveDateOfChange(false)(postRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.ContactingYouController.get(false).url))
+
+        val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
+        verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
+
+        captor.getValue.registeredOffice map {
+          case savedOffice: RegisteredOfficeUK =>
+            savedOffice must be(updatedOffice)
+        }
+
+      }
 
     }
   }

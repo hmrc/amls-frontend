@@ -4,7 +4,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
+import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOffice, RegisteredOfficeUK}
 import models.status.SubmissionDecisionApproved
 import services.StatusService
 
@@ -57,6 +57,22 @@ trait RegisteredOfficeController extends BaseController  {
   def dateOfChange = Authorised.async{
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.aboutthebusiness.date_of_change()))
+  }
+
+  def saveDateOfChange(edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
+      Form2[DateOfChange](request.body) match {
+        case ValidForm(_, data) =>
+          for {
+            aboutTheBusiness <- dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
+            _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
+              aboutTheBusiness.registeredOffice(aboutTheBusiness.registeredOffice match {
+                case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(data))
+              }))
+          } yield {
+            Redirect(routes.ContactingYouController.get(false))
+          }
+      }
   }
 }
 

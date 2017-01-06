@@ -41,6 +41,7 @@ POST        /about-the-business/confirming-address                      controll
 GET         /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
 GET         /about-the-business/new-registered-office/date-of-change    controllers.aboutthebusiness.RegisteredOfficeController.dateOfChange()
+POST        /about-the-business/new-registered-office/date-of-change    controllers.aboutthebusiness.RegisteredOfficeController.saveDateOfChange(edit: Boolean ?= false)
 
 GET         /about-the-business/address-for-letters                     controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
 POST        /about-the-business/address-for-letters                     controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
