@@ -24,7 +24,8 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "postCode" -> Seq("NE7 7DX"),
           "dateOfChange.day" -> Seq("12"),
           "dateOfChange.month" -> Seq("1"),
-          "dateOfChange.year" -> Seq("2016")
+          "dateOfChange.year" -> Seq("2016"),
+          "activityStartDate" -> Seq(new LocalDate(2016,1,1).toString("yyyy-MM-dd"))
         )
 
         RegisteredOffice.formRule.validate(ukModel) must
@@ -170,13 +171,13 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLineNonUK4" -> Seq("Area"),
           "country" -> Seq("GB"),
           "dateOfChange.day" -> Seq("12"),
-          "dateOfChange.month" -> Seq("1"),
+          "dateOfChange.month" -> Seq("01"),
           "dateOfChange.year" -> Seq("2016"),
-          "activityStartDate" -> Seq("2017-1-1")
+          "activityStartDate" -> Seq("2017-01-01")
         )
         RegisteredOffice.formRule.validate(data) must
           be(Failure(Seq(
-            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate"))
+            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", "01-01-2017"))
           )))
       }
 
