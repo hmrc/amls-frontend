@@ -4,8 +4,9 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOffice, RegisteredOfficeUK, RegisteredOfficeNonUK}
+import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOffice, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import models.status.SubmissionDecisionApproved
+import org.joda.time.LocalDate
 import services.StatusService
 
 import scala.concurrent.Future
@@ -54,9 +55,9 @@ trait RegisteredOfficeController extends BaseController  {
       }
   }
 
-  def dateOfChange = Authorised.async{
+  def dateOfChange(edit: Boolean = false) = Authorised {
     implicit authContext => implicit request =>
-      Future.successful(Ok(views.html.aboutthebusiness.date_of_change()))
+      Ok(views.html.aboutthebusiness.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), edit))
   }
 
   def saveDateOfChange(edit: Boolean = false) = Authorised.async {
