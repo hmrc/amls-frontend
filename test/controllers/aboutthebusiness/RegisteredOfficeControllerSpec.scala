@@ -2,7 +2,8 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOffice, RegisteredOfficeUK}
+import models.Country
+import models.aboutthebusiness._
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -178,13 +179,44 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
         val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
         verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
 
-        captor.getValue.registeredOffice map {
-          case savedOffice: RegisteredOfficeUK =>
-            savedOffice must be(updatedOffice)
+        captor.getValue.registeredOffice match {
+          case Some(savedOffice: RegisteredOfficeUK) => savedOffice must be(updatedOffice)
         }
 
       }
 
+      "given valid data for a Non-UK address and edit mode = false" in new Fixture {
+
+        val postRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.year" -> "2005",
+          "dateOfChange.month" -> "04",
+          "dateOfChange.day" -> "26"
+        )
+
+        val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
+        val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2005, 4, 26))))
+
+        val business = AboutTheBusiness(registeredOffice = Some(office))
+
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+          thenReturn(Future.successful(Some(business)))
+
+        when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
+          thenReturn(Future.successful(mock[CacheMap]))
+
+        val result = controller.saveDateOfChange(false)(postRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.ContactingYouController.get(false).url))
+
+        val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
+        verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
+
+        captor.getValue.registeredOffice match {
+          case Some(savedOffice: RegisteredOfficeNonUK) => savedOffice must be(updatedOffice)
+        }
+      }
     }
+
   }
 }
