@@ -1,13 +1,13 @@
+@import include.forms2._
 @import models.aboutthebusiness._
 
 @(model: RegisteredOffice)
 
-
-    <div class="panel-indent panel-indent--gutter panel-wide">
-        <p>
-        @model.toLines.map { line =>
-            @line<br />
-        }
-        </p>
-    </div>
-
+  @panel(
+    jsHidden = false,
+    wide = true
+  ) {
+      <p>@model.toLines.map { line =>
+          @line<br />
+      }</p>
+  }
