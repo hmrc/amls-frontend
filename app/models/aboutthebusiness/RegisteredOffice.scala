@@ -6,7 +6,7 @@ import models.businesscustomer.Address
 import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms._
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{JsNull, Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
 
@@ -109,7 +109,7 @@ object RegisteredOffice {
             (__ \ "addressLine3").readNullable[String] and
             (__ \ "addressLine4").readNullable[String] and
             (__ \ "postCode").read[String] and
-            (__ \ "dateOfChange").readNullable[DateOfChange]
+            __ .readNullable[DateOfChange]
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
@@ -118,25 +118,41 @@ object RegisteredOffice {
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
           (__ \ "country").read[Country] and
-          (__ \ "dateOfChange").readNullable[DateOfChange]
+          __ .readNullable[DateOfChange]
         ) (RegisteredOfficeNonUK.apply _)
   }
 
   implicit val jsonWrites = Writes[RegisteredOffice] {
+
     case m: RegisteredOfficeUK =>
       Json.obj(
         "addressLine1" -> m.addressLine1,
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
-        "postCode" -> m.postCode)
+        "postCode" -> m.postCode,
+        "dateOfChange" -> {
+          m.dateOfChange match {
+            case Some(data: DateOfChange) => data.dateOfChange.toString
+            case None => JsNull
+          }
+        }
+      )
+
     case m: RegisteredOfficeNonUK =>
       Json.obj(
         "addressLineNonUK1" -> m.addressLine1,
         "addressLineNonUK2" -> m.addressLine2,
         "addressLineNonUK3" -> m.addressLine3,
         "addressLineNonUK4" -> m.addressLine4,
-        "country" -> m.country.code)
+        "country" -> m.country.code,
+        "dateOfChange" -> {
+          m.dateOfChange match {
+            case Some(data: DateOfChange) => data.dateOfChange.toString
+            case None => JsNull
+          }
+        }
+      )
   }
 
   implicit def convert(address: Address): RegisteredOffice = {
