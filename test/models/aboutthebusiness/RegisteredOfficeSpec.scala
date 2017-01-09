@@ -222,7 +222,6 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         "country" -> Seq("GB"))
     }
 
-
     "json read the given non UK address" in {
 
       val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")

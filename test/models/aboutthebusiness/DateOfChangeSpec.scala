@@ -5,7 +5,7 @@ import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, _}
 
 
 class DateOfChangeSpec extends PlaySpec {
@@ -39,9 +39,7 @@ class DateOfChangeSpec extends PlaySpec {
 
     "read from JSON correctly" in {
 
-      val json = Json.obj(
-        "dateOfChange" -> "2016-02-24"
-      )
+      val json = JsString("2016-02-24")
 
       val result = Json.fromJson[DateOfChange](json)
       result.get.dateOfChange must be(new LocalDate(2016,2,24))
@@ -50,9 +48,7 @@ class DateOfChangeSpec extends PlaySpec {
     "write to JSON correctly" in {
 
       val date = DateOfChange(new LocalDate(2016,2,24))
-      val json = Json.obj(
-        "dateOfChange" -> "2016-02-24"
-      )
+      val json = JsString("2016-02-24")
 
       val result = Json.toJson(date)
       result must be(json)

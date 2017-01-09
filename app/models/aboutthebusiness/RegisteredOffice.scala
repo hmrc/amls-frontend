@@ -109,7 +109,7 @@ object RegisteredOffice {
             (__ \ "addressLine3").readNullable[String] and
             (__ \ "addressLine4").readNullable[String] and
             (__ \ "postCode").read[String] and
-            __ .readNullable[DateOfChange]
+            (__ \ "dateOfChange").readNullable[DateOfChange]
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
@@ -118,7 +118,7 @@ object RegisteredOffice {
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
           (__ \ "country").read[Country] and
-          __ .readNullable[DateOfChange]
+          (__ \ "dateOfChange").readNullable[DateOfChange]
         ) (RegisteredOfficeNonUK.apply _)
   }
 
@@ -131,12 +131,7 @@ object RegisteredOffice {
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
         "postCode" -> m.postCode,
-        "dateOfChange" -> {
-          m.dateOfChange match {
-            case Some(data: DateOfChange) => data.dateOfChange.toString
-            case None => JsNull
-          }
-        }
+        "dateOfChange" -> m.dateOfChange
       )
 
     case m: RegisteredOfficeNonUK =>
@@ -146,12 +141,7 @@ object RegisteredOffice {
         "addressLineNonUK3" -> m.addressLine3,
         "addressLineNonUK4" -> m.addressLine4,
         "country" -> m.country.code,
-        "dateOfChange" -> {
-          m.dateOfChange match {
-            case Some(data: DateOfChange) => data.dateOfChange.toString
-            case None => JsNull
-          }
-        }
+        "dateOfChange" -> m.dateOfChange
       )
   }
 
