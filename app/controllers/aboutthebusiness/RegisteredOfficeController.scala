@@ -63,6 +63,8 @@ trait RegisteredOfficeController extends BaseController  {
   def saveDateOfChange = Authorised.async {
     implicit authContext => implicit request =>
       Form2[DateOfChange](request.body) match {
+        case form: InvalidForm =>
+          Future.successful(BadRequest(date_of_change(form)))
         case ValidForm(_, dateOfChange) =>
           for {
             aboutTheBusiness <- dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)

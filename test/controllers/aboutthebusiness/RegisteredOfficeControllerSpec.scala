@@ -217,5 +217,20 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
         }
       }
     }
+
+    "show the data of change form once again" when {
+
+      "posted with invalid data" in new Fixture {
+
+        val postRequest = request.withFormUrlEncodedBody()
+
+        val result = controller.saveDateOfChange(postRequest)
+
+        status(result) must be(BAD_REQUEST)
+        verify(controller.dataCacheConnector, never()).save[AboutTheBusiness](any(), any())(any(), any(), any())
+
+      }
+
+    }
   }
 }
