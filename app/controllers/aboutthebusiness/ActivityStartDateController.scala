@@ -51,7 +51,7 @@ trait ActivityStartDateController extends BaseController {
 
   private def getRouting(businessType: BusinessType, edit: Boolean): Result = {
     (businessType, edit) match {
-      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, false) =>
+      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, _) =>
         Redirect(routes.VATRegisteredController.get(edit))
       case (_, true) => Redirect(routes.SummaryController.get())
       case (_, false) =>
