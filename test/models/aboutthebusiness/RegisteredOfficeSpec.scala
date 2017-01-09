@@ -247,7 +247,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "write correct value to json without date of change" in {
-      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
+      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX", None)
 
       Json.toJson(data) must
         be(Json.obj(
@@ -255,7 +255,8 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLine2" -> "Longbenton",
           "addressLine3" -> "line 1",
           "addressLine4" -> JsNull,
-          "postCode" -> "NE7 7DX")
+          "postCode" -> "NE7 7DX",
+          "dateOfChange" -> JsNull)
         )
     }
 
