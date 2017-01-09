@@ -1,7 +1,10 @@
 package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
+import models.Country
 import models.aboutthebusiness._
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -12,6 +15,9 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import org.mockito.Matchers.{eq => meq, _}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -59,20 +65,58 @@ class ActivityStartDateControllerSpec extends PlaySpec with OneAppPerSuite with 
 
     "Post" must {
 
-      "successfully redirect VATRegisteredController" in new Fixture {
+      "successfully redirect to ConfirmRegisteredOfficeController if not org or partnership" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "startDate.day" -> "12",
           "startDate.month" -> "5",
           "startDate.year" -> "1999"
         )
-        when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+
+        val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
+        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+          .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
         when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+      }
+
+      "successfully redirect to VATRegisteredController org or partnership" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "startDate.day" -> "12",
+          "startDate.month" -> "5",
+          "startDate.year" -> "1999"
+        )
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+
+        when (controller.dataCache.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
+        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+          .thenReturn(Some(AboutTheBusiness(Some(PreviouslyRegisteredNo))))
+
+        when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.VATRegisteredController.get().url))
       }
 
       "show error with invalid" in new Fixture {
