@@ -55,12 +55,12 @@ trait RegisteredOfficeController extends BaseController  {
       }
   }
 
-  def dateOfChange(edit: Boolean = false) = Authorised {
+  def dateOfChange = Authorised {
     implicit authContext => implicit request =>
-      Ok(views.html.aboutthebusiness.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), edit))
+      Ok(views.html.aboutthebusiness.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now))))
   }
 
-  def saveDateOfChange(edit: Boolean = false) = Authorised.async {
+  def saveDateOfChange = Authorised.async {
     implicit authContext => implicit request =>
       Form2[DateOfChange](request.body) match {
         case ValidForm(_, dateOfChange) =>
@@ -71,10 +71,7 @@ trait RegisteredOfficeController extends BaseController  {
                 case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
                 case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))
               }))
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.ContactingYouController.get(false))
-          }
+          } yield Redirect(routes.SummaryController.get())
       }
   }
 }

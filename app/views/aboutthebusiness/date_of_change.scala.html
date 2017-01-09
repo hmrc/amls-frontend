@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+@(f: forms.Form2[_])(implicit request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -13,7 +13,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.dateOfChange(edit)) {
+    @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()) {
 
         @date(
             f = f,
