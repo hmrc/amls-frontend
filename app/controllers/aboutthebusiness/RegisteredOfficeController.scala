@@ -4,7 +4,8 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOffice, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.DateOfChange
+import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import models.businessactivities.BusinessActivities
 import models.status.SubmissionDecisionApproved
 import org.joda.time.LocalDate
@@ -74,7 +75,6 @@ trait RegisteredOfficeController extends BaseController {
           val extraFields: Map[String, Seq[String]] = Map(
             "activityStartDate" -> Seq(aboutTheBusiness.get.activityStartDate.map(date => date.startDate.toString("yyyy-MM-dd")))
           )
-          println(">>>>>>>>>>>>>>>>>>>>>>>>" + (request.body.asFormUrlEncoded.get ++ extraFields))
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
               Future.successful(BadRequest(date_of_change(form)))

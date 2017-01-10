@@ -1,6 +1,6 @@
 package models.aboutthebusiness
 
-import models.Country
+import models.{Country, DateOfChange}
 import models.FormTypes._
 import models.businesscustomer.Address
 import org.joda.time.LocalDate

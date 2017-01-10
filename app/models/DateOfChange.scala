@@ -1,9 +1,9 @@
-package models.aboutthebusiness
+package models
 
 import models.FormTypes.localDateFutureRule
-import org.joda.time.{DateTimeFieldType, LocalDate}
-import play.api.data.mapping.{From, Rule, Write}
+import org.joda.time.LocalDate
 import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.mapping.{From, Rule, Write}
 import play.api.libs.json._
 
 case class DateOfChange (dateOfChange: LocalDate)

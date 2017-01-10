@@ -1,7 +1,8 @@
 package views.aboutthebusiness
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{DateOfChange, RegisteredOfficeUK}
+import models.DateOfChange
+import models.aboutthebusiness.RegisteredOfficeUK
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite

@@ -2,7 +2,7 @@ package controllers.aboutthebusiness
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.Country
+import models.{Country, DateOfChange}
 import models.aboutthebusiness._
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.joda.time.LocalDate
