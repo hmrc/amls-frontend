@@ -637,6 +637,7 @@ aboutthebusiness.contactingyou.businessaddress = Business address:
 aboutthebusiness.contactingyou.invalid.phone = Invalid Phone Number
 aboutthebusiness.contactingyou.invalid.mobile = Invalid Mobile Number
 aboutthebusiness.correspondenceaddress.title = What’s your postal address?
+aboutthebusiness.correspondenceaddress.lbl = Is this a UK address?
 aboutthebusiness.correspondenceaddress.p = We’ll send letters relating to anti-money laundering supervision to this address.
 aboutthebusiness.correspondenceaddress.contact.info = Contact person or business
 aboutthebusiness.correspondenceaddress.yourName = Your name
