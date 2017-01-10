@@ -106,25 +106,28 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
       redirectLocation(result) must be(Some(routes.ContactingYouController.get().url))
     }
 
-    "fail form submission on validation error" in new Fixture {
+    "respond with BAD_REQUEST" when {
 
-      when(controller.dataCacheConnector.fetch(any())(any(), any(), any())).thenReturn(Future.successful(None))
-      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      "form validation fails" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUK"-> "true",
-        "addressLine2"->"line2",
-        "addressLine3"->"",
-        "addressLine4"->"",
-        "postCode"->"NE7 7DS")
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("err.summary"))
+        when(controller.dataCacheConnector.fetch(any())(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
+          "addressLine2" -> "line2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
+          "postCode" -> "NE7 7DS")
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(Messages("err.summary"))
+
+      }
 
     }
 
     "go to the date of change page" when {
-
       "the submission has been approved and registeredOffice has changed" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
@@ -154,7 +157,6 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
     }
 
     "handle the date of change form post" when {
-
       "given valid data for a UK address" in new Fixture {
 
         val postRequest = request.withFormUrlEncodedBody(
@@ -222,8 +224,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
     }
 
     "show the data of change form once again" when {
-
       "posted with invalid data" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+          thenReturn(Future.successful(Some(AboutTheBusiness())))
 
         val postRequest = request.withFormUrlEncodedBody()
 
@@ -233,7 +237,30 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
         verify(controller.dataCacheConnector, never()).save[AboutTheBusiness](any(), any())(any(), any(), any())
 
       }
+      "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
+        val postRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.year" -> "2010",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.day" -> "01"
+        )
 
+        val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+        val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+        val business = AboutTheBusiness(
+          activityStartDate = Some(ActivityStartDate(new LocalDate(2015, 10, 1))),
+          registeredOffice = Some(office)
+        )
+
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
+          thenReturn(Future.successful(Some(business)))
+
+        when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
+          thenReturn(Future.successful(mock[CacheMap]))
+
+        val result = controller.saveDateOfChange()(postRequest)
+        status(result) must be(BAD_REQUEST)
+      }
     }
   }
 }
