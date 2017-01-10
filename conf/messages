@@ -855,10 +855,10 @@ bankdetails.remove.bank.account.text = This will permanently remove {0} from you
 bankdetails.remove.bank.account.btn = Remove bank account
 
 businessactivities.whatyouneed.requiredinfo.heading = For this section you may need to know:
-businessactivities.whatyouneed.line_1 = the anticipated turnover for the next 12 months
+businessactivities.whatyouneed.line_1 = the anticipated net profit for the next 12 months
 businessactivities.whatyouneed.line_2 = approximately how many people your business employs
 businessactivities.whatyouneed.line_3 = approximately how many people work on activities covered by Money Laundering Regulations
-businessactivities.whatyouneed.possiblerequiredinfo.heading = Depending on your circumstances, you may also need to know:
+businessactivities.whatyouneed.possiblerequiredinfo.heading = You’ll also need to know:
 businessactivities.whatyouneed.line_4 = in which countries your customers live or work
 businessactivities.whatyouneed.line_5 = your franchisor’s name
 businessactivities.whatyouneed.line_6 = how you record transactions
