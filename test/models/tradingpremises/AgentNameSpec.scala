@@ -59,8 +59,7 @@ class AgentNameSpec extends PlaySpec {
       AgentName.format.reads(AgentName.format.writes(
         AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1)))))) must be(
         JsSuccess(
-          AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1)))),
-          JsPath \ "agentName"))
+          AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1))))))
     }
 
   }

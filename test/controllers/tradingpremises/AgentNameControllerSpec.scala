@@ -1,10 +1,15 @@
 package controllers.tradingpremises
 
+import com.sun.org.apache.xalan.internal.utils.FeatureManager.Feature
 import connectors.DataCacheConnector
-import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService, BillPaymentServices}
+import controllers.aboutthebusiness.routes
+import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOfficeUK}
+import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -15,6 +20,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => meq, _}
+import services.StatusService
 
 import scala.concurrent.Future
 
@@ -26,7 +32,10 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
     val controller = new AgentNameController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
+
+    when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
   }
 
   "AgentNameController" when {
@@ -191,6 +200,67 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
             agentPartnership = None
           ))))(any(), any(), any())
       }
+
+      "go to the date of change page" when {
+        "the agent name has been changed and submission is successful" in new Fixture {
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremisesWithHasChangedFalse))))
+
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "agentName" -> "someName")
+
+          val result = controller.post(1)(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AgentNameController.dateOfChange().url))
+        }
+      }
+
+      "return view for Date of Change" in new Fixture {
+        val result = controller.dateOfChange()(request)
+        status(result) must be(OK)
+      }
+
+      "handle the date of change form post" when {
+
+        "given valid data for a agent name" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+          val name = AgentName("someName")
+          val updatedName= name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+          val premises = TradingPremises(agentName = Some(name))
+
+          when(controller.dataCacheConnector.fetch[TradingPremises](meq(TradingPremises.key))(any(), any(), any())).
+            thenReturn(Future.successful(Some(premises)))
+
+          when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
+            thenReturn(Future.successful(mock[CacheMap]))
+
+          val result = controller.saveDateOfChange()(postRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+          val captor = ArgumentCaptor.forClass(classOf[TradingPremises])
+          verify(controller.dataCacheConnector).save[TradingPremises](meq(TradingPremises.key), captor.capture())(any(), any(), any())
+
+          captor.getValue.agentName match {
+            case Some(savedName: AgentName) => savedName must be(updatedName)
+          }
+
+        }
+      }
+
     }
   }
   val address = Address("1", "2",None,None,"asdfasdf")
