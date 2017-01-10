@@ -391,11 +391,11 @@ start.line1 = Use this service to register with HM Revenue and Customs (HMRC) fo
 start.line2 = If you’re already registered you can update your information, de-register or renew your registration.
 start.button.text = Start now
 start.before.heading = Before you start
-start.before.line1 = You’ll need some details about your business, including your:
+start.before.line1 = You’ll need some information about your business. Most of it’s pretty straightforward, but you might be asked for your:
 start.utr.heading = Unique Tax Reference (UTR) number
-start.utr.line1 = You’ll find it in the header of any letter issued by HMRC. It may be labelled 'Tax Reference', 'UTR' or 'Official Use'.
+start.utr.line1 = We’ll try and find your business automatically, but if we can’t we’ll ask for your UTR number. You’ll find it in the header of any letter issued by HMRC. It may be labelled 'Tax Reference', 'UTR' or 'Official Use'.
 start.crn.heading = Company registration number
-start.crn.line1 = You’ll find it on your Certificate of Incorporation, on official letters from Companies House, or you can
+start.crn.line1 = You’ll need this if your business is a Limited Company. You’ll find it on your Certificate of Incorporation, on official letters from Companies House, or you can
 start.crn.link.text = search for it online
 
 ############################### Status page ###############################
