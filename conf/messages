@@ -854,7 +854,7 @@ bankdetails.remove.bank.account.title = Remove bank details
 bankdetails.remove.bank.account.text = This will permanently remove {0} from your list of bank accounts.
 bankdetails.remove.bank.account.btn = Remove bank account
 
-businessactivities.whatyouneed.requiredinfo.heading = For this section you’ll need to know:
+businessactivities.whatyouneed.requiredinfo.heading = For this section you may need to know:
 businessactivities.whatyouneed.line_1 = the anticipated turnover for the next 12 months
 businessactivities.whatyouneed.line_2 = approximately how many people your business employs
 businessactivities.whatyouneed.line_3 = approximately how many people work on activities covered by Money Laundering Regulations
