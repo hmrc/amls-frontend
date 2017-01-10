@@ -36,6 +36,21 @@ class DateOfChangeSpec extends PlaySpec {
 
     }
 
+    "fail form validation when given a date before a business activities start date" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq("24"),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("2012"),
+        "activityStartDate" -> Seq("2016-05-25")
+      )
+
+      DateOfChange.formRule.validate(model) must be(
+        Failure(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", "25-05-2016")))
+        ))
+    }
+
     "read from JSON correctly" in {
 
       val json = JsString("2016-02-24")

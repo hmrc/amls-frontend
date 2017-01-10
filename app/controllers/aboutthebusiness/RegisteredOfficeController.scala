@@ -72,9 +72,11 @@ trait RegisteredOfficeController extends BaseController {
     implicit authContext =>
       implicit request =>
         dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
-          val extraFields: Map[String, Seq[String]] = Map(
-            "activityStartDate" -> Seq(aboutTheBusiness.get.activityStartDate.map(date => date.startDate.toString("yyyy-MM-dd")))
-          )
+          val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
+            case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
+            case None => Map()
+          }
+          println(">>>>>>>>>>>>>>>>>>>>>>>>" + (request.body.asFormUrlEncoded.get ++ extraFields))
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
               Future.successful(BadRequest(date_of_change(form)))
