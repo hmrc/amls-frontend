@@ -85,7 +85,6 @@ trait RegisteredOfficeController extends BaseController {
   }
 
   private def redirectToDateOfChange(aboutTheBusiness: AboutTheBusiness, office: RegisteredOffice) = {
-    println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + ApplicationConfig.release7);
     ApplicationConfig.release7 && !aboutTheBusiness.registeredOffice.contains(office)
   }
 }
