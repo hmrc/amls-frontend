@@ -1,6 +1,5 @@
 package models
 
-import models.aboutthebusiness.DateOfChange
 import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded

@@ -1,6 +1,5 @@
-package models.aboutthebusiness
+package models
 
-import models.tradingpremises.ActivityEndDate
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}

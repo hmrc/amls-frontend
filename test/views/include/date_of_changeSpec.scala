@@ -1,7 +1,12 @@
 package views.include
 
 import forms.{Form2, InvalidForm, ValidForm}
+<<<<<<< HEAD:test/views/include/date_of_changeSpec.scala
 import models.aboutthebusiness.DateOfChange
+=======
+import models.DateOfChange
+import models.aboutthebusiness.RegisteredOfficeUK
+>>>>>>> 70fea83737a5c2b62bfa39f905938f9534692bee:test/views/aboutthebusiness/date_of_changeSpec.scala
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite

@@ -1,9 +1,9 @@
-package models.aboutthebusiness
+package models
 
 import models.FormTypes.localDateFutureRule
-import org.joda.time.{DateTimeFieldType, LocalDate}
-import play.api.data.mapping.{From, Rule, Write}
+import org.joda.time.LocalDate
 import play.api.data.mapping.forms.UrlFormEncoded
+import play.api.data.mapping.{From, Rule, Write}
 import play.api.libs.json._
 
 case class DateOfChange (dateOfChange: LocalDate)
@@ -28,9 +28,9 @@ object DateOfChange {
   implicit val formWrites: Write[DateOfChange, UrlFormEncoded] =
     Write {
       case DateOfChange(b) =>Map(
-        "dateOfChange.day" -> Seq(b.get(DateTimeFieldType.dayOfMonth()).toString),
-        "dateOfChange.month" -> Seq(b.get(DateTimeFieldType.monthOfYear()).toString),
-        "dateOfChange.year" -> Seq(b.get(DateTimeFieldType.year()).toString)
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("")
       )
     }
 }

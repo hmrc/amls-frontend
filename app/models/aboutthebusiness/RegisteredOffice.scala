@@ -1,6 +1,6 @@
 package models.aboutthebusiness
 
-import models.Country
+import models.{Country, DateOfChange}
 import models.FormTypes._
 import models.businesscustomer.Address
 import org.joda.time.LocalDate
@@ -28,6 +28,8 @@ sealed trait RegisteredOffice {
         Some(a.country.toString)
       ).flatten
   }
+
+  def dateOfChange: Option[DateOfChange]
 }
 
 case class RegisteredOfficeUK(
