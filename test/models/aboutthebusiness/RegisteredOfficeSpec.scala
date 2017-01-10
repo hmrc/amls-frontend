@@ -1,6 +1,6 @@
 package models.aboutthebusiness
 
-import models.Country
+import models.{Country, DateOfChange}
 import models.businesscustomer.Address
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
@@ -21,11 +21,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLine2" -> Seq("building"),
           "addressLine3" -> Seq("street"),
           "addressLine4" -> Seq("Longbenton"),
-          "postCode" -> Seq("NE7 7DX"),
-          "dateOfChange.day" -> Seq("12"),
-          "dateOfChange.month" -> Seq("1"),
-          "dateOfChange.year" -> Seq("2016"),
-          "activityStartDate" -> Seq(new LocalDate(2016,1,1).toString("yyyy-MM-dd"))
+          "postCode" -> Seq("NE7 7DX")
         )
 
         RegisteredOffice.formRule.validate(ukModel) must
@@ -35,7 +31,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
             Some("street"),
             Some("Longbenton"),
             "NE7 7DX",
-            Some(DateOfChange(new LocalDate(2016, 1, 12)))
+            None
           )))
       }
 
@@ -46,10 +42,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLineNonUK2" -> Seq("building"),
           "addressLineNonUK3" -> Seq("street"),
           "addressLineNonUK4" -> Seq("Area"),
-          "country" -> Seq("GB"),
-          "dateOfChange.day" -> Seq("12"),
-          "dateOfChange.month" -> Seq("1"),
-          "dateOfChange.year" -> Seq("2016")
+          "country" -> Seq("GB")
         )
 
         RegisteredOffice.formRule.validate(nonUKModel) must
@@ -60,7 +53,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               Some("street"),
               Some("Area"),
               Country("United Kingdom", "GB"),
-              Some(DateOfChange(new LocalDate(2016, 1, 12))))))
+              None)))
       }
     }
 
@@ -159,26 +152,6 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
             )))
         }
 
-      }
-
-      "given a dateOfChange before business activity start date" in {
-
-        val data = Map(
-          "isUK" -> Seq("false"),
-          "addressLineNonUK1" -> Seq("38B"),
-          "addressLineNonUK2" -> Seq("building"),
-          "addressLineNonUK3" -> Seq("street"),
-          "addressLineNonUK4" -> Seq("Area"),
-          "country" -> Seq("GB"),
-          "dateOfChange.day" -> Seq("12"),
-          "dateOfChange.month" -> Seq("01"),
-          "dateOfChange.year" -> Seq("2016"),
-          "activityStartDate" -> Seq("2017-01-01")
-        )
-        RegisteredOffice.formRule.validate(data) must
-          be(Failure(Seq(
-            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", "01-01-2017"))
-          )))
       }
 
     }
@@ -287,13 +260,13 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       ) must be(JsSuccess(nonUKRegisteredOffice))
     }
 
-    "covert Business Customer Address to RegisteredOfficeUK" in {
+    "convert Business Customer Address to RegisteredOfficeUK" in {
       val address = Address("addr1", "addr2", Some("line3"), Some("line4"), Some("NE2 6GH"), Country("United Kingdom", "GB"))
 
       RegisteredOffice.convert(address) must be(RegisteredOfficeUK("addr1", "addr2", Some("line3"), Some("line4"), "NE2 6GH"))
     }
 
-    "covert Business Customer Address to RegisteredOfficeNonUK" in {
+    "convert Business Customer Address to RegisteredOfficeNonUK" in {
       val address = Address("addr1", "addr2", Some("line3"), Some("line4"), None, Country("United Kingdom", "GB"))
 
       RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", "addr2", Some("line3"), Some("line4"), Country("United Kingdom", "GB")))

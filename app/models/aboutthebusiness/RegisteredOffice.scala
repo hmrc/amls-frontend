@@ -1,6 +1,6 @@
 package models.aboutthebusiness
 
-import models.Country
+import models.{Country, DateOfChange}
 import models.FormTypes._
 import models.businesscustomer.Address
 import org.joda.time.LocalDate
@@ -28,6 +28,8 @@ sealed trait RegisteredOffice {
         Some(a.country.toString)
       ).flatten
   }
+
+  def dateOfChange: Option[DateOfChange]
 }
 
 case class RegisteredOfficeUK(
@@ -61,18 +63,19 @@ object RegisteredOffice {
             (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLine3").read(optionR(validateAddress)) and
             (__ \ "addressLine4").read(optionR(validateAddress)) and
-            (__ \ "postCode").read(postcodeType) and
-            (__ ).read(registeredOfficeDateOfChangeRule compose dateOfChangeMapping)
-          ) (RegisteredOfficeUK.apply _)
+            (__ \ "postCode").read(postcodeType)
+          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], postCode: String) =>
+            RegisteredOfficeUK(addr1, addr2, addr3, addr4, postCode, None))
+
       case false =>
         (
           (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) and
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) and
-            (__ \ "country").read[Country] and
-          (__ ).read(registeredOfficeDateOfChangeRule compose dateOfChangeMapping)
-          ) (RegisteredOfficeNonUK.apply _)
+            (__ \ "country").read[Country]
+          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: Country) =>
+          RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
     }
   }
 
