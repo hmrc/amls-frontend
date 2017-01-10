@@ -64,7 +64,7 @@ trait RegisteredOfficeController extends BaseController {
   def dateOfChange = FeatureToggle(ApplicationConfig.release7) {
     Authorised {
       implicit authContext => implicit request =>
-        Ok(views.html.aboutthebusiness.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now))))
+        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()))
     }
   }
 
@@ -79,7 +79,7 @@ trait RegisteredOfficeController extends BaseController {
           println(">>>>>>>>>>>>>>>>>>>>>>>>" + (request.body.asFormUrlEncoded.get ++ extraFields))
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(date_of_change(form)))
+              Future.successful(BadRequest(views.html.include.date_of_change(form, "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange())))
             case ValidForm(_, dateOfChange) =>
               for {
                 _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
