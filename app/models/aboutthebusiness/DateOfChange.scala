@@ -28,9 +28,9 @@ object DateOfChange {
   implicit val formWrites: Write[DateOfChange, UrlFormEncoded] =
     Write {
       case DateOfChange(b) =>Map(
-        "dateOfChange.day" -> Seq(b.get(DateTimeFieldType.dayOfMonth()).toString),
-        "dateOfChange.month" -> Seq(b.get(DateTimeFieldType.monthOfYear()).toString),
-        "dateOfChange.year" -> Seq(b.get(DateTimeFieldType.year()).toString)
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("")
       )
     }
 }
