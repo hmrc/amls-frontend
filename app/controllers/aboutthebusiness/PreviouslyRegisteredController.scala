@@ -55,7 +55,7 @@ trait PreviouslyRegisteredController extends BaseController {
     data match {
       case PreviouslyRegisteredYes(_) => aboutTheBusiness.copy(previouslyRegistered = Some(data), activityStartDate = None,
                                                                 hasChanged = true)
-      case PreviouslyRegisteredNo => aboutTheBusiness.copy(previouslyRegistered = Some(data), vatRegistered = None, corporationTaxRegistered = None,
+      case PreviouslyRegisteredNo => aboutTheBusiness.copy(previouslyRegistered = Some(data),
                                                                 hasChanged = true)
     }
   }
