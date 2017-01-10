@@ -1,7 +1,7 @@
-package views.aboutthebusiness
+package views.include
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{DateOfChange, RegisteredOfficeUK}
+import models.aboutthebusiness.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
@@ -17,18 +17,33 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
     val form2: ValidForm[DateOfChange] = Form2(DateOfChange(LocalDate.now()))
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.aboutthebusiness.date_of_change(form2)
+      def view = views.html.include.date_of_change(
+        form2,
+        "testSubheadingMessage",
+        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+      )
+
       doc.title must startWith(Messages("dateofchange.title"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.aboutthebusiness.date_of_change(form2)
+      def view = views.html.include.date_of_change(
+        form2,
+        "testSubheadingMessage",
+        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+      )
+
       heading.html must be (Messages("dateofchange.title"))
-      subHeading.html must include (Messages("summary.aboutbusiness"))
+      subHeading.html must include ("testSubheadingMessage")
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.aboutthebusiness.date_of_change(form2)
+      def view = views.html.include.date_of_change(
+        form2,
+        "testSubheadingMessage",
+        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+      )
+
       html must include(Messages("lbl.date.example"))
     }
 
@@ -39,7 +54,11 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
           (Path \ "dateOfChange") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.aboutthebusiness.date_of_change(form2)
+      def view = views.html.include.date_of_change(
+        form2,
+        "testSubheadingMessage",
+        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+      )
 
       errorSummary.html() must include("not a message Key")
 
