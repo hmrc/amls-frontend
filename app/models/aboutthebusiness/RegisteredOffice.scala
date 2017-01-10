@@ -3,9 +3,10 @@ package models.aboutthebusiness
 import models.Country
 import models.FormTypes._
 import models.businesscustomer.Address
-import play.api.data.mapping.forms._
+import org.joda.time.LocalDate
 import play.api.data.mapping._
-import play.api.libs.json.{Writes, Reads, Json}
+import play.api.data.mapping.forms._
+import play.api.libs.json.{JsNull, Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
 
@@ -34,7 +35,8 @@ case class RegisteredOfficeUK(
                                addressLine2: String,
                                addressLine3: Option[String] = None,
                                addressLine4: Option[String] = None,
-                               postCode: String
+                               postCode: String,
+                               dateOfChange: Option[DateOfChange] = None
                              ) extends RegisteredOffice
 
 case class RegisteredOfficeNonUK(
@@ -42,7 +44,8 @@ case class RegisteredOfficeNonUK(
                                   addressLine2: String,
                                   addressLine3: Option[String] = None,
                                   addressLine4: Option[String] = None,
-                                  country: Country
+                                  country: Country,
+                                  dateOfChange: Option[DateOfChange] = None
                                 ) extends RegisteredOffice
 
 object RegisteredOffice {
@@ -58,16 +61,18 @@ object RegisteredOffice {
             (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLine3").read(optionR(validateAddress)) and
             (__ \ "addressLine4").read(optionR(validateAddress)) and
-            (__ \ "postCode").read(postcodeType)
+            (__ \ "postCode").read(postcodeType) and
+            (__ ).read(registeredOfficeDateOfChangeRule compose dateOfChangeMapping)
           ) (RegisteredOfficeUK.apply _)
       case false =>
         (
-          (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose  validateAddress) and
+          (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
             (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) and
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) and
-            (__ \ "country").read[Country]
-          )(RegisteredOfficeNonUK.apply _)
+            (__ \ "country").read[Country] and
+          (__ ).read(registeredOfficeDateOfChangeRule compose dateOfChangeMapping)
+          ) (RegisteredOfficeNonUK.apply _)
     }
   }
 
@@ -93,53 +98,61 @@ object RegisteredOffice {
   }
 
   implicit val jsonReads: Reads[RegisteredOffice] = {
-    import play.api.libs.json._
-    import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
+    import play.api.libs.json.Reads._
+    import play.api.libs.json._
     (
       (__ \ "postCode").read[String] andKeep
         (
-            (__ \ "addressLine1").read[String] and
+          (__ \ "addressLine1").read[String] and
             (__ \ "addressLine2").read[String] and
             (__ \ "addressLine3").readNullable[String] and
             (__ \ "addressLine4").readNullable[String] and
-            (__ \ "postCode").read[String]
+            (__ \ "postCode").read[String] and
+            (__ \ "dateOfChange").readNullable[DateOfChange]
           ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
       ) orElse
       (
-          (__ \ "addressLineNonUK1").read[String] and
+        (__ \ "addressLineNonUK1").read[String] and
           (__ \ "addressLineNonUK2").read[String] and
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
-          (__ \ "country").read[Country]
+          (__ \ "country").read[Country] and
+          (__ \ "dateOfChange").readNullable[DateOfChange]
         ) (RegisteredOfficeNonUK.apply _)
   }
 
   implicit val jsonWrites = Writes[RegisteredOffice] {
+
     case m: RegisteredOfficeUK =>
       Json.obj(
         "addressLine1" -> m.addressLine1,
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
-        "postCode" -> m.postCode)
+        "postCode" -> m.postCode,
+        "dateOfChange" -> m.dateOfChange
+      )
+
     case m: RegisteredOfficeNonUK =>
       Json.obj(
         "addressLineNonUK1" -> m.addressLine1,
         "addressLineNonUK2" -> m.addressLine2,
         "addressLineNonUK3" -> m.addressLine3,
         "addressLineNonUK4" -> m.addressLine4,
-        "country" -> m.country.code)
+        "country" -> m.country.code,
+        "dateOfChange" -> m.dateOfChange
+      )
   }
 
   implicit def convert(address: Address): RegisteredOffice = {
     address.postcode match {
-      case Some(data) => RegisteredOfficeUK (address.line_1,
+      case Some(data) => RegisteredOfficeUK(address.line_1,
         address.line_2,
         address.line_3,
         address.line_4,
         data)
-      case None => RegisteredOfficeNonUK (address.line_1,
+      case None => RegisteredOfficeNonUK(address.line_1,
         address.line_2,
         address.line_3,
         address.line_4,

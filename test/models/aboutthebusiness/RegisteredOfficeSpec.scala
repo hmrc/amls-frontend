@@ -2,6 +2,7 @@ package models.aboutthebusiness
 
 import models.Country
 import models.businesscustomer.Address
+import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -20,11 +21,22 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLine2" -> Seq("building"),
           "addressLine3" -> Seq("street"),
           "addressLine4" -> Seq("Longbenton"),
-          "postCode" -> Seq("NE7 7DX")
+          "postCode" -> Seq("NE7 7DX"),
+          "dateOfChange.day" -> Seq("12"),
+          "dateOfChange.month" -> Seq("1"),
+          "dateOfChange.year" -> Seq("2016"),
+          "activityStartDate" -> Seq(new LocalDate(2016,1,1).toString("yyyy-MM-dd"))
         )
 
         RegisteredOffice.formRule.validate(ukModel) must
-          be(Success(RegisteredOfficeUK("38B", "building", Some("street"), Some("Longbenton"), "NE7 7DX")))
+          be(Success(RegisteredOfficeUK(
+            "38B",
+            "building",
+            Some("street"),
+            Some("Longbenton"),
+            "NE7 7DX",
+            Some(DateOfChange(new LocalDate(2016, 1, 12)))
+          )))
       }
 
       "given a valid non UK address" in {
@@ -34,11 +46,21 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLineNonUK2" -> Seq("building"),
           "addressLineNonUK3" -> Seq("street"),
           "addressLineNonUK4" -> Seq("Area"),
-          "country" -> Seq("GB")
+          "country" -> Seq("GB"),
+          "dateOfChange.day" -> Seq("12"),
+          "dateOfChange.month" -> Seq("1"),
+          "dateOfChange.year" -> Seq("2016")
         )
 
         RegisteredOffice.formRule.validate(nonUKModel) must
-          be(Success(RegisteredOfficeNonUK("38B", "building", Some("street"), Some("Area"), Country("United Kingdom", "GB"))))
+          be(Success(
+            RegisteredOfficeNonUK(
+              "38B",
+              "building",
+              Some("street"),
+              Some("Area"),
+              Country("United Kingdom", "GB"),
+              Some(DateOfChange(new LocalDate(2016, 1, 12))))))
       }
     }
 
@@ -98,6 +120,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
             )))
         }
+
       }
 
       "given an isUK value of 'true' and" when {
@@ -135,8 +158,28 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
               (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
             )))
         }
+
       }
 
+      "given a dateOfChange before business activity start date" in {
+
+        val data = Map(
+          "isUK" -> Seq("false"),
+          "addressLineNonUK1" -> Seq("38B"),
+          "addressLineNonUK2" -> Seq("building"),
+          "addressLineNonUK3" -> Seq("street"),
+          "addressLineNonUK4" -> Seq("Area"),
+          "country" -> Seq("GB"),
+          "dateOfChange.day" -> Seq("12"),
+          "dateOfChange.month" -> Seq("01"),
+          "dateOfChange.year" -> Seq("2016"),
+          "activityStartDate" -> Seq("2017-01-01")
+        )
+        RegisteredOffice.formRule.validate(data) must
+          be(Failure(Seq(
+            (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", "01-01-2017"))
+          )))
+      }
 
     }
 
@@ -179,7 +222,6 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         "country" -> Seq("GB"))
     }
 
-
     "json read the given non UK address" in {
 
       val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
@@ -189,8 +231,8 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       JsSuccess(data, JsPath \ "postCode")
     }
 
-    "write correct value to json" in {
-      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX")
+    "write correct value to json with date of change" in {
+      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX", Some(DateOfChange(new LocalDate(2017,1,1))))
 
       Json.toJson(data) must
         be(Json.obj(
@@ -198,7 +240,22 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           "addressLine2" -> "Longbenton",
           "addressLine3" -> "line 1",
           "addressLine4" -> JsNull,
-          "postCode" -> "NE7 7DX")
+          "postCode" -> "NE7 7DX",
+          "dateOfChange" -> "2017-01-01")
+        )
+    }
+
+    "write correct value to json without date of change" in {
+      val data = RegisteredOfficeUK("38B", "Longbenton", Some("line 1"), None, "NE7 7DX", None)
+
+      Json.toJson(data) must
+        be(Json.obj(
+          "addressLine1" -> "38B",
+          "addressLine2" -> "Longbenton",
+          "addressLine3" -> "line 1",
+          "addressLine4" -> JsNull,
+          "postCode" -> "NE7 7DX",
+          "dateOfChange" -> JsNull)
         )
     }
 

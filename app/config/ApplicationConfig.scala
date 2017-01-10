@@ -12,6 +12,8 @@ trait ApplicationConfig {
   def amendmentsToggle: Boolean
 
   def businessMatchingDetailsToggle: Boolean
+
+  def release7: Boolean
 }
 
 
@@ -80,5 +82,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     Logger.info(s"s[ApplicationConfig][business-matching-details-lookup] $value")
     value
   }
+
+  override def release7 = getConfBool("feature-toggle.release7", false)
 
 }
