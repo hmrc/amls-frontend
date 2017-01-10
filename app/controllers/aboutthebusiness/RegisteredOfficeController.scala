@@ -76,7 +76,6 @@ trait RegisteredOfficeController extends BaseController {
             case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
             case None => Map()
           }
-          println(">>>>>>>>>>>>>>>>>>>>>>>>" + (request.body.asFormUrlEncoded.get ++ extraFields))
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
               Future.successful(BadRequest(views.html.include.date_of_change(form, "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange())))
