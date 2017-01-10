@@ -786,11 +786,11 @@ businessmatching.registrationnumber.lbl = Company registration number
 businessmatching.registrationnumber.example = It’s 8 characters and can be just numbers, or a mix of numbers and letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 businessmatching.typeofbusiness.title = What’s your type of business?
 businessmatching.typeofbusiness.lbl.hint = For example: association, charity, trust
-businessmatching.psr.number.title = Has your business applied for a Payment Systems Regulator (PSR) registration number?
-businessmatching.psr.number.lbl = Registration number
-businessmatching.psr.number.hint = This will be a 6-digit number
+businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
+businessmatching.psr.number.lbl = PSR registration number
+businessmatching.psr.number.hint = It’s 6 numbers with no letters, punctuation or other characters
 businessmatching.cannotcontinuewiththeapplication.heading = You cannot continue with your application
-businessmatching.summary.icon.title = You are applying to register the following business for anti-money laundering supervision
+businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision
 businessmatching.summary.business.address.lbl = Your business:
 businessmatching.button.confirm.start = Confirm and start application
 
