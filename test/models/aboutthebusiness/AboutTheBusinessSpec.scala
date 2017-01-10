@@ -59,7 +59,8 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
       "addressLine2" -> "Longbenton",
       "addressLine3" -> JsNull,
       "addressLine4" -> JsNull,
-      "postCode" -> "NE7 7DX"),
+      "postCode" -> "NE7 7DX",
+      "dateOfChange" -> JsNull),
     "correspondenceAddress" -> Json.obj(
       "yourName" -> "Name",
       "businessName" -> "Business Name",

@@ -1,0 +1,29 @@
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_])(implicit request: Request[_])
+
+@header = {
+    @errorSummary(f)
+    @heading("dateofchange.title", "summary.aboutbusiness")
+}
+
+@main(
+    title = Messages("dateofchange.title") + " - " + Messages("summary.aboutbusiness"),
+    heading = header
+) {
+
+    @form(f, controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()) {
+
+        @date(
+            f = f,
+            p = "dateOfChange",
+            labelText = "dateofchange.title",
+            example = true,
+            legendHidden = true
+        )
+
+        @submit(false, Some(Messages("button.saveandcontinue")))
+
+    }
+}
