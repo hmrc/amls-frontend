@@ -28,6 +28,8 @@ sealed trait RegisteredOffice {
         Some(a.country.toString)
       ).flatten
   }
+
+  def dateOfChange: Option[DateOfChange]
 }
 
 case class RegisteredOfficeUK(
