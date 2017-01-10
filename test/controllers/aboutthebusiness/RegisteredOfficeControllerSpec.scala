@@ -12,19 +12,18 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.data.mapping.Format
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-
 class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  MockitoSugar{
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -124,25 +123,29 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
 
     }
 
-    "when it's a variation, go to the date of change page" in new Fixture {
-      when(controller.dataCacheConnector.fetch(any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-      when (controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionDecisionApproved))
+    "go to the date of change page" when {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isUK"-> "true",
-        "addressLine1"->"line1",
-        "addressLine2"->"line2",
-        "addressLine3"->"",
-        "addressLine4"->"",
-        "postCode"->"NE7 7DS")
-      val result = controller.post()(newRequest)
+      "the submission has been approved and registeredOffice has changed" in new Fixture {
 
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.RegisteredOfficeController.dateOfChange().url))
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(AboutTheBusiness(None,None, None, None, None, Some(ukAddress), None))))
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
+          "addressLine1" -> "line1",
+          "addressLine2" -> "line2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
+          "postCode" -> "NE7 7DS")
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.RegisteredOfficeController.dateOfChange().url))
+      }
     }
 
     "return view for Date of Change" in new Fixture {
@@ -232,5 +235,59 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
       }
 
     }
+  }
+}
+
+class RegisteredOfficeControllerNoRelease7Spec extends PlaySpec with OneAppPerSuite with  MockitoSugar {
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+
+    val controller = new RegisteredOfficeController() {
+      override val dataCacheConnector = mock[DataCacheConnector]
+      override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
+    }
+  }
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
+
+  val emptyCache = CacheMap("", Map.empty)
+
+  "RegisteredOfficeController" must {
+
+    "not go to the date of change page" when {
+
+      "the submission has been approved and registeredOffice has changed" in new Fixture {
+
+        val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
+
+        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(AboutTheBusiness(None, None, None, None, None, Some(ukAddress), None))))
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isUK" -> "true",
+          "addressLine1" -> "line1",
+          "addressLine2" -> "line2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
+          "postCode" -> "NE7 7DS")
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must not be Some(routes.RegisteredOfficeController.dateOfChange().url)
+      }
+
+      "return view for Date of Change" in new Fixture {
+        val result = controller.dateOfChange()(request)
+        status(result) must be(NOT_FOUND)
+      }
+    }
+
   }
 }
