@@ -16,7 +16,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
     val form2: ValidForm[DateOfChange] = Form2(DateOfChange(LocalDate.now()))
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.include.date_of_change(
+      def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
@@ -26,7 +26,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.include.date_of_change(
+      def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
@@ -37,7 +37,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.include.date_of_change(
+      def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
@@ -53,7 +53,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
           (Path \ "dateOfChange") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.include.date_of_change(
+      def view = views.html.date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
