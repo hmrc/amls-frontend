@@ -1326,7 +1326,7 @@ hvd.receiving.option.01 = By courier
 hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Other
 hvd.receiving.give.details = Please give details
-hvd.receiving.give.details.lbl = Please give other details
+hvd.receiving.give.details.lbl = Please give details
 
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
