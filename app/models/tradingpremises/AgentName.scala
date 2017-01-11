@@ -28,10 +28,7 @@ object AgentName {
 
   implicit val formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (
-      (__ \ "agentName").read(agentNameType) and
-      (__ ).read(optionR(registeredOfficeDateOfChangeRule compose dateOfChangeMapping))
-      )(AgentName.apply _)
+    (__ \ "agentName").read(agentNameType) fmap(AgentName(_))
   }
 
   implicit val formWrites: Write[AgentName, UrlFormEncoded] = Write {

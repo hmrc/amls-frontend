@@ -13,14 +13,10 @@ class AgentNameSpec extends PlaySpec {
 
     "validate form Read" in {
       val formInput = Map(
-        "agentName" -> Seq("sometext"),
-        "dateOfChange.day" -> Seq("12"),
-        "dateOfChange.month" -> Seq("1"),
-        "dateOfChange.year" -> Seq("2016"),
-        "activityStartDate" -> Seq(new LocalDate(2016,1,1).toString("yyyy-MM-dd"))
+        "agentName" -> Seq("sometext")
       )
 
-      AgentName.formReads.validate(formInput) must be(Success(AgentName("sometext", Some(DateOfChange(new LocalDate(2016, 1, 12))))))
+      AgentName.formReads.validate(formInput) must be(Success(AgentName("sometext", None)))
     }
 
     "throw error when required field is missing" in {
@@ -35,21 +31,6 @@ class AgentNameSpec extends PlaySpec {
 
     "validate form write" in {
       AgentName.formWrites.writes(AgentName("sometext")) must be(Map("agentName" -> Seq("sometext")))
-    }
-
-    "given a dateOfChange before business activity start date" in {
-
-      val data = Map(
-        "agentName" -> Seq("sometext"),
-        "dateOfChange.day" -> Seq("12"),
-        "dateOfChange.month" -> Seq("01"),
-        "dateOfChange.year" -> Seq("2016"),
-        "activityStartDate" -> Seq("2017-01-01")
-      )
-      AgentName.formReads.validate(data) must
-        be(Failure(Seq(
-          (Path \ "dateOfChange") -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", "01-01-2017"))
-        )))
     }
 
   }
