@@ -44,14 +44,14 @@ import scala.concurrent.Future
           Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index,edit)))
         case ValidForm(_, data) => {
           for {
-            tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)
+            tradingPremises <- getData[TradingPremises](index)
             result <- updateDataStrict[TradingPremises](index) { tp =>
                 TradingPremises(tp.registeringAgentPremises,tp.yourTradingPremises,
                   tp.businessStructure, Some(data), None, None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
             }
             status <- statusService.getStatus
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, data) =>
+            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises.get, data) =>
               Redirect(routes.AgentNameController.dateOfChange())
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))

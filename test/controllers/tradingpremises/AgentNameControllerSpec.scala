@@ -1,26 +1,24 @@
 package controllers.tradingpremises
 
-import com.sun.org.apache.xalan.internal.utils.FeatureManager.Feature
 import connectors.DataCacheConnector
-import controllers.aboutthebusiness.routes
-import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOfficeUK}
+import models.aboutthebusiness.DateOfChange
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
-import org.mockito.Matchers.{eq => meq, _}
-import services.StatusService
 
 import scala.concurrent.Future
 
@@ -209,6 +207,8 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
           when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+
+          when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
           val newRequest = request.withFormUrlEncodedBody(
             "agentName" -> "someName")
