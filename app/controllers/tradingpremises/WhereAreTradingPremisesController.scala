@@ -6,6 +6,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises._
 import play.api.Logger
+import services.StatusService
 import utils.RepeatingSection
 import views.html.tradingpremises._
 
@@ -14,6 +15,7 @@ import scala.concurrent.Future
 trait WhereAreTradingPremisesController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  val statusService: StatusService
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>

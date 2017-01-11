@@ -2,7 +2,7 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService, BillPaymentServices}
+import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -15,7 +15,8 @@ import utils.AuthorisedFixture
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => meq, _}
 import models._
-
+import models.status.SubmissionDecisionRejected
+import services.StatusService
 
 import scala.concurrent.Future
 
@@ -29,7 +30,10 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
     val controller = new WhereAreTradingPremisesController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
+
+    when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
   }
 
   val emptyCache = CacheMap("", Map.empty)

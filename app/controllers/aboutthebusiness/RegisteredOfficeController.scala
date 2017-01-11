@@ -64,7 +64,8 @@ trait RegisteredOfficeController extends BaseController {
   def dateOfChange = FeatureToggle(ApplicationConfig.release7) {
     Authorised {
       implicit authContext => implicit request =>
-        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()))
+        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+          "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()))
     }
   }
 
