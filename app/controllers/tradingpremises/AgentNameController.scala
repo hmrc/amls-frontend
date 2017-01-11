@@ -5,7 +5,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.tradingpremises.routes
 import forms.{Form2, _}
-import models.{DateOfChange}
+import models.DateOfChange
+import models.aboutthebusiness.AboutTheBusiness
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -75,15 +76,21 @@ import scala.concurrent.Future
    def saveDateOfChange = Authorised.async {
      implicit authContext =>
        implicit request =>
-         Form2[DateOfChange](request.body) match {
-           case form: InvalidForm =>
-             Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange())))
-           case ValidForm(_, dateOfChange) =>
-             for {
-               tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)
-               _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
-                 tradingPremises.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange))))
-             } yield Redirect(routes.SummaryController.get())
+         dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
+           val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
+             case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
+             case None => Map()
+           }
+           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+             case form: InvalidForm =>
+               Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange())))
+             case ValidForm(_, dateOfChange) =>
+               for {
+                 tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)
+                 _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
+                   tradingPremises.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange))))
+               } yield Redirect(routes.SummaryController.get())
+           }
          }
    }
 

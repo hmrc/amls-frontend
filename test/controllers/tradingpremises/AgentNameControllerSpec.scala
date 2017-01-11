@@ -2,6 +2,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.DateOfChange
+import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
@@ -240,6 +241,9 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
           val premises = TradingPremises(agentName = Some(name))
 
+          when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
+            thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009,1,1)))))))
+
           when(controller.dataCacheConnector.fetch[TradingPremises](meq(TradingPremises.key))(any(), any(), any())).
             thenReturn(Future.successful(Some(premises)))
 
@@ -258,6 +262,26 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
             case Some(savedName: AgentName) => savedName must be(updatedName)
           }
 
+        }
+
+        "given a date of change which is before the activity start date" in new Fixture {
+          val postRequest = request.withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2007",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+          val name = AgentName("someName")
+          val updatedName= name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2007, 10, 1))))
+
+          val premises = TradingPremises(agentName = Some(name))
+
+          when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
+            thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009,1,1)))))))
+
+          val result = controller.saveDateOfChange()(postRequest)
+
+          status(result) must be(BAD_REQUEST)
         }
       }
 
