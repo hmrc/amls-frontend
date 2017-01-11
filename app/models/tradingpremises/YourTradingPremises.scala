@@ -1,5 +1,6 @@
 package models.tradingpremises
 
+import models.DateOfChange
 import org.joda.time.LocalDate
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -11,7 +12,8 @@ case class YourTradingPremises(
                                 tradingName: String,
                                 tradingPremisesAddress: Address,
                                 isResidential: Boolean,
-                                startDate: LocalDate
+                                startDate: LocalDate,
+                                dateOfChange: Option[DateOfChange] = None
                               )
 
 object YourTradingPremises {
@@ -27,7 +29,8 @@ object YourTradingPremises {
       (__ \ "tradingName").read[String] and
         __.read[Address] and
         (__ \ "isResidential").read[Boolean] and
-        (__ \ "startDate").read[LocalDate]
+        (__ \ "startDate").read[LocalDate] and
+        (__ \ "dateOfChange").readNullable[DateOfChange]
       ) (YourTradingPremises.apply _)
   }
 
@@ -38,7 +41,8 @@ object YourTradingPremises {
       (__ \ "tradingName").write[String] and
         __.write[Address] and
         (__ \ "isResidential").write[Boolean] and
-        (__ \ "startDate").write[LocalDate]
+        (__ \ "startDate").write[LocalDate] and
+        (__ \ "dateOfChange").writeNullable[DateOfChange]
       ) (unlift(YourTradingPremises.unapply))
   }
 
@@ -51,7 +55,6 @@ object YourTradingPremises {
           __.read[Address] ~
           (__ \ "isResidential").read[Boolean].withMessage("error.required.tp.residential.address") ~
           (__ \ "startDate").read(localDateRule)
-
         ) (YourTradingPremises.apply _)
     }
 

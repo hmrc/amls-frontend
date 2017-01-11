@@ -1,5 +1,6 @@
 package models.tradingpremises
 
+import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -18,7 +19,10 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "isResidential" -> Seq("true"),
       "startDate.day" -> Seq("24"),
       "startDate.month" -> Seq("2"),
-      "startDate.year" -> Seq("1990")
+      "startDate.year" -> Seq("1990"),
+      "dateOfChange.month" -> Seq("1"),
+      "dateOfChange.year" -> Seq("2016"),
+      "activityStartDate" -> Seq(new LocalDate(2016,1,1).toString("yyyy-MM-dd"))
     )
 
     val json = Json.obj(
@@ -40,7 +44,8 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "asdfasdf"
       ),
       true,
-      new LocalDate(1990, 2, 24)
+      new LocalDate(1990, 2, 24),
+      Some(DateOfChange(new LocalDate(2016, 1, 12)))
     )
 
     "fail vaidation when isresidential not selected" in {
@@ -51,7 +56,8 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "isResidential" -> Seq(""),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Failure(Seq(Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
+        "startDate.year" -> Seq("1990"),
+      )) must be (Failure(Seq(Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
       )))
     }
 
