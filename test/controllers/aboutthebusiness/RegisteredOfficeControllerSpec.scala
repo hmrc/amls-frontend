@@ -147,121 +147,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.RegisteredOfficeController.dateOfChange().url))
+        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get().url))
       }
     }
 
-    "return view for Date of Change" in new Fixture {
-      val result = controller.dateOfChange()(request)
-      status(result) must be(OK)
-    }
-
-    "handle the date of change form post" when {
-      "given valid data for a UK address" in new Fixture {
-
-        val postRequest = request.withFormUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01"
-        )
-
-        val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
-        val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
-
-        val business = AboutTheBusiness(registeredOffice = Some(office))
-
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
-          thenReturn(Future.successful(Some(business)))
-
-        when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
-          thenReturn(Future.successful(mock[CacheMap]))
-
-        val result = controller.saveDateOfChange()(postRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-
-        val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
-        verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
-
-        captor.getValue.registeredOffice match {
-          case Some(savedOffice: RegisteredOfficeUK) => savedOffice must be(updatedOffice)
-        }
-
-      }
-
-      "given valid data for a Non-UK address" in new Fixture {
-
-        val postRequest = request.withFormUrlEncodedBody(
-          "dateOfChange.year" -> "2005",
-          "dateOfChange.month" -> "04",
-          "dateOfChange.day" -> "26"
-        )
-
-        val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
-        val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2005, 4, 26))))
-
-        val business = AboutTheBusiness(registeredOffice = Some(office))
-
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
-          thenReturn(Future.successful(Some(business)))
-
-        when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
-          thenReturn(Future.successful(mock[CacheMap]))
-
-        val result = controller.saveDateOfChange()(postRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-
-        val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
-        verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
-
-        captor.getValue.registeredOffice match {
-          case Some(savedOffice: RegisteredOfficeNonUK) => savedOffice must be(updatedOffice)
-        }
-      }
-    }
-
-    "show the data of change form once again" when {
-      "posted with invalid data" in new Fixture {
-
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
-          thenReturn(Future.successful(Some(AboutTheBusiness())))
-
-        val postRequest = request.withFormUrlEncodedBody()
-
-        val result = controller.saveDateOfChange(postRequest)
-
-        status(result) must be(BAD_REQUEST)
-        verify(controller.dataCacheConnector, never()).save[AboutTheBusiness](any(), any())(any(), any(), any())
-
-      }
-      "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01"
-        )
-
-        val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "NE7 7DX")
-        val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
-
-        val business = AboutTheBusiness(
-          activityStartDate = Some(ActivityStartDate(new LocalDate(2015, 10, 1))),
-          registeredOffice = Some(office)
-        )
-
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())).
-          thenReturn(Future.successful(Some(business)))
-
-        when(controller.dataCacheConnector.save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any[AboutTheBusiness])(any(), any(), any())).
-          thenReturn(Future.successful(mock[CacheMap]))
-
-        val result = controller.saveDateOfChange()(postRequest)
-        status(result) must be(BAD_REQUEST)
-      }
-    }
   }
 }
 
@@ -307,13 +196,9 @@ class RegisteredOfficeControllerNoRelease7Spec extends PlaySpec with OneAppPerSu
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must not be Some(routes.RegisteredOfficeController.dateOfChange().url)
+        redirectLocation(result) must not be Some(routes.RegisteredOfficeDateOfChangeController.get().url)
       }
 
-      "return view for Date of Change" in new Fixture {
-        val result = controller.dateOfChange()(request)
-        status(result) must be(NOT_FOUND)
-      }
     }
 
   }

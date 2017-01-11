@@ -70,7 +70,7 @@
         @a.dateOfChange.map { d =>
             @checkYourAnswers(
                 question = Messages("dateofchange.title"),
-                editUrl = controllers.aboutthebusiness.routes.RegisteredOfficeController.dateOfChange().toString
+                editUrl = controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.get().toString
             ) {
                 <p>@DateHelper.formatDate(d.dateOfChange)</p>
             }

@@ -20,7 +20,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
       def view = views.html.include.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       doc.title must startWith(Messages("dateofchange.title"))
@@ -30,7 +30,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
       def view = views.html.include.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       heading.html must be (Messages("dateofchange.title"))
@@ -41,7 +41,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
       def view = views.html.include.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       html must include(Messages("lbl.date.example"))
@@ -57,7 +57,7 @@ class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
       def view = views.html.include.date_of_change(
         form2,
         "testSubheadingMessage",
-        controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()
+        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
       errorSummary.html() must include("not a message Key")
