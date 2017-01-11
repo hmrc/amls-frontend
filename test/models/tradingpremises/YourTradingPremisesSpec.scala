@@ -19,10 +19,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "isResidential" -> Seq("true"),
       "startDate.day" -> Seq("24"),
       "startDate.month" -> Seq("2"),
-      "startDate.year" -> Seq("1990"),
-      "dateOfChange.month" -> Seq("1"),
-      "dateOfChange.year" -> Seq("2016"),
-      "activityStartDate" -> Seq(new LocalDate(2016,1,1).toString("yyyy-MM-dd"))
+      "startDate.year" -> Seq("1990")
     )
 
     val json = Json.obj(
@@ -31,7 +28,8 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       "addressLine2" -> "2",
       "postcode" -> "asdfasdf",
       "isResidential" -> true,
-      "startDate" -> new LocalDate(1990, 2, 24)
+      "startDate" -> new LocalDate(1990, 2, 24),
+      "dateOfChange" -> new LocalDate(2016,1,12)
     )
 
     val model = YourTradingPremises(
@@ -48,7 +46,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
       Some(DateOfChange(new LocalDate(2016, 1, 12)))
     )
 
-    "fail vaidation when isresidential not selected" in {
+    "fail validation when isresidential not selected" in {
       YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foo"),
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
@@ -56,7 +54,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "isResidential" -> Seq(""),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"),
+        "startDate.year" -> Seq("1990")
       )) must be (Failure(Seq(Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
       )))
     }
@@ -76,13 +74,14 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
 
     "Correctly serialise from form data" in {
 
+
       implicitly[Rule[UrlFormEncoded, YourTradingPremises]].validate(data) must
-        be(Success(model))
+        be(Success(model.copy(dateOfChange = None)))
     }
 
     "Correctly write from model to form" in {
 
-      implicitly[Write[YourTradingPremises, UrlFormEncoded]].writes(model) must
+      implicitly[Write[YourTradingPremises, UrlFormEncoded]].writes(model.copy(dateOfChange = None)) must
         be(data)
     }
 

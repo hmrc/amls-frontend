@@ -55,8 +55,13 @@ object YourTradingPremises {
           __.read[Address] ~
           (__ \ "isResidential").read[Boolean].withMessage("error.required.tp.residential.address") ~
           (__ \ "startDate").read(localDateRule)
-        ) (YourTradingPremises.apply _)
+        ) ((tradingName: String, address: Address, isResidential: Boolean, startDate: LocalDate) =>
+        YourTradingPremises(tradingName, address, isResidential, startDate))
     }
+
+  def unapplyWithoutDateOfChange(data: YourTradingPremises) = {
+    Some((data.tradingName, data.tradingPremisesAddress,data.isResidential, data.startDate))
+  }
 
   implicit val formW: Write[YourTradingPremises, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
@@ -68,7 +73,7 @@ object YourTradingPremises {
           __.write[Address] ~
           (__ \ "isResidential").write[Boolean] ~
           (__ \ "startDate").write(localDateWrite)
-        ) (unlift(YourTradingPremises.unapply))
+        ) (unlift(YourTradingPremises.unapplyWithoutDateOfChange))
     }
 
   implicit def convert(data: YourTradingPremises): Option[TradingPremises] = {
