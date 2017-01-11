@@ -5,13 +5,13 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.tradingpremises.routes
 import forms.{Form2, _}
-import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.{DateOfChange}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
 import utils.{FeatureToggle, RepeatingSection}
-import views.html.aboutthebusiness.date_of_change
+import views.html.include.date_of_change
 
 import scala.concurrent.Future
 
@@ -68,7 +68,7 @@ import scala.concurrent.Future
    def dateOfChange = FeatureToggle(ApplicationConfig.release7) {
      Authorised {
        implicit authContext => implicit request =>
-         Ok(views.html.aboutthebusiness.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now))))
+         Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.tradingpremises", routes.AgentNameController.saveDateOfChange()))
      }
    }
 
@@ -77,7 +77,7 @@ import scala.concurrent.Future
        implicit request =>
          Form2[DateOfChange](request.body) match {
            case form: InvalidForm =>
-             Future.successful(BadRequest(date_of_change(form)))
+             Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange())))
            case ValidForm(_, dateOfChange) =>
              for {
                tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)

@@ -1,7 +1,7 @@
 package models.tradingpremises
 
 import models.FormTypes._
-import models.aboutthebusiness.DateOfChange
+import models.DateOfChange
 import play.api.data.mapping._
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -30,7 +30,7 @@ object AgentName {
     import play.api.data.mapping.forms.Rules._
     (
       (__ \ "agentName").read(agentNameType) and
-      (__ ).read(registeredOfficeDateOfChangeRule compose dateOfChangeMapping)
+      (__ ).read(optionR(registeredOfficeDateOfChangeRule compose dateOfChangeMapping))
       )(AgentName.apply _)
   }
 

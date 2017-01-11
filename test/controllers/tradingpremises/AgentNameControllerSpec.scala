@@ -1,7 +1,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.DateOfChange
+import models.DateOfChange
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
