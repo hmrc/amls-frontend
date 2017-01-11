@@ -4,7 +4,9 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.aboutthebusiness.{AboutTheBusiness, DateOfChange, RegisteredOffice, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.DateOfChange
+import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.businessactivities.BusinessActivities
 import models.status.SubmissionDecisionApproved
 import org.joda.time.LocalDate
 import services.StatusService
@@ -62,31 +64,36 @@ trait RegisteredOfficeController extends BaseController {
   def dateOfChange = FeatureToggle(ApplicationConfig.release7) {
     Authorised {
       implicit authContext => implicit request =>
-        Ok(views.html.aboutthebusiness.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now))))
+        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()))
     }
   }
 
   def saveDateOfChange = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[DateOfChange](request.body) match {
-          case form: InvalidForm =>
-            Future.successful(BadRequest(date_of_change(form)))
-          case ValidForm(_, dateOfChange) =>
-            for {
-              aboutTheBusiness <- dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key)
-              _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-                aboutTheBusiness.registeredOffice(aboutTheBusiness.registeredOffice match {
-                  case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
-                  case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))
-                }))
-            } yield Redirect(routes.SummaryController.get())
+        dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
+          val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
+            case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
+            case None => Map()
+          }
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+            case form: InvalidForm =>
+              Future.successful(BadRequest(views.html.include.date_of_change(form, "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange())))
+            case ValidForm(_, dateOfChange) =>
+              for {
+                _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
+                  aboutTheBusiness.registeredOffice(aboutTheBusiness.registeredOffice match {
+                    case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
+                    case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))
+                  }))
+              } yield Redirect(routes.SummaryController.get())
+          }
         }
   }
 
-  private def redirectToDateOfChange(aboutTheBusiness: AboutTheBusiness, office: RegisteredOffice) = {
+  private def redirectToDateOfChange(aboutTheBusiness: AboutTheBusiness, office: RegisteredOffice) =
     ApplicationConfig.release7 && !aboutTheBusiness.registeredOffice.contains(office)
-  }
+
 }
 
 object RegisteredOfficeController extends RegisteredOfficeController {

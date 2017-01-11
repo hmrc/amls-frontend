@@ -26,14 +26,17 @@
             panel = false
         ) {
             @input(
-                field = f("phoneNumber"),
-                labelText = "aboutthebusiness.contactingyou.phone.lbl"
+                field = f("email"),
+                labelText = "aboutthebusiness.contactingyou.email.lbl",
+                hintText = "aboutthebusiness.contactingyou.email.hint"
             )
 
             @input(
-                field = f("email"),
-                labelText = "aboutthebusiness.contactingyou.email.lbl"
+                field = f("phoneNumber"),
+                labelText = "aboutthebusiness.contactingyou.phone.lbl",
+                hintText = "aboutthebusiness.contactingyou.phone.hint"
             )
+
         }
 
         @registered_office_helper(model)

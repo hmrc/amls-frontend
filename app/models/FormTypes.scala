@@ -1,6 +1,5 @@
 package models
 
-import models.aboutthebusiness.DateOfChange
 import org.joda.time.LocalDate
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -179,10 +178,9 @@ object FormTypes {
     case _ => Success(None)
   }
 
-  val registeredOfficeDateOfChangeRuleMapping = Rule.fromMapping[(Option[LocalDate], Option[LocalDate]), Option[LocalDate]]{
-    case (Some(d1), Some(d2)) if d2.isAfter(d1) => Success(Some(d2))
-    case (None, Some(d2)) => Success(Some(d2))
-    case (None, None) => Success(None)
+  val registeredOfficeDateOfChangeRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate]{
+    case (Some(d1), d2) if d2.isAfter(d1) => Success(d2)
+    case (None, d2) => Success(d2)
     case (Some(activityStartDate), _) => Failure(Seq(
       ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", activityStartDate.toString("dd-MM-yyyy"))))
   }
@@ -190,7 +188,7 @@ object FormTypes {
   val registeredOfficeDateOfChangeRule = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
     ((__ \ "activityStartDate").read(optionR(jodaLocalDateRule("yyyy-MM-dd"))) ~
-      (__ \ "dateOfChange").read(optionR(localDateFutureRule))).tupled.compose(registeredOfficeDateOfChangeRuleMapping).repath(_ => Path \ "dateOfChange")
+      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.compose(registeredOfficeDateOfChangeRuleMapping).repath(_ => Path \ "dateOfChange")
   }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{

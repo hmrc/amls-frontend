@@ -1,6 +1,5 @@
-package models.aboutthebusiness
+package models
 
-import models.tradingpremises.ActivityEndDate
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -35,6 +34,21 @@ class DateOfChangeSpec extends PlaySpec {
             Path \ "dateOfChange" -> Seq(ValidationError("error.future.date")))
         ))
 
+    }
+
+    "fail form validation when given a date before a business activities start date" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq("24"),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("2012"),
+        "activityStartDate" -> Seq("2016-05-25")
+      )
+
+      DateOfChange.formRule.validate(model) must be(
+        Failure(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", "25-05-2016")))
+        ))
     }
 
     "read from JSON correctly" in {

@@ -16,6 +16,7 @@
 
     @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
+            <div class="panel-indent">
             <ul class="list list--comma">
                 @bmBusinessActivities.map { ba =>
                     @ba.businessActivities.map {activity =>
@@ -23,6 +24,7 @@
                     }
                 }
             </ul>
+            </div>
 
             @fieldset(
                 f = f("expectedAMLSTurnover"),

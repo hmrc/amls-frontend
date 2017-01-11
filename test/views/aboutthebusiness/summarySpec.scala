@@ -21,7 +21,6 @@ class summarySpec extends WordSpec
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-
       def view = views.html.aboutthebusiness.summary(AboutTheBusiness())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.aboutbusiness"))
