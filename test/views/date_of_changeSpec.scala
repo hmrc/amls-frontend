@@ -1,4 +1,4 @@
-package views.include
+package views
 
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
@@ -8,7 +8,6 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.data.mapping.Path
 import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
 
 class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
 

@@ -8,11 +8,11 @@ import models.DateOfChange
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
 import services.StatusService
-import utils.FeatureToggle
+import utils.{DateOfChangeHelper, FeatureToggle}
 
 import scala.concurrent.Future
 
-trait RegisteredOfficeDateOfChangeController extends BaseController{
+trait RegisteredOfficeDateOfChangeController extends BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
