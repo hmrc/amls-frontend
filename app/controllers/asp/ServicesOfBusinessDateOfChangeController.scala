@@ -65,7 +65,7 @@ trait ServiceOfBusinessDateOfChangeController extends RepeatingSection with Base
       implicit authContext => implicit request =>
         Form2[DateOfChange](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesDateOfChangeController.post())))
+            Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
           case ValidForm(_, data) => {
             for {
               businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
