@@ -491,10 +491,10 @@ select {
   }
 }
 
-.form-group {
+/*.form-group {
     padding-top: 0;
     padding-bottom: 0;
-}
+}*/
 
 /* Add some space under the last fieldset in a .panel-indent,
    otherwise it butts up against the submit button.
@@ -1034,4 +1034,22 @@ table.notifications thead th {
 .messaging a:link,
 .messaging a:visited {
   color: #fff;
+}
+
+
+/* Overrides the stupid Assets Frontend overrides - what were they thinking */
+button, .button, .button--get-started {
+  line-height: 1.25em;
+  padding: 0.5em 0.6em 0.3em 0.6em;
+  font-size: 1em;
+}
+
+#wrapper {
+  padding-bottom: 0;
+}
+
+@media (min-width: 769px) {
+    #wrapper {
+        padding-bottom: 0;
+    }
 }
