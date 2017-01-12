@@ -2,28 +2,27 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import controllers.aboutthebusiness.routes
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
-import models.tradingpremises._
-import org.joda.time.LocalDate
-import org.jsoup.Jsoup
-import org.mockito.Mockito._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.i18n.Messages
-import play.api.test.Helpers.{status => hstatus, _}
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Matchers.{eq => meq, _}
 import models._
 import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.tradingpremises._
+import org.joda.time.LocalDate
+import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
+import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.i18n.Messages
+import play.api.test.Helpers.{status => hstatus, _}
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with BeforeAndAfter {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 
@@ -37,6 +36,10 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
     }
 
     when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+  }
+
+  before {
+    reset(mockDataCacheConnector)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -336,13 +339,9 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
         "dateOfChange.day" -> "01"
       )
 
-      val name = AgentName("someName")
-      val updatedName = name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
-
-      val premises = TradingPremises(agentName = Some(name))
-
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009, 1, 1)))))))
+      val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2001, 1, 1), None)
+      val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
+      val expectedResult = yourPremises.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(premises))))
@@ -355,11 +354,11 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       hstatus(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
-      val captor = ArgumentCaptor.forClass(classOf[TradingPremises])
-      verify(controller.dataCacheConnector).save[TradingPremises](meq(TradingPremises.key), captor.capture())(any(), any(), any())
+      val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](meq(TradingPremises.key), captor.capture())(any(), any(), any())
 
-      captor.getValue.agentName match {
-        case Some(savedName: AgentName) => savedName must be(updatedName)
+      captor.getValue.head.yourTradingPremises match {
+        case Some(result: YourTradingPremises) => result must be(expectedResult)
       }
 
     }
@@ -372,8 +371,11 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
         "dateOfChange.day" -> "01"
       )
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
-        thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009, 1, 1)))))))
+      val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2008, 1, 1), None)
+      val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(premises))))
 
       val result = controller.saveDateOfChange(1)(postRequest)
 

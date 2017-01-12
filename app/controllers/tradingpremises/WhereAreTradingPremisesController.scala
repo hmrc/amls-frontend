@@ -48,7 +48,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             _ <- updateDataStrict[TradingPremises](index) { tp =>
                 TradingPremises(tp.registeringAgentPremises,
                   Some(ytp), tp.businessStructure,tp.agentName,tp.agentCompanyName,
-                  tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
+                  tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, hasChanged = true, tp.lineId, tp.status, tp.endDate)
             }
             status <- statusService.getStatus
           } yield status match {
@@ -75,22 +75,24 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   }
 
   def saveDateOfChange(index: Int) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
-          val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
-            case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
-            case None => Map()
+    implicit authContext => implicit request =>
+
+        getData[TradingPremises](index) flatMap { tradingPremises =>
+          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
+            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
           }
+
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
               Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
-              for {
-                tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)
-                _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
-                  tradingPremises.yourTradingPremises(tradingPremises.yourTradingPremises.get.copy(dateOfChange = Some(dateOfChange))))
-              } yield Redirect(routes.SummaryController.get())
+              updateDataStrict[TradingPremises](index) { tp =>
+                tp.yourTradingPremises.fold(tp) { _ =>
+                  tp.copy(yourTradingPremises = Some(tp.yourTradingPremises.get.copy(dateOfChange = Some(dateOfChange))))
+                }
+              } map { _ =>
+                Redirect(routes.SummaryController.get())
+              }
           }
         }
   }
