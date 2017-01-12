@@ -18,36 +18,44 @@
     @form(f, controllers.businessmatching.routes.BusinessTypeController.post()) {
 
         @fieldset(
-            f = f("businessType"),
+            f = f("redundantvalue"),
             legend = "businessmatching.businessType.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
+            @errorGroup(
+
+                field = f("businessType")
+            ) {
+
+                @radio(
                 f = f("businessType"),
                 labelText = "businessmatching.businessType.lbl.01",
                 value = "01"
-            )
-            @radio(
-                f = f("businessType"),
-                labelText = "businessmatching.businessType.lbl.02",
-                value = "02"
-            )
-            @radio(
-                f = f("businessType"),
-                labelText = "businessmatching.businessType.lbl.03",
-                value = "03"
-            )
-            @radio(
-                f = f("businessType"),
-                labelText = "businessmatching.businessType.lbl.04",
-                value = "04"
-            )
-            @radio(
-                f = f("businessType"),
-                labelText = "businessmatching.businessType.lbl.05",
-                value = "05"
-            )
+                )
+                @radio(
+                    f = f("businessType"),
+                    labelText = "businessmatching.businessType.lbl.02",
+                    value = "02"
+                )
+                @radio(
+                    f = f("businessType"),
+                    labelText = "businessmatching.businessType.lbl.03",
+                    value = "03"
+                )
+                @radio(
+                    f = f("businessType"),
+                    labelText = "businessmatching.businessType.lbl.04",
+                    value = "04"
+                )
+                @radio(
+                    f = f("businessType"),
+                    labelText = "businessmatching.businessType.lbl.05",
+                    value = "05"
+                )
+
+                }
+
         }
 
         @submit(false)
