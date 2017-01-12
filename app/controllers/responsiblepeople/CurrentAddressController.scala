@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, Empty, ZeroToFiveMonths, ThreeYearsPlus}
-import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddressHistory, ResponsiblePersonAddress, ResponsiblePeople}
+import models.responsiblepeople._
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -18,7 +18,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
-  final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), Empty)
+  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), Empty)
 
   def get(index: Int, edit: Boolean = false) =
     Authorised.async {
@@ -26,7 +26,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
 
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(_, _, _, Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _))
-          => Ok(current_address(Form2[ResponsiblePersonAddress](currentAddress), edit, index))
+          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index))
           case Some(ResponsiblePeople(_, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(current_address(Form2(DefaultAddressHistory), edit, index))
           case _
@@ -38,7 +38,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
   def post(index: Int, edit: Boolean = false) =
     Authorised.async {
       implicit authContext => implicit request =>
-        (Form2[ResponsiblePersonAddress](request.body) match {
+        (Form2[ResponsiblePersonCurrentAddress](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(current_address(f, edit, index)))
           case ValidForm(_, data) =>
@@ -58,7 +58,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
     }
 
   private def doUpdate
-  (index: Int, data: ResponsiblePersonAddress)
+  (index: Int, data: ResponsiblePersonCurrentAddress)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(

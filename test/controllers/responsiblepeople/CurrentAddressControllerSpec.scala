@@ -36,7 +36,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
   "CurrentAddressController" when {
 
-    "get is called" must {
+      "get is called" must {
 
       "display the persons page when no existing data in keystore" in new Fixture {
 
@@ -71,7 +71,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       "display the previous home address with UK fields populated" in new Fixture {
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+        val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -94,7 +94,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       "display the previous home address with non-UK fields populated" in new Fixture {
 
         val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-        val additionalAddress = ResponsiblePersonAddress(nonUKAddress, SixToElevenMonths)
+        val additionalAddress = ResponsiblePersonCurrentAddress(nonUKAddress, SixToElevenMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -128,7 +128,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             "timeAtAddress" -> "04"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -152,7 +152,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             "timeAtAddress" -> "02"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -242,7 +242,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               "timeAtAddress" -> "01"
             )
             val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+            val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -269,7 +269,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               "timeAtAddress" -> "03"
             )
             val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+            val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -295,7 +295,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               "timeAtAddress" -> "04"
             )
             val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+            val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
