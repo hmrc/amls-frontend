@@ -13,6 +13,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.RepeatingSection
 import views.html.responsiblepeople.current_address
 
+import scala.concurrent.Future
+
 trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
@@ -23,15 +25,17 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
       Ok
   }
 
-  def post(index: Int) = Authorised {
+  def post(index: Int, edit: Boolean) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[DateOfChange](request.body) match {
+      (Form2[DateOfChange](request.body) match {
         case f: InvalidForm =>
-          BadRequest(current_address(f, true, index))
+          Future.successful(BadRequest(current_address(f, true, index)))
         case ValidForm(_, dateOfChange) =>
 
           doUpdate(index, dateOfChange)
-          Redirect(routes.DetailedAnswersController.get(index))
+          Future.successful(Redirect(routes.DetailedAnswersController.get(index)))
+      }).recoverWith {
+        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
   }
 
@@ -54,7 +58,7 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
 
 }
 
-object RegisteredOfficeDateOfChangeController extends CurrentAddressDateOfChangeController {
+object CurrentAddressDateOfChangeController extends CurrentAddressDateOfChangeController {
   // $COVERAGE-OFF$
   override val dataCacheConnector = DataCacheConnector
   override val authConnector = AMLSAuthConnector

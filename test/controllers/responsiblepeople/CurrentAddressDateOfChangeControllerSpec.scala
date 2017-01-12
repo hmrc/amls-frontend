@@ -64,18 +64,10 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
         when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post(0)(postRequest)
+        val result = controller.post(0, true)(postRequest)
 
         status(result) must be(SEE_OTHER)
-
-        //      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-        //
-        //      val captor = ArgumentCaptor.forClass(classOf[AboutTheBusiness])
-        //      verify(controller.dataCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), captor.capture())(any(), any(), any())
-        //
-        //      captor.getValue.registeredOffice match {
-        //        case Some(savedOffice: RegisteredOfficeUK) => savedOffice must be(updatedOffice)
-        //      }
+        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(0).url))
 
       }
     }

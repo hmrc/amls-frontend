@@ -234,6 +234,12 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
         "time at address is less than 1 year" must {
           "redirect to the correct location" in new Fixture {
 
+            /////
+            //
+            //   UPDATE REDIRECT LOCATION TO DATE OF CHANGE FOR ALL THREE TESTS
+            //
+
+
             val requestWithParams = request.withFormUrlEncodedBody(
               "isUK" -> "true",
               "addressLine1" -> "Line 1",
