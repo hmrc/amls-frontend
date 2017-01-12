@@ -89,7 +89,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppP
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("Invalid value")
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
   }
