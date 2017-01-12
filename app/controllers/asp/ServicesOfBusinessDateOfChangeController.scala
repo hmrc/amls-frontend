@@ -7,6 +7,8 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.RepeatingSection
 import views.html.date_of_change
 
@@ -22,58 +24,45 @@ trait ServiceOfBusinessDateOfChangeController extends RepeatingSection with Base
         Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
     }
 
-  def post1 =
-    Authorised.async {
-      implicit authContext => implicit request =>
-        dataCacheConnector.fetchAll flatMap {
-          optionalCache =>
-            (for {
-              cache <- optionalCache
-              aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-              asp <- cache.getEntry[Asp](Asp.key)
-            } yield {
-              val extraFields = aboutTheBusiness.activityStartDate match {
-                case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
-                case None => Map()
-              }
-              Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
-                case f: InvalidForm =>
-                  Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
-                case ValidForm(_, data) => {
-                  for {
-                    _ <- dataCacheConnector.save[Asp](Asp.key,
-                      asp.services(asp.services.get.copy(dateOfChange = Some(data))))
-                  } yield Redirect(routes.SummaryController.get())
-                }
-              }
-            }).getOrElse(Future.successful(Redirect(routes.SummaryController.get())))
+  private def getModelWithDateMap()(implicit authContext: AuthContext, hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {
+    dataCacheConnector.fetchAll map {
+      optionalCache =>
+        (for {
+          cache <- optionalCache
+          aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+          asp <- cache.getEntry[Asp](Asp.key)
+        } yield {
+          (asp, aboutTheBusiness.activityStartDate)
+        }) match {
+          case Some((asp, Some(activityStartDate))) => (asp, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
+          case Some((asp, _)) => (asp, Map())
+          case _ =>(Asp(), Map())
         }
-    }
-
-  def updatedService(businessServices: Option[Asp], data:DateOfChange ): Asp = {
-    businessServices match {
-      case Some(asp) => asp.services match {
-        case Some(service) => asp.copy(services = Some(service.copy(dateOfChange = Some(data))))
-        case None => asp
-      }
-      case _ => None
     }
   }
 
-  def post =
-    Authorised.async {
+  def post = Authorised.async {
       implicit authContext => implicit request =>
-        Form2[DateOfChange](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
-          case ValidForm(_, data) => {
-            for {
-              businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
-              _ <- dataCacheConnector.save[Asp](Asp.key, updatedService(businessServices, data))
-            } yield {
-              Redirect(routes.SummaryController.get())
+        getModelWithDateMap() flatMap {
+          case (asp, startDate) =>
+            Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
+              case f: InvalidForm =>
+                Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
+              case ValidForm(_, data) => {
+                for {
+                  _ <- dataCacheConnector.save[Asp](Asp.key,
+                    asp.services match {
+                      case Some(service) => {
+                        val a = asp.copy(services = Some(service.copy(dateOfChange = Some(data))))
+                        a
+                      }
+                      case None => asp
+                    })
+                } yield {
+                  Redirect(routes.SummaryController.get())
+                }
+              }
             }
-          }
         }
     }
 }
