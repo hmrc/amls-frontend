@@ -17,38 +17,38 @@ import views.html.include.date_of_change
 import scala.concurrent.Future
 
 
- trait AgentNameController extends RepeatingSection with BaseController {
+trait AgentNameController extends RepeatingSection with BaseController {
 
-    val dataCacheConnector: DataCacheConnector
-   val statusService: StatusService
+  val dataCacheConnector: DataCacheConnector
+  val statusService: StatusService
 
-    def get(index: Int, edit: Boolean = false) = Authorised.async {
-      implicit authContext => implicit request =>
+  def get(index: Int, edit: Boolean = false) = Authorised.async {
+    implicit authContext => implicit request =>
 
-        getData[TradingPremises](index) map {
+      getData[TradingPremises](index) map {
 
-          case Some(tp) => {
-            val form = tp.agentName match {
-              case Some(data) => Form2[AgentName](data)
-              case None => EmptyForm
-            }
-            Ok(views.html.tradingpremises.agent_name(form, index, edit))
+        case Some(tp) => {
+          val form = tp.agentName match {
+            case Some(data) => Form2[AgentName](data)
+            case None => EmptyForm
           }
-          case None => NotFound(notFoundView)
+          Ok(views.html.tradingpremises.agent_name(form, index, edit))
         }
-    }
+        case None => NotFound(notFoundView)
+      }
+  }
 
-   def post(index: Int ,edit: Boolean = false) = Authorised.async {
+  def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
       Form2[AgentName](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index,edit)))
+          Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index, edit)))
         case ValidForm(_, data) => {
           for {
             tradingPremises <- getData[TradingPremises](index)
             result <- updateDataStrict[TradingPremises](index) { tp =>
-                TradingPremises(tp.registeringAgentPremises,tp.yourTradingPremises,
-                  tp.businessStructure, Some(data), None, None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
+              TradingPremises(tp.registeringAgentPremises, tp.yourTradingPremises,
+                tp.businessStructure, Some(data), None, None, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
             }
             status <- statusService.getStatus
           } yield status match {
@@ -66,38 +66,37 @@ import scala.concurrent.Future
     }
   }
 
-   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
-     Authorised {
-       implicit authContext => implicit request =>
-         Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
-           "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index)))
-     }
-   }
+  def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
+    Authorised {
+      implicit authContext => implicit request =>
+        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+          "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index)))
+    }
+  }
 
-   def saveDateOfChange(index: Int) = Authorised.async {
-     implicit authContext =>
-       implicit request =>
-         dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
-           val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
-             case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
-             case None => Map[String, Seq[String]]()
-           }
-           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
-             case form: InvalidForm =>
-               Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
-             case ValidForm(_, dateOfChange) =>
-               for {
-                 tradingPremises <- getData[TradingPremises](index)
-                 _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
-                   tradingPremises.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange))))
-               } yield Redirect(routes.SummaryController.get())
-           }
-         }
-   }
+  def saveDateOfChange(index: Int) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        getData[TradingPremises](index) flatMap { tradingPremises =>
+          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
+            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
+          }
 
-   private def redirectToDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-     ApplicationConfig.release7 && !tradingPremises.agentName.contains(name)
-   }
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+            case form: InvalidForm =>
+              Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
+            case ValidForm(_, dateOfChange) =>
+              for {
+                _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
+                  tradingPremises.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange))))
+              } yield Redirect(routes.SummaryController.get())
+          }
+        }
+  }
+
+  private def redirectToDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
+    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name)
+  }
 }
 
 object AgentNameController extends AgentNameController {

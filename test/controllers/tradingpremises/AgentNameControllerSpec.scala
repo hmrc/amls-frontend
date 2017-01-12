@@ -239,10 +239,10 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           val name = AgentName("someName")
           val updatedName= name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
-          val premises = TradingPremises(agentName = Some(name))
+          val yourPremises = mock[YourTradingPremises]
+          when(yourPremises.startDate) thenReturn new LocalDate(2005, 1, 1)
 
-          when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
-            thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009,1,1)))))))
+          val premises = TradingPremises(agentName = Some(name), yourTradingPremises = Some(yourPremises))
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(premises))))
