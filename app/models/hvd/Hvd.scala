@@ -40,6 +40,8 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Hvd =
     this.copy(percentageOfCashPaymentOver15000 = Some(v))
 
+  def dateOfChange(v: DateOfChange): Hvd = this.copy(dateOfChange = Some(v))
+
   def isComplete: Boolean = {
     Logger.debug(s"[Hvd][isComplete] $this")
     this match {
@@ -78,16 +80,9 @@ object Hvd {
         (__ \ "percentageOfCashPaymentOver15000").readNullable[PercentageOfCashPaymentOver15000] and
         (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] and
         (__ \ "linkedCashPayment").readNullable[LinkedCashPayments] and
+        (__ \ "dateOfChange").readNullable[DateOfChange] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
-      ) ((cashPayment:Option[CashPayment],
-          products: Option[Products],
-          exciseGoods: Option[ExciseGoods],
-          howWillYouSellGoods:Option[HowWillYouSellGoods],
-          percentageOfCashPaymentOver15000:Option[PercentageOfCashPaymentOver15000],
-          receiveCashPayments:Option[ReceiveCashPayments],
-          linkedCashPayment: Option[LinkedCashPayments],
-          hasChanged: Boolean) => Hvd(cashPayment, products, exciseGoods, howWillYouSellGoods, percentageOfCashPaymentOver15000,
-          receiveCashPayments, linkedCashPayment, None, hasChanged))
+      ) apply Hvd.apply _
   }
 
   implicit val writes: Writes[Hvd] = Json.writes[Hvd]

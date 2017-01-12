@@ -1,10 +1,9 @@
 package models.hvd
 
-import controllers.hvd.routes.javascript
+import models.DateOfChange
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsUndefined, Json}
@@ -20,7 +19,9 @@ class HvdSpec extends PlaySpec with MockitoSugar{
 
   val completeModel = Hvd(cashPayment = Some(DefaultCashPayment),
     None,None,None,None,
-    receiveCashPayments = Some(DefaultReceiveCashPayments))
+    receiveCashPayments = Some(DefaultReceiveCashPayments),
+    None,
+    Some(DateOfChange(new LocalDate("2016-02-24"))))
 
   "hvd" must {
 
@@ -37,6 +38,7 @@ class HvdSpec extends PlaySpec with MockitoSugar{
           "other" -> true,
           "details" -> "foo")
       ),
+      "dateOfChange" -> "2016-02-24",
       "hasChanged" -> false
     )
 
