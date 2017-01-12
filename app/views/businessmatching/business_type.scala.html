@@ -24,14 +24,13 @@
             panel = false
         ) {
             @errorGroup(
-
                 field = f("businessType")
             ) {
 
                 @radio(
-                f = f("businessType"),
-                labelText = "businessmatching.businessType.lbl.01",
-                value = "01"
+                    f = f("businessType"),
+                    labelText = "businessmatching.businessType.lbl.01",
+                    value = "01"
                 )
                 @radio(
                     f = f("businessType"),
@@ -54,10 +53,8 @@
                     value = "05"
                 )
 
-                }
-
+            }
         }
-
         @submit(false)
     }
 }

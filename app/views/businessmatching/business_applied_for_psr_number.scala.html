@@ -20,24 +20,30 @@
     @form(f, controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
         @fieldset(
-            f = f("appliedFor"),
+            f = f("redundantvalue"),
             legend = "businessmatching.psr.number.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("appliedFor"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target",
-                inline = true
-            )
-            @radio(
-                f = f("appliedFor"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+
+            @errorGroup(
+                field = f("appliedFor")
+            ) {
+
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @fieldset(
