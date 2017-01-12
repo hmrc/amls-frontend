@@ -170,8 +170,26 @@ object FormTypes {
         ) (d => (d.year.getAsString, d.monthOfYear.getAsString, d.dayOfMonth.getAsString))
     }
 
-  val futureDateRule = maxDateWithMsg(LocalDate.now, "error.future.date")
-  val localDateFutureRule = localDateRule compose futureDateRule
+  val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
+  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRule compose futureDateRule
+
+  val dateOfChangeMapping = Rule.fromMapping[Option[LocalDate], Option[DateOfChange]] {
+    case Some(date) => Success(Some(DateOfChange(date)))
+    case _ => Success(None)
+  }
+
+  val registeredOfficeDateOfChangeRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate]{
+    case (Some(d1), d2) if d2.isAfter(d1) => Success(d2)
+    case (None, d2) => Success(d2)
+    case (Some(activityStartDate), _) => Failure(Seq(
+      ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", activityStartDate.toString("dd-MM-yyyy"))))
+  }
+
+  val registeredOfficeDateOfChangeRule = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
+    ((__ \ "activityStartDate").read(optionR(jodaLocalDateRule("yyyy-MM-dd"))) ~
+      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.compose(registeredOfficeDateOfChangeRuleMapping).repath(_ => Path \ "dateOfChange")
+  }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
     case (d1, d2) if d2.isAfter(d1) => Success(d2)

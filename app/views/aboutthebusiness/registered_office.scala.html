@@ -18,8 +18,8 @@
 
         @fieldset(
             f = f("isUK"),
-            legend = "aboutthebusiness.registeredoffice.title",
-            legendHidden = true,
+            legend = "aboutthebusiness.registeredoffice.lbl",
+            legendHidden = false,
             panel = false
         ) {
             @radio(
@@ -111,7 +111,7 @@
             )
         }
 
-        @submit(edit)
+        @submit(edit, Some(Messages("button.saveandcontinue")))
 
     }
 }
