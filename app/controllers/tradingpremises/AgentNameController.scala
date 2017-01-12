@@ -53,7 +53,7 @@ import scala.concurrent.Future
             status <- statusService.getStatus
           } yield status match {
             case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises.get, data) =>
-              Redirect(routes.AgentNameController.dateOfChange())
+              Redirect(routes.AgentNameController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
               case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
@@ -66,27 +66,28 @@ import scala.concurrent.Future
     }
   }
 
-   def dateOfChange = FeatureToggle(ApplicationConfig.release7) {
+   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
      Authorised {
        implicit authContext => implicit request =>
-         Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.tradingpremises", routes.AgentNameController.saveDateOfChange()))
+         Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+           "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index)))
      }
    }
 
-   def saveDateOfChange = Authorised.async {
+   def saveDateOfChange(index: Int) = Authorised.async {
      implicit authContext =>
        implicit request =>
          dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
            val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
              case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
-             case None => Map()
+             case None => Map[String, Seq[String]]()
            }
            Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
              case form: InvalidForm =>
-               Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange())))
+               Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
              case ValidForm(_, dateOfChange) =>
                for {
-                 tradingPremises <- dataCacheConnector.fetch[TradingPremises](TradingPremises.key)
+                 tradingPremises <- getData[TradingPremises](index)
                  _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
                    tradingPremises.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange))))
                } yield Redirect(routes.SummaryController.get())

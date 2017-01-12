@@ -2,6 +2,7 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
+import controllers.aboutthebusiness.routes
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -15,7 +16,9 @@ import utils.AuthorisedFixture
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => meq, _}
 import models._
-import models.status.SubmissionDecisionRejected
+import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import org.mockito.ArgumentCaptor
 import services.StatusService
 
 import scala.concurrent.Future
@@ -245,6 +248,136 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
             yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, true, TradingPremisesSection.date))
           ))))(any(), any(), any())
       }
+    }
+  }
+
+  "go to the date of change page" when {
+    "the submission has been approved and trading name has changed" in new Fixture {
+
+      val initRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address 1",
+        "addressLine2" -> "Address 2",
+        "postcode" -> "NE98 1ZZ",
+        "isResidential" -> "true",
+        "startDate.day" -> "01",
+        "startDate.month" -> "02",
+        "startDate.year" -> "2010"
+      )
+
+      val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, true, LocalDate.now())
+
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises))))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+
+      val result = controller.post(1)(initRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.dateOfChange(1).url))
+    }
+  }
+
+  "go to the summary page" when {
+    "data has not changed" in new Fixture {
+
+      val initRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address 1",
+        "addressLine2" -> "Address 2",
+        "postcode" -> "NE98 1ZZ",
+        "isResidential" -> "true",
+        "startDate.day" -> "01",
+        "startDate.month" -> "02",
+        "startDate.year" -> "2010"
+      )
+
+      val address = Address("Address 1", "Address 2", None, None, "NE98 1ZZ")
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, true, new LocalDate(2010,2,1))
+
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises))))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+
+      val result = controller.post(1)(initRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+    }
+  }
+  "return view for Date of Change" in new Fixture {
+    val result = controller.dateOfChange(1)(request)
+    hstatus(result) must be(OK)
+  }
+
+  "handle the date of change form post" when {
+    "given valid data for a trading premises name" in new Fixture {
+
+      val postRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.year" -> "2010",
+        "dateOfChange.month" -> "10",
+        "dateOfChange.day" -> "01"
+      )
+
+      val name = AgentName("someName")
+      val updatedName = name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+      val premises = TradingPremises(agentName = Some(name))
+
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
+        thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009, 1, 1)))))))
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(premises))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
+        thenReturn(Future.successful(mock[CacheMap]))
+
+      val result = controller.saveDateOfChange(1)(postRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+      val captor = ArgumentCaptor.forClass(classOf[TradingPremises])
+      verify(controller.dataCacheConnector).save[TradingPremises](meq(TradingPremises.key), captor.capture())(any(), any(), any())
+
+      captor.getValue.agentName match {
+        case Some(savedName: AgentName) => savedName must be(updatedName)
+      }
+
+    }
+
+
+    "given a date of change which is before the activity start date" in new Fixture {
+      val postRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.year" -> "2007",
+        "dateOfChange.month" -> "10",
+        "dateOfChange.day" -> "01"
+      )
+
+      when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
+        thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009, 1, 1)))))))
+
+      val result = controller.saveDateOfChange(1)(postRequest)
+
+      hstatus(result) must be(BAD_REQUEST)
     }
   }
 }

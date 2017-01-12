@@ -59,14 +59,16 @@ GET         /trading-premises/add                                       controll
 
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/premises/date-of-change                   controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
+POST        /trading-premises/premises/date-of-change                   controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
 
 GET         /trading-premises/crn-name/:index                           controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/crn-name/:index                           controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-premises/agent-name/:index                         controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/agent-name/:index                         controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
-GET         /trading-premises/agent-name/date-of-change                 controllers.tradingpremises.AgentNameController.dateOfChange
-POST        /trading-premises/agent-name/date-of-change                 controllers.tradingpremises.AgentNameController.saveDateOfChange
+GET         /trading-premises/agent-name/date-of-change                 controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)
+POST        /trading-premises/agent-name/date-of-change                 controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
 
 
 GET         /trading-premises/partners/:index                           controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)

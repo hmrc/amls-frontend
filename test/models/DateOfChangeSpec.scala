@@ -7,7 +7,8 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsString, _}
 
 
-class DateOfChangeSpec extends PlaySpec {
+class
+DateOfChangeSpec extends PlaySpec {
   "DateOfChange" must {
 
     "read the form correctly when given a valid date" in {

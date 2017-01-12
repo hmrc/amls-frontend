@@ -217,12 +217,12 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           val result = controller.post(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.AgentNameController.dateOfChange().url))
+          redirectLocation(result) must be(Some(routes.AgentNameController.dateOfChange(1).url))
         }
       }
 
       "return view for Date of Change" in new Fixture {
-        val result = controller.dateOfChange()(request)
+        val result = controller.dateOfChange(1)(request)
         status(result) must be(OK)
       }
 
@@ -244,13 +244,13 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
             thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009,1,1)))))))
 
-          when(controller.dataCacheConnector.fetch[TradingPremises](meq(TradingPremises.key))(any(), any(), any())).
-            thenReturn(Future.successful(Some(premises)))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(premises))))
 
           when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
             thenReturn(Future.successful(mock[CacheMap]))
 
-          val result = controller.saveDateOfChange()(postRequest)
+          val result = controller.saveDateOfChange(1)(postRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get().url))
@@ -271,15 +271,10 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
             "dateOfChange.day" -> "01"
           )
 
-          val name = AgentName("someName")
-          val updatedName= name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2007, 10, 1))))
-
-          val premises = TradingPremises(agentName = Some(name))
-
           when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
             thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009,1,1)))))))
 
-          val result = controller.saveDateOfChange()(postRequest)
+          val result = controller.saveDateOfChange(1)(postRequest)
 
           status(result) must be(BAD_REQUEST)
         }
