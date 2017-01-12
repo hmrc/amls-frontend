@@ -92,41 +92,5 @@ class ServicesDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite wi
       contentAsString(result) must include("Invalid value")
     }
 
-    "fail submission when no check boxes were selected" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-
-      )
-
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#services]").html() must include(Messages("error.required.asp.business.services"))
-    }
-
-    "submit with valid data in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "services[1]" -> "02",
-        "services[0]" -> "01",
-        "services[2]" -> "03"
-      )
-
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get().url))
-    }
   }
 }
