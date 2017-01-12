@@ -27,7 +27,7 @@ class HvdSpec extends PlaySpec with MockitoSugar{
     val completeJson = Json.obj(
       "cashPayment" ->Json.obj(
         "acceptedAnyPayment" -> true,
-        "paymentDate" ->  new LocalDate(1956, 2, 15)
+        "paymentDate" -> new LocalDate(1956, 2, 15)
       ),
       "receiveCashPayments" -> Json.obj(
         "receivePayments" -> true,
@@ -39,9 +39,6 @@ class HvdSpec extends PlaySpec with MockitoSugar{
       ),
       "hasChanged" -> false
     )
-
-
-
 
     "Serialise as expected" in {
       Json.toJson(completeModel) must be(completeJson)

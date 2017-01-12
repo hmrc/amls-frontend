@@ -1,10 +1,9 @@
 package models.hvd
 
 
+import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.Logger
-import play.api.data.mapping.{To, Write}
-import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json.{Json, Reads, Writes}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -16,6 +15,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
                 percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
                 receiveCashPayments: Option[ReceiveCashPayments] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None,
+                dateOfChange: Option[DateOfChange] = None,
                 hasChanged: Boolean = false) {
 
   def cashPayment(p: CashPayment): Hvd =
@@ -43,9 +43,9 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def isComplete: Boolean = {
     Logger.debug(s"[Hvd][isComplete] $this")
     this match {
-      case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_), _)
+      case Hvd(Some(_), Some(pr), _, Some(_), Some(_), Some(_), Some(_),_, _)
         if pr.items.forall(item => item != Alcohol && item != Tobacco) => true
-      case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _) => true
+      case Hvd(Some(_), Some(pr), Some(_), Some(_), Some(_), Some(_), Some(_), _,_) => true
       case _ => false
     }
   }
@@ -79,7 +79,15 @@ object Hvd {
         (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] and
         (__ \ "linkedCashPayment").readNullable[LinkedCashPayments] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)}
-      ) apply Hvd.apply _
+      ) ((cashPayment:Option[CashPayment],
+          products: Option[Products],
+          exciseGoods: Option[ExciseGoods],
+          howWillYouSellGoods:Option[HowWillYouSellGoods],
+          percentageOfCashPaymentOver15000:Option[PercentageOfCashPaymentOver15000],
+          receiveCashPayments:Option[ReceiveCashPayments],
+          linkedCashPayment: Option[LinkedCashPayments],
+          hasChanged: Boolean) => Hvd(cashPayment, products, exciseGoods, howWillYouSellGoods, percentageOfCashPaymentOver15000,
+          receiveCashPayments, linkedCashPayment, None, hasChanged))
   }
 
   implicit val writes: Writes[Hvd] = Json.writes[Hvd]
