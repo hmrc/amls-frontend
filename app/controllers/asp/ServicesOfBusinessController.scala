@@ -3,15 +3,19 @@ package controllers.asp
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.asp.{ServicesOfBusiness, Asp}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.asp.{Asp, ServicesOfBusiness}
+import models.status.SubmissionDecisionApproved
+import services.StatusService
+import utils.DateOfChangeHelper
 import views.html.asp._
 
 import scala.concurrent.Future
 
-trait ServicesOfBusinessController extends BaseController {
+trait ServicesOfBusinessController extends BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
+  val statusService: StatusService
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -36,12 +40,14 @@ trait ServicesOfBusinessController extends BaseController {
             businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
             _ <- dataCacheConnector.save[Asp](Asp.key,
               businessServices.services(data))
-          } yield edit match {
-            case true =>
-              Redirect(routes.SummaryController.get())
-            case false =>
-              Redirect(routes.OtherBusinessTaxMattersController.get())
-
+            status <- statusService.getStatus
+          } yield status match {
+            case SubmissionDecisionApproved if redirectToDateOfChange[ServicesOfBusiness](businessServices.services, data) =>
+              Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
+            case _ => edit match {
+              case true => Redirect(routes.SummaryController.get())
+              case false => Redirect(routes.OtherBusinessTaxMattersController.get(edit))
+            }
           }
       }
   }
@@ -51,5 +57,6 @@ object ServicesOfBusinessController extends ServicesOfBusinessController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override val statusService = StatusService
 }
 

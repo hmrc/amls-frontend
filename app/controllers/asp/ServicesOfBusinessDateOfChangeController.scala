@@ -8,18 +8,18 @@ import models.DateOfChange
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import utils.RepeatingSection
-import views.html.include.date_of_change
+import views.html.date_of_change
 
 import scala.concurrent.Future
 
-trait ServicesDateOfChangeController extends RepeatingSection with BaseController {
+trait ServiceOfBusinessDateOfChangeController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
   def get =
     Authorised.async {
       implicit authContext => implicit request =>
-        Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesDateOfChangeController.post())))
+        Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
     }
 
   def post =
@@ -38,7 +38,7 @@ trait ServicesDateOfChangeController extends RepeatingSection with BaseControlle
               }
               Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
                 case f: InvalidForm =>
-                  Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesDateOfChangeController.post())))
+                  Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
                 case ValidForm(_, data) => {
                   for {
                     _ <- dataCacheConnector.save[Asp](Asp.key,
@@ -51,7 +51,7 @@ trait ServicesDateOfChangeController extends RepeatingSection with BaseControlle
     }
 }
 
-object ServicesDateOfChangeController extends ServicesDateOfChangeController {
+object ServicesOfBusinessDateOfChangeController extends ServiceOfBusinessDateOfChangeController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
 

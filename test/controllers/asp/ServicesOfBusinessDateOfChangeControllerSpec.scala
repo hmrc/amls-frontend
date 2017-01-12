@@ -19,12 +19,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class ServicesDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new ServicesDateOfChangeController {
+    val controller = new ServiceOfBusinessDateOfChangeController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
