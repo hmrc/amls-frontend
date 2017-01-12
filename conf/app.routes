@@ -59,8 +59,8 @@ GET         /trading-premises/add                                       controll
 
 GET         /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/premises/:index                           controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
-GET         /trading-premises/premises/date-of-change                   controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
-POST        /trading-premises/premises/date-of-change                   controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
+GET         /trading-premises/premises/date-of-change/:index            controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
+POST        /trading-premises/premises/date-of-change/:index            controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
 
 GET         /trading-premises/crn-name/:index                           controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/crn-name/:index                           controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
