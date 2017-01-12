@@ -37,12 +37,12 @@ a.block-link {
 }
 
 .page-header .heading-secondary {
-  display: table-header-group;
-  margin-bottom: 0;
   color: #6f777b;
+  display: table-header-group;
   font-size: 20px;
   font-weight: 400;
   line-height: 1.11111;
+  margin-bottom: 0;
   text-transform: none;
 }
 
@@ -508,14 +508,8 @@ select {
 }
 
 /* These are all prefixed with `form` to override some stuff (apparently) */
-form input[type="text"].form-control,
-form input[type="tel"].form-control,
-form input[type="number"].form-control {
+form .form-control {
   border: 2px solid #6f777b;
-}
-
-form input[type="text"].form-control,
-form input[type="tel"].form-control {
   width: 50%;
 }
 
@@ -661,9 +655,9 @@ fieldset .panel-indent {
   word-wrap: break-word;
 }
 
-.check-your-answers .edit {
+.check-your-answers .change-answer {
   color: #005ea5;
-  font-weight: normal;
+  font-weight: bold;
   line-height: 1.25;
   margin: 0 0 .21053em;
   text-decoration: underline;
@@ -881,9 +875,8 @@ fieldset.panel-indent legend {
     border-left-width: 10px;
 }
 
-
 .progress-steps__amend .progress-step--status {
-    display:flex
+    display: flex;
 }
 
 .progress-steps__amend .progress-step--status-time {

@@ -46,14 +46,19 @@
             legend = "aboutthebusiness.registeredformlr.mlrregno.lbl",
             legendHidden = true,
             jsHidden = true,
-            id = target
+            id = target,
+            panel = false
         ) {
-            @input(
-                field = f("prevMLRRegNo"),
-                labelText = "aboutthebusiness.registeredformlr.mlrregno.lbl",
-                hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
-                bold = false
-            )
+            @panel(
+                jsHidden = false
+            ) {
+                @input(
+                    field = f("prevMLRRegNo"),
+                    labelText = "aboutthebusiness.registeredformlr.mlrregno.lbl",
+                    hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
+                    bold = false
+                )
+            }
         }
 
         @submit(false)

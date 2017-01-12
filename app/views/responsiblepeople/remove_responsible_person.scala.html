@@ -15,9 +15,13 @@
 ) {
 
     @form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, complete, personName)) {
-        <div class="panel-indent panel-border-wide">
+
+        @panel(
+            jsHidden = false,
+            wide = true
+        ) {
             <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
-        </div>
+        }
 
         @if(showDateField) {
             @date(

@@ -15,13 +15,16 @@
 
     @form(f, controllers.responsiblepeople.routes.PersonRegisteredController.post(index)) {
 
-        <div class="panel-indent panel-indent--gutter panel-border-wide">
+        @panel(
+            jsHidden = false,
+            wide = true
+        ) {
             @if(index <= 1){
                 <p>@Messages("responsiblepeople.have.registered.person.text", index) </p>
             } else {
                 <p>@Messages("responsiblepeople.have.registered.people.text", index) </p>
             }
-        </div>
+        }
 
         @fieldset(
             f = f("registerAnotherPerson"),
