@@ -15,7 +15,7 @@
 ) {
 
     @form(f, controllers.msb.routes.CETransactionsInNext12MonthsController.post(edit)) {
-        @input(f("ceTransaction"), labelText = "msb.ce.transactions.expected.in.12.months.title")
+        @input(f("ceTransaction"))
 
         @submit(edit)
     }
