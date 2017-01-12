@@ -89,7 +89,7 @@ class ServicesDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite wi
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("Invalid value")
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
     "fail submission when no check boxes were selected" in new Fixture {

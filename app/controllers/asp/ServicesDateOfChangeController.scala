@@ -22,7 +22,7 @@ trait ServicesDateOfChangeController extends RepeatingSection with BaseControlle
         Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesDateOfChangeController.post())))
     }
 
-  def post =
+  def post1 =
     Authorised.async {
       implicit authContext => implicit request =>
         dataCacheConnector.fetchAll flatMap {
@@ -47,6 +47,33 @@ trait ServicesDateOfChangeController extends RepeatingSection with BaseControlle
                 }
               }
             }).getOrElse(Future.successful(Redirect(routes.SummaryController.get())))
+        }
+    }
+
+  def updatedService(businessServices: Option[Asp], data:DateOfChange ): Asp = {
+    businessServices match {
+      case Some(asp) => asp.services match {
+        case Some(service) => asp.copy(services = Some(service.copy(dateOfChange = Some(data))))
+        case None => asp
+      }
+      case _ => None
+    }
+  }
+
+  def post =
+    Authorised.async {
+      implicit authContext => implicit request =>
+        Form2[DateOfChange](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesDateOfChangeController.post())))
+          case ValidForm(_, data) => {
+            for {
+              businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
+              _ <- dataCacheConnector.save[Asp](Asp.key, updatedService(businessServices, data))
+            } yield {
+              Redirect(routes.SummaryController.get())
+            }
+          }
         }
     }
 }
