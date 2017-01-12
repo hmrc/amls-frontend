@@ -277,6 +277,9 @@ POST        /accountancy-service-provider/services                      controll
 GET         /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
 POST        /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
 
+GET         /accountancy-service-provider/date-change                   controllers.asp.ServicesOfBusinessDateOfChangeController.get
+POST        /accountancy-service-provider/date-change                   controllers.asp.ServicesOfBusinessDateOfChangeController.post
+
 GET         /accountancy-service-provider/check-your-answers            controllers.asp.SummaryController.get()
 
 GET         /trust-company-service-provider/what-you-need               controllers.tcsp.WhatYouNeedController.get()
