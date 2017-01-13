@@ -40,8 +40,9 @@ POST        /about-the-business/confirming-address                      controll
 
 GET         /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /about-the-business/new-registered-office                   controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
-GET         /about-the-business/new-registered-office/date-of-change    controllers.aboutthebusiness.RegisteredOfficeController.dateOfChange
-POST        /about-the-business/new-registered-office/date-of-change    controllers.aboutthebusiness.RegisteredOfficeController.saveDateOfChange
+
+GET         /about-the-business/new-registered-office/date-change       controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.get()
+POST        /about-the-business/new-registered-office/date-change       controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.post()
 
 GET         /about-the-business/address-for-letters                     controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
 POST        /about-the-business/address-for-letters                     controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
@@ -279,6 +280,9 @@ POST        /accountancy-service-provider/services                      controll
 
 GET         /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
 POST        /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
+
+GET         /accountancy-service-provider/date-change                   controllers.asp.ServicesOfBusinessDateOfChangeController.get
+POST        /accountancy-service-provider/date-change                   controllers.asp.ServicesOfBusinessDateOfChangeController.post
 
 GET         /accountancy-service-provider/check-your-answers            controllers.asp.SummaryController.get()
 

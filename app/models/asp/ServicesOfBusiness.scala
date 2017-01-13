@@ -1,12 +1,13 @@
 package models.asp
 
+import models.DateOfChange
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import utils.TraversableValidators._
 
-case class ServicesOfBusiness(services: Set[Service])
+case class ServicesOfBusiness(services: Set[Service], dateOfChange: Option[DateOfChange] = None)
 
 sealed trait Service
 
@@ -69,7 +70,7 @@ object ServicesOfBusiness {
    p: Path => RuleLike[UrlFormEncoded, Set[Service]]
     ): Rule[UrlFormEncoded, ServicesOfBusiness] =
     From[UrlFormEncoded] { __ =>
-       (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.asp.business.services")) fmap ServicesOfBusiness.apply
+       (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.asp.business.services")) .flatMap(ServicesOfBusiness(_, None))
   }
 
   implicit def formWrites

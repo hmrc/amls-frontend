@@ -1,21 +1,18 @@
 package controllers.aboutthebusiness
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.DateOfChange
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeNonUK, RegisteredOfficeUK}
-import models.businessactivities.BusinessActivities
+import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
 import models.status.SubmissionDecisionApproved
-import org.joda.time.LocalDate
 import services.StatusService
-import utils.FeatureToggle
-
-import scala.concurrent.Future
+import utils.DateOfChangeHelper
 import views.html.aboutthebusiness._
 
-trait RegisteredOfficeController extends BaseController {
+import scala.concurrent.Future
+
+trait RegisteredOfficeController extends BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -50,8 +47,8 @@ trait RegisteredOfficeController extends BaseController {
                 aboutTheBusiness.registeredOffice(data))
               status <- statusService.getStatus
             } yield status match {
-              case SubmissionDecisionApproved if redirectToDateOfChange(aboutTheBusiness, data) =>
-                Redirect(routes.RegisteredOfficeController.dateOfChange())
+              case SubmissionDecisionApproved if redirectToDateOfChange[RegisteredOffice](aboutTheBusiness.registeredOffice, data) =>
+                Redirect(routes.RegisteredOfficeDateOfChangeController.get())
               case _ => edit match {
                 case true => Redirect(routes.SummaryController.get())
                 case false => Redirect(routes.ContactingYouController.get(edit))
@@ -60,40 +57,6 @@ trait RegisteredOfficeController extends BaseController {
           }
         }
   }
-
-  def dateOfChange = FeatureToggle(ApplicationConfig.release7) {
-    Authorised {
-      implicit authContext => implicit request =>
-        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
-          "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange()))
-    }
-  }
-
-  def saveDateOfChange = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap { aboutTheBusiness =>
-          val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
-            case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
-            case None => Map()
-          }
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
-            case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.include.date_of_change(form, "summary.aboutbusiness", controllers.aboutthebusiness.routes.RegisteredOfficeController.saveDateOfChange())))
-            case ValidForm(_, dateOfChange) =>
-              for {
-                _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-                  aboutTheBusiness.registeredOffice(aboutTheBusiness.registeredOffice match {
-                    case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
-                    case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))
-                  }))
-              } yield Redirect(routes.SummaryController.get())
-          }
-        }
-  }
-
-  private def redirectToDateOfChange(aboutTheBusiness: AboutTheBusiness, office: RegisteredOffice) =
-    ApplicationConfig.release7 && !aboutTheBusiness.registeredOffice.contains(office)
 
 }
 

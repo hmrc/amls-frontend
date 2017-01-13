@@ -12,7 +12,6 @@ import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
 import utils.{FeatureToggle, RepeatingSection}
-import views.html.include.date_of_change
 
 import scala.concurrent.Future
 
@@ -69,7 +68,7 @@ trait AgentNameController extends RepeatingSection with BaseController {
   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
     Authorised {
       implicit authContext => implicit request =>
-        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+        Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
           "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index)))
     }
   }
@@ -84,7 +83,7 @@ trait AgentNameController extends RepeatingSection with BaseController {
 
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
+              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               for {
                 _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,

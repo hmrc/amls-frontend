@@ -15,6 +15,12 @@
     heading = header
 ) {
 
+
+    <div class="panel-indent panel-border-wide">
+        @Messages("responsiblepeople.position_within_business.important")
+    </div>
+
+
     @form(f, controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.post(index,edit)) {
 
         <div class="form-field">

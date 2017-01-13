@@ -3,17 +3,13 @@ package controllers.tradingpremises
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.aboutthebusiness.routes
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import play.api.Logger
 import services.StatusService
 import utils.{FeatureToggle, RepeatingSection}
-import views.html.include.date_of_change
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
@@ -69,7 +65,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
     Authorised {
       implicit authContext => implicit request =>
-        Ok(views.html.include.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+        Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
           "summary.tradingpremises", controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index)))
     }
   }
@@ -84,7 +80,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(date_of_change(form, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
+              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               updateDataStrict[TradingPremises](index) { tp =>
                 tp.yourTradingPremises.fold(tp) { _ =>
@@ -98,7 +94,6 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   }
 
   private def redirectToDateOfChange(tradingPremises: TradingPremises, premises: YourTradingPremises) =
-//    ApplicationConfig.release7 && !tradingPremises.yourTradingPremises.contains(premises)
   ApplicationConfig.release7 && {
     (for {
       ytp <- tradingPremises.yourTradingPremises

@@ -32,7 +32,12 @@
         </div>
     </div>
 
-    <p>@Messages("confirmation.breakdown")</p>
+
+    @detailsSummary(
+            summary = Messages("confirmation.breakdown.details")
+        ) {
+
+             <p>@Messages("confirmation.breakdown")</p>
 
     <table>
         <thead>
@@ -62,6 +67,13 @@
             </tr>
         </tfoot>
     </table>
+
+
+        }
+
+
+
+
 
     <p><a class="button" href="@ApplicationConfig.paymentsUrl">@Messages("button.payfee")</a></p>
 

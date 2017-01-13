@@ -67,14 +67,6 @@
             }</p>
         }
 
-        @a.dateOfChange.map { d =>
-            @checkYourAnswers(
-                question = Messages("dateofchange.title"),
-                editUrl = controllers.aboutthebusiness.routes.RegisteredOfficeController.dateOfChange().toString
-            ) {
-                <p>@DateHelper.formatDate(d.dateOfChange)</p>
-            }
-        }
     }
 
     @model.contactingYou.map { c =>

@@ -48,7 +48,7 @@ DateOfChangeSpec extends PlaySpec {
       DateOfChange.formRule.validate(model) must be(
         Failure(
           Seq(
-            Path \ "dateOfChange" -> Seq(ValidationError("error.expected.regofficedateofchange.date.after.activitystartdate", "25-05-2016")))
+            Path \ "dateOfChange" -> Seq(ValidationError("error.expected.dateofchange.date.after.activitystartdate", "25-05-2016")))
         ))
     }
 
