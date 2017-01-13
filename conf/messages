@@ -73,6 +73,8 @@ error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 error.survey.satisfaction.required = Select one option to answer the question: how did you feel about using the service?
 
 
+error.expected.dateofchange.date.after.activitystartdate = The date must be after you started activities that need to be registered for anti-money laundering supervision, which was {0}
+
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
