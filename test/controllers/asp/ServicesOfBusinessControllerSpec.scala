@@ -2,6 +2,7 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import models.asp._
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -10,6 +11,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -23,6 +25,7 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with
     val controller = new ServicesOfBusinessController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -50,6 +53,9 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with
 
       when(controller.dataCacheConnector.save[Asp](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -111,6 +117,9 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with
         "services[2]" -> "03"
       )
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
+
       when(controller.dataCacheConnector.fetch[Asp](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -120,6 +129,27 @@ class ServicesOfBusinessControllerSpec extends PlaySpec with OneAppPerSuite with
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get().url))
+    }
+
+    "go to the date of change page" when {
+      "the submission has been approved and registeredOffice has changed" in new Fixture {
+
+        when(controller.dataCacheConnector.fetch[Asp](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "services[0]" -> "02",
+          "services[1]" -> "01",
+          "services[2]" -> "03")
+        val result = controller.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get().url))
+      }
     }
 
   }

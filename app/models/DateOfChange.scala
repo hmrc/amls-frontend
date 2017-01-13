@@ -22,7 +22,7 @@ object DateOfChange {
 
   implicit val formRule: Rule[UrlFormEncoded, DateOfChange] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    __.read(registeredOfficeDateOfChangeRule) fmap DateOfChange.apply
+    __.read(dateOfChangeActivityStartDateRule) fmap DateOfChange.apply
   }
 
   implicit val formWrites: Write[DateOfChange, UrlFormEncoded] =

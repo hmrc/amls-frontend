@@ -15,7 +15,7 @@
 ) {
 
     @form(f, controllers.msb.routes.TransactionsInNext12MonthsController.post(edit)) {
-        @input(f("txnAmount"), labelText = "msb.transactions.expected.title", bold = false)
+        @input(f("txnAmount"), bold = false)
 
         @submit(edit)
     }
