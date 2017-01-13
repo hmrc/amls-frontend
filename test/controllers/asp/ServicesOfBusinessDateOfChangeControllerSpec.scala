@@ -89,7 +89,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppP
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format", "24-02-1990"))
     }
 
     "fail submission when input date is before activity start date" in new Fixture {
