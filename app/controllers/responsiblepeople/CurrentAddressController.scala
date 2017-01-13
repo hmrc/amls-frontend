@@ -3,22 +3,22 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress._
 import models.responsiblepeople._
 import models.status.SubmissionDecisionApproved
-import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.RepeatingSection
+import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.current_address
 
 import scala.concurrent.Future
 
-trait CurrentAddressController extends RepeatingSection with BaseController {
+trait CurrentAddressController extends RepeatingSection with BaseController with DateOfChangeHelper {
 
   def dataCacheConnector: DataCacheConnector
+
   val statusService: StatusService
 
 
@@ -45,41 +45,43 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
         (Form2[ResponsiblePersonCurrentAddress](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(current_address(f, edit, index)))
-          case ValidForm(_, data) =>
-            doUpdate(index, data).map { _ =>
-              val status = statusService.getStatus
+          case ValidForm(_, data) => {
 
-              status.map {
-                case SubmissionDecisionApproved => ???
-                case _ => handleNotYetApproved(index, data.timeAtAddress, edit)
+            val futOldPersonAddress = getData[ResponsiblePeople](index) map { rp =>
+              for {
+                addHist <- rp.addressHistory
+                rpCurr <- addHist.currentAddress
+              } yield {
+                rpCurr.personAddress
               }
-
-              handleNotYetApproved(index, data.timeAtAddress, edit)
             }
+
+            doUpdate(index, data).flatMap { _ =>
+              for {
+                oldPersonAddress <- futOldPersonAddress
+                status <- statusService.getStatus
+              } yield {
+                status match {
+                  case SubmissionDecisionApproved if redirectToDateOfChange[PersonAddress](oldPersonAddress, data.personAddress) =>
+                    Redirect(routes.CurrentAddressDateOfChangeController.get(index, true))
+                  case SubmissionDecisionApproved => Redirect(routes.DetailedAnswersController.get(index))
+                  case _ => handleNotYetApproved(index, data.timeAtAddress, edit)
+                }
+              }
+            }
+          }
         }).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
 
-  private def handleNotYetApproved(index: Int, timeAtAddress:TimeAtAddress, edit: Boolean) = {
+  private def handleNotYetApproved(index: Int, timeAtAddress: TimeAtAddress, edit: Boolean) = {
     (timeAtAddress, edit) match {
-      case (ThreeYearsPlus|OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
+      case (ThreeYearsPlus | OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
       case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit))
-      case (ThreeYearsPlus|OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index))
+      case (ThreeYearsPlus | OneToThreeYears, true) => Redirect(routes.DetailedAnswersController.get(index))
       case (_, true) => Redirect(routes.AdditionalAddressController.get(index, edit))
     }
-  }
-
-  private def handleApproved(index: Int, newTimeAtAddress:TimeAtAddress, oldTimeAtAddress: TimeAtAddress) = {
-
-    def lessThanOneYear(date: TimeAtAddress) = (date == ZeroToFiveMonths) || (date == SixToElevenMonths)
-    def moreThanOneYear(date: TimeAtAddress) = (date == OneToThreeYears) || (date == ThreeYearsPlus)
-
-      if (oldTimeAtAddress == newTimeAtAddress) {
-        Redirect(routes.CurrentAddressDateOfChangeController.get(index, true))
-      } else if (moreThanOneYear(oldTimeAtAddress)) {
-        Redirect(routes.CurrentAddressDateOfChangeController.get(index, true)) // need to insert a flag to redirect on from here?? or check this in the next bit instead.
-      }
   }
 
   private def doUpdate
@@ -88,8 +90,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController {
     updateDataStrict[ResponsiblePeople](index) { res =>
       res.addressHistory(
         (res.addressHistory, data.timeAtAddress) match {
-          case (Some(a), ThreeYearsPlus) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
-          case (Some(a), OneToThreeYears) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
+          case (Some(a), ThreeYearsPlus|OneToThreeYears) => ResponsiblePersonAddressHistory(currentAddress = Some(data))
           case (Some(a), _) => a.currentAddress(data)
           case _ => ResponsiblePersonAddressHistory(currentAddress = Some(data))
         })
