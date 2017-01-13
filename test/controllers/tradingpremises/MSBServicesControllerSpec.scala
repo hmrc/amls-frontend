@@ -1,15 +1,19 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.TradingPremisesSection
+import models.{DateOfChange, TradingPremisesSection}
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -25,8 +29,14 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
     val controller = new MSBServicesController {
       override val dataCacheConnector: DataCacheConnector = self.cache
+
       override protected def authConnector: AuthConnector = self.authConnector
+
+      override val statusService = mock[StatusService]
     }
+
+    when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+
   }
 
   "MSBServicesController" must {
@@ -88,7 +98,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.get(1,false)(request)
+        val result = controller.get(1, false)(request)
 
         status(result) must be(NOT_FOUND)
       }
@@ -128,7 +138,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-      val result = controller.post(1,edit = false)(newRequest)
+      val result = controller.post(1, edit = false)(newRequest)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
@@ -254,5 +264,77 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
           msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)))
         ))))(any(), any(), any())
     }
+
+    "redirect to the dateOfChange page when the services have changed for a variation" in new Fixture {
+
+      val model = TradingPremises(
+        msbServices = Some(MsbServices(
+          Set(TransmittingMoney)
+        ))
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "msbServices[0]" -> "01",
+        "msbServices[1]" -> "02"
+      )
+
+      when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(1, edit = false)(newRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.MSBServicesController.dateOfChange(1).url)
+    }
+
+    "return the view for Date Of Change" in new Fixture {
+      val result = controller.dateOfChange(1)(request)
+      status(result) must be(OK)
+    }
+
+    "handle the date of change form" when {
+      "given valid data" in new Fixture {
+
+        val postRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.year" -> "2010",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.day" -> "01"
+        )
+
+        val data = MsbServices(Set(TransmittingMoney))
+        val expectedData = MsbServices(Set(TransmittingMoney), Some(DateOfChange(new LocalDate(2010,10,1))))
+
+        val yourPremises = mock[YourTradingPremises]
+        when(yourPremises.startDate) thenReturn new LocalDate(2005, 1, 1)
+
+        val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(premises))))
+
+        when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
+          thenReturn(Future.successful(mock[CacheMap]))
+
+        val result = controller.saveDateOfChange(1)(postRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+        val captor = ArgumentCaptor.forClass(classOf[TradingPremises])
+        verify(controller.dataCacheConnector).save[TradingPremises](meq(TradingPremises.key), captor.capture())(any(), any(), any())
+
+        captor.getValue.msbServices match {
+          case Some(services: MsbServices) => services must be(expectedData)
+        }
+
+
+      }
+    }
+
   }
 }

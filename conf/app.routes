@@ -80,6 +80,8 @@ POST        /trading-premises/what-does-your-business-do/:index         controll
 
 GET         /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/msb-activities/:index                     controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/msb-activities/date-of-change/:index      controllers.tradingpremises.MSBServicesController.dateOfChange(index: Int)
+POST        /trading-premises/msb-activities/date-of-change/:index      controllers.tradingpremises.MSBServicesController.saveDateOfChange(index: Int)
 
 GET         /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/agent/:index                              controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
