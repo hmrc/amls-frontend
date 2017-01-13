@@ -1038,8 +1038,8 @@ button, .button, .button--get-started {
     }
 }
 
-.form-label {
-    margin-bottom: -5px;
+.form-hint {
+    margin-top: 0;
 }
 
 .form-field {
