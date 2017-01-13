@@ -42,22 +42,28 @@
         @registered_office_helper(model)
 
         @fieldset(
-            f = f("letterToThisAddress"),
+            f = f("redundantvalue"),
             legend = "aboutthebusiness.contactingyou.sendletter.lbl",
             panel = false
         ) {
-            @radio(
-                f = f("letterToThisAddress"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("letterToThisAddress"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+
+            @errorGroup(
+                field = f("letterToThisAddress")
+            ) {
+
+                @radio(
+                    f = f("letterToThisAddress"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("letterToThisAddress"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @submit()
