@@ -115,7 +115,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppP
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.dateofchange.date.after.activitystartdate"))
+      contentAsString(result) must include(Messages("error.expected.dateofchange.date.after.activitystartdate", "24-02-1990"))
     }
 
   }
