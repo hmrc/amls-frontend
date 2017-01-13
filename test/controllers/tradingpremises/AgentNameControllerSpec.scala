@@ -2,7 +2,6 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.DateOfChange
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
@@ -266,13 +265,18 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
         "given a date of change which is before the activity start date" in new Fixture {
           val postRequest = request.withFormUrlEncodedBody(
-            "dateOfChange.year" -> "2007",
+            "dateOfChange.year" -> "2003",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[AboutTheBusiness](meq(AboutTheBusiness.key))(any(), any(), any())).
-            thenReturn(Future.successful(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(2009,1,1)))))))
+          val yourPremises = mock[YourTradingPremises]
+          when(yourPremises.startDate) thenReturn new LocalDate(2005, 1, 1)
+
+          val premises = TradingPremises(agentName = Some(AgentName("Trading Name")), yourTradingPremises = Some(yourPremises))
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(premises))))
 
           val result = controller.saveDateOfChange(1)(postRequest)
 
