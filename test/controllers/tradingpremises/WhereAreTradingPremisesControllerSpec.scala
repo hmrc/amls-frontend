@@ -35,7 +35,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       override val statusService = mock[StatusService]
     }
 
-    when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+    when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
   }
 
   before {
@@ -305,7 +305,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       )
 
       val address = Address("Address 1", "Address 2", None, None, "NE98 1ZZ")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, true, new LocalDate(2010,2,1))
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, true, new LocalDate(2007, 2, 1))
 
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -325,6 +325,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
     }
   }
+
   "return view for Date of Change" in new Fixture {
     val result = controller.dateOfChange(1)(request)
     hstatus(result) must be(OK)
@@ -363,25 +364,23 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
     }
 
+  }
 
-    "given a date of change which is before the activity start date" in new Fixture {
-      val postRequest = request.withFormUrlEncodedBody(
-        "dateOfChange.year" -> "2007",
-        "dateOfChange.month" -> "10",
-        "dateOfChange.day" -> "01"
-      )
+  "given a date of change which is before the activity start date" in new Fixture {
+    val postRequest = request.withFormUrlEncodedBody(
+      "dateOfChange.year" -> "2007",
+      "dateOfChange.month" -> "10",
+      "dateOfChange.day" -> "01"
+    )
 
-      val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2008, 1, 1), None)
-      val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
+    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2008, 1, 1), None)
+    val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(premises))))
+    when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(Seq(premises))))
 
-      val result = controller.saveDateOfChange(1)(postRequest)
+    val result = controller.saveDateOfChange(1)(postRequest)
 
-      hstatus(result) must be(BAD_REQUEST)
-    }
+    hstatus(result) must be(BAD_REQUEST)
   }
 }
-
-

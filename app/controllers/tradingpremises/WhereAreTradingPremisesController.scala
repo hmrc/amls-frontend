@@ -98,7 +98,14 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   }
 
   private def redirectToDateOfChange(tradingPremises: TradingPremises, premises: YourTradingPremises) =
-    ApplicationConfig.release7 && !tradingPremises.yourTradingPremises.contains(premises)
+//    ApplicationConfig.release7 && !tradingPremises.yourTradingPremises.contains(premises)
+  ApplicationConfig.release7 && {
+    (for {
+      ytp <- tradingPremises.yourTradingPremises
+    } yield {
+      ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress
+    }) getOrElse false
+  }
 }
 
 object WhereAreTradingPremisesController extends WhereAreTradingPremisesController {
