@@ -2,7 +2,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
-import models.status.SubmissionDecisionApproved
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -69,6 +69,9 @@ class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPe
         "products[1]" -> "02"
       )
 
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
+
       when(controller.dataCacheConnector.fetch[Hvd](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -86,6 +89,9 @@ class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPe
         "products[0]" -> "03",
         "products[1]" -> "04"
       )
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
 
       when(controller.dataCacheConnector.fetch[Hvd](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
@@ -106,6 +112,9 @@ class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPe
         "products[2]" -> "12",
         "otherDetails" -> "test"
       )
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
 
       when(controller.dataCacheConnector.fetch[Hvd](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
