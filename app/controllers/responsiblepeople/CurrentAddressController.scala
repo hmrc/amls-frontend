@@ -64,7 +64,11 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                 status match {
                   case SubmissionDecisionApproved if redirectToDateOfChange[PersonAddress](oldPersonAddress, data.personAddress) =>
                     Redirect(routes.CurrentAddressDateOfChangeController.get(index, true))
-                  case SubmissionDecisionApproved => Redirect(routes.DetailedAnswersController.get(index))
+                  case SubmissionDecisionApproved if data.timeAtAddress == ThreeYearsPlus =>
+                    Redirect(routes.DetailedAnswersController.get(index))
+                  case SubmissionDecisionApproved if data.timeAtAddress == OneToThreeYears =>
+                    Redirect(routes.DetailedAnswersController.get(index))
+                  case SubmissionDecisionApproved => Redirect(routes.AdditionalAddressController.get(index, true))
                   case _ => handleNotYetApproved(index, data.timeAtAddress, edit)
                 }
               }
