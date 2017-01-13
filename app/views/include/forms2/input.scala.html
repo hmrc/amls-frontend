@@ -21,7 +21,11 @@
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}">
     <label class="form-label@if(bold){-bold}" for="@field.id">
         @if(labelText.nonEmpty) {
-            <span class="@if(labelHidden){ visuallyhidden}">@Messages(labelText)</span>
+            @if(labelHidden) {<span class="visuallyhidden">}
+
+            @Messages(labelText)
+
+            @if(labelHidden){</span>}
         }
         @if(hintText.nonEmpty) {
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
