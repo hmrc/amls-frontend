@@ -62,13 +62,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                 status <- statusService.getStatus
               } yield {
                 status match {
-                  case SubmissionDecisionApproved if redirectToDateOfChange[PersonAddress](oldPersonAddress, data.personAddress) =>
-                    Redirect(routes.CurrentAddressDateOfChangeController.get(index, true))
-                  case SubmissionDecisionApproved if data.timeAtAddress == ThreeYearsPlus =>
-                    Redirect(routes.DetailedAnswersController.get(index))
-                  case SubmissionDecisionApproved if data.timeAtAddress == OneToThreeYears =>
-                    Redirect(routes.DetailedAnswersController.get(index))
-                  case SubmissionDecisionApproved => Redirect(routes.AdditionalAddressController.get(index, true))
+                  case SubmissionDecisionApproved => handleApproved(index, edit, oldPersonAddress, data)
                   case _ => handleNotYetApproved(index, data.timeAtAddress, edit)
                 }
               }
@@ -79,7 +73,20 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         }
     }
 
-  private def handleNotYetApproved(index: Int, timeAtAddress: TimeAtAddress, edit: Boolean) = {
+  private def handleApproved(index: Int,
+                             edit: Boolean,
+                             originalPersonAddress: Option[PersonAddress],
+                             data: ResponsiblePersonCurrentAddress) = {
+    if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)) {
+      Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
+    } else if ((data.timeAtAddress == ThreeYearsPlus) || data.timeAtAddress == OneToThreeYears) {
+      Redirect(routes.DetailedAnswersController.get(index))
+    } else {Redirect(routes.AdditionalAddressController.get(index, edit))}
+  }
+
+  private def handleNotYetApproved(index: Int,
+                                   timeAtAddress: TimeAtAddress,
+                                   edit: Boolean) = {
     (timeAtAddress, edit) match {
       case (ThreeYearsPlus | OneToThreeYears, false) => Redirect(routes.PositionWithinBusinessController.get(index, edit))
       case (_, false) => Redirect(routes.AdditionalAddressController.get(index, edit))

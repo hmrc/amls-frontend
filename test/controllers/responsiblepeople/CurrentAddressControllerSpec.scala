@@ -442,7 +442,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             when(currentAddressController.statusService.getStatus(any(), any(), any()))
               .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-            val result = currentAddressController.post(RecordId)(requestWithParams)
+            val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(1, true).url))
@@ -476,7 +476,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               val result = currentAddressController.post(RecordId)(requestWithParams)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
+              redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1).url))
             }
           }
           "time at address is more than 1 year" must {
