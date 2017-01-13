@@ -19,16 +19,28 @@
 ) {
 
     @if(!hasBankAccount) {
-        <div class="panel-indent panel-border-wide">
+        @panel(
+            jsHidden = false,
+            wide = true
+        ) {
             <p>@Messages("bankdetails.summary.nobank.account")</p>
-            <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
-        </div>
+            @anchor(
+                attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,
+                linkText = Messages("bankdetails.summary.nobank.add.account")
+            )
+        }
     }
 
     @if(complete && hasBankAccount) {
-        <div class="panel-indent panel-border-wide">
-            <a href="@controllers.bankdetails.routes.BankAccountAddController.get(false)"> @Messages("bankdetails.summary.nobank.add.account") </a>
-        </div>
+        @panel(
+            jsHidden = false,
+            wide = true
+        ) {
+            @anchor(
+                attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,
+                linkText = Messages("bankdetails.summary.nobank.add.account")
+            )
+        }
     }
 
     <ul class="list list--listing">
