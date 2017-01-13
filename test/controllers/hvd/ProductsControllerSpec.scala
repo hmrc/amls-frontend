@@ -1,14 +1,17 @@
 package controllers.hvd
 
 import connectors.DataCacheConnector
-import models.hvd.{Tobacco, Products, Alcohol, Hvd}
+import models.hvd.{Alcohol, Hvd, Products, Tobacco}
+import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
@@ -17,6 +20,8 @@ import scala.concurrent.Future
 
 class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPerSuite {
 
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -24,6 +29,7 @@ class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPe
 
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override protected def authConnector: AuthConnector = self.authConnector
+      override val statusService: StatusService = mock[StatusService]
     }
   }
 
@@ -153,6 +159,28 @@ class ProductsControllerSpec extends PlaySpec with MockitoSugar with OneServerPe
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#otherDetails]").html() must include(Messages("error.invalid.hvd.business.sell.other.details"))
+    }
+
+    "redirect to dateOfChange when a change is made and decision is approved" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody(
+        "products[0]" -> "01",
+        "products[1]" -> "02",
+        "products[2]" -> "12",
+        "otherDetails" -> "test"
+      )
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(controller.dataCacheConnector.fetch[Hvd](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco)))))))
+
+      when(controller.dataCacheConnector.save[Hvd](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.ExciseGoodsController.get(true).url))
     }
   }
 
