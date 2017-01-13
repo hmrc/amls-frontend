@@ -44,22 +44,23 @@
                     inline = true
                 )
             }
-        }
 
-        @fieldset(
-            f = f("regNumber-fieldset"),
-            legend = "businessmatching.psr.number.lbl",
-            legendHidden = true,
-            jsHidden = true,
-            id = target,
-            panel = false
-        ) {
-            @input(
-                field = f("regNumber"),
-                bold = false,
-                labelText = "businessmatching.psr.number.lbl",
-                hintText = "businessmatching.psr.number.hint"
-            )
+                @fieldset(
+                    f = f("regNumber-fieldset"),
+                    legend = "businessmatching.psr.number.lbl",
+                    legendHidden = true,
+                    jsHidden = true,
+                    id = target
+
+                ) {
+                    @input(
+                        field = f("regNumber"),
+                        bold = false,
+                        labelText = "businessmatching.psr.number.lbl",
+                        hintText = "businessmatching.psr.number.hint"
+                    )
+                }
+
         }
 
         @submit(edit)

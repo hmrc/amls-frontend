@@ -386,12 +386,8 @@ div.grid-layout {
   background-color: #f8f8f8;
   border-bottom: #dee0e2 solid 3px;
   margin-left: 30px;
-  padding: 15px;
-}
-
-.application-submit .heading-small,
-.user-attention .heading-small {
-  margin-top: 0;
+  padding: 20px;
+  padding-bottom: 30px;
 }
 
 @media screen and (max-width: 640px) {
@@ -417,16 +413,6 @@ div.grid-layout {
 
 .confirmation > h1 {
   margin: 0;
-}
-
-.user-attention {
-  background-color: #f8f8f8;
-  border-bottom: #dee0e2 solid 3px;
-  padding: 15px;
-}
-
-.user-attention > .heading-small {
-  margin: 10px 0 15px 0;
 }
 
 td.numeric,
@@ -1035,6 +1021,11 @@ button, .button, .button--get-started {
   line-height: 1.25em;
   padding: 0.5em 0.6em 0.3em 0.6em;
   font-size: 1em;
+}
+
+.button--get-started {
+    padding-right: 40px;
+    font-size: 24px;
 }
 
 #wrapper {
