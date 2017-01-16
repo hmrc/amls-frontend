@@ -2,6 +2,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.{CashPaymentNo, CashPaymentYes, Hvd}
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -9,7 +10,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -18,11 +21,14 @@ import scala.concurrent.Future
 
 class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+
   trait Fixture extends AuthorisedFixture {
     self =>
     val controller = new CashPaymentController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -80,13 +86,16 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
 
     "Post" must {
 
-      "successfully redirect to the page on selection of 'Yes' when edit mode is on" in new Fixture {
+      "redirect to the page on selection of 'Yes' when edit mode is on" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "true",
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "1999"
         )
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
 
         when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
@@ -99,7 +108,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
       }
 
-      "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
+      "redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "true",
           "paymentDate.day" -> "12",
@@ -107,6 +116,9 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
           "paymentDate.year" -> "1999"
         )
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
+
         when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
@@ -118,9 +130,12 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         redirectLocation(result) must be(Some(controllers.hvd.routes.LinkedCashPaymentsController.get().url))
       }
 
-      "successfully redirect to the page on selection of 'No' when edit mode is off" in new Fixture {
+      "redirect to the page on selection of 'No' when edit mode is off" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
 
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
+
         when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
@@ -132,23 +147,51 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
         redirectLocation(result) must be(Some(controllers.hvd.routes.LinkedCashPaymentsController.get().url))
       }
 
+      "redirect to the page on selection of Option 'No' when edit mode is on" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "acceptedAnyPayment" -> "false"
+        )
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
+
+        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      }
+
+      "redirect to DateOfChange page if the date has changed and application has been approved" in new Fixture {
+
+        val hvd = Hvd(cashPayment = Some(CashPaymentYes(new LocalDate(1999,1,1))))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "acceptedAnyPayment" -> "true",
+          "paymentDate.day" -> "12",
+          "paymentDate.month" -> "5",
+          "paymentDate.year" -> "1999"
+        )
+
+        when(controller.statusService.getStatus(any(),any(),any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(hvd)))
+
+        when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
+      }
+
     }
-
-    "successfully redirect to the page on selection of Option 'No' when edit mode is on" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody(
-        "acceptedAnyPayment" -> "false"
-      )
-      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
-    }
-
 
     "on post invalid data show error" in new Fixture {
 
@@ -215,5 +258,7 @@ class CashPaymentControllerSpec extends PlaySpec with OneAppPerSuite with Mockit
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
+
+
   }
 }
