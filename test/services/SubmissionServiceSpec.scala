@@ -63,7 +63,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       etmpFormBundleNumber = "",
       amlsRefNo = "amlsRef",
       registrationFee = 0,
-      fPFee = None,
+      fpFee = None,
       premiseFee = 0,
       totalFees = 0,
       paymentReference = ""
@@ -73,7 +73,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fPFee = None,
+      fpFee = None,
       premiseFee = 0,
       totalFees = 100,
       paymentReference = Some("XA111123451111"),
@@ -84,7 +84,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fPFee = None,
+      fpFee = None,
       premiseFee = 0,
       totalFees = 100,
       paymentReference = Some(""),
@@ -257,7 +257,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper", None, None)), hasAlreadyPassedFitAndProper = Some(true))
       )
 
-      val amendResponseWithRPFees = amendmentResponse.copy(fPFee = Some(100))
+      val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
 
       when {
         TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -387,7 +387,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           ResponsiblePeople(Some(PersonName("Deleted", None, "Person", None, None)), status = Some(StatusConstants.Deleted))
         )
 
-        val amendResponseWithRPFees = amendmentResponse.copy(fPFee = Some(100))
+        val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
 
         when {
           TestSubmissionService.cacheConnector.fetchAll(any(), any())
@@ -476,7 +476,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
-        } thenReturn Some(variationResponse.copy(fPFee = None))
+        } thenReturn Some(variationResponse.copy(fpFee = None))
 
         when {
           cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
@@ -508,7 +508,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
-        } thenReturn Some(subscriptionResponse.copy(fPFee = Some(100)))
+        } thenReturn Some(subscriptionResponse.copy(fpFee = Some(100)))
 
         when {
           cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
@@ -825,7 +825,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
-        } thenReturn Some(variationResponse.copy(fPFee = None))
+        } thenReturn Some(variationResponse.copy(fpFee = None))
 
         when {
           cache.getEntry[AmendVariationResponse](any())(any())
@@ -863,7 +863,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         when {
           cache.getEntry[AmendVariationResponse](eqTo(AmendVariationResponse.key))(any())
-        } thenReturn Some(variationResponse.copy(fPFee = None))
+        } thenReturn Some(variationResponse.copy(fpFee = None))
 
         when {
           cache.getEntry[AmendVariationResponse](any())(any())
