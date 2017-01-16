@@ -222,6 +222,9 @@ POST        /responsible-people/self-assessment/:index                  controll
 GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
+
 GET         /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
 
