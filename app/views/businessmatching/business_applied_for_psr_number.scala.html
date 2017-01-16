@@ -45,13 +45,11 @@
                 )
             }
 
-                @fieldset(
-                    f = f("regNumber-fieldset"),
-                    legend = "businessmatching.psr.number.lbl",
-                    legendHidden = true,
-                    jsHidden = true,
-                    id = target
 
+                @panel(
+                        f = f("regNumber-fieldset"),
+                        jsHidden = false,
+                        id = target
                 ) {
                     @input(
                         field = f("regNumber"),
