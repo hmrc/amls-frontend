@@ -37,7 +37,7 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends PlaySpec with OneA
       etmpFormBundleNumber = "",
       amlsRefNo = "",
       registrationFee = 0,
-      fPFee = None,
+      fpFee = None,
       premiseFee = 0,
       totalFees = 0,
       paymentReference = ""
@@ -146,7 +146,7 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends PlaySpec with OneAp
       etmpFormBundleNumber = "",
       amlsRefNo = "",
       registrationFee = 0,
-      fPFee = None,
+      fpFee = None,
       premiseFee = 0,
       totalFees = 0,
       paymentReference = ""
