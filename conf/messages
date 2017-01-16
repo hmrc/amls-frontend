@@ -296,7 +296,7 @@ title.ya = Your answers
 title.yapp = Your application
 
 button.saveandcontinue = Save and continue
-button.saveandreturn = Save and return to summary
+button.saveandreturn = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Edit
