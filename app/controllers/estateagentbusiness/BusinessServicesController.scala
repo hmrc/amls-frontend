@@ -5,11 +5,12 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
 import models.estateagentbusiness.{Services, Residential, EstateAgentBusiness}
+import utils.DateOfChangeHelper
 import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
-trait BusinessServicesController extends BaseController {
+trait BusinessServicesController extends BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
 
