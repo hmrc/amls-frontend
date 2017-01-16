@@ -23,6 +23,15 @@ trait HvdDateOfChangeController extends RepeatingSection with BaseController {
         Future.successful(Ok(date_of_change(EmptyForm, "summary.hvd", routes.HvdDateOfChangeController.post())))
   }
 
+  def compareAndUpdateDate(hvd: Hvd, newDate: DateOfChange): Hvd = {
+    hvd.dateOfChange match {
+      case Some(s4ltrDate) => s4ltrDate.dateOfChange.isAfter(newDate.dateOfChange) match {
+        case true => hvd
+        case false => hvd.dateOfChange(newDate)
+      }
+      case _ => hvd
+    }
+  }
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
@@ -33,7 +42,7 @@ trait HvdDateOfChangeController extends RepeatingSection with BaseController {
       Future.successful(BadRequest(date_of_change(f, "summary.hvd", routes.HvdDateOfChangeController.post())))
         case ValidForm(_, data) => {
           for {
-          _ <- dataCacheConnector.save[Hvd](Hvd.key, hvd.dateOfChange(data))
+          _ <- dataCacheConnector.save[Hvd](Hvd.key, compareAndUpdateDate(hvd , data))
           } yield {
             Redirect(routes.SummaryController.get())
           }
