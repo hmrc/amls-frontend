@@ -11,15 +11,13 @@
     f: forms.Field
 )(content: Html)(implicit lang: Lang)
 
-<div class="form-field-group">
-    <fieldset
-        @if(f.id.nonEmpty){ id="@f.id"}
-        class="@if(panel){ panel-indent}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
+<fieldset
+    @if(f.id.nonEmpty){ id="@f.id"}
+    class="@if(panel){ panel-indent}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
 
-            @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden)
-            @if(f.hasErrors) {
-                <span class="error-notification">@f.error</span>
-            }
-            @content
-    </fieldset>
-</div>
+        @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden)
+        @if(f.hasErrors) {
+            <span class="error-notification">@f.error</span>
+        }
+        @content
+</fieldset>

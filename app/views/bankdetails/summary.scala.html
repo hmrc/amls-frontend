@@ -21,7 +21,8 @@
     @if(!hasBankAccount) {
         @panel(
             jsHidden = false,
-            wide = true
+            wide = true,
+            gutter = true
         ) {
             <p>@Messages("bankdetails.summary.nobank.account")</p>
             @anchor(
@@ -34,7 +35,8 @@
     @if(complete && hasBankAccount) {
         @panel(
             jsHidden = false,
-            wide = true
+            wide = true,
+            gutter = true
         ) {
             @anchor(
                 attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,

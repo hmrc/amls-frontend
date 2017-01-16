@@ -578,7 +578,7 @@ table.summary ul li {
 }
 
 .panel-indent {
-  margin-bottom: 40px;
+  /*margin-bottom: 40px;*/
 }
 
 fieldset .panel-indent {
@@ -1043,4 +1043,12 @@ button, .button, .button--get-started {
 
 details {
     margin: 0;
+}
+
+.form-group-footer {
+  padding-top: 30px;
+}
+
+.panel-indent--gutter {
+  margin-top: 0;
 }
