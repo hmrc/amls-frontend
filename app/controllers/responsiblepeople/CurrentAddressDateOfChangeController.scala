@@ -7,6 +7,7 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.TimeAtAddress.{ThreeYearsPlus, SixToElevenMonths, OneToThreeYears, ZeroToFiveMonths}
+import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -22,7 +23,11 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
 
   def get(index: Int, edit: Boolean) = Authorised {
     implicit authContext => implicit request =>
-      Ok
+      Ok(views.html.date_of_change(
+        Form2[DateOfChange](DateOfChange(LocalDate.now)),
+        "summary.responsiblepeople",
+        controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.post(index, edit)
+      ))
   }
 
   def post(index: Int, edit: Boolean) = Authorised.async {
