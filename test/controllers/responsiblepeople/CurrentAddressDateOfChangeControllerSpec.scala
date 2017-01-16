@@ -1,13 +1,10 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import controllers.aboutthebusiness.routes
 import models.DateOfChange
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
-import models.responsiblepeople.TimeAtAddress.{ZeroToFiveMonths, OneToThreeYears}
+import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ThreeYearsPlus, OneToThreeYears, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -22,12 +19,12 @@ import scala.concurrent.Future
 
 
 class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new CurrentAddressDateOfChangeController () {
+    val controller = new CurrentAddressDateOfChangeController() {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
@@ -43,32 +40,118 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
     }
 
 
-    "handle the date of change form post" when {
-      "given valid data for a current address" in new Fixture {
+    "when post is called" when {
+      "given valid data for a current address time ZeroToFiveMonths" must {
+        "redirect to the additional address page" in new Fixture {
 
-        val postRequest = request.withFormUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01"
-        )
+          val postRequest = request.withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
 
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-        val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
 
-        val result = controller.post(0, true)(postRequest)
+          val result = controller.post(1, true)(postRequest)
 
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(0).url))
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
 
+        }
+      }
+      "given valid data for a current address time SixToElevenMonths" must {
+        "redirect to the additional address page" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, SixToElevenMonths)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, true)(postRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
+
+        }
+      }
+      "given valid data for a current address with time OneToThreeYears" must {
+        "redirect to the details page" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, OneToThreeYears)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, true)(postRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+
+        }
+      }
+      "given valid data for a current address with time ThreeYearsPlus" must {
+        "redirect to the details page" in new Fixture {
+
+          val postRequest = request.withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, true)(postRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+
+        }
       }
     }
   }
