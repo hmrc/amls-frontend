@@ -31,7 +31,7 @@ object AmendVariationResponse {
       (__ \ "processingDate").read[String] and
         (__ \ "etmpFormBundleNumber").read[String] and
         (__ \ "registrationFee").read[BigDecimal] and
-        (__ \ "fpFee").read[BigDecimal].orElse((__ \ "fPFee").read[BigDecimal]).orElse(Reads.pure(None)) and
+        (__ \ "fpFee").read[Option[BigDecimal]].orElse((__ \ "fPFee").read[Option[BigDecimal]]).orElse(Reads.pure(None)) and
         (__ \ "premiseFee").read[BigDecimal] and
         (__ \ "totalFees").read[BigDecimal] and
         (__ \ "paymentReference").readNullable[String] and
