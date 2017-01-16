@@ -6,7 +6,7 @@ import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.TimeAtAddress.{ThreeYearsPlus, SixToElevenMonths, OneToThreeYears, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
@@ -34,7 +34,10 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
     implicit authContext => implicit request =>
       (Form2[DateOfChange](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(current_address(f, true, index)))
+          Future.successful(BadRequest(views.html.date_of_change(
+            f, "summary.responsiblepeople",
+            controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.post(index, edit))
+          ))
         case ValidForm(_, dateOfChange) => {
 
           val futOptTimeAtCurrent = getData[ResponsiblePeople](index) map { rp =>
@@ -63,12 +66,11 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
       }
   }
 
-
   private def doUpdate
   (index: Int, date: DateOfChange)
-  (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) { res =>
+  (implicit authContext: AuthContext, request: Request[AnyContent]) =
 
+    updateDataStrict[ResponsiblePeople](index) { res =>
       for {
         addressHist <- res.addressHistory
         rpCurrentAdd <- addressHist.currentAddress
@@ -78,7 +80,6 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
         res.copy(addressHistory = Some(addHistWDateOfChange))
       }
     }
-  }
 
 }
 
