@@ -16,8 +16,7 @@
     title = Messages("businessactivities.keep.customer.records.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
-
-    @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
+        @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
 
         @fieldset(
             legend = "businessactivities.keep.customer.records.title",
@@ -38,9 +37,8 @@
                 value = "false",
                 inline = true
             )
-        }
 
-        @fieldset(
+            @fieldset(
             f = f("transactions"),
             legend = "businessactivities.do.keep.records",
             hint = "businessactivities.do.keep.records.hint",
@@ -68,6 +66,9 @@
                 labelText = "businessactivities.name.software.pkg.lbl",
                 jsHidden = true
             )
+        }
+
+
         }
 
 
