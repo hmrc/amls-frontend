@@ -245,6 +245,34 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
         }
       }
 
+      "respond with NOT_FOUND" when {
+        "given an out of bounds index" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "NE17YH",
+            "timeAtAddress" -> "01"
+          )
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          val result = currentAddressController.post(40, true)(requestWithParams)
+
+          status(result) must be(NOT_FOUND)
+        }
+      }
+
       "when the service status is not yet submitted" when {
 
         "edit mode is on" when {
@@ -569,9 +597,7 @@ class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuit
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "CurrentAddressController" when {
-
-
+  "CurrentAddressController" must {
     "when the service status is Approved and the address is changed" when {
       "time at address is less than 1 year" must {
         "redirect to the correct location" in new Fixture {

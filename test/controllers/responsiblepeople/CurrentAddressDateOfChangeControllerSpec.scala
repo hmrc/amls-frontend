@@ -55,8 +55,6 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
-
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
@@ -82,8 +80,6 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, SixToElevenMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
-
-          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -111,8 +107,6 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
-
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
@@ -139,8 +133,6 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-          val updatedCurrentAddress = currentAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
-
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
@@ -152,6 +144,52 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
         }
+      }
+    }
+    "respond with BAD_REQUEST" when {
+      "given invalid data" in new Fixture {
+
+        val invalidPostRequest = request.withFormUrlEncodedBody()
+
+        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
+        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(1, true)(invalidPostRequest)
+
+        status(result) must be(BAD_REQUEST)
+
+      }
+    }
+    "respond with NOT_FOUND" when {
+      "post is called with an out of bounds index" in new Fixture {
+
+        val postRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.year" -> "2010",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.day" -> "01"
+        )
+
+        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
+        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(40, true)(postRequest)
+
+        status(result) must be(NOT_FOUND)
+
       }
     }
   }
