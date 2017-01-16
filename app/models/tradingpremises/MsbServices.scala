@@ -6,7 +6,7 @@ import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
 import play.api.libs.json._
-import utils.{JsonMapping, TraversableValidators}
+import utils.TraversableValidators
 
 sealed trait MsbService {
 
@@ -23,8 +23,7 @@ case object CurrencyExchange extends MsbService
 case object ChequeCashingNotScrapMetal extends MsbService
 case object ChequeCashingScrapMetal extends MsbService
 
-case class MsbServices(services : Set[MsbService], dateOfChange: Option[DateOfChange] = None) {
-}
+case class MsbServices(services : Set[MsbService], dateOfChange: Option[DateOfChange] = None)
 
 object MsbService {
 
@@ -63,9 +62,6 @@ object MsbService {
 
 sealed trait MsbServices0 {
 
-  import JsonMapping._
-
-
   private implicit def rule[A]
   (implicit
    p: Path => RuleLike[A, Set[MsbService]]
@@ -90,16 +86,6 @@ sealed trait MsbServices0 {
 
       (__ \ "msbServices").write[Set[MsbService]] contramap unlift(MsbService.unapplyWithoutDateOfChange)
     }
-
-//  val jsonR: Reads[MsbServices] = {
-//    import play.api.data.mapping.json.Rules.{JsValue => _, pickInJson => _, _}
-//    implicitly[Reads[MsbServices]]
-//  }
-//
-//  val jsonW: Writes[MsbServices] = {
-//    import play.api.data.mapping.json.Writes._
-//    implicitly[Writes[MsbServices]]
-//  }
 
   val formR: Rule[UrlFormEncoded, MsbServices] = {
     import play.api.data.mapping.forms.Rules._
@@ -130,15 +116,16 @@ object MsbServices {
     }
   }
 
-  implicit val jsonReads = new Reads[MsbServices] {
-    override def reads(json: JsValue): JsResult[MsbServices] = {
-      val services = ((json \ "msbServices").as[JsArray].value map { value => MsbService.jsonR.validate(value).asOpt.get }).toSet
-        JsSuccess(MsbServices(services, (json \ "dateOfChange").asOpt[DateOfChange]))
-    }
+  implicit val msbServiceReader: Reads[Set[MsbService]] = {
+    __.read[JsArray].map(a => a.value.map(MsbService.jsonR.validate(_).get).toSet)
   }
 
-  //  implicit val jsonR: Reads[MsbServices] = Cache.jsonR
-//  implicit val jsonW: Writes[MsbServices] = Cache.jsonW
+  implicit val jReads: Reads[MsbServices] = {
+    import play.api.libs.functional.syntax._
+    ((__ \ "msbServices").read[Set[MsbService]] and
+      (__ \ "dateOfChange").readNullable[DateOfChange])(MsbServices.apply _)
+  }
+
   implicit val formR: Rule[UrlFormEncoded, MsbServices] = Cache.formR
   implicit val formW: Write[MsbServices, UrlFormEncoded] = Cache.formW
 }
