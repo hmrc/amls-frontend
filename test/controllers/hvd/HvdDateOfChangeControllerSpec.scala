@@ -47,7 +47,7 @@ class HvdDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"
       )
-
+      val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1990,2,24))))
       val mockCacheMap = mock[CacheMap]
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
@@ -64,6 +64,9 @@ class HvdDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+
+      verify(controller.dataCacheConnector).save[Hvd](any(),
+        meq(hvd))(any(), any(), any())
     }
 
     "successfully submit request" when {

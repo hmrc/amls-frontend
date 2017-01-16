@@ -29,7 +29,7 @@ trait HvdDateOfChangeController extends RepeatingSection with BaseController {
         case true => hvd
         case false => hvd.dateOfChange(newDate)
       }
-      case _ => hvd
+      case _ => hvd.dateOfChange(newDate)
     }
   }
 
