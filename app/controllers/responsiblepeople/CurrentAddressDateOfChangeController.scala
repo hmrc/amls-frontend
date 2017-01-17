@@ -33,8 +33,9 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
   def post(index: Int, edit: Boolean) = Authorised.async {
     implicit authContext => implicit request =>
 
-      val extraFieldsFut = dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key) map { rp =>
+      val extraFieldsFut = getData[ResponsiblePeople](index) map { rpO =>
         val startDate = for {
+          rp <- rpO
           position <- rp.positions
           date <- position.startDate
         } yield {
@@ -56,8 +57,9 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
             ))
           case ValidForm(_, dateOfChange) => {
 
-            val futOptTimeAtCurrent = getData[ResponsiblePeople](index) map { rp =>
+            val futOptTimeAtCurrent = getData[ResponsiblePeople](index) map { rpO =>
               for {
+                rp <- rpO
                 addHist <- rp.addressHistory
                 rpCurr <- addHist.currentAddress
               } yield {
