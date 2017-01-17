@@ -166,6 +166,30 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
         status(result) must be(BAD_REQUEST)
 
       }
+      "given a date before the responsible person start date" in new Fixture {
+
+        val postRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.year" -> "2010",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.day" -> "01",
+          "activityStartDate" -> new LocalDate(2017, 1, 1).toString("yyyy-MM-dd")
+        )
+
+        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus, Some(DateOfChange(new LocalDate(2017,1,1))))
+        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(1, true)(postRequest)
+
+        status(result) must be(BAD_REQUEST)
+
+      }
     }
     "respond with NOT_FOUND" when {
       "post is called with an out of bounds index" in new Fixture {
