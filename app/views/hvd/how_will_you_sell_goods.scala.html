@@ -15,6 +15,9 @@
     heading = header
 ) {
 
+
+    <span class="form-hint">@Messages("lbl.select.all")</span>
+
     @form(f, controllers.hvd.routes.HowWillYouSellGoodsController.post(edit)) {
         @fieldset(
             f = f("salesChannels"),
@@ -22,7 +25,7 @@
             legendHidden = true,
             panel = false
         ) {
-            <p>@Messages("lbl.select.all")</p>
+
             @checkbox(
                 f = f("salesChannels[]"),
                 labelText = "hvd.how-will-you-sell-goods.channels.auction",

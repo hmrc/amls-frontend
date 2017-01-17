@@ -13,10 +13,13 @@
     heading = header
 ) {
 
+    <span class="form-hint">@Messages("lbl.select.all")</span>
+
     @form(f, controllers.hvd.routes.ProductsController.post(edit)) {
         @fieldset(
             f = f("products"),
-            legend = "lbl.select.all",
+            legend = "hvd.products.title",
+            legendHidden = true,
             panel = false
         ) {
             @checkbox(f = f("products[]"), labelText = "hvd.products.option.01", value = "01")
