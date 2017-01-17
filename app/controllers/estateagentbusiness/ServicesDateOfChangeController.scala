@@ -34,8 +34,7 @@ trait ServicesDateOfChangeController extends BaseController {
           _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
           eab.services match {
             case Some(service) => {
-              val a = eab.copy(services = Some(service.copy(dateOfChange = Some(data))))
-              a
+              eab.copy(services = Some(service.copy(dateOfChange = Some(data))))
             }
             case None => eab
           })
