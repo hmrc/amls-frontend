@@ -3,10 +3,8 @@ package controllers.tradingpremises
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.tradingpremises.routes
 import forms.{Form2, _}
 import models.DateOfChange
-import models.aboutthebusiness.AboutTheBusiness
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -86,8 +84,9 @@ trait AgentNameController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               for {
-                _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
-                  tradingPremises.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange))))
+                _ <- updateDataStrict[TradingPremises](index) { tp =>
+                  tp.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange)))
+                }
               } yield Redirect(routes.SummaryController.get())
           }
         }
