@@ -306,6 +306,12 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
           "dateOfChange.day" -> "01"
         )
 
+        val model = TradingPremises(
+          msbServices = Some(MsbServices(
+            Set(TransmittingMoney)
+          ))
+        )
+
         val data = MsbServices(Set(TransmittingMoney))
         val expectedData = MsbServices(Set(TransmittingMoney), Some(DateOfChange(new LocalDate(2010,10,1))))
 
@@ -316,6 +322,9 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(premises))))
+
+        when(cache.fetch[Seq[TradingPremises]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
 
         when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
           thenReturn(Future.successful(mock[CacheMap]))

@@ -69,7 +69,23 @@ trait MSBServicesController extends RepeatingSection with BaseController {
   }
 
   def saveDateOfChange(index: Int) = Authorised.async {
-    implicit authContext => implicit request => ???
+    implicit authContext =>
+      implicit request =>
+        getData[TradingPremises](index) flatMap { tradingPremises =>
+          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
+            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
+          }
+
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+            case form: InvalidForm =>
+              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index))))
+            case ValidForm(_, dateOfChange) =>
+              for {
+                _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
+                  tradingPremises.msbServices(tradingPremises.msbServices.get.copy(dateOfChange = Some(dateOfChange))))
+              } yield Redirect(routes.SummaryController.get())
+          }
+        }
   }
 }
 
