@@ -340,9 +340,15 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
         "dateOfChange.day" -> "01"
       )
 
-      val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2001, 1, 1), None)
+      val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ", Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = true, new LocalDate(2001, 1, 1), None)
       val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
-      val expectedResult = yourPremises.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+      val expectedResult = yourPremises.copy(
+        tradingNameChangeDate = Some(DateOfChange(new LocalDate(2010, 10, 1))),
+        tradingPremisesAddress = address
+      )
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(premises))))

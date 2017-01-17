@@ -84,7 +84,11 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             case ValidForm(_, dateOfChange) =>
               updateDataStrict[TradingPremises](index) { tp =>
                 tp.yourTradingPremises.fold(tp) { _ =>
-                  tp.copy(yourTradingPremises = Some(tp.yourTradingPremises.get.copy(dateOfChange = Some(dateOfChange))))
+                  tp.copy(
+                    yourTradingPremises = Some(tp.yourTradingPremises.get.copy(
+                      tradingNameChangeDate = Some(dateOfChange),
+                      tradingPremisesAddress = tp.yourTradingPremises.get.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
+                      )))
                 }
               } map { _ =>
                 Redirect(routes.SummaryController.get())

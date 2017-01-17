@@ -13,7 +13,7 @@ case class YourTradingPremises(
                                 tradingPremisesAddress: Address,
                                 isResidential: Boolean,
                                 startDate: LocalDate,
-                                dateOfChange: Option[DateOfChange] = None
+                                tradingNameChangeDate: Option[DateOfChange] = None
                               )
 
 object YourTradingPremises {
@@ -30,7 +30,7 @@ object YourTradingPremises {
         __.read[Address] and
         (__ \ "isResidential").read[Boolean] and
         (__ \ "startDate").read[LocalDate] and
-        (__ \ "dateOfChange").readNullable[DateOfChange]
+        (__ \ "tradingNameChangeDate").readNullable[DateOfChange]
       ) (YourTradingPremises.apply _)
   }
 
@@ -42,7 +42,7 @@ object YourTradingPremises {
         __.write[Address] and
         (__ \ "isResidential").write[Boolean] and
         (__ \ "startDate").write[LocalDate] and
-        (__ \ "dateOfChange").writeNullable[DateOfChange]
+        (__ \ "tradingNameChangeDate").writeNullable[DateOfChange]
       ) (unlift(YourTradingPremises.unapply))
   }
 
