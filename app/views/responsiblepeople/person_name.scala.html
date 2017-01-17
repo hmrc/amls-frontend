@@ -15,21 +15,31 @@
 ) {
     @form(f, controllers.responsiblepeople.routes.PersonNameController.post(index, edit)) {
 
-        @input(
-            field = f("firstName"),
-            labelText = Messages("responsiblepeople.personName.firstname")
-        )
+        @fieldset(
+            panel = false,
+            legend = "responsiblepeople.personName.title",
+            legendHidden = true,
+            jsHidden = false,
+             f = f("redundantvalue")
+        ) {
 
-        @input(
-            field = f("middleName"),
-            labelText = Messages("responsiblepeople.personName.middlename")
-        )
+            @input(
+                field = f("firstName"),
+                labelText = Messages("responsiblepeople.personName.firstname")
+            )
 
-        @input(
-            field = f("lastName"),
-            labelText = Messages("responsiblepeople.personName.lastname")
-        )
+            @input(
+                field = f("middleName"),
+                labelText = Messages("responsiblepeople.personName.middlename")
+            )
 
+            @input(
+                field = f("lastName"),
+                labelText = Messages("responsiblepeople.personName.lastname")
+            )
+        }
+
+        <div class="form-group">
         @fieldset(
             f = f("hasPreviousName"),
             legend = "responsiblepeople.personName.isknownbyothernames",
@@ -53,6 +63,7 @@
             }
             @date(f, "previous.date", "responsiblepeople.personName.previous.date.lbl")
         }
+        </div>
 
         @fieldset(
             f = f("hasOtherNames"),

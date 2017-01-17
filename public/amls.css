@@ -888,7 +888,7 @@ fieldset.panel-indent legend {
 /* Bits from Gov Elements */
 .notice {
   position: relative;
-  margin: 40px 0;
+  margin-bottom: 40px;
 }
 
 .notice .icon {
