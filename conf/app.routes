@@ -94,6 +94,7 @@ GET         /trading-premises/remove/:index                             controll
 POST        /trading-premises/remove/:index                             controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
 
 GET         /estate-agents/what-you-need                                controllers.estateagentbusiness.WhatYouNeedController.get()
+
 GET         /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
@@ -102,6 +103,9 @@ POST        /estate-agents/penalised-act                                controll
 
 GET         /estate-agents/services                                     controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
 POST        /estate-agents/services                                     controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
+
+GET         /estate-agents/date-change                                  controllers.estateagentbusiness.ServicesDateOfChangeController.get
+POST        /estate-agents/date-change                                  controllers.estateagentbusiness.ServicesDateOfChangeController.post
 
 GET         /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
 POST        /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
