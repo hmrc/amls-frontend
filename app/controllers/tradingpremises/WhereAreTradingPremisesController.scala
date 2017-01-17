@@ -83,11 +83,11 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
               Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               updateDataStrict[TradingPremises](index) { tp =>
-                tp.yourTradingPremises.fold(tp) { _ =>
+                tp.yourTradingPremises.fold(tp) { ytp =>
                   tp.copy(
-                    yourTradingPremises = Some(tp.yourTradingPremises.get.copy(
+                    yourTradingPremises = Some(ytp.copy(
                       tradingNameChangeDate = Some(dateOfChange),
-                      tradingPremisesAddress = tp.yourTradingPremises.get.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
+                      tradingPremisesAddress = ytp.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
                       )))
                 }
               } map { _ =>
@@ -99,11 +99,9 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   private def redirectToDateOfChange(tradingPremises: TradingPremises, premises: YourTradingPremises) =
   ApplicationConfig.release7 && {
-    (for {
-      ytp <- tradingPremises.yourTradingPremises
-    } yield {
+    tradingPremises.yourTradingPremises.fold(false) { ytp =>
       ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress
-    }) getOrElse false
+    }
   }
 }
 
