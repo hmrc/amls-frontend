@@ -25,7 +25,7 @@ trait HvdDateOfChangeController extends RepeatingSection with BaseController {
 
   def compareAndUpdateDate(hvd: Hvd, newDate: DateOfChange): Hvd = {
     hvd.dateOfChange match {
-      case Some(s4ltrDate) => s4ltrDate.dateOfChange.isAfter(newDate.dateOfChange) match {
+      case Some(s4ltrDate) => s4ltrDate.dateOfChange.isBefore(newDate.dateOfChange) match {
         case true => hvd
         case false => hvd.dateOfChange(newDate)
       }

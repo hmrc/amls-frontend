@@ -69,8 +69,9 @@ class HvdDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
         meq(hvd))(any(), any(), any())
     }
 
-    "successfully submit request" when {
-      "input changeOfDate is later then save4Later date" in new Fixture {
+    "submit request" when {
+
+      "dateOfChange is earlier than that in S4L" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "dateOfChange.day" -> "24",
@@ -79,7 +80,38 @@ class HvdDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
         )
 
         val mockCacheMap = mock[CacheMap]
-        val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,28))))
+        val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1999,1,28))))
+
+        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
+          .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1988, 2, 24))))))
+
+        when(mockCacheMap.getEntry[Hvd](Hvd.key))
+          .thenReturn(Some(hvd))
+
+        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save[Hvd](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+
+        verify(controller.dataCacheConnector).save[Hvd](any(),
+          meq(hvd.copy(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,24))))))(any(), any(), any())
+      }
+
+      "dateOfChange is later than that in S4L" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "dateOfChange.day" -> "24",
+          "dateOfChange.month" -> "1",
+          "dateOfChange.year" -> "2001"
+        )
+
+        val mockCacheMap = mock[CacheMap]
+        val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,20))))
 
         when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
           .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1988, 2, 24))))))
@@ -99,39 +131,6 @@ class HvdDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with Mo
 
         verify(controller.dataCacheConnector).save[Hvd](any(),
           meq(hvd))(any(), any(), any())
-      }
-
-      "input changeOfDate is after save4Later date" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "dateOfChange.day" -> "24",
-          "dateOfChange.month" -> "1",
-          "dateOfChange.year" -> "2001"
-        )
-
-        val mockCacheMap = mock[CacheMap]
-        val hvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,20))))
-
-        val upDatedhvd = Hvd(dateOfChange = Some(DateOfChange(new LocalDate(2001,1,24))))
-
-        when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-          .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1988, 2, 24))))))
-
-        when(mockCacheMap.getEntry[Hvd](Hvd.key))
-          .thenReturn(Some(hvd))
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(controller.dataCacheConnector.save[Hvd](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
-
-        verify(controller.dataCacheConnector).save[Hvd](any(),
-          meq(upDatedhvd))(any(), any(), any())
 
       }
 
