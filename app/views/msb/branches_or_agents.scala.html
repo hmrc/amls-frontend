@@ -14,7 +14,7 @@
     heading = header
 ) {
 
-    <p>@Messages("msb.branchesoragents.intro")</p>
+    <span class="form-hint">@Messages("msb.branchesoragents.intro")</span>
 
     @form(f, controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
 
@@ -39,28 +39,30 @@
             )
         }
 
-      @fieldset(
-        legend = "msb.branchesoragents.legend",
-        jsHidden = false,
-        f = f("hasCountries-fieldset"),
-        data = Seq("data-toggle-new")
-      ) {
+
+        @panel(
+            f = f("hasCountries-fieldset"),
+            jsHidden = false,
+            data = Seq("data-toggle-new")
+        ) {
+
         @hint(
             hint = "msb.branchesoragents.hint"
         )
-        @errorGroup(f("countries")) {
-          @addRemove("lbl.add.another.country") {
-            @for(i <- 0 until 10) {
-              @defining(
-                f(s"countries[$i]")
-              ) { field =>
-                @country(field, classes = field match {
-                  case f: ValidField => Seq("")
-                  case f: InvalidField => Seq("js-hidden")
-                })
-              }
+
+            @errorGroup(f("countries")) {
+                @addRemove("lbl.add.another.country") {
+                    @for(i <- 0 until 10) {
+                    @defining(
+                        f(s"countries[$i]")
+                    ) { field =>
+                    @country(field, classes = field match {
+                    case f: ValidField => Seq("")
+                    case f: InvalidField => Seq("js-hidden")
+                    })
+                }
+                }
             }
-          }
         }
       }
 
