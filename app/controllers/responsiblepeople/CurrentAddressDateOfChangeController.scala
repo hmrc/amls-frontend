@@ -12,10 +12,10 @@ import play.api.mvc.{AnyContent, Request}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.RepeatingSection
-import views.html.responsiblepeople.current_address
 
 import scala.concurrent.Future
 
+//noinspection ScalaStyle
 trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
@@ -32,37 +32,50 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
 
   def post(index: Int, edit: Boolean) = Authorised.async {
     implicit authContext => implicit request =>
-      (Form2[DateOfChange](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.date_of_change(
-            f, "summary.responsiblepeople",
-            controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.post(index, edit))
-          ))
-        case ValidForm(_, dateOfChange) => {
 
-          val futOptTimeAtCurrent = getData[ResponsiblePeople](index) map { rp =>
-            for {
-              addHist <- rp.addressHistory
-              rpCurr <- addHist.currentAddress
-            } yield {
-              rpCurr.timeAtAddress
+      val extraFieldsFut = dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key) map { rp =>
+        val startDate = for {
+          position <- rp.positions
+          date <- position.startDate
+        } yield {
+          date
+        }
+
+        startDate match {
+          case Some(date) => Map("activityStartDate" -> Seq(date.toString("yyyy-MM-dd")))
+          case _ => Map()
+        }
+      }
+
+      extraFieldsFut.flatMap { extraFields =>
+        (Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.date_of_change(
+              f, "summary.responsiblepeople",
+              controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.post(index, edit))
+            ))
+          case ValidForm(_, dateOfChange) => {
+
+            val futOptTimeAtCurrent = getData[ResponsiblePeople](index) map { rp =>
+              for {
+                addHist <- rp.addressHistory
+                rpCurr <- addHist.currentAddress
+              } yield {
+                rpCurr.timeAtAddress
+              }
             }
-          }
 
-          doUpdate(index, dateOfChange).flatMap { _ =>
-            for {
-              optTimeAtCurrent <- futOptTimeAtCurrent
-            } yield {
-              optTimeAtCurrent match {
+            doUpdate(index, dateOfChange).flatMap { _ =>
+              futOptTimeAtCurrent map {
                 case Some(ZeroToFiveMonths) | Some(SixToElevenMonths) =>
                   Redirect(routes.AdditionalAddressController.get(index, edit))
                 case Some(_) => Redirect(routes.DetailedAnswersController.get(index))
               }
             }
           }
+        }).recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }).recoverWith {
-        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
   }
 
