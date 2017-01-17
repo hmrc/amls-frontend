@@ -81,8 +81,9 @@ trait MSBServicesController extends RepeatingSection with BaseController {
               Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               for {
-                _ <- dataCacheConnector.save[TradingPremises](TradingPremises.key,
-                  tradingPremises.msbServices(tradingPremises.msbServices.get.copy(dateOfChange = Some(dateOfChange))))
+                _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
+                  tradingPremises.msbServices(tradingPremises.msbServices.get.copy(dateOfChange = Some(dateOfChange)))
+                }
               } yield Redirect(routes.SummaryController.get())
           }
         }
