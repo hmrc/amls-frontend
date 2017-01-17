@@ -9,12 +9,11 @@ import models.aboutthebusiness.AboutTheBusiness
 import models.estateagentbusiness.EstateAgentBusiness
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.RepeatingSection
 import views.html.date_of_change
 
 import scala.concurrent.Future
 
-trait ServicesDateOfChangeController extends RepeatingSection with BaseController {
+trait ServicesDateOfChangeController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
@@ -22,7 +21,6 @@ trait ServicesDateOfChangeController extends RepeatingSection with BaseControlle
       implicit authContext => implicit request =>
         Future.successful(Ok(date_of_change(EmptyForm, "summary.estateagentbusiness", routes.ServicesDateOfChangeController.post())))
   }
-
 
   def post = Authorised.async {
     implicit authContext => implicit request =>
