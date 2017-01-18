@@ -82,13 +82,13 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("edit") must be(true)
-        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("edit") must be(true)
-        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("edit") must be(true)
-        document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("edit") must be(true)
-        document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("edit") must be(true)
-        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("edit") must be(false)
-        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(3).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(4).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(5).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(6).getElementsByTag("a").hasClass("change-answer") must be(false)
       }
     }
 
@@ -105,7 +105,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         val document = Jsoup.parse(contentAsString(result))
         val elements = document.getElementsByTag("section").iterator
         while(elements.hasNext){
-          elements.next().getElementsByTag("a").hasClass("edit") must be(true)
+          elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
         }
       }
     }
