@@ -4,17 +4,18 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.DateOfChange
+import models.{DateOfChange, DateOfChangeHelpers}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
+import play.api.i18n.Messages
 import services.StatusService
 import utils.{FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
 
-trait AgentNameController extends RepeatingSection with BaseController {
+trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -75,13 +76,12 @@ trait AgentNameController extends RepeatingSection with BaseController {
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) flatMap { tradingPremises =>
-          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
-            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
-          }
-
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ tradingPremises.startDateFormFields()) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
+              Future.successful(BadRequest(views.html.date_of_change(
+                form.withMessageFor(DateOfChange.errorPath,
+                  Messages("error.expected.tp.dateofchange.after.startdate", tradingPremises.startDate.fold("")(_.toString("dd-MM-yyyy")))),
+                "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               for {
                 _ <- updateDataStrict[TradingPremises](index) { tp =>
