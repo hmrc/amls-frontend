@@ -24,10 +24,11 @@ s"""${f("mlrRefNumber").id}-fieldset"""
 
         @fieldset(
             legend = "tcsp.servicesOfAnotherTcsp.title",
+            legendHidden = true,
             f = f("servicesOfAnotherTCSP"),
-            panel = false,
-            legendHidden = true
+            panel = false
         ) {
+
             @radio(
                 f = f("servicesOfAnotherTCSP"),
                 labelText = "lbl.yes",

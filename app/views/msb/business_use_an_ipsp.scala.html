@@ -13,6 +13,8 @@
     heading = header
 ) {
 
+    <p class="form-hint">@Messages("msb.throughput.ipsp.hint")</p>
+
     @form(f, controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 
         @fieldset(
@@ -42,7 +44,7 @@
             f = f(s"""${f("name").id}-fieldset""")
         ) {
             @input(f("name"), "msb.ipsp.name.lbl", bold = false)
-            @input(f("referenceNumber"), "msb.ipsp.referenceNumber.lbl", bold = false)
+            @input(f("referenceNumber"), "msb.ipsp.referenceNumber.lbl", hintText = "msb.ipsp.referenceNumber.hint", bold = false)
         }
 
         @submit(edit)

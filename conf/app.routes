@@ -94,6 +94,7 @@ GET         /trading-premises/remove/:index                             controll
 POST        /trading-premises/remove/:index                             controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
 
 GET         /estate-agents/what-you-need                                controllers.estateagentbusiness.WhatYouNeedController.get()
+
 GET         /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised-body                               controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
@@ -102,6 +103,9 @@ POST        /estate-agents/penalised-act                                controll
 
 GET         /estate-agents/services                                     controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
 POST        /estate-agents/services                                     controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
+
+GET         /estate-agents/date-change                                  controllers.estateagentbusiness.ServicesDateOfChangeController.get
+POST        /estate-agents/date-change                                  controllers.estateagentbusiness.ServicesDateOfChangeController.post
 
 GET         /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
 POST        /estate-agents/redress-scheme                               controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
@@ -222,6 +226,9 @@ POST        /responsible-people/self-assessment/:index                  controll
 GET         /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/address/:index                          controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false)
 
+GET         /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
+POST        /responsible-people/address/:index/date-change              controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
+
 GET         /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /responsible-people/residency/:index                        controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false)
 
@@ -276,6 +283,9 @@ POST        /accountancy-service-provider/services                      controll
 
 GET         /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
 POST        /accountancy-service-provider/agent-scheme                  controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)
+
+GET         /accountancy-service-provider/date-change                   controllers.asp.ServicesOfBusinessDateOfChangeController.get
+POST        /accountancy-service-provider/date-change                   controllers.asp.ServicesOfBusinessDateOfChangeController.post
 
 GET         /accountancy-service-provider/check-your-answers            controllers.asp.SummaryController.get()
 
@@ -367,3 +377,6 @@ POST        /high-value-dealer/percentage                               controll
 
 GET         /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/receiving                                controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /high-value-dealer/date-change                              controllers.hvd.HvdDateOfChangeController.get
+POST        /high-value-dealer/date-change                              controllers.hvd.HvdDateOfChangeController.post
