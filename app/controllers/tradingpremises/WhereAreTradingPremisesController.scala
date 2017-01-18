@@ -8,6 +8,8 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
+import play.api.data.mapping.Path
+import play.api.data.validation.ValidationError
 import services.StatusService
 import utils.{FeatureToggle, RepeatingSection}
 import views.html.tradingpremises._
@@ -73,6 +75,12 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   def saveDateOfChange(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
 
+      implicit class FormExtensions(form: InvalidForm) {
+        def withMessageFor(p: Path, message: String) = {
+          InvalidForm(form.data, (form.errors filter (x => x._1 != p)) :+ (p, Seq(ValidationError(message))))
+        }
+      }
+
         getData[TradingPremises](index) flatMap { tradingPremises =>
           val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
             Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
@@ -80,7 +88,10 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
+
+              val f = form.withMessageFor(Path \ "dateOfChange", "HAY U GUYZ!")
+
+              Future.successful(BadRequest(views.html.date_of_change(f, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               updateDataStrict[TradingPremises](index) { tp =>
                 tp.yourTradingPremises.fold(tp) { ytp =>
