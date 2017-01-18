@@ -38,11 +38,11 @@
 
         @fieldset(
             f = f("riskassessments"),
-            legend = "businessactivities.paper.or.digital"
+            legend = "businessactivities.paper.or.digital",
+            hint = "lbl.select.all"
+
         ) {
-            @hint(
-                hint = "lbl.select.all"
-            )
+
             @checkbox(
                 f = f("riskassessments[]"),
                 labelText = "businessactivities.RiskAssessmentType.lbl.01",
@@ -54,6 +54,7 @@
                 value = "02"
             )
         }
+
 
         @submit(edit)
     }

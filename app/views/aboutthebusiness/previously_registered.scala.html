@@ -45,18 +45,10 @@
                     inline = true
                 )
 
-                    @fieldset(
-                    f = f("prevMLRRegNo-fieldset"),
-                    legend = "aboutthebusiness.registeredformlr.mlrregno.lbl",
-                    legendHidden = true,
-                    jsHidden = true,
-                    id = target,
-                    panel = false
-
-                    ) {
-
-                        @panel(
-                        jsHidden = false
+                    @panel(
+                        f = f("prevMLRRegNo-fieldset"),
+                        jsHidden = false,
+                        id = target
                     ) {
                         @input(
                             field = f("prevMLRRegNo"),
@@ -65,7 +57,7 @@
                             bold = false
                         )
                     }
-                }
+
             }
         }
 

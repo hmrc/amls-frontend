@@ -43,13 +43,11 @@
                     inline = true
                 )
 
-                    @fieldset(
-                    f = f("vrnNumber-fieldset"),
-                    legend = "aboutthebusiness.registeredforvat.lbl.vatNumber",
-                    legendHidden = true,
-                    jsHidden = true,
-                    id = target
-                ) {
+                    @panel(
+                        f = f("vrnNumber-fieldset"),
+                        jsHidden = false,
+                        id = target
+                    ) {
                     @input(
                         field = f("vrnNumber"),
                         labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",

@@ -1,16 +1,16 @@
 package models.tradingpremises
 
 import models.FormTypes._
+import models.DateOfChange
 import play.api.data.mapping._
 import play.api.data.mapping.forms.Rules._
-import play.api.libs.json._
-import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 import typeclasses.MongoKey
-import utils.{JsonMapping, TraversableValidators}
 
-case class AgentName(agentName: String)
+case class AgentName(agentName: String,
+                     dateOfChange: Option[DateOfChange] = None
+                    )
 
 object AgentName {
 
@@ -28,11 +28,11 @@ object AgentName {
 
   implicit val formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
-    (__ \ "agentName").read(agentNameType) fmap AgentName.apply
+    (__ \ "agentName").read(agentNameType) fmap(AgentName(_))
   }
 
   implicit val formWrites: Write[AgentName, UrlFormEncoded] = Write {
-    case AgentName(crn) => Map("agentName" -> Seq(crn))
+    case AgentName(crn, _) => Map("agentName" -> Seq(crn))
   }
 
   implicit def convert(data: AgentName): Option[TradingPremises] = {

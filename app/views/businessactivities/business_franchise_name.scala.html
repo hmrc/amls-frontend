@@ -22,37 +22,40 @@ s"""${f("franchiseName").id}-fieldset"""
         <p class="form-hint">@Messages("businessactivities.businessfranchise.subtitle")</p>
 
         @fieldset(
-            f = f("businessFranchise"),
+            f = f("redundantvalue"),
             legend = "businessactivities.businessfranchise.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("businessFranchise"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target",
-                inline = true
-            )
-            @radio(
-                f = f("businessFranchise"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
-        }
 
-        @fieldset(
-            f = f(s"$target"),
-            legend = "businessactivities.businessfranchise.lbl.franchisename",
-            legendHidden = true,
-            id = target
-        ) {
-            @input(
-                field = f("franchiseName"),
-                labelText = "businessactivities.businessfranchise.lbl.franchisename",
-                bold = false
-            )
+            @errorGroup(
+                field = f("businessFranchise")
+            ) {
+
+                @radio(
+                    f = f("businessFranchise"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("businessFranchise"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+                @panel(
+                    f = f(s"$target"),
+                    jsHidden = false
+                ) {
+                @input(
+                    field = f("franchiseName"),
+                    labelText = "businessactivities.businessfranchise.lbl.franchisename",
+                    bold = false
+                )
+                }
+            }
         }
 
         @submit(edit)

@@ -3,8 +3,9 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
-import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -12,7 +13,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -29,6 +32,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
     val currentAddressController = new CurrentAddressController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
+
     }
   }
 
@@ -44,7 +49,6 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
         when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
 
         val result = currentAddressController.get(RecordId)(request)
         status(result) must be(OK)
@@ -71,7 +75,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       "display the previous home address with UK fields populated" in new Fixture {
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-        val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+        val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -94,7 +98,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       "display the previous home address with non-UK fields populated" in new Fixture {
 
         val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-        val additionalAddress = ResponsiblePersonAddress(nonUKAddress, SixToElevenMonths)
+        val additionalAddress = ResponsiblePersonCurrentAddress(nonUKAddress, SixToElevenMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -128,7 +132,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             "timeAtAddress" -> "04"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -136,6 +140,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
@@ -152,7 +158,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             "timeAtAddress" -> "02"
           )
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -160,6 +166,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
@@ -175,6 +183,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)
@@ -195,6 +205,9 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
@@ -218,6 +231,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
@@ -230,164 +245,302 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
         }
       }
 
-      "when edit mode is on" when {
-        "time at address is less than 1 year" must {
-          "redirect to the correct location" in new Fixture {
+      "respond with NOT_FOUND" when {
+        "given an out of bounds index" in new Fixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "isUK" -> "true",
-              "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
-              "postCode" -> "NE17YH",
-              "timeAtAddress" -> "01"
-            )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
-            val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-            val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode" -> "NE17YH",
+            "timeAtAddress" -> "01"
+          )
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
-            when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
 
-            val result = currentAddressController.post(RecordId, true)(requestWithParams)
+          val result = currentAddressController.post(40, true)(requestWithParams)
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+          status(result) must be(NOT_FOUND)
+        }
+      }
+
+      "when the service status is not yet submitted" when {
+
+        "edit mode is on" when {
+          "time at address is less than 1 year" must {
+            "redirect to the correct location" in new Fixture {
+
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "Line 1",
+                "addressLine2" -> "Line 2",
+                "postCode" -> "NE17YH",
+                "timeAtAddress" -> "01"
+              )
+              val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+              val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+              val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+            }
+          }
+
+          "time at address is OneToThreeYears" must {
+            "redirect to the correct location" in new Fixture {
+
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "Line 1",
+                "addressLine2" -> "Line 2",
+                "postCode" -> "NE17YH",
+                "timeAtAddress" -> "03"
+              )
+              val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+              val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+              val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+            }
+          }
+          "time at address is ThreeYearsPlus" must {
+            "redirect to the correct location" in new Fixture {
+
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "Line 1",
+                "addressLine2" -> "Line 2",
+                "postCode" -> "NE17YH",
+                "timeAtAddress" -> "04"
+              )
+              val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+              val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+              val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+            }
           }
         }
 
-        "time at address is OneToThreeYears" must {
-          "redirect to the correct location" in new Fixture {
+        "when edit mode is off" when {
+          "time at address is less than 1 year" must {
+            "redirect to the correct location" in new Fixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "isUK" -> "true",
-              "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
-              "postCode" -> "NE17YH",
-              "timeAtAddress" -> "03"
-            )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
-            val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-            val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "Line 1",
+                "addressLine2" -> "Line 2",
+                "postCode" -> "NE17YH",
+                "timeAtAddress" -> "01"
+              )
+              val responsiblePeople = ResponsiblePeople()
 
-            when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
 
-            val result = currentAddressController.post(RecordId, true)(requestWithParams)
+              val result = currentAddressController.post(RecordId)(requestWithParams)
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
+            }
           }
-        }
-        "time at address is ThreeYearsPlus" must {
-          "redirect to the correct location" in new Fixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "isUK" -> "true",
-              "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
-              "postCode" -> "NE17YH",
-              "timeAtAddress" -> "04"
-            )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, ZeroToFiveMonths)
-            val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-            val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          "time at address is OneToThreeYears" must {
+            "redirect to the correct location" in new Fixture {
 
-            when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "Line 1",
+                "addressLine2" -> "Line 2",
+                "postCode" -> "NE17YH",
+                "timeAtAddress" -> "03"
+              )
+              val responsiblePeople = ResponsiblePeople()
 
-            val result = currentAddressController.post(RecordId, true)(requestWithParams)
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+              val result = currentAddressController.post(RecordId)(requestWithParams)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
+            }
+          }
+
+          "time at address is ThreeYearsPlus" must {
+            "redirect to the correct location" in new Fixture {
+
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "Line 1",
+                "addressLine2" -> "Line 2",
+                "postCode" -> "NE17YH",
+                "timeAtAddress" -> "04"
+              )
+              val responsiblePeople = ResponsiblePeople()
+
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionReadyForReview))
+
+              val result = currentAddressController.post(RecordId)(requestWithParams)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
+            }
           }
         }
       }
 
-      "when edit mode is off" when {
-        "time at address is less than 1 year" must {
-          "redirect to the correct location" in new Fixture {
-
+      "when the service status is approved" when {
+        "the address has been changed" must {
+          "redirect to the date of change controller" in new Fixture {
             val requestWithParams = request.withFormUrlEncodedBody(
               "isUK" -> "true",
-              "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
-              "postCode" -> "NE17YH",
-              "timeAtAddress" -> "01"
-            )
-            val responsiblePeople = ResponsiblePeople()
-
-            when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = currentAddressController.post(RecordId)(requestWithParams)
-
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId).url))
-          }
-        }
-
-        "time at address is OneToThreeYears" must {
-          "redirect to the correct location" in new Fixture {
-
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "isUK" -> "true",
-              "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
-              "postCode" -> "NE17YH",
-              "timeAtAddress" -> "03"
-            )
-            val responsiblePeople = ResponsiblePeople()
-
-            when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = currentAddressController.post(RecordId)(requestWithParams)
-
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
-          }
-        }
-
-        "time at address is ThreeYearsPlus" must {
-          "redirect to the correct location" in new Fixture {
-
-            val requestWithParams = request.withFormUrlEncodedBody(
-              "isUK" -> "true",
-              "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
-              "postCode" -> "NE17YH",
+              "addressLine1" -> "newline1",
+              "addressLine2" -> "newline2",
+              "postCode" -> "AB1 2CD",
               "timeAtAddress" -> "04"
             )
-            val responsiblePeople = ResponsiblePeople()
+
+            val originalResponsiblePeople = ResponsiblePeople(
+              addressHistory = Some(ResponsiblePersonAddressHistory(
+                currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                )
+              ))
+            )
 
             when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+              .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
             when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
+            when(currentAddressController.statusService.getStatus(any(), any(), any()))
+              .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-            val result = currentAddressController.post(RecordId)(requestWithParams)
+            val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(RecordId).url))
+            redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(1, true).url))
+          }
+        }
+        "the address has not changed" when {
+          "time at address is less than 1 year" must {
+            "redirect to the additional address controller" in new Fixture {
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "line1",
+                "addressLine2" -> "line2",
+                "postCode" -> "AB1 2CD",
+                "timeAtAddress" -> "01"
+              )
+
+              val originalResponsiblePeople = ResponsiblePeople(
+                addressHistory = Some(ResponsiblePersonAddressHistory(
+                  currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), ZeroToFiveMonths, None)
+                  )
+                ))
+              )
+
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+              val result = currentAddressController.post(RecordId)(requestWithParams)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1).url))
+            }
+          }
+          "time at address is more than 1 year" must {
+            "redirect to the detailed answers controller" in new Fixture {
+              val requestWithParams = request.withFormUrlEncodedBody(
+                "isUK" -> "true",
+                "addressLine1" -> "line1",
+                "addressLine2" -> "line2",
+                "postCode" -> "AB1 2CD",
+                "timeAtAddress" -> "03"
+              )
+
+              val originalResponsiblePeople = ResponsiblePeople(
+                addressHistory = Some(ResponsiblePersonAddressHistory(
+                  currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                  )
+                ))
+              )
+
+              when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
+              when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                .thenReturn(Future.successful(emptyCache))
+              when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+              val result = currentAddressController.post(RecordId)(requestWithParams)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+            }
           }
         }
       }
+
     }
-
-
   }
 
   it must {
@@ -422,4 +575,90 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
     }
   }
 
+}
+
+
+class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
+  val mockDataCacheConnector = mock[DataCacheConnector]
+  val RecordId = 1
+
+  trait Fixture extends AuthorisedFixture {
+    self =>
+
+    val currentAddressController = new CurrentAddressController {
+      override val dataCacheConnector = mockDataCacheConnector
+      override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
+    }
+  }
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
+
+  val emptyCache = CacheMap("", Map.empty)
+
+  "CurrentAddressController" must {
+    "when the service status is Approved and the address is changed" when {
+      "time at address is less than 1 year" must {
+        "redirect to the correct location" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "new Line 1",
+            "addressLine2" -> "new Line 2",
+            "postCode" -> "NE17YH",
+            "timeAtAddress" -> "01"
+          )
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+        }
+      }
+      "time at address is more than 1 year" must {
+        "redirect to the correct location" in new Fixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "isUK" -> "true",
+            "addressLine1" -> "new Line 1",
+            "addressLine2" -> "new Line 2",
+            "postCode" -> "NE17YH",
+            "timeAtAddress" -> "03"
+          )
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, OneToThreeYears)
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+
+
+          when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          when(currentAddressController.statusService.getStatus(any(), any(), any()))
+            .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+          val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+        }
+      }
+    }
+  }
 }

@@ -1,11 +1,9 @@
-package controllers.asp
+package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import models.aboutthebusiness.{ActivityStartDate, AboutTheBusiness}
-import models.asp._
+import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.estateagentbusiness.EstateAgentBusiness
 import org.joda.time.LocalDate
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -19,12 +17,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class ServicesDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new ServiceOfBusinessDateOfChangeController {
+    val controller = new ServicesDateOfChangeController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
     }
@@ -37,7 +35,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppP
     "on get display date of change view" in new Fixture {
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("summary.asp"))
+      contentAsString(result) must include(Messages("summary.estateagentbusiness"))
     }
 
     "submit with valid data" in new Fixture {
@@ -52,18 +50,18 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppP
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
-      when(mockCacheMap.getEntry[Asp](Asp.key))
+      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(None)
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[Asp](any(), any())
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
     }
 
     "fail submission when invalid date is supplied" in new Fixture {
@@ -78,13 +76,13 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppP
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
-      when(mockCacheMap.getEntry[Asp](Asp.key))
+      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
         .thenReturn(None)
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[Asp](any(), any())
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -104,13 +102,13 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends PlaySpec with OneAppP
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
-      when(mockCacheMap.getEntry[Asp](Asp.key))
-        .thenReturn(Some(Asp()))
+      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
+        .thenReturn(Some(EstateAgentBusiness()))
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[Asp](any(), any())
+      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)

@@ -14,9 +14,13 @@
     heading = header
 ) {
 
-    <div class="panel-indent panel-border-wide">
+    @panel(
+        wide = true,
+        jsHidden = false,
+        gutter = true
+    ) {
         <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a>
-    </div>
+    }
 
     <ul class="list">
         @responsiblePeople.zipWithIndex.map { case (rp, index) =>

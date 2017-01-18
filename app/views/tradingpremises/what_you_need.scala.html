@@ -24,7 +24,7 @@
     </ul>
 
     @if(msbExists) {
-        <h3>@Messages("tradingpremises.whatyouneed.agents.sub.heading")</h3>
+        <h3 class="heading-medium">@Messages("tradingpremises.whatyouneed.agents.sub.heading")</h3>
         <p>@Messages("tradingpremises.whatyouneed.agents.desc")</p>
 
         <p>@Messages("tradingpremises.whatyouneed.agents.individual.info.heading")</p>
@@ -40,7 +40,7 @@
         </ul>
     }
 
-    <div class="form-group">
+
         @if(msbExists) {
             @anchor(
                 attrHref = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index).toString,
@@ -56,7 +56,7 @@
                 visuallyhidden = Messages("summary.tradingpremises")
             )
         }
-    </div>
+
 
 }
 

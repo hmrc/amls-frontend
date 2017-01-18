@@ -485,13 +485,8 @@ select {
 /* Add some space under the last fieldset in a .panel-indent,
    otherwise it butts up against the submit button.
    I'd rather not have to do this. */
-.form-field-group-end {
-  margin-bottom: 30px;
-}
 
-.form-field-group-end .form-field-group {
-  margin-bottom: 0;
-}
+
 
 /* These are all prefixed with `form` to override some stuff (apparently) */
 form .form-control {
@@ -583,7 +578,7 @@ table.summary ul li {
 }
 
 .panel-indent {
-  margin-bottom: 40px;
+  /*margin-bottom: 40px;*/
 }
 
 fieldset .panel-indent {
@@ -893,7 +888,7 @@ fieldset.panel-indent legend {
 /* Bits from Gov Elements */
 .notice {
   position: relative;
-  margin: 40px 0;
+  margin-bottom: 40px;
 }
 
 .notice .icon {
@@ -1042,7 +1037,7 @@ button, .button, .button--get-started {
     margin-top: 0;
 }
 
-.form-field {
+.form-field, .form-field-group {
     margin-bottom: 30px;
 }
 
@@ -1050,3 +1045,10 @@ details {
     margin: 0;
 }
 
+.form-group-footer {
+  padding-top: 30px;
+}
+
+.panel-indent--gutter {
+  margin-top: 0;
+}

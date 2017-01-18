@@ -40,14 +40,11 @@
                     value = "false",
                     inline = true
                 )
-
-                @fieldset(
-                    legend = "aboutthebusiness.registeredforcorporationtax.taxReference",
-                    legendHidden = true,
-                    jsHidden = true,
-                    classes = Seq("corporationTaxReference-fieldset"),
-                    f = f("corporationTaxReference-fieldset")
-                ) {
+                @panel(
+                        f = f("corporationTaxReference-fieldset"),
+                        classes = Seq("corporationTaxReference-fieldset"),
+                        jsHidden = false
+                    ) {
                     @input(
                         field = f("corporationTaxReference"),
                         labelText = "aboutthebusiness.registeredforcorporationtax.taxReference",
