@@ -2,24 +2,27 @@ package controllers.tradingpremises
 
 
 import connectors.DataCacheConnector
-import models.businessmatching.{MoneyServiceBusiness, EstateAgentBusinessService, BillPaymentServices}
+import models._
+import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers.{status => hstatus, _}
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Matchers.{eq => meq, _}
-import models._
-
 
 import scala.concurrent.Future
 
-class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with BeforeAndAfter {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 
@@ -29,7 +32,14 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
     val controller = new WhereAreTradingPremisesController {
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
+
+    when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+  }
+
+  before {
+    reset(mockDataCacheConnector)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -243,6 +253,140 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       }
     }
   }
+
+  "go to the date of change page" when {
+    "the submission has been approved and trading name has changed" in new Fixture {
+
+      val initRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address 1",
+        "addressLine2" -> "Address 2",
+        "postcode" -> "NE98 1ZZ",
+        "isResidential" -> "true",
+        "startDate.day" -> "01",
+        "startDate.month" -> "02",
+        "startDate.year" -> "2010"
+      )
+
+      val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, true, LocalDate.now())
+
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises))))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+
+      val result = controller.post(1)(initRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.dateOfChange(1).url))
+    }
+  }
+
+  "go to the summary page" when {
+    "data has not changed" in new Fixture {
+
+      val initRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address 1",
+        "addressLine2" -> "Address 2",
+        "postcode" -> "NE98 1ZZ",
+        "isResidential" -> "true",
+        "startDate.day" -> "01",
+        "startDate.month" -> "02",
+        "startDate.year" -> "2010"
+      )
+
+      val address = Address("Address 1", "Address 2", None, None, "NE98 1ZZ")
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, true, new LocalDate(2007, 2, 1))
+
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises))))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+
+      val result = controller.post(1)(initRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+    }
+  }
+
+  "return view for Date of Change" in new Fixture {
+    val result = controller.dateOfChange(1)(request)
+    hstatus(result) must be(OK)
+  }
+
+  "handle the date of change form post" when {
+    "given valid data for a trading premises name" in new Fixture {
+
+      val postRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.year" -> "2010",
+        "dateOfChange.month" -> "10",
+        "dateOfChange.day" -> "01"
+      )
+
+      val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ", Some(DateOfChange(new LocalDate(2010, 10, 1))))
+
+      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = true, new LocalDate(2001, 1, 1), None)
+      val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
+
+      val expectedResult = yourPremises.copy(
+        tradingNameChangeDate = Some(DateOfChange(new LocalDate(2010, 10, 1))),
+        tradingPremisesAddress = address
+      )
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(premises))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
+        thenReturn(Future.successful(mock[CacheMap]))
+
+      val result = controller.saveDateOfChange(1)(postRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+      val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](meq(TradingPremises.key), captor.capture())(any(), any(), any())
+
+      captor.getValue.head.yourTradingPremises match {
+        case Some(result: YourTradingPremises) => result must be(expectedResult)
+      }
+
+    }
+
+  }
+
+  "given a date of change which is before the activity start date" in new Fixture {
+    val postRequest = request.withFormUrlEncodedBody(
+      "dateOfChange.year" -> "2007",
+      "dateOfChange.month" -> "10",
+      "dateOfChange.day" -> "01"
+    )
+
+    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = true, new LocalDate(2008, 1, 1), None)
+    val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
+
+    when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(Seq(premises))))
+
+    val result = controller.saveDateOfChange(1)(postRequest)
+
+    hstatus(result) must be(BAD_REQUEST)
+  }
 }
-
-
