@@ -16,12 +16,12 @@
 
     @form(f, controllers.tradingpremises.routes.AgentPartnershipController.post(index,edit)) {
 
-        <div class="form-field-group">
-            @input(
-                field = f("agentPartnership"),
-                hintText = "tradingpremises.agentpartnership.lbl.hint"
-            )
-        </div>
+        @input(
+            field = f("agentPartnership"),
+            labelText = "tradingpremises.agentpartnership.title",
+            hintText = "tradingpremises.agentpartnership.lbl.hint",
+            labelHidden = true
+        )
 
         @submit(edit)
     }

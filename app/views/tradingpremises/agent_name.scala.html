@@ -16,12 +16,11 @@
 
     @form(f, controllers.tradingpremises.routes.AgentNameController.post(index,edit)) {
 
-        <div class="form-field-group">
-            @input(
-                field = f("agentName"),
-                labelText = "tradingpremises.agentname.title"
-            )
-        </div>
+        @input(
+            field = f("agentName"),
+            labelText = "tradingpremises.agentname.title",
+            labelHidden = true
+        )
 
         @submit(edit)
     }

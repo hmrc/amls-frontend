@@ -10,7 +10,8 @@
     cols: String = "",
     rows: String = "",
     maxLength: String = "",
-    charCount: Boolean = false
+    charCount: Boolean = false,
+    largeWidth: Boolean = false
 )(implicit lang: Lang)
 
 <div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter}>
@@ -28,7 +29,10 @@
                   @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint"}
                   @if(cols.nonEmpty) { cols="@cols" }
                   @if(rows.nonEmpty) { rows="@rows" }
-                  @if(maxLength.nonEmpty) { maxLength="@maxLength" }>@field.value</textarea>
+                  @if(maxLength.nonEmpty) { maxLength="@maxLength" }
+                @if(largeWidth) { class="textarea--3-4" }
+
+                  >@field.value</textarea>
         @if(charCount) {
             <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>
         }

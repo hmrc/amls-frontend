@@ -20,25 +20,36 @@
 
     @form(f, controllers.declaration.routes.AddPersonController.post()) {
 
-        @input(
-            field = f("firstName"),
-            labelText = Messages("declaration.addperson.firstname")
-        )
+        <div class="form-group">
+            @fieldset(
+                panel = false,
+                f = f("redundantvalue"),
+                legend = "declaration.addperson.title",
+                legendHidden = true
 
-        @input(
-            field = f("middleName"),
-            labelText = Messages("declaration.addperson.middlename")
-        )
+            ) {
+                @input(
+                    field = f("firstName"),
+                    labelText = Messages("declaration.addperson.firstname")
+                )
 
-        @input(
-            field = f("lastName"),
-            labelText = Messages("declaration.addperson.lastname")
-        )
+                @input(
+                    field = f("middleName"),
+                    labelText = Messages("declaration.addperson.middlename")
+                )
+
+                @input(
+                    field = f("lastName"),
+                    labelText = Messages("declaration.addperson.lastname")
+                )
+
+            }
+        </div>
 
         @fieldset(
             f = f("roleWithinBusiness"),
             legend = "declaration.addperson.whatsyourrole",
-            bold = true,
+            bold = false,
             panel = false
         ) {
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.01", "01")

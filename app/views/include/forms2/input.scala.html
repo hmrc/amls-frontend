@@ -19,9 +19,13 @@
 )(implicit lang: Lang)
 
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}">
-    <label>
+    <label class="form-label@if(bold){-bold}" for="@field.id">
         @if(labelText.nonEmpty) {
-            <span class="form-label@if(bold){-bold}@if(labelHidden){ visuallyhidden}">@Messages(labelText)</span>
+            @if(labelHidden) {<span class="visuallyhidden">}
+
+            @Messages(labelText)
+
+            @if(labelHidden){</span>}
         }
         @if(hintText.nonEmpty) {
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
@@ -29,7 +33,9 @@
         @if(field.hasErrors) {
             <span class="error-notification">@field.error</span>
         }
-        <input name="@field.name" class="form-control @classes.mkString(" ")"
+
+    </label>
+    <input name="@field.name" class="form-control @classes.mkString(" ")"
             value="@field.value" id="@field.id"
             @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
             @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
@@ -39,5 +45,4 @@
             @if(attrMax.nonEmpty) { max="@attrMax" }
             @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
         />
-    </label>
 </div>

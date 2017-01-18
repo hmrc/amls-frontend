@@ -15,15 +15,11 @@
 
     @form(f, controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
 
-
-        @hint(
-            hint = "businessactivities.ncaRegistered.subtitle"
-        )
-
         @fieldset(
             f = f("ncaRegistered"),
             legend = "businessactivities.ncaRegistered.title",
             legendHidden = true,
+            hint = "businessactivities.ncaRegistered.subtitle",
             panel = false
         ) {
             @radio(
