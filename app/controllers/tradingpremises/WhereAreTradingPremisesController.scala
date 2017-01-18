@@ -4,19 +4,18 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.DateOfChange
+import models.{DateOfChange, DateOfChangeHelpers}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import play.api.i18n.Messages
 import services.StatusService
 import utils.{FeatureToggle, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
-trait WhereAreTradingPremisesController extends RepeatingSection with BaseController {
+trait WhereAreTradingPremisesController extends RepeatingSection with BaseController with DateOfChangeHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -75,23 +74,13 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   def saveDateOfChange(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
 
-      implicit class FormExtensions(form: InvalidForm) {
-        def withMessageFor(p: Path, message: String) = {
-          InvalidForm(form.data, (form.errors filter (x => x._1 != p)) :+ (p, Seq(ValidationError(message))))
-        }
-      }
-
         getData[TradingPremises](index) flatMap { tradingPremises =>
-          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
-            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
-          }
-
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ tradingPremises.startDateFormFields()) match {
             case form: InvalidForm =>
-
-              val f = form.withMessageFor(Path \ "dateOfChange", "HAY U GUYZ!")
-
-              Future.successful(BadRequest(views.html.date_of_change(f, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
+              Future.successful(BadRequest(
+                views.html.date_of_change(form.withMessageFor(DateOfChange.errorPath,
+                  Messages("error.expected.tp.dateofchange.after.startdate", tradingPremises.startDate.fold("")(_.toString("dd-MM-yyyy")))), "summary.tradingpremises",
+                  routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               updateDataStrict[TradingPremises](index) { tp =>
                 tp.yourTradingPremises.fold(tp) { ytp =>

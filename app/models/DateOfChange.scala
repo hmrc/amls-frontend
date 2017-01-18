@@ -1,15 +1,17 @@
 package models
 
 import models.FormTypes._
+import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, Write}
+import play.api.data.mapping.{From, Path, Rule, Write}
 import play.api.libs.json._
 
 case class DateOfChange (dateOfChange: LocalDate)
 
 object DateOfChange {
 
+  val errorPath = Path \ "dateOfChange"
 
   implicit val reads: Reads[DateOfChange] =
     __.read[LocalDate] map {
@@ -35,4 +37,18 @@ object DateOfChange {
     }
 }
 
+trait DateOfChangeHelpers {
 
+  implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises]) {
+
+    def startDate = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => Some(ytp.startDate))
+
+    def startDateFormFields(fieldName: String = "activityStartDate") = {
+      startDate match {
+        case Some(date) => Map(fieldName -> Seq(date.toString("yyyy-MM-dd")))
+        case _ => Map.empty[String, Seq[String]]
+      }
+    }
+  }
+
+}
