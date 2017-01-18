@@ -5,7 +5,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.{ResponsiblePersonCurrentAddress, ResponsiblePersonAddressHistory, ResponsiblePeople}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request}
@@ -86,14 +86,14 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
   (implicit authContext: AuthContext, request: Request[AnyContent]) =
 
     updateDataStrict[ResponsiblePeople](index) { res =>
-      for {
+      (for {
         addressHist <- res.addressHistory
         rpCurrentAdd <- addressHist.currentAddress
       } yield {
         val currentWDateOfChange = rpCurrentAdd.copy(dateOfChange = Some(date))
         val addHistWDateOfChange = addressHist.copy(currentAddress = Some(currentWDateOfChange))
         res.copy(addressHistory = Some(addHistWDateOfChange))
-      }
+      }).getOrElse(throw new RuntimeException("CurrentAddressDateOfChangeController [post - doUpdate]"))
     }
 
 }

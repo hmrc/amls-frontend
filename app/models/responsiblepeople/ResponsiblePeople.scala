@@ -140,7 +140,7 @@ object ResponsiblePeople {
       ) apply ResponsiblePeople.apply _
   }
 
-  implicit def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
+  def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
     responsiblePeople.getOrElse(ResponsiblePeople())
 
 }

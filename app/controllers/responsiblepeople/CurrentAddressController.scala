@@ -47,8 +47,9 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
             Future.successful(BadRequest(current_address(f, edit, index)))
           case ValidForm(_, data) => {
 
-            val futureOriginalPersonAddress = getData[ResponsiblePeople](index) map { rp =>
+            val futureOriginalPersonAddress = getData[ResponsiblePeople](index) map { rpO =>
               for {
+                rp <- rpO
                 addHist <- rp.addressHistory
                 rpCurr <- addHist.currentAddress
               } yield {
