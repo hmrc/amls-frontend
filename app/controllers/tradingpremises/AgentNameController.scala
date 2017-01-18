@@ -4,18 +4,18 @@ import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.{DateOfChange, DateOfChangeHelpers}
+import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import services.StatusService
-import utils.{FeatureToggle, RepeatingSection}
+import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
 
-trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelpers {
+trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -76,11 +76,10 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) flatMap { tradingPremises =>
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ tradingPremises.startDateFormFields()) match {
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
             case form: InvalidForm =>
               Future.successful(BadRequest(views.html.date_of_change(
-                form.withMessageFor(DateOfChange.errorPath,
-                  Messages("error.expected.tp.dateofchange.after.startdate", tradingPremises.startDate.fold("")(_.toString("dd-MM-yyyy")))),
+                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
                 "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               for {

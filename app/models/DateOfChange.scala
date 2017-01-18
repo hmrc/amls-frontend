@@ -36,19 +36,3 @@ object DateOfChange {
       )
     }
 }
-
-trait DateOfChangeHelpers {
-
-  implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises]) {
-
-    def startDate = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => Some(ytp.startDate))
-
-    def startDateFormFields(fieldName: String = "activityStartDate") = {
-      startDate match {
-        case Some(date) => Map(fieldName -> Seq(date.toString("yyyy-MM-dd")))
-        case _ => Map.empty[String, Seq[String]]
-      }
-    }
-  }
-
-}
