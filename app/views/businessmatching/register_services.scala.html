@@ -19,6 +19,7 @@
 
     @form(f, controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
 
+        <div class="form-group">
         @fieldset(
             f = f("redundantvalue"),
             legend = "businessmatching.registerservices.title",
@@ -65,6 +66,8 @@
                 )
             }
         }
+        </div>
+
 
         @detailsSummary(
             summary = Messages("businessmatching.registerservices.details")
