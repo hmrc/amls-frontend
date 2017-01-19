@@ -49,7 +49,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             }
             status <- statusService.getStatus
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises.get, ytp) =>
+            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises.get, ytp) && edit =>
               Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
