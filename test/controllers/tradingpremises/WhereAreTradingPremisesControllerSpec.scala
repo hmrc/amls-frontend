@@ -277,13 +277,11 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
-
-
+      
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-
-      val result = controller.post(1)(initRequest)
+      val result = controller.post(1, edit = true)(initRequest)
 
       hstatus(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.dateOfChange(1).url))
