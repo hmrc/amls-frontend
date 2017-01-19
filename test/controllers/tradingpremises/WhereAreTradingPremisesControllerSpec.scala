@@ -384,6 +384,28 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
+    "given a date of change in the future" in new Fixture {
+
+      val tp = mock[TradingPremises]
+      val ytp = mock[YourTradingPremises]
+
+      when(tp.yourTradingPremises) thenReturn Some(ytp)
+      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+
+      val postRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.day" -> "1",
+        "dateOfChange.month" -> "1",
+        "dateOfChange.year" -> LocalDate.now.plusYears(1).getYear.toString
+      )
+
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any())) thenReturn Future.successful(Some(Seq(tp)))
+
+      val result = controller.saveDateOfChange(1)(postRequest)
+
+      hstatus(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.future.date"))
+    }
+
   }
 
   "given a date of change which is before the activity start date" in new Fixture {
