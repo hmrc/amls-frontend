@@ -1,9 +1,7 @@
 package controllers.tradingpremises
 
-
 import connectors.DataCacheConnector
 import models._
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -277,7 +275,7 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
-      
+
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
@@ -366,6 +364,24 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
         case Some(result: YourTradingPremises) => result must be(expectedResult)
       }
 
+    }
+
+    "given invalid form data" in new Fixture {
+
+      val tp = mock[TradingPremises]
+      val ytp = mock[YourTradingPremises]
+
+      when(tp.yourTradingPremises) thenReturn Some(ytp)
+      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+
+      val postRequest = request.withFormUrlEncodedBody()
+
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any())) thenReturn Future.successful(Some(Seq(tp)))
+
+      val result = controller.saveDateOfChange(1)(postRequest)
+
+      hstatus(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
   }
