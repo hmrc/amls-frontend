@@ -20,40 +20,44 @@
     @form(f, controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
         @fieldset(
-            f = f("appliedFor"),
+            f = f("redundantvalue"),
             legend = "businessmatching.psr.number.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("appliedFor"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target",
-                inline = true
-            )
-            @radio(
-                f = f("appliedFor"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
-        }
 
-        @fieldset(
-            f = f("regNumber-fieldset"),
-            legend = "businessmatching.psr.number.lbl",
-            legendHidden = true,
-            jsHidden = true,
-            id = target,
-            panel = false
-        ) {
-            @input(
-                field = f("regNumber"),
-                bold = false,
-                labelText = "businessmatching.psr.number.lbl",
-                hintText = "businessmatching.psr.number.hint"
-            )
+            @errorGroup(
+                field = f("appliedFor")
+            ) {
+
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("appliedFor"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
+
+                @panel(
+                        f = f("regNumber-fieldset"),
+                        jsHidden = false,
+                        id = target
+                ) {
+                    @input(
+                        field = f("regNumber"),
+                        bold = false,
+                        labelText = "businessmatching.psr.number.lbl",
+                        hintText = "businessmatching.psr.number.hint"
+                    )
+                }
+
         }
 
         @submit(edit)

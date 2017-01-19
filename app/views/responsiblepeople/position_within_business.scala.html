@@ -14,61 +14,72 @@
     heading = header
 ) {
 
+    @panel(
+        wide = true,
+        jsHidden = false,
+        gutter = true
+    ) {
 
-    <p>@Messages("lbl.select.all")</p>
+
+        <p>@Messages("responsiblepeople.position_within_business.important")</p>
+    }
+
+    <span class="form-hint">@Messages("lbl.select.all")</span>
 
     @form(f, controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit)) {
 
-        @fieldset(
-            f = f("positions"),
-            legend = "responsiblepeople.position_within_business.title",
-            legendHidden = true,
-            panel = false
-        ) {
-            @businessType match {
-                case BusinessType.SoleProprietor => {
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "responsiblepeople.position_within_business.lbl.06",
-                        value = "06"
-                    )
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "responsiblepeople.position_within_business.lbl.04",
-                        value = "04"
-                    )
-                }
-                case BusinessType.Partnership => {
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "responsiblepeople.position_within_business.lbl.05",
-                        value = "05"
-                    )
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "responsiblepeople.position_within_business.lbl.04",
-                        value = "04"
-                    )
-                }
-                case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "responsiblepeople.position_within_business.lbl.01",
-                        value = "01"
-                    )
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "responsiblepeople.position_within_business.lbl.02",
-                        value = "02"
-                    )
-                    @checkbox(
-                        f = f("positions[]"),
-                        labelText = "responsiblepeople.position_within_business.lbl.04",
-                        value = "04"
-                    )
+        <div class="form-group">
+            @fieldset(
+                f = f("positions"),
+                legend = "responsiblepeople.position_within_business.title",
+                legendHidden = true,
+                panel = false
+            ) {
+                @businessType match {
+                    case BusinessType.SoleProprietor => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.06",
+                            value = "06"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                    }
+                    case BusinessType.Partnership => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.05",
+                            value = "05"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                    }
+                    case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.01",
+                            value = "01"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.02",
+                            value = "02"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                    }
                 }
             }
-        }
+        </div>
 
         @date(
             f = f,

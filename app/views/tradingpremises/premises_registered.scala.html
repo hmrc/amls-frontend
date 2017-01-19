@@ -14,9 +14,14 @@
 ) {
 
     @form(f, controllers.tradingpremises.routes.PremisesRegisteredController.post(index)) {
-        <div class="panel-indent panel-border-wide">
+
+        @panel(
+            wide = true,
+            gutter = true,
+            jsHidden = false
+        ) {
             <p>@Messages("tradingpremises.have.registered.premises.text", index) </p>
-        </div>
+        }
 
         @fieldset(
             f = f("registerAnotherPremises"),

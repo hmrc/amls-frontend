@@ -18,9 +18,15 @@
     heading = header
 )  {
 
-    @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
+   @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+        ) {
+            <p>@Messages("bankdetails.confirm-activities.subtitle") @businessTypes</p>
+    }
 
-        <p>@Messages("bankdetails.confirm-activities.subtitle") @businessTypes</p>
+    @form(f, controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
 
         @fieldset(
             f = f("involvedInOther"),
@@ -42,22 +48,21 @@
                 value = "false",
                 inline = true
             )
+            @panel(
+                f = f("target"),
+                jsHidden = false,
+                id = target
+            ) {
+                @textarea(
+                    field = f("details"),
+                    labelText = "businessactivities.confirm-activities.lbl.details",
+                    bold = false,
+                    largeWidth = true,
+                    rows = "6",
+                    cols = "30"
+                )
+            }
         }
-
-        @fieldset(
-            f = f(s"$target"),
-            legend = "businessactivities.confirm-activities.line1.text",
-            legendHidden = true,
-            id = target
-        ) {
-            @textarea(
-                field = f("details"),
-                labelText = "businessactivities.confirm-activities.lbl.details",
-                bold = false
-            )
-        }
-
         @submit(false)
-
     }
 }

@@ -17,22 +17,27 @@
     @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
 
     @fieldset(
-        legend = "msb.which_currencies.uptoThree",
+        legend = "msb.which_currencies.title",
+        legendHidden = true,
         panel = false,
         classes = Seq("form-field-group-end"),
         hint = "msb.which_currencies.uptoThree.hint",
         f = f("currencies-fieldset")
-    ) {
+    )   {
         @errorGroup(f("currencies")) {
-            @currency(field=f("currencies[0]"))
-            @currency(field=f("currencies[1]"), requiredField = false)
-            @currency(field=f("currencies[2]"), requiredField = false)
+        @currency(field=f("currencies[0]"))
+        @currency(field=f("currencies[1]"), requiredField = false)
+        @currency(field=f("currencies[2]"), requiredField = false)
         }
     }
+
+
 
         @fieldset(
             legend = "msb.which_currencies.who",
             panel = false,
+            bold = false,
+
             classes = Seq("form-field-group-end"),
             hint = "lbl.select.all",
             f = f("WhoWillSupply-fieldset")

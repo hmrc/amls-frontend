@@ -15,16 +15,15 @@
     heading = header
 ) {
 
-    <div class="form-field">
+
         @Messages("estateagentbusiness.penalisedunderestateagentsact.subtitle")
-    </div>
-
-    @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
-
-        <ul class="list list-bullet form-group">
+        <ul class="list list-bullet">
             <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.warning")</li>
             <li>@Messages("estateagentbusiness.penalisedunderestateagentsact.banned")</li>
         </ul>
+
+
+    @form(f, controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.post(edit)) {
 
         @fieldset(
             f = f("penalisedUnderEstateAgentsAct"),
@@ -58,7 +57,10 @@
                 f("penalisedUnderEstateAgentsActDetails"),
                 labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
                 hintText = "hint.255.chars",
-                bold = false
+                bold = false,
+                largeWidth = true,
+                cols = "30",
+                rows = "8"
             )
         }
 

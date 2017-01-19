@@ -13,9 +13,9 @@
     heading = header
 ) {
 
-    @form(f, controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
+    <span class="form-hint">@Messages("hvd.percentage.text")</span>
 
-        <p>@Messages("hvd.percentage.text")</p>
+    @form(f, controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 
         @fieldset(
             f = f("percentage"),

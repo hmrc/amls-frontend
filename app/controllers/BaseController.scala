@@ -2,6 +2,9 @@ package controllers
 
 import config.ApplicationConfig
 import controllers.auth.AmlsRegime
+import forms.InvalidForm
+import play.api.data.mapping.Path
+import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import uk.gov.hmrc.play.frontend.auth.Actions
@@ -19,4 +22,9 @@ trait BaseController extends FrontendController with Actions {
       Messages("error.not-found.message"))
   }
 
+  implicit class InvalidFormExtensions(form: InvalidForm) {
+    def withMessageFor(p: Path, message: String) = {
+      InvalidForm(form.data, (form.errors filter (x => x._1 != p)) :+ (p, Seq(ValidationError(message))))
+    }
+  }
 }

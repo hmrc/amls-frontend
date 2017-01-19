@@ -13,9 +13,9 @@
   heading = header
 ) {
 
-  @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
+  <span class="form-hint">@Messages("hvd.receiving.convert.currency.text")</span>
 
-    <p>@Messages("hvd.receiving.convert.currency.text")</p>
+  @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
 
     @fieldset(
       f = f("receivePayments"),
@@ -44,7 +44,7 @@
           legend = "hvd.receiving.expect.to.receive",
           classes = Seq("paymentMethods-fieldset"),
           hint = "lbl.select.all"
-    ) {
+      ) {
           @checkbox(
             f = f("paymentMethods.courier"),
             labelText = "hvd.receiving.option.01",

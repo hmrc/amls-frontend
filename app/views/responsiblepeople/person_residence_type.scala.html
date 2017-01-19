@@ -15,65 +15,66 @@
 
     @form(f, controllers.responsiblepeople.routes.PersonResidentTypeController.post(index, edit)) {
 
-        @fieldset(f = f("isUKResidence"),
-            legend = "responsiblepeople.person.a.resident.title",
-            legendHidden = true,
-            panel = false) {
+        <div class="form-group">
+            @fieldset(f = f("isUKResidence"),
+                legend = "responsiblepeople.person.a.resident.title",
+                legendHidden = true,
+                panel = false) {
 
-            @radio(f("isUKResidence"), "lbl.yes", "true", target = ".ukResident-fieldset", inline = true)
-            @radio(f("isUKResidence"), "lbl.no", "false", target = ".nonUkResident-fieldset", inline = true)
-        }
-
-        @panel(
-            jsHidden = true,
-            classes = Seq("ukResident-fieldset")
-        ) {
-            @input(f("nino"), "lbl.nino", "lbl.nino.hint", bold = false)
-        }
-
-        @panel(
-            jsHidden = true,
-            classes = Seq("nonUkResident-fieldset")
-        ) {
-
-            @fieldset(
-                f = f("passportType"),
-                legend = "responsiblepeople.passporttype.lbl",
-                panel=false
-            ) {
-                @radio(f("passportType"), "responsiblepeople.uk.passport.lbl", "01", target = ".ukPassportNumber-fieldset")
-                @panel(
-                    jsHidden = true,
-                    classes = Seq("ukPassportNumber-fieldset")
-                ) {
-                   @input(f("ukPassportNumber"), "lbl.passport.number", bold = false)
-                }
-
-                @radio(f("passportType"), "responsiblepeople.non.uk.passport.lbl", "02", target = ".nonUKPassportNumber-fieldset")
-                @panel(
-                    jsHidden = true,
-                    classes = Seq("nonUKPassportNumber-fieldset")
-                ) {
-                    @input(f("nonUKPassportNumber"), "lbl.passport.number", bold = false)
-                }
-
-                @radio(f("passportType"), "responsiblepeople.no.passport.lbl", "03")
+                @radio(f("isUKResidence"), "lbl.yes", "true", target = ".ukResident-fieldset", inline = true)
+                @radio(f("isUKResidence"), "lbl.no", "false", target = ".nonUkResident-fieldset", inline = true)
             }
-            @date(
-                f = f,
-                p = "dateOfBirth",
-                labelText = "responsiblepeople.dob.lbl",
-                hintText = "responsiblepeople.dob.lbl.hint",
-                example = false,
-                jsHidden = true
-            )
-        }
 
-        <div class="form-field-group">
-            <div class="form-field">
-                @country(f("countryOfBirth"), labelText = "responsiblepeople.country.of.birth.lbl" )
-            </div>
+            @panel(
+                jsHidden = true,
+                classes = Seq("ukResident-fieldset")
+            ) {
+                @input(f("nino"), "lbl.nino", "lbl.nino.hint", bold = false)
+            }
+
+            @panel(
+                jsHidden = true,
+                classes = Seq("nonUkResident-fieldset")
+            ) {
+
+
+                    @fieldset(
+                        f = f("passportType"),
+                        legend = "responsiblepeople.passporttype.lbl",
+                        panel=false
+                    ) {
+                        @radio(f("passportType"), "responsiblepeople.uk.passport.lbl", "01", target = ".ukPassportNumber-fieldset")
+                        @panel(
+                            jsHidden = true,
+                            classes = Seq("ukPassportNumber-fieldset")
+                        ) {
+                           @input(f("ukPassportNumber"), "lbl.passport.number", bold = false)
+                        }
+
+                        @radio(f("passportType"), "responsiblepeople.non.uk.passport.lbl", "02", target = ".nonUKPassportNumber-fieldset")
+                        @panel(
+                            jsHidden = true,
+                            classes = Seq("nonUKPassportNumber-fieldset")
+                        ) {
+                            @input(f("nonUKPassportNumber"), "lbl.passport.number", bold = false)
+                        }
+
+                        @radio(f("passportType"), "responsiblepeople.no.passport.lbl", "03")
+                    }
+                    @date(
+                        f = f,
+                        p = "dateOfBirth",
+                        labelText = "responsiblepeople.dob.lbl",
+                        hintText = "responsiblepeople.dob.lbl.hint",
+                        example = false,
+                        jsHidden = true
+                    )
+
+            }
         </div>
+
+        @country(f("countryOfBirth"), labelText = "responsiblepeople.country.of.birth.lbl" )
+
 
         @submit(false)
     }
