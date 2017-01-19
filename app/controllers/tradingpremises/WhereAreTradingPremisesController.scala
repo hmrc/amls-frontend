@@ -3,7 +3,7 @@ package controllers.tradingpremises
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
@@ -15,7 +15,7 @@ import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
-trait WhereAreTradingPremisesController extends RepeatingSection with BaseController with DateOfChangeHelper {
+trait WhereAreTradingPremisesController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService

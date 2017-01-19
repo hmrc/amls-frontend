@@ -8,14 +8,13 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{MsbServices, TradingPremises}
 import org.joda.time.LocalDate
-import play.api.i18n.Messages
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait MSBServicesController extends RepeatingSection with BaseController with DateOfChangeHelper {
+trait MSBServicesController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
