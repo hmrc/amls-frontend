@@ -424,5 +424,6 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
     val result = controller.saveDateOfChange(1)(postRequest)
 
     hstatus(result) must be(BAD_REQUEST)
+    contentAsString(result) must include(Messages("error.expected.tp.dateofchange.after.startdate", "01-01-2008"))
   }
 }
