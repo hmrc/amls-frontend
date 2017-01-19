@@ -254,10 +254,10 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
-          val captor = ArgumentCaptor.forClass(classOf[TradingPremises])
-          verify(controller.dataCacheConnector).save[TradingPremises](meq(TradingPremises.key), captor.capture())(any(), any(), any())
+          val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](meq(TradingPremises.key), captor.capture())(any(), any(), any())
 
-          captor.getValue.agentName match {
+          captor.getValue.head.agentName match {
             case Some(savedName: AgentName) => savedName must be(updatedName)
           }
 

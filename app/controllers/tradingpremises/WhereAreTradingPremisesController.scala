@@ -8,13 +8,14 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
+import play.api.i18n.Messages
 import services.StatusService
-import utils.{FeatureToggle, RepeatingSection}
+import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
-trait WhereAreTradingPremisesController extends RepeatingSection with BaseController {
+trait WhereAreTradingPremisesController extends RepeatingSection with BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -72,15 +73,13 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   def saveDateOfChange(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
-
         getData[TradingPremises](index) flatMap { tradingPremises =>
-          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
-            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
-          }
-
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
+              Future.successful(BadRequest(
+                views.html.date_of_change(
+                  form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
+                  "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               updateDataStrict[TradingPremises](index) { tp =>
                 tp.yourTradingPremises.fold(tp) { ytp =>

@@ -8,14 +8,14 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{MsbServices, TradingPremises}
 import org.joda.time.LocalDate
-import play.api.mvc.{Action, Result}
+import play.api.i18n.Messages
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait MSBServicesController extends RepeatingSection with BaseController {
+trait MSBServicesController extends RepeatingSection with BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -72,13 +72,11 @@ trait MSBServicesController extends RepeatingSection with BaseController {
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) flatMap { tradingPremises =>
-          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
-            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
-          }
-
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index))))
+              Future.successful(BadRequest(views.html.date_of_change(
+                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
+                "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               for {
                 _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
