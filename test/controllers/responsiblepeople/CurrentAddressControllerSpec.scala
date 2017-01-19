@@ -447,7 +447,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
       "when the service status is approved" when {
         "the address has been changed" must {
-          "redirect to the date of change controller" in new Fixture {
+          "redirect to the date of change controller when edit mode is true" in new Fixture {
             val requestWithParams = request.withFormUrlEncodedBody(
               "isUK" -> "true",
               "addressLine1" -> "newline1",
@@ -474,6 +474,34 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(1, true).url))
+          }
+          "redirect to the detailed answers controller when edit mode is false" in new Fixture {
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "isUK" -> "true",
+              "addressLine1" -> "newline1",
+              "addressLine2" -> "newline2",
+              "postCode" -> "AB1 2CD",
+              "timeAtAddress" -> "04"
+            )
+
+            val originalResponsiblePeople = ResponsiblePeople(
+              addressHistory = Some(ResponsiblePersonAddressHistory(
+                currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                )
+              ))
+            )
+
+            when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
+            when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(emptyCache))
+            when(currentAddressController.statusService.getStatus(any(), any(), any()))
+              .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+            val result = currentAddressController.post(RecordId, false)(requestWithParams)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
           }
         }
         "the address has not changed" when {

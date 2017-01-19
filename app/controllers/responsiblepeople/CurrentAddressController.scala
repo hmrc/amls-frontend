@@ -78,7 +78,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                              edit: Boolean,
                              originalPersonAddress: Option[PersonAddress],
                              data: ResponsiblePersonCurrentAddress) = {
-    if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)) {
+    if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress) && edit) {
       Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
     } else if ((data.timeAtAddress == ThreeYearsPlus) || data.timeAtAddress == OneToThreeYears) {
       Redirect(routes.DetailedAnswersController.get(index))
