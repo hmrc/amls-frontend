@@ -45,6 +45,16 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
     "get is called" must {
 
+      "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
+        val responsiblePeople = ResponsiblePeople()
+
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
+        val result = currentAddressController.get(40)(request)
+        status(result) must be(NOT_FOUND)
+      }
+
       "display the persons page when no existing data in keystore" in new Fixture {
 
         val responsiblePeople = ResponsiblePeople()

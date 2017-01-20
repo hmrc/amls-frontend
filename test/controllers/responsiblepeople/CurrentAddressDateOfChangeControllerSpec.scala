@@ -35,11 +35,12 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
   val emptyCache = CacheMap("", Map.empty)
 
   "CurrentAddressDateOfChangeController" must {
-    "return viewfor Date of Change" in new Fixture {
-      val result = controller.get(0, false)(request)
-      status(result) must be(OK)
+    "when get is called" must {
+      "return view for Date of Change when given a valid request" in new Fixture {
+        val result = controller.get(0, false)(request)
+        status(result) must be(OK)
+      }
     }
-
 
     "when post is called" when {
       "given valid data for a current address time ZeroToFiveMonths" must {
