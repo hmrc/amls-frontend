@@ -46,7 +46,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
             }
             status <- statusService.getStatus
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, data) && edit =>
+            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, data) && edit && tradingPremises.lineId.isDefined =>
               Redirect(routes.MSBServicesController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))

@@ -23,7 +23,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getData[TradingPremises](index) map {
-        case Some(TradingPremises(_,Some(data), _,_,_,_,_,_,_,_,_,_)) =>
+        case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _)) =>
           Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
         case Some(_) =>
           Ok(where_are_trading_premises(EmptyForm, edit, index))
@@ -43,13 +43,13 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
           for {
             tradingPremises <- getData[TradingPremises](index)
             _ <- updateDataStrict[TradingPremises](index) { tp =>
-                TradingPremises(tp.registeringAgentPremises,
-                  Some(ytp), tp.businessStructure,tp.agentName,tp.agentCompanyName,
-                  tp.agentPartnership,tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, hasChanged = true, tp.lineId, tp.status, tp.endDate)
+              TradingPremises(tp.registeringAgentPremises,
+                Some(ytp), tp.businessStructure, tp.agentName, tp.agentCompanyName,
+                tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, hasChanged = true, tp.lineId, tp.status, tp.endDate)
             }
             status <- statusService.getStatus
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises.get, ytp) && edit =>
+            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, ytp) && edit =>
               Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
@@ -73,35 +73,36 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
 
   def saveDateOfChange(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
-        getData[TradingPremises](index) flatMap { tradingPremises =>
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
-            case form: InvalidForm =>
-              Future.successful(BadRequest(
-                views.html.date_of_change(
-                  form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
-                  "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
-            case ValidForm(_, dateOfChange) =>
-              updateDataStrict[TradingPremises](index) { tp =>
-                tp.yourTradingPremises.fold(tp) { ytp =>
-                  tp.copy(
-                    yourTradingPremises = Some(ytp.copy(
-                      tradingNameChangeDate = Some(dateOfChange),
-                      tradingPremisesAddress = ytp.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
-                      )))
-                }
-              } map { _ =>
-                Redirect(routes.SummaryController.get())
+      getData[TradingPremises](index) flatMap { tradingPremises =>
+        Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
+          case form: InvalidForm =>
+            Future.successful(BadRequest(
+              views.html.date_of_change(
+                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
+                "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
+          case ValidForm(_, dateOfChange) =>
+            updateDataStrict[TradingPremises](index) { tp =>
+              tp.yourTradingPremises.fold(tp) { ytp =>
+                tp.copy(
+                  yourTradingPremises = Some(ytp.copy(
+                    tradingNameChangeDate = Some(dateOfChange),
+                    tradingPremisesAddress = ytp.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
+                  )))
               }
-          }
+            } map { _ =>
+              Redirect(routes.SummaryController.get())
+            }
         }
+      }
   }
 
-  private def redirectToDateOfChange(tradingPremises: TradingPremises, premises: YourTradingPremises) =
-  ApplicationConfig.release7 && {
-    tradingPremises.yourTradingPremises.fold(false) { ytp =>
-      ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress
-    }
-  }
+  private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], premises: YourTradingPremises) =
+    ApplicationConfig.release7 && (for {
+      tp <- tradingPremises
+      ytp <- tp.yourTradingPremises
+    } yield (ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress) && tp.lineId.isDefined
+      ).getOrElse(false)
+
 }
 
 object WhereAreTradingPremisesController extends WhereAreTradingPremisesController {
