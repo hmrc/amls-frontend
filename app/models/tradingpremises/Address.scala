@@ -39,8 +39,8 @@ object Address {
       (
         (__ \ "addressLine1").read(notEmptyStrip.withMessage("error.required.address.line1") compose validateAddress) ~
           (__ \ "addressLine2").read(notEmptyStrip.withMessage("error.required.address.line2") compose validateAddress) ~
-          (__ \ "addressLine3").read(notEmptyStrip compose validateAddress compose valueOrNone) ~
-          (__ \ "addressLine4").read(notEmptyStrip compose validateAddress compose valueOrNone) ~
+          (__ \ "addressLine3").read(optionR(notEmptyStrip compose validateAddress)) ~
+          (__ \ "addressLine4").read(optionR(notEmptyStrip compose validateAddress)) ~
           (__ \ "postcode").read(postcodeType)
         )(Address.applyWithoutDateOfChange _)
     }
