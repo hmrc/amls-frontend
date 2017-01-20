@@ -52,10 +52,10 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case f: InvalidForm => {
               val fullName = name.fullName
-              val dateFormatted = date.toString("yyyy-MM-dd")
+              val dateFormatted = date.toString("d MMMM yyyy")
               Future.successful(BadRequest(
                 views.html.date_of_change(
-                  f.withMessageFor(DateOfChange.errorPath, Messages("error.expected.rp.date.after.start")),
+                  f.withMessageFor(DateOfChange.errorPath, Messages("error.expected.rp.date.after.start", fullName, dateFormatted)),
                   "summary.responsiblepeople",
                   controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.post(index, edit)
                 )
