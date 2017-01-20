@@ -267,11 +267,10 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       )
 
       val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, true, LocalDate.now())
-
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, LocalDate.now())
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises))))))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = Some(1))))))
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
@@ -319,6 +318,37 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
       hstatus(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+    }
+
+    "the trading premises instance is brand new" in new Fixture {
+
+      val initRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address 1",
+        "addressLine2" -> "Address 2",
+        "postcode" -> "NE98 1ZZ",
+        "isResidential" -> "true",
+        "startDate.day" -> "01",
+        "startDate.month" -> "02",
+        "startDate.year" -> "2010"
+      )
+
+      val address = Address("Address 1", "Address 2", None, None, "NE98 1ZZ")
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, new LocalDate(2007, 2, 1))
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = None)))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.post(1, edit = true)(initRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url))
     }
   }
 
