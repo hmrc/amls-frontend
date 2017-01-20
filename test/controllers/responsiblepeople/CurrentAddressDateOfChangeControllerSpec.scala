@@ -203,10 +203,13 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+        val responsiblePeople = ResponsiblePeople(
+          addressHistory = Some(history),
+          personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+          positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2013,1,1)))))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          .thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 

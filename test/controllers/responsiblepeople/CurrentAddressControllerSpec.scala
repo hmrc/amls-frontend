@@ -23,6 +23,8 @@ import scala.concurrent.Future
 
 class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
+
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
 
@@ -474,7 +476,9 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.CurrentAddressDateOfChangeController.get(1, true).url))
+
           }
+
           "redirect to the detailed answers controller when edit mode is false" in new Fixture {
             val requestWithParams = request.withFormUrlEncodedBody(
               "isUK" -> "true",
