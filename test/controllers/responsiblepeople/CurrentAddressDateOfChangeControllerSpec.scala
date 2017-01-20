@@ -19,6 +19,7 @@ import scala.concurrent.Future
 
 
 class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   trait Fixture extends AuthorisedFixture {
@@ -53,7 +54,10 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(
+            addressHistory = Some(history),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -79,7 +83,10 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, SixToElevenMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(
+            addressHistory = Some(history),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -105,7 +112,10 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, OneToThreeYears)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(
+            addressHistory = Some(history),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -131,7 +141,10 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+          val responsiblePeople = ResponsiblePeople(
+            addressHistory = Some(history),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -154,7 +167,10 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+        val responsiblePeople = ResponsiblePeople(
+          addressHistory = Some(history),
+          personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+          positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -178,7 +194,10 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus, Some(DateOfChange(new LocalDate(2017,1,1))))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
+        val responsiblePeople = ResponsiblePeople(
+          addressHistory = Some(history),
+          personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+          positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2017,1,1)))))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -199,14 +218,6 @@ class CurrentAddressDateOfChangeControllerSpec extends PlaySpec with OneAppPerSu
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"
         )
-
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, ThreeYearsPlus)
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePeople(
-          addressHistory = Some(history),
-          personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
-          positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2013,1,1)))))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))

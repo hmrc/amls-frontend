@@ -8,6 +8,7 @@ import models.DateOfChange
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
+import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -44,49 +45,44 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
         }
       }
 
-      extraInfo.flatMap { info =>
+      extraInfo.flatMap {
+        case Some((date, name, responsiblePeople)) => {
+          val extraFields = Map("activityStartDate" -> Seq(date.toString("yyyy-MM-dd")))
 
-        println("**************" + info)
-
-        val newInfo = info.getOrElse(throw new RuntimeException("there really should be a person name and date here"))
-        val date = newInfo._1
-        val personName = newInfo._2
-        val extraFields = Map("activityStartDate" -> Seq(date.toString("yyyy-MM-dd")))
-
-        (Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
-          case f: InvalidForm => {
-            val fullName = personName.fullName
-            val dateFormatted = date.toString("yyyy-MM-dd")
-            Future.successful(BadRequest(
-              views.html.date_of_change(
-                // move into messages...
-                f.withMessageFor(DateOfChange.errorPath, s"The date must be after $fullName started in this position, which was $dateFormatted"),
-                "summary.responsiblepeople",
-                controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.post(index, edit)
-              )
-            ))
-          }
-          case ValidForm(_, dateOfChange) => {
-            val timeAtCurrentO = newInfo._3 flatMap { rp =>
-              for {
-                addHist <- rp.addressHistory
-                rpCurr <- addHist.currentAddress
-              } yield {
-                rpCurr.timeAtAddress
-              }
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+            case f: InvalidForm => {
+              val fullName = name.fullName
+              val dateFormatted = date.toString("yyyy-MM-dd")
+              Future.successful(BadRequest(
+                views.html.date_of_change(
+                  f.withMessageFor(DateOfChange.errorPath, Messages("error.expected.rp.date.after.start")),
+                  "summary.responsiblepeople",
+                  controllers.responsiblepeople.routes.CurrentAddressDateOfChangeController.post(index, edit)
+                )
+              ))
             }
+            case ValidForm(_, dateOfChange) => {
+              val timeAtCurrentO = responsiblePeople flatMap { rp =>
+                for {
+                  addHist <- rp.addressHistory
+                  rpCurr <- addHist.currentAddress
+                } yield {
+                  rpCurr.timeAtAddress
+                }
+              }
 
-            doUpdate(index, dateOfChange).map { _ =>
-              timeAtCurrentO match {
-                case Some(ZeroToFiveMonths) | Some(SixToElevenMonths) =>
-                  Redirect(routes.AdditionalAddressController.get(index, edit))
-                case Some(_) => Redirect(routes.DetailedAnswersController.get(index))
+              doUpdate(index, dateOfChange).map { _ =>
+                timeAtCurrentO match {
+                  case Some(ZeroToFiveMonths) | Some(SixToElevenMonths) =>
+                    Redirect(routes.AdditionalAddressController.get(index, edit))
+                  case Some(_) => Redirect(routes.DetailedAnswersController.get(index))
+                }
               }
             }
           }
-        }).recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+
         }
+        case _ => Future.successful(NotFound(notFoundView))
       }
   }
 
