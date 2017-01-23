@@ -1,6 +1,6 @@
 package models.tradingpremises
 
-import models.DateOfChange
+import models.{DateOfChange, FormTypes}
 import org.joda.time.LocalDate
 import play.api.data.mapping.forms.Rules._
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -19,7 +19,7 @@ case class YourTradingPremises(
 object YourTradingPremises {
 
   val maxLengthPremisesTradingName = 120
-  val premisesTradingNameType = notEmpty.withMessage("error.required.tp.trading.name") compose
+  val premisesTradingNameType = FormTypes.notEmptyStrip.withMessage("error.required.tp.trading.name") compose
     maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name")
 
   implicit val reads: Reads[YourTradingPremises] = {

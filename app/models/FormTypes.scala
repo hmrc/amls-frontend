@@ -71,6 +71,11 @@ object FormTypes {
     _.trim
   }
 
+  val valueOrNone = Rule.zero[String] fmap {
+    case "" => None
+    case str => Some(str)
+  }
+
   val transformUppercase = Rule.zero[String] fmap {
     _.toUpperCase
   }
