@@ -1,9 +1,10 @@
 package models.businessmatching
 
+import models.DateOfChange
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
-import play.api.i18n.{Messages, Lang}
+import play.api.i18n.{Lang, Messages}
 import play.api.libs.json._
 import utils.TraversableValidators._
 
@@ -107,9 +108,6 @@ object BusinessActivities {
   }
 
   implicit val formats = Json.format[BusinessActivities]
-
-  implicit def toFormRequestBody(activities: BusinessActivities): Seq[(String, String)] =
-    formWrites.writes(activities).map(f => (f._1, f._2.head)).toSeq
 
 }
 

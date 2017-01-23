@@ -1,23 +1,28 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
+import models.DateOfChange
 import models.businessmatching._
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.status.SubmissionDecisionApproved
+import models.tradingpremises.{MsbServices, TradingPremises, WhatDoesYourBusinessDo}
+import org.joda.time.LocalDate
 import play.api.mvc.Result
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.HeaderCarrier
-import utils.RepeatingSection
+import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
-trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController {
+trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController with FormHelpers with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
+  val statusService: StatusService
 
   private def data(index: Int, edit: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
@@ -87,30 +92,36 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 BadRequest(what_does_your_business_do(f, ba, edit, index))
               }
             case ValidForm(_, data) => {
-              updateDataStrict[TradingPremises](index) {
-                case tp if data.activities.contains(MoneyServiceBusiness) =>
-                  tp.whatDoesYourBusinessDoAtThisAddress(data)
-                case tp if !data.activities.contains(MoneyServiceBusiness) =>
-                  TradingPremises(
-                    tp.registeringAgentPremises,
-                    tp.yourTradingPremises,
-                    tp.businessStructure,
-                    tp.agentName,
-                    tp.agentCompanyName,
-                    tp.agentPartnership,
-                    Some(data),
-                    None,
-                    true,
-                    tp.lineId,
-                    tp.status,
-                    tp.endDate
-                  )
-              } map {
-                _ => data.activities.contains(MoneyServiceBusiness) match {
+              for {
+                tradingPremises <- getData[TradingPremises](index)
+                _ <- updateDataStrict[TradingPremises](index) {
+                  case tp if data.activities.contains(MoneyServiceBusiness) =>
+                    tp.whatDoesYourBusinessDoAtThisAddress(data)
+                  case tp if !data.activities.contains(MoneyServiceBusiness) =>
+                    TradingPremises(
+                      tp.registeringAgentPremises,
+                      tp.yourTradingPremises,
+                      tp.businessStructure,
+                      tp.agentName,
+                      tp.agentCompanyName,
+                      tp.agentPartnership,
+                      Some(data),
+                      None,
+                      true,
+                      tp.lineId,
+                      tp.status,
+                      tp.endDate
+                    )
+                }
+                status <- statusService.getStatus
+              } yield status match {
+                case SubmissionDecisionApproved if !data.activities.contains(MoneyServiceBusiness) && redirectToDateOfChange(tradingPremises, data) && edit =>
+                  Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
+                case _ => data.activities.contains(MoneyServiceBusiness) match {
                   case true => Redirect(routes.MSBServicesController.get(index, edit))
-                  case false => edit match {
-                    case true => Redirect(routes.SummaryController.getIndividual(index))
-                    case false => Redirect(routes.PremisesRegisteredController.get(index))
+                  case _ => edit match {
+                    case true => Redirect (routes.SummaryController.getIndividual (index) )
+                    case false => Redirect (routes.PremisesRegisteredController.get (index) )
                   }
                 }
               }
@@ -122,6 +133,33 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
       }
   }
 
+  def dateOfChange(index: Int) = Authorised {
+    implicit authContext => implicit request =>
+      Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index)))
+  }
+
+  def saveDateOfChange(index: Int) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        getData[TradingPremises](index) flatMap { tradingPremises =>
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
+            case form: InvalidForm =>
+              Future.successful(BadRequest(views.html.date_of_change(
+                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
+                "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
+            case ValidForm(_, dateOfChange) =>
+              for {
+                _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
+                  tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
+                }
+              } yield Redirect(routes.SummaryController.get())
+          }
+        }
+  }
+
+  def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo) =
+    ApplicationConfig.release7 && !tradingPremises.get.whatDoesYourBusinessDoAtThisAddress.contains(WhatDoesYourBusinessDo)
+
   // scalastyle:on cyclomatic.complexity
 }
 
@@ -129,4 +167,5 @@ object WhatDoesYourBusinessDoController extends WhatDoesYourBusinessDoController
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override val statusService = StatusService
 }
