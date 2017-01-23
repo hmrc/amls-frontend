@@ -135,7 +135,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
 
   def dateOfChange(index: Int) = Authorised {
     implicit authContext => implicit request =>
-      Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index)))
+      Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index)))
   }
 
   def saveDateOfChange(index: Int) = Authorised.async {
@@ -158,7 +158,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
   }
 
   def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo) =
-    ApplicationConfig.release7 && !tradingPremises.get.whatDoesYourBusinessDoAtThisAddress.contains(WhatDoesYourBusinessDo)
+    ApplicationConfig.release7 && tradingPremises.lineId.isDefined && !tradingPremises.get.whatDoesYourBusinessDoAtThisAddress.contains(WhatDoesYourBusinessDo)
 
   // scalastyle:on cyclomatic.complexity
 }

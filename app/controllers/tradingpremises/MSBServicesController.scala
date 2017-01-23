@@ -47,7 +47,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
             status <- statusService.getStatus
           } yield status match {
             case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, data) && edit && tradingPremises.lineId.isDefined =>
-              Redirect(routes.MSBServicesController.dateOfChange(index))
+              Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
               case false => Redirect(routes.PremisesRegisteredController.get(index))
@@ -61,30 +61,6 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
 
   def redirectToDateOfChange(tradingPremises: TradingPremises, msbServices: MsbServices) =
     ApplicationConfig.release7 && !tradingPremises.msbServices.contains(msbServices)
-
-  def dateOfChange(index: Int) = Authorised {
-    implicit authContext => implicit request =>
-      Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index)))
-  }
-
-  def saveDateOfChange(index: Int) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        getData[TradingPremises](index) flatMap { tradingPremises =>
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
-            case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(
-                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
-                "summary.tradingpremises", routes.MSBServicesController.saveDateOfChange(index))))
-            case ValidForm(_, dateOfChange) =>
-              for {
-                _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
-                  tradingPremises.msbServices(tradingPremises.msbServices.get.copy(dateOfChange = Some(dateOfChange)))
-                }
-              } yield Redirect(routes.SummaryController.get())
-          }
-        }
-  }
 }
 
 object MSBServicesController extends MSBServicesController {

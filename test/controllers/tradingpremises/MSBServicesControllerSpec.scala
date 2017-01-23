@@ -290,7 +290,7 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       val result = controller.post(1, edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.MSBServicesController.dateOfChange(1).url)
+      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
     }
 
     "redirect to the summary controller when editing, and the services have changed for a record that hasn't been submitted yet" in new Fixture {
@@ -319,59 +319,6 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
-    }
-
-    "return the view for Date Of Change" in new Fixture {
-      val result = controller.dateOfChange(1)(request)
-      status(result) must be(OK)
-    }
-
-    "handle the date of change form" when {
-      "given valid data" in new Fixture {
-
-        val postRequest = request.withFormUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01"
-        )
-
-        val model = TradingPremises(
-          msbServices = Some(MsbServices(
-            Set(TransmittingMoney)
-          ))
-        )
-
-        val data = MsbServices(Set(TransmittingMoney))
-        val expectedData = MsbServices(Set(TransmittingMoney), Some(DateOfChange(new LocalDate(2010,10,1))))
-
-        val yourPremises = mock[YourTradingPremises]
-        when(yourPremises.startDate) thenReturn new LocalDate(2005, 1, 1)
-
-        val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
-
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(premises))))
-
-        when(cache.fetch[Seq[TradingPremises]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
-
-        when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
-          thenReturn(Future.successful(mock[CacheMap]))
-
-        val result = controller.saveDateOfChange(1)(postRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-
-        val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(controller.dataCacheConnector).save[Seq[TradingPremises]](meq(TradingPremises.key), captor.capture())(any(), any(), any())
-
-        captor.getValue.head.msbServices match {
-          case Some(services: MsbServices) => services must be(expectedData)
-        }
-
-
-      }
     }
 
   }
