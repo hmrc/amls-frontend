@@ -8,14 +8,13 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{MsbServices, TradingPremises}
 import org.joda.time.LocalDate
-import play.api.i18n.Messages
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait MSBServicesController extends RepeatingSection with BaseController with DateOfChangeHelper {
+trait MSBServicesController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -47,7 +46,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
             }
             status <- statusService.getStatus
           } yield status match {
-            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, data) =>
+            case SubmissionDecisionApproved if redirectToDateOfChange(tradingPremises, data) && edit && tradingPremises.lineId.isDefined =>
               Redirect(routes.MSBServicesController.dateOfChange(index))
             case _ => edit match {
               case true => Redirect(routes.SummaryController.getIndividual(index))
