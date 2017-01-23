@@ -118,7 +118,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 case SubmissionDecisionApproved if !data.activities.contains(MoneyServiceBusiness) && redirectToDateOfChange(tradingPremises, data) && edit =>
                   Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
                 case _ => data.activities.contains(MoneyServiceBusiness) match {
-                  case true => Redirect(routes.MSBServicesController.get(index, edit))
+                  case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
                   case _ => edit match {
                     case true => Redirect (routes.SummaryController.getIndividual (index) )
                     case false => Redirect (routes.PremisesRegisteredController.get (index) )
@@ -157,8 +157,11 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
         }
   }
 
+  def modelHasChanged(tradingPremises: TradingPremises, model: WhatDoesYourBusinessDo) =
+    tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(false) { _.activities != model.activities }
+
   def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo) =
-    ApplicationConfig.release7 && tradingPremises.lineId.isDefined && !tradingPremises.get.whatDoesYourBusinessDoAtThisAddress.contains(WhatDoesYourBusinessDo)
+    ApplicationConfig.release7 && tradingPremises.lineId.isDefined && modelHasChanged(tradingPremises, model)
 
   // scalastyle:on cyclomatic.complexity
 }

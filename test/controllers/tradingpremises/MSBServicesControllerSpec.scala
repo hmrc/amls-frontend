@@ -293,6 +293,34 @@ class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoS
       redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
     }
 
+    "redirect to the dateOfChange page when the MsbServices haven't changed, but a change from previous services page has been flagged" in new Fixture {
+
+      val model = TradingPremises(
+        lineId = Some(1),
+        msbServices = Some(MsbServices(
+          Set(TransmittingMoney)
+        ))
+      )
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "msbServices[0]" -> "01"
+      )
+
+      when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+
+      when(cache.fetch[Seq[TradingPremises]](any())
+        (any(), any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())
+        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+      val result = controller.post(1, edit = true, changed = true)(newRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.WhatDoesYourBusinessDoController.dateOfChange(1).url)
+    }
+
+
     "redirect to the summary controller when editing, and the services have changed for a record that hasn't been submitted yet" in new Fixture {
 
       val model = TradingPremises(

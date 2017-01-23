@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
@@ -25,13 +26,16 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with BeforeAndAfter {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockCacheMap = mock[CacheMap]
   val fieldElements = Array("report-name", "report-email", "report-action", "report-error")
   val recordId1 = 1
 
+  before {
+    reset(mockDataCacheConnector)
+  }
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -236,7 +240,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.MSBServicesController.get(recordId1, edit = true).url))
+            redirectLocation(result) must be(Some(routes.MSBServicesController.get(recordId1, edit = true, changed = true).url))
           }
 
         }
@@ -249,7 +253,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
               thenReturn(Future.successful(SubmissionDecisionApproved))
 
             val model = WhatDoesYourBusinessDo(Set(AccountancyServices))
-            val tradingPremises = TradingPremises(None, None, None, None, None, None, Some(model), None)
+            val tradingPremises = TradingPremises(None, None, None, None, None, None, Some(model), None, lineId = Some(1))
             val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
             when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -259,7 +263,7 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "02")
+            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
