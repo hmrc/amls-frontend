@@ -39,8 +39,6 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
     val businessMatchingActivitiesAll = BusinessMatchingActivities(
       Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-//    when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-//      .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
     val emptyCache = CacheMap("", Map.empty)
     when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
@@ -182,12 +180,13 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
 
           val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01")
 
-          val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
+          val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
           status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId1).url))
         }
 
 
-        "given a Valid Request with multiple ACTIVITIES and show the summary page" in new Fixture {
+        "given a Valid Request with multiple ACTIVITIES and show the 'premises registered' page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
           val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
@@ -208,6 +207,30 @@ class WhatDoesYourBusinessDoControllerSpec extends PlaySpec with OneAppPerSuite 
           val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+        }
+
+        "given a valid request and money services were specified" must {
+
+          "redirect to the Money Services page" in new Fixture {
+
+            val model = WhatDoesYourBusinessDo(Set(AccountancyServices))
+            val tradingPremises = TradingPremises(None, None, None, None, None, None, Some(model), None)
+            val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
+
+            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+              .thenReturn(Some(Seq(tradingPremises)))
+            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
+
+            val newRequest = request.withFormUrlEncodedBody("activities[0]" -> "01", "activities[1]" -> "05")
+
+            val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.MSBServicesController.get(recordId1).url))
+          }
+
         }
 
 

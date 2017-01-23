@@ -107,6 +107,10 @@ object BusinessActivities {
   }
 
   implicit val formats = Json.format[BusinessActivities]
+
+  implicit def toFormRequestBody(activities: BusinessActivities): Seq[(String, String)] =
+    formWrites.writes(activities).map(f => (f._1, f._2.head)).toSeq
+
 }
 
 
