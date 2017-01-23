@@ -13,10 +13,9 @@
     heading = header
 )  {
 
+    <span class="form-hint">@Messages("hvd.cash.payment.convert.currency.text")</span>
 
     @form(f, controllers.hvd.routes.CashPaymentController.post(edit)) {
-
-        <p>@Messages("hvd.cash.payment.convert.currency.text")</p>
 
         @fieldset(
             f = f("acceptedAnyPayment"),

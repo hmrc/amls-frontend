@@ -16,8 +16,7 @@
     title = Messages("businessactivities.keep.customer.records.title") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
-
-    @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
+        @form(f, controllers.businessactivities.routes.TransactionRecordController.post(edit)) {
 
         @fieldset(
             legend = "businessactivities.keep.customer.records.title",
@@ -43,6 +42,7 @@
         @fieldset(
             f = f("transactions"),
             legend = "businessactivities.do.keep.records",
+            hint = "businessactivities.do.keep.records.hint",
             classes = Seq("transactions-fieldset")
         ) {
             @checkbox(

@@ -1,17 +1,17 @@
 package connectors
 
-import models.declaration.{AddPerson, BeneficialShareholder}
 import models._
+import models.declaration.{AddPerson, BeneficialShareholder}
 import org.joda.time.LocalDateTime
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.domain.{CtUtr, SaUtr, Org}
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.domain.Org
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -65,7 +65,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     etmpFormBundleNumber = "",
     amlsRefNo = "",
     registrationFee = 0,
-    fPFee = None,
+    fpFee = None,
     premiseFee = 0,
     totalFees = 0,
     paymentReference = ""
@@ -75,7 +75,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
-    fPFee = Some(0),
+    fpFee = Some(0),
     premiseFee = 0,
     totalFees = 0,
     paymentReference = Some(""),

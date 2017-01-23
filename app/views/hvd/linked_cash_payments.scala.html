@@ -13,11 +13,13 @@
     heading = header
 ) {
 
+    <span class="form-hint">@Messages("hvd.identify.linked.cash.payments.subtitle")</span>
     @form(f, controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
 
         @fieldset(
             f = f("linkedCashPayments"),
-            legend = "hvd.identify.linked.cash.payments.subtitle",
+            legend = "hvd.identify.linked.cash.payment.title",
+            legendHidden = true,
             panel = false
         ) {
             @radio(

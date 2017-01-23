@@ -13,11 +13,14 @@
     heading = header
 ) {
 
+
+    <span class="form-hint">@Messages("asp.other.business.tax.matters.lbl")</span>
     @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
         @fieldset(
             f = f("otherBusinessTaxMatters"),
-            legend = "asp.other.business.tax.matters.lbl",
+            legend = "asp.other.business.tax.matters.title",
+            legendHidden = true,
             panel = false
         ) {
             @radio(

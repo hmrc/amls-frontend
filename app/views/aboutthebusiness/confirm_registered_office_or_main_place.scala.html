@@ -20,23 +20,30 @@
         @registered_office_helper(model)
 
         @fieldset(
-            f = f("isRegOfficeOrMainPlaceOfBusiness"),
+            f = f("redundantvalue"),
             legend = "aboutthebusiness.confirmingyouraddress.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("isRegOfficeOrMainPlaceOfBusiness"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true
-            )
-            @radio(
-                f = f("isRegOfficeOrMainPlaceOfBusiness"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
+
+            @errorGroup(
+                field = f("isRegOfficeOrMainPlaceOfBusiness")
+            ) {
+
+
+                @radio(
+                    f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
+                )
+                @radio(
+                    f = f("isRegOfficeOrMainPlaceOfBusiness"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+            }
         }
 
         @submit(edit)

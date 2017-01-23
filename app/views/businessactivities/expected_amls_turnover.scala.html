@@ -14,8 +14,11 @@
     heading = header
 ) {
 
-    @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
-
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+        ) {
             <ul class="list list--comma">
                 @bmBusinessActivities.map { ba =>
                     @ba.businessActivities.map {activity =>
@@ -23,6 +26,9 @@
                     }
                 }
             </ul>
+        }
+
+        @form(f, controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
 
             @fieldset(
                 f = f("expectedAMLSTurnover"),

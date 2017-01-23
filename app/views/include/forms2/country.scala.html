@@ -8,7 +8,7 @@
     classes: Seq[String] = Seq.empty
 )(implicit lang: Lang)
 
-<div class="form-field form-field--tall @if(field.hasErrors) {form-field--error}">
+<div class="form-field-group @if(field.hasErrors) {form-field--error}">
     <label for="@field.id">
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>

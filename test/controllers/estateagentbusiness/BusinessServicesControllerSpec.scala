@@ -3,6 +3,7 @@ package controllers.estateagentbusiness
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness._
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -11,6 +12,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -24,6 +26,7 @@ class BusinessServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
     val controller = new BusinessServicesController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -44,12 +47,15 @@ class BusinessServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
       contentAsString(result) must include(Messages("estateagentbusiness.services.title") + " - " + Messages("summary.estateagentbusiness") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
     }
 
-    "submit with valid data 1" in new Fixture {
+    "submit with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "services" -> "02",
         "services" -> "08"
       )
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
 
       when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
@@ -118,6 +124,9 @@ class BusinessServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
         "services[2]" -> "03"
       )
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
       when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -137,6 +146,9 @@ class BusinessServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
         "services[2]" -> "03"
       )
 
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionReadyForReview))
+
       when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -148,22 +160,30 @@ class BusinessServicesControllerSpec extends PlaySpec with OneAppPerSuite with M
       redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get().url))
     }
 
-    "submit with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "services[0]" -> "02",
-        "services[1]" -> "08"
-      )
+    "successfully redirect to dateOfChange page" when {
+      "user edits services option" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+        val newRequest = request.withFormUrlEncodedBody(
+          "services[0]" -> "01",
+          "services[1]" -> "02",
+          "services[2]" -> "07"
+        )
 
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get().url))
+        when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(
+          services = Some(Services(Set(Residential, Commercial, Auction)))))))
+
+        when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+      }
     }
   }
 }

@@ -13,9 +13,13 @@
     heading = header
 ) {
 
-    <div class="panel-indent panel-indent--gutter panel-wide">
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+    ) {
         @Messages("businessmatching.summary.icon.title")
-    </div>
+    }
 
     @model.reviewDetails.map { review =>
         @checkYourAnswers(

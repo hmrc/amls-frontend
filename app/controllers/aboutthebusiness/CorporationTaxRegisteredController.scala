@@ -1,10 +1,10 @@
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
-import connectors.DataCacheConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
+import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.aboutthebusiness.{CorporationTaxRegistered, AboutTheBusiness}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.aboutthebusiness.{AboutTheBusiness, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import views.html.aboutthebusiness.corporation_tax_registered
 
 import scala.concurrent.Future
@@ -12,16 +12,25 @@ import scala.concurrent.Future
 trait CorporationTaxRegisteredController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
+  val businessMatchingConnector: BusinessMatchingConnector
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) map {
-          response =>
-          val form: Form2[CorporationTaxRegistered] = (for {
-            aboutTheBusiness <- response
-            corporationTaxRegistered <- aboutTheBusiness.corporationTaxRegistered
-          } yield Form2[CorporationTaxRegistered](corporationTaxRegistered)).getOrElse(EmptyForm)
-          Ok(corporation_tax_registered(form, edit))
+
+      dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key) flatMap {
+        case Some(response) if response.corporationTaxRegistered.isDefined =>
+          Future.successful(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get))
+
+        case _ if ApplicationConfig.businessMatchingDetailsToggle =>
+          businessMatchingConnector.getReviewDetails map {
+            case Some(details) if details.utr.isDefined => Form2[CorporationTaxRegistered](CorporationTaxRegisteredYes(details.utr.get))
+            case _ => EmptyForm
+          }
+
+        case _ => Future.successful(EmptyForm)
+
+      } map { form =>
+        Ok(corporation_tax_registered(form, edit))
       }
   }
 
@@ -48,4 +57,5 @@ trait CorporationTaxRegisteredController extends BaseController {
 object CorporationTaxRegisteredController extends CorporationTaxRegisteredController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
+  override val businessMatchingConnector = BusinessMatchingConnector
 }

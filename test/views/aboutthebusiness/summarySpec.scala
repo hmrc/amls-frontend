@@ -21,7 +21,6 @@ class summarySpec extends WordSpec
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-
       def view = views.html.aboutthebusiness.summary(AboutTheBusiness())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.aboutbusiness"))
@@ -36,12 +35,12 @@ class summarySpec extends WordSpec
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("aboutthebusiness.registeredformlr.title",checkElementTextIncludes(_, "aboutthebusiness.registeredformlr.mlrregno.lbl")),
-      ("aboutthebusiness.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date")),
-      ("aboutthebusiness.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number")),
-      ("aboutthebusiness.registeredforcorporationtax.title",checkElementTextIncludes(_, "aboutthebusiness.registeredforcorporationtax.taxReference")),
+      ("aboutthebusiness.registeredformlr.title",checkElementTextIncludes(_, "aboutthebusiness.registeredformlr.mlrregno.lbl", "1234")),
+      ("aboutthebusiness.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
+      ("aboutthebusiness.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
+      ("aboutthebusiness.registeredforcorporationtax.title",checkElementTextIncludes(_, "aboutthebusiness.registeredforcorporationtax.taxReference", "3456")),
       ("aboutthebusiness.registeredoffice.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
-      ("aboutthebusiness.contactingyou.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.phone.lbl","aboutthebusiness.contactingyou.email.lbl")),
+      ("aboutthebusiness.contactingyou.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.phone.lbl", "01234567890","aboutthebusiness.contactingyou.email.lbl", "test@test.com")),
       ("aboutthebusiness.correspondenceaddress.postal.address",
         checkElementTextIncludes(_, "your name", "business name","line1","line2","line3","line4","AB12CD"))
     )

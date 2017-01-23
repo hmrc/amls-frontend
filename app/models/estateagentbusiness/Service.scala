@@ -1,12 +1,13 @@
 package models.estateagentbusiness
 
+import models.DateOfChange
 import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.data.mapping._
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import utils.TraversableValidators._
 
-case class Services(services: Set[Service])
+case class Services(services: Set[Service], dateOfChange: Option[DateOfChange] = None)
 
 sealed trait Service
 
@@ -93,7 +94,7 @@ object Services {
    p: Path => RuleLike[UrlFormEncoded, Set[Service]]
   ): Rule[UrlFormEncoded, Services] =
     From[UrlFormEncoded] { __ =>
-       (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.eab.business.services")) fmap Services.apply
+       (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.eab.business.services")) .flatMap(Services(_, None))
   }
 
   implicit def formWrites

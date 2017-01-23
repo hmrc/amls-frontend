@@ -1,5 +1,7 @@
 package models.tradingpremises
 
+import models.DateOfChange
+import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
@@ -10,8 +12,7 @@ class MsbServicesSpec extends PlaySpec {
   "MsbServices" must {
 
     "round trip through Json correctly" in {
-
-      val data = MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
+      val data = MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange), Some(DateOfChange(LocalDate.now)))
       val js = Json.toJson(data)
 
       js.as[MsbServices] mustEqual data

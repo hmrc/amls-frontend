@@ -17,7 +17,7 @@
     heading = header
 )  {
 
-    <p>@Messages("supervision.another_body.description")</p>
+    <span class="form-hint">@Messages("supervision.another_body.description")</span>
 
     @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
 
@@ -67,7 +67,7 @@
                 false
             )
 
-            @textarea(f("endingReason"), "supervision.another_body.endingReason.lbl", bold = false)
+            @textarea(f("endingReason"), "supervision.another_body.endingReason.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
 
         }
 

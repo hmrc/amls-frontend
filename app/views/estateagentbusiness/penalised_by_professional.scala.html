@@ -18,11 +18,8 @@ title = Messages("estateagentbusiness.penalisedbyprofessional.title") + " - " + 
 heading = header
 ) {
 
-<div class="form-field">
-    @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
-</div>
 
-@form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
+    @Messages("estateagentbusiness.penalisedbyprofessional.subtitle")
 
     <ul class="list list-bullet form-group">
         <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_1")</li>
@@ -31,9 +28,15 @@ heading = header
         <li>@Messages("estateagentbusiness.penalisedbyprofessional.line_4")</li>
     </ul>
 
+
+@form(f, controllers.estateagentbusiness.routes.PenalisedByProfessionalController.post(edit)) {
+
+
+
     @fieldset(
         f = f("penalised"),
         legend = "estateagentbusiness.penalisedbyprofessional.title",
+        legendHidden = true,
         panel = false
     ){
         @radio(
@@ -62,7 +65,10 @@ heading = header
             field = f("professionalBody"),
             labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
             hintText = "hint.255.chars",
-            bold = false
+            bold = false,
+            largeWidth = true,
+            cols = "30",
+            rows = "8"
         )
     }
 

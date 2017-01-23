@@ -108,9 +108,9 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("edit") must be(false)
-        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("edit") must be(false)
-        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("edit") must be(false)
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(false)
       }
     }
 
@@ -132,9 +132,9 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("edit") must be(true)
-        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("edit") must be(true)
-        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("edit") must be(true)
+        document.getElementsByTag("section").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
+        document.getElementsByTag("section").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
       }
     }
 

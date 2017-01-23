@@ -1,7 +1,6 @@
 package controllers
 
 import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
-import models.{AmendVariationResponse, SubscriptionResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -14,7 +13,8 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.mvc.{Call, Request}
+import models.{AmendVariationResponse, SubscriptionResponse}
+import play.api.mvc.{Action, Call, Request}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -27,6 +27,18 @@ trait LandingController extends BaseController {
   private[controllers] def landingService: LandingService
   private[controllers] def enrolmentsService: AuthEnrolmentsService
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
+
+  private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
+    headerCarrier.authorization.isDefined
+
+  def start() = Action.async {
+    implicit request =>
+      if (isAuthorised) {
+        Future.successful(Redirect(controllers.routes.LandingController.get()))
+      } else {
+        Future.successful(Ok(views.html.start()))
+      }
+  }
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>

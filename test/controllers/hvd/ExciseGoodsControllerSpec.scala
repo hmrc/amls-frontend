@@ -2,12 +2,15 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import models.hvd.{ExciseGoods, Hvd}
+import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
@@ -15,11 +18,14 @@ import scala.concurrent.Future
 
 class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
 
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+
   trait Fixture extends AuthorisedFixture {
     self =>
     val controller = new ExciseGoodsController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val statusService = mock[StatusService]
     }
   }
 
@@ -59,6 +65,9 @@ class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
+
       when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
@@ -73,6 +82,9 @@ class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
 
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionRejected))
 
       when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
@@ -92,6 +104,26 @@ class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.required.hvd.excise.goods"))
+    }
+
+    "redirect to dateOfChange when the model has been changed and application is approved" in new Fixture{
+
+      val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+
+      val newRequest = request.withFormUrlEncodedBody("exciseGoods" -> "false")
+
+      when(controller.statusService.getStatus(any(),any(),any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(hvd)))
+
+      when(controller.dataCacheConnector.save[Hvd](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get().url))
     }
 
   }

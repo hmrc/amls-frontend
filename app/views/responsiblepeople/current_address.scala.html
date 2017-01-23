@@ -14,61 +14,74 @@
     heading = header
 ) {
 
+    @panel(
+        wide = true,
+        jsHidden = false,
+        gutter = true
+    )   {
+        <p>@Messages("responsiblepeople.wherepersonlives.need.to.know")</p>
+    }
+
     @form(f, controllers.responsiblepeople.routes.CurrentAddressController.post(index,edit)) {
 
-        <p class="form-hint">@Messages("responsiblepeople.wherepersonlives.need.to.know")</p>
-        @fieldset(
-            f = f("isUK"),
-            legend = "responsiblepeople.wherepersonlives.is.uk",
-            panel=false
-        ) {
-            @radio(
+        <div class="form-group">
+            @fieldset(
                 f = f("isUK"),
-                labelText = "responsiblepeople.wherepersonlives.ukAddress",
-                value = "true",
-                target = ".ukAddress-fieldset",
-                inline = true
-            )
-            @radio(
-                f = f("isUK"),
-                labelText = "responsiblepeople.wherepersonlives.nonUkAddress",
-                value = "false",
-                target = ".nonUkAddress-fieldset",
-                inline = true
-            )
-        }
+                legend = "responsiblepeople.wherepersonlives.is.uk",
+                panel=false
+            ) {
+                @radio(
+                    f = f("isUK"),
+                    labelText = "responsiblepeople.wherepersonlives.ukAddress",
+                    value = "true",
+                    target = ".ukAddress-fieldset",
+                    inline = true
+                )
+                @radio(
+                    f = f("isUK"),
+                    labelText = "responsiblepeople.wherepersonlives.nonUkAddress",
+                    value = "false",
+                    target = ".nonUkAddress-fieldset",
+                    inline = true
+                )
+            }
+        </div>
 
-        @fieldset(
-            legend = "responsiblepeople.wherepersonlives.title",
-            legendHidden = true,
-            panel = false,
-            classes = Seq("ukAddress-fieldset"),
-            f = f("ukAddress-fieldset")
-        ) {
-            @input(
-                field = f("addressLine1"),
-                labelText = "lbl.address.line1"
-            )
-            @input(
-                field = f("addressLine2"),
-                labelText = "lbl.address.line2"
-            )
-            @input(
-                field = f("addressLine3"),
-                labelText = "lbl.address.line3",
-                requiredField = false
-            )
-            @input(
-                field = f("addressLine4"),
-                labelText = "lbl.address.line4",
-                requiredField = false
-            )
-            @input(
-                field = f("postCode"),
-                labelText = "responsiblepeople.wherepersonlives.postcode",
-                classes = Seq("postcode")
-            )
-        }
+        <div class="form-group">
+            @fieldset(
+                legend = "responsiblepeople.wherepersonlives.title",
+                legendHidden = true,
+                panel = false,
+                classes = Seq("ukAddress-fieldset"),
+                f = f("ukAddress-fieldset")
+            ) {
+                @input(
+                    field = f("addressLine1"),
+                    labelText = "lbl.address.line1"
+                )
+                @input(
+                    field = f("addressLine2"),
+                    labelText = "lbl.address.line2",
+                    labelHidden = true
+                )
+                @input(
+                    field = f("addressLine3"),
+                    labelText = "lbl.address.line3",
+                    requiredField = false,
+                    labelHidden = true
+                )
+                @input(
+                    field = f("addressLine4"),
+                    labelText = "lbl.address.line4",
+                    requiredField = false,
+                    labelHidden = true
+                )
+                @input(
+                    field = f("postCode"),
+                    labelText = "responsiblepeople.wherepersonlives.postcode",
+                    classes = Seq("postcode")
+                )
+            }
 
         @fieldset(
             legend = "responsiblepeople.wherepersonlives.title",
@@ -83,23 +96,28 @@
             )
             @input(
                 field = f("addressLineNonUK2"),
-                labelText = "lbl.address.line2"
+                labelText = "lbl.address.line2",
+                labelHidden = true
             )
             @input(
                 field = f("addressLineNonUK3"),
                 labelText = "lbl.address.line3",
-                requiredField = false
+                requiredField = false,
+                labelHidden = true
             )
             @input(
                 field = f("addressLineNonUK4"),
                 labelText = "lbl.address.line4",
-                requiredField = false
+                requiredField = false,
+                labelHidden = true
             )
             @country(
                 field = f("country"),
                 labelText = "responsiblepeople.wherepersonlives.country"
             )
         }
+
+        </div>
 
         @fieldset(
             f = f("timeAtAddress"),

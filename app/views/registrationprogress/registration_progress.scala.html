@@ -33,21 +33,20 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
         @* Sidebar *@
         <div class="grid-layout__column grid-layout__column--1-3 progress-step--submit">
             <div class="application-submit">
+                <h3 class="heading-small">@Messages("progress.submit")</h3>
+
+               <p>@if(declarationAvailable) {
+                        @Messages("progress.declarationavailable")
+                    } else {
+                        @Messages("progress.declarationunavailable")
+                    }
+                </p>
                 <form method="get" action="@controllers.declaration.routes.WhoIsRegisteringController.get.url">
-                    <fieldset class="form-field-group">
-                        @include.forms2.legend("progress.submit", false, true, "", false)
-                        <p>
-                            @if(declarationAvailable) {
-                                @Messages("progress.declarationavailable")
-                            } else {
-                                @Messages("progress.declarationunavailable")
-                            }
-                        </p>
-                        <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
-                            @Messages("progress.submit")
-                        </button>
-                    </fieldset>
+                    <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
+                        @Messages("progress.submit")
+                    </button>
                 </form>
+
             </div>
         </div>
 

@@ -1,5 +1,7 @@
 package models.tradingpremises
 
+import models.DateOfChange
+import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
@@ -10,8 +12,11 @@ class AgentNameSpec extends PlaySpec {
   "AgentName" must {
 
     "validate form Read" in {
-      val formInput = Map("agentName" -> Seq("sometext"))
-      AgentName.formReads.validate(formInput) must be(Success(AgentName("sometext")))
+      val formInput = Map(
+        "agentName" -> Seq("sometext")
+      )
+
+      AgentName.formReads.validate(formInput) must be(Success(AgentName("sometext", None)))
     }
 
     "throw error when required field is missing" in {
@@ -28,13 +33,14 @@ class AgentNameSpec extends PlaySpec {
       AgentName.formWrites.writes(AgentName("sometext")) must be(Map("agentName" -> Seq("sometext")))
     }
 
-
   }
 
   "Json Validation" must {
     "Successfully read/write Json data" in {
       AgentName.format.reads(AgentName.format.writes(
-        AgentName("test"))) must be(JsSuccess(AgentName("test"), JsPath \ "agentName"))
+        AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1)))))) must be(
+        JsSuccess(
+          AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1))))))
     }
 
   }

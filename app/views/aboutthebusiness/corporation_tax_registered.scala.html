@@ -16,39 +16,43 @@
     @form(f, controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.post(edit)) {
 
         @fieldset(
-            f = f("registeredForCorporationTax"),
+            f = f("redundantvalue"),
             legend = "aboutthebusiness.registeredforcorporationtax.title",
             legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("registeredForCorporationTax"),
-                labelText = "lbl.yes",
-                value = "true",
-                inline = true,
-                target = s".corporationTaxReference-fieldset"
-            )
-            @radio(
-                f = f("registeredForCorporationTax"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
-        }
 
-        @fieldset(
-            legend = "aboutthebusiness.registeredforcorporationtax.taxReference",
-            legendHidden = true,
-            jsHidden = true,
-            classes = Seq("corporationTaxReference-fieldset"),
-            f = f("corporationTaxReference-fieldset")
-        ) {
-            @input(
-                field = f("corporationTaxReference"),
-                labelText = "aboutthebusiness.registeredforcorporationtax.taxReference",
-                hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
-                bold = false
-            )
+             @errorGroup(
+                field = f("registeredForCorporationTax")
+            ) {
+
+
+                @radio(
+                    f = f("registeredForCorporationTax"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true,
+                    target = s".corporationTaxReference-fieldset"
+                )
+                @radio(
+                    f = f("registeredForCorporationTax"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+                @panel(
+                        f = f("corporationTaxReference-fieldset"),
+                        classes = Seq("corporationTaxReference-fieldset"),
+                        jsHidden = false
+                    ) {
+                    @input(
+                        field = f("corporationTaxReference"),
+                        labelText = "aboutthebusiness.registeredforcorporationtax.taxReference",
+                        hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+                        bold = false
+                    )
+                }
+            }
         }
 
         @submit(edit)

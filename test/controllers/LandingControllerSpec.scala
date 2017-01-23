@@ -1,11 +1,12 @@
 package controllers
 
-import config.{AmlsShortLivedCache, ApplicationConfig}
+import config.ApplicationConfig
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{BusinessAppliedForPSRNumberYes, BusinessType, CompanyRegistrationNumber, TypeOfBusiness, _}
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -14,21 +15,21 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{Country, SubscriptionResponse}
-import models.businesscustomer.{Address, ReviewDetails}
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito._
 import org.mockito.Mockito
-import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
 import org.scalatest.MustMatchers
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.fixture.WordSpec
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.test.FakeApplication
+import play.api.i18n.Messages
 import play.api.test.Helpers._
-import play.api.libs.json.{JsValue, Json}
+import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import utils.AuthorisedFixture
 
@@ -227,6 +228,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
     when(controller.landingService.refreshCache(any())(any(),any(),any())).thenReturn(Future.successful(mock[CacheMap]))
   }
 
+
   def setUpMocksForNoEnrolment(controller : LandingController) = {
     when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.successful(None))
@@ -310,6 +312,18 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
     }
 
     result
+  }
+
+  "show landing page without authorisation" in new Fixture {
+
+    val result = controller.start()(FakeRequest().withSession())
+    status(result) must be (OK)
+
+  }
+
+  "direct to the service when authorised" in new Fixture {
+    val result = controller.start()(request)
+    status(result) must be (SEE_OTHER)
   }
 
   "Landing Controller" when {

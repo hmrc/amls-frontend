@@ -17,25 +17,34 @@
 
     @form(f, controllers.tradingpremises.routes.WhereAreTradingPremisesController.post(index, edit)) {
 
-        @input(
-            field = f("tradingName"),
-            labelText = "tradingpremises.yourtradingpremises.tradingname"
-        )
-
         @fieldset(
             legend = "legend.address",
             legendHidden = true,
             panel = false,
             f = f("address-fieldset")
         ) {
-            @input(field = f("addressLine1"), labelText = "lbl.address.line1")
-            @input(field = f("addressLine2"), labelText = "lbl.address.line2")
-            @input(field = f("addressLine3"), labelText = "lbl.address.line3", requiredField = false)
-            @input(field = f("addressLine4"), labelText = "lbl.address.line4", requiredField = false)
+
+            @input(
+            field = f("tradingName"),
+            labelText = "tradingpremises.yourtradingpremises.tradingname"
+            )
+
+            @input(field = f("addressLine1"), labelText = "lbl.address.line1" )
+            @input(field = f("addressLine2"), labelText = "lbl.address.line2", labelHidden = true)
+            @input(field = f("addressLine3"), labelText = "lbl.address.line3", requiredField = false, labelHidden = true)
+            @input(field = f("addressLine4"), labelText = "lbl.address.line4", requiredField = false, labelHidden = true)
+
             @input(
                 field = f("postcode"),
                 labelText = "lbl.address.postcode",
                 classes = Seq("postcode")
+            )
+
+            @date(
+                f = f,
+                p = "startDate",
+                hintId = "dob",
+                labelText = "tradingpremises.yourtradingpremises.startdate"
             )
         }
 
@@ -57,13 +66,6 @@
                 inline = true
             )
         }
-
-        @date(
-            f = f,
-            p = "startDate",
-            hintId = "dob",
-            labelText = "tradingpremises.yourtradingpremises.startdate"
-        )
 
         @submit(false)
     }

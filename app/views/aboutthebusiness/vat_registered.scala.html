@@ -20,38 +20,42 @@
     @form(f, controllers.aboutthebusiness.routes.VATRegisteredController.post(edit)) {
 
         @fieldset(
-            f = f("registeredForVAT"),
+            f = f("redundantvalue"),
             legend = "aboutthebusiness.registeredforvat.title",
+            legendHidden = true,
             panel = false
         ) {
-            @radio(
-                f = f("registeredForVAT"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target",
-                inline = true
-            )
-            @radio(
-                f = f("registeredForVAT"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
-        }
 
-        @fieldset(
-            f = f("vrnNumber-fieldset"),
-            legend = "aboutthebusiness.registeredforvat.lbl.vatNumber",
-            legendHidden = true,
-            jsHidden = true,
-            id = target
-        ) {
-            @input(
-                field = f("vrnNumber"),
-                labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",
-                hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
-                bold = false
-            )
+            @errorGroup(
+                field = f("registeredForVAT")
+            ) {
+                @radio(
+                    f = f("registeredForVAT"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    target = s"#$target",
+                    inline = true
+                )
+                @radio(
+                    f = f("registeredForVAT"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
+                )
+
+                    @panel(
+                        f = f("vrnNumber-fieldset"),
+                        jsHidden = false,
+                        id = target
+                    ) {
+                    @input(
+                        field = f("vrnNumber"),
+                        labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",
+                        hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
+                        bold = false
+                    )
+                }
+            }
         }
 
         @submit(false)

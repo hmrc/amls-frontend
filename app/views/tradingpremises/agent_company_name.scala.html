@@ -16,12 +16,10 @@
 
     @form(f, controllers.tradingpremises.routes.AgentCompanyNameController.post(index,edit)) {
 
-        <div class="form-field-group">
-            @input(
-                field = f("agentCompanyName"),
-                hintText = "tradingpremises.agentcompanyname.lbl.hint"
-            )
-        </div>
+        @input(
+            field = f("agentCompanyName"),
+            hintText = "tradingpremises.agentcompanyname.lbl.hint"
+        )
 
         @submit(edit)
     }

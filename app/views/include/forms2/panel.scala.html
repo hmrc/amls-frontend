@@ -7,13 +7,15 @@
     classes: Seq[String] = Seq.empty,
     data: Seq[String] = Seq.empty,
     wide: Boolean = false,
+    gutter: Boolean = false,
     field: Option[forms.Field] = None
 )(content: Html)(implicit lang: Lang)
 
     @if(field.isDefined) {
         <div
-                @if(field.get.id.nonEmpty){ id="@field.get.id"}
-                class="@if(panel){ panel-indent}@if(wide){ panel-border-wide}@if(field.get.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
+                @if(f.id.nonEmpty){ id="@f.id"}
+                class="@if(panel){ panel-indent}@if(wide){ panel-border-wide} @if(gutter){panel-indent--gutter}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")
+        >
         @if(field.get.hasErrors) {
             <span class="error-notification">@field.get.error</span>
         }

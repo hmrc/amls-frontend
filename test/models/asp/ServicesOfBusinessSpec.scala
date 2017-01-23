@@ -1,5 +1,7 @@
 package models.asp
 
+import models.DateOfChange
+import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
@@ -52,12 +54,21 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
     "JSON validation" must {
 
-      "successfully validate given values" in {
+      "successfully validate and read services and date of change values" in {
+
+        val json =  Json.obj("services" -> Seq("01","02","03","04","05"),
+          "dateOfChange" -> "2016-02-24")
+
+        Json.fromJson[ServicesOfBusiness](json) must
+          be(JsSuccess(ServicesOfBusiness(businessServices, Some(DateOfChange(new LocalDate("2016-02-24")))), JsPath))
+      }
+
+      "successfully validate selected services value" in {
 
         val json =  Json.obj("services" -> Seq("01","02","03","04","05"))
 
         Json.fromJson[ServicesOfBusiness](json) must
-          be(JsSuccess(ServicesOfBusiness(businessServices), JsPath \ "services"))
+          be(JsSuccess(ServicesOfBusiness(businessServices, None)))
       }
 
       "fail when on invalid data" in {

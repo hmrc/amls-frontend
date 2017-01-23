@@ -15,17 +15,27 @@
     heading = header
 ) {
 
+    @panel(
+        wide = true,
+        jsHidden = false,
+        gutter = true
+    ) {
     <p>@Messages("responsiblepeople.contact_details.lbl")</p>
+    }
 
     @form(f, controllers.responsiblepeople.routes.ContactDetailsController.post(index, edit)) {
         @input(
             field = f("phoneNumber"),
-            labelText = Messages("responsiblepeople.contact_details.phone.lbl")
+            labelText = Messages("responsiblepeople.contact_details.phone.lbl"),
+            hintText = "aboutthebusiness.contactingyou.phone.hint"
+
         )
 
         @input(
             field = f("emailAddress"),
-            labelText = Messages("responsiblepeople.contact_details.email.lbl")
+            labelText = Messages("responsiblepeople.contact_details.email.lbl"),
+            hintText = "aboutthebusiness.contactingyou.email.hint"
+
         )
 
         @submit()
