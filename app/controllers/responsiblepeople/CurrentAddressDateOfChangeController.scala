@@ -3,7 +3,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{FormHelpers, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
@@ -17,7 +17,7 @@ import utils.{DateOfChangeHelper, RepeatingSection}
 import scala.concurrent.Future
 
 //noinspection ScalaStyle
-trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseController with DateOfChangeHelper {
+trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
