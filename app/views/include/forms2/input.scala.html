@@ -22,9 +22,7 @@
     <label class="form-label@if(bold){-bold}" for="@field.id">
         @if(labelText.nonEmpty) {
             @if(labelHidden) {<span class="visuallyhidden">}
-
             @Messages(labelText)
-
             @if(labelHidden){</span>}
         }
         @if(hintText.nonEmpty) {
@@ -33,7 +31,6 @@
         @if(field.hasErrors) {
             <span class="error-notification">@field.error</span>
         }
-
     </label>
     <input name="@field.name" class="form-control @classes.mkString(" ")"
             value="@field.value" id="@field.id"

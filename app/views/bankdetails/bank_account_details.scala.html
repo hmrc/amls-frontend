@@ -51,39 +51,41 @@
                 inline = true,
                 target = s"#$target1"
             )
-            @panel(
-                f = f(s"$target")
-            ) {
-                @input(
-                    field = f("sortCode"),
-                    labelText = "bankdetails.bankaccount.sortcode",
-                    hintText = "bankdetails.bankaccount.sortcode.hint",
-                    bold = false
-                )
-                @input(
-                    field = f("accountNumber"),
-                    labelText = "bankdetails.bankaccount.accountnumber",
-                    hintText = "bankdetails.bankaccount.accountnumber.hint",
-                    bold = false
-                )
-            }
-            @panel(
-                f = f(s"$target1")
-            ) {
-                @input(
-                    field = f("IBANNumber"),
-                    labelText = "bankdetails.bankaccount.iban",
-                    hintText = "bankdetails.bankaccount.iban.hint",
-                    bold = false
-                )
-                <p>or</p>
-                @input(
-                    field = f("nonUKAccountNumber"),
-                    labelText = "bankdetails.bankaccount.accountnumber",
-                    hintText = "bankdetails.bankaccount.accountnumber.nonuk.hint",
-                    bold = false
-                )
-            }
+        }
+
+        @panel(
+            f = f(s"$target")
+        ) {
+            @input(
+                field = f("sortCode"),
+                labelText = "bankdetails.bankaccount.sortcode",
+                hintText = "bankdetails.bankaccount.sortcode.hint",
+                bold = false
+            )
+            @input(
+                field = f("accountNumber"),
+                labelText = "bankdetails.bankaccount.accountnumber",
+                hintText = "bankdetails.bankaccount.accountnumber.hint",
+                bold = false
+            )
+        }
+
+        @panel(
+            f = f(s"$target1")
+        ) {
+            @input(
+                field = f("IBANNumber"),
+                labelText = "bankdetails.bankaccount.iban",
+                hintText = "bankdetails.bankaccount.iban.hint",
+                bold = false
+            )
+            <p>or</p>
+            @input(
+                field = f("nonUKAccountNumber"),
+                labelText = "bankdetails.bankaccount.accountnumber",
+                hintText = "bankdetails.bankaccount.accountnumber.nonuk.hint",
+                bold = false
+            )
         }
 
         @submit(edit)
