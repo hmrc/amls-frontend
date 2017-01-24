@@ -18,9 +18,12 @@ case class WhichCurrencies(currencies: Seq[String],
                            usesForeignCurrencies: Boolean,
                            bankMoneySource: Option[BankMoneySource],
                            wholesalerMoneySource: Option[WholesalerMoneySource],
-                           customerMoneySource: Boolean)
+                           customerMoneySource: Option[Boolean])
+
 
 private sealed trait WhichCurrencies0 {
+
+  type MoneySource = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
 
   val emptyToNone: String => Option[String] = { x =>
     x.trim() match {
@@ -39,12 +42,10 @@ private sealed trait WhichCurrencies0 {
     TraversableValidators.minLengthR[Seq[String]](1) compose
     GenericRules.traversableR(GenericValidators.inList(currencies))
 
-  private val validateMoneySources: ValidationRule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] =
-    Rule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean),
-      (Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] {
+  private val validateMoneySources: ValidationRule[MoneySource] = Rule[MoneySource, MoneySource] {
       case x@(Some(_), _, _) => Success(x)
       case x@(_, Some(_), _) => Success(x)
-      case x@(_, _, true) => Success(x)
+      case x@(_, _, Some(true)) => Success(x)
       case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
     }
 
@@ -80,25 +81,24 @@ private sealed trait WhichCurrencies0 {
       }
 
     val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] fmap {
-      case Some("Yes") => true
-      case _ => false
+      case Some("Yes") => Some(true)
+      case _ => None
     }
 
     foreignCurrencyToggle flatMap {
       case true =>
         (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
-          .apply { (a: Traversable[String], b: (Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)) =>
+          .apply { (a: Traversable[String], b: MoneySource) =>
             (a, b) match {
-              case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, usesForeignCurrencies = true, bms, wms, customerMoneySource = cms)
+              case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, usesForeignCurrencies = true, bms, wms, cms)
             }
           }
       case _ =>
         currencies compose Rule.fromMapping[Traversable[String], WhichCurrencies] { c =>
-          Success(WhichCurrencies(c.toSeq, usesForeignCurrencies = false, None, None, customerMoneySource = false))
+          Success(WhichCurrencies(c.toSeq, usesForeignCurrencies = false, None, None, None))
         }
 
     }
-
 
   }
 
@@ -122,7 +122,7 @@ private sealed trait WhichCurrencies0 {
       wc.bankMoneySource.map(bms => bms.bankNames),
       wc.wholesalerMoneySource.map(_ => "Yes"),
       wc.wholesalerMoneySource.map(bms => bms.wholesalerNames),
-      if (wc.customerMoneySource) Some("Yes") else None,
+      wc.customerMoneySource.map(_ => "Yes"),
       if (wc.usesForeignCurrencies) Some("Yes") else None
       ))
   }

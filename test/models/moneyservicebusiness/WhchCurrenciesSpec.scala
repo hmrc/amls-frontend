@@ -16,7 +16,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         usesForeignCurrencies = true,
         Some(BankMoneySource("Bank names")),
         Some(WholesalerMoneySource("wholesaler names")),
-        customerMoneySource = true)
+        customerMoneySource = Some(true))
 
       val fullFormData = Map(
         "currencies[0]" -> Seq("USD"),
@@ -66,7 +66,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         usesForeignCurrencies = true,
         None,
         Some(WholesalerMoneySource("wholesaler names")),
-        customerMoneySource = true)
+        customerMoneySource = Some(true))
 
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
@@ -259,7 +259,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
 
       "not fail validation for the foreign currency fields" in {
 
-        val model = WhichCurrencies(Seq("GBP", "EUR", "USD"), false, None, None, false)
+        val model = WhichCurrencies(Seq("GBP", "EUR", "USD"), usesForeignCurrencies = false, None, None, None)
 
         WhichCurrencies.formR.validate(formData) must be(Success(model))
 

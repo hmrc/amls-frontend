@@ -35,7 +35,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPer
     false,
     Some(BankMoneySource("Bank names")),
     Some(WholesalerMoneySource("wholesaler names")),
-    true
+    Some(true)
   )
 
   "CETransactionsInNext12MonthsController" must {
