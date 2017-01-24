@@ -86,8 +86,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
       "display the previous home address with UK fields populated" in new Fixture {
 
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-        val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+        val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -109,8 +109,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
       "display the previous home address with non-UK fields populated" in new Fixture {
 
-        val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-        val additionalAddress = ResponsiblePersonCurrentAddress(nonUKAddress, SixToElevenMonths)
+        val nonukAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
+        val additionalAddress = ResponsiblePersonCurrentAddress(nonukAddress, SixToElevenMonths)
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -143,8 +143,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             "postCode" -> "NE17YH",
             "timeAtAddress" -> "04"
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -169,8 +169,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             "country" -> "ES",
             "timeAtAddress" -> "02"
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -267,8 +267,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
             "postCode" -> "NE17YH",
             "timeAtAddress" -> "01"
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -298,8 +298,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
                 "postCode" -> "NE17YH",
                 "timeAtAddress" -> "01"
               )
-              val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-              val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -327,8 +327,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
                 "postCode" -> "NE17YH",
                 "timeAtAddress" -> "03"
               )
-              val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-              val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -342,7 +342,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
             }
           }
           "time at address is ThreeYearsPlus" must {
@@ -355,8 +355,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
                 "postCode" -> "NE17YH",
                 "timeAtAddress" -> "04"
               )
-              val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-              val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+              val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+              val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
               val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
               val responsiblePeople = ResponsiblePeople(addressHistory = Some(history))
 
@@ -371,7 +371,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
             }
           }
         }
@@ -459,8 +459,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
       "when the service status is approved" when {
         "the responsible person has previously been submitted and therefore has a lineID" when {
-          "the address has been changed" must {
-            "redirect to the date of change controller when edit mode is true" in new Fixture {
+          "editing an existing address and the address has been changed" must {
+            "redirect to the date of change controller" in new Fixture {
               val requestWithParams = request.withFormUrlEncodedBody(
                 "isUK" -> "true",
                 "addressLine1" -> "newline1",
@@ -491,7 +491,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
             }
           }
-          "the address has not changed" when {
+          "editing an existing address and the address has not changed" when {
             "time at address is less than 1 year" must {
               "redirect to the additional address controller" in new Fixture {
                 val requestWithParams = request.withFormUrlEncodedBody(
@@ -548,17 +548,17 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
                 when(currentAddressController.statusService.getStatus(any(), any(), any()))
                   .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-                val result = currentAddressController.post(RecordId)(requestWithParams)
+                val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1, true).url))
               }
             }
           }
         }
         "the responsible person has not previously been submitted and therefore has not got a lineID" when {
 
-          "edit is false" when {
+          "adding a new responsible person (therefore edit is false)" when {
             "time at address is less than 1 year" must {
               "redirect to the additional address controller" in new Fixture {
                 val requestWithParams = request.withFormUrlEncodedBody(
@@ -571,10 +571,9 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
                 val originalResponsiblePeople = ResponsiblePeople(
                   addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), ZeroToFiveMonths, None)
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
                     )
-                  )),
-                  lineId = None
+                  ))
                 )
 
                 when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -604,8 +603,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
                   addressHistory = Some(ResponsiblePersonAddressHistory(
                     currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
                     )
-                  )),
-                  lineId = None
+                  ))
                 )
 
                 when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -619,6 +617,70 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(routes.PositionWithinBusinessController.get(1, false).url))
+              }
+            }
+          }
+          "editing a previously added responsible person (therefore edit is true)" when {
+            "time at address is less than 1 year" must {
+              "redirect to the additional address controller" in new Fixture {
+                val requestWithParams = request.withFormUrlEncodedBody(
+                  "isUK" -> "true",
+                  "addressLine1" -> "line1",
+                  "addressLine2" -> "line2",
+                  "postCode" -> "AB1 2CD",
+                  "timeAtAddress" -> "01"
+                )
+
+                val originalResponsiblePeople = ResponsiblePeople(
+                  addressHistory = Some(ResponsiblePersonAddressHistory(
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), ZeroToFiveMonths, None)
+                    )
+                  )),
+                  lineId = None
+                )
+
+                when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
+                when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                  .thenReturn(Future.successful(emptyCache))
+                when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                  .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+                val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(1, true).url))
+              }
+            }
+            "time at address is more than 1 year" must {
+              "redirect to the DetailedAnswersController" in new Fixture {
+                val requestWithParams = request.withFormUrlEncodedBody(
+                  "isUK" -> "true",
+                  "addressLine1" -> "line1",
+                  "addressLine2" -> "line2",
+                  "postCode" -> "AB1 2CD",
+                  "timeAtAddress" -> "03"
+                )
+
+                val originalResponsiblePeople = ResponsiblePeople(
+                  addressHistory = Some(ResponsiblePersonAddressHistory(
+                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
+                    )
+                  )),
+                  lineId = None
+                )
+
+                when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
+                when(currentAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
+                  .thenReturn(Future.successful(emptyCache))
+                when(currentAddressController.statusService.getStatus(any(), any(), any()))
+                  .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+                val result = currentAddressController.post(RecordId, true)(requestWithParams)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1, true).url))
               }
             }
           }
@@ -667,7 +729,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val RecordId = 1
+  val recordId = 1
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -695,8 +757,8 @@ class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuit
             "postCode" -> "NE17YH",
             "timeAtAddress" -> "01"
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, ZeroToFiveMonths)
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, ZeroToFiveMonths)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
 
@@ -709,10 +771,10 @@ class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuit
           when(currentAddressController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = currentAddressController.post(RecordId, true)(requestWithParams)
+          val result = currentAddressController.post(recordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(RecordId, true).url))
+          redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(recordId, true).url))
         }
       }
       "time at address is more than 1 year" must {
@@ -725,8 +787,8 @@ class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuit
             "postCode" -> "NE17YH",
             "timeAtAddress" -> "03"
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
-          val additionalAddress = ResponsiblePersonCurrentAddress(UKAddress, OneToThreeYears)
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "NE17YH")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, OneToThreeYears)
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
 
@@ -739,10 +801,10 @@ class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuit
           when(currentAddressController.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = currentAddressController.post(RecordId, true)(requestWithParams)
+          val result = currentAddressController.post(recordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, true).url))
         }
       }
     }
