@@ -110,6 +110,7 @@ trait MoneyServiceBusinessTestData {
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
     Some(WhichCurrencies(
       Seq("USD", "GBP", "EUR"),
+      false,
       Some(BankMoneySource("bank names")),
       Some(WholesalerMoneySource("Wholesaler Names")),
       true)),

@@ -32,6 +32,7 @@ class CETransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPer
 
   val fullModel = WhichCurrencies(
     Seq("USD", "CHF", "EUR"),
+    false,
     Some(BankMoneySource("Bank names")),
     Some(WholesalerMoneySource("wholesaler names")),
     true

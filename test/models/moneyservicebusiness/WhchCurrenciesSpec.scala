@@ -7,9 +7,17 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
 
 class WhichCurrenciesSpec extends WordSpec with MustMatchers {
-  "Which Currencies" when  {
+
+  "Which Currencies" when {
     "data is complete" should {
-      val fullModel = WhichCurrencies(Seq("USD", "CHF", "EUR"), Some(BankMoneySource("Bank names")), Some(WholesalerMoneySource("wholesaler names")), true)
+
+      val fullModel = WhichCurrencies(
+        Seq("USD", "CHF", "EUR"),
+        usesForeignCurrencies = true,
+        Some(BankMoneySource("Bank names")),
+        Some(WholesalerMoneySource("wholesaler names")),
+        customerMoneySource = true)
+
       val fullFormData = Map(
         "currencies[0]" -> Seq("USD"),
         "currencies[1]" -> Seq("CHF"),
@@ -18,11 +26,12 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "bankNames" -> Seq("Bank names"),
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
-        "customerMoneySource" -> Seq("Yes")
+        "customerMoneySource" -> Seq("Yes"),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "Write correctly to a form" in {
-        WhichCurrencies.formW.writes(fullModel) must be (fullFormData)
+        WhichCurrencies.formW.writes(fullModel) must be(fullFormData)
       }
 
       "Read correctly from a form" in {
@@ -34,19 +43,43 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
     }
 
+    "there is no foreignCurrencyToggle" should {
+
+      val form = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[0]" -> Seq("USD"),
+        "currencies[0]" -> Seq("USD")
+      )
+
+      "fail validation" in {
+
+        WhichCurrencies.formR.validate(form) must be(Failure(Seq(Path \ "foreignCurrencyToggle" -> Seq(ValidationError("error.required.msb.wc.foreignCurrencyToggle")))))
+
+      }
+
+    }
+
     "there is no bankMoneySource" should {
-      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(WholesalerMoneySource("wholesaler names")), true)
+
+      val model = WhichCurrencies(
+        Seq("USD", "CHF", "EUR"),
+        usesForeignCurrencies = true,
+        None,
+        Some(WholesalerMoneySource("wholesaler names")),
+        customerMoneySource = true)
+
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
         "currencies[1]" -> Seq("CHF"),
         "currencies[2]" -> Seq("EUR"),
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
-        "customerMoneySource" -> Seq("Yes")
+        "customerMoneySource" -> Seq("Yes"),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "Write correctly to a form" in {
-        WhichCurrencies.formW.writes(model) must be (formData)
+        WhichCurrencies.formW.writes(model) must be(formData)
       }
 
       "Read correctly from a form" in {
@@ -58,7 +91,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
     }
 
-    def buildString(length: Int, acc : String = ""): String = {
+    def buildString(length: Int, acc: String = ""): String = {
       length match {
         case 0 => ""
         case 1 => "X"
@@ -72,11 +105,12 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "currencies[1]" -> Seq("CHF"),
         "currencies[2]" -> Seq("EUR"),
         "bankMoneySource" -> Seq("Yes"),
-        "bankNames" -> Seq("")
+        "bankNames" -> Seq(""),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "fail validation" in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")))))
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")))))
       }
     }
 
@@ -86,15 +120,16 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "currencies[1]" -> Seq("CHF"),
         "currencies[2]" -> Seq("EUR"),
         "wholesalerMoneySource" -> Seq("Yes"),
-        "wholesalerNames" -> Seq("")
+        "wholesalerNames" -> Seq(""),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "fail validation" in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
       }
     }
 
-    "BankNames > 140 characters" should {
+    "bankNames > 140 characters" should {
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
         "currencies[1]" -> Seq("CHF"),
@@ -103,11 +138,12 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "bankNames" -> Seq(buildString(141)),
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
-        "customerMoneySource" -> Seq("Yes")
+        "customerMoneySource" -> Seq("Yes"),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")))))
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")))))
       }
     }
 
@@ -120,15 +156,16 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "bankNames" -> Seq("Bank names"),
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
-        "customerMoneySource" -> Seq("Yes")
+        "customerMoneySource" -> Seq("Yes"),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "fail validation" in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
       }
     }
 
-    "WholesalerNames > 140 characters" should {
+    "wholesalerNames > 140 characters" should {
       val formData = Map(
         "currencies[0]" -> Seq("USD"),
         "currencies[1]" -> Seq("CHF"),
@@ -137,73 +174,97 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "bankNames" -> Seq("Nak names"),
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq(buildString(141)),
-        "customerMoneySource" -> Seq("Yes")
+        "customerMoneySource" -> Seq("Yes"),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames.too-long")))))
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames.too-long")))))
       }
     }
 
-    "No money source specified" should {
+    "no money source specified" should {
       "fail validation" in {
         val formData = Map(
           "currencies[0]" -> Seq("USD"),
           "currencies[1]" -> Seq("CHF"),
-          "currencies[2]" -> Seq("EUR")
+          "currencies[2]" -> Seq("EUR"),
+          "foreignCurrencyToggle" -> Seq("Yes")
         )
 
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
       }
     }
 
-    "No currencies entered" should {
-      "fail validation" in{
+    "no currencies entered" should {
+      "fail validation" in {
         val formData = Map(
           "bankMoneySource" -> Seq("Yes"),
           "bankNames" -> Seq("Bank names"),
           "wholesalerMoneySource" -> Seq("Yes"),
           "wholesalerNames" -> Seq("wholesaler names"),
-          "customerMoneySource" -> Seq("Yes")
+          "customerMoneySource" -> Seq("Yes"),
+          "foreignCurrencyToggle" -> Seq("Yes")
         )
 
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
       }
     }
 
-    "No currencies or sources entered" should {
+    "no currencies or sources entered" should {
       val formData = Map(
         "currencies[0]" -> Seq(""),
         "currencies[1]" -> Seq(""),
         "currencies[2]" -> Seq(""),
         "bankNames" -> Seq(""),
-        "wholesalerNames" -> Seq("")
+        "wholesalerNames" -> Seq(""),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
-      "fail validation with both error messages" in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq(
+      "fail validation with error messages" in {
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
           (Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))
         )))
       }
     }
 
-    "No currencies entered and bankName Missing" should {
+    "no currencies entered and bankName Missing" should {
       val formData = Map(
         "currencies[0]" -> Seq(""),
         "currencies[1]" -> Seq(""),
         "currencies[2]" -> Seq(""),
         "bankMoneySource" -> Seq("Yes"),
         "bankNames" -> Seq(""),
-        "wholesalerNames" -> Seq("")
+        "wholesalerNames" -> Seq(""),
+        "foreignCurrencyToggle" -> Seq("Yes")
       )
 
       "fail validation with both error messages" in {
-        WhichCurrencies.formR.validate(formData) must be (Failure(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Failure(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
           (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames"))
         )))
       }
+    }
+
+    "the business does not deal in foreign currencies" should {
+
+      val formData = Map(
+        "currencies[0]" -> Seq("GBP"),
+        "currencies[1]" -> Seq("EUR"),
+        "currencies[2]" -> Seq("USD"),
+        "foreignCurrencyToggle" -> Seq("No")
+      )
+
+      "not fail validation for the foreign currency fields" in {
+
+        val model = WhichCurrencies(Seq("GBP", "EUR", "USD"), false, None, None, false)
+
+        WhichCurrencies.formR.validate(formData) must be(Success(model))
+
+      }
+
     }
   }
 }
