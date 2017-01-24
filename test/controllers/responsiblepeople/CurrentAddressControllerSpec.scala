@@ -569,12 +569,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
                   "timeAtAddress" -> "01"
                 )
 
-                val originalResponsiblePeople = ResponsiblePeople(
-                  addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
-                    )
-                  ))
-                )
+                val originalResponsiblePeople = ResponsiblePeople()
 
                 when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))
@@ -599,12 +594,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
                   "timeAtAddress" -> "03"
                 )
 
-                val originalResponsiblePeople = ResponsiblePeople(
-                  addressHistory = Some(ResponsiblePersonAddressHistory(
-                    currentAddress = Some(ResponsiblePersonCurrentAddress(PersonAddressUK("line1", "line2", None, None, "AB1 2CD"), OneToThreeYears, None)
-                    )
-                  ))
-                )
+                val originalResponsiblePeople = ResponsiblePeople()
 
                 when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
                   .thenReturn(Future.successful(Some(Seq(originalResponsiblePeople))))

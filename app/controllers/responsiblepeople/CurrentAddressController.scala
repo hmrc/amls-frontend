@@ -3,7 +3,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{FormHelpers, Form2, InvalidForm, ValidForm}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress._
 import models.responsiblepeople._
 import models.status.SubmissionDecisionApproved
@@ -47,28 +47,32 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
             Future.successful(BadRequest(current_address(f, edit, index)))
           case ValidForm(_, data) => {
 
-            val futureOriginalPersonAddress = getData[ResponsiblePeople](index) map { rpO =>
-              for {
-                rp <- rpO
-                addHist <- rp.addressHistory
-                rpCurr <- addHist.currentAddress
-              } yield {
-                (rpCurr.personAddress, rp.lineId)
-              }
-            }
+            val responsiblePersonF = getData[ResponsiblePeople](index)
 
             doUpdate(index, data).flatMap { _ =>
               for {
-                originalPersonAddress <- futureOriginalPersonAddress
+                rpO <- responsiblePersonF
                 status <- statusService.getStatus
               } yield {
                 status match {
                   case SubmissionDecisionApproved => {
-                    originalPersonAddress match {
-                      case Some((address, lineID)) => {
-                        handleApproved(index, edit, Some(address), data)
+                    rpO match {
+                      case None => NotFound(notFoundView)
+                      case Some(rp) => {
+
+                        val lineId = rp.lineId
+
+                        rp.addressHistory match {
+                          case None => handleApproved(index, edit, None, lineId, data)
+                          case Some(hist) => {
+
+                            hist.currentAddress match {
+                              case None => handleApproved(index, edit, None, lineId, data)
+                              case Some(currAdd) => handleApproved(index, edit, Some(currAdd.personAddress), lineId, data)
+                            }
+                          }
+                        }
                       }
-                      case _ => NotFound(notFoundView)
                     }
                   }
                   case _ => handleNotYetApproved(index, data.timeAtAddress, edit)
@@ -77,19 +81,22 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
             }
           }
         }).recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+          case _: IndexOutOfBoundsException =>
+            Future.successful(NotFound(notFoundView))
         }
     }
 
-
   private def handleApproved(index: Int,
-                                         edit: Boolean,
-                                         originalPersonAddress: Option[PersonAddress],
-                                         data: ResponsiblePersonCurrentAddress) = {
+                              edit: Boolean,
+                              originalPersonAddress: Option[PersonAddress],
+                              lineId: Option[Int],
+                              data: ResponsiblePersonCurrentAddress) = {
 
     val moreThanOneYear = (data.timeAtAddress == ThreeYearsPlus) || data.timeAtAddress == OneToThreeYears
 
-    if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)) {
+
+    if (redirectToDateOfChange[PersonAddress](originalPersonAddress, data.personAddress)
+      && lineId.isDefined && originalPersonAddress.isDefined) {
       Redirect(routes.CurrentAddressDateOfChangeController.get(index, edit))
     } else if (moreThanOneYear && !edit) {
       Redirect(routes.PositionWithinBusinessController.get(index, edit))
