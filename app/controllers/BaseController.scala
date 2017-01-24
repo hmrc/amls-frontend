@@ -6,7 +6,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import utils.{FeatureToggle, JsonMapping}
+import utils.FeatureToggle
 
 trait BaseController extends FrontendController with Actions {
 

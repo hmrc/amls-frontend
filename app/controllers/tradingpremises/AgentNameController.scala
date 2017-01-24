@@ -9,12 +9,12 @@ import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import services.StatusService
-import utils.{FeatureToggle, RepeatingSection}
+import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
 
-trait AgentNameController extends RepeatingSection with BaseController {
+trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -75,13 +75,11 @@ trait AgentNameController extends RepeatingSection with BaseController {
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) flatMap { tradingPremises =>
-          val extraFields = tradingPremises.yourTradingPremises.fold(Map[String, Seq[String]]()) { ytp =>
-            Map("activityStartDate" -> Seq(ytp.startDate.toString("yyyy-MM-dd")))
-          }
-
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(form, "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
+              Future.successful(BadRequest(views.html.date_of_change(
+                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
+                "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>
               for {
                 _ <- updateDataStrict[TradingPremises](index) { tp =>
@@ -93,7 +91,7 @@ trait AgentNameController extends RepeatingSection with BaseController {
   }
 
   private def redirectToDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name)
+    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
   }
 }
 

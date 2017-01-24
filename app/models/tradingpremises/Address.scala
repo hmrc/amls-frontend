@@ -37,10 +37,10 @@ object Address {
       import models.FormTypes._
       import play.api.data.mapping.forms.Rules._
       (
-        (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
-          (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
-          (__ \ "addressLine3").read(optionR(validateAddress)) ~
-          (__ \ "addressLine4").read(optionR(validateAddress)) ~
+        (__ \ "addressLine1").read(notEmptyStrip.withMessage("error.required.address.line1") compose validateAddress) ~
+          (__ \ "addressLine2").read(notEmptyStrip.withMessage("error.required.address.line2") compose validateAddress) ~
+          (__ \ "addressLine3").read(optionR(notEmptyStrip compose validateAddress)) ~
+          (__ \ "addressLine4").read(optionR(notEmptyStrip compose validateAddress)) ~
           (__ \ "postcode").read(postcodeType)
         )(Address.applyWithoutDateOfChange _)
     }

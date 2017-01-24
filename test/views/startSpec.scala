@@ -26,7 +26,7 @@ class startSpec extends WordSpec with MustMatchers with OneAppPerSuite{
       html must include(Messages("start.line1"))
       html must include(Messages("start.line2"))
       html must include(Messages("start.before.heading"))
-      html must include(Messages("start.crn.link.text"))
+      html must include(Messages("start.crn.line1"))
     }
   }
 }

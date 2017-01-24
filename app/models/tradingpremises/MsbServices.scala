@@ -23,7 +23,7 @@ case object CurrencyExchange extends MsbService
 case object ChequeCashingNotScrapMetal extends MsbService
 case object ChequeCashingScrapMetal extends MsbService
 
-case class MsbServices(services : Set[MsbService], dateOfChange: Option[DateOfChange] = None)
+case class MsbServices(services : Set[MsbService])
 
 object MsbService {
 
@@ -110,9 +110,9 @@ object MsbServices {
     def writes(s: MsbServices): JsValue = {
       val values = s.services map { x => JsString(MsbService.serviceW.writes(x)) }
 
-      addDateOfChange(s.dateOfChange, Json.obj(
+      Json.obj(
         "msbServices" -> values
-      ))
+      )
     }
   }
 
@@ -121,9 +121,7 @@ object MsbServices {
   }
 
   implicit val jReads: Reads[MsbServices] = {
-    import play.api.libs.functional.syntax._
-    ((__ \ "msbServices").read[Set[MsbService]] and
-      (__ \ "dateOfChange").readNullable[DateOfChange])(MsbServices.apply _)
+    (__ \ "msbServices").read[Set[MsbService]].map(MsbServices.apply _)
   }
 
   implicit val formR: Rule[UrlFormEncoded, MsbServices] = Cache.formR

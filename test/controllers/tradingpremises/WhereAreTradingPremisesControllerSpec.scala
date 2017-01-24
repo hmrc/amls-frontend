@@ -1,9 +1,7 @@
 package controllers.tradingpremises
 
-
 import connectors.DataCacheConnector
 import models._
-import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -269,21 +267,18 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
       )
 
       val address = Address("addressLine1", "addressLine2", None, None, "NE98 1ZZ")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, true, LocalDate.now())
-
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, LocalDate.now())
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises))))))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = Some(1))))))
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-
-      val result = controller.post(1)(initRequest)
+      val result = controller.post(1, edit = true)(initRequest)
 
       hstatus(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.dateOfChange(1).url))
@@ -323,6 +318,37 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
       hstatus(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(1).url))
+    }
+
+    "the trading premises instance is brand new" in new Fixture {
+
+      val initRequest = request.withFormUrlEncodedBody(
+        "tradingName" -> "Trading Name",
+        "addressLine1" -> "Address 1",
+        "addressLine2" -> "Address 2",
+        "postcode" -> "NE98 1ZZ",
+        "isResidential" -> "true",
+        "startDate.day" -> "01",
+        "startDate.month" -> "02",
+        "startDate.year" -> "2010"
+      )
+
+      val address = Address("Address 1", "Address 2", None, None, "NE98 1ZZ")
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = true, new LocalDate(2007, 2, 1))
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = None)))))
+
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      when(controller.statusService.getStatus(any(), any(), any()))
+        .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+      val result = controller.post(1, edit = true)(initRequest)
+
+      hstatus(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url))
     }
   }
 
@@ -370,6 +396,46 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
 
     }
 
+    "given invalid form data" in new Fixture {
+
+      val tp = mock[TradingPremises]
+      val ytp = mock[YourTradingPremises]
+
+      when(tp.yourTradingPremises) thenReturn Some(ytp)
+      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+
+      val postRequest = request.withFormUrlEncodedBody()
+
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any())) thenReturn Future.successful(Some(Seq(tp)))
+
+      val result = controller.saveDateOfChange(1)(postRequest)
+
+      hstatus(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+    }
+
+    "given a date of change in the future" in new Fixture {
+
+      val tp = mock[TradingPremises]
+      val ytp = mock[YourTradingPremises]
+
+      when(tp.yourTradingPremises) thenReturn Some(ytp)
+      when(ytp.startDate) thenReturn new LocalDate(2011,1,1)
+
+      val postRequest = request.withFormUrlEncodedBody(
+        "dateOfChange.day" -> "1",
+        "dateOfChange.month" -> "1",
+        "dateOfChange.year" -> LocalDate.now.plusYears(1).getYear.toString
+      )
+
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any())) thenReturn Future.successful(Some(Seq(tp)))
+
+      val result = controller.saveDateOfChange(1)(postRequest)
+
+      hstatus(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.future.date"))
+    }
+
   }
 
   "given a date of change which is before the activity start date" in new Fixture {
@@ -388,5 +454,6 @@ class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite
     val result = controller.saveDateOfChange(1)(postRequest)
 
     hstatus(result) must be(BAD_REQUEST)
+    contentAsString(result) must include(Messages("error.expected.tp.dateofchange.after.startdate", "01-01-2008"))
   }
 }

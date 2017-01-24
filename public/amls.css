@@ -1052,3 +1052,7 @@ details {
 .panel-indent--gutter {
   margin-top: 0;
 }
+
+.panel-indent .form-control {
+  width : 50%;
+}
