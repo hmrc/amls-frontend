@@ -37,21 +37,20 @@
         f = f("redundantvalue")
     ){
         @radio(
-            f = f("usesForeignCurrency"),
+            f = f("usesForeignCurrencies"),
             labelText = "lbl.yes",
             value = "Yes",
-            target = "#foreignCurrencyServices-panel",
+            target = "#usesForeignCurrency-fieldset",
             inline = true )
         @radio(
-            f = f("usesForeignCurrency"),
+            f = f("usesForeignCurrencies"),
             labelText = "lbl.no",
             value = "No",
             inline = true )
 
         @panel(
             f = f("usesForeignCurrency-fieldset"),
-            jsHidden = false,
-            id = "usesForeignCurrency-panel"
+            jsHidden = false
         ) {
             @fieldset(
                 legend = "msb.which_currencies.who",
