@@ -1,8 +1,8 @@
 package models.tradingpremises
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 class MsbServicesSpec extends PlaySpec {

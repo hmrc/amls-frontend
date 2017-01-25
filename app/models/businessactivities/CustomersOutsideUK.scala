@@ -1,9 +1,9 @@
 package models.businessactivities
 
 import models.Country
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, Success, Write}
-import play.api.data.mapping._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, Success, Write}
+import jto.validation._
 import play.api.libs.functional.Monoid
 import play.api.libs.json.{Reads, Writes}
 import utils.{TraversableValidators, JsonMapping}
@@ -39,9 +39,9 @@ sealed trait CustomersOutsideUK0 {
         }
 
       val countrySeqR = {
-        (seqToOptionSeq[String] compose flattenR[String] compose cR)
-          .compose(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.ba.select.country")
-          .compose(maxLengthR[Seq[Country]](maxLength))
+        (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
+          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.ba.select.country")
+          .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 
       (__ \ "isOutside").read(boolR).flatMap[Option[Seq[Country]]] {
@@ -54,7 +54,7 @@ sealed trait CustomersOutsideUK0 {
 
   private implicit def write[A]
   (implicit
-   mon: Monoid[A],
+   mon: cats.Monoid[A],
    a: Path => WriteLike[Boolean, A],
    b: Path => WriteLike[Option[Seq[Country]], A]
   ): Write[CustomersOutsideUK, A] =
@@ -63,28 +63,28 @@ sealed trait CustomersOutsideUK0 {
         (__ \ "isOutside").write[Boolean].contramap[Option[_]] {
           case Some(_) => true
           case None => false
-        } and
+        } ~
           (__ \ "countries").write[Option[Seq[Country]]]
         )(a => (a.countries, a.countries))
     }
 
   val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicitly
   }
 
   val jsonR: Reads[CustomersOutsideUK] = {
-    import play.api.data.mapping.json.Rules.{JsValue => _, pickInJson => _, _}
+    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     implicitly
   }
 
   val formW: Write[CustomersOutsideUK, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     implicitly
   }
 
   val jsonW: Writes[CustomersOutsideUK] = {
-    import play.api.data.mapping.json.Writes._
+    import jto.validation.playjson.Writes._
     implicitly
   }
 }

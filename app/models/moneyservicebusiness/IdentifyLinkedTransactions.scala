@@ -1,7 +1,7 @@
 package models.moneyservicebusiness
 
-import play.api.data.mapping.{Write, From, Rule}
-import play.api.data.mapping.forms._
+import jto.validation.{Write, From, Rule}
+import jto.validation.forms._
 import play.api.libs.json.Json
 
 case class IdentifyLinkedTransactions (linkedTxn: Boolean)
@@ -13,7 +13,7 @@ object IdentifyLinkedTransactions {
   implicit val format =  Json.format[IdentifyLinkedTransactions]
 
   implicit val formRule: Rule[UrlFormEncoded, IdentifyLinkedTransactions] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "linkedTxn").read[Boolean].withMessage("error.required.msb.linked.txn") fmap IdentifyLinkedTransactions.apply
   }
 

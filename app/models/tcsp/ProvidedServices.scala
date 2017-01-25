@@ -1,12 +1,12 @@
 package models.tcsp
 
 import models.FormTypes._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import play.api.i18n.{Messages, Lang}
 import play.api.Play.current
@@ -116,7 +116,7 @@ object ProvidedServices {
             case "08" =>
               (JsPath \ "details").read[String].map (Other.apply  _) map identity[TcspService]
             case _ =>
-              Reads(_ => JsError((JsPath \ "services") -> ValidationError("error.invalid")))
+              Reads(_ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TcspService]]](
             Reads[Set[TcspService]](_ => JsSuccess(Set.empty))
          ){

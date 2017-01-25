@@ -2,9 +2,9 @@ package models.tradingpremises
 
 import models.DateOfChange
 import models.businessmatching.BusinessActivity
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules.{minLength => _, _}
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.Json
 import utils.TraversableValidators.minLengthR
 

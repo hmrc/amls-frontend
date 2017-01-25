@@ -1,10 +1,8 @@
 package models.tcsp
 
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
-import play.api.libs.json._
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 
 case class TcspTypes(serviceProviders: Set[ServiceProvider])
@@ -42,12 +40,12 @@ object TcspTypes {
           case "03" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(RegisteredOfficeEtc))
           case "04" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(CompanyDirectorEtc))
           case "05" =>
-            ((__ \ "onlyOffTheShelfCompsSold").read[Boolean].withMessage("error.required.tcsp.off.the.shelf.companies") and
+            ((__ \ "onlyOffTheShelfCompsSold").read[Boolean].withMessage("error.required.tcsp.off.the.shelf.companies") ~
               (__ \ "complexCorpStructureCreation").read[Boolean].withMessage("error.required.tcsp.complex.corporate.structures")
               ) (CompanyFormationAgent.apply _)
           case _ =>
             Rule[UrlFormEncoded, ServiceProvider] { _ =>
-              Failure(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.invalid"))))
+              Failure(Seq((Path \ "serviceProviders") -> Seq(jto.validation.ValidationError("error.invalid"))))
             }
         }.foldLeft[Rule[UrlFormEncoded, Set[ServiceProvider]]](
           Rule[UrlFormEncoded, Set[ServiceProvider]](_ => Success(Set.empty))
@@ -75,6 +73,9 @@ object TcspTypes {
           m
       }
   }
+
+  import play.api.data.validation.ValidationError
+  import play.api.libs.json._
 
   implicit val jsonReads: Reads[TcspTypes] = {
     import play.api.libs.json._

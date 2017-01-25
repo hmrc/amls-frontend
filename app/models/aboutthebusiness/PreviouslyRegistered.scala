@@ -1,8 +1,8 @@
 package models.aboutthebusiness
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait PreviouslyRegistered
@@ -16,7 +16,7 @@ object PreviouslyRegistered {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, PreviouslyRegistered] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "previouslyRegistered").read[Boolean].withMessage("error.required.atb.previously.registered") flatMap {
       case true =>
         (__ \ "prevMLRRegNo").read(notEmpty.withMessage("error.required.atb.mlr.number")

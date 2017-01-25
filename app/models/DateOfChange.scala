@@ -3,8 +3,8 @@ package models
 import models.FormTypes._
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Path, Rule, Write}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Path, Rule, Write}
 import play.api.libs.json._
 
 case class DateOfChange (dateOfChange: LocalDate)
@@ -23,7 +23,7 @@ object DateOfChange {
   }
 
   implicit val formRule: Rule[UrlFormEncoded, DateOfChange] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     __.read(dateOfChangeActivityStartDateRule) fmap DateOfChange.apply
   }
 

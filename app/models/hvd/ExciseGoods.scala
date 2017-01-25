@@ -1,7 +1,7 @@
 package models.hvd
 
-import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, Write}
+import jto.validation.forms._
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class ExciseGoods(exciseGoods: Boolean)
@@ -12,7 +12,7 @@ object ExciseGoods {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ExciseGoods] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "exciseGoods").read[Boolean].withMessage("error.required.hvd.excise.goods") fmap ExciseGoods.apply
   }
 

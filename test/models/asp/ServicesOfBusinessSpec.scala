@@ -4,8 +4,8 @@ import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Failure, Path, Success}
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
@@ -14,7 +14,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
     val businessServices: Set[Service] = Set(Accountancy, PayrollServices, BookKeeping, Auditing, FinancialOrTaxAdvice)
 
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
 
     "validate model with few check box selected" in {
 

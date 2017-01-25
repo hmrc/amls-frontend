@@ -1,7 +1,7 @@
 package models.businessactivities
 
 import org.scalatest.{MustMatchers, Matchers, WordSpec}
-import play.api.data.mapping.Success
+import jto.validation.Success
 import play.api.libs.json.{JsPath, Json, JsSuccess}
 
 class WhoIsYourAccountantSpec extends WordSpec with Matchers {

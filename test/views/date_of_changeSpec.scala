@@ -5,8 +5,8 @@ import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 
 class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{

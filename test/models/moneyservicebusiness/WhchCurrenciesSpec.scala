@@ -1,9 +1,9 @@
 package models.moneyservicebusiness
 
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Failure, Success}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json.Json
 
 class WhichCurrenciesSpec extends WordSpec with MustMatchers {

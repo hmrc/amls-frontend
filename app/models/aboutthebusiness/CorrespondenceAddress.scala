@@ -1,9 +1,9 @@
 package models.aboutthebusiness
 
 import models.Country
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{Path, From, Rule, Write}
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Path, From, Rule, Write}
+import jto.validation.ValidationError
 import play.api.libs.json.{Reads, Writes}
 
 sealed trait CorrespondenceAddress {
@@ -55,7 +55,7 @@ case class NonUKCorrespondenceAddress(
 object CorrespondenceAddress {
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
       val nameMaxLength = 140

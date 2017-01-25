@@ -1,12 +1,12 @@
 package models.supervision
 
 import models.FormTypes._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 
 sealed trait ProfessionalBodyMember
@@ -150,7 +150,7 @@ object ProfessionalBodyMember {
           case "14" =>
             (JsPath \ "specifyOtherBusiness").read[String].map(Other.apply _) map identity[BusinessType]
           case _ =>
-            Reads(_ => JsError((JsPath \ "businessType") -> ValidationError("error.invalid")))
+            Reads(_ => JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
         }.foldLeft[Reads[Set[BusinessType]]](
           Reads[Set[BusinessType]](_ => JsSuccess(Set.empty))
         ) {

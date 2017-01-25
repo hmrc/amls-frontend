@@ -3,8 +3,8 @@ package models.bankdetails
 import models.responsiblepeople.BankAccountRegistered
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Failure, Path, Success}
+import jto.validation.ValidationError
 
 class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
 

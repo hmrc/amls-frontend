@@ -2,9 +2,9 @@ package models.businessactivities
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.forms._
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms._
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class CustomersOutsideUKSpec extends PlaySpec {

@@ -2,8 +2,8 @@ package models.tradingpremises
 
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
-import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, Write}
+import jto.validation.forms._
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class ActivityEndDate (endDate: LocalDate)
@@ -13,7 +13,7 @@ object ActivityEndDate {
   implicit val format =  Json.format[ActivityEndDate]
 
   implicit val formRule: Rule[UrlFormEncoded, ActivityEndDate] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     __.read(premisesEndDateRule) fmap ActivityEndDate.apply
   }
 

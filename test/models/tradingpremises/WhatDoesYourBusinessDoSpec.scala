@@ -2,8 +2,8 @@ package models.tradingpremises
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Failure, Path, Success}
+import jto.validation.ValidationError
 
 class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
   val model = WhatDoesYourBusinessDo(

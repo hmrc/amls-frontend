@@ -1,8 +1,8 @@
 package models.moneyservicebusiness
 
 import models.Country
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.{Reads, Writes}
 import utils.TraversableValidators
 
@@ -44,24 +44,24 @@ private sealed trait MostTransactions0 {
     }
 
   val formR: Rule[UrlFormEncoded, MostTransactions] = {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicitly
   }
 
   val jsonR: Reads[MostTransactions] = {
-    import play.api.data.mapping.json.Rules.{JsValue => _, pickInJson => _, _}
+    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     import utils.JsonMapping._
     implicitly
   }
 
   val formW: Write[MostTransactions, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     import utils.MappingUtils.spm
     implicitly
   }
 
   val jsonW: Writes[MostTransactions] = {
-    import play.api.data.mapping.json.Writes._
+    import jto.validation.playjson.Writes._
     import utils.JsonMapping._
     implicitly
   }

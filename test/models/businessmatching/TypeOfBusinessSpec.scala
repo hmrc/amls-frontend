@@ -1,8 +1,8 @@
 package models.businessmatching
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Success, Path, Failure}
-import play.api.data.validation.ValidationError
+import jto.validation.{Success, Path, Failure}
+import jto.validation.ValidationError
 
 class TypeOfBusinessSpec extends PlaySpec {
 

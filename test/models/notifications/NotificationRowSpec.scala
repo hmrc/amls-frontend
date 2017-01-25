@@ -4,7 +4,7 @@ import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.specs2.mock.mockito.MockitoMatchers
 import ContactType._
-import play.api.data.validation.ValidationError
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSuite {

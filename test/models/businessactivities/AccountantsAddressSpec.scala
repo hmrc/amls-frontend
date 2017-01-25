@@ -2,8 +2,8 @@ package models.businessactivities
 
 import models.{Country, FormTypes}
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Success, Failure, Path}
-import play.api.data.validation.ValidationError
+import jto.validation.{Success, Failure, Path}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class AccountantsAddressSpec extends PlaySpec {

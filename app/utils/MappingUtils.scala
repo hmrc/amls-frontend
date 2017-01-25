@@ -1,12 +1,12 @@
 package utils
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.PM.PM
-import play.api.data.mapping.forms._
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.PM.PM
+import jto.validation.forms._
+import jto.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
-import play.api.data.mapping.GenericRules
-import play.api.data.mapping.forms.PM._
+import jto.validation.GenericRules
+import jto.validation.forms.PM._
 
 import scala.collection.{GenTraversableOnce, TraversableLike}
 
@@ -135,7 +135,7 @@ trait MappingUtils {
     implicit def toReadsSuccess[A, B <: A](b: B): Reads[A] =
       Reads { _ => JsSuccess(b) }
 
-    implicit def toReadsFailure[A](f: ValidationError): Reads[A] =
+    implicit def toReadsFailure[A](f: play.api.data.validation.ValidationError): Reads[A] =
       Reads { _ => JsError(f) }
 
     implicit class RichRule[I, O](rule: Rule[I, O]) {
@@ -176,7 +176,7 @@ trait MappingUtils {
     import play.api.libs.json.Reads._
 
     def nonEmpty[M](implicit reads: Reads[M], p: M => TraversableLike[_, M]) =
-      filter[M](ValidationError("error.required"))(_.isEmpty)
+      filter[M](play.api.data.validation.ValidationError("error.required"))(_.isEmpty)
   }
 
 

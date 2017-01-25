@@ -1,9 +1,9 @@
 package models.tradingpremises
 
 import models.DateOfChange
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.TraversableValidators
@@ -46,13 +46,13 @@ object MsbService {
 
   // TODO: Create generic rules that will remove the need for this
   implicit val jsonR: Rule[JsValue, MsbService] = {
-    import play.api.data.mapping.json.Rules._
+    import jto.validation.playjson.Rules._
     stringR compose serviceR
   }
 
   // TODO: Create generic writes that will remove the need for this
   implicit val jsonW: Write[MsbService, JsValue] = {
-    import play.api.data.mapping.json.Writes._
+    import jto.validation.playjson.Writes._
     serviceW compose string
   }
 
@@ -90,12 +90,12 @@ sealed trait MsbServices0 {
     }
 
   val formR: Rule[UrlFormEncoded, MsbServices] = {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicitly[Rule[UrlFormEncoded, MsbServices]]
   }
 
   val formW: Write[MsbServices, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     import utils.MappingUtils.writeM
     implicitly[Write[MsbServices, UrlFormEncoded]]
   }

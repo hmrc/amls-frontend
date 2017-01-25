@@ -2,15 +2,15 @@ package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Failure, Path, Success}
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
   "RiskAssessmentSpec" must {
 
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
 
     val formalRiskAssessments: Set[RiskAssessmentType] = Set(PaperBased, Digital)
 

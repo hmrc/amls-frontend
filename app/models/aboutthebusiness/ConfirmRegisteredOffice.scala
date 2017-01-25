@@ -1,7 +1,7 @@
 package models.aboutthebusiness
 
-import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, Write}
+import jto.validation.forms._
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness: Boolean)
@@ -13,7 +13,7 @@ object ConfirmRegisteredOffice {
 
   implicit val formRule: Rule[UrlFormEncoded, ConfirmRegisteredOffice] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (__ \ "isRegOfficeOrMainPlaceOfBusiness").read[Boolean].withMessage("error.required.atb.confirm.office") fmap ConfirmRegisteredOffice.apply
     }
 

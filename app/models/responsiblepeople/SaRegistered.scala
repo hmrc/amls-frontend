@@ -1,9 +1,9 @@
 package models.responsiblepeople
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import play.api.data.mapping.forms.Rules._
+import jto.validation.forms.Rules._
 import utils.MappingUtils.Implicits._
 
 sealed trait SaRegistered
@@ -18,7 +18,7 @@ object SaRegistered {
   val utrType = notEmpty.withMessage("error.required.utr.number") compose pattern(utrTypeRegex).withMessage("error.invalid.length.utr.number")
 
   implicit val formRule: Rule[UrlFormEncoded, SaRegistered] = From[UrlFormEncoded] { __ =>
-  import play.api.data.mapping.forms.Rules._
+  import jto.validation.forms.Rules._
     (__ \ "saRegistered").read[Boolean].withMessage("error.required.sa.registration") flatMap {
       case true =>
         (__ \ "utrNumber").read(utrType) fmap (SaRegisteredYes.apply)

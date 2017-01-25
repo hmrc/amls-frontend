@@ -2,8 +2,8 @@ package models.hvd
 
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Failure, Success}
+import jto.validation.ValidationError
 import play.api.libs.json.Json
 
 

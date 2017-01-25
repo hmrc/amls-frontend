@@ -1,7 +1,7 @@
 package models
 
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.api.libs.json._
 
@@ -21,10 +21,10 @@ object Country {
         case e @ Country(_, c) if c == code =>
           JsSuccess(e)
       } getOrElse {
-        JsError(JsPath -> ValidationError("error.invalid"))
+        JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid"))
       }
     case _ =>
-      JsError(JsPath -> ValidationError("error.invalid"))
+      JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid"))
   }
 
   implicit val formWrites: Write[Country, String] =
@@ -43,12 +43,12 @@ object Country {
     }
 
   implicit val jsonW: Write[Country, JsValue] = {
-    import play.api.data.mapping.json.Writes.string
+    import jto.validation.playjson.Writes.string
     formWrites compose string
   }
 
   implicit val jsonR: Rule[JsValue, Country] = {
-    import play.api.data.mapping.json.Rules.stringR
+    import jto.validation.playjson.Rules.stringR
     stringR compose formRule
   }
 }

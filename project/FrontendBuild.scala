@@ -1,7 +1,4 @@
 import sbt._
-import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
 
 object FrontendBuild extends Build with MicroService {
 
@@ -31,7 +28,7 @@ private object AppDependencies {
   private val httpCachingClientVersion = "6.1.0"
   private val playWhitelistFilterVersion = "2.0.0"
 
-  private val validationVersion = "1.1"
+  private val validationVersion = "2.0.1"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
@@ -45,14 +42,14 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "play-authorised-frontend" % playAuthorisedFrontendVersion,
     "uk.gov.hmrc" %% "play-config" % playConfigVersion,
-    "uk.gov.hmrc" %% "play-json-logger" % playJsonLoggerVersion,
+    "uk.gov.hmrc" %% "logback-json-logger" % playJsonLoggerVersion,
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
 
+    "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
+    "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
+    "io.github.jto" %% "validation-form"      % validationVersion excludeAll playJars
 
-    "io.github.jto" %% "validation-core" % validationVersion excludeAll playJars,
-    "io.github.jto" %% "validation-json" % validationVersion excludeAll playJars,
-    "io.github.jto" %% "validation-form" % validationVersion excludeAll playJars
   )
 
   trait ScopeDependencies {

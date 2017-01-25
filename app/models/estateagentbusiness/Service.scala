@@ -1,9 +1,9 @@
 package models.estateagentbusiness
 
 import models.DateOfChange
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
 import utils.TraversableValidators._
 
@@ -69,7 +69,7 @@ object Service {
       case JsString("07") => JsSuccess(LandManagement)
       case JsString("08") => JsSuccess(Development)
       case JsString("09") => JsSuccess(SocialHousing)
-      case _ => JsError((JsPath \ "services") -> ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid"))
     }
 
   implicit val jsonServiceWrites =

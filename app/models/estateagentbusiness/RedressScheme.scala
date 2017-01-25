@@ -1,9 +1,9 @@
 package models.estateagentbusiness
 
-import play.api.data.mapping.forms.Rules._
-import play.api.data.validation.ValidationError
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation.forms.Rules._
+import jto.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait RedressScheme
@@ -23,7 +23,7 @@ object RedressScheme {
     maxLength(maxRedressOtherTypeLength).withMessage("error.invalid.eab.redress.scheme.name")
 
   implicit val formRedressRule: Rule[UrlFormEncoded, RedressScheme] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     import models.FormTypes._
     (__ \ "isRedress").read[Boolean].withMessage("error.required.eab.redress.scheme") flatMap {
       case true => {
@@ -69,7 +69,7 @@ object RedressScheme {
               Other(_)
             }
           case _ =>
-            ValidationError("error.invalid")
+            play.api.data.validation.ValidationError("error.invalid")
         }
       }
       case false => Reads(_ => JsSuccess(RedressSchemedNo))

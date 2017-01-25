@@ -1,15 +1,15 @@
 package models
 
 import org.joda.time.LocalDate
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import utils.DateHelper.localDateOrdering
 
 import scala.util.matching.Regex
 
 object FormTypes {
 
-  import play.api.data.mapping.forms.Rules._
+  import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 
   /** Lengths **/
@@ -100,34 +100,34 @@ object FormTypes {
   private val lastNameRequired = required("error.required.lastname")
   private val lastNameLength = maxWithMsg(maxNameTypeLength, "error.invalid.length.lastname")
 
-  val firstNameType = firstNameRequired compose firstNameLength
-  val middleNameType = notEmpty compose middleNameLength
-  val lastNameType = lastNameRequired compose lastNameLength
+  val firstNameType = firstNameRequired andThen firstNameLength
+  val middleNameType = notEmpty andThen middleNameLength
+  val lastNameType = lastNameRequired andThen lastNameLength
 
   /** VAT Registration Number Rules **/
 
   private val vrnRequired = required("error.required.vat.number")
   private val vrnRegex = regexWithMsg(vrnTypeRegex, "error.invalid.vat.number")
 
-  val vrnType = vrnRequired compose vrnRegex
+  val vrnType = vrnRequired andThen vrnRegex
 
   /** Corporation Tax Type Rules **/
 
   private val corporationTaxRequired = required("error.required.atb.corporation.tax.number")
   private val corporationTaxPattern = regexWithMsg(corporationTaxRegex, "error.invalid.atb.corporation.tax.number")
 
-  val corporationTaxType = corporationTaxRequired compose corporationTaxPattern
+  val corporationTaxType = corporationTaxRequired andThen corporationTaxPattern
 
   /** Address Rules **/
 
-  val addressType = notEmpty compose maxLength(maxAddressLength)
+  val addressType = notEmpty andThen maxLength(maxAddressLength)
 
   val validateAddress = maxLength(maxAddressLength).withMessage("error.max.length.address.line")
 
   private val postcodeRequired = required("error.required.postcode")
   private val postcodeLength = maxWithMsg(maxPostCodeTypeLength, "error.invalid.postcode")
 
-  val postcodeType = postcodeRequired compose postcodeLength
+  val postcodeType = postcodeRequired andThen postcodeLength
 
   /** Contact Details Rules **/
 
@@ -148,11 +148,11 @@ object FormTypes {
   private val yearRequired = required("error.required.tp.year")
   private val yearPattern = regexWithMsg(yearRegex, "error.invalid.tp.year")
 
-  val phoneNumberType = phoneNumberRequired compose phoneNumberLength compose phoneNumberPattern
-  val emailType = emailRequired compose emailLength compose emailPattern
-  val dayType = dayRequired compose dayPattern
-  val monthType = monthRequired compose monthPattern
-  val yearType: Rule[String, String] = yearRequired compose yearPattern
+  val phoneNumberType = phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
+  val emailType = emailRequired andThen emailLength andThen emailPattern
+  val dayType = dayRequired andThen dayPattern
+  val monthType = monthRequired andThen monthPattern
+  val yearType: Rule[String, String] = yearRequired andThen yearPattern
 
   val localDateRule: Rule[UrlFormEncoded, LocalDate] =
     From[UrlFormEncoded] { __ =>
@@ -161,13 +161,13 @@ object FormTypes {
           (__ \ "month").read(monthType) ~
           (__ \ "day").read(dayType)
         ) ((y, m, d) => s"$y-$m-$d") orElse
-        Rule[UrlFormEncoded, String](__ => Success("INVALID DATE STRING")) compose
-        jodaLocalDateRule("yyyy-MM-dd")
+        Rule[UrlFormEncoded, String](__ => Success("INVALID DATE STRING")) andThen
+        jodaLocalDateR("yyyy-MM-dd")
     }.repath(_ => Path)
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Writes._
+      import jto.validation.forms.Writes._
       (
         (__ \ "year").write[String] ~
           (__ \ "month").write[String] ~
@@ -176,7 +176,7 @@ object FormTypes {
     }
 
   val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
-  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRule compose futureDateRule
+  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRule andThen futureDateRule
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate]{
     case (Some(d1), d2) if d2.isAfter(d1) => Success(d2)
@@ -186,9 +186,9 @@ object FormTypes {
   }
 
   val dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    ((__ \ "activityStartDate").read(optionR(jodaLocalDateRule("yyyy-MM-dd"))) ~
-      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.compose(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
+    import jto.validation.forms.Rules._
+    ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
+      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
   }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
@@ -197,9 +197,9 @@ object FormTypes {
   }
 
   val premisesEndDateRule = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    ((__ \ "premisesStartDate").read(jodaLocalDateRule("yyyy-MM-dd")) ~
-      (__ \ "endDate").read(localDateFutureRule)).tupled.compose(premisesEndDateRuleMapping).repath(_ => Path \ "endDate")
+    import jto.validation.forms.Rules._
+    ((__ \ "premisesStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
+      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(premisesEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
   val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
@@ -208,10 +208,10 @@ object FormTypes {
   }
 
   val peopleEndDateRule = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    ((__ \ "positionStartDate").read(jodaLocalDateRule("yyyy-MM-dd")) ~
+    import jto.validation.forms.Rules._
+    ((__ \ "positionStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
       (__ \ "endDate").read(localDateFutureRule) ~
-      (__ \ "userName").read[String]).tupled.compose(peopleEndDateRuleMapping).repath(_ => Path \ "endDate")
+      (__ \ "userName").read[String]).tupled.andThen(peopleEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
   /** Bank details Rules **/
@@ -219,52 +219,52 @@ object FormTypes {
   //TODO: Add error messages
 
   val accountNameType = notEmptyStrip
-    .compose(notEmpty.withMessage("error.bankdetails.accountname"))
-    .compose(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
+    .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
+    .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
 
-  val sortCodeType = (removeDashRule compose removeSpacesRule compose notEmpty)
+  val sortCodeType = (removeDashRule andThen removeSpacesRule andThen notEmpty)
     .withMessage("error.invalid.bankdetails.sortcode")
-    .compose(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
+    .andThen(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
 
 
   val ukBankAccountNumberType = notEmpty
     .withMessage("error.bankdetails.accountnumber")
-    .compose(maxLength(maxUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.accountnumber"))
-    .compose(pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber"))
+    .andThen(maxLength(maxUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.accountnumber"))
+    .andThen(pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber"))
 
   val nonUKBankAccountNumberType = notEmpty
-    .compose(maxLength(maxNonUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.account"))
-    .compose(pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account"))
+    .andThen(maxLength(maxNonUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.account"))
+    .andThen(pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account"))
 
   val ibanType = notEmpty
-    .compose(maxLength(maxIBANLength).withMessage("error.max.length.bankdetails.iban"))
-    .compose(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
+    .andThen(maxLength(maxIBANLength).withMessage("error.max.length.bankdetails.iban"))
+    .andThen(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
 
   /** Business Identifier Rules */
 
   //TODO: Add error messages
 
   val accountantRefNoType = notEmpty
-    .compose(maxLength(minAccountantRefNoTypeLength))
-    .compose(minLength(minAccountantRefNoTypeLength))
+    .andThen(maxLength(minAccountantRefNoTypeLength))
+    .andThen(minLength(minAccountantRefNoTypeLength))
 
   val declarationNameType = notEmptyStrip
-    .compose(notEmpty)
-    .compose(maxLength(maxNameTypeLength))
+    .andThen(notEmpty)
+    .andThen(maxLength(maxNameTypeLength))
 
   val roleWithinBusinessOtherType = notEmptyStrip
-    .compose(notEmpty)
-    .compose(maxLength(maxRoleWithinBusinessOtherType))
+    .andThen(notEmpty)
+    .andThen(maxLength(maxRoleWithinBusinessOtherType))
 
   val typeOfBusinessType = notEmptyStrip
-    .compose(notEmpty.withMessage("error.required.bm.businesstype.type"))
-    .compose(maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type"))
+    .andThen(notEmpty.withMessage("error.required.bm.businesstype.type"))
+    .andThen(maxLength(maxTypeOfBusinessLength).withMessage("error.invalid.bm.business.type"))
 
   /** Personal Identification Rules **/
 
   private val ninoRequired = required("error.required.nino")
   private val ninoPattern = regexWithMsg(ninoRegex, "error.invalid.nino")
-  private val ninoTransforms = removeSpacesRule compose removeDashRule compose transformUppercase
+  private val ninoTransforms = removeSpacesRule andThen removeDashRule andThen transformUppercase
 
   private val passportRequired = required("error.required.uk.passport")
   private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
@@ -272,7 +272,7 @@ object FormTypes {
   private val nonUKPassportRequired = required("error.required.non.uk.passport")
   private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
 
-  val ninoType = ninoTransforms compose ninoRequired compose ninoPattern
-  val ukPassportType = passportRequired compose passportPattern
-  val noUKPassportType = nonUKPassportRequired compose nonUkPassportLength
+  val ninoType = ninoTransforms andThen ninoRequired andThen ninoPattern
+  val ukPassportType = passportRequired andThen passportPattern
+  val noUKPassportType = nonUKPassportRequired andThen nonUkPassportLength
 }

@@ -1,8 +1,8 @@
 package models.businessactivities
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait InvolvedInOther
@@ -23,7 +23,7 @@ object InvolvedInOther {
 
 
   implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "involvedInOther").read[Boolean].withMessage("error.required.ba.involved.in.other") flatMap {
       case true =>
         (__ \ "details").read(OtherBusinessActivityType) fmap InvolvedInOtherYes.apply

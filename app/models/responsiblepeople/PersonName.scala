@@ -1,8 +1,8 @@
 package models.responsiblepeople
 
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms._
-import play.api.data.mapping._
+import jto.validation.forms.Rules._
+import jto.validation.forms._
+import jto.validation._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import models.FormTypes._

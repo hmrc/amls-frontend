@@ -1,8 +1,8 @@
 package models.tradingpremises
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Failure, Path, Success}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
 class AgentPartnershipSpec extends PlaySpec {

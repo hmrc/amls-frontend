@@ -1,9 +1,9 @@
 package models.responsiblepeople
 
 import models.estateagentbusiness.Other
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait PassportType
@@ -17,7 +17,7 @@ object PassportType {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, PassportType] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     import models.FormTypes._
     (__ \ "passportType").read[String].withMessage("error.required.rp.passport.option") flatMap {
       case "01" =>
@@ -55,7 +55,7 @@ object PassportType {
           }
         case "03" => NoPassport
         case _ =>
-          ValidationError("error.invalid")
+          play.api.data.validation.ValidationError("error.invalid")
       }
   }
 

@@ -2,8 +2,8 @@ package models.moneyservicebusiness
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 
 class FundsTransferSpec extends PlaySpec {
   "FundsTransfer" must {

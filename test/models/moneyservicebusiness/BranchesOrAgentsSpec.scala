@@ -3,8 +3,8 @@ package models.moneyservicebusiness
 import models.Country
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{

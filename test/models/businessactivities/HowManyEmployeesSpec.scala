@@ -2,8 +2,8 @@ package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Failure, Success}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 import scala.language.postfixOps

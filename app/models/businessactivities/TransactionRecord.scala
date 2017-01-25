@@ -1,12 +1,12 @@
 package models.businessactivities
 
 import models.FormTypes._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 
 sealed trait TransactionRecord
@@ -93,7 +93,7 @@ object TransactionRecord {
             case "03" =>
               (JsPath \ "digitalSoftwareName").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
             case _ =>
-              Reads(_ => JsError((JsPath \ "transactions") -> ValidationError("error.invalid")))
+              Reads(_ => JsError((JsPath \ "transactions") -> play.api.data.validation.ValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TransactionType]]](
             Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
          ){

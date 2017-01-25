@@ -1,9 +1,9 @@
 package models.businessmatching
 
 import models.FormTypes._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait BusinessAppliedForPSRNumber
@@ -19,7 +19,7 @@ object BusinessAppliedForPSRNumber {
     notEmpty.withMessage("error.invalid.msb.psr.number") compose regNumberRegex
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessAppliedForPSRNumber] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "appliedFor").read[Boolean].withMessage("error.required.msb.psr.options") flatMap {
       case true =>
          (__ \ "regNumber").read(registrationNumberType) fmap BusinessAppliedForPSRNumberYes.apply

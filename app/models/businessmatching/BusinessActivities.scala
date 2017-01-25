@@ -1,8 +1,8 @@
 package models.businessmatching
 
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.i18n.{Lang, Messages}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
@@ -79,7 +79,7 @@ object BusinessActivity {
     case JsString("05") => JsSuccess(MoneyServiceBusiness)
     case JsString("06") => JsSuccess(TrustAndCompanyServices)
     case JsString("07") => JsSuccess(TelephonePaymentService)
-    case _ => JsError((JsPath \ "businessActivities") -> ValidationError("error.invalid"))
+    case _ => JsError((JsPath \ "businessActivities") -> play.api.data.validation.ValidationError("error.invalid"))
   }
 
   implicit val jsonActivityWrite = Writes[BusinessActivity] {

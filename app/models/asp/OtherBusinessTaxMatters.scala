@@ -1,10 +1,10 @@
 package models.asp
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
+import jto.validation._
+import jto.validation.forms.Rules._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation.forms.UrlFormEncoded
 
 sealed trait OtherBusinessTaxMatters
 
@@ -17,7 +17,7 @@ object OtherBusinessTaxMatters {
   import play.api.libs.json._
 
   implicit val formRule: Rule[UrlFormEncoded, OtherBusinessTaxMatters] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "otherBusinessTaxMatters").read[Boolean].withMessage("error.required.asp.other.business.tax.matters") flatMap {
       case true => Rule.fromMapping { _ => Success(OtherBusinessTaxMattersYes) }
       case false => Rule.fromMapping { _ => Success(OtherBusinessTaxMattersNo) }

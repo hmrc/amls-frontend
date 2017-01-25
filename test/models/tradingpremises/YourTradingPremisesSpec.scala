@@ -3,8 +3,8 @@ package models.tradingpremises
 import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
 import play.api.libs.json._
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers {

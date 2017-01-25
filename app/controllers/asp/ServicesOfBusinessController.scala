@@ -30,7 +30,7 @@ trait ServicesOfBusinessController extends BaseController with DateOfChangeHelpe
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicit authContext => implicit request =>
       Form2[ServicesOfBusiness](request.body) match {
         case f: InvalidForm =>

@@ -2,8 +2,8 @@ package models.responsiblepeople
 
 import models.FormTypes._
 import org.joda.time.LocalDate
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, To, Write}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, To, Write}
 import play.api.libs.json.{Writes, Reads}
 
 sealed trait ResidenceType
@@ -20,13 +20,13 @@ object ResidenceType {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ResidenceType] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "isUKResidence").read[Boolean].withMessage("error.required.rp.is.uk.resident") flatMap {
       case true =>
         (__ \ "nino").read(ninoType).fmap(UKResidence.apply)
       case false =>
         (
-          (__ \ "dateOfBirth").read(localDateRule) and
+          (__ \ "dateOfBirth").read(localDateRule) ~
             __.read[PassportType]
           ) (NonUKResidence.apply _)
     }
@@ -51,7 +51,7 @@ object ResidenceType {
 
   implicit val formWritesNonUK: Write[NonUKResidence, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import models.FormTypes.localDateWrite
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
       (__ \ "dateOfBirth").write(localDateWrite) ~

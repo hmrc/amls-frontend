@@ -2,10 +2,10 @@ package models.moneyservicebusiness
 
 import javassist.runtime.Inner
 
-import play.api.data.mapping
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.mapping.GenericRules._
+import jto.validation
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.GenericRules._
 import play.api.libs.functional.Monoid
 import play.api.libs.json.{Writes, JsValue, Reads, Format}
 import utils.OptionValidators._
@@ -29,13 +29,13 @@ private sealed trait WhichCurrencies0 {
   }
 
   private def nameType(fieldName : String) = {
-    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") compose
+    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
       maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long")
   }
 
-  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
-                              TraversableValidators.flattenR[String] compose
-                              TraversableValidators.minLengthR[Seq[String]](1) compose
+  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
+                              TraversableValidators.flattenR[String] andThen
+                              TraversableValidators.minLengthR[Seq[String]](1) andThen
                               GenericRules.traversableR(GenericValidators.inList(currencies))
 
   private val validateMoneySources : ValidationRule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] =
@@ -78,7 +78,7 @@ private sealed trait WhichCurrencies0 {
             case _ => false
           }
 
-      (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
+      (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources))
         .apply {(a:Traversable[String], b:(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)) =>
           (a, b) match {
             case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, bms, wms, cms)
@@ -88,7 +88,7 @@ private sealed trait WhichCurrencies0 {
 
     private implicit def write[A]
     (implicit
-    m: Monoid[A],
+    m: cats.Monoid[A],
     a: Path => WriteLike[Seq[String], A],
     b: Path => WriteLike[String, A],
     c: Path => WriteLike[Option[String], A]
@@ -110,25 +110,23 @@ private sealed trait WhichCurrencies0 {
     }
 
   val formR: Rule[UrlFormEncoded, WhichCurrencies] = {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicitly
   }
 
   val formW: Write[WhichCurrencies, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     implicitly
   }
 
   val jsonR: Reads[WhichCurrencies] = {
-    import play.api.data.mapping.json.Rules.{JsValue => _, pickInJson => _, _}
+    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     import utils.JsonMapping._
     implicitly[Reads[WhichCurrencies]]
   }
 
 
   val jsonW: Writes[WhichCurrencies] = {
-    import play.api.data.mapping.json.Writes._
-    import utils.JsonMapping._
     implicitly[Writes[WhichCurrencies]]
   }
 }

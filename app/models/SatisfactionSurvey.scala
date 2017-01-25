@@ -1,9 +1,9 @@
 package models
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait SatisfactionSurvey
@@ -22,7 +22,7 @@ object SatisfactionSurvey {
   val detailsRule = maxLength(maxDetailsLength).withMessage("error.invalid.maxlength.1200")
 
   implicit val formRule: Rule[UrlFormEncoded, SatisfactionSurvey] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     import models.FormTypes._
     (__ \ "satisfaction").read[String].withMessage("error.survey.satisfaction.required") flatMap {
       case "01" => (__ \ "details").read(optionR(detailsRule)) fmap First.apply
@@ -45,7 +45,7 @@ object SatisfactionSurvey {
       case "04" => (__ \ "details").readNullable[String] map Fourth.apply
       case "05" => (__ \ "details").readNullable[String] map Fifth.apply
       case _ =>
-        ValidationError("error.invalid")
+        play.api.data.validation.ValidationError("error.invalid")
     }
   }
 

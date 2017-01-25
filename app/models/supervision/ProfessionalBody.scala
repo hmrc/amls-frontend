@@ -1,8 +1,8 @@
 package models.supervision
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait ProfessionalBody
@@ -20,7 +20,7 @@ object ProfessionalBody {
     maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "penalised").read[Boolean].withMessage("error.required.eab.penalised.by.professional.body") flatMap {
       case true =>
         (__ \ "professionalBody").read(penalisedType) fmap ProfessionalBodyYes.apply

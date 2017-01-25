@@ -1,10 +1,10 @@
 package models.responsiblepeople
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
+import jto.validation._
+import jto.validation.forms.Rules._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation.forms.UrlFormEncoded
 
 
 sealed trait ExperienceTraining
@@ -24,7 +24,7 @@ object ExperienceTraining {
 
 
   implicit val formRule: Rule[UrlFormEncoded, ExperienceTraining] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "experienceTraining").read[Boolean].withMessage("error.required.rp.experiencetraining") flatMap {
       case true =>
         (__ \ "experienceInformation").read(experienceInformationType) fmap (ExperienceTrainingYes.apply)

@@ -1,10 +1,10 @@
 package models.businessactivities
 
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 
 sealed trait RiskAssessmentPolicy
@@ -39,7 +39,7 @@ object RiskAssessmentType {
     Reads {
       case JsString("01") => JsSuccess(PaperBased)
       case JsString("02") => JsSuccess(Digital)
-      case _ => JsError((JsPath \ "riskassessments") -> ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "riskassessments") -> play.api.data.validation.ValidationError("error.invalid"))
     }
 
   implicit val jsonRiskAssessmentWrites =

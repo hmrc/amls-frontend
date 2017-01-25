@@ -4,8 +4,8 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.bankdetails.{Account, BankAccountType, NonUKAccountNumber}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import views.ViewFixture

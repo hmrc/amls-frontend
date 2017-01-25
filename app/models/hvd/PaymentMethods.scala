@@ -1,11 +1,9 @@
 package models.hvd
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms._
-import play.api.data.validation.ValidationError
-import play.api.libs.functional.Monoid
-import play.api.libs.json.{Json, JsObject, JsValue}
-import utils.TraversableValidators
+import jto.validation._
+import jto.validation.forms._
+import jto.validation.ValidationError
+import play.api.libs.json.{Reads, Writes}
 
 case class PaymentMethods(
                          courier: Boolean,
@@ -49,14 +47,14 @@ sealed trait PaymentMethods0 {
       }
 
       val detailsR: Rule[String, String] =
-        (minLengthR(minLength) withMessage "error.required.hvd.describe") compose
+        (minLengthR(minLength) withMessage "error.required.hvd.describe") andThen
           (maxLengthR(maxLength) withMessage "error.invalid.maxlength.255")
 
       val booleanR = b andThen { _ fmap { case Some(b) => b; case None => false } }
 
       (
-        (__ \ "courier").read(booleanR) and
-        (__ \ "direct").read(booleanR) and
+        (__ \ "courier").read(booleanR) ~
+        (__ \ "direct").read(booleanR) ~
         (__ \ "other").read(booleanR).flatMap[Option[String]] {
           case true =>
             (__ \ "details").read(detailsR) fmap Some.apply
@@ -71,51 +69,47 @@ sealed trait PaymentMethods0 {
 
   private implicit def write[A]
   (implicit
-   mon: Monoid[A],
+   mon: cats.Monoid[A],
    s: Path => WriteLike[Option[String], A],
    b: Path => WriteLike[Boolean, A]
   ): Write[PaymentMethods, A] =
     To[A] { __ =>
       (
-        (__ \ "courier").write[Boolean] and
-        (__ \ "direct").write[Boolean] and
+        (__ \ "courier").write[Boolean] ~
+        (__ \ "direct").write[Boolean] ~
         (__ \ "other").write[Boolean].contramap[Option[_]] {
           case Some(_) => true
           case None => false
-        } and
+        } ~
         (__ \ "details").write[Option[String]]
       )(a => (a.courier, a.direct, a.other, a.other))
     }
 
   val formR: Rule[UrlFormEncoded, PaymentMethods] = {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicitly[Rule[UrlFormEncoded, PaymentMethods]]
   }
 
-  /*val jsonR: Rule[JsValue, PaymentMethods] = {
-    import play.api.data.mapping.json.Rules.{pickInJson => _, _}
-    import utils.JsonMapping.{genericJsonR, pickInJson}
-    implicitly[Rule[JsValue, PaymentMethods]]
-  }*/
+  val jsonR: Reads[PaymentMethods] = {
+   // import jto.validation.playjson.Rules.{pickInJson => _, _}
+    implicitly
+  }
 
   val formW: Write[PaymentMethods, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
     implicitly[Write[PaymentMethods, UrlFormEncoded]]
   }
 
- /* val jsonW: Write[PaymentMethods, JsObject] = {
-    import play.api.data.mapping.json.Writes._
-    implicitly[Write[PaymentMethods, JsObject]]
-  }*/
+  val jsonW: Writes[PaymentMethods] = {
+    implicitly
+  }
 }
 
 object PaymentMethods {
 
-  implicit val format = Json.format[PaymentMethods]
   object Cache extends PaymentMethods0
 
-  implicit val formR = Cache.formR
-  implicit val formW = Cache.formW
-  //implicit val jsonR = Cache.jsonR
-  //implicit val jsonW = Cache.jsonW
+  implicit val formR: Rule[UrlFormEncoded, PaymentMethods] = Cache.formR
+  implicit val jsonR: Reads[PaymentMethods] = Cache.jsonR
+  implicit val formW: Write[PaymentMethods, UrlFormEncoded] = Cache.formW
+  implicit val jsonW: Writes[PaymentMethods] = Cache.jsonW
 }

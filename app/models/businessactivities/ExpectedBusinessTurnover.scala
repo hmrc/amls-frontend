@@ -1,8 +1,8 @@
 package models.businessactivities
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.i18n.{Messages, Lang}
 import play.api.libs.json._
 
@@ -22,7 +22,7 @@ object ExpectedBusinessTurnover {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ExpectedBusinessTurnover] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     import models.FormTypes._
     (__ \ "expectedBusinessTurnover").read[String].withMessage("error.required.ba.business.turnover") flatMap {
       case "01" => First
@@ -58,7 +58,7 @@ object ExpectedBusinessTurnover {
       case "06" => Sixth
       case "07" => Seventh
       case _ =>
-        ValidationError("error.invalid")
+        play.api.data.validation.ValidationError("error.invalid")
     }
   }
 

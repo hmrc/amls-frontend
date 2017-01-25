@@ -5,8 +5,8 @@ import models.declaration.WhoIsRegistering
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 

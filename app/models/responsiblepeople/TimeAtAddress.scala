@@ -1,8 +1,8 @@
 package models.responsiblepeople
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait TimeAtAddress
@@ -19,7 +19,7 @@ object TimeAtAddress {
 
   implicit val formRule: Rule[UrlFormEncoded, TimeAtAddress] = From[UrlFormEncoded] { __ =>
 
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
 
     (__ \ "timeAtAddress").read[String].withMessage("error.required.rp.wherepersonlives.howlonglived") flatMap {
       case "" => (Path \ "timeAtAddress") -> Seq(ValidationError("error.required.timeAtAddress"))
@@ -48,7 +48,7 @@ object TimeAtAddress {
         case "03" => OneToThreeYears
         case "04" => ThreeYearsPlus
         case _ =>
-          ValidationError("error.invalid")
+          play.api.data.validation.ValidationError("error.invalid")
       }
     }
 

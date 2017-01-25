@@ -1,11 +1,11 @@
 package models.tradingpremises
 
 import models.FormTypes._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
+import jto.validation._
+import jto.validation.forms.Rules._
 import play.api.libs.json._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import typeclasses.MongoKey
 import utils.{JsonMapping, TraversableValidators}
@@ -27,7 +27,7 @@ object AgentCompanyName {
   implicit val format = Json.format[AgentCompanyName]
 
   implicit val formReads: Rule[UrlFormEncoded, AgentCompanyName] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "agentCompanyName").read(agentsRegisteredCompanyNameType) fmap AgentCompanyName.apply
   }
 

@@ -1,14 +1,14 @@
 package utils
 
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json.{PathNode => _, _}
 
 trait JsonMapping {
 
   import play.api.libs.json
   import play.api.libs.json.{JsPath, JsValue, Reads, Writes, JsSuccess, JsError}
-  import play.api.data.mapping.{KeyPathNode, IdxPathNode, PathNode}
+  import jto.validation.{KeyPathNode, IdxPathNode, PathNode}
 
   def nodeToJsNode(n: PathNode): json.PathNode = {
     n match {
@@ -28,7 +28,7 @@ trait JsonMapping {
         (pathToJsPath(path), errors)
     }
 
-  implicit def genericJsonR[A]
+/*  implicit def genericJsonR[A]
   (implicit
    rule: Rule[JsValue, A]
   ): Reads[A] =
@@ -40,7 +40,7 @@ trait JsonMapping {
           case Failure(errors) =>
             JsError(errors)
         }
-    }
+    }*/
 
   implicit def genericJsonW[A]
   (implicit
@@ -74,7 +74,7 @@ trait JsonMapping {
         case None => Failure(Seq(Path -> Seq(ValidationError("error.required"))))
         case Some(js) => Success(js)
       }
-    }.compose(r)
+    }.andThen(r)
   }
 }
 

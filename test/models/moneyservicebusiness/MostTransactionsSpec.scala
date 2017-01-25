@@ -2,9 +2,9 @@ package models.moneyservicebusiness
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsError, JsSuccess, Json}
 
 class MostTransactionsSpec extends PlaySpec {

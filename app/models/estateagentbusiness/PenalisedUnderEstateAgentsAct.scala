@@ -1,8 +1,8 @@
 package models.estateagentbusiness
 
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, Success, Write}
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, Success, Write}
 import play.api.libs.json._
 
 sealed trait PenalisedUnderEstateAgentsAct
@@ -20,7 +20,7 @@ object PenalisedUnderEstateAgentsAct {
     maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
 
   implicit val formRule: Rule[UrlFormEncoded, PenalisedUnderEstateAgentsAct] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
 
     (__ \ "penalisedUnderEstateAgentsAct").read[Boolean].withMessage("error.required.eab.penalised.under.act") flatMap {
       case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) fmap PenalisedUnderEstateAgentsActYes.apply
