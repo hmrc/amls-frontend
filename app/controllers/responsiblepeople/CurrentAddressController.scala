@@ -63,12 +63,15 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
                         val lineId = rp.lineId
 
                         rp.addressHistory match {
-                          case None => handleApproved(index, edit, None, lineId, data)
+                          case None =>
+                            handleApproved(index, edit, None, lineId, data)
                           case Some(hist) => {
 
                             hist.currentAddress match {
-                              case None => handleApproved(index, edit, None, lineId, data)
-                              case Some(currAdd) => handleApproved(index, edit, Some(currAdd.personAddress), lineId, data)
+                              case None =>
+                                handleApproved(index, edit, None, lineId, data)
+                              case Some(currAdd) =>
+                                handleApproved(index, edit, Some(currAdd.personAddress), lineId, data)
                             }
                           }
                         }

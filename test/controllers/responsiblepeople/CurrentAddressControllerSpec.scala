@@ -615,8 +615,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               "redirect to the additional address controller" in new Fixture {
                 val requestWithParams = request.withFormUrlEncodedBody(
                   "isUK" -> "true",
-                  "addressLine1" -> "line1",
-                  "addressLine2" -> "line2",
+                  "addressLine1" -> "line1new",
+                  "addressLine2" -> "line2new",
                   "postCode" -> "AB1 2CD",
                   "timeAtAddress" -> "01"
                 )
@@ -646,8 +646,8 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
               "redirect to the DetailedAnswersController" in new Fixture {
                 val requestWithParams = request.withFormUrlEncodedBody(
                   "isUK" -> "true",
-                  "addressLine1" -> "line1",
-                  "addressLine2" -> "line2",
+                  "addressLine1" -> "line1new",
+                  "addressLine2" -> "line2new",
                   "postCode" -> "AB1 2CD",
                   "timeAtAddress" -> "03"
                 )
