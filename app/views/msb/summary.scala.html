@@ -4,7 +4,7 @@
 @import models.businessmatching._
 @import models.Country
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_], lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.msb")

@@ -9,6 +9,8 @@ import play.api.libs.json.Reads.StringReads
 import play.api.data.mapping.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import play.api.i18n.{Messages, Lang}
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 sealed trait TcspService {
 

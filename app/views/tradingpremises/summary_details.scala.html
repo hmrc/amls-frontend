@@ -4,7 +4,7 @@
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
 
-@(model: TradingPremises, index: Int)(implicit request: Request[_], lang: Lang)
+@(model: TradingPremises, index: Int)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("summary.detailedanswers.title", "summary.tradingpremises")

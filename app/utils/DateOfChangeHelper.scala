@@ -4,6 +4,8 @@ import config.ApplicationConfig
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 trait DateOfChangeHelper {
 

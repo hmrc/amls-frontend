@@ -67,18 +67,19 @@ trait LandingService {
     desConnector.view(amlsRefNumber) flatMap { viewResponse =>
       cacheConnector.remove(authContext.user.oid) flatMap {
         _ => cacheConnector.save[BusinessMatching](BusinessMatching.key, viewResponse.businessMatchingSection) flatMap {
-          _ => cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
-            _ => cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, viewResponse.tradingPremisesSection) flatMap {
+          _ => cacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key, viewResponse.eabSection) flatMap {
+            _ => cacheConnector.save[Seq[TradingPremises]](TradingPremises.key, viewResponse.tradingPremisesSection.getOrElse(Seq.empty)) flatMap {
               _ => cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection) flatMap {
                 _ => cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)) flatMap {
                   _ => cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection) flatMap {
                     _ => cacheConnector.save[BusinessActivities](BusinessActivities.key, viewResponse.businessActivitiesSection) flatMap {
-                      _ => cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, viewResponse.responsiblePeopleSection) flatMap {
-                        _ => cacheConnector.save[Option[Tcsp]](Tcsp.key, viewResponse.tcspSection) flatMap {
-                          _ => cacheConnector.save[Option[Asp]](Asp.key, viewResponse.aspSection) flatMap {
-                            _ => cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
-                              _ => cacheConnector.save[Option[Hvd]](Hvd.key, viewResponse.hvdSection) flatMap {
-                                _ => cacheConnector.save[Option[Supervision]](Supervision.key, viewResponse.supervisionSection)
+                      _ => cacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key,
+                        viewResponse.responsiblePeopleSection.getOrElse(Seq.empty)) flatMap {
+                        _ => cacheConnector.save[Tcsp](Tcsp.key, viewResponse.tcspSection) flatMap {
+                          _ => cacheConnector.save[Asp](Asp.key, viewResponse.aspSection) flatMap {
+                            _ => cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, viewResponse.msbSection) flatMap {
+                              _ => cacheConnector.save[Hvd](Hvd.key, viewResponse.hvdSection) flatMap {
+                                _ => cacheConnector.save[Supervision](Supervision.key, viewResponse.supervisionSection)
                               }
                             }
                           }

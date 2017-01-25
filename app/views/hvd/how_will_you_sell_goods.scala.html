@@ -3,7 +3,7 @@
 @import models.hvd._
 @import utils._
 
-@(f : forms.Form2[_], edit : Boolean)(implicit request: Request[_])
+@(f : forms.Form2[_], edit : Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)

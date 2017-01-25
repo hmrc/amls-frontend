@@ -2,7 +2,7 @@
 @import forms2._
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
-@(model: BusinessMatching)(implicit request: Request[_])
+@(model: BusinessMatching)(implicit request: Request[_],messages:Messages)
 
 @header = {
     @heading("title.cya", "summary.businessmatching")

@@ -10,7 +10,7 @@
     classes: Seq[String] = Seq.empty,
     panel: Boolean = false,
     jsHidden: Boolean = false
-)(implicit lang: Lang)
+)(implicit lang:Lang,  m: Messages)
 
 <div class="form-group @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent}">
     <label for="@field.id" class="@if(jsHidden){amls-js-hidden}">

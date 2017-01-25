@@ -1,4 +1,4 @@
-@(f: forms.Field)(content: Html)(implicit lang: Lang)
+@(f: forms.Field)(content: Html)(implicit lang:Lang,  m: Messages)
 <fieldset class="form-field-group">
     <div class="form-field inline @if(f.hasErrors){form-field--error}" id="@f.id">
         @if(f.hasErrors) {

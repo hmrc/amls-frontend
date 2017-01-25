@@ -6,6 +6,8 @@ import play.api.data.validation.ValidationError
 import play.api.i18n.{Messages, Lang}
 import play.api.libs.json.Writes
 import play.api.libs.json._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 sealed trait TaxType {
   def message(implicit lang: Lang): String =

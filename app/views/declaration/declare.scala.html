@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(content: (String,String), name: String)(implicit request: Request[_])
+@(content: (String,String), name: String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("declaration.declaration.title", content._2)

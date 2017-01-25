@@ -3,7 +3,7 @@
     editUrl: String = "",
     removeUrl: String = "",
     canEdit: Boolean
-)(content: Html)(implicit lang: Lang)
+)(content: Html)(implicit lang:Lang,  m: Messages)
 
 <li class="group check-your-answers">
     <span class="visuallyhidden">@Messages("visuallyhidden.you.have.registered")</span>

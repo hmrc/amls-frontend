@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(msgTitle: String, msgContent: String)(implicit request: Request[_])
+@(msgTitle: String, msgContent: String)(implicit request: Request[_],m:Messages)
 
 @header = {
 @heading(msgTitle, "summary.status")

@@ -9,7 +9,7 @@
     wide: Boolean = false,
     gutter: Boolean = false,
     f: forms.Field = forms.ValidField(PM.asPath("/default/path"), Seq("defaultVal"))
-)(content: Html)(implicit lang: Lang)
+)(content: Html)(implicit lang:Lang,  m: Messages)
 
 <div
   @if(f.id.nonEmpty){ id="@f.id"}

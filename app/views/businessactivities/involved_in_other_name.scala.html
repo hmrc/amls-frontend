@@ -2,7 +2,7 @@
 @import forms2._
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, bmModel: BusinessMatching, businessTypes: Option[String])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("details").id}-fieldset"""

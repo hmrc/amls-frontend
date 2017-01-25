@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 @import config.{ApplicationConfig => appConfig}
-@()(implicit request: Request[_])
+@()(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("businessmatching.cannotcontinuewiththeapplication.title", "summary.businessmatching")

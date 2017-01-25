@@ -3,7 +3,7 @@
 @import models.supervision._
 @import utils._
 
-@(model: Supervision)(implicit request: Request[_], lang: Lang)
+@(model: Supervision)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.supervision")

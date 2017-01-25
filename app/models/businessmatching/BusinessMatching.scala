@@ -84,12 +84,12 @@ object BusinessMatching {
   val key = "business-matching"
 
   implicit val reads: Reads[BusinessMatching] = (
-    __.read[Option[ReviewDetails]] and
-      __.read[Option[BusinessActivities]] and
-      __.read[Option[MsbServices]] and
-      __.read[Option[TypeOfBusiness]] and
-      __.read[Option[CompanyRegistrationNumber]] and
-      __.read[Option[BusinessAppliedForPSRNumber]] and
+    __.read(Reads.optionNoError[ReviewDetails]) and
+      __.read(Reads.optionNoError[BusinessActivities]) and
+      __.read(Reads.optionNoError[MsbServices]) and
+      __.read(Reads.optionNoError[TypeOfBusiness]) and
+      __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
+      __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessMatching.apply _)
 

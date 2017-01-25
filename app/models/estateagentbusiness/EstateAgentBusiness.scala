@@ -52,10 +52,10 @@ object EstateAgentBusiness {
   val key = "estate-agent-business"
 
   implicit val reads: Reads[EstateAgentBusiness] = (
-    __.read[Option[Services]] and
-      __.read[Option[RedressScheme]] and
-      __.read[Option[ProfessionalBody]] and
-      __.read[Option[PenalisedUnderEstateAgentsAct]] and
+    __.read(Reads.optionNoError[Services]) and
+      __.read(Reads.optionNoError[RedressScheme]) and
+      __.read(Reads.optionNoError[ProfessionalBody]) and
+      __.read(Reads.optionNoError[PenalisedUnderEstateAgentsAct]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false))
     ) (EstateAgentBusiness.apply _)
 

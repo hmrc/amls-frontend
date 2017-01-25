@@ -3,7 +3,7 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
+@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_],m:Messages)
 
 @main(
     title = Messages("confirmation.title")

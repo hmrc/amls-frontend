@@ -27,7 +27,7 @@ object WhoIsYourAccountant {
 
   implicit val jsonReads : Reads[WhoIsYourAccountant] =
     ((__ \ "accountantsName").read[String] and
-     (__ \ "accountantsTradingName").read[Option[String]] and
+     (__ \ "accountantsTradingName").readNullable[String] and
      __.read[AccountantsAddress])(WhoIsYourAccountant.apply _)
 
 

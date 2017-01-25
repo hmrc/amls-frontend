@@ -40,7 +40,7 @@ object PersonResidenceType {
     (
       __.read[ResidenceType] and
         (__ \ "countryOfBirth").read[Country] and
-        (__ \ "nationality").read[Option[Country]]
+        (__ \ "nationality").readNullable[Country]
       ) (PersonResidenceType.apply _)
   }
 

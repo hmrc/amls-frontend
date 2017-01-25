@@ -7,6 +7,8 @@ import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.TraversableValidators
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 sealed trait MsbService {
 

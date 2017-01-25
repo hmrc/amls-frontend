@@ -4,7 +4,7 @@
 @import models.tradingpremises._
 @import models.businessmatching._
 
-@(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit lang: Lang, request: Request[_])
+@(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)

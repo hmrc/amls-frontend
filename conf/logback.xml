@@ -28,7 +28,7 @@
     </appender>
 
     <appender name="CONNECTOR_LOG_FILE" class="ch.qos.logback.core.FileAppender">
-        <file>logs/connectors.log</file>
+        <file>logs/connector.log</file>
         <encoder>
             <pattern>%message%n</pattern>
         </encoder>
@@ -43,6 +43,8 @@
         <appender-ref ref="STDOUT_IGNORE_NETTY" />
     </logger>
 
+    <logger name="com.google.inject" level="INFO"/>
+
     <logger name="uk.gov" level="INFO"/>
 
     <logger name="application" level="DEBUG"/>
@@ -51,7 +53,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="DEBUG">
+    <root level="WARN">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </root>

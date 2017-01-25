@@ -4,7 +4,7 @@
     bold: Boolean = false,
     hint: String = "",
     legendHidden: Boolean = false
-)(implicit lang: Lang)
+)(implicit lang:Lang,  m: Messages)
 
 <legend class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
     @Messages(legend)

@@ -10,6 +10,7 @@ import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.{LoadAuditingConfig, AuditingConfig}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.{ServicesConfig, ControllerConfig, AppName, RunMode}
+import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HttpGet
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
@@ -38,7 +39,7 @@ object AMLSAuthConnector extends AuthConnector {
   override lazy val http: HttpGet = WSHttp
 }
 
-object AMLSAuditFilter extends FrontendAuditFilter with AppName {
+object AMLSAuditFilter extends FrontendAuditFilter with AppName with MicroserviceFilterSupport{
 
   override lazy val maskedFormFields: Seq[String] = Nil
 
@@ -50,7 +51,7 @@ object AMLSAuditFilter extends FrontendAuditFilter with AppName {
     AMLSControllerConfig.paramsForController(controllerName).needsAuditing
 }
 
-object AMLSLoggingFilter extends FrontendLoggingFilter {
+object AMLSLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSupport{
   override def controllerNeedsLogging(controllerName: String): Boolean =
     AMLSControllerConfig.paramsForController(controllerName).needsLogging
 }
@@ -77,7 +78,7 @@ object AmlsShortLivedCache extends ShortLivedCache {
   override lazy val shortLiveCache = AmlsShortLivedHttpCaching
 }
 
-object WhitelistFilter extends AkamaiWhitelistFilter {
+object WhitelistFilter extends AkamaiWhitelistFilter with MicroserviceFilterSupport{
   override def whitelist: Seq[String] = ApplicationConfig.whitelist
   // TODO redirect to shutter page when it is configured
   override def destination: Call = Call("GET", "https://www.gov.uk")

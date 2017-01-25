@@ -3,7 +3,7 @@
 @import models.responsiblepeople.ResponsiblePeople
 @import utils.StatusConstants
 
-@(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
+@(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.ya", "summary.responsiblepeople")

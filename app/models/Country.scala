@@ -32,13 +32,13 @@ object Country {
 
   implicit val formRule: Rule[String, Country] =
     Rule {
-      case "" => Failure(Seq(Path -> Seq(ValidationError(Messages("error.required.country")))))
+      case "" => Failure(Seq(Path -> Seq(ValidationError("error.required.country"))))
       case code =>
         countries.collectFirst {
           case e @ Country(_, c) if c == code =>
             Success(e)
         } getOrElse {
-          Failure(Seq(Path -> Seq(ValidationError(Messages("error.invalid.country")))))
+          Failure(Seq(Path -> Seq(ValidationError("error.invalid.country"))))
         }
     }
 

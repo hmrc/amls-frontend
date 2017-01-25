@@ -99,7 +99,7 @@ object TradingPremises {
     import play.api.libs.json._
 
     def backCompatibleReads[T](fieldName : String)(implicit rds:Reads[T]) = {
-      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read[Option[T]]
+      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read(Reads.optionNoError[T])
     }
 
     (

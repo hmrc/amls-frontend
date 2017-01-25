@@ -4,7 +4,7 @@ import play.api.data.mapping._
 import play.api.data.mapping.forms._
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.Monoid
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.{Json, JsObject, JsValue}
 import utils.TraversableValidators
 
 case class PaymentMethods(
@@ -92,29 +92,30 @@ sealed trait PaymentMethods0 {
     implicitly[Rule[UrlFormEncoded, PaymentMethods]]
   }
 
-  val jsonR: Rule[JsValue, PaymentMethods] = {
+  /*val jsonR: Rule[JsValue, PaymentMethods] = {
     import play.api.data.mapping.json.Rules.{pickInJson => _, _}
     import utils.JsonMapping.{genericJsonR, pickInJson}
     implicitly[Rule[JsValue, PaymentMethods]]
-  }
+  }*/
 
   val formW: Write[PaymentMethods, UrlFormEncoded] = {
     import play.api.data.mapping.forms.Writes._
     implicitly[Write[PaymentMethods, UrlFormEncoded]]
   }
 
-  val jsonW: Write[PaymentMethods, JsObject] = {
+ /* val jsonW: Write[PaymentMethods, JsObject] = {
     import play.api.data.mapping.json.Writes._
     implicitly[Write[PaymentMethods, JsObject]]
-  }
+  }*/
 }
 
 object PaymentMethods {
 
+  implicit val format = Json.format[PaymentMethods]
   object Cache extends PaymentMethods0
 
   implicit val formR = Cache.formR
   implicit val formW = Cache.formW
-  implicit val jsonR = Cache.jsonR
-  implicit val jsonW = Cache.jsonW
+  //implicit val jsonR = Cache.jsonR
+  //implicit val jsonW = Cache.jsonW
 }
