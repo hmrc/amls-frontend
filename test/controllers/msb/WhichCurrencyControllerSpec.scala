@@ -1,8 +1,9 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import models.moneyservicebusiness.{MoneyServiceBusiness, WhichCurrencies}
+import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness, WhichCurrencies, WholesalerMoneySource}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
+import org.mockito.ArgumentCaptor
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
@@ -88,6 +89,41 @@ class WhichCurrencyControllerSpec extends WordSpec
 
           status(result) must be (SEE_OTHER)
           redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+        }
+      }
+
+      "data is valid, but not using foreign currencies" should {
+        "clear the foreign currency data" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody (
+            "currencies[0]" -> "USD",
+            "currencies[1]" -> "GBP",
+            "currencies[2]" -> "BOB",
+            "bankMoneySource" ->"Yes",
+            "bankNames" ->"Bank names",
+            "wholesalerMoneySource" -> "Yes",
+            "wholesalerNames" -> "wholesaler names",
+            "customerMoneySource" -> "Yes",
+            "usesForeignCurrencies" -> "No"
+          )
+
+          val currentModel = WhichCurrencies(Seq("USD"), usesForeignCurrencies = true, Some(mock[BankMoneySource]), Some(mock[WholesalerMoneySource]), Some(true))
+
+          when(controller.cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any())).
+            thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
+
+          val expectedModel = WhichCurrencies(Seq("USD", "GBP", "BOB"), usesForeignCurrencies = false, None, None, None)
+          val result = controller.post(false).apply(newRequest)
+
+          status(result) must be(SEE_OTHER)
+
+          val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
+
+          verify(controller.cache).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
+
+          captor.getValue match {
+            case result: MoneyServiceBusiness => result.whichCurrencies must be(Some(expectedModel))
+          }
         }
       }
 
