@@ -1,5 +1,7 @@
 import sbt._
-import scala.language.reflectiveCalls
+import uk.gov.hmrc.SbtAutoBuildPlugin
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
+import uk.gov.hmrc.versioning.SbtGitVersioning
 
 object FrontendBuild extends Build with MicroService {
 
@@ -13,23 +15,21 @@ object FrontendBuild extends Build with MicroService {
 
 private object AppDependencies {
 
-  import play.PlayImport._
+  import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val playHealthVersion = "1.1.0"
-  private val govukTemplateVersion = "4.0.0"
-  private val playUiVersion = "4.17.2"
 
-  private val frontendBootstrapVersion = "6.7.0"
-  private val playPartialsVersion = "4.5.0"
-  private val playAuthorisedFrontendVersion = "5.5.0"
-  private val playConfigVersion = "2.1.0"
-  private val playJsonLoggerVersion = "2.1.1"
-  private val httpCachingClientVersion = "5.6.0"
-  private val playWhitelistFilterVersion = "1.1.0"
+  private val playHealthVersion = "2.0.0"
+  private val playJsonLoggerVersion = "3.0.0"
+  private val frontendBootstrapVersion = "7.10.0"
+  private val govukTemplateVersion = "5.0.0"
+  private val playUiVersion = "5.4.0"
+  private val playPartialsVersion = "5.2.0"
+  private val playAuthorisedFrontendVersion = "6.2.0"
+  private val playConfigVersion = "3.1.0"
 
-  private val metricsPlayVersion = "0.2.1"
-  private val metricsGraphiteVersion = "3.0.2"
+  private val httpCachingClientVersion = "6.1.0"
+  private val playWhitelistFilterVersion = "2.0.0"
 
   private val validationVersion = "1.1"
 
@@ -49,8 +49,6 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
 
-    "com.kenshoo" %% "metrics-play" % metricsPlayVersion,
-    "com.codahale.metrics" % "metrics-graphite" % metricsGraphiteVersion,
 
     "io.github.jto" %% "validation-core" % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-json" % validationVersion excludeAll playJars,
