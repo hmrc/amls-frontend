@@ -38,7 +38,7 @@ class business_applied_for_psr_numberSpec extends WordSpec with MustMatchers wit
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "appliedFor") -> Seq(ValidationError("not a message Key")),
-          (Path \ "regNumber-fieldset") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
       def view = views.html.businessmatching.business_applied_for_psr_number(form2, true)
@@ -49,7 +49,7 @@ class business_applied_for_psr_numberSpec extends WordSpec with MustMatchers wit
       doc.getElementById("appliedFor")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("regNumber-fieldset")
+      doc.getElementById("regNumber-panel")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
