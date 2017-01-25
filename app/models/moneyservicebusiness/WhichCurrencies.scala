@@ -59,7 +59,7 @@ private sealed trait WhichCurrencies0 {
 
     val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
 
-    val foreignCurrencyToggle = (__ \ "foreignCurrencyToggle").read[String] withMessage "error.required.msb.wc.foreignCurrencyToggle" fmap {
+    val foreignCurrencyToggle = (__ \ "usesForeignCurrencies").read[String] withMessage "error.required.msb.wc.foreignCurrencies" fmap {
       case "Yes" => true
       case _ => false
     }
@@ -116,7 +116,7 @@ private sealed trait WhichCurrencies0 {
         (__ \ "wholesalerMoneySource").write[Option[String]] ~
         (__ \ "wholesalerNames").write[Option[String]] ~
         (__ \ "customerMoneySource").write[Option[String]] ~
-        (__ \ "foreignCurrencyToggle").write[Option[String]]
+        (__ \ "usesForeignCurrencies").write[Option[String]]
       ).apply(wc => (wc.currencies,
       wc.bankMoneySource.map(_ => "Yes"),
       wc.bankMoneySource.map(bms => bms.bankNames),

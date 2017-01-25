@@ -27,7 +27,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
         "customerMoneySource" -> Seq("Yes"),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "Write correctly to a form" in {
@@ -43,7 +43,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
     }
 
-    "there is no foreignCurrencyToggle" should {
+    "there is no foreignCurrency flag present" should {
 
       val form = Map(
         "currencies[0]" -> Seq("USD"),
@@ -53,7 +53,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
 
       "fail validation" in {
 
-        WhichCurrencies.formR.validate(form) must be(Failure(Seq(Path \ "foreignCurrencyToggle" -> Seq(ValidationError("error.required.msb.wc.foreignCurrencyToggle")))))
+        WhichCurrencies.formR.validate(form) must be(Failure(Seq(Path \ "usesForeignCurrencies" -> Seq(ValidationError("error.required.msb.wc.foreignCurrencies")))))
 
       }
 
@@ -75,7 +75,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
         "customerMoneySource" -> Seq("Yes"),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "Write correctly to a form" in {
@@ -106,7 +106,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "currencies[2]" -> Seq("EUR"),
         "bankMoneySource" -> Seq("Yes"),
         "bankNames" -> Seq(""),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation" in {
@@ -121,7 +121,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "currencies[2]" -> Seq("EUR"),
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq(""),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation" in {
@@ -139,7 +139,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
         "customerMoneySource" -> Seq("Yes"),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation " in {
@@ -157,7 +157,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq("wholesaler names"),
         "customerMoneySource" -> Seq("Yes"),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation" in {
@@ -175,7 +175,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "wholesalerMoneySource" -> Seq("Yes"),
         "wholesalerNames" -> Seq(buildString(141)),
         "customerMoneySource" -> Seq("Yes"),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation " in {
@@ -189,7 +189,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
           "currencies[0]" -> Seq("USD"),
           "currencies[1]" -> Seq("CHF"),
           "currencies[2]" -> Seq("EUR"),
-          "foreignCurrencyToggle" -> Seq("Yes")
+          "usesForeignCurrencies" -> Seq("Yes")
         )
 
         WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
@@ -204,7 +204,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
           "wholesalerMoneySource" -> Seq("Yes"),
           "wholesalerNames" -> Seq("wholesaler names"),
           "customerMoneySource" -> Seq("Yes"),
-          "foreignCurrencyToggle" -> Seq("Yes")
+          "usesForeignCurrencies" -> Seq("Yes")
         )
 
         WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
@@ -218,7 +218,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "currencies[2]" -> Seq(""),
         "bankNames" -> Seq(""),
         "wholesalerNames" -> Seq(""),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation with error messages" in {
@@ -237,7 +237,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "bankMoneySource" -> Seq("Yes"),
         "bankNames" -> Seq(""),
         "wholesalerNames" -> Seq(""),
-        "foreignCurrencyToggle" -> Seq("Yes")
+        "usesForeignCurrencies" -> Seq("Yes")
       )
 
       "fail validation with both error messages" in {
@@ -254,7 +254,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
         "currencies[0]" -> Seq("GBP"),
         "currencies[1]" -> Seq("EUR"),
         "currencies[2]" -> Seq("USD"),
-        "foreignCurrencyToggle" -> Seq("No")
+        "usesForeignCurrencies" -> Seq("No")
       )
 
       "not fail validation for the foreign currency fields" in {

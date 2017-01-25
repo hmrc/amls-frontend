@@ -266,7 +266,7 @@ error.invalid.msb.wc.bankNames = Enter the banks’ names
 error.invalid.msb.wc.bankNames.too-long = You can’t enter more than 140 characters for the bank names
 error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
 error.invalid.msb.wc.wholesalerNames.too-long = You can’t enter more than 140 characters for the wholesaler names
-error.required.msb.wc.foreignCurrencyToggle = Select yes if you deal in physical foreign currencies
+error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
 error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################

@@ -110,7 +110,7 @@ trait MoneyServiceBusinessTestData {
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
     Some(WhichCurrencies(
       Seq("USD", "GBP", "EUR"),
-      usesForeignCurrencies = false,
+      usesForeignCurrencies = true,
       Some(BankMoneySource("bank names")),
       Some(WholesalerMoneySource("Wholesaler Names")),
       Some(true))),
@@ -140,7 +140,8 @@ trait MoneyServiceBusinessTestData {
       "bankNames" -> "bank names",
       "wholesalerMoneySource" -> "Yes",
       "wholesalerNames" -> "Wholesaler Names",
-      "customerMoneySource" -> "Yes"
+      "customerMoneySource" -> "Yes",
+      "usesForeignCurrencies" -> "Yes"
     ),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
