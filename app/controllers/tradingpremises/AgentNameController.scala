@@ -91,7 +91,7 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
   }
 
   private def redirectToDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name)
+    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
   }
 }
 
