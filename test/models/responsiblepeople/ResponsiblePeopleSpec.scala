@@ -113,28 +113,28 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
     "Merged with personName" must {
       "return ResponsiblePeople with correct personName" in {
-        val result = EmptyResponsiblePeople.personName(NewValues.personName)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).personName(NewValues.personName)
         result must be(ResponsiblePeople(personName = Some(NewValues.personName), hasChanged = true))
       }
     }
 
     "Merged with PersonResidenceType" must {
       "return ResponsiblePeople with correct PersonResidenceType" in {
-        val result = EmptyResponsiblePeople.personResidenceType(NewValues.personResidenceType)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).personResidenceType(NewValues.personResidenceType)
         result must be(ResponsiblePeople(personResidenceType = Some(NewValues.personResidenceType), hasChanged = true))
       }
     }
 
     "Merged with ContactDetails" must {
       "return ResponsiblePeople with correct ContactDetails" in {
-        val result = EmptyResponsiblePeople.contactDetails(NewValues.contactDetails)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).contactDetails(NewValues.contactDetails)
         result must be(ResponsiblePeople(contactDetails = Some(NewValues.contactDetails), hasChanged = true))
       }
     }
 
     "Merged with AddressHistory" must {
       "return ResponsiblePeople with correct AddressHistory" in {
-        val result = EmptyResponsiblePeople.addressHistory(NewValues.addressHistory)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).addressHistory(NewValues.addressHistory)
         result must be(ResponsiblePeople(addressHistory = Some(NewValues.addressHistory), hasChanged = true))
       }
     }
@@ -142,42 +142,42 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
     "Merged with Positions" must {
       "return ResponsiblePeople with correct Positions" in {
-        val result = EmptyResponsiblePeople.positions(NewValues.positions)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).positions(NewValues.positions)
         result must be(ResponsiblePeople(positions = Some(NewValues.positions), hasChanged = true))
       }
     }
 
     "Merged with SaRegistered" must {
       "return ResponsiblePeople with correct SaRegistered" in {
-        val result = EmptyResponsiblePeople.saRegistered(NewValues.saRegistered)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).saRegistered(NewValues.saRegistered)
         result must be(ResponsiblePeople(saRegistered = Some(NewValues.saRegistered), hasChanged = true))
       }
     }
 
     "Merged with VatRegistered" must {
       "return ResponsiblePeople with correct VatRegistered" in {
-        val result = EmptyResponsiblePeople.vatRegistered(NewValues.vatRegistered)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).vatRegistered(NewValues.vatRegistered)
         result must be(ResponsiblePeople(vatRegistered = Some(NewValues.vatRegistered), hasChanged = true))
       }
     }
 
     "Merged with experienceTraining" must {
       "return ResponsiblePeople with correct experienceTraining" in {
-        val result = EmptyResponsiblePeople.experienceTraining(NewValues.experienceTraining)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).experienceTraining(NewValues.experienceTraining)
         result must be(ResponsiblePeople(experienceTraining = Some(NewValues.experienceTraining), hasChanged = true))
       }
     }
 
     "Merged with Training" must {
       "return ResponsiblePeople with correct Training" in {
-        val result = EmptyResponsiblePeople.training(NewValues.training)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).training(NewValues.training)
         result must be(ResponsiblePeople(training = Some(NewValues.training), hasChanged = true))
       }
     }
 
     "Merged with FitAndProper" must {
       "return ResponsiblePeople with correct hasAlreadyPassedFitAndProper" in {
-        val result = EmptyResponsiblePeople.hasAlreadyPassedFitAndProper(true)
+        val result = ResponsiblePeople.default(EmptyResponsiblePeople).hasAlreadyPassedFitAndProper(true)
         result must be(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true), hasChanged = true))
       }
     }

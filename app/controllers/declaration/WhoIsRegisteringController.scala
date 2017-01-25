@@ -40,7 +40,7 @@ trait WhoIsRegisteringController extends BaseController {
   def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
 
     val rpOption = responsiblePeople.find(_.personName.exists(name => whoIsRegistering.person.equals(name.firstName.concat(name.lastName))))
-    val rp: ResponsiblePeople = rpOption.getOrElse(None)
+    val rp: ResponsiblePeople = rpOption.getOrElse(ResponsiblePeople.default(None))
 
     rp.personName match {
       case Some(name) => Some(AddPerson(name.firstName, name.middleName, name.lastName,
