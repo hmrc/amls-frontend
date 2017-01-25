@@ -80,7 +80,8 @@ class WhichCurrencyControllerSpec extends WordSpec
             "bankNames" ->"Bank names",
             "wholesalerMoneySource" -> "Yes",
             "wholesalerNames" -> "wholesaler names",
-            "customerMoneySource" -> "Yes"
+            "customerMoneySource" -> "Yes",
+            "usesForeignCurrencies" -> "Yes"
           )
 
           val result = controller.post(false).apply(newRequest)
