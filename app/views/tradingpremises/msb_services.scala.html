@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], index: Int, edit: Boolean)(implicit request: Request[_])
+@(f: Form2[_], index: Int, edit: Boolean, changed: Boolean)(implicit request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -14,7 +14,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit)) {
+    @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit, changed)) {
 
         @fieldset(
             f = f("msbServices"),

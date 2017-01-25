@@ -8,14 +8,13 @@ import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import play.api.i18n.Messages
 import services.StatusService
 import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
 
-trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper {
+trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
@@ -92,7 +91,7 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
   }
 
   private def redirectToDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name)
+    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
   }
 }
 
