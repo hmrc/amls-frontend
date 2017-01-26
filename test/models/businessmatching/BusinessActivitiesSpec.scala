@@ -1,13 +1,14 @@
 package models.businessmatching
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import play.api.i18n.Messages
 import play.api.libs.json._
+import utils.GenericTestHelper
 
 
-class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
+class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
   import jto.validation.forms.Rules._
 
   "BusinessActivitiesSpec" must {
@@ -82,13 +83,13 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     }
 
     "get the message for each activity type" in {
-      AccountancyServices.getMessage must be("businessmatching.registerservices.servicename.lbl.01")
-      BillPaymentServices.getMessage must be("businessmatching.registerservices.servicename.lbl.02")
-      EstateAgentBusinessService.getMessage must be("businessmatching.registerservices.servicename.lbl.03")
-      HighValueDealing.getMessage must be("businessmatching.registerservices.servicename.lbl.04")
-      MoneyServiceBusiness.getMessage must be("businessmatching.registerservices.servicename.lbl.05")
-      TrustAndCompanyServices.getMessage must be("businessmatching.registerservices.servicename.lbl.06")
-      TelephonePaymentService.getMessage must be("businessmatching.registerservices.servicename.lbl.07")
+      AccountancyServices.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.01"))
+      BillPaymentServices.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.02"))
+      EstateAgentBusinessService.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.03"))
+      HighValueDealing.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.04"))
+      MoneyServiceBusiness.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.05"))
+      TrustAndCompanyServices.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.06"))
+      TelephonePaymentService.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.07"))
 
     }
 

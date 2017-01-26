@@ -119,7 +119,7 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj(
         "roleWithinBusiness" -> "01"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(BeneficialShareholder, JsPath \ "roleWithinBusiness"))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(BeneficialShareholder, JsPath))
     }
 
 
@@ -127,7 +127,7 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj(
         "roleWithinBusiness" -> "02"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(Director, JsPath \ "roleWithinBusiness"))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(Director, JsPath))
     }
 
 
@@ -135,28 +135,28 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj(
         "roleWithinBusiness" -> "03"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(ExternalAccountant, JsPath \ "roleWithinBusiness"))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(ExternalAccountant, JsPath))
     }
 
     "Read the json and return the RoleWithinBusiness domain object successfully for the InternalAccountant" in {
       val json = Json.obj(
         "roleWithinBusiness" -> "04"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(InternalAccountant, JsPath \ "roleWithinBusiness"))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(InternalAccountant, JsPath))
     }
 
     "Read the json and return the RoleWithinBusiness domain object successfully for the NominatedOfficer" in {
       val json = Json.obj(
         "roleWithinBusiness" -> "05"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(NominatedOfficer, JsPath \ "roleWithinBusiness"))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(NominatedOfficer, JsPath))
     }
 
     "Read the json and return the RoleWithinBusiness domain object successfully for the Partner" in {
       val json = Json.obj(
         "roleWithinBusiness" -> "06"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(Partner, JsPath \ "roleWithinBusiness"))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(Partner, JsPath))
     }
 
 
@@ -164,7 +164,7 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj(
         "roleWithinBusiness" -> "07"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(SoleProprietor, JsPath \ "roleWithinBusiness"))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(SoleProprietor, JsPath))
     }
 
 
@@ -176,14 +176,14 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       )
 
       Json.fromJson[RoleWithinBusiness](json) must
-        be(JsSuccess(Other("any other value"), JsPath \ "roleWithinBusiness" \ "roleWithinBusinessOther"))
+        be(JsSuccess(Other("any other value"), JsPath \ "roleWithinBusinessOther"))
     }
 
     "Read the json and return error if an invalid value is found" in {
       val json = Json.obj(
         "roleWithinBusiness" -> "09"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.invalid")))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath) -> play.api.data.validation.ValidationError("error.invalid")))
     }
 
 

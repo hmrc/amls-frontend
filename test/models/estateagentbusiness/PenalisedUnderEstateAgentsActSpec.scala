@@ -74,20 +74,20 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
       Json.fromJson[PenalisedUnderEstateAgentsAct](Json.obj("penalisedUnderEstateAgentsAct" -> false)) must
-        be(JsSuccess(PenalisedUnderEstateAgentsActNo, JsPath \ "penalisedUnderEstateAgentsAct"))
+        be(JsSuccess(PenalisedUnderEstateAgentsActNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
       val json = Json.obj("penalisedUnderEstateAgentsAct" -> true, "penalisedUnderEstateAgentsActDetails" -> "Do not remember why penalised before")
       Json.fromJson[PenalisedUnderEstateAgentsAct](json) must
         be(JsSuccess(PenalisedUnderEstateAgentsActYes("Do not remember why penalised before"),
-          JsPath \ "penalisedUnderEstateAgentsAct" \ "penalisedUnderEstateAgentsActDetails"))
+          JsPath \ "penalisedUnderEstateAgentsActDetails"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
       val json = Json.obj("penalisedUnderEstateAgentsAct" -> true)
       Json.fromJson[PenalisedUnderEstateAgentsAct](json) must
-        be(JsError((JsPath \ "penalisedUnderEstateAgentsAct" \ "penalisedUnderEstateAgentsActDetails") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "penalisedUnderEstateAgentsActDetails") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {
