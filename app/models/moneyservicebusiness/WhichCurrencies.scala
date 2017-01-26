@@ -45,17 +45,10 @@ object WhichCurrencies {
       case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
     }
 
-  private implicit def rule[A]
-  (implicit
-   a: Path => RuleLike[A, Seq[String]],
-   b: Path => RuleLike[A, Option[String]],
-   d: Path => RuleLike[A, String],
-   c: Path => RuleLike[A, Boolean]
-  ): Rule[A, WhichCurrencies] = From[A] { __ =>
+  implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Rules._
 
     val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
-
-    println("*** " + ApplicationConfig.release7)
 
     val usesForeignCurrencies = ApplicationConfig.release7 match {
       case true =>
@@ -63,23 +56,23 @@ object WhichCurrencies {
           case "Yes" => Some(true)
           case _ => Some(false)
         }
-      case _ => Rule[A, Option[Boolean]](_ => Success(None))
+      case _ => Rule[UrlFormEncoded, Option[Boolean]](_ => Success(None))
     }
 
-    val bankMoneySource: Rule[A, Option[BankMoneySource]] =
+    val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
       (__ \ "bankMoneySource").read[Option[String]] flatMap {
         case Some("Yes") => (__ \ "bankNames")
           .read(nameType("bankNames"))
           .fmap(names => Some(BankMoneySource(names)))
-        case _ => Rule[A, Option[BankMoneySource]](_ => Success(None))
+        case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Success(None))
       }
 
-    val wholesalerMoneySource: Rule[A, Option[WholesalerMoneySource]] =
+    val wholesalerMoneySource: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] =
       (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
         case Some("Yes") => (__ \ "wholesalerNames")
           .read(nameType("wholesalerNames"))
           .fmap(names => Some(WholesalerMoneySource(names)))
-        case _ => Rule[A, Option[WholesalerMoneySource]](_ => Success(None))
+        case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Success(None))
       }
 
     val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] fmap {
@@ -107,17 +100,10 @@ object WhichCurrencies {
       case _ => build(None)
     }
 
-
-
   }
 
-  private implicit def write[A]
-  (implicit
-   m: Monoid[A],
-   a: Path => WriteLike[Seq[String], A],
-   b: Path => WriteLike[String, A],
-   c: Path => WriteLike[Option[String], A]
-  ): Write[WhichCurrencies, A] = To[A] { __ =>
+  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import play.api.data.mapping.forms.Writes._
     (
       (__ \ "currencies").write[Seq[String]] ~
         (__ \ "bankMoneySource").write[Option[String]] ~
@@ -137,16 +123,6 @@ object WhichCurrencies {
         case _ => Some("No")
       }
       ))
-  }
-
-  implicit val formR: Rule[UrlFormEncoded, WhichCurrencies] = {
-    import play.api.data.mapping.forms.Rules._
-    implicitly
-  }
-
-  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
-    implicitly
   }
 
   implicit val bmsReader: Reads[Option[BankMoneySource]] = {

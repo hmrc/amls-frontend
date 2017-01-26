@@ -39,13 +39,11 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       }
 
       "Read correctly from a form" in {
-        println(ApplicationConfig.release7)
         WhichCurrencies.formR.validate(fullFormData) must be(Success(fullModel))
       }
 
       "Round trip through Json correctly" in {
         val js = Json.toJson(fullModel)
-        println(Console.YELLOW + js + Console.WHITE)
         js.as[WhichCurrencies] must be(fullModel)
       }
     }
