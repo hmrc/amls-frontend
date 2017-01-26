@@ -17,7 +17,7 @@ case class WhichCurrencies(currencies: Seq[String],
                            customerMoneySource: Option[Boolean])
 
 
-private sealed trait WhichCurrencies0 {
+object WhichCurrencies {
 
   type MoneySource = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
 
@@ -54,6 +54,8 @@ private sealed trait WhichCurrencies0 {
   ): Rule[A, WhichCurrencies] = From[A] { __ =>
 
     val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
+
+    println("*** " + ApplicationConfig.release7)
 
     val usesForeignCurrencies = ApplicationConfig.release7 match {
       case true =>
@@ -137,12 +139,12 @@ private sealed trait WhichCurrencies0 {
       ))
   }
 
-  val formR: Rule[UrlFormEncoded, WhichCurrencies] = {
+  implicit val formR: Rule[UrlFormEncoded, WhichCurrencies] = {
     import play.api.data.mapping.forms.Rules._
     implicitly
   }
 
-  val formW: Write[WhichCurrencies, UrlFormEncoded] = {
+  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = {
     import play.api.data.mapping.forms.Writes._
     implicitly
   }
@@ -201,7 +203,7 @@ private sealed trait WhichCurrencies0 {
     }
   }
 
-  val jsonR: Reads[WhichCurrencies] = {
+  implicit val jsonR: Reads[WhichCurrencies] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
@@ -215,7 +217,7 @@ private sealed trait WhichCurrencies0 {
 
   }
 
-  val jsonW: Writes[WhichCurrencies] = {
+  implicit val jsonW: Writes[WhichCurrencies] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
@@ -231,12 +233,12 @@ private sealed trait WhichCurrencies0 {
   }
 }
 
-object WhichCurrencies {
-
-  private object Cache extends WhichCurrencies0
-
-  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = Cache.formW
-  implicit val formR: Rule[UrlFormEncoded, WhichCurrencies] = Cache.formR
-  implicit val jsonR: Reads[WhichCurrencies] = Cache.jsonR
-  implicit val jsonW: Writes[WhichCurrencies] = Cache.jsonW
-}
+//object WhichCurrencies {
+//
+//  private object Cache extends WhichCurrencies0
+//
+//  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = Cache.formW
+//  implicit val formR: Rule[UrlFormEncoded, WhichCurrencies] = Cache.formR
+//  implicit val jsonR: Reads[WhichCurrencies] = Cache.jsonR
+//  implicit val jsonW: Writes[WhichCurrencies] = Cache.jsonW
+//}

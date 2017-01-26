@@ -35,11 +35,11 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "Write correctly to a form" in {
-        println(ApplicationConfig.release7)
         WhichCurrencies.formW.writes(fullModel) must be(fullFormData)
       }
 
       "Read correctly from a form" in {
+        println(ApplicationConfig.release7)
         WhichCurrencies.formR.validate(fullFormData) must be(Success(fullModel))
       }
 
