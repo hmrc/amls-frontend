@@ -39,7 +39,7 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
       Some(WhichCurrencies(
         Seq("USD", "GBP", "EUR"),
-        usesForeignCurrencies = false,
+        usesForeignCurrencies = Some(false),
         Some(BankMoneySource("bank names")),
         Some(WholesalerMoneySource("Wholesaler Names")),
         Some(true))),

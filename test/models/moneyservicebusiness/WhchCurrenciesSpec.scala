@@ -1,19 +1,23 @@
 package models.moneyservicebusiness
 
+import config.ApplicationConfig
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.mapping.forms.UrlFormEncoded
+import org.scalatestplus.play.OneAppPerSuite
+import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
+import play.api.test.FakeApplication
 
-class WhichCurrenciesSpec extends WordSpec with MustMatchers {
+class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   "Which Currencies" when {
     "data is complete" should {
 
       val fullModel = WhichCurrencies(
         Seq("USD", "CHF", "EUR"),
-        usesForeignCurrencies = true,
+        usesForeignCurrencies = Some(true),
         Some(BankMoneySource("Bank names")),
         Some(WholesalerMoneySource("wholesaler names")),
         customerMoneySource = Some(true))
@@ -31,6 +35,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       )
 
       "Write correctly to a form" in {
+        println(ApplicationConfig.release7)
         WhichCurrencies.formW.writes(fullModel) must be(fullFormData)
       }
 
@@ -39,7 +44,9 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
 
       "Round trip through Json correctly" in {
-        Json.toJson(fullModel).as[WhichCurrencies] must be(fullModel)
+        val js = Json.toJson(fullModel)
+        println(Console.YELLOW + js + Console.WHITE)
+        js.as[WhichCurrencies] must be(fullModel)
       }
     }
 
@@ -63,7 +70,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
 
       val model = WhichCurrencies(
         Seq("USD", "CHF", "EUR"),
-        usesForeignCurrencies = true,
+        usesForeignCurrencies = Some(true),
         None,
         Some(WholesalerMoneySource("wholesaler names")),
         customerMoneySource = Some(true))
@@ -87,7 +94,8 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
       }
 
       "Round trip through Json correctly" in {
-        Json.toJson(model).as[WhichCurrencies] must be(model)
+        val json = Json.toJson(model)
+        json.as[WhichCurrencies] must be(model)
       }
     }
 
@@ -259,7 +267,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers {
 
       "not fail validation for the foreign currency fields" in {
 
-        val model = WhichCurrencies(Seq("GBP", "EUR", "USD"), usesForeignCurrencies = false, None, None, None)
+        val model = WhichCurrencies(Seq("GBP", "EUR", "USD"), usesForeignCurrencies = Some(false), None, None, None)
 
         WhichCurrencies.formR.validate(formData) must be(Success(model))
 

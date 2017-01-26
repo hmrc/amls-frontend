@@ -107,12 +107,12 @@ class WhichCurrencyControllerSpec extends WordSpec
             "usesForeignCurrencies" -> "No"
           )
 
-          val currentModel = WhichCurrencies(Seq("USD"), usesForeignCurrencies = true, Some(mock[BankMoneySource]), Some(mock[WholesalerMoneySource]), Some(true))
+          val currentModel = WhichCurrencies(Seq("USD"), usesForeignCurrencies = Some(true), Some(mock[BankMoneySource]), Some(mock[WholesalerMoneySource]), Some(true))
 
           when(controller.cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any())).
             thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
-          val expectedModel = WhichCurrencies(Seq("USD", "GBP", "BOB"), usesForeignCurrencies = false, None, None, None)
+          val expectedModel = WhichCurrencies(Seq("USD", "GBP", "BOB"), usesForeignCurrencies = Some(false), None, None, None)
           val result = controller.post(false).apply(newRequest)
 
           status(result) must be(SEE_OTHER)
