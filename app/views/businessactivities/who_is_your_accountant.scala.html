@@ -79,7 +79,7 @@
                 requiredField = false
             )
             @panel(
-                f = f(s"${f("postCode").id}-field"),
+                field = Some(f(s"${f("postCode").id}-field")),
                 panel = false
             ) {
                 @input(
@@ -89,7 +89,7 @@
                 )
             }
             @panel(
-                f = f(s"${f("country").id}-field"),
+                field = Some(f(s"${f("country").id}-field")),
                 panel = false
             ) {
                 @country(

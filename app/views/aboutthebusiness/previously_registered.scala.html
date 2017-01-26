@@ -4,7 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @target = @{
-    s"""${f("prevMLRRegNo").id}-fieldset"""
+    s"""${f("prevMLRRegNo").id}-panel"""
 }
 
 @header = {
@@ -44,21 +44,20 @@
                     value = "false",
                     inline = true
                 )
-
-                    @panel(
-                        f = f("prevMLRRegNo-fieldset"),
-                        jsHidden = false,
-                        id = target
-                    ) {
-                        @input(
-                            field = f("prevMLRRegNo"),
-                            labelText = "aboutthebusiness.registeredformlr.mlrregno.lbl",
-                            hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
-                            bold = false
-                        )
-                    }
-
             }
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = false,
+            id = target
+        ) {
+            @input(
+                field = f("prevMLRRegNo"),
+                labelText = "aboutthebusiness.registeredformlr.mlrregno.lbl",
+                hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
+                bold = false
+            )
         }
 
         @submit(false)

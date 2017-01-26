@@ -4,7 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
 
 @target = @{
-    s"""${f("regNumber").id}-fieldset"""
+    s"""${f("regNumber").id}-panel"""
 }
 
 @header = {
@@ -44,20 +44,18 @@
                     inline = true
                 )
             }
+        }
 
-                @panel(
-                        f = f("regNumber-fieldset"),
-                        jsHidden = false,
-                        id = target
-                ) {
-                    @input(
-                        field = f("regNumber"),
-                        bold = false,
-                        labelText = "businessmatching.psr.number.lbl",
-                        hintText = "businessmatching.psr.number.hint"
-                    )
-                }
-
+        @panel(
+            field = Some(f(s"$target")),
+            id = target
+        ) {
+            @input(
+                field = f("regNumber"),
+                bold = false,
+                labelText = "businessmatching.psr.number.lbl",
+                hintText = "businessmatching.psr.number.hint"
+            )
         }
 
         @submit(edit)
