@@ -58,7 +58,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
   }
 
   "Json read and writes" must {
-
+    import play.api.data.validation.ValidationError
     "Serialise single service as expected" in {
       Json.toJson(ProvidedServices(Set(EmailServer))) must be(Json.obj("services" -> Seq("03")))
     }

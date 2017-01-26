@@ -11,7 +11,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers.{status => hstatus, _}
 import services.StatusService
@@ -20,7 +20,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class WhereAreTradingPremisesControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with BeforeAndAfter {
+class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with MockitoSugar with BeforeAndAfter {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 

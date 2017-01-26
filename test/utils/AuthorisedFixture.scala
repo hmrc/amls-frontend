@@ -17,8 +17,9 @@ trait AuthorisedFixture extends MockitoSugar {
 
   val authority = Authority(
     "Test User",
-    Accounts(org = Some(OrgAccount("org/1234", Org("1234")))), None, None, CredentialStrength.Strong ,ConfidenceLevel.L50, None, None
+    Accounts(org = Some(OrgAccount("org/1234", Org("1234")))), None, None, CredentialStrength.Strong ,ConfidenceLevel.L50, None, None,None, ""
   )
+
 
   implicit val request = FakeRequest().withSession(
     SessionKeys.sessionId -> "SessionId",

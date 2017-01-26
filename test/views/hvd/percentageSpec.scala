@@ -3,15 +3,15 @@ package views.hvd
 import forms.{InvalidForm, ValidForm, Form2}
 import models.hvd.PercentageOfCashPaymentOver15000
 import models.hvd.PercentageOfCashPaymentOver15000.{Third, Second}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
 
-class percentageSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class percentageSpec extends GenericTestHelper with MustMatchers  {
 
   "percentage view" must {
     "have correct title" in new ViewFixture {

@@ -65,6 +65,8 @@ object TradingPremises {
 
   val key = "trading-premises"
 
+  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
+
   def anyChanged(newModel: Seq[TradingPremises]): Boolean = {
     newModel exists { _.hasChanged }
   }

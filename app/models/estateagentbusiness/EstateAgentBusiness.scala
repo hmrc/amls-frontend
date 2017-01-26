@@ -51,6 +51,8 @@ object EstateAgentBusiness {
 
   val key = "estate-agent-business"
 
+  implicit val formatOption = Reads.optionWithNull[EstateAgentBusiness]
+
   implicit val reads: Reads[EstateAgentBusiness] = (
     __.read(Reads.optionNoError[Services]) and
       __.read(Reads.optionNoError[RedressScheme]) and

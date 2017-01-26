@@ -9,7 +9,7 @@ import org.mockito.Matchers._
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -19,7 +19,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class HvdDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class HvdDateOfChangeControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

@@ -2,12 +2,11 @@ package models.responsiblepeople
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import org.specs2.mock.mockito.MockitoMatchers
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 
-class PreviousNameSpec extends PlaySpec with MockitoMatchers {
+class PreviousNameSpec extends PlaySpec {
 
   "PreviousName" must {
 

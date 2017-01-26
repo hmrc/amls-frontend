@@ -12,12 +12,11 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import  utils.GenericTestHelper
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.AuthEnrolmentsService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -163,7 +162,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
 }
 
-class NotificationsControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class NotificationsControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

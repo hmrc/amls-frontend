@@ -2,11 +2,11 @@ package views.bankdetails
 
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import org.scalatestplus.play.OneAppPerSuite
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.ViewFixture
 
-class what_you_needSpec extends WordSpec with MustMatchers with OneAppPerSuite{
+class what_you_needSpec extends GenericTestHelper with MustMatchers {
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {

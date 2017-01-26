@@ -4,14 +4,14 @@ import connectors.DataCacheConnector
 import models.Country
 import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 

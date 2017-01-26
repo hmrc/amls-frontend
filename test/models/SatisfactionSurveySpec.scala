@@ -124,7 +124,7 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
     "fail to validate given no data" in {
       val json = Json.obj()
       Json.fromJson[SatisfactionSurvey](json) must
-        be(JsError((JsPath \ "satisfaction") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "satisfaction") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
   }

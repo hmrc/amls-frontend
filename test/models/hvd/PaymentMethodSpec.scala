@@ -2,8 +2,8 @@ package models.hvd
 
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Failure, Path, Success}
-import jto.validation.ValidationError
-import play.api.libs.json.JsSuccess
+import play.api.data.validation.ValidationError
+import play.api.libs.json.{Json, JsSuccess}
 
 class PaymentMethodSpec extends PlaySpec {
 
@@ -16,7 +16,9 @@ class PaymentMethodSpec extends PlaySpec {
 
     "roundtrip through json" in {
       val data = PaymentMethods(courier = true, direct = true, other = Some("foo"))
-      PaymentMethods.jsonR.validate(PaymentMethods.jsonW.writes(data)) mustEqual Success(data)
+      val js = Json.toJson(data)
+
+      js.as[PaymentMethods] mustEqual data
     }
 
     "fail to validate when no payment method is selected" in {

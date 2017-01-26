@@ -2,15 +2,15 @@ package views.estateagentbusiness
 
 import forms.{Form2, InvalidForm, ValidForm}
 import models.estateagentbusiness.{Other, RedressScheme}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
 
-class redress_schemeSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class redress_schemeSpec extends GenericTestHelper with MustMatchers  {
 
   trait TestFixture extends ViewFixture {
     val testScheme = Other("test scheme")

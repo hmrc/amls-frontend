@@ -8,7 +8,7 @@ import org.mockito.Mockito._
 import models.hvd.{PercentageOfCashPaymentOver15000, Hvd}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -17,7 +17,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000ControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures{
+class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
     self =>

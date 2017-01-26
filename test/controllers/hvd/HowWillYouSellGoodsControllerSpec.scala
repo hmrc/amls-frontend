@@ -6,7 +6,7 @@ import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
@@ -16,7 +16,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class HowWillYouSellGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
+class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 

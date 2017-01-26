@@ -1,17 +1,16 @@
 package views.aboutthebusiness
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
 import models.aboutthebusiness.ActivityStartDate
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import jto.validation.Path
-import jto.validation.ValidationError
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.GenericTestHelper
 import views.ViewFixture
 
 
-class activity_start_dateSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class activity_start_dateSpec extends GenericTestHelper with MustMatchers {
 
   "activity_start_date view" must {
     "have correct title" in new ViewFixture {

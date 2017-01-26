@@ -87,7 +87,7 @@ class PenalisedUnderEstateAgentsActSpec extends PlaySpec with MockitoSugar {
     "fail to validate when given an empty `Yes` value" in {
       val json = Json.obj("penalisedUnderEstateAgentsAct" -> true)
       Json.fromJson[PenalisedUnderEstateAgentsAct](json) must
-        be(JsError((JsPath \ "penalisedUnderEstateAgentsAct" \ "penalisedUnderEstateAgentsActDetails") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "penalisedUnderEstateAgentsAct" \ "penalisedUnderEstateAgentsActDetails") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

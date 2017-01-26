@@ -57,24 +57,24 @@ private object AppDependencies {
     val dependencies: Seq[ModuleID]
   }
 
-  private val scalatestVersion = "2.2.5"
-  private val scalatestPlusPlayVersion = "1.2.0"
+  private val scalatestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
   private val jsoupVersion = "1.8.3"
-  private val hmrctestVersion = "1.6.0"
+  private val hmrctestVersion = "2.2.0"
   private val authTestVersion = "2.4.0"
 
   object Test {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
+        "uk.gov.hmrc" %% "hmrctest" % hmrctestVersion % scope,
         "org.scalatest" %% "scalatest" % scalatestVersion % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.5" % scope,
-        "org.scalatestplus" %% "play" % scalatestPlusPlayVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "uk.gov.hmrc" %% "hmrctest" % hmrctestVersion % scope
+        "org.mockito" % "mockito-all" % "1.10.19" % scope,
+        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope
       )
     }.dependencies
   }
@@ -84,7 +84,6 @@ private object AppDependencies {
       override lazy val scope = "it"
       override lazy val dependencies = Seq(
         "org.scalatest" %% "scalatest" % scalatestVersion % scope,
-        "org.scalatestplus" %% "play" % scalatestPlusPlayVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,

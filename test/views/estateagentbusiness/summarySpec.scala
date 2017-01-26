@@ -1,12 +1,12 @@
 package views.estateagentbusiness
 
 import models.estateagentbusiness._
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.ViewFixture
 
-class summarySpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class summarySpec extends GenericTestHelper with MustMatchers  {
 
   trait TestFixture extends ViewFixture {
     val validBusiness = EstateAgentBusiness(

@@ -97,7 +97,7 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("saRegistered" -> true)
 
       Json.fromJson[SaRegistered](json) must
-        be(JsError((JsPath \ "saRegistered" \ "utrNumber") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "saRegistered" \ "utrNumber") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

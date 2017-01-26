@@ -93,7 +93,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("involvedInOther" -> true)
 
       Json.fromJson[InvolvedInOther](json) must
-        be(JsError((JsPath \ "involvedInOther" \ "details") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "involvedInOther" \ "details") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

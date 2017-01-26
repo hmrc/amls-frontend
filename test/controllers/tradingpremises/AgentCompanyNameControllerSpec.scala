@@ -6,7 +6,7 @@ import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Mockito._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -19,7 +19,7 @@ import org.mockito.Matchers.{eq => meq, _}
 
 import scala.concurrent.Future
 
-class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class AgentCompanyNameControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>

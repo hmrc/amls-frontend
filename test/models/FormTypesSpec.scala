@@ -1,12 +1,11 @@
 package models
 
 import org.scalatestplus.play.PlaySpec
-import org.specs2.mock.mockito.MockitoMatchers
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Failure, Path, Success}
-import jto.validation.ValidationError
+import play.api.data.validation.ValidationError
 
-class FormTypesSpec extends PlaySpec with MockitoMatchers {
+class FormTypesSpec extends PlaySpec {
 
   import FormTypes._
 

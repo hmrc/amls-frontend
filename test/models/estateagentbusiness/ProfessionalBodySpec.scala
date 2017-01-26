@@ -97,7 +97,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("penalised" -> true)
 
       Json.fromJson[ProfessionalBody](json) must
-        be(JsError((JsPath \ "penalised" \ "professionalBody") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "penalised" \ "professionalBody") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

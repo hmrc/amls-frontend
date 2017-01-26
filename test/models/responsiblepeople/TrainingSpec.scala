@@ -95,7 +95,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("training" -> true)
 
       Json.fromJson[Training](json) must
-        be(JsError((JsPath \ "training" \ "information") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "training" \ "information") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

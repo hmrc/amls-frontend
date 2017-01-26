@@ -1,10 +1,10 @@
 package views
 
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 
-class startSpec extends WordSpec with MustMatchers with OneAppPerSuite{
+class startSpec extends GenericTestHelper with MustMatchers {
 
   "Landing Page View" must {
 

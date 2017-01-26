@@ -66,7 +66,7 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[TimeAtAddress](Json.obj(FieldName -> "20")) must
-        be(JsError(JsPath \ FieldName, ValidationError("error.invalid")))
+        be(JsError(JsPath \ FieldName, play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 }

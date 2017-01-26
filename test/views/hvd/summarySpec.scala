@@ -5,15 +5,15 @@ import models.hvd._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.ViewFixture
 
 import scala.collection.JavaConversions._
 
 
-class summarySpec extends WordSpec with MustMatchers with OneAppPerSuite with TableDrivenPropertyChecks {
+class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenPropertyChecks {
 
   "summary view" must {
     "have correct title" in new ViewFixture {

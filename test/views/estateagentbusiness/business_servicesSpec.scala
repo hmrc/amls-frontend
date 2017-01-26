@@ -2,15 +2,15 @@ package views.estateagentbusiness
 
 import forms.{InvalidForm, ValidForm, Form2}
 import models.estateagentbusiness._
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
 
-class business_servicessSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class business_servicessSpec extends GenericTestHelper with MustMatchers  {
 
   "business_servicess view" must {
     "have correct title" in new ViewFixture {

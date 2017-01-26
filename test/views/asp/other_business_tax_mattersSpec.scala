@@ -2,15 +2,15 @@ package views.asp
 
 import forms.{InvalidForm, ValidForm, Form2}
 import models.asp.{OtherBusinessTaxMattersNo, OtherBusinessTaxMattersYes, OtherBusinessTaxMatters}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
 
-class other_business_tax_mattersSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class other_business_tax_mattersSpec extends GenericTestHelper with MustMatchers  {
 
   "other_business_tax_matters view" must {
     "have correct title" in new ViewFixture {

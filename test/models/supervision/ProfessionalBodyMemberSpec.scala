@@ -170,12 +170,12 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       "fail when on path is missing" in {
         Json.fromJson[ProfessionalBodyMember](Json.obj("isAMember" -> true,
           "transaction" -> Seq("01"))) must
-          be(JsError((JsPath \ "isAMember" \ "businessType") -> ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "isAMember" \ "businessType") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[ProfessionalBodyMember](Json.obj("isAMember" -> true,"businessType" -> Seq("40"))) must
-          be(JsError(((JsPath \ "isAMember" \ "businessType") \ "businessType") -> ValidationError("error.invalid")))
+          be(JsError(((JsPath \ "isAMember" \ "businessType") \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
       }
 
       "write valid data in using json write" in {

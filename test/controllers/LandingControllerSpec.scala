@@ -21,7 +21,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
@@ -35,7 +35,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
@@ -207,7 +207,7 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
   }
 }
 
-class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
+class LandingControllerWithAmendmentsSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
 
   val businessCustomerUrl = "TestUrl"
 

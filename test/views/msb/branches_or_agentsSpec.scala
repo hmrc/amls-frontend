@@ -6,11 +6,11 @@ import models.moneyservicebusiness.BranchesOrAgents
 import org.jsoup.Jsoup
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import org.scalatestplus.play.OneAppPerSuite
+import  utils.GenericTestHelper
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 
-class branches_or_agentsSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class branches_or_agentsSpec extends GenericTestHelper with MustMatchers  {
   "branches_or_agents view" when {
     "The model contains no countries" must {
       "check the no radio button" in {

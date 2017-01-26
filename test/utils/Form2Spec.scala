@@ -15,7 +15,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
     implicit val formRule: Rule[UrlFormEncoded, Foobar] = From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       (
-        (__ \ "services").read[String] and
+        (__ \ "services").read[String] ~
           (__ \ "f").read[String]
         )(Foobar.apply _)
     }
@@ -24,7 +24,7 @@ class Form2Spec extends PlaySpec with MockitoSugar {
       import jto.validation.forms.Writes._
       import play.api.libs.functional.syntax.unlift
       (
-        (__ \ "services").write[String] and
+        (__ \ "services").write[String] ~
           (__ \ "f").write[String]
         )(unlift(Foobar.unapply _))
     }

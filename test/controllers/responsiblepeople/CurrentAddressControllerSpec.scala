@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -21,7 +21,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
@@ -716,7 +716,7 @@ class CurrentAddressControllerSpec extends PlaySpec with OneAppPerSuite with Moc
 }
 
 
-class CurrentAddressControllerNoRelease7Spec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class CurrentAddressControllerNoRelease7Spec extends GenericTestHelper with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val recordId = 1

@@ -2,15 +2,15 @@ package views.businessmatching
 
 import forms.{InvalidForm, ValidForm, Form2}
 import models.businessmatching.TypeOfBusiness
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
 
-class type_of_businessSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class type_of_businessSpec extends GenericTestHelper with MustMatchers  {
 
   "type_of_business view" must {
     "have correct title" in new ViewFixture {

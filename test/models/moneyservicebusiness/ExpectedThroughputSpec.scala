@@ -122,7 +122,7 @@ class ExpectedThroughputSpec extends PlaySpec {
 
       "throw error for invalid data" in {
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "20")) must
-          be(JsError(JsPath \ "throughput", ValidationError("error.invalid")))
+          be(JsError(JsPath \ "throughput", play.api.data.validation.ValidationError("error.invalid")))
       }
     }
    

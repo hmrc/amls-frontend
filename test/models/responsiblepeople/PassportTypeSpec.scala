@@ -90,7 +90,7 @@ class PassportTypeSpec extends PlaySpec {
         val json = Json.obj(
           "passportType" -> "09"
         )
-        PassportType.jsonReads.reads(json) must be(JsError((JsPath \ "passportType") -> ValidationError("error.invalid")))
+        PassportType.jsonReads.reads(json) must be(JsError((JsPath \ "passportType") -> play.api.data.validation.ValidationError("error.invalid")))
       }
     }
   }

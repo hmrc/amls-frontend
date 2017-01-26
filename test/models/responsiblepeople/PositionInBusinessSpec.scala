@@ -98,7 +98,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
     "fail to validate when given an empty value" in {
       Json.fromJson[PositionWithinBusiness](JsString("")) must
-        be(JsError((JsPath \ "positions") -> ValidationError("error.invalid")))
+        be(JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid")))
     }
 
     "write the correct value for BeneficialOwner" in {

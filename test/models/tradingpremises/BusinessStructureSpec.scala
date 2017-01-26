@@ -64,7 +64,7 @@ class BusinessStructureSpec extends PlaySpec {
 
     "throw error for invalid data" in {
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "20")) must
-        be(JsError(JsPath \ "agentsBusinessStructure", ValidationError("error.invalid")))
+        be(JsError(JsPath \ "agentsBusinessStructure", play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 

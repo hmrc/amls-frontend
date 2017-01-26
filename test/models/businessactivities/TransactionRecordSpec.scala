@@ -170,12 +170,12 @@ class TransactionRecordSpec extends PlaySpec with MockitoSugar {
       "fail when on path is missing" in {
         Json.fromJson[TransactionRecord](Json.obj("isRecorded" -> true,
           "transaction" -> Seq("01"))) must
-          be(JsError((JsPath \ "isRecorded" \ "transactions") -> ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "isRecorded" \ "transactions") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[TransactionRecord](Json.obj("isRecorded" -> true,"transactions" -> Seq("40"))) must
-          be(JsError(((JsPath \ "isRecorded" \ "transactions") \ "transactions") -> ValidationError("error.invalid")))
+          be(JsError(((JsPath \ "isRecorded" \ "transactions") \ "transactions") -> play.api.data.validation.ValidationError("error.invalid")))
       }
 
       "write valid data in using json write" in {

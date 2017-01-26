@@ -1,26 +1,23 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.{DateOfChange, TradingPremisesSection}
+import models.TradingPremisesSection
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class MSBServicesControllerSpec extends PlaySpec with ScalaFutures with MockitoSugar with OneAppPerSuite {
+class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

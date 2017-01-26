@@ -40,7 +40,7 @@ class StatusSpec extends PlaySpec {
     }
 
     "fail with error when status value is passed incorrectly" in {
-      StatusType.jsonReads.reads(JsString("12")) must be(JsError(List((JsPath ,List(ValidationError("error.invalid"))))))
+      StatusType.jsonReads.reads(JsString("12")) must be(JsError(List((JsPath ,List(play.api.data.validation.ValidationError("error.invalid"))))))
 
     }
   }

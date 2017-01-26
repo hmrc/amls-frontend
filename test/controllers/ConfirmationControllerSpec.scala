@@ -1,24 +1,20 @@
 package controllers
 
-import config.AMLSAuthConnector
+import models.SubscriptionResponse
 import models.confirmation.Currency
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.{ReadStatusResponse, SubscriptionResponse}
-import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{GenericTestHelper, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class ConfirmationControllerSpec extends PlaySpec with OneAppPerSuite {
+class ConfirmationControllerSpec extends GenericTestHelper {
 
   trait Fixture extends AuthorisedFixture {
     self =>

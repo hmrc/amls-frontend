@@ -2,8 +2,8 @@ package views.bankdetails
 
 import forms.{Form2, InvalidForm, ValidForm}
 import models.bankdetails.{Account, BankAccountType, NonUKAccountNumber}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -11,7 +11,7 @@ import play.twirl.api.HtmlFormat
 import views.ViewFixture
 
 
-class bank_account_typeSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class bank_account_typeSpec extends GenericTestHelper with MustMatchers  {
 
   "bank_account_type view " must{
     "have correct title" in new ViewFixture {

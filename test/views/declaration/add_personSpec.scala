@@ -2,15 +2,15 @@ package views.declaration
 
 import forms.{Form2, InvalidForm, ValidForm}
 import models.declaration.{AddPerson, BeneficialShareholder}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
 
-class add_personSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class add_personSpec extends GenericTestHelper with MustMatchers  {
 
   "add_person view" must {
     "have correct title" in new ViewFixture {

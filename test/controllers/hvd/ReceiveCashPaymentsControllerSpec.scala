@@ -4,7 +4,7 @@ import connectors.DataCacheConnector
 import models.hvd.Hvd
 import models.status.{SubmissionDecisionApproved, NotCompleted}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import services.StatusService
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -14,7 +14,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

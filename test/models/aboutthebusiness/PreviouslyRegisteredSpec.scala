@@ -165,7 +165,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("previouslyRegistered" -> true)
 
       Json.fromJson[PreviouslyRegistered](json) must
-        be(JsError((JsPath \ "previouslyRegistered" \ "prevMLRRegNo") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "previouslyRegistered" \ "prevMLRRegNo") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

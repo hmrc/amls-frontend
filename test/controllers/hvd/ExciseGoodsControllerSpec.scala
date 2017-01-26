@@ -6,17 +6,16 @@ import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{GenericTestHelper, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class ExciseGoodsControllerSpec extends PlaySpec  with OneAppPerSuite {
+class ExciseGoodsControllerSpec extends GenericTestHelper {
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 

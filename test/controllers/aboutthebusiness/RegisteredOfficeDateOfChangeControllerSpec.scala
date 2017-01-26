@@ -11,7 +11,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -21,7 +21,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class RegisteredOfficeDateOfChangeControllerSpec extends PlaySpec with OneAppPerSuite with  MockitoSugar{
+class RegisteredOfficeDateOfChangeControllerSpec extends GenericTestHelper with  MockitoSugar{
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 

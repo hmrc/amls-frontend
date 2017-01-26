@@ -128,7 +128,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         val json = Json.obj("acceptedAnyPayment" -> true)
 
         Json.fromJson[CashPayment](json) must
-          be(JsError((JsPath \ "acceptedAnyPayment" \ "paymentDate") -> ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "acceptedAnyPayment" \ "paymentDate") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
 
       "Successfully read and write Json data" in {

@@ -8,7 +8,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -17,7 +17,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 
-class ResidentialRedressSchemeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class ResidentialRedressSchemeControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>

@@ -1,14 +1,12 @@
 package models.businessactivities
 
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import jto.validation.{Path, Failure, Success}
-import jto.validation.ValidationError
+import jto.validation.{Failure, Path, Success, ValidationError}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 import scala.language.postfixOps
 
-class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class HowManyEmployeesSpec extends PlaySpec {
 
   "Form Validation" must {
 
@@ -64,7 +62,7 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
   }
 
   "JSON read" must {
-
+  import play.api.data.validation.ValidationError
     "fail to validate when given employeeCountAMLSSupervision is missing" in {
       val json = Json.obj("employeeCount" -> "12345678901")
       Json.fromJson[HowManyEmployees](json) must

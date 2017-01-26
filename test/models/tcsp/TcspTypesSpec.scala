@@ -67,7 +67,7 @@ class TcspTypesSpec extends PlaySpec {
     }
 
     "Json Validation" must {
-
+      import play.api.data.validation.ValidationError
       "successfully validate given values with option CompanyDirectorEtc" in {
         val json =  Json.obj(
           "serviceProviders" -> Seq("01","02","03","04", "05"),

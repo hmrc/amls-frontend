@@ -159,7 +159,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForCorporationTax" -> true)
 
       Json.fromJson[CorporationTaxRegistered](json) must
-        be(JsError((JsPath \ "registeredForCorporationTax" \ "corporationTaxReference") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "registeredForCorporationTax" \ "corporationTaxReference") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

@@ -57,6 +57,8 @@ object Hvd {
 
   val key = "hvd"
 
+  implicit val formatOption = Reads.optionWithNull[Hvd]
+
   def section(implicit cache: CacheMap): Section = {
     val notStarted = Section(key, NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get())
     cache.getEntry[Hvd](key).fold(notStarted)  {

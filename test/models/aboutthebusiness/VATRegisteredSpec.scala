@@ -163,7 +163,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForVAT" -> true)
 
       Json.fromJson[VATRegistered](json) must
-        be(JsError((JsPath \ "registeredForVAT" \ "vrnNumber") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "registeredForVAT" \ "vrnNumber") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

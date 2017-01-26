@@ -14,7 +14,7 @@ import play.api.test.FakeApplication
 import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-import utils.AuthorisedFixture
+import utils.{GenericTestHelper, AuthorisedFixture}
 import play.api.test.Helpers._
 import play.api.http.Status.OK
 import org.mockito.Mockito._
@@ -37,7 +37,7 @@ trait Fixture extends AuthorisedFixture {
   protected val mockCacheMap = mock[CacheMap]
 }
 
-class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite with MockitoSugar{
+class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
@@ -227,7 +227,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
   }
 }
 
-class RegistrationProgressControllerWithoutAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite{
+class RegistrationProgressControllerWithoutAmendmentsSpec extends GenericTestHelper with MustMatchers {
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 

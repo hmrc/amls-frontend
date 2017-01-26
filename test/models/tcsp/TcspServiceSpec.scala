@@ -1,10 +1,11 @@
 package models.tcsp
 
-import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
-class TcspServiceSpec extends PlaySpec with MockitoSugar {
+class TcspServiceSpec extends PlaySpec {
 
   "TcspService" should {
 

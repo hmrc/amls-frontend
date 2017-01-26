@@ -2,15 +2,15 @@ package views.aboutthebusiness
 
 import forms.{InvalidForm, ValidForm, Form2}
 import models.aboutthebusiness.{VATRegisteredYes, VATRegistered}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.ViewFixture
 
 
-class vat_registeredSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class vat_registeredSpec extends GenericTestHelper with MustMatchers  {
 
   "vat_registered view" must {
     "have correct title" in new ViewFixture {

@@ -9,7 +9,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -19,7 +19,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with PatienceConfiguration with IntegrationPatience {
+class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
   trait Fixture extends AuthorisedFixture {
     self =>

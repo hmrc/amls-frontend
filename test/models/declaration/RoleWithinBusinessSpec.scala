@@ -183,7 +183,7 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj(
         "roleWithinBusiness" -> "09"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath \ "roleWithinBusiness") -> ValidationError("error.invalid")))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.invalid")))
     }
 
 

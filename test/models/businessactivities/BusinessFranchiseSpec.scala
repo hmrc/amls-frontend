@@ -116,7 +116,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("businessFranchise" -> true)
 
       Json.fromJson[BusinessFranchise](json) must
-        be(JsError((JsPath \ "businessFranchise" \ "franchiseName") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "businessFranchise" \ "franchiseName") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

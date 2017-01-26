@@ -12,7 +12,7 @@ import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -23,7 +23,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class StatusControllerSpec extends GenericTestHelper with MockitoSugar {
 
   val cacheMap = mock[CacheMap]
 
@@ -545,7 +545,7 @@ class StatusControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSuga
   }
 }
 
-class StatusControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
 
   val cacheMap = mock[CacheMap]
 
@@ -594,7 +594,7 @@ class StatusControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSu
   }
 }
 
-class StatusControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
   val cacheMap = mock[CacheMap]
 

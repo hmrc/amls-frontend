@@ -141,12 +141,12 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
       "fail when on path is missing" in {
         Json.fromJson[Products](Json.obj(
           "product" -> Seq("01"))) must
-          be(JsError((JsPath \ "products") -> ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "products") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[Products](Json.obj("products" -> Seq("40"))) must
-          be(JsError(((JsPath \ "products") \ "products") -> ValidationError("error.invalid")))
+          be(JsError(((JsPath \ "products") \ "products") -> play.api.data.validation.ValidationError("error.invalid")))
       }
 
       "write valid data in using json write" in {

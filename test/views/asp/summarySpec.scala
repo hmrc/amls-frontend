@@ -3,17 +3,17 @@ package views.asp
 import models.asp._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import views.{HtmlAssertions, ViewFixture}
 import scala.collection.JavaConversions._
 
 
 
-class summarySpec extends WordSpec
+class summarySpec extends GenericTestHelper
         with MustMatchers
-        with OneAppPerSuite
+
         with HtmlAssertions
         with TableDrivenPropertyChecks {
 
