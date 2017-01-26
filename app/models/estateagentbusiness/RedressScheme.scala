@@ -19,7 +19,7 @@ object RedressScheme {
   import utils.MappingUtils.Implicits._
 
   val maxRedressOtherTypeLength = 255
-  val redressOtherType = notEmpty.withMessage("error.required.eab.redress.scheme.name") compose
+  val redressOtherType = notEmpty.withMessage("error.required.eab.redress.scheme.name") andThen
     maxLength(maxRedressOtherTypeLength).withMessage("error.invalid.eab.redress.scheme.name")
 
   implicit val formRedressRule: Rule[UrlFormEncoded, RedressScheme] = From[UrlFormEncoded] { __ =>

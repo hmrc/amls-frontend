@@ -3,7 +3,7 @@ package models.supervision
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Failure, Success}
+import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -13,7 +13,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given no selected" in {
       val urlFormEncoded = Map("anotherBody" -> Seq("false"))
-      val expected = Success(AnotherBodyNo)
+      val expected = Valid(AnotherBodyNo)
       AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
     }
 
@@ -33,7 +33,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
 
       val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
       val end = new LocalDate(1998, 2, 24)   //scalastyle:off magic.number
-      val expected = Success(AnotherBodyYes("Name", start, end, "Reason"))
+      val expected = Valid(AnotherBodyYes("Name", start, end, "Reason"))
 
       AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
     }
@@ -66,7 +66,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
 
     "show an error with missing values when Yes selected" in {
       val urlFormEncoded = Map("anotherBody" -> Seq("true"))
-      val expected = Failure(
+      val expected = Invalid(
         Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required")),
         (Path \ "startDate") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
         (Path \ "endDate") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),

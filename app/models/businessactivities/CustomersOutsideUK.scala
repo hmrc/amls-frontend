@@ -4,8 +4,7 @@ import models.Country
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Success, Write}
 import jto.validation._
-import play.api.libs.functional.Monoid
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import utils.{TraversableValidators, JsonMapping}
 
 case class CustomersOutsideUK(countries: Option[Seq[Country]])
@@ -52,40 +51,34 @@ sealed trait CustomersOutsideUK0 {
       } fmap CustomersOutsideUK.apply
     }
 
-  private implicit def write[A]
-  (implicit
-   mon: cats.Monoid[A],
-   a: Path => WriteLike[Boolean, A],
-   b: Path => WriteLike[Option[Seq[Country]], A]
-  ): Write[CustomersOutsideUK, A] =
-    To[A] { __ =>
-      (
-        (__ \ "isOutside").write[Boolean].contramap[Option[_]] {
-          case Some(_) => true
-          case None => false
-        } ~
-          (__ \ "countries").write[Option[Seq[Country]]]
-        )(a => (a.countries, a.countries))
-    }
+  implicit def formW = Write[CustomersOutsideUK, UrlFormEncoded] {x =>
+    val countries = x.countries.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
+    Map(
+        "isOutside" -> Seq("true"),
+        "countries" -> countries
+      )
+  }
 
   val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = {
     import jto.validation.forms.Rules._
     implicitly
   }
 
-  val jsonR: Reads[CustomersOutsideUK] = {
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
-    implicitly
+  implicit val jsonR: Reads[CustomersOutsideUK] = {
+    import play.api.libs.json.Reads._
+    import play.api.libs.json._
+    (__ \ "isOutside").read[Boolean].flatMap[Option[Seq[Country]]]  {
+      case true => (__ \ "countries").readNullable[Seq[Country]]
+      case false => Reads[Option[Seq[Country]]](_ => JsSuccess(None))
+    }.map(CustomersOutsideUK(_))
   }
 
-  val formW: Write[CustomersOutsideUK, UrlFormEncoded] = {
-    import jto.validation.forms.Writes._
-    implicitly
-  }
-
-  val jsonW: Writes[CustomersOutsideUK] = {
-    import jto.validation.playjson.Writes._
-    implicitly
+  val jsonW: Writes[CustomersOutsideUK] = Writes {x =>
+    val countries = x.countries.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
+    Json.obj(
+      "isOutside" -> true,
+      "countries" -> countries
+    )
   }
 }
 

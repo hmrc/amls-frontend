@@ -2,7 +2,7 @@ package models.asp
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -12,29 +12,29 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given enum value" in {
       OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq("false"))) must
-        be(Success(OtherBusinessTaxMattersNo))
+        be(Valid(OtherBusinessTaxMattersNo))
     }
 
     "successfully validate given an `Yes` value" in {
       OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq("true"))) must
-        be(Success(OtherBusinessTaxMattersYes))
+        be(Valid(OtherBusinessTaxMattersYes))
     }
 
     "Fail validation when an option is not selected" when {
       "represented by and empty string" in  {
         OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq(""))) must
-          be(Failure(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
+          be(Invalid(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
       }
 
       "represented by a missing field" in {
         OtherBusinessTaxMatters.formRule.validate(Map.empty[String, Seq[String]]) must
-          be(Failure(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
+          be(Invalid(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
       }
     }
 
     "Fail validation when an unexpected value is provided" in  {
       OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq("Wheeeeee!!!!"))) must
-        be(Failure(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
+        be(Invalid(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
     }
 
     "write correct data from enum value" in {
@@ -58,13 +58,13 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[OtherBusinessTaxMatters](Json.obj("otherBusinessTaxMatters" -> false)) must
-        be(JsSuccess(OtherBusinessTaxMattersNo, JsPath \ "otherBusinessTaxMatters"))
+        be(JsSuccess(OtherBusinessTaxMattersNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
 
       Json.fromJson[OtherBusinessTaxMatters](Json.obj("otherBusinessTaxMatters" -> true)) must
-        be(JsSuccess(OtherBusinessTaxMattersYes, JsPath \ "otherBusinessTaxMatters"))
+        be(JsSuccess(OtherBusinessTaxMattersYes, JsPath))
     }
 
     "write the correct value" in {

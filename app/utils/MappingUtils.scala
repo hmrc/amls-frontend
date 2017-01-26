@@ -151,7 +151,7 @@ trait MappingUtils {
         }
 
       def validateWith(msg: String = "error.invalid")(fn: O => Boolean): Rule[I, O] =
-        rule compose Rule[O, O] {
+        rule andThen Rule[O, O] {
           case a if fn(a) =>
             Success(a)
           case a =>

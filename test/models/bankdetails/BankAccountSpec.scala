@@ -2,7 +2,7 @@ package models.bankdetails
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Failure, Success}
+import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError
 
 import play.api.libs.json.{JsSuccess, JsPath, Json}
@@ -21,7 +21,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         )
 
         BankAccount.formRule.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "accountName") -> Seq(ValidationError("error.bankdetails.accountname"))
           )))
       }
@@ -34,7 +34,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         )
 
         BankAccount.formRule.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "accountName") -> Seq(ValidationError("error.invalid.bankdetails.accountname"))
           )))
       }
@@ -44,7 +44,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "isUK" -> Seq("")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "isUK") -> Seq(ValidationError("error.bankdetails.ukbankaccount")))))
       }
       "a UK account is selected and an empty account number is provided" in {
@@ -55,7 +55,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "sortCode" -> Seq("112233")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "accountNumber") -> Seq(ValidationError("error.bankdetails.accountnumber")))))
       }
       "a UK account is selected and the account number given is longer than the max length" in {
@@ -66,7 +66,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "sortCode" -> Seq("112233")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "accountNumber") -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
       }
       "a UK account is selected and the account number has an incorrect pattern" in {
@@ -77,7 +77,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "sortCode" -> Seq("112233")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "accountNumber") -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
       }
       "a UK account is selected and the sort code given is empty" in {
@@ -88,7 +88,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "sortCode" -> Seq("")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "sortCode") -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
       }
       "a UK account is selected and the value given has an incorrect pattern" in {
@@ -99,7 +99,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "sortCode" -> Seq("AABB23")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "sortCode") -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
       }
       "a non UK account is selected and both the IBAN and non UK account number are empty" in {
@@ -110,7 +110,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "nonUKAccountNumber" -> Seq("")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "IBANNumber") -> Seq(ValidationError("error.required.bankdetails.iban.account")))))
       }
       "a non UK account is selected and the IBAN given is greater than the max length permitted" in {
@@ -121,7 +121,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "IBANNumber" -> Seq("12334623784623648236482364872364726384762384762384623874554787876868")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "IBANNumber") -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
       }
       "a non UK account is selected and the IBAN given has an incorrect pattern" in {
@@ -132,7 +132,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "IBANNumber" -> Seq("12345678--")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "IBANNumber") -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
       }
       "a non UK account is selected and the non UK account number is greater than the max length permitted" in {
@@ -143,7 +143,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "IBANNumber" -> Seq("")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.max.length.bankdetails.account")))))
       }
       "a non UK account is selected and the non UK account number given has an incorrect pattern" in {
@@ -154,7 +154,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
           "IBANNumber" -> Seq("")
         )
 
-        Account.formRead.validate(urlFormEncoded) must be(Failure(Seq(
+        Account.formRead.validate(urlFormEncoded) must be(Invalid(Seq(
           (Path \ "nonUKAccountNumber") -> Seq(ValidationError("error.invalid.bankdetails.account")))))
       }
 
@@ -172,7 +172,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> Seq("112233")
       )
 
-      Account.formRead.validate(urlFormEncoded) must be(Success(UKAccount("12345678", "112233")))
+      Account.formRead.validate(urlFormEncoded) must be(Valid(UKAccount("12345678", "112233")))
     }
 
     "displaySortCode" must {
@@ -192,7 +192,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "nonUKAccountNumber" -> Seq("123456789012345678901234567890ABCDefghij")
       )
 
-      Account.formRead.validate(urlFormEncoded) must be(Success(NonUKAccountNumber("123456789012345678901234567890ABCDefghij")))
+      Account.formRead.validate(urlFormEncoded) must be(Valid(NonUKAccountNumber("123456789012345678901234567890ABCDefghij")))
     }
 
     "Form Rule validation is successful for UKAccount2" in {
@@ -203,7 +203,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "nonUKAccountNumber" -> Seq("")
       )
 
-      Account.formRead.validate(urlFormEncoded) must be(Success(NonUKIBANNumber("123456789012345678901234567890ABCD")))
+      Account.formRead.validate(urlFormEncoded) must be(Valid(NonUKIBANNumber("123456789012345678901234567890ABCD")))
     }
 
     "Form Write is successful for UKAccount" in {
@@ -251,7 +251,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> "112233"
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(UKAccount("12345678", "112233"), JsPath \ "isUK"))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(UKAccount("12345678", "112233"), JsPath))
     }
 
     "JSON Write is successful for UKAccount" in {
@@ -292,7 +292,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "isIBAN" -> true
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKIBANNumber("IB12345678"), JsPath \ "isUK" \ "isIBAN" \"IBANNumber"))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKIBANNumber("IB12345678"), JsPath \"IBANNumber"))
     }
 
     "JSON Read is successful for Non UKAccount with Account Number" in {
@@ -303,7 +303,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "isIBAN" -> false
       )
 
-      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKAccountNumber("12345"), JsPath \ "isUK" \ "isIBAN" \"nonUKAccountNumber"))
+      Account.jsonReads.reads(jsObject) must be(JsSuccess(NonUKAccountNumber("12345"), JsPath \"nonUKAccountNumber"))
     }
 
     "JSON Write is successful for Non UK Account Number" in {
@@ -357,7 +357,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> Seq("112233")
       )
 
-      BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("test", UKAccount("12345678", "112233"))))
+      BankAccount.formRule.validate(urlFormEncoded) must be(Valid(BankAccount("test", UKAccount("12345678", "112233"))))
     }
 
     "Form Write validation for UKAccount" in {
@@ -385,7 +385,7 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
         "nonUKAccountNumber" -> Seq("123456789012345678901234567890ABCDEFGHIJ")
       )
 
-      BankAccount.formRule.validate(urlFormEncoded) must be(Success(BankAccount("My Account", NonUKAccountNumber("123456789012345678901234567890ABCDEFGHIJ"))))
+      BankAccount.formRule.validate(urlFormEncoded) must be(Valid(BankAccount("My Account", NonUKAccountNumber("123456789012345678901234567890ABCDEFGHIJ"))))
     }
 
     "Form Write for Non UK Account" in {

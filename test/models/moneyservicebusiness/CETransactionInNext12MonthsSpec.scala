@@ -1,7 +1,7 @@
 package models.moneyservicebusiness
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
@@ -15,35 +15,35 @@ class CETransactionInNext12MonthsSpec extends PlaySpec {
 
         val map = Map("ceTransaction" -> Seq("12345678963"))
 
-        CETransactionsInNext12Months.formRule.validate(map) must be(Success(CETransactionsInNext12Months("12345678963")))
+        CETransactionsInNext12Months.formRule.validate(map) must be(Valid(CETransactionsInNext12Months("12345678963")))
       }
 
       "fail validation on missing field" in {
 
         val map = Map("ceTransaction" -> Seq(""))
 
-        CETransactionsInNext12Months.formRule.validate(map) must be(Failure(
+        CETransactionsInNext12Months.formRule.validate(map) must be(Invalid(
           Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.required.msb.transactions.in.12months")))))
       }
 
       "fail validation on invalid field" in {
 
         val map = Map("ceTransaction" -> Seq("asas"))
-        CETransactionsInNext12Months.formRule.validate(map) must be(Failure(
+        CETransactionsInNext12Months.formRule.validate(map) must be(Invalid(
           Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
       }
 
       "fail validation on invalid field when it exceeds the max length" in {
 
         val map = Map("ceTransaction" -> Seq("123"*10))
-        CETransactionsInNext12Months.formRule.validate(map) must be(Failure(
+        CETransactionsInNext12Months.formRule.validate(map) must be(Invalid(
           Seq( Path \ "ceTransaction" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
       }
 
       "fail validation on invalid field1" in {
 
         val map = Map("ceTransaction" -> Seq("123456"))
-        CETransactionsInNext12Months.formRule.validate(map) must be(Success(CETransactionsInNext12Months("123456")))
+        CETransactionsInNext12Months.formRule.validate(map) must be(Valid(CETransactionsInNext12Months("123456")))
       }
 
 

@@ -15,7 +15,7 @@ case object SaRegisteredNo extends SaRegistered
 object SaRegistered {
 
   val utrTypeRegex = "^[0-9]{10}$".r
-  val utrType = notEmpty.withMessage("error.required.utr.number") compose pattern(utrTypeRegex).withMessage("error.invalid.length.utr.number")
+  val utrType = notEmpty.withMessage("error.required.utr.number") andThen pattern(utrTypeRegex).withMessage("error.invalid.length.utr.number")
 
   implicit val formRule: Rule[UrlFormEncoded, SaRegistered] = From[UrlFormEncoded] { __ =>
   import jto.validation.forms.Rules._

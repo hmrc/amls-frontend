@@ -3,7 +3,7 @@ package models.responsiblepeople
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 
 @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.MutableDataStructures"))
@@ -29,7 +29,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
       )
 
       PersonName.formRule.validate(data) must
-        equal(Success(
+        equal(Valid(
           PersonName(
             firstName = "John",
             middleName = Some("Envy"),
@@ -58,7 +58,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
       )
 
       PersonName.formRule.validate(data) must
-        equal(Success(
+        equal(Valid(
           PersonName(
             firstName = "John",
             middleName = None,
@@ -77,7 +77,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "hasPreviousName" -> Seq(""),
         "hasOtherNames" -> Seq("")
       )) must
-        equal(Failure(Seq(
+        equal(Invalid(Seq(
           (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
           (Path \ "lastName") -> Seq(ValidationError("error.required.lastname")),
           (Path \ "hasPreviousName") -> Seq(ValidationError("error.required.rp.hasPreviousName")),
@@ -101,7 +101,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
         "previous.lastName" -> Seq(""),
         "otherNames" -> Seq("")
       )) must
-        equal(Failure(Seq(
+        equal(Invalid(Seq(
           (Path \ "firstName") -> Seq(ValidationError("error.required.firstname")),
           (Path \ "lastName") -> Seq(ValidationError("error.required.lastname")),
           (Path \ "previous") -> Seq(ValidationError("error.rp.previous.invalid")),
@@ -128,7 +128,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
       )
 
       PersonName.formRule.validate(data) must
-        equal(Failure(Seq(
+        equal(Invalid(Seq(
           (Path \ "firstName") -> Seq(ValidationError("error.invalid.length.firstname")),
           (Path \ "middleName") -> Seq(ValidationError("error.invalid.length.middlename")),
           (Path \ "lastName") -> Seq(ValidationError("error.invalid.length.lastname")),

@@ -2,7 +2,7 @@ package models.moneyservicebusiness
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsNull, JsPath, JsSuccess, Json}
 
@@ -19,7 +19,7 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
           "country_3" -> Seq("AS")
         )
       ) mustBe {
-        Success(SendTheLargestAmountsOfMoney(
+        Valid(SendTheLargestAmountsOfMoney(
           
             Country("Albania", "AL"),
             Some(Country("Algeria", "DZ")),
@@ -34,7 +34,7 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
       val json = Map("country_1" -> Seq("ABC"))
 
       SendTheLargestAmountsOfMoney.formRule.validate(json) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "country_1") -> Seq(ValidationError("error.required.country.name"))
         )))
     }
@@ -43,14 +43,14 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
       val json = Map("country_1" -> Seq("A"))
 
       SendTheLargestAmountsOfMoney.formRule.validate(json) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "country_1") -> Seq(ValidationError("error.required.country.name"))
         )))
     }
 
     "validate mandatory country field" in {
       SendTheLargestAmountsOfMoney.formRule.validate(Map("country_1" -> Seq(""))) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "country_1") -> Seq(ValidationError("error.required.country.name"))
         )))
     }

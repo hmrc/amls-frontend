@@ -38,7 +38,7 @@ class PreviousNameSpec extends PlaySpec {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = Some("Marty"),
             middleName = Some("Mc"),
             lastName = Some("Fly"),
@@ -61,7 +61,7 @@ class PreviousNameSpec extends PlaySpec {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = Some("Marty"),
             middleName = None,
             lastName = None,
@@ -82,7 +82,7 @@ class PreviousNameSpec extends PlaySpec {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = None,
             middleName = Some("Mc"),
             lastName = None,
@@ -103,7 +103,7 @@ class PreviousNameSpec extends PlaySpec {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = None,
             middleName = None,
             lastName = Some("Fly"),
@@ -126,7 +126,7 @@ class PreviousNameSpec extends PlaySpec {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Failure(Seq(
+          Invalid(Seq(
             Path -> Seq(ValidationError("error.rp.previous.invalid"))
           ))
         )
@@ -145,7 +145,7 @@ class PreviousNameSpec extends PlaySpec {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
           ))
         )
@@ -164,7 +164,7 @@ class PreviousNameSpec extends PlaySpec {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Failure(Seq(
+          Invalid(Seq(
             (Path) -> Seq(ValidationError("error.rp.previous.invalid")),
             (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
         )

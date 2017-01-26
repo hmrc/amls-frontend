@@ -14,7 +14,7 @@ class FundsTransferSpec extends PlaySpec {
       )
 
       FundsTransfer.formRule.validate(data) must
-      be(Success(FundsTransfer(true)))
+      be(Valid(FundsTransfer(true)))
     }
 
     "successfully validate when user selects 'no' option" in {
@@ -23,12 +23,12 @@ class FundsTransferSpec extends PlaySpec {
       )
 
       FundsTransfer.formRule.validate(data) must
-      be(Success(FundsTransfer(false)))
+      be(Valid(FundsTransfer(false)))
     }
 
     "fail validation when data is invalid" in {
       FundsTransfer.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
         (Path \ "transferWithoutFormalSystems") -> Seq(ValidationError("error.required.msb.fundsTransfer"))
         )))
     }

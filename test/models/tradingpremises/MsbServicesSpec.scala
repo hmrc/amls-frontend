@@ -21,7 +21,7 @@ class MsbServicesSpec extends PlaySpec {
       val model = MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
       val data = implicitly[Write[MsbServices, UrlFormEncoded]].writes(model)
 
-      implicitly[Rule[UrlFormEncoded, MsbServices]].validate(data) mustEqual Success(model)
+      implicitly[Rule[UrlFormEncoded, MsbServices]].validate(data) mustEqual Valid(model)
     }
 
     "fail to validate when the set is empty" in {
@@ -31,7 +31,7 @@ class MsbServicesSpec extends PlaySpec {
       )
 
       implicitly[Rule[UrlFormEncoded, MsbServices]].validate(data)
-          .mustEqual(Failure(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.msb.services")))))
+          .mustEqual(Invalid(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.msb.services")))))
     }
 
     "fail to validate when there is an invalid entry in the set" in {
@@ -41,7 +41,7 @@ class MsbServicesSpec extends PlaySpec {
       )
 
       implicitly[Rule[UrlFormEncoded, MsbServices]].validate(data)
-          .mustEqual(Failure(Seq((Path \ "msbServices" \ 0) -> Seq(ValidationError("error.invalid")))))
+          .mustEqual(Invalid(Seq((Path \ "msbServices" \ 0) -> Seq(ValidationError("error.invalid")))))
     }
   }
 }

@@ -1,6 +1,6 @@
 package models.businessactivities
 
-import jto.validation.{Failure, Path, Success, ValidationError}
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -15,7 +15,7 @@ class HowManyEmployeesSpec extends PlaySpec {
       HowManyEmployees.formRule.validate(
         Map("employeeCount" -> Seq("123456789"),
           "employeeCountAMLSSupervision" -> Seq("12345678"))) must
-        be(Success(HowManyEmployees("123456789", "12345678")))
+        be(Valid(HowManyEmployees("123456789", "12345678")))
     }
 
     "write the model fields to url encoded response" in {
@@ -32,7 +32,7 @@ class HowManyEmployeesSpec extends PlaySpec {
         "employeeCountAMLSSupervision" -> Seq(""))
 
       HowManyEmployees.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "employeeCount") -> Seq(ValidationError("error.required.ba.employee.count1")),
           (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.required.ba.employee.count2"))
         )))
@@ -44,7 +44,7 @@ class HowManyEmployeesSpec extends PlaySpec {
         "employeeCountAMLSSupervision" -> Seq("ghjgj"))
 
       HowManyEmployees.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count"))
         )))
     }
@@ -55,7 +55,7 @@ class HowManyEmployeesSpec extends PlaySpec {
         "employeeCountAMLSSupervision" -> Seq("111111111111"))
 
       HowManyEmployees.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.max.length.ba.employee.count"))
         )))
     }

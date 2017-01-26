@@ -3,7 +3,7 @@ package models.businessactivities
 import models.FormTypes
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -12,7 +12,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
   "Form Validation" must {
     "successfully validate given an enum value" in {
       BusinessFranchise.formRule.validate(Map("businessFranchise" -> Seq("false"))) must
-        be(Success(BusinessFranchiseNo))
+        be(Valid(BusinessFranchiseNo))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -22,7 +22,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       )
 
       BusinessFranchise.formRule.validate(data) must
-        be(Success(BusinessFranchiseYes("test test")))
+        be(Valid(BusinessFranchiseYes("test test")))
     }
 
     "fail to validate given an `Yes` with no value" when {
@@ -33,7 +33,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
         )
 
         BusinessFranchise.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "franchiseName") -> Seq(ValidationError("error.required.ba.franchise.name"))
           )))
       }
@@ -44,7 +44,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
         )
 
         BusinessFranchise.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "franchiseName") -> Seq(ValidationError("error.required"))
           )))
       }
@@ -58,7 +58,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       )
 
       BusinessFranchise.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "franchiseName") -> Seq(ValidationError("error.max.length.ba.franchise.name"))
         )))
     }
@@ -75,7 +75,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
         s"represented by $desc" in {
           val data = rep
             BusinessFranchise.formRule.validate(data) must
-              be(Failure(Seq(
+              be(Invalid(Seq(
                 (Path \ "businessFranchise") -> Seq(ValidationError("error.required.ba.is.your.franchise"))
               )))
         }
@@ -100,7 +100,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[BusinessFranchise](Json.obj("businessFranchise" -> false)) must
-        be(JsSuccess(BusinessFranchiseNo, JsPath \ "businessFranchise"))
+        be(JsSuccess(BusinessFranchiseNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -108,7 +108,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("businessFranchise" -> true, "franchiseName" ->"test test")
 
       Json.fromJson[BusinessFranchise](json) must
-        be(JsSuccess(BusinessFranchiseYes("test test"), JsPath \ "businessFranchise" \ "franchiseName"))
+        be(JsSuccess(BusinessFranchiseYes("test test"), JsPath \ "franchiseName"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -116,7 +116,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("businessFranchise" -> true)
 
       Json.fromJson[BusinessFranchise](json) must
-        be(JsError((JsPath \ "businessFranchise" \ "franchiseName") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "franchiseName") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

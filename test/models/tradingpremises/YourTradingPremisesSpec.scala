@@ -44,7 +44,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
         "startDate.year" -> Seq("1990")
-      )) must be (Failure(Seq(Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
+      )) must be (Invalid(Seq(Path \ "isResidential"  -> Seq(ValidationError("error.required.tp.residential.address"))
       )))
     }
 
@@ -57,7 +57,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
         "isResidential" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Failure(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
+        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
       )))
     }
 
@@ -65,7 +65,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers {
 
 
       implicitly[Rule[UrlFormEncoded, YourTradingPremises]].validate(data) must
-        be(Success(model.copy(tradingNameChangeDate = None)))
+        be(Valid(model.copy(tradingNameChangeDate = None)))
     }
 
     "Correctly write from model to form" in {

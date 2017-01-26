@@ -19,7 +19,7 @@ object Training {
 
   val maxInformationTypeLength = 255
 
-  val informationType = notEmpty.withMessage("error.required.rp.training.information") compose
+  val informationType = notEmpty.withMessage("error.required.rp.training.information") andThen
     maxLength(maxInformationTypeLength).withMessage("error.invalid.length.rp.training.information")
 
 

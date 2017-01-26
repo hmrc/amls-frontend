@@ -3,7 +3,7 @@ package models.bankdetails
 import models.responsiblepeople.BankAccountRegistered
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 
 class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
@@ -16,7 +16,7 @@ class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       BankAccountRegistered.formRule.validate(data) must
-        be(Success(BankAccountRegistered(true)))
+        be(Valid(BankAccountRegistered(true)))
     }
 
     "successfully validate given a data model containing true" in {
@@ -26,7 +26,7 @@ class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       BankAccountRegistered.formRule.validate(data) must
-        be(Success(BankAccountRegistered(true)))
+        be(Valid(BankAccountRegistered(true)))
     }
 
     "successfully validate given a data model containing false" in {
@@ -36,13 +36,13 @@ class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       BankAccountRegistered.formRule.validate(data) must
-        be(Success(BankAccountRegistered(false)))
+        be(Valid(BankAccountRegistered(false)))
     }
 
     "fail to validate when given invalid data" in {
 
       BankAccountRegistered.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "registerAnotherBank") -> Seq(ValidationError("error.required.bankdetails.register.another.bank"))
         )))
     }

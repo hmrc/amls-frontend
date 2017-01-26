@@ -4,7 +4,7 @@ import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json._
 
@@ -25,14 +25,14 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
       )
 
       Services.formReads.validate(model) must
-        be(Success(Services(businessServices)))
+        be(Valid(Services(businessServices)))
 
     }
 
     "fail to validate on empty Map" in {
 
       Services.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required.eab.business.services")))))
+        be(Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.required.eab.business.services")))))
 
     }
 
@@ -42,7 +42,7 @@ class ServicesSpec extends PlaySpec with MockitoSugar {
       )
 
       Services.formReads.validate(model) must
-        be(Failure(Seq((Path \ "services"\ 1 \ "services", Seq(ValidationError("error.invalid"))))))
+        be(Invalid(Seq((Path \ "services"\ 1 \ "services", Seq(ValidationError("error.invalid"))))))
     }
 
     "write correct data for services value" in {

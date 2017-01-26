@@ -27,6 +27,7 @@ trait ServicesController extends BaseController {
   }
 
   def post(edit: Boolean = false) = Authorised.async {
+    import jto.validation.forms.Rules._
     implicit authContext => implicit request =>
       Form2[MsbServices](request.body) match {
         case f: InvalidForm =>
@@ -35,12 +36,12 @@ trait ServicesController extends BaseController {
           for {
             bm <- cache.fetch[BusinessMatching](BusinessMatching.key)
              _ <- cache.save[BusinessMatching](BusinessMatching.key,
-               data.services.contains(TransmittingMoney) match {
+               data.msbServices.contains(TransmittingMoney) match {
                  case true => bm.msbServices(data)
                  case false => bm.copy(msbServices = Some(data), businessAppliedForPSRNumber = None)
                }
              )
-          } yield data.services.contains(TransmittingMoney) match {
+          } yield data.msbServices.contains(TransmittingMoney) match {
             case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
             case false => Redirect(routes.SummaryController.get())
           }

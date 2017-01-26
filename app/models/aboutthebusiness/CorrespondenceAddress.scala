@@ -65,19 +65,19 @@ object CorrespondenceAddress {
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose businessNameType) ~
-            (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
+            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
+            (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
             (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "postCode").read(postcodeType)
           )(UKCorrespondenceAddress.apply _)
         case false => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose businessNameType) ~
-            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
-            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
+            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
+            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
               (__ \ "country").read[Country]

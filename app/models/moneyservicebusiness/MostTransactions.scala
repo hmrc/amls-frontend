@@ -26,9 +26,9 @@ private sealed trait MostTransactions0 {
       }
 
       val seqR = {
-        (seqToOptionSeq[String] compose flattenR[String] compose cR)
-          .compose(minLengthR[Seq[Country]](1) withMessage "error.required.countries.msb.most.transactions")
-          .compose(maxLengthR[Seq[Country]](3))
+        (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
+          .andThen(minLengthR[Seq[Country]](1) withMessage "error.required.countries.msb.most.transactions")
+          .andThen(maxLengthR[Seq[Country]](3))
       }
 
       (__ \ "mostTransactionsCountries").read(seqR) fmap MostTransactions.apply

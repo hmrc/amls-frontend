@@ -47,13 +47,13 @@ object MsbService {
   // TODO: Create generic rules that will remove the need for this
   implicit val jsonR: Rule[JsValue, MsbService] = {
     import jto.validation.playjson.Rules._
-    stringR compose serviceR
+    stringR andThen serviceR
   }
 
   // TODO: Create generic writes that will remove the need for this
   implicit val jsonW: Write[MsbService, JsValue] = {
     import jto.validation.playjson.Writes._
-    serviceW compose string
+    serviceW andThen string
   }
 
   def applyWithoutDateOfChange(services: Set[MsbService]) = MsbServices(services)

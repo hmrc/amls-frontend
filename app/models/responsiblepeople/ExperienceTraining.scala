@@ -19,7 +19,7 @@ object ExperienceTraining {
 
   val maxInformationTypeLength = 255
 
-  val experienceInformationType = notEmpty.withMessage("error.required.rp.experiencetraining.information") compose
+  val experienceInformationType = notEmpty.withMessage("error.required.rp.experiencetraining.information") andThen
     maxLength(maxInformationTypeLength).withMessage("error.invalid.length.rp.experiencetraining.information")
 
 

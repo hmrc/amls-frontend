@@ -2,7 +2,7 @@ package models.hvd
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -19,7 +19,7 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
       )
 
       Products.formRule.validate(model) must
-        be(Success(Products(Set(Alcohol, Tobacco, Other("test")))))
+        be(Valid(Products(Set(Alcohol, Tobacco, Other("test")))))
 
     }
 
@@ -29,7 +29,7 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
                         "otherDetails" -> Seq(""))
 
         Products.formRule.validate(model) must
-          be(Failure(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
+          be(Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
       }
 
       "represented by a sequence of whitespace" in {
@@ -37,13 +37,13 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
           "otherDetails" -> Seq("  \t"))
 
         Products.formRule.validate(model) must
-          be(Failure(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
+          be(Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
       }
 
       "represented by a missing field" in {
         val model = Map("products[]" -> Seq("12"))
         Products.formRule.validate(model) must
-          be(Failure(List((Path \ "otherDetails", Seq(ValidationError("error.required"))))))
+          be(Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.required"))))))
       }
     }
 
@@ -54,7 +54,7 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
         "otherDetails" -> Seq("t"*256)
       )
       Products.formRule.validate(model) must
-        be(Failure(List(( Path \ "otherDetails", Seq(ValidationError("error.invalid.hvd.business.sell.other.details"))))))
+        be(Invalid(List(( Path \ "otherDetails", Seq(ValidationError("error.invalid.hvd.business.sell.other.details"))))))
     }
 
 
@@ -66,7 +66,7 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
         val (rep, model) = x
         s"represented by $rep" in {
           Products.formRule.validate(model) must
-            be(Failure(List((Path \ "products", List(ValidationError("error.required.hvd.business.sell.atleast"))))))
+            be(Invalid(List((Path \ "products", List(ValidationError("error.required.hvd.business.sell.atleast"))))))
         }
       }
     }
@@ -76,7 +76,7 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
         "products[]" -> Seq("01, 15")
       )
       Products.formRule.validate(model) must
-        be(Failure(Seq((Path \ "products") -> Seq(ValidationError("error.invalid")))))
+        be(Invalid(Seq((Path \ "products") -> Seq(ValidationError("error.invalid")))))
 
     }
 

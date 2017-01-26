@@ -28,7 +28,7 @@ object PersonName {
 
       val otherNamesLength = 140
       val otherNamesType =
-        required("error.required.rp.otherNames") compose
+        required("error.required.rp.otherNames") andThen
           maxWithMsg(otherNamesLength, "error.invalid.length.otherNames")
 
       (

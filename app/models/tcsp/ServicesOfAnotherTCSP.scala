@@ -19,7 +19,7 @@ object ServicesOfAnotherTCSP {
 
   val service = notEmpty
     .withMessage("error.required.tcsp.mlr.reference.number")
-    .compose(pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number"))
+    .andThen(pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number"))
 
   implicit val formRule: Rule[UrlFormEncoded, ServicesOfAnotherTCSP] = From[UrlFormEncoded] { __ =>
   import jto.validation.forms.Rules._

@@ -4,6 +4,5 @@
 @(f: Form2[_], call: Call)(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 
 <form method="@call.method" action="@call.url" autocomplete="off" novalidate="novalidate">
-    @CSRF.formField(request)
     @content
 </form>

@@ -36,8 +36,8 @@ object TransactionRecord {
   import utils.MappingUtils.Implicits._
 
   val maxSoftwareNameLength = 40
-  val softwareNameType =  notEmptyStrip compose
-                          notEmpty.withMessage("error.required.ba.software.package.name") compose
+  val softwareNameType =  notEmptyStrip andThen
+                          notEmpty.withMessage("error.required.ba.software.package.name") andThen
                           maxLength(maxSoftwareNameLength).withMessage("error.max.length.ba.software.package.name")
 
   implicit val formRule: Rule[UrlFormEncoded, TransactionRecord] =

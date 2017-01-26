@@ -2,7 +2,7 @@ package models.responsiblepeople
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 
 class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
@@ -15,7 +15,7 @@ class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       PersonRegistered.formRule.validate(data) must
-        be(Success(PersonRegistered(true)))
+        be(Valid(PersonRegistered(true)))
     }
 
     "successfully validate given a data model" in {
@@ -25,13 +25,13 @@ class PersonRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       PersonRegistered.formRule.validate(data) must
-        be(Success(PersonRegistered(true)))
+        be(Valid(PersonRegistered(true)))
     }
 
     "fail to validate when given invalid data" in {
 
       PersonRegistered.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "registerAnotherPerson") -> Seq(ValidationError("error.required.rp.register.another.person"))
         )))
     }

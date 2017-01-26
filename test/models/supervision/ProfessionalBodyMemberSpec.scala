@@ -2,7 +2,7 @@ package models.supervision
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -20,7 +20,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Success(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))))
+        be(Valid(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))))
 
     }
 
@@ -31,7 +31,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Success(ProfessionalBodyMemberNo))
+        be(Valid(ProfessionalBodyMemberNo))
 
     }
 
@@ -43,7 +43,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
+        be(Invalid(List(( Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
 
     }
 
@@ -55,7 +55,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "specifyOtherBusiness" -> Seq("")
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
+        be(Invalid(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
     }
 
     "fail validation when field is business a member of professional body selected and specifyOther exceeds max length" in {
@@ -66,7 +66,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "specifyOtherBusiness" -> Seq("test"*200)
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
+        be(Invalid(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
     }
 
     "fail validation when none of the check boxes selected" in {
@@ -77,13 +77,13 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "specifyOtherBusiness" -> Seq("test")
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
+        be(Invalid(List(( Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
     }
 
     "fail to validate on empty Map" in {
 
       ProfessionalBodyMember.formRule.validate(Map.empty) must
-        be(Failure(Seq((Path \ "isAMember") -> Seq(ValidationError("error.required.supervision.business.a.member")))))
+        be(Invalid(Seq((Path \ "isAMember") -> Seq(ValidationError("error.required.supervision.business.a.member")))))
 
     }
 
@@ -94,7 +94,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "businessType[]" -> Seq("01", "20")
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
+        be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
 
     }
 

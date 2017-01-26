@@ -1,10 +1,10 @@
 package models.aboutthebusiness
 
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{Path, ValidationError}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
-import jto.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.Json
 
 class ContactingYouSpec extends PlaySpec with MockitoSugar {
   "Contacting You Form Details" must {
@@ -19,7 +19,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactingYouForm.formRule.validate(data) must
-          be(Success(ContactingYouForm("1234567890", "test@test.com", true)))
+          be(Valid(ContactingYouForm("1234567890", "test@test.com", true)))
       }
 
       "given a valid phone number, email and letterToThisAddress 'false' value" in {
@@ -31,7 +31,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactingYouForm.formRule.validate(data) must
-          be(Success(ContactingYouForm("1234567890", "test@test.com", false)))
+          be(Valid(ContactingYouForm("1234567890", "test@test.com", false)))
       }
     }
 
@@ -39,7 +39,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
       "given missing data represented by an empty map" in {
 
         ContactingYouForm.formRule.validate(Map.empty) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.required")),
             (Path \ "email") -> Seq(ValidationError("error.required")),
             (Path \ "letterToThisAddress") -> Seq(ValidationError("error.required.rightaddress"))
@@ -55,7 +55,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactingYouForm.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.required.rp.phone")),
             (Path \ "email") -> Seq(ValidationError("error.required.rp.email")),
             (Path \ "letterToThisAddress") -> Seq(ValidationError("error.required.rightaddress"))
@@ -71,7 +71,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactingYouForm.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.max.length.rp.phone")),
             (Path \ "email") -> Seq(ValidationError("error.max.length.rp.email"))
           )))
@@ -86,7 +86,7 @@ class ContactingYouSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactingYouForm.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.invalid.rp.phone"))
           )))
       }

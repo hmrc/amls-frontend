@@ -1,10 +1,13 @@
 package models.businessmatching
 
-import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import jto.validation._
 import jto.validation.ValidationError
 import play.api.libs.json._
-import utils.{JsonMapping, TraversableValidators}
+import cats.data.Validated.{Valid, Invalid}
+import utils.TraversableValidators._
+
+case class MsbServices(msbServices : Set[MsbService])
 
 sealed trait MsbService
 
@@ -13,16 +16,14 @@ case object CurrencyExchange extends MsbService
 case object ChequeCashingNotScrapMetal extends MsbService
 case object ChequeCashingScrapMetal extends MsbService
 
-case class MsbServices(services : Set[MsbService])
-
 object MsbService {
 
   implicit val serviceR = Rule[String, MsbService] {
-    case "01" => Success(TransmittingMoney)
-    case "02" => Success(CurrencyExchange)
-    case "03" => Success(ChequeCashingNotScrapMetal)
-    case "04" => Success(ChequeCashingScrapMetal)
-    case _ => Failure(Seq(Path -> Seq(ValidationError("error.invalid"))))
+    case "01" => Valid(TransmittingMoney)
+    case "02" => Valid(CurrencyExchange)
+    case "03" => Valid(ChequeCashingNotScrapMetal)
+    case "04" => Valid(ChequeCashingScrapMetal)
+    case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val serviceW = Write[MsbService, String] {
@@ -32,77 +33,41 @@ object MsbService {
     case ChequeCashingScrapMetal => "04"
   }
 
-  // TODO: Create generic rules that will remove the need for this
-  implicit val jsonR: Rule[JsValue, MsbService] = {
-    import jto.validation.playjson.Rules._
-    stringR compose serviceR
+  implicit val jsonR:Reads[MsbService] =  Reads {
+    case JsString("01") => JsSuccess(TransmittingMoney)
+    case JsString("02") => JsSuccess(CurrencyExchange)
+    case JsString("03") => JsSuccess(ChequeCashingNotScrapMetal)
+    case JsString("04") => JsSuccess(ChequeCashingScrapMetal)
+    case _ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid"))
   }
 
-  // TODO: Create generic writes that will remove the need for this
-  implicit val jsonW: Write[MsbService, JsValue] = {
-    import jto.validation.playjson.Writes._
-    serviceW compose string
-  }
-}
-
-sealed trait MsbServices0 {
-
-  import JsonMapping._
-
-  private implicit def rule[A]
-  (implicit
-   p: Path => RuleLike[A, Set[MsbService]]
-  ): Rule[A, MsbServices] =
-    From[A] { __ =>
-
-      import utils.MappingUtils.Implicits.RichRule
-
-      val required =
-        TraversableValidators.minLengthR[Set[MsbService]](1) withMessage "error.required.msb.services"
-
-      (__ \ "msbServices").read(required) fmap MsbServices.apply
-    }
-
-  private implicit def write[A]
-  (implicit
-   p: Path => WriteLike[Set[MsbService], A]
-  ): Write[MsbServices, A] =
-    To[A] { __ =>
-
-      import play.api.libs.functional.syntax.unlift
-
-      (__ \ "msbServices").write[Set[MsbService]] contramap unlift(MsbServices.unapply)
-    }
-
-  val jsonR: Reads[MsbServices] = {
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
-    implicitly[Reads[MsbServices]]
-  }
-
-  val jsonW: Writes[MsbServices] = {
-    import jto.validation.playjson.Writes._
-    implicitly[Writes[MsbServices]]
-  }
-
-  val formR: Rule[UrlFormEncoded, MsbServices] = {
-    import jto.validation.forms.Rules._
-    implicitly[Rule[UrlFormEncoded, MsbServices]]
-  }
-
-  val formW: Write[MsbServices, UrlFormEncoded] = {
-    import jto.validation.forms.Writes._
-    import utils.MappingUtils.writeM
-    implicitly[Write[MsbServices, UrlFormEncoded]]
+  implicit val jsonW = Writes[MsbService] {
+    case TransmittingMoney => JsString("01")
+    case CurrencyExchange => JsString("02")
+    case ChequeCashingNotScrapMetal => JsString("03")
+    case ChequeCashingScrapMetal => JsString("04")
   }
 }
 
 object MsbServices {
 
-  private object Cache extends MsbServices0
+  import utils.MappingUtils.Implicits._
 
-  implicit val jsonR: Reads[MsbServices] = Cache.jsonR
-  implicit val jsonW: Writes[MsbServices] = Cache.jsonW
-  implicit val formR: Rule[UrlFormEncoded, MsbServices] = Cache.formR
-  implicit val formW: Write[MsbServices, UrlFormEncoded] = Cache.formW
+  implicit def formReads
+  (implicit
+   p: Path => RuleLike[UrlFormEncoded, Set[MsbService]]
+  ): Rule[UrlFormEncoded, MsbServices] =
+    From[UrlFormEncoded] { __ =>
+      (__ \ "msbServices").read(minLengthR[Set[MsbService]](1).withMessage("error.required.msb.services")).flatMap(MsbServices.apply)
+    }
+
+  implicit def formWrites
+  (implicit
+   w: Write[MsbService, String]
+  ) = Write[MsbServices, UrlFormEncoded] { data =>
+    Map("msbServices[]" -> data.msbServices.toSeq.map(w.writes))
+  }
+
+  implicit val formats = Json.format[MsbServices]
 }
 

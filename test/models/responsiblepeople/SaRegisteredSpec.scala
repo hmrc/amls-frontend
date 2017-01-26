@@ -2,7 +2,7 @@ package models.responsiblepeople
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -15,13 +15,13 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
       "successfully validate" in {
 
         SaRegistered.utrType.validate("1234567890") must
-          be(Success("1234567890"))
+          be(Valid("1234567890"))
       }
 
       "fail to validate an empty string" in {
 
         SaRegistered.utrType.validate("") must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             Path -> Seq(ValidationError("error.required.utr.number"))
           )))
       }
@@ -29,7 +29,7 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
       "fail to validate a string longer than 10" in {
 
         SaRegistered.utrType.validate("1" * 11) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             Path -> Seq(ValidationError("error.invalid.length.utr.number"))
           )))
       }
@@ -37,7 +37,7 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
       SaRegistered.formRule.validate(Map("saRegistered" -> Seq("false"))) must
-        be(Success(SaRegisteredNo))
+        be(Valid(SaRegisteredNo))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -47,7 +47,7 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       SaRegistered.formRule.validate(data) must
-        be(Success(SaRegisteredYes("0123456789")))
+        be(Valid(SaRegisteredYes("0123456789")))
     }
 
     "fail to validate given an `Yes` with no value" in {
@@ -57,7 +57,7 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       SaRegistered.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "utrNumber") -> Seq(ValidationError("error.required"))
         )))
     }

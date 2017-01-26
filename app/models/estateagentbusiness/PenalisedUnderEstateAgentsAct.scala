@@ -16,7 +16,7 @@ object PenalisedUnderEstateAgentsAct {
   import utils.MappingUtils.Implicits._
 
   val maxPenalisedTypeLength = 255
-  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") compose
+  val penalisedType = notEmpty.withMessage("error.required.eab.info.about.penalty") andThen
     maxLength(maxPenalisedTypeLength).withMessage("error.invalid.eab.info.about.penalty")
 
   implicit val formRule: Rule[UrlFormEncoded, PenalisedUnderEstateAgentsAct] = From[UrlFormEncoded] { __ =>

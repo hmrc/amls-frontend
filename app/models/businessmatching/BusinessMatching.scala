@@ -36,7 +36,7 @@ case class BusinessMatching(
 
   def msbComplete(activities: BusinessActivities): Boolean = {
     if (activities.businessActivities.contains(MoneyServiceBusiness)) {
-      this.msbServices.isDefined && this.msbServices.fold(false)(x => x.services.contains(TransmittingMoney) match {
+      this.msbServices.isDefined && this.msbServices.fold(false)(_.msbServices.contains(TransmittingMoney) match {
         case true => this.businessAppliedForPSRNumber.isDefined
         case false => true
       })
@@ -86,7 +86,7 @@ object BusinessMatching {
   implicit val reads: Reads[BusinessMatching] = (
     __.read(Reads.optionNoError[ReviewDetails]) and
       __.read(Reads.optionNoError[BusinessActivities]) and
-      __.read(Reads.pure(None)) and
+      __.read(Reads.optionNoError[MsbServices]) and
       __.read(Reads.optionNoError[TypeOfBusiness]) and
       __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
       __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and

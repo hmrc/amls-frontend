@@ -2,7 +2,7 @@ package models.estateagentbusiness
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -14,7 +14,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       ProfessionalBody.formRule.validate(Map("penalised" -> Seq("false"))) must
-        be(Success(ProfessionalBodyNo))
+        be(Valid(ProfessionalBodyNo))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -25,13 +25,13 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBody.formRule.validate(data) must
-        be(Success(ProfessionalBodyYes("details")))
+        be(Valid(ProfessionalBodyYes("details")))
     }
 
     "fail to validate missing mandatory value" in {
 
       ProfessionalBody.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "penalised") -> Seq(ValidationError("error.required.eab.penalised.by.professional.body"))
         )))
     }
@@ -44,7 +44,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBody.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "professionalBody") -> Seq(ValidationError("error.required.eab.info.about.penalty"))
         )))
     }
@@ -57,7 +57,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBody.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.eab.info.about.penalty"))
         )))
     }

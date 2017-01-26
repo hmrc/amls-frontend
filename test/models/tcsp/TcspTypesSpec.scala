@@ -1,7 +1,7 @@
 package models.tcsp
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Failure, Success}
+import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, JsPath, JsError, Json}
 
@@ -21,7 +21,7 @@ class TcspTypesSpec extends PlaySpec {
         )
 
         TcspTypes.formReads.validate(model) mustBe
-        Success(Services)
+        Valid(Services)
       }
 
       "read invalid form data and return failure message for required fields" in {
@@ -32,14 +32,14 @@ class TcspTypesSpec extends PlaySpec {
         )
 
         TcspTypes.formReads.validate(model) mustBe
-          Failure(Seq((Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("error.required.tcsp.off.the.shelf.companies")),
+          Invalid(Seq((Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("error.required.tcsp.off.the.shelf.companies")),
             (Path \ "complexCorpStructureCreation") -> Seq(ValidationError("error.required.tcsp.complex.corporate.structures"))))
       }
 
       "return failure message when user has not selected any of the services" in {
 
         TcspTypes.formReads.validate(Map.empty) mustBe
-          Failure(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.required.tcsp.service.providers"))))
+          Invalid(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.required.tcsp.service.providers"))))
       }
 
       "return failure message when user has filled invalid data" in {
@@ -49,7 +49,7 @@ class TcspTypesSpec extends PlaySpec {
         )
 
         TcspTypes.formReads.validate(model) mustBe
-          Failure(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.invalid"))))
+          Invalid(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.invalid"))))
       }
 
       "write correct data" in {

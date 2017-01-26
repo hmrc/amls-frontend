@@ -1,27 +1,27 @@
 package models.businessactivities
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 
 class IdentifySuspiciousActivitySpec extends PlaySpec {
 
   "Form Validation" must {
     "Fail if neither option is picked" in {
-      IdentifySuspiciousActivity.formRule.validate(Map()) must be(Failure(Seq(
+      IdentifySuspiciousActivity.formRule.validate(Map()) must be(Invalid(Seq(
         (Path \ "hasWrittenGuidance") -> Seq(ValidationError("error.required.ba.suspicious.activity")))))
     }
 
     "Succeed if yes option is picked" in {
-      IdentifySuspiciousActivity.formRule.validate(Map("hasWrittenGuidance" -> Seq("true"))) must be(Success(IdentifySuspiciousActivity(true)))
+      IdentifySuspiciousActivity.formRule.validate(Map("hasWrittenGuidance" -> Seq("true"))) must be(Valid(IdentifySuspiciousActivity(true)))
     }
 
     "Succeed if no option is picked" in {
-      IdentifySuspiciousActivity.formRule.validate(Map("hasWrittenGuidance" -> Seq("false"))) must be(Success(IdentifySuspiciousActivity(false)))
+      IdentifySuspiciousActivity.formRule.validate(Map("hasWrittenGuidance" -> Seq("false"))) must be(Valid(IdentifySuspiciousActivity(false)))
     }
 
     "Fail if an invalid value is passed" in {
-      IdentifySuspiciousActivity.formRule.validate(Map("hasWrittenGuidance" -> Seq("random"))) must be(Failure(Seq(
+      IdentifySuspiciousActivity.formRule.validate(Map("hasWrittenGuidance" -> Seq("random"))) must be(Invalid(Seq(
         (Path \ "hasWrittenGuidance") -> Seq(ValidationError("error.required.ba.suspicious.activity")))))
     }
   }

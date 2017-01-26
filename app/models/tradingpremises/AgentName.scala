@@ -18,7 +18,7 @@ object AgentName {
 
   val maxAgentNameLength = 140
 
-  val agentNameType =  notEmptyStrip compose notEmpty.withMessage("error.required.tp.agent.name") compose
+  val agentNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.name") andThen
     maxLength(maxAgentNameLength).withMessage("error.invalid.tp.agent.name")
 
   implicit val mongoKey = new MongoKey[AgentName] {

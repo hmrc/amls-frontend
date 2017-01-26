@@ -69,8 +69,8 @@ object ProfessionalBodyMember {
   import utils.MappingUtils.Implicits._
 
   val maxSpecidyDetailsLength = 255
-  val specifyOtherType = notEmptyStrip compose
-    notEmpty.withMessage("error.required.supervision.business.details") compose
+  val specifyOtherType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.supervision.business.details") andThen
     maxLength(maxSpecidyDetailsLength).withMessage("error.invalid.supervision.business.details")
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBodyMember] =

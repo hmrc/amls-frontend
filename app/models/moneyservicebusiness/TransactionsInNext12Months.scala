@@ -15,8 +15,8 @@ object TransactionsInNext12Months {
   implicit val format = Json.format[TransactionsInNext12Months]
 
   private val txnAmountRegex = regexWithMsg("^[0-9]{1,11}$".r, "error.invalid.msb.transactions.in.12months")
-  private val txnAmountType = notEmptyStrip compose
-    notEmpty.withMessage("error.required.msb.transactions.in.12months") compose txnAmountRegex
+  private val txnAmountType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.msb.transactions.in.12months") andThen txnAmountRegex
 
   implicit val formRule: Rule[UrlFormEncoded, TransactionsInNext12Months] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

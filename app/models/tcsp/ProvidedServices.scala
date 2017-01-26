@@ -56,8 +56,8 @@ object ProvidedServices {
   import utils.MappingUtils.Implicits._
 
   val serviceDetailsMaxLength = 255
-  val serviceDetailsType = notEmptyStrip compose
-                           notEmpty.withMessage("error.required.tcsp.provided_services.details") compose
+  val serviceDetailsType = notEmptyStrip andThen
+                           notEmpty.withMessage("error.required.tcsp.provided_services.details") andThen
                            maxLength(serviceDetailsMaxLength)
 
   val serviceType = minLengthR[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")

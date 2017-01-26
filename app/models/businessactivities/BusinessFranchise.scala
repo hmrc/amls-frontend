@@ -18,7 +18,7 @@ object BusinessFranchise {
   import utils.MappingUtils.Implicits._
 
   val maxFranchiseName = 140
-  val franchiseNameType =  notEmptyStrip compose notEmpty.withMessage("error.required.ba.franchise.name") compose
+  val franchiseNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.ba.franchise.name") andThen
     maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name")
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessFranchise] = From[UrlFormEncoded] { __ =>

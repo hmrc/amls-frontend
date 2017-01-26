@@ -1,7 +1,7 @@
 package models.declaration
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
@@ -14,14 +14,14 @@ class WhoIsRegisteringSpec extends PlaySpec {
       "successfully validate given a valid person name" in {
         val data = Map("person" -> Seq("PersonName"))
         val result = WhoIsRegistering.formRule.validate(data)
-        result mustBe Success(WhoIsRegistering("PersonName"))
+        result mustBe Valid(WhoIsRegistering("PersonName"))
       }
     }
 
     "fail validation" when {
       "fail validation for missing data represented by an empty Map" in {
         val result = WhoIsRegistering.formRule.validate(Map.empty)
-        result mustBe Failure(Seq((Path \ "person", Seq(ValidationError("error.required.declaration.who.is.registering")))))
+        result mustBe Invalid(Seq((Path \ "person", Seq(ValidationError("error.required.declaration.who.is.registering")))))
       }
     }
 

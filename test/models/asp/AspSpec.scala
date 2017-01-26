@@ -1,9 +1,8 @@
 package models.asp
 
-import models.aboutthebusiness.AboutTheBusiness
-import models.registrationprogress.{Completed, Started, NotStarted, Section}
-import org.scalatest.mock.MockitoSugar
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap

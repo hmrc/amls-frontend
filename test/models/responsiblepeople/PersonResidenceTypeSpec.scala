@@ -3,7 +3,7 @@ package models.responsiblepeople
 import models.Country
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
@@ -22,7 +22,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Success(PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))))
+          be(Valid(PersonResidenceType(UKResidence("AA346464B"), Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))))
       }
 
       "fail to validate on missing nino" in {
@@ -34,7 +34,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(Path \ "nino" -> Seq(ValidationError("error.required.nino")))))
+          be(Invalid(Seq(Path \ "nino" -> Seq(ValidationError("error.required.nino")))))
       }
 
       "fail to validate on invalid nino" in {
@@ -46,7 +46,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(Path \ "nino" -> Seq(ValidationError("error.invalid.nino")))))
+          be(Invalid(Seq(Path \ "nino" -> Seq(ValidationError("error.invalid.nino")))))
       }
 
 
@@ -59,7 +59,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country")))))
+          be(Invalid(Seq(Path \ "countryOfBirth" -> Seq(ValidationError("error.required.rp.birth.country")))))
       }
 
       "successfully read json when nationality field is empty" in {
@@ -70,7 +70,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Success(PersonResidenceType(UKResidence("AA346464B"),Country("United Kingdom", "GB"), None)))
+          be(Valid(PersonResidenceType(UKResidence("AA346464B"),Country("United Kingdom", "GB"), None)))
       }
 
       "successfully validate non uk model" in {
@@ -86,7 +86,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Success(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
+          be(Valid(PersonResidenceType(NonUKResidence(new LocalDate(1990, 2, 24), UKPassport("123464646")),
             Country("United Kingdom", "GB"), Some(Country("United Kingdom", "GB")))))
       }
 
@@ -103,7 +103,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")),
             Path \ "ukPassportNumber" -> Seq(ValidationError("error.invalid.uk.passport")))))
       }
@@ -121,7 +121,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(Path \ "ukPassportNumber" -> Seq(ValidationError("error.required.uk.passport")))))
+          be(Invalid(Seq(Path \ "ukPassportNumber" -> Seq(ValidationError("error.required.uk.passport")))))
       }
 
 
@@ -138,7 +138,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.required.non.uk.passport")))))
+          be(Invalid(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.required.non.uk.passport")))))
       }
 
       "fail to validate when non uk  invalid non uk passport number" in {
@@ -154,7 +154,7 @@ class PersonResidenceTypeSpec extends PlaySpec {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Failure(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.invalid.non.uk.passport")))))
+          be(Invalid(Seq(Path \ "nonUKPassportNumber" -> Seq(ValidationError("error.invalid.non.uk.passport")))))
       }
 
       "write correct UKResidence model" in {

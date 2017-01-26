@@ -1,7 +1,7 @@
 package models.moneyservicebusiness
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
@@ -15,19 +15,19 @@ class SendMoneyToOtherCountrySpec extends PlaySpec {
 
         val map = Map("money" -> Seq("true"))
 
-        SendMoneyToOtherCountry.formRule.validate(map) must be(Success(SendMoneyToOtherCountry(true)))
+        SendMoneyToOtherCountry.formRule.validate(map) must be(Valid(SendMoneyToOtherCountry(true)))
       }
 
       "Successfully read form data for option no" in {
 
         val map = Map("money" -> Seq("false"))
 
-        SendMoneyToOtherCountry.formRule.validate(map) must be(Success(SendMoneyToOtherCountry(false)))
+        SendMoneyToOtherCountry.formRule.validate(map) must be(Valid(SendMoneyToOtherCountry(false)))
       }
 
       "fail validation on missing field" in {
 
-        SendMoneyToOtherCountry.formRule.validate(Map.empty) must be(Failure(
+        SendMoneyToOtherCountry.formRule.validate(Map.empty) must be(Invalid(
           Seq( Path \ "money" -> Seq(ValidationError("error.required.msb.send.money")))))
       }
 

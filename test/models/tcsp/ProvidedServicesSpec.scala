@@ -2,7 +2,7 @@ package models.tcsp
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Failure, Success}
+import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -12,7 +12,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given one selected values" in {
       val urlFormEncoded = Map("services[]" -> Seq("01"))
-      val expected = Success(ProvidedServices(Set(PhonecallHandling)))
+      val expected = Valid(ProvidedServices(Set(PhonecallHandling)))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
@@ -20,13 +20,13 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map("services[]" -> Seq("01", "02", "03", "04", "05", "06", "07"))
       val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
                                          SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
-      val expected = Success(ProvidedServices(allServices))
+      val expected = Valid(ProvidedServices(allServices))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
     "successfully validate given other value" in {
       val urlFormEncoded = Map("services[]" -> Seq("08"), "details" -> Seq("other service"))
-      val expected = Success(ProvidedServices(Set(Other("other service"))))
+      val expected = Valid(ProvidedServices(Set(Other("other service"))))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
@@ -50,7 +50,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "show an error with an invalid value" in {
       val urlFormEncoded = Map("services[]" -> Seq("1738"))
-      val expected = Failure(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
+      val expected = Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 

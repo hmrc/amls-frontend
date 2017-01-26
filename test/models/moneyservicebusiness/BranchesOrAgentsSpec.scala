@@ -25,7 +25,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
       val model: BranchesOrAgents = BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))
 
-      rule.validate(write.writes(model)) mustBe Success(model)
+      rule.validate(write.writes(model)) mustBe Valid(model)
     }
 
     "successfully validate when hasCountries is false" in {
@@ -36,7 +36,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
       val model: BranchesOrAgents = BranchesOrAgents(None)
 
-      rule.validate(form) mustBe Success(model)
+      rule.validate(form) mustBe Valid(model)
     }
 
     "successfully validate when hasCountries is true and there is at least 1 country selected" in {
@@ -51,7 +51,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
           Some(Seq(Country("United Kingdom", "GB")))
         )
 
-      rule.validate(form) mustBe Success(model)
+      rule.validate(form) mustBe Valid(model)
     }
 
     "fail to validate when hasCountries is true and there are no countries selected" in {
@@ -61,7 +61,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
         "countries" -> Seq.empty
       )
 
-      rule.validate(form) mustBe Failure(
+      rule.validate(form) mustBe Invalid(
         Seq((Path \ "countries") -> Seq(ValidationError("error.invalid.countries.msb.branchesOrAgents")))
       )
     }
@@ -73,7 +73,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
         "countries[]" -> Seq.fill(11)("GB")
       )
 
-      rule.validate(form) mustBe Failure(
+      rule.validate(form) mustBe Invalid(
         Seq((Path \ "countries") -> Seq(ValidationError("error.maxLength", 10)))
       )
     }
@@ -82,7 +82,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
       val form: UrlFormEncoded = Map.empty
 
-      rule.validate(form) mustBe Failure(
+      rule.validate(form) mustBe Invalid(
         Seq((Path \ "hasCountries") -> Seq(ValidationError("error.required.hasCountries.msb.branchesOrAgents")))
       )
     }
@@ -94,7 +94,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
         "countries[]" -> Seq("GB", "", "US", "")
       )
 
-      rule.validate(form) mustBe Success(BranchesOrAgents(Some(Seq(
+      rule.validate(form) mustBe Valid(BranchesOrAgents(Some(Seq(
         Country("United Kingdom", "GB"),
         Country("United States", "US")
       ))))
@@ -108,7 +108,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
         "countries[1]" -> Seq("")
       )
 
-      rule.validate(form) mustBe Success(BranchesOrAgents(Some(Seq(
+      rule.validate(form) mustBe Valid(BranchesOrAgents(Some(Seq(
         Country("United Kingdom", "GB")
       ))))
     }

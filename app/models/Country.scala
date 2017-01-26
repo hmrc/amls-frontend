@@ -44,11 +44,11 @@ object Country {
 
   implicit val jsonW: Write[Country, JsValue] = {
     import jto.validation.playjson.Writes.string
-    formWrites compose string
+    formWrites andThen string
   }
 
   implicit val jsonR: Rule[JsValue, Country] = {
     import jto.validation.playjson.Rules.stringR
-    stringR compose formRule
+    stringR andThen formRule
   }
 }

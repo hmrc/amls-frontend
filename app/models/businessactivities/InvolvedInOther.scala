@@ -17,8 +17,8 @@ object InvolvedInOther {
   import utils.MappingUtils.Implicits._
 
   val maxOtherBusinessActivityTypeLength = 255
-  val OtherBusinessActivityType = notEmptyStrip compose
-                                  notEmpty.withMessage("error.required.ba.involved.in.other.text") compose
+  val OtherBusinessActivityType = notEmptyStrip andThen
+                                  notEmpty.withMessage("error.required.ba.involved.in.other.text") andThen
                                   maxLength(maxOtherBusinessActivityTypeLength).withMessage("error.invalid.maxlength.255")
 
 

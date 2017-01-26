@@ -2,7 +2,7 @@ package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json._
 
@@ -16,12 +16,12 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
 
     "fail to validate on empty map" in {
       RiskAssessmentPolicy.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "hasPolicy") -> Seq(ValidationError("error.required.ba.option.risk.assessment")))))
+        be(Invalid(Seq((Path \ "hasPolicy") -> Seq(ValidationError("error.required.ba.option.risk.assessment")))))
     }
 
     "successfully validate given an enum value" in {
       RiskAssessmentPolicy.formReads.validate(Map("hasPolicy" -> Seq("false"))) must
-        be(Success(RiskAssessmentPolicyNo))
+        be(Valid(RiskAssessmentPolicyNo))
     }
 
     "validate model with few check box selected" in {
@@ -32,7 +32,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
       )
 
       RiskAssessmentPolicy.formReads.validate(model) must
-        be(Success(RiskAssessmentPolicyYes(formalRiskAssessments)))
+        be(Valid(RiskAssessmentPolicyYes(formalRiskAssessments)))
     }
 
     "fail to validate given `Yes` with no value" in {
@@ -42,7 +42,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
       )
 
       RiskAssessmentPolicy.formReads.validate(model) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "riskassessments") -> Seq(ValidationError("error.required.ba.risk.assessment.format"))
         )))
     }
@@ -54,7 +54,7 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
       )
 
       RiskAssessmentPolicy.formReads.validate(model) must
-        be(Failure(Seq((Path \ "riskassessments" \ 1 \ "riskassessments", Seq(ValidationError("error.invalid"))))))
+        be(Invalid(Seq((Path \ "riskassessments" \ 1 \ "riskassessments", Seq(ValidationError("error.invalid"))))))
     }
 
     "write correct data for risk assessment value" in {
@@ -84,14 +84,14 @@ class RiskAssessmentSpec extends PlaySpec with MockitoSugar {
           "riskassessments" -> Seq("01", "02"))
 
         Json.fromJson[RiskAssessmentPolicy](json) must
-          be(JsSuccess(RiskAssessmentPolicyYes(formalRiskAssessments), JsPath \ "hasPolicy" \ "riskassessments"))
+          be(JsSuccess(RiskAssessmentPolicyYes(formalRiskAssessments), JsPath))
       }
 
       "successfully validate given values with option No" in {
         val json = Json.obj("hasPolicy" -> false)
 
         Json.fromJson[RiskAssessmentPolicy](json) must
-          be(JsSuccess(RiskAssessmentPolicyNo, JsPath \ "hasPolicy"))
+          be(JsSuccess(RiskAssessmentPolicyNo, JsPath))
       }
 
       "fail when on invalid data" in {

@@ -2,7 +2,7 @@ package models.responsiblepeople
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -15,13 +15,13 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       "successfully validate" in {
 
         Training.informationType.validate("did the training for the anti money laundering. Dont know when") must
-          be(Success("did the training for the anti money laundering. Dont know when"))
+          be(Valid("did the training for the anti money laundering. Dont know when"))
       }
 
       "fail to validate an empty string" in {
 
         Training.informationType.validate("") must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             Path -> Seq(ValidationError("error.required.rp.training.information"))
           )))
       }
@@ -29,7 +29,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       "fail to validate a string longer than 255 characters" in {
 
         Training.informationType.validate("A" * 256) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             Path -> Seq(ValidationError("error.invalid.length.rp.training.information"))
           )))
       }
@@ -37,7 +37,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
       Training.formRule.validate(Map("training" -> Seq("false"))) must
-        be(Success(TrainingNo))
+        be(Valid(TrainingNo))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -46,7 +46,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
         "information" -> Seq("0123456789")
       )
 
-      Training.formRule.validate(data) must be(Success(TrainingYes("0123456789")))
+      Training.formRule.validate(data) must be(Valid(TrainingYes("0123456789")))
     }
 
     "fail to validate given an `Yes` with no value" in {
@@ -56,7 +56,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       )
 
       Training.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "information") -> Seq(ValidationError("error.required"))
         )))
     }

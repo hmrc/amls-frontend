@@ -5,7 +5,7 @@ import models.businesscustomer.Address
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsNull, JsPath, JsSuccess, Json}
 
@@ -25,7 +25,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         )
 
         RegisteredOffice.formRule.validate(ukModel) must
-          be(Success(RegisteredOfficeUK(
+          be(Valid(RegisteredOfficeUK(
             "38B",
             "building",
             Some("street"),
@@ -46,7 +46,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         )
 
         RegisteredOffice.formRule.validate(nonUKModel) must
-          be(Success(
+          be(Valid(
             RegisteredOfficeNonUK(
               "38B",
               "building",
@@ -61,7 +61,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       "given missing data represented by an empty Map" in {
 
         RegisteredOffice.formRule.validate(Map.empty) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
           )))
       }
@@ -72,7 +72,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         )
 
         RegisteredOffice.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
           )))
       }
@@ -87,7 +87,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           )
 
           RegisteredOffice.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
               (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
               (Path \ "country") -> Seq(ValidationError("error.required.country"))
@@ -105,7 +105,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           )
 
           RegisteredOffice.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line")),
@@ -126,7 +126,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           )
 
           RegisteredOffice.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
               (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
               (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
@@ -144,7 +144,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           )
 
           RegisteredOffice.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLine3") -> Seq(ValidationError("error.max.length.address.line")),
               (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line")),

@@ -3,7 +3,7 @@ package models.tradingpremises
 import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
@@ -16,17 +16,17 @@ class AgentNameSpec extends PlaySpec {
         "agentName" -> Seq("sometext")
       )
 
-      AgentName.formReads.validate(formInput) must be(Success(AgentName("sometext", None)))
+      AgentName.formReads.validate(formInput) must be(Valid(AgentName("sometext", None)))
     }
 
     "throw error when required field is missing" in {
       val formInput = Map("agentName" -> Seq(""))
-      AgentName.formReads.validate(formInput) must be(Failure(Seq((Path \ "agentName", Seq(ValidationError("error.required.tp.agent.name"))))))
+      AgentName.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentName", Seq(ValidationError("error.required.tp.agent.name"))))))
     }
 
     "throw error when input exceeds max length" in {
       val formInput = Map("agentName" -> Seq("sometesttexttest"*11))
-      AgentName.formReads.validate(formInput) must be(Failure(Seq((Path \ "agentName") -> Seq(ValidationError("error.invalid.tp.agent.name")))))
+      AgentName.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentName") -> Seq(ValidationError("error.invalid.tp.agent.name")))))
     }
 
     "validate form write" in {

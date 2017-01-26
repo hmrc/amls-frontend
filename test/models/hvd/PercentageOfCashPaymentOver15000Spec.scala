@@ -1,7 +1,7 @@
 package models.hvd
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -13,19 +13,19 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
       "successfully validate given an enum value" in {
 
         PercentageOfCashPaymentOver15000.formRule.validate(Map("percentage" -> Seq("01"))) must
-          be(Success(PercentageOfCashPaymentOver15000.First))
+          be(Valid(PercentageOfCashPaymentOver15000.First))
 
         PercentageOfCashPaymentOver15000.formRule.validate(Map("percentage" -> Seq("02"))) must
-          be(Success(PercentageOfCashPaymentOver15000.Second))
+          be(Valid(PercentageOfCashPaymentOver15000.Second))
 
         PercentageOfCashPaymentOver15000.formRule.validate(Map("percentage" -> Seq("03"))) must
-          be(Success(PercentageOfCashPaymentOver15000.Third))
+          be(Valid(PercentageOfCashPaymentOver15000.Third))
 
         PercentageOfCashPaymentOver15000.formRule.validate(Map("percentage" -> Seq("04"))) must
-          be(Success(PercentageOfCashPaymentOver15000.Fourth))
+          be(Valid(PercentageOfCashPaymentOver15000.Fourth))
 
         PercentageOfCashPaymentOver15000.formRule.validate(Map("percentage" -> Seq("05"))) must
-          be(Success(PercentageOfCashPaymentOver15000.Fifth))
+          be(Valid(PercentageOfCashPaymentOver15000.Fifth))
 
       }
 
@@ -51,12 +51,12 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
 
       "throw error on invalid data" in {
         PercentageOfCashPaymentOver15000.formRule.validate(Map("percentage" -> Seq("20"))) must
-          be(Failure(Seq((Path \ "percentage", Seq(ValidationError("error.invalid"))))))
+          be(Invalid(Seq((Path \ "percentage", Seq(ValidationError("error.invalid"))))))
       }
 
       "throw error on empty data" in {
         PercentageOfCashPaymentOver15000.formRule.validate(Map.empty) must
-          be(Failure(Seq((Path \ "percentage", Seq(ValidationError("error.required.hvd.percentage"))))))
+          be(Invalid(Seq((Path \ "percentage", Seq(ValidationError("error.required.hvd.percentage"))))))
       }
     }
 

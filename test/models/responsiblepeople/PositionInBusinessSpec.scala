@@ -3,7 +3,7 @@ package models.responsiblepeople
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json._
 
@@ -14,24 +14,24 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
     "PositionInBusiness" must {
 
       "successfully validate" in {
-        PositionWithinBusiness.formRule.validate("01") must be (Success(BeneficialOwner))
-        PositionWithinBusiness.formRule.validate("02") must be (Success(Director))
-        PositionWithinBusiness.formRule.validate("03") must be (Success(InternalAccountant))
-        PositionWithinBusiness.formRule.validate("04") must be (Success(NominatedOfficer))
-        PositionWithinBusiness.formRule.validate("05") must be (Success(Partner))
-        PositionWithinBusiness.formRule.validate("06") must be (Success(SoleProprietor))
+        PositionWithinBusiness.formRule.validate("01") must be (Valid(BeneficialOwner))
+        PositionWithinBusiness.formRule.validate("02") must be (Valid(Director))
+        PositionWithinBusiness.formRule.validate("03") must be (Valid(InternalAccountant))
+        PositionWithinBusiness.formRule.validate("04") must be (Valid(NominatedOfficer))
+        PositionWithinBusiness.formRule.validate("05") must be (Valid(Partner))
+        PositionWithinBusiness.formRule.validate("06") must be (Valid(SoleProprietor))
       }
 
       "fail to validate an empty string" in {
         PositionWithinBusiness.formRule.validate("") must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }
 
       "fail to validate an invalid string" in {
         PositionWithinBusiness.formRule.validate("10") must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }

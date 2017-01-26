@@ -2,13 +2,12 @@ package models
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsString, _}
 
 
-class
-DateOfChangeSpec extends PlaySpec {
+class DateOfChangeSpec extends PlaySpec {
   "DateOfChange" must {
 
     "read the form correctly when given a valid date" in {
@@ -18,7 +17,7 @@ DateOfChangeSpec extends PlaySpec {
         "dateOfChange.year" -> Seq("1990")
       )
 
-      DateOfChange.formRule.validate(model) must be (Success(DateOfChange(new LocalDate(1990, 2, 24))))
+      DateOfChange.formRule.validate(model) must be (Valid(DateOfChange(new LocalDate(1990, 2, 24))))
 
     }
 
@@ -30,7 +29,7 @@ DateOfChangeSpec extends PlaySpec {
       )
 
       DateOfChange.formRule.validate(model) must be(
-        Failure(
+        Invalid(
           Seq(
             Path \ "dateOfChange" -> Seq(ValidationError("error.future.date")))
         ))
@@ -46,7 +45,7 @@ DateOfChangeSpec extends PlaySpec {
       )
 
       DateOfChange.formRule.validate(model) must be(
-        Failure(
+        Invalid(
           Seq(
             Path \ "dateOfChange" -> Seq(ValidationError("error.expected.dateofchange.date.after.activitystartdate", "25-05-2016")))
         ))

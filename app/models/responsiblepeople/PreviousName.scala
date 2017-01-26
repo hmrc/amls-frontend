@@ -57,7 +57,7 @@ object PreviousName {
         (__ \ "firstName").read(optionR(firstNameType)) ~
         (__ \ "middleName").read(optionR(middleNameType)) ~
         (__ \ "lastName").read(optionR(lastNameType))
-      ).tupled compose iR) ~ (
+      ).tupled andThen iR) ~ (
         (__ \ "date").read(localDateRule)
       ))(builder)
     }

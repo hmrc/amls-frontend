@@ -19,7 +19,7 @@ case class YourTradingPremises(
 object YourTradingPremises {
 
   val maxLengthPremisesTradingName = 120
-  val premisesTradingNameType = FormTypes.notEmptyStrip.withMessage("error.required.tp.trading.name") compose
+  val premisesTradingNameType = FormTypes.notEmptyStrip.withMessage("error.required.tp.trading.name") andThen
     maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name")
 
   implicit val reads: Reads[YourTradingPremises] = {

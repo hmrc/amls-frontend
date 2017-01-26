@@ -1,7 +1,7 @@
 package models.businessmatching
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
@@ -17,21 +17,21 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
           val map = Map("appliedFor" -> Seq("true"),
             "regNumber" -> Seq("123789"))
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Success(BusinessAppliedForPSRNumberYes("123789")))
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Valid(BusinessAppliedForPSRNumberYes("123789")))
         }
 
         "given the option no" in {
 
           val map = Map("appliedFor" -> Seq("false"))
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Success(BusinessAppliedForPSRNumberNo))
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Valid(BusinessAppliedForPSRNumberNo))
         }
       }
 
       "fail validation" when {
         "given missing data represented by an empty Map" in {
 
-          BusinessAppliedForPSRNumber.formRule.validate(Map.empty) must be(Failure(Seq((Path \ "appliedFor",
+          BusinessAppliedForPSRNumber.formRule.validate(Map.empty) must be(Invalid(Seq((Path \ "appliedFor",
             Seq(ValidationError("error.required.msb.psr.options"))))))
         }
 
@@ -39,14 +39,14 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
           val map = Map("appliedFor" -> Seq("true"),
             "regNumber" -> Seq(""))
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
             Seq(ValidationError("error.invalid.msb.psr.number"))))))
         }
 
         "given a 'yes' value with a missing psr number respresented by a missing field" in {
           val map = Map("appliedFor" -> Seq("true"))
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
             Seq(ValidationError("error.required"))))))
         }
 
@@ -54,7 +54,7 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
           val map = Map("appliedFor" -> Seq("true"),
             "regNumber" -> Seq("1" * 7))
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
             Seq(ValidationError("error.invalid.msb.psr.number"))))))
         }
 
@@ -62,7 +62,7 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
           val map = Map("appliedFor" -> Seq("true"),
             "regNumber" -> Seq("1" * 5))
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
             Seq(ValidationError("error.invalid.msb.psr.number"))))))
         }
 
@@ -70,7 +70,7 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
           val map = Map("appliedFor" -> Seq("true"),
             "regNumber" -> Seq("12ab34"))
 
-          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Failure(Seq((Path \ "regNumber",
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
             Seq(ValidationError("error.invalid.msb.psr.number"))))))
         }
       }

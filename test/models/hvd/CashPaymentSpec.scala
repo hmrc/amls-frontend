@@ -3,7 +3,7 @@ package models.hvd
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -17,7 +17,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
       "successfully validate given an enum value" in {
 
         CashPayment.formRule.validate(Map("acceptedAnyPayment" -> Seq("false"))) must
-          be(Success(CashPaymentNo))
+          be(Valid(CashPaymentNo))
       }
 
       "successfully validate given an `Yes` value" in {
@@ -30,12 +30,12 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPayment.formRule.validate(data) must
-          be(Success(CashPaymentYes(new LocalDate(1956, 2, 15))))
+          be(Valid(CashPaymentYes(new LocalDate(1956, 2, 15))))
       }
 
       "fail to validate when neither 'Yes' nor 'No' is selected" in {
         CashPayment.formRule.validate(Map.empty) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "acceptedAnyPayment") -> Seq(ValidationError("error.required.hvd.accepted.cash.payment"))
           )))
       }
@@ -50,7 +50,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPayment.formRule.validate(data) must
-          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "fail to validate given missing day" in {
@@ -63,7 +63,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPayment.formRule.validate(data) must
-          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "fail to validate given missing month" in {
@@ -76,7 +76,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPayment.formRule.validate(data) must
-          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "fail to validate given missing year" in {
@@ -89,7 +89,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPayment.formRule.validate(data) must
-          be(Failure(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "write correct data from enum value" in {

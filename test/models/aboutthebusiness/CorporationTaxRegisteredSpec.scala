@@ -1,22 +1,23 @@
 package models.aboutthebusiness
 
+import cats.data.Validated.{Invalid, Valid}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
-import jto.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import jto.validation.Path
+import play.api.data.validation.ValidationError
+import play.api.libs.json._
 
 class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
-
+    import jto.validation.ValidationError
     "successfully validate" when {
       "given a 'false' value" in {
 
         val data = Map("registeredForCorporationTax" -> Seq("false"))
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Success(CorporationTaxRegisteredNo))
+          be(Valid(CorporationTaxRegisteredNo))
       }
 
       "given a 'true' value and a valid corporation tax reference" in {
@@ -27,7 +28,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Success(CorporationTaxRegisteredYes("1234567890")))
+          be(Valid(CorporationTaxRegisteredYes("1234567890")))
       }
     }
 
@@ -35,7 +36,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
       "no option is selected - represented by an empty Map" in {
 
         CorporationTaxRegistered.formRule.validate(Map.empty) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "registeredForCorporationTax") -> Seq(ValidationError("error.required.atb.corporation.tax"))
           )))
       }
@@ -47,7 +48,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "registeredForCorporationTax") -> Seq(ValidationError("error.required.atb.corporation.tax"))
           )))
       }
@@ -60,7 +61,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
           )))
       }
@@ -72,7 +73,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
           )))
       }
@@ -84,7 +85,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
           )))
       }
@@ -95,7 +96,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "corporationTaxReference") -> Seq(ValidationError("error.required"))
           )))
       }
@@ -107,7 +108,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "corporationTaxReference") -> Seq(ValidationError("error.required.atb.corporation.tax.number"))
           )))
       }
@@ -119,7 +120,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         CorporationTaxRegistered.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "corporationTaxReference") -> Seq(ValidationError("error.invalid.atb.corporation.tax.number"))
           )))
       }
@@ -143,7 +144,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an false value" in {
       Json.fromJson[CorporationTaxRegistered](Json.obj("registeredForCorporationTax" -> false)) must
-        be(JsSuccess(CorporationTaxRegisteredNo, JsPath \ "registeredForCorporationTax"))
+        be(JsSuccess(CorporationTaxRegisteredNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -151,7 +152,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForCorporationTax" -> true, "corporationTaxReference" -> "1234567890")
 
       Json.fromJson[CorporationTaxRegistered](json) must
-        be(JsSuccess(CorporationTaxRegisteredYes("1234567890"), JsPath \ "registeredForCorporationTax" \ "corporationTaxReference"))
+        be(JsSuccess(CorporationTaxRegisteredYes("1234567890"), JsPath \ "corporationTaxReference"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -159,7 +160,7 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForCorporationTax" -> true)
 
       Json.fromJson[CorporationTaxRegistered](json) must
-        be(JsError((JsPath \ "registeredForCorporationTax" \ "corporationTaxReference") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "corporationTaxReference") -> ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

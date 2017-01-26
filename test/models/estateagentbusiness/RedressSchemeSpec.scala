@@ -2,7 +2,7 @@ package models.estateagentbusiness
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json._
 
@@ -13,16 +13,16 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
     "validate model with redress option selected as yes" in {
 
       RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("01"))) must
-        be(Success(ThePropertyOmbudsman))
+        be(Valid(ThePropertyOmbudsman))
 
       RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("02"))) must
-        be(Success(OmbudsmanServices))
+        be(Valid(OmbudsmanServices))
 
       RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("03"))) must
-        be(Success(PropertyRedressScheme))
+        be(Valid(PropertyRedressScheme))
 
       RedressScheme.formRedressRule.validate(Map("isRedress" -> Seq("true"), "propertyRedressScheme" -> Seq("04"), "other" -> Seq("test"))) must
-        be(Success(Other("test")))
+        be(Valid(Other("test")))
 
     }
 
@@ -33,7 +33,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
       )
 
       RedressScheme.formRedressRule.validate(model) must
-        be(Success(RedressSchemedNo))
+        be(Valid(RedressSchemedNo))
     }
 
     "fail to validate given an `other` with no value" in {
@@ -45,7 +45,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
       )
 
       RedressScheme.formRedressRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "other") -> Seq(ValidationError("error.required.eab.redress.scheme.name"))
         )))
     }
@@ -59,7 +59,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
       )
 
       RedressScheme.formRedressRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "other") -> Seq(ValidationError("error.invalid.eab.redress.scheme.name"))
         )))
     }
@@ -73,7 +73,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
       )
 
       RedressScheme.formRedressRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.invalid"))
         )))
     }
@@ -81,7 +81,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
     "fail to validate given an empty form post" in {
       val data = Map[String, Seq[String]]()
 
-      RedressScheme.formRedressRule.validate(data) must be(Failure(Seq(
+      RedressScheme.formRedressRule.validate(data) must be(Invalid(Seq(
         (Path \ "isRedress") -> Seq(ValidationError("error.required.eab.redress.scheme"))
       )))
     }
@@ -91,7 +91,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
         "isRedress" -> Seq("true")
       )
 
-      RedressScheme.formRedressRule.validate(data) must be(Failure(Seq(
+      RedressScheme.formRedressRule.validate(data) must be(Invalid(Seq(
         (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.required.eab.which.redress.scheme"))
       )))
     }

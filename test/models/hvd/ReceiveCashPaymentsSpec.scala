@@ -1,7 +1,7 @@
 package models.hvd
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{Json, JsSuccess}
 
@@ -13,7 +13,7 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
 
     "roundtrip through form" in {
       val data = ReceiveCashPayments(Some(paymentMethods))
-      ReceiveCashPayments.formR.validate(ReceiveCashPayments.formW.writes(data)) mustEqual Success(data)
+      ReceiveCashPayments.formR.validate(ReceiveCashPayments.formW.writes(data)) mustEqual Valid(data)
     }
 
     "roundtrip through json" in {
@@ -24,7 +24,7 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
     "fail to validate when no choice is made for main question" in {
       val data = Map.empty[String, Seq[String]]
       ReceiveCashPayments.formR.validate(data)
-        .mustEqual(Failure(Seq((Path \ "receivePayments") -> Seq(ValidationError("error.required.hvd.receive.cash.payments")))))
+        .mustEqual(Invalid(Seq((Path \ "receivePayments") -> Seq(ValidationError("error.required.hvd.receive.cash.payments")))))
     }
 
     "fail to validate when no method is selected" in {
@@ -32,7 +32,7 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
         "receivePayments" -> Seq("true")
       )
       ReceiveCashPayments.formR.validate(data)
-        .mustEqual(Failure(Seq((Path \ "paymentMethods") -> Seq(ValidationError("error.required.hvd.choose.option")))))
+        .mustEqual(Invalid(Seq((Path \ "paymentMethods") -> Seq(ValidationError("error.required.hvd.choose.option")))))
     }
 
     "fail to validate when no text is entered in the details field" in {
@@ -42,7 +42,7 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
       )
 
       ReceiveCashPayments.formR.validate(data)
-        .mustEqual(Failure(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.required")))))
+        .mustEqual(Invalid(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.required")))))
     }
 
     "fail to validate when more than 255 characters are entered in the details field" in {
@@ -53,7 +53,7 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
       )
 
       ReceiveCashPayments.formR.validate(data)
-        .mustEqual(Failure(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.invalid.maxlength.255")))))
+        .mustEqual(Invalid(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.invalid.maxlength.255")))))
     }
   }
 

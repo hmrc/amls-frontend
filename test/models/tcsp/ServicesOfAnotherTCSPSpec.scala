@@ -2,7 +2,7 @@ package models.tcsp
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -12,7 +12,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given enum value" in {
       ServicesOfAnotherTCSP.formRule.validate(Map("servicesOfAnotherTCSP" -> Seq("false"))) must
-        be(Success(ServicesOfAnotherTCSPNo))
+        be(Valid(ServicesOfAnotherTCSPNo))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -23,12 +23,12 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
       )
 
       ServicesOfAnotherTCSP.formRule.validate(data) must
-        be(Success(ServicesOfAnotherTCSPYes("12345678")))
+        be(Valid(ServicesOfAnotherTCSPYes("12345678")))
     }
 
     "fail when mandatory fields are missing" in {
       ServicesOfAnotherTCSP.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp"))
         )))
 
@@ -42,7 +42,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
       )
 
       ServicesOfAnotherTCSP.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "mlrRefNumber") -> Seq(ValidationError("error.required.tcsp.mlr.reference.number"))
         )))
     }
@@ -55,7 +55,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
       )
 
       ServicesOfAnotherTCSP.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "mlrRefNumber") -> Seq(ValidationError("error.invalid.tcsp.mlr.reference.number"))
         )))
     }

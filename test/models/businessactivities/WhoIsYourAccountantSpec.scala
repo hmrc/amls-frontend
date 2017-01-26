@@ -1,7 +1,7 @@
 package models.businessactivities
 
 import org.scalatest.{MustMatchers, Matchers, WordSpec}
-import jto.validation.Success
+import jto.validation.Valid
 import play.api.libs.json.{JsPath, Json, JsSuccess}
 
 class WhoIsYourAccountantSpec extends WordSpec with Matchers {
@@ -40,7 +40,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
           WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
                                                   DefaultTradingName,
                                                   DefaultUKAddress))
-        ) should be (Success(WhoIsYourAccountant(DefaultName,
+        ) should be (Valid(WhoIsYourAccountant(DefaultName,
                       DefaultTradingName,
                       DefaultUKAddress)))
       }
@@ -50,7 +50,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
           WhoIsYourAccountant.formWrites.writes(WhoIsYourAccountant(DefaultName,
             DefaultTradingName,
             DefaultUKAddress))
-        ) should be (Success(WhoIsYourAccountant(DefaultName,
+        ) should be (Valid(WhoIsYourAccountant(DefaultName,
                             DefaultTradingName,
                             DefaultUKAddress)))
       }

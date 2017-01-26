@@ -2,7 +2,7 @@ package models.businessmatching
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Failure, Path, Success}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json._
 
@@ -16,22 +16,22 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
         val model1 = Map("businessActivities[]" -> Seq("03", "01", "02"))
 
         BusinessActivities.formReads.validate(model1) must
-          be(Success(BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, BillPaymentServices))))
+          be(Valid(BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, BillPaymentServices))))
 
         val model2 = Map("businessActivities[]" -> Seq("04", "05", "06"))
 
         BusinessActivities.formReads.validate(model2) must
-          be(Success(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))))
+          be(Valid(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))))
 
         BusinessActivities.formReads.validate(Map("businessActivities[]" -> Seq("07"))) must
-          be(Success(BusinessActivities(Set(TelephonePaymentService))))
+          be(Valid(BusinessActivities(Set(TelephonePaymentService))))
       }
 
       "residential business activity check box is selected" in {
         val model = Map("businessActivities" -> Seq("07"))
 
         BusinessActivities.formReads.validate(model) must
-          be(Success(BusinessActivities(Set(TelephonePaymentService))))
+          be(Valid(BusinessActivities(Set(TelephonePaymentService))))
       }
     }
 
@@ -39,7 +39,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "given missing data represented by an empty Map" in {
 
         BusinessActivities.formReads.validate(Map.empty) must
-          be(Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service")))))
+          be(Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service")))))
       }
 
       "given invalid data" in {
@@ -47,7 +47,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
         val model = Map("businessActivities[]" -> Seq("01", "99", "03"))
 
         BusinessActivities.formReads.validate(model) must
-          be(Failure(Seq((Path \ "businessActivities" \ 1 \ "businessActivities") -> Seq(ValidationError("error.invalid")))))
+          be(Invalid(Seq((Path \ "businessActivities" \ 1 \ "businessActivities") -> Seq(ValidationError("error.invalid")))))
       }
     }
 

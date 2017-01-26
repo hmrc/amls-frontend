@@ -18,7 +18,7 @@ object AgentPartnership {
 
   val maxAgentPartnershipLength = 140
 
-  val agentsPartnershipType =  notEmptyStrip compose notEmpty.withMessage("error.required.tp.agent.partnership") compose
+  val agentsPartnershipType =  notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.partnership") andThen
     maxLength(maxAgentPartnershipLength).withMessage("error.invalid.tp.agent.partnership")
 
   implicit val mongoKey = new MongoKey[AgentPartnership] {
