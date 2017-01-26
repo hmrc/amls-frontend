@@ -38,7 +38,7 @@ class vat_registeredSpec extends WordSpec with MustMatchers with OneAppPerSuite 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "registeredForVAT") -> Seq(ValidationError("not a message Key")),
-          (Path \ "vrnNumber-fieldset") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "vrnNumber-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
       def view = views.html.aboutthebusiness.vat_registered(form2, true)
@@ -49,7 +49,7 @@ class vat_registeredSpec extends WordSpec with MustMatchers with OneAppPerSuite 
       doc.getElementById("registeredForVAT")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("vrnNumber-fieldset")
+      doc.getElementById("vrnNumber-panel")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }

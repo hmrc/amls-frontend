@@ -48,21 +48,23 @@
                 value = "false",
                 inline = true
             )
-            @panel(
-                f = f("target"),
-                jsHidden = false,
-                id = target
-            ) {
-                @textarea(
-                    field = f("details"),
-                    labelText = "businessactivities.confirm-activities.lbl.details",
-                    bold = false,
-                    largeWidth = true,
-                    rows = "6",
-                    cols = "30"
-                )
-            }
         }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = false,
+            id = target
+        ) {
+            @textarea(
+                field = f("details"),
+                labelText = "businessactivities.confirm-activities.lbl.details",
+                bold = false,
+                largeWidth = true,
+                rows = "6",
+                cols = "30"
+            )
+        }
+
         @submit(false)
     }
 }
