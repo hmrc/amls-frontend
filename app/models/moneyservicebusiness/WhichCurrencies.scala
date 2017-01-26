@@ -5,7 +5,6 @@ import models._
 import play.api.data.mapping.GenericRules._
 import play.api.data.mapping._
 import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.libs.functional.Monoid
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
@@ -104,6 +103,12 @@ object WhichCurrencies {
 
   implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Writes._
+
+    val bToS: (Boolean) => Option[String] = {
+      case true => Some("Yes")
+      case _ => Some("No")
+    }
+
     (
       (__ \ "currencies").write[Seq[String]] ~
         (__ \ "bankMoneySource").write[Option[String]] ~
@@ -118,10 +123,7 @@ object WhichCurrencies {
       wc.wholesalerMoneySource.map(_ => "Yes"),
       wc.wholesalerMoneySource.map(bms => bms.wholesalerNames),
       wc.customerMoneySource.map(_ => "Yes"),
-      wc.usesForeignCurrencies match {
-        case Some(true) => Some("Yes")
-        case _ => Some("No")
-      }
+      wc.usesForeignCurrencies.fold[Option[String]](None)(bToS)
       ))
   }
 
