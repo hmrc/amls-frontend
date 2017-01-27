@@ -23,7 +23,7 @@ object ResidenceType {
     import jto.validation.forms.Rules._
     (__ \ "isUKResidence").read[Boolean].withMessage("error.required.rp.is.uk.resident") flatMap {
       case true =>
-        (__ \ "nino").read(ninoType).fmap(UKResidence.apply)
+        (__ \ "nino").read(ninoType).map(UKResidence.apply)
       case false =>
         (
           (__ \ "dateOfBirth").read(localDateRule) ~
@@ -64,7 +64,7 @@ object ResidenceType {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
-      (__ \ "nino").read[String] fmap UKResidence.apply map identity[ResidenceType] orElse
+      (__ \ "nino").read[String] map UKResidence.apply map identity[ResidenceType] orElse
       (
         (__ \ "dateOfBirth").read[LocalDate] and
           __.read[PassportType]

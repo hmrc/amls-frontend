@@ -22,7 +22,7 @@ object BusinessAppliedForPSRNumber {
     import jto.validation.forms.Rules._
     (__ \ "appliedFor").read[Boolean].withMessage("error.required.msb.psr.options") flatMap {
       case true =>
-         (__ \ "regNumber").read(registrationNumberType) fmap BusinessAppliedForPSRNumberYes.apply
+         (__ \ "regNumber").read(registrationNumberType) map BusinessAppliedForPSRNumberYes.apply
       case false => Rule.fromMapping { _ => Success(BusinessAppliedForPSRNumberNo) }
     }
   }

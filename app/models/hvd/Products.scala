@@ -82,7 +82,7 @@ object Products{
           case "10" => Rule[UrlFormEncoded, ItemType](_ => Success(MobilePhones))
           case "11" => Rule[UrlFormEncoded, ItemType](_ => Success(Clothing))
           case "12" =>
-            (__ \ "otherDetails").read(otherDetailsType) fmap Other.apply
+            (__ \ "otherDetails").read(otherDetailsType) map Other.apply
           case _ =>
             Rule[UrlFormEncoded, ItemType] { _ =>
               Failure(Seq((Path \ "products") -> Seq(ValidationError("error.invalid"))))
@@ -92,11 +92,11 @@ object Products{
         ) {
           case (m, n) =>
             n flatMap { x =>
-              m fmap {
+              m map {
                 _ + x
               }
             }
-        } fmap Products.apply
+        } map Products.apply
       }
     }
 

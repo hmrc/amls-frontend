@@ -14,7 +14,7 @@ object BankAccountRegistered {
   implicit val formRule: Rule[UrlFormEncoded, BankAccountRegistered] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "registerAnotherBank").read[Boolean].withMessage("error.required.bankdetails.register.another.bank") fmap BankAccountRegistered.apply
+      (__ \ "registerAnotherBank").read[Boolean].withMessage("error.required.bankdetails.register.another.bank") map BankAccountRegistered.apply
     }
 
   implicit val formWrites: Write[BankAccountRegistered, UrlFormEncoded] =

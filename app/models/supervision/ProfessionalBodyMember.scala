@@ -93,7 +93,7 @@ object ProfessionalBodyMember {
               case "12" => Rule[UrlFormEncoded, BusinessType](_ => Success(AssociationOfBookkeepers))
               case "13" => Rule[UrlFormEncoded, BusinessType](_ => Success(LawSociety))
               case "14" =>
-                (__ \ "specifyOtherBusiness").read(specifyOtherType) fmap Other.apply
+                (__ \ "specifyOtherBusiness").read(specifyOtherType) map Other.apply
               case _ =>
                 Rule[UrlFormEncoded, BusinessType] { _ =>
                   Failure(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid"))))
@@ -103,11 +103,11 @@ object ProfessionalBodyMember {
             ) {
               case (m, n) =>
                 n flatMap { x =>
-                  m fmap {
+                  m map {
                     _ + x
                   }
                 }
-            } fmap ProfessionalBodyMemberYes.apply
+            } map ProfessionalBodyMemberYes.apply
           }
 
         case false => Rule.fromMapping { _ => Success(ProfessionalBodyMemberNo) }

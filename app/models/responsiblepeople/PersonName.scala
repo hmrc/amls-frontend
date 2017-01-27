@@ -37,13 +37,13 @@ object PersonName {
         (__ \ "lastName").read(lastNameType) ~
         (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
           case true =>
-            (__ \ "previous").read[PreviousName] fmap Some.apply
+            (__ \ "previous").read[PreviousName] map Some.apply
           case false =>
             Rule(_ => Success(None))
         } ~
         (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames").flatMap[Option[String]] {
           case true =>
-            (__ \ "otherNames").read(otherNamesType) fmap Some.apply
+            (__ \ "otherNames").read(otherNamesType) map Some.apply
           case false =>
             Rule(_ => Success(None))
         }

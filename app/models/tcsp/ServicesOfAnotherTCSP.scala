@@ -25,7 +25,7 @@ object ServicesOfAnotherTCSP {
   import jto.validation.forms.Rules._
     (__ \ "servicesOfAnotherTCSP").read[Boolean].withMessage("error.required.tcsp.services.another.tcsp") flatMap {
       case true =>
-       (__ \ "mlrRefNumber").read(service) fmap ServicesOfAnotherTCSPYes.apply
+       (__ \ "mlrRefNumber").read(service) map ServicesOfAnotherTCSPYes.apply
       case false => Rule.fromMapping { _ => Success(ServicesOfAnotherTCSPNo) }
     }
   }

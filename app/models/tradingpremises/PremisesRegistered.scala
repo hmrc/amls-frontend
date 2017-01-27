@@ -14,7 +14,7 @@ object PremisesRegistered {
   implicit val formRule: Rule[UrlFormEncoded, PremisesRegistered] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "registerAnotherPremises").read[Boolean].withMessage("error.required.tp.register.another.premises") fmap PremisesRegistered.apply
+      (__ \ "registerAnotherPremises").read[Boolean].withMessage("error.required.tp.register.another.premises") map PremisesRegistered.apply
     }
 
   implicit val formWrites: Write[PremisesRegistered, UrlFormEncoded] =

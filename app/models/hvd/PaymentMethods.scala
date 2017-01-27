@@ -18,7 +18,7 @@ sealed trait PaymentMethods0 {
   (implicit
     r: Rule[I, O]
   ): Rule[I, Option[O]] =
-    r.fmap(Some.apply).orElse(Rule(_ => Success(None)))
+    r.map(Some.apply).orElse(Rule(_ => Success(None)))
 
   private implicit def rule[A]
   (implicit
@@ -50,14 +50,14 @@ sealed trait PaymentMethods0 {
         (minLengthR(minLength) withMessage "error.required.hvd.describe") andThen
           (maxLengthR(maxLength) withMessage "error.invalid.maxlength.255")
 
-      val booleanR = b andThen { _ fmap { case Some(b) => b; case None => false } }
+      val booleanR = b andThen { _ map { case Some(b) => b; case None => false } }
 
       (
         (__ \ "courier").read(booleanR) ~
         (__ \ "direct").read(booleanR) ~
         (__ \ "other").read(booleanR).flatMap[Option[String]] {
           case true =>
-            (__ \ "details").read(detailsR) fmap Some.apply
+            (__ \ "details").read(detailsR) map Some.apply
           case false =>
             Rule(_ => Success(None))
         }

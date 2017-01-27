@@ -17,7 +17,7 @@ object WhatDoesYourBusinessDo {
   implicit val formRule : Rule[UrlFormEncoded, WhatDoesYourBusinessDo] = From[UrlFormEncoded] { __ =>
     (__ \ "activities")
       .read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.tp.activity.your.business.do"))
-      .fmap((activities) => WhatDoesYourBusinessDo(activities, None))
+      .map((activities) => WhatDoesYourBusinessDo(activities, None))
   }
 
   implicit val formWrite = Write[WhatDoesYourBusinessDo, UrlFormEncoded] { data =>

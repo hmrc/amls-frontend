@@ -4,7 +4,7 @@ import models.Country
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.functional.Monoid
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import utils.{JsonMapping, TraversableValidators}
 
 case class BranchesOrAgents(branches: Option[Seq[Country]])
@@ -45,11 +45,12 @@ sealed trait BranchesOrAgents0 {
 
       (__ \ "hasCountries").read(boolR).flatMap[Option[Seq[Country]]] {
         case true =>
-          (__ \ "countries").read(countrySeqR) fmap Some.apply
+          (__ \ "countries").read(countrySeqR) map Some.apply
         case false =>
           Rule(_ => Success(None))
-      } fmap BranchesOrAgents.apply
+      } map BranchesOrAgents.apply
     }
+
 
   private implicit def write[A]
   (implicit
@@ -64,8 +65,8 @@ sealed trait BranchesOrAgents0 {
           case Some(_) => true
           case None => false
         } ~
-        (__ \ "countries").write[Option[Seq[Country]]]
-      )(a => (a.branches, a.branches))
+          (__ \ "countries").write[Option[Seq[Country]]]
+        )(a => (a.branches, a.branches))
     }
 
   val formR: Rule[UrlFormEncoded, BranchesOrAgents] = {
@@ -78,14 +79,34 @@ sealed trait BranchesOrAgents0 {
     implicitly
   }
 
-  val formW: Write[BranchesOrAgents, UrlFormEncoded] = {
-    import jto.validation.forms.Writes._
-    implicitly
+  implicit def formW (implicit
+                      w: Write[BranchesOrAgents, UrlFormEncoded]
+                     ) = Write[BranchesOrAgents, UrlFormEncoded] {x =>
+    val branches = x.branches.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
+    branches.nonEmpty match {
+      case true =>Map(
+        "hasCountries" -> Seq("true"),
+        "countries" -> branches
+      )
+      case false =>Map(
+        "hasCountries" -> Seq("false")
+      )
+    }
+
   }
 
-  val jsonW: Writes[BranchesOrAgents] = {
-    import jto.validation.playjson.Writes._
-    implicitly
+  val jsonW: Writes[BranchesOrAgents] = Writes {x =>
+    val countries = x.branches.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
+    countries.nonEmpty match {
+      case true =>  Json.obj(
+        "hasCountries" -> true,
+        "countries" -> countries
+      )
+      case false =>
+        Json.obj(
+          "hasCountries" -> false
+        )
+    }
   }
 }
 

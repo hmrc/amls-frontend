@@ -62,8 +62,8 @@ object Account {
 
       case false =>
         (__ \ "isIBAN").read[Boolean] flatMap {
-          case true => (__ \ "IBANNumber").read[String] fmap  NonUKIBANNumber.apply
-          case false =>  (__ \ "nonUKAccountNumber").read[String] fmap  NonUKAccountNumber.apply
+          case true => (__ \ "IBANNumber").read[String] map  NonUKIBANNumber.apply
+          case false =>  (__ \ "nonUKAccountNumber").read[String] map  NonUKAccountNumber.apply
         }
     }
   }

@@ -14,7 +14,7 @@ object RegisteringAgentPremises {
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       import utils.MappingUtils.Implicits._
-      (__ \ "agentPremises").read[Boolean].withMessage("error.required.tp.agent.premises") fmap RegisteringAgentPremises.apply
+      (__ \ "agentPremises").read[Boolean].withMessage("error.required.tp.agent.premises") map RegisteringAgentPremises.apply
     }
 
   implicit val formWrites: Write[RegisteringAgentPremises, UrlFormEncoded] =

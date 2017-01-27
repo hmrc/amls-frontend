@@ -14,7 +14,7 @@ object IdentifyLinkedTransactions {
 
   implicit val formRule: Rule[UrlFormEncoded, IdentifyLinkedTransactions] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "linkedTxn").read[Boolean].withMessage("error.required.msb.linked.txn") fmap IdentifyLinkedTransactions.apply
+    (__ \ "linkedTxn").read[Boolean].withMessage("error.required.msb.linked.txn") map IdentifyLinkedTransactions.apply
   }
 
   implicit val formWrites: Write[IdentifyLinkedTransactions, UrlFormEncoded] = Write {x =>

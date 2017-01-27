@@ -45,10 +45,10 @@ sealed trait CustomersOutsideUK0 {
 
       (__ \ "isOutside").read(boolR).flatMap[Option[Seq[Country]]] {
         case true =>
-          (__ \ "countries").read(countrySeqR) fmap Some.apply
+          (__ \ "countries").read(countrySeqR) map Some.apply
         case false =>
           Rule(_ => Success(None))
-      } fmap CustomersOutsideUK.apply
+      } map CustomersOutsideUK.apply
     }
 
   implicit def formW = Write[CustomersOutsideUK, UrlFormEncoded] {x =>
@@ -75,10 +75,16 @@ sealed trait CustomersOutsideUK0 {
 
   val jsonW: Writes[CustomersOutsideUK] = Writes {x =>
     val countries = x.countries.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
-    Json.obj(
-      "isOutside" -> true,
-      "countries" -> countries
-    )
+     countries.nonEmpty match {
+       case true =>  Json.obj(
+         "isOutside" -> true,
+         "countries" -> countries
+       )
+       case false =>
+         Json.obj(
+           "isOutside" -> false
+         )
+    }
   }
 }
 

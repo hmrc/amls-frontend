@@ -21,7 +21,7 @@ object SaRegistered {
   import jto.validation.forms.Rules._
     (__ \ "saRegistered").read[Boolean].withMessage("error.required.sa.registration") flatMap {
       case true =>
-        (__ \ "utrNumber").read(utrType) fmap (SaRegisteredYes.apply)
+        (__ \ "utrNumber").read(utrType) map (SaRegisteredYes.apply)
       case false => Rule.fromMapping { _ => Success(SaRegisteredNo) }
     }
   }

@@ -19,7 +19,7 @@ object VATRegistered {
     import jto.validation.forms.Rules._
     (__ \ "registeredForVAT").read[Boolean].withMessage("error.required.atb.registered.for.vat") flatMap {
       case true =>
-        (__ \ "vrnNumber").read(vrnType) fmap VATRegisteredYes.apply
+        (__ \ "vrnNumber").read(vrnType) map VATRegisteredYes.apply
       case false => Rule.fromMapping { _ => Success(VATRegisteredNo) }
     }
   }

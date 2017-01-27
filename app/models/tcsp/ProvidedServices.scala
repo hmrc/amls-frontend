@@ -74,7 +74,7 @@ object ProvidedServices {
               case "06" => Rule[UrlFormEncoded, TcspService](_ => Success(Receptionist))
               case "07" => Rule[UrlFormEncoded, TcspService](_ => Success(ConferenceRooms))
               case "08" =>
-                (__ \ "details").read(serviceDetailsType) fmap Other.apply
+                (__ \ "details").read(serviceDetailsType) map Other.apply
               case _ =>
                 Rule[UrlFormEncoded, TcspService] { _ =>
                   Failure(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
@@ -84,11 +84,11 @@ object ProvidedServices {
             ) {
               case (m, n) =>
                   n flatMap { x =>
-                    m fmap {
+                    m map {
                       _ + x
                     }
                   }
-            } fmap ProvidedServices.apply
+            } map ProvidedServices.apply
           }
     }
 

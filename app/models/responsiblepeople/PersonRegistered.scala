@@ -14,7 +14,7 @@ object PersonRegistered {
   implicit val formRule: Rule[UrlFormEncoded, PersonRegistered] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "registerAnotherPerson").read[Boolean].withMessage("error.required.rp.register.another.person") fmap PersonRegistered.apply
+      (__ \ "registerAnotherPerson").read[Boolean].withMessage("error.required.rp.register.another.person") map PersonRegistered.apply
     }
 
   implicit val formWrites: Write[PersonRegistered, UrlFormEncoded] =

@@ -23,7 +23,7 @@ object PenalisedUnderEstateAgentsAct {
     import jto.validation.forms.Rules._
 
     (__ \ "penalisedUnderEstateAgentsAct").read[Boolean].withMessage("error.required.eab.penalised.under.act") flatMap {
-      case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) fmap PenalisedUnderEstateAgentsActYes.apply
+      case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) map PenalisedUnderEstateAgentsActYes.apply
       case false => Rule.fromMapping { _ => Success(PenalisedUnderEstateAgentsActNo) }
     }
   }

@@ -52,11 +52,11 @@ object TcspTypes {
         ) {
           case (m, n) =>
             n flatMap { x =>
-              m fmap {
+              m map {
                 _ + x
               }
             }
-        } fmap TcspTypes.apply
+        } map TcspTypes.apply
       }
     }
   }

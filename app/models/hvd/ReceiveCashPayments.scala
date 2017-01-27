@@ -8,6 +8,7 @@ import play.api.libs.json.{Writes, _}
 case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
 sealed trait ReceiveCashPayments0 {
+  import utils.JsonMapping._
 
   private implicit def rule[A]
   (implicit
@@ -23,10 +24,10 @@ sealed trait ReceiveCashPayments0 {
 
       (__ \ "receivePayments").read(booleanR).flatMap[Option[PaymentMethods]] {
         case true =>
-          (__ \ "paymentMethods").read[A] andThen paymentMethodsR.repath((Path \ "paymentMethods") ++ _) fmap Some.apply
+          (__ \ "paymentMethods").read[A] andThen paymentMethodsR.repath((Path \ "paymentMethods") ++ _) map Some.apply
         case false =>
           Rule(_ => Success(None))
-      } fmap ReceiveCashPayments.apply
+      } map ReceiveCashPayments.apply
     }
 
   val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
@@ -47,22 +48,14 @@ sealed trait ReceiveCashPayments0 {
 
   import play.api.libs.json.{Writes, _}
 
-  val jsonR: Reads[ReceiveCashPayments] = {
-    import jto.validation.playjson.Rules.{pickInJson => _, _}
-    implicitly[Reads[ReceiveCashPayments]]
-  }
-
-  val jsonW: Writes[ReceiveCashPayments] = {
-    implicitly[Writes[ReceiveCashPayments]]
-  }
 }
 
 object ReceiveCashPayments {
 
   private object Cache extends ReceiveCashPayments0
-
+implicit val format = Json.format[ReceiveCashPayments]
   implicit val formR = Cache.formR
   implicit val formW = Cache.formWrites
-  implicit val jsonR = Cache.jsonR
-  implicit val jsonW = Cache.jsonW
+ // implicit val jsonR = Cache.jsonR
+ // implicit val jsonW = Cache.jsonW
 }

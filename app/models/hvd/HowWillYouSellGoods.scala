@@ -16,7 +16,7 @@ trait HowWillYouSellGoods0 {
   ) = From[A] { __ =>
     (__ \ "salesChannels")
       .read(TraversableValidators.minLengthR[Seq[String]](1))
-      .withMessage("error.required.hvd.how-will-you-sell-goods").fmap {s =>
+      .withMessage("error.required.hvd.how-will-you-sell-goods").map {s =>
         HowWillYouSellGoods(s.map{str =>
           val sc:SalesChannel = str match {
             case "Retail" => Retail

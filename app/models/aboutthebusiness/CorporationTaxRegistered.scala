@@ -19,7 +19,7 @@ object CorporationTaxRegistered {
     import jto.validation.forms.Rules._
     (__ \ "registeredForCorporationTax").read[Boolean].withMessage("error.required.atb.corporation.tax") flatMap {
       case true =>
-        (__ \ "corporationTaxReference").read(corporationTaxType) fmap CorporationTaxRegisteredYes.apply
+        (__ \ "corporationTaxReference").read(corporationTaxType) map CorporationTaxRegisteredYes.apply
       case false => Rule.fromMapping { _ => Success(CorporationTaxRegisteredNo) }
     }
   }

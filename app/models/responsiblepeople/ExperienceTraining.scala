@@ -27,7 +27,7 @@ object ExperienceTraining {
     import jto.validation.forms.Rules._
     (__ \ "experienceTraining").read[Boolean].withMessage("error.required.rp.experiencetraining") flatMap {
       case true =>
-        (__ \ "experienceInformation").read(experienceInformationType) fmap (ExperienceTrainingYes.apply)
+        (__ \ "experienceInformation").read(experienceInformationType) map (ExperienceTrainingYes.apply)
       case false => Rule.fromMapping { _ => Success(ExperienceTrainingNo) }
     }
   }

@@ -25,7 +25,7 @@ object Nationality {
         case "01" => British
         case "02" => Irish
         case "03" =>
-          (readerURLFormEncoded \ "otherCountry").read[Country] fmap OtherCountry.apply
+          (readerURLFormEncoded \ "otherCountry").read[Country] map OtherCountry.apply
         case _ =>
           (Path \ "nationality") -> Seq(ValidationError("error.invalid"))
       }

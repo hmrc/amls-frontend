@@ -23,7 +23,7 @@ object ProfessionalBody {
     import jto.validation.forms.Rules._
     (__ \ "penalised").read[Boolean].withMessage("error.required.eab.penalised.by.professional.body") flatMap {
       case true =>
-        (__ \ "professionalBody").read(penalisedType) fmap ProfessionalBodyYes.apply
+        (__ \ "professionalBody").read(penalisedType) map ProfessionalBodyYes.apply
       case false => Rule.fromMapping { _ => Success(ProfessionalBodyNo) }
     }
   }

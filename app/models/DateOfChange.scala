@@ -24,7 +24,7 @@ object DateOfChange {
 
   implicit val formRule: Rule[UrlFormEncoded, DateOfChange] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    __.read(dateOfChangeActivityStartDateRule) fmap DateOfChange.apply
+    __.read(dateOfChangeActivityStartDateRule) map DateOfChange.apply
   }
 
   implicit val formWrites: Write[DateOfChange, UrlFormEncoded] =

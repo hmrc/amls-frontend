@@ -14,7 +14,7 @@ object IdentifySuspiciousActivity {
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       import utils.MappingUtils.Implicits._
-      (__ \ "hasWrittenGuidance").read[Boolean].withMessage("error.required.ba.suspicious.activity") fmap (IdentifySuspiciousActivity.apply)
+      (__ \ "hasWrittenGuidance").read[Boolean].withMessage("error.required.ba.suspicious.activity") map (IdentifySuspiciousActivity.apply)
     }
 
   implicit val formWrites: Write[IdentifySuspiciousActivity, UrlFormEncoded] =

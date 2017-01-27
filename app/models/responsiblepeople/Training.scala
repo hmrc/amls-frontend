@@ -27,7 +27,7 @@ object Training {
     import jto.validation.forms.Rules._
     (__ \ "training").read[Boolean].withMessage("error.required.rp.training") flatMap {
       case true =>
-        (__ \ "information").read(informationType) fmap (TrainingYes.apply)
+        (__ \ "information").read(informationType) map (TrainingYes.apply)
       case false => Rule.fromMapping { _ => Success(TrainingNo) }
     }
   }

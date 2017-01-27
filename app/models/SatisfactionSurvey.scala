@@ -25,11 +25,11 @@ object SatisfactionSurvey {
     import jto.validation.forms.Rules._
     import models.FormTypes._
     (__ \ "satisfaction").read[String].withMessage("error.survey.satisfaction.required") flatMap {
-      case "01" => (__ \ "details").read(optionR(detailsRule)) fmap First.apply
-      case "02" => (__ \ "details").read(optionR(detailsRule)) fmap Second.apply
-      case "03" => (__ \ "details").read(optionR(detailsRule)) fmap Third.apply
-      case "04" => (__ \ "details").read(optionR(detailsRule)) fmap Fourth.apply
-      case "05" => (__ \ "details").read(optionR(detailsRule)) fmap Fifth.apply
+      case "01" => (__ \ "details").read(optionR(detailsRule)) map First.apply
+      case "02" => (__ \ "details").read(optionR(detailsRule)) map Second.apply
+      case "03" => (__ \ "details").read(optionR(detailsRule)) map Third.apply
+      case "04" => (__ \ "details").read(optionR(detailsRule)) map Fourth.apply
+      case "05" => (__ \ "details").read(optionR(detailsRule)) map Fifth.apply
       case _ =>
         (Path \ "satisfaction") -> Seq(ValidationError("error.invalid"))
     }

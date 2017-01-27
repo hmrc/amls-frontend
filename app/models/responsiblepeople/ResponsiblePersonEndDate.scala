@@ -14,7 +14,7 @@ object ResponsiblePersonEndDate {
 
   implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonEndDate] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    __.read(peopleEndDateRule) fmap ResponsiblePersonEndDate.apply
+    __.read(peopleEndDateRule) map ResponsiblePersonEndDate.apply
   }
 
   implicit val formWrites: Write[ResponsiblePersonEndDate, UrlFormEncoded] =

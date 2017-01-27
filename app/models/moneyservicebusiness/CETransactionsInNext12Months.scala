@@ -20,7 +20,7 @@ object CETransactionsInNext12Months {
 
   implicit val formRule: Rule[UrlFormEncoded, CETransactionsInNext12Months] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "ceTransaction").read(txnAmountType) fmap CETransactionsInNext12Months.apply
+    (__ \ "ceTransaction").read(txnAmountType) map CETransactionsInNext12Months.apply
   }
 
   implicit val formWrites: Write[CETransactionsInNext12Months, UrlFormEncoded] = Write {x =>

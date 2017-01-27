@@ -14,7 +14,7 @@ object TaxMatters {
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       import utils.MappingUtils.Implicits._
-      (__ \ "manageYourTaxAffairs").read[Boolean].withMessage("error.required.ba.tax.matters") fmap TaxMatters.apply
+      (__ \ "manageYourTaxAffairs").read[Boolean].withMessage("error.required.ba.tax.matters") map TaxMatters.apply
     }
 
   implicit val formWrites: Write[TaxMatters, UrlFormEncoded] =

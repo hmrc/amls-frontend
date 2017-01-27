@@ -21,9 +21,9 @@ object PassportType {
     import models.FormTypes._
     (__ \ "passportType").read[String].withMessage("error.required.rp.passport.option") flatMap {
       case "01" =>
-        (__ \ "ukPassportNumber").read(ukPassportType) fmap UKPassport.apply
+        (__ \ "ukPassportNumber").read(ukPassportType) map UKPassport.apply
       case "02" =>
-        (__ \ "nonUKPassportNumber").read(noUKPassportType) fmap NonUKPassport.apply
+        (__ \ "nonUKPassportNumber").read(noUKPassportType) map NonUKPassport.apply
       case "03" => NoPassport
       case _ =>
         (Path \ "passportType") -> Seq(ValidationError("error.invalid"))

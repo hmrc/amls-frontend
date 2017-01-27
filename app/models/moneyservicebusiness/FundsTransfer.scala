@@ -14,7 +14,7 @@ object FundsTransfer {
   implicit val formRule: Rule[UrlFormEncoded, FundsTransfer] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "transferWithoutFormalSystems").read[Boolean].withMessage("error.required.msb.fundsTransfer") fmap FundsTransfer.apply
+      (__ \ "transferWithoutFormalSystems").read[Boolean].withMessage("error.required.msb.fundsTransfer") map FundsTransfer.apply
       }
 
   implicit val formWrites: Write[FundsTransfer, UrlFormEncoded] =

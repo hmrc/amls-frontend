@@ -28,7 +28,7 @@ object AgentName {
 
   implicit val formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "agentName").read(agentNameType) fmap(AgentName(_))
+    (__ \ "agentName").read(agentNameType) map(AgentName(_))
   }
 
   implicit val formWrites: Write[AgentName, UrlFormEncoded] = Write {

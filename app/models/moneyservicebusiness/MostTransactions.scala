@@ -31,7 +31,7 @@ private sealed trait MostTransactions0 {
           .andThen(maxLengthR[Seq[Country]](3))
       }
 
-      (__ \ "mostTransactionsCountries").read(seqR) fmap MostTransactions.apply
+      (__ \ "mostTransactionsCountries").read(seqR) map MostTransactions.apply
     }
 
   private implicit def write[A]
@@ -49,8 +49,8 @@ private sealed trait MostTransactions0 {
   }
 
   val jsonR: Reads[MostTransactions] = {
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     import utils.JsonMapping._
+    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     implicitly
   }
 

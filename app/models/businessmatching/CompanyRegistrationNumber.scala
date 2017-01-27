@@ -20,7 +20,7 @@ object CompanyRegistrationNumber {
 
   implicit val formReads: Rule[UrlFormEncoded, CompanyRegistrationNumber] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "companyRegistrationNumber").read(registrationType) fmap CompanyRegistrationNumber.apply
+    (__ \ "companyRegistrationNumber").read(registrationType) map CompanyRegistrationNumber.apply
   }
 
   implicit val formWrites: Write[CompanyRegistrationNumber, UrlFormEncoded] = Write {

@@ -22,25 +22,31 @@ trait JsonMapping {
   private def pathToJsPath(p: Path): JsPath =
     JsPath(p.path.map(nodeToJsNode _))
 
-  implicit def errorConversion(errs: Seq[(Path, Seq[ValidationError])]): Seq[(JsPath, Seq[ValidationError])] =
+  def convertError(error: ValidationError): play.api.data.validation.ValidationError = {
+    play.api.data.validation.ValidationError(error.message, error.args)
+  }
+
+  implicit def convertValidationErros(errors: Seq[ValidationError]): Seq[play.api.data.validation.ValidationError] = {
+   errors.map(convertError(_))
+  }
+
+  implicit def errorConversion(errs: Seq[(Path, Seq[ValidationError])]): Seq[(JsPath, Seq[play.api.data.validation.ValidationError])] =
     errs map {
       case (path, errors) =>
-        (pathToJsPath(path), errors)
+        (pathToJsPath(path), convertValidationErros(errors))
     }
 
-/*  implicit def genericJsonR[A]
+  implicit def genericJsonR[A]
   (implicit
    rule: Rule[JsValue, A]
   ): Reads[A] =
     Reads {
       json =>
         rule.validate(json) match {
-          case Success(a) =>
-            JsSuccess(a)
-          case Failure(errors) =>
-            JsError(errors)
+          case Success(x) => JsSuccess(x)
+          case Failure(error) => JsError(error)
         }
-    }*/
+    }
 
   implicit def genericJsonW[A]
   (implicit

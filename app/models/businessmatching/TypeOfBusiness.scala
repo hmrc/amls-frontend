@@ -13,7 +13,7 @@ object TypeOfBusiness{
 
   implicit val formRead:Rule[UrlFormEncoded, TypeOfBusiness] = From[UrlFormEncoded] {__ =>
     import jto.validation.forms.Rules._
-    (__ \ "typeOfBusiness").read(typeOfBusinessType) fmap TypeOfBusiness.apply
+    (__ \ "typeOfBusiness").read(typeOfBusinessType) map TypeOfBusiness.apply
   }
 
   implicit val formWrite: Write[TypeOfBusiness, UrlFormEncoded] = Write {

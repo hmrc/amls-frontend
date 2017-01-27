@@ -67,16 +67,16 @@ object FormTypes {
 
   def maxDateWithMsg(maxDate: LocalDate, msg: String) = max(maxDate).withMessage(msg)
 
-  val notEmptyStrip = Rule.zero[String] fmap {
+  val notEmptyStrip = Rule.zero[String] map {
     _.trim
   }
 
-  val valueOrNone = Rule.zero[String] fmap {
+  val valueOrNone = Rule.zero[String] map {
     case "" => None
     case str => Some(str)
   }
 
-  val transformUppercase = Rule.zero[String] fmap {
+  val transformUppercase = Rule.zero[String] map {
     _.toUpperCase
   }
 
@@ -84,7 +84,7 @@ object FormTypes {
     def insensitive = s"(?i)${regex.pattern}".r
   }
 
-  def removeCharacterRule(c: Char) = Rule.zero[String] fmap {
+  def removeCharacterRule(c: Char) = Rule.zero[String] map {
     _.replace(c.toString, "")
   }
 

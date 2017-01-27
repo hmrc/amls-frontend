@@ -61,7 +61,7 @@ object RiskAssessmentPolicy {
       (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
           case true =>
              (__ \ "riskassessments").
-               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) fmap RiskAssessmentPolicyYes.apply
+               read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
          case false => Rule.fromMapping { _ => Success(RiskAssessmentPolicyNo) }
       }
 

@@ -13,7 +13,7 @@ object LinkedCashPayments {
 
   implicit val formRule: Rule[UrlFormEncoded, LinkedCashPayments] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "linkedCashPayments").read[Boolean].withMessage("error.required.hvd.linked.cash.payment") fmap LinkedCashPayments.apply
+    (__ \ "linkedCashPayments").read[Boolean].withMessage("error.required.hvd.linked.cash.payment") map LinkedCashPayments.apply
   }
 
   implicit val formWrites: Write[LinkedCashPayments, UrlFormEncoded] = Write {

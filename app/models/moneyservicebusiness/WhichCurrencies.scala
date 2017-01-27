@@ -14,6 +14,7 @@ import utils.MappingUtils.Implicits._
 import models._
 
 
+
 case class WhichCurrencies(currencies : Seq[String]
                            , bankMoneySource : Option[BankMoneySource]
                            , wholesalerMoneySource : Option[WholesalerMoneySource]
@@ -61,7 +62,7 @@ private sealed trait WhichCurrencies0 {
             (__ \ "bankMoneySource").read[Option[String]] flatMap {
               case Some("Yes") => (__ \ "bankNames")
                                     .read(nameType("bankNames"))
-                                    .fmap(names => Some(BankMoneySource(names)))
+                                    .map(names => Some(BankMoneySource(names)))
               case _ => Rule[A, Option[BankMoneySource]](_ => Success(None))
             }
 
@@ -69,11 +70,11 @@ private sealed trait WhichCurrencies0 {
           (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
             case Some("Yes") => (__ \ "wholesalerNames")
                                   .read(nameType("wholesalerNames"))
-                                  .fmap(names => Some(WholesalerMoneySource(names)))
+                                  .map(names => Some(WholesalerMoneySource(names)))
             case _ => Rule[A, Option[WholesalerMoneySource]](_ => Success(None))
           }
 
-          val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] fmap {
+          val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] map {
             case Some("Yes") => true
             case _ => false
           }
@@ -120,8 +121,9 @@ private sealed trait WhichCurrencies0 {
   }
 
   val jsonR: Reads[WhichCurrencies] = {
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     import utils.JsonMapping._
+    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
+
     implicitly[Reads[WhichCurrencies]]
   }
 

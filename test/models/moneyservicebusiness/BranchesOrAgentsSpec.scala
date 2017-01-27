@@ -24,7 +24,6 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
     "round trip through forms correctly" in {
 
       val model: BranchesOrAgents = BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))
-
       rule.validate(write.writes(model)) mustBe Valid(model)
     }
 

@@ -26,7 +26,7 @@ object InvolvedInOther {
     import jto.validation.forms.Rules._
     (__ \ "involvedInOther").read[Boolean].withMessage("error.required.ba.involved.in.other") flatMap {
       case true =>
-        (__ \ "details").read(OtherBusinessActivityType) fmap InvolvedInOtherYes.apply
+        (__ \ "details").read(OtherBusinessActivityType) map InvolvedInOtherYes.apply
       case false => Rule.fromMapping { _ => Success(InvolvedInOtherNo) }
     }
   }

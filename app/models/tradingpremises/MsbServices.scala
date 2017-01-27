@@ -75,7 +75,7 @@ sealed trait MsbServices0 {
       val required =
         TraversableValidators.minLengthR[Set[MsbService]](1) withMessage "error.required.msb.services"
 
-      (__ \ "msbServices").read(required) fmap MsbService.applyWithoutDateOfChange
+      (__ \ "msbServices").read(required) map MsbService.applyWithoutDateOfChange
     }
 
   private implicit def write[A]

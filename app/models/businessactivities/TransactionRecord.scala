@@ -49,7 +49,7 @@ object TransactionRecord {
               case "01" => Rule[UrlFormEncoded, TransactionType](_ => Success(Paper))
               case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))
               case "03" =>
-                (__ \ "name").read(softwareNameType) fmap DigitalSoftware.apply
+                (__ \ "name").read(softwareNameType) map DigitalSoftware.apply
               case _ =>
                 Rule[UrlFormEncoded, TransactionType] { _ =>
                   Failure(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid"))))
@@ -59,11 +59,11 @@ object TransactionRecord {
             ) {
               case (m, n) =>
                   n flatMap { x =>
-                    m fmap {
+                    m map {
                       _ + x
                     }
                   }
-            } fmap TransactionRecordYes.apply
+            } map TransactionRecordYes.apply
           }
 
         case false => Rule.fromMapping { _ => Success(TransactionRecordNo) }

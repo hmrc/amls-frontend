@@ -15,7 +15,7 @@ object NCARegistered {
 
   implicit val formRule: Rule[UrlFormEncoded, NCARegistered] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "ncaRegistered").read[Boolean].withMessage("error.required.ba.select.nca") fmap NCARegistered.apply
+    (__ \ "ncaRegistered").read[Boolean].withMessage("error.required.ba.select.nca") map NCARegistered.apply
   }
 
   implicit val formWrites: Write[NCARegistered, UrlFormEncoded] = Write {

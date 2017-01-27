@@ -16,7 +16,7 @@ object WhoIsRegistering {
   implicit val formRule: Rule[UrlFormEncoded, WhoIsRegistering] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "person").read[String].withMessage("error.required.declaration.who.is.registering") fmap WhoIsRegistering.apply
+      (__ \ "person").read[String].withMessage("error.required.declaration.who.is.registering") map WhoIsRegistering.apply
     }
   implicit val formWrites: Write[WhoIsRegistering, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._

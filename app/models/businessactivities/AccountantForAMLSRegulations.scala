@@ -14,7 +14,7 @@ object AccountantForAMLSRegulations {
 
   implicit val formRule: Rule[UrlFormEncoded, AccountantForAMLSRegulations] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "accountantForAMLSRegulations").read[Boolean].withMessage("error.required.ba.business.use.accountant") fmap AccountantForAMLSRegulations.apply
+    (__ \ "accountantForAMLSRegulations").read[Boolean].withMessage("error.required.ba.business.use.accountant") map AccountantForAMLSRegulations.apply
   }
 
   implicit val formWrites: Write[AccountantForAMLSRegulations, UrlFormEncoded] = Write {

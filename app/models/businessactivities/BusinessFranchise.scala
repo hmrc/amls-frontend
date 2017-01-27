@@ -25,7 +25,7 @@ object BusinessFranchise {
   import jto.validation.forms.Rules._
     (__ \ "businessFranchise").read[Boolean].withMessage("error.required.ba.is.your.franchise") flatMap {
       case true =>
-        (__ \ "franchiseName").read(franchiseNameType) fmap BusinessFranchiseYes.apply
+        (__ \ "franchiseName").read(franchiseNameType) map BusinessFranchiseYes.apply
       case false => Rule.fromMapping { _ => Success(BusinessFranchiseNo) }
     }
   }
