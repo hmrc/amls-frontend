@@ -110,8 +110,10 @@ object WhichCurrencies {
     }
 
     val defaultFlagValue: (WhichCurrencies) => Option[String] = {
-      case x if x.customerMoneySource.contains(true) || x.bankMoneySource.isDefined || x.wholesalerMoneySource.isDefined => Some("Yes")
-      case _ if ApplicationConfig.release7 => Some("No")
+      case x if ApplicationConfig.release7 && (x.customerMoneySource.contains(true) || x.bankMoneySource.isDefined || x.wholesalerMoneySource.isDefined) =>
+        Some("Yes")
+      case _ if ApplicationConfig.release7 =>
+        Some("No")
       case _ => None
     }
 

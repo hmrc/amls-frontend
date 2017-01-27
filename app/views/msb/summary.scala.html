@@ -162,6 +162,20 @@
                         <li>@cur</li>
                         }
                     </ul>
+
+                    @if(config.ApplicationConfig.release7) {
+                        @wc.usesForeignCurrencies.map { v =>
+                            @checkYourAnswersExtra(
+                                question = Messages("msb.which_currencies.foreign_currencies_question")
+                            ) {
+                                @(v match {
+                                    case true => Messages("lbl.yes")
+                                    case _ => Messages("lbl.no")
+                                })
+                            }
+                        }
+                    }
+
                     @checkYourAnswersExtra(
                         question = Messages("msb.which_currencies.who")
                     ) {
