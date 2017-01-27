@@ -64,6 +64,27 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
 
     }
 
+    "there is no foreignCurrency flag but contains foreign currency form data" should {
+
+      val fullFormData = Map(
+        "currencies[0]" -> Seq("USD"),
+        "currencies[1]" -> Seq("CHF"),
+        "currencies[2]" -> Seq("EUR"),
+        "bankMoneySource" -> Seq("Yes"),
+        "bankNames" -> Seq("Bank names"),
+        "usesForeignCurrencies" -> Seq("Yes")
+      )
+
+      val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
+
+      "set usesForeignCurrencies to true" in {
+
+        WhichCurrencies.formW.writes(model) must be(fullFormData)
+
+      }
+
+    }
+
     "there is no bankMoneySource" should {
 
       val model = WhichCurrencies(

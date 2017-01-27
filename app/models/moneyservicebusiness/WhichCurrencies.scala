@@ -109,6 +109,12 @@ object WhichCurrencies {
       case _ => Some("No")
     }
 
+    val defaultFlagValue: (WhichCurrencies) => Option[String] = {
+      case x if x.customerMoneySource.contains(true) || x.bankMoneySource.isDefined || x.wholesalerMoneySource.isDefined => Some("Yes")
+      case _ if ApplicationConfig.release7 => Some("No")
+      case _ => None
+    }
+
     (
       (__ \ "currencies").write[Seq[String]] ~
         (__ \ "bankMoneySource").write[Option[String]] ~
@@ -123,7 +129,7 @@ object WhichCurrencies {
       wc.wholesalerMoneySource.map(_ => "Yes"),
       wc.wholesalerMoneySource.map(bms => bms.wholesalerNames),
       wc.customerMoneySource.map(_ => "Yes"),
-      wc.usesForeignCurrencies.fold[Option[String]](None)(bToS)
+      wc.usesForeignCurrencies.fold[Option[String]](defaultFlagValue(wc))(bToS)
       ))
   }
 
