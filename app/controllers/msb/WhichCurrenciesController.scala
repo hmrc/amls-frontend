@@ -1,9 +1,9 @@
 package controllers.msb
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness._
 import play.api.Logger
 import play.api.mvc.Request
