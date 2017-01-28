@@ -31,58 +31,95 @@
         }
     }
 
-
+    @if(config.ApplicationConfig.release7) {
 
         @fieldset(
-            legend = "msb.which_currencies.who",
+            legend = Messages("msb.which_currencies.foreign_currencies_question"),
             panel = false,
-            bold = false,
+            f = f("redundantvalue")
+        ){
+            @radio(
+                f = f("usesForeignCurrencies"),
+                labelText = "lbl.yes",
+                value = "Yes",
+                target = "#usesForeignCurrency-fieldset",
+                inline = true )
 
-            classes = Seq("form-field-group-end"),
-            hint = "lbl.select.all",
-            f = f("WhoWillSupply-fieldset")
-        ) {
-            @errorGroup(f("WhoWillSupply")) {
+            @radio(
+                f = f("usesForeignCurrencies"),
+                labelText = "lbl.no",
+                value = "No",
+                inline = true )
 
-                @checkbox(f("bankMoneySource"),
-                    "msb.which_currencies.source.banks",
-                    "Yes",
-                    target = ".form-group:has(#bankNames)")
-                    @fieldset(
-                        legend = "msb.which_currencies.source.which_banks",
-                        panel = false,
-                        classes = Seq("form-group visuallyhidden-legend"),
-                        f = f("bankNames-fieldset")
-                    ) {
-                        @input(f("bankNames"),
-                            labelText = "msb.which_currencies.source.which_banks",
-                            panel = true,
-                            jsHidden = true)
+            @panel(
+                field = Some(f("usesForeignCurrency-fieldset")),
+                jsHidden = false
+            ) {
+                @panelContents
+            }
+        }
 
-                    }
+    } else {
+        @panelContents
+    }
 
-                @checkbox(f("wholesalerMoneySource"),
-                    "msb.which_currencies.source.wholesalers",
-                    "Yes",
-                    target = ".form-group:has(#wholesalerNames)")
-                    @fieldset(
-                        legend = "msb.which_currencies.source.which_wholesalers",
-                        panel = false,
-                        classes = Seq("form-group visuallyhidden-legend"),
-                        f = f("wholesalerNames-fieldset")
-                    ) {
-                        @input(f("wholesalerNames"),
-                            labelText = "msb.which_currencies.source.which_wholesalers",
-                            panel = true,
-                            jsHidden = true)
-                    }
-                @checkbox(f("customerMoneySource"),
-                    "msb.which_currencies.source.customers",
-                    "Yes")
-                }
+    @submit()
+
+    }
+}
+
+@panelContents = {
+    @fieldset(
+        legend = "msb.which_currencies.who",
+        panel = false,
+        bold = false,
+
+        classes = Seq("form-field-group-end"),
+        hint = "lbl.select.all",
+        f = f("WhoWillSupply-fieldset")
+    ) {
+
+        @errorGroup(f("WhoWillSupply")) {
+
+            @checkbox(f("bankMoneySource"),
+                "msb.which_currencies.source.banks",
+                "Yes",
+                target = ".form-group:has(#bankNames)")
+
+            @fieldset(
+                legend = "msb.which_currencies.source.which_banks",
+                panel = false,
+                classes = Seq("form-group visuallyhidden-legend"),
+                f = f("bankNames-fieldset")
+            ) {
+                @input(f("bankNames"),
+                    labelText = "msb.which_currencies.source.which_banks",
+                    panel = true,
+                    jsHidden = true)
             }
 
+            @checkbox(
+                f("wholesalerMoneySource"),
+                "msb.which_currencies.source.wholesalers",
+                "Yes",
+                target = ".form-group:has(#wholesalerNames)")
 
-        @submit()
+            @fieldset(
+                legend = "msb.which_currencies.source.which_wholesalers",
+                panel = false,
+                classes = Seq("form-group visuallyhidden-legend"),
+                f = f("wholesalerNames-fieldset")
+            ) {
+                @input(f("wholesalerNames"),
+                labelText = "msb.which_currencies.source.which_wholesalers",
+                panel = true,
+                jsHidden = true)
+            }
+
+            @checkbox(
+                f("customerMoneySource"),
+                "msb.which_currencies.source.customers",
+                "Yes")
+        }
     }
 }

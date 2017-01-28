@@ -2,6 +2,8 @@ package models.moneyservicebusiness
 
 import config.ApplicationConfig
 import models._
+import config.ApplicationConfig
+import models._
 import jto.validation.GenericRules._
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
