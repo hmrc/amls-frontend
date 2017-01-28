@@ -77,7 +77,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[VATRegistered](Json.obj("registeredForVAT" -> false)) must
-        be(JsSuccess(VATRegisteredNo, JsPath \ "registeredForVAT"))
+        be(JsSuccess(VATRegisteredNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -85,7 +85,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForVAT" -> true, "vrnNumber" ->"12345678")
 
       Json.fromJson[VATRegistered](json) must
-        be(JsSuccess(VATRegisteredYes("12345678"), JsPath \ "registeredForVAT" \ "vrnNumber"))
+        be(JsSuccess(VATRegisteredYes("12345678"), JsPath \ "vrnNumber"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -93,7 +93,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForVAT" -> true)
 
       Json.fromJson[VATRegistered](json) must
-        be(JsError((JsPath \ "registeredForVAT" \ "vrnNumber") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "vrnNumber") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

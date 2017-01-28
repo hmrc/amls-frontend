@@ -77,7 +77,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "Deserialise single service as expected" in {
       val json = Json.obj("services" -> Set("01"))
-      val expected = JsSuccess(ProvidedServices(Set(PhonecallHandling)), JsPath \ "services")
+      val expected = JsSuccess(ProvidedServices(Set(PhonecallHandling)), JsPath )
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 
@@ -85,13 +85,13 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("services" -> Seq("01", "02", "03", "04", "05", "06", "07"))
       val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
                                          SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
-      val expected = JsSuccess(ProvidedServices(allServices), JsPath \ "services")
+      val expected = JsSuccess(ProvidedServices(allServices), JsPath )
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 
     "Deserialise 'other' service as expected" in {
       val json = Json.obj("services" -> Set("08"), "details" -> "other service")
-      val expected = JsSuccess(ProvidedServices(Set(Other("other service"))), JsPath \ "services" \ "details")
+      val expected = JsSuccess(ProvidedServices(Set(Other("other service"))), JsPath )
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 

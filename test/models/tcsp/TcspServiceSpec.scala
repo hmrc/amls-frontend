@@ -1,11 +1,12 @@
 package models.tcsp
 
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import utils.GenericTestHelper
 
-class TcspServiceSpec extends PlaySpec {
+class TcspServiceSpec extends GenericTestHelper {
 
   "TcspService" should {
 

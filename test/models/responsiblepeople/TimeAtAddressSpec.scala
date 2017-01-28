@@ -51,10 +51,10 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
 
-      Json.fromJson[TimeAtAddress](ZeroToFiveJson) must be(JsSuccess(TimeAtAddress.ZeroToFiveMonths, JsPath \ FieldName))
-      Json.fromJson[TimeAtAddress](SixToElevenJson) must be(JsSuccess(TimeAtAddress.SixToElevenMonths, JsPath \ FieldName))
-      Json.fromJson[TimeAtAddress](OneToThreeJson) must be(JsSuccess(TimeAtAddress.OneToThreeYears, JsPath \ FieldName))
-      Json.fromJson[TimeAtAddress](MoreThanThreeJson) must be(JsSuccess(TimeAtAddress.ThreeYearsPlus, JsPath \ FieldName))
+      Json.fromJson[TimeAtAddress](ZeroToFiveJson) must be(JsSuccess(TimeAtAddress.ZeroToFiveMonths, JsPath))
+      Json.fromJson[TimeAtAddress](SixToElevenJson) must be(JsSuccess(TimeAtAddress.SixToElevenMonths, JsPath))
+      Json.fromJson[TimeAtAddress](OneToThreeJson) must be(JsSuccess(TimeAtAddress.OneToThreeYears, JsPath))
+      Json.fromJson[TimeAtAddress](MoreThanThreeJson) must be(JsSuccess(TimeAtAddress.ThreeYearsPlus, JsPath))
     }
 
     "write the correct value" in {
@@ -66,7 +66,7 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[TimeAtAddress](Json.obj(FieldName -> "20")) must
-        be(JsError(JsPath \ FieldName, play.api.data.validation.ValidationError("error.invalid")))
+        be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 }

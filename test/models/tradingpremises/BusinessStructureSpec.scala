@@ -38,19 +38,19 @@ class BusinessStructureSpec extends PlaySpec {
 
     "Read JSON data successfully" in {
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "01")) must be(JsSuccess(SoleProprietor,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "02")) must be(JsSuccess(LimitedLiabilityPartnership,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "03")) must be(JsSuccess(Partnership,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "04")) must be(JsSuccess(IncorporatedBody,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "05")) must be(JsSuccess(UnincorporatedBody,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
     }
 
     "Write JSON data successfully" in {
@@ -64,7 +64,7 @@ class BusinessStructureSpec extends PlaySpec {
 
     "throw error for invalid data" in {
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "20")) must
-        be(JsError(JsPath \ "agentsBusinessStructure", play.api.data.validation.ValidationError("error.invalid")))
+        be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 
