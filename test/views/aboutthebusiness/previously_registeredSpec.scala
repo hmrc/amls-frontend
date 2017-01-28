@@ -38,7 +38,7 @@ class previously_registeredSpec extends GenericTestHelper with MustMatchers  {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "previouslyRegistered") -> Seq(ValidationError("not a message Key")),
-          (Path \ "prevMLRRegNo-fieldset") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "prevMLRRegNo-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
       def view = views.html.aboutthebusiness.previously_registered(form2, true)
@@ -49,7 +49,7 @@ class previously_registeredSpec extends GenericTestHelper with MustMatchers  {
       doc.getElementById("previouslyRegistered")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("prevMLRRegNo-fieldset")
+      doc.getElementById("prevMLRRegNo-panel")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }

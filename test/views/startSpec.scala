@@ -17,7 +17,7 @@ class startSpec extends GenericTestHelper with MustMatchers {
       def view = views.html.start()
 
       heading.html must be (Messages("start.title"))
-      subHeading.html must include (Messages("progress.businessmatching.name"))
+
     }
 
     "contain the expected content elements" in new ViewFixture{

@@ -7,10 +7,10 @@
 
 @* http://hmrc.github.io/assets-frontend/section-details.html *@
 <div class="form-group">
-<details role="group">
-    <summary class="@summaryClasses.mkString(" ")">@summary</summary>
-    <div@if(detailsInner) { class="details__inner"}>
-        @content
-    </div>
-</details>
+    <details role="group">
+        <summary class="@summaryClasses.mkString(" ")">@summary</summary>
+        <div@if(detailsInner) { class="details__inner"}>
+            @content
+        </div>
+    </details>
 </div>

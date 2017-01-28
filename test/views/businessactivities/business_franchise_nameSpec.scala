@@ -44,7 +44,7 @@ class business_franchise_nameSpec extends GenericTestHelper with MustMatchers  {
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("franchiseName-fieldset")
+      doc.getElementById("franchiseName-panel")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
       doc.getElementById("businessFranchise")

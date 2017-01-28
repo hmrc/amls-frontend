@@ -8,14 +8,23 @@
     data: Seq[String] = Seq.empty,
     wide: Boolean = false,
     gutter: Boolean = false,
-    f: forms.Field = forms.ValidField(PM.asPath("/default/path"), Seq("defaultVal"))
-)(content: Html)(implicit lang:Lang,  m: Messages)
+    field: Option[forms.Field] = None
+)(content: Html)(implicit lang: Lang, m: Messages)
 
-<div
-  @if(f.id.nonEmpty){ id="@f.id"}
-  class="@if(panel){ panel-indent}@if(wide){ panel-border-wide} @if(gutter){panel-indent--gutter}@if(f.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
-    @if(f.hasErrors) {
-        <span class="error-notification">@f.error</span>
+    @classDefs = {classes ++ defineClass(panel "panel-indent"), (wide, "panel-border-wide") (gutter, "panel-indent--gutter"), (field.get.hasErrors, "form-field--error"), (jsHidden, "amls-js-hidden"))}
+
+    @if(field.isDefined) {
+        <div
+                @if(field.get.id.nonEmpty){ id="@field.get.id"}
+                class="@if(panel){ panel-indent}@if(wide){ panel-border-wide} @if(gutter){panel-indent--gutter}@if(field.get.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")
+        >
+        @if(field.get.hasErrors) {
+            <span class="error-notification">@field.get.error</span>
+        }
+    } else {
+        <div
+                class="@if(panel){ panel-indent }@if(wide){ panel-border-wide }@if(jsHidden){ amls-js-hidden } @classes.mkString(" ")" @data.mkString(" ")
+        >
     }
     @content
 </div>

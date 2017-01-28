@@ -38,7 +38,7 @@ class corporation_tax_registeredSpec extends GenericTestHelper with MustMatchers
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
           (Path \ "registeredForCorporationTax") -> Seq(ValidationError("not a message Key")),
-          (Path \ "corporationTaxReference-fieldset") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "corporationTaxReference-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
       def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
@@ -49,7 +49,7 @@ class corporation_tax_registeredSpec extends GenericTestHelper with MustMatchers
       doc.getElementById("registeredForCorporationTax")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("corporationTaxReference-fieldset")
+      doc.getElementById("corporationTaxReference-panel")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }

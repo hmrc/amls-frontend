@@ -3,6 +3,10 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
+@target = @{
+    s"""${f("corporationTaxReference").id}-panel"""
+}
+
 @header = {
     @errorSummary(f)
     @heading("aboutthebusiness.registeredforcorporationtax.title", "summary.aboutbusiness")
@@ -32,7 +36,7 @@
                     labelText = "lbl.yes",
                     value = "true",
                     inline = true,
-                    target = s".corporationTaxReference-fieldset"
+                    target = s".$target"
                 )
                 @radio(
                     f = f("registeredForCorporationTax"),
@@ -40,19 +44,20 @@
                     value = "false",
                     inline = true
                 )
-                @panel(
-                        f = f("corporationTaxReference-fieldset"),
-                        classes = Seq("corporationTaxReference-fieldset"),
-                        jsHidden = false
-                    ) {
-                    @input(
-                        field = f("corporationTaxReference"),
-                        labelText = "aboutthebusiness.registeredforcorporationtax.taxReference",
-                        hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
-                        bold = false
-                    )
-                }
             }
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            classes = Seq(s"$target"),
+            jsHidden = false
+        ) {
+            @input(
+                field = f("corporationTaxReference"),
+                labelText = "aboutthebusiness.registeredforcorporationtax.taxReference",
+                hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+                bold = false
+            )
         }
 
         @submit(edit)
