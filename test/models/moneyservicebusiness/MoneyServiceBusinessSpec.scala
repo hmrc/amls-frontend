@@ -4,14 +4,14 @@ import models.Country
 import models.businessmatching._
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import play.api.mvc.Call
 
-class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServiceBusinessTestData {
+class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServiceBusinessTestData with OneAppPerSuite{
 
   "MoneyServiceBusiness" should {
 
@@ -110,9 +110,10 @@ trait MoneyServiceBusinessTestData {
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
     Some(WhichCurrencies(
       Seq("USD", "GBP", "EUR"),
+      usesForeignCurrencies = Some(true),
       Some(BankMoneySource("bank names")),
       Some(WholesalerMoneySource("Wholesaler Names")),
-      true)),
+      Some(true))),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
     branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),
@@ -139,7 +140,8 @@ trait MoneyServiceBusinessTestData {
       "bankNames" -> "bank names",
       "wholesalerMoneySource" -> "Yes",
       "wholesalerNames" -> "Wholesaler Names",
-      "customerMoneySource" -> "Yes"
+      "customerMoneySource" -> "Yes",
+      "usesForeignCurrencies" -> true
     ),
     "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
     "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),

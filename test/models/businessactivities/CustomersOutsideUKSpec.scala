@@ -22,7 +22,6 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "round trip through forms correctly" in {
 
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"), Country("India", "IN"))))
-      println(write.writes(model))
       rule.validate(write.writes(model)) mustBe Valid(model)
     }
 

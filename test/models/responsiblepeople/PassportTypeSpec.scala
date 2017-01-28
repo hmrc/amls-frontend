@@ -71,26 +71,26 @@ class PassportTypeSpec extends PlaySpec {
       "Read the json and return the PassportType domain object successfully for the NoPassport" in {
 
         PassportType.jsonReads.reads(PassportType.jsonWrites.writes(NoPassport)) must
-          be(JsSuccess(NoPassport, JsPath \ "passportType"))
+          be(JsSuccess(NoPassport, JsPath))
       }
 
       "Read the json and return NonUKPassport" in {
         val model = NonUKPassport("21321313213132132")
         PassportType.jsonReads.reads(PassportType.jsonWrites.writes(model)) must
-          be(JsSuccess(model, JsPath \ "passportType" \ "nonUKPassportNumber"))
+          be(JsSuccess(model, JsPath \ "nonUKPassportNumber"))
       }
 
       "Read the json and return UKPassport" in {
         val model = UKPassport("AA2132131")
         PassportType.jsonReads.reads(PassportType.jsonWrites.writes(model)) must
-          be(JsSuccess(model, JsPath \ "passportType" \ "ukPassportNumber"))
+          be(JsSuccess(model, JsPath \ "ukPassportNumber"))
       }
 
       "Read the json and return error if an invalid value is found" in {
         val json = Json.obj(
           "passportType" -> "09"
         )
-        PassportType.jsonReads.reads(json) must be(JsError((JsPath \ "passportType") -> play.api.data.validation.ValidationError("error.invalid")))
+        PassportType.jsonReads.reads(json) must be(JsError((JsPath) -> play.api.data.validation.ValidationError("error.invalid")))
       }
     }
   }

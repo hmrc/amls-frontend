@@ -15,7 +15,7 @@ sealed trait CustomersOutsideUK0 {
   val maxLength = 10
 
   import JsonMapping._
-  import utils.MappingUtils.Implicits._
+
 
   private implicit def rule[A]
   (implicit
@@ -52,23 +52,20 @@ sealed trait CustomersOutsideUK0 {
       } fmap CustomersOutsideUK.apply
     }
 
-
-
-
-  private implicit def write
+  private implicit def write[A]
   (implicit
-   mon:cats.Monoid[UrlFormEncoded],
-   a: Path => WriteLike[Boolean, UrlFormEncoded],
-   b: Path => WriteLike[Option[Seq[Country]] , UrlFormEncoded]
-  ): Write[CustomersOutsideUK, UrlFormEncoded] =
-    To[UrlFormEncoded] { __ =>
+   mon: cats.Monoid[A],
+   a: Path => WriteLike[Boolean, A],
+   b: Path => WriteLike[Option[Seq[Country]], A]
+  ): Write[CustomersOutsideUK, A] =
+    To[A] { __ =>
       (
         (__ \ "isOutside").write[Boolean].contramap[Option[_]] {
           case Some(_) => true
           case None => false
         } ~
           (__ \ "countries").write[Option[Seq[Country]]]
-        )(a => (a.countries, a.countries))
+        ) (a => (a.countries, a.countries))
     }
 
   val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = {
@@ -83,21 +80,22 @@ sealed trait CustomersOutsideUK0 {
 
   val formW: Write[CustomersOutsideUK, UrlFormEncoded] = {
     import cats.implicits._
+    import utils.MappingUtils.MonoidImplicits.urlMonoid
     import jto.validation.forms.Writes._
     implicitly
   }
 
-  val jsonW = Writes[CustomersOutsideUK]  {x =>
+  val jsonW = Writes[CustomersOutsideUK] { x =>
     val countries = x.countries.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
-     countries.nonEmpty match {
-       case true =>  Json.obj(
-         "isOutside" -> true,
-         "countries" -> countries
-       )
-       case false =>
-         Json.obj(
-           "isOutside" -> false
-         )
+    countries.nonEmpty match {
+      case true => Json.obj(
+        "isOutside" -> true,
+        "countries" -> countries
+      )
+      case false =>
+        Json.obj(
+          "isOutside" -> false
+        )
     }
   }
 }

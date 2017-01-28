@@ -61,7 +61,6 @@ class ActivityEndDateSpec extends PlaySpec {
     "Json" should {
 
       "Read and write successfully" in {
-
         ActivityEndDate.format.reads(ActivityEndDate.format.writes(ActivityEndDate(new LocalDate(1990, 2, 24)))) must be(
           JsSuccess(ActivityEndDate(new LocalDate(1990, 2, 24)), JsPath \ "endDate"))
 

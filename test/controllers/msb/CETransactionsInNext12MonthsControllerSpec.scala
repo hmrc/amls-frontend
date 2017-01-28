@@ -32,9 +32,10 @@ class CETransactionsInNext12MonthsControllerSpec extends GenericTestHelper with 
 
   val fullModel = WhichCurrencies(
     Seq("USD", "CHF", "EUR"),
+    Some(false),
     Some(BankMoneySource("Bank names")),
     Some(WholesalerMoneySource("wholesaler names")),
-    true
+    Some(true)
   )
 
   "CETransactionsInNext12MonthsController" must {

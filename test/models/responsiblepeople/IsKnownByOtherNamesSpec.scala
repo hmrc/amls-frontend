@@ -123,7 +123,7 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
       )
 
       IsKnownByOtherNames.jsonReads.reads(json) must
-        be(JsSuccess(IsKnownByOtherNamesYes("John", Some("Envy"), "Doe"), JsPath \ "isKnownByOtherNames"))
+        be(JsSuccess(IsKnownByOtherNamesYes("John", Some("Envy"), "Doe"), JsPath ))
     }
 
     "Write the json successfully from the InKnownByOtherNamesYes domain object created" in {

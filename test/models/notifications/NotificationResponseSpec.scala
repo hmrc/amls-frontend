@@ -2,7 +2,7 @@ package models.notifications
 
 import org.joda.time.LocalDateTime
 import org.scalatest.WordSpec
-import org.scalatest.matchers.MustMatchers
+import org.scalatest.MustMatchers
 import play.api.libs.json.Json
 
 class NotificationResponseSpec extends WordSpec with MustMatchers {

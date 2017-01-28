@@ -79,23 +79,23 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
 
     "Read json and write the option British successfully" in {
 
-      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(British)) must be(JsSuccess(British, JsPath \ "nationality"))
+      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(British)) must be(JsSuccess(British, JsPath))
     }
 
     "Read json and write the option Irish successfully" in {
 
-      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(Irish)) must be(JsSuccess(Irish, JsPath \ "nationality"))
+      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(Irish)) must be(JsSuccess(Irish, JsPath))
     }
 
     "Read read and write the option `other country` successfully" in {
       val json = Nationality.jsonWrites.writes(OtherCountry(Country("United Kingdom", "GB")))
       Nationality.jsonReads.reads(json) must be(
-        JsSuccess(OtherCountry(Country("United Kingdom", "GB")), JsPath \ "nationality" \ "otherCountry"))
+        JsSuccess(OtherCountry(Country("United Kingdom", "GB")), JsPath \ "otherCountry"))
     }
 
     "fail to validate given an invalid value supplied that is not matching to any nationality" in {
 
-      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath \ "nationality", List(play.api.data.validation.ValidationError("error.invalid"))))))
+      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath, List(play.api.data.validation.ValidationError("error.invalid"))))))
 
     }
   }

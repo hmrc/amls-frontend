@@ -14,7 +14,7 @@ sealed trait BranchesOrAgents0 {
   val maxLength = 10
 
   import JsonMapping._
-  import utils.MappingUtils.Implicits._
+  import utils.MappingUtils.MonoidImplicits._
 
   private implicit def rule[A]
   (implicit

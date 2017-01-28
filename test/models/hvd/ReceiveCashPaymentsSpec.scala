@@ -3,7 +3,7 @@ package models.hvd
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{Json, JsSuccess}
+import play.api.libs.json.{JsPath, Json, JsSuccess}
 
 class ReceiveCashPaymentsSpec extends PlaySpec {
 
@@ -13,14 +13,20 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
 
     "roundtrip through form" in {
       val data = ReceiveCashPayments(Some(paymentMethods))
-      println(ReceiveCashPayments.formW.writes(data))
       ReceiveCashPayments.formR.validate(ReceiveCashPayments.formW.writes(data)) mustEqual Valid(data)
     }
 
     "roundtrip through json" in {
       val data = ReceiveCashPayments(Some(paymentMethods))
+      ReceiveCashPayments.jsonR.reads(ReceiveCashPayments.jsonW.writes(data)) mustEqual JsSuccess(data, JsPath \"paymentMethods")
+    }
+
+
+    "roundtrip through json1" in {
+      val data = ReceiveCashPayments(None)
       ReceiveCashPayments.jsonR.reads(ReceiveCashPayments.jsonW.writes(data)) mustEqual JsSuccess(data)
     }
+
 
     "fail to validate when no choice is made for main question" in {
       val data = Map.empty[String, Seq[String]]

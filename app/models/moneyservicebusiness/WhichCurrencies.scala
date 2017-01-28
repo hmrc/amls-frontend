@@ -1,143 +1,230 @@
 package models.moneyservicebusiness
 
-import javassist.runtime.Inner
-
-import jto.validation
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.GenericRules._
-import play.api.libs.functional.Monoid
-import play.api.libs.json.{Writes, JsValue, Reads, Format}
-import utils.OptionValidators._
-import utils.{GenericValidators, TraversableValidators}
-import utils.MappingUtils.Implicits._
+import config.ApplicationConfig
 import models._
+import jto.validation.GenericRules._
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import play.api.libs.json._
+import utils.MappingUtils.Implicits._
+import utils.{GenericValidators, TraversableValidators}
+
+case class WhichCurrencies(currencies: Seq[String],
+                           usesForeignCurrencies: Option[Boolean],
+                           bankMoneySource: Option[BankMoneySource],
+                           wholesalerMoneySource: Option[WholesalerMoneySource],
+                           customerMoneySource: Option[Boolean])
 
 
+object WhichCurrencies {
 
-case class WhichCurrencies(currencies : Seq[String]
-                           , bankMoneySource : Option[BankMoneySource]
-                           , wholesalerMoneySource : Option[WholesalerMoneySource]
-                           , customerMoneySource : Boolean)
+  type MoneySource = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
 
-private sealed trait WhichCurrencies0 {
-
-  val emptyToNone: String => Option[String] = {x =>
+  val emptyToNone: String => Option[String] = { x =>
     x.trim() match {
       case "" => None
       case s => Some(s)
     }
   }
 
-  private def nameType(fieldName : String) = {
-    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
+  private def nameType(fieldName: String) = {
+    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") compose
       maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long")
   }
 
-  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
-                              TraversableValidators.flattenR[String] andThen
-                              TraversableValidators.minLengthR[Seq[String]](1) andThen
-                              GenericRules.traversableR(GenericValidators.inList(currencies))
+  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
+    TraversableValidators.flattenR[String] compose
+    TraversableValidators.minLengthR[Seq[String]](1) compose
+    GenericRules.traversableR(GenericValidators.inList(currencies))
 
-  private val validateMoneySources : ValidationRule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] =
-    Rule[(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean),
-        (Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)] {
-    case x@(Some(_), _, _) => Success(x)
-    case x@( _, Some(_), _) => Success(x)
-    case x@( _, _, true) => Success(x)
-    case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+  private val validateMoneySources: ValidationRule[MoneySource] = Rule[MoneySource, MoneySource] {
+      case x@(Some(_), _, _) => Success(x)
+      case x@(_, Some(_), _) => Success(x)
+      case x@(_, _, Some(true)) => Success(x)
+      case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+    }
+
+  implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+
+    val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
+
+    val usesForeignCurrencies = ApplicationConfig.release7 match {
+      case true =>
+        (__ \ "usesForeignCurrencies").read[String] withMessage "error.required.msb.wc.foreignCurrencies" fmap {
+          case "Yes" => Some(true)
+          case _ => Some(false)
+        }
+      case _ => Rule[UrlFormEncoded, Option[Boolean]](_ => Success(None))
+    }
+
+    val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
+      (__ \ "bankMoneySource").read[Option[String]] flatMap {
+        case Some("Yes") => (__ \ "bankNames")
+          .read(nameType("bankNames"))
+          .fmap(names => Some(BankMoneySource(names)))
+        case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Success(None))
+      }
+
+    val wholesalerMoneySource: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] =
+      (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
+        case Some("Yes") => (__ \ "wholesalerNames")
+          .read(nameType("wholesalerNames"))
+          .fmap(names => Some(WholesalerMoneySource(names)))
+        case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Success(None))
+      }
+
+    val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] fmap {
+      case Some("Yes") => Some(true)
+      case _ => None
+    }
+
+    def build(foreignCurrencyFlag: Option[Boolean]) =
+      (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
+        .apply { (a: Traversable[String], b: MoneySource) =>
+          (a, b) match {
+            case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, foreignCurrencyFlag, bms, wms, cms)
+          }
+        }
+
+    ApplicationConfig.release7 match {
+      case true =>
+        usesForeignCurrencies flatMap {
+          case flag@Some(true) => build(flag)
+          case flag =>
+            currencies compose Rule.fromMapping[Traversable[String], WhichCurrencies] { c =>
+              Success(WhichCurrencies(c.toSeq, flag, None, None, None))
+            }
+        }
+      case _ => build(None)
+    }
+
   }
 
-  private implicit def rule[A]
-    (implicit
-      a : Path => RuleLike[A, Seq[String]],
-      b: Path => RuleLike[A, Option[String]],
-      d: Path => RuleLike[A, String],
-      c: Path => RuleLike[A, Boolean]
-    ) : Rule[A, WhichCurrencies] = From[A] {__ =>
+  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Writes._
 
-        val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
-
-        val bankMoneySource : Rule[A, Option[BankMoneySource]]=
-            (__ \ "bankMoneySource").read[Option[String]] flatMap {
-              case Some("Yes") => (__ \ "bankNames")
-                                    .read(nameType("bankNames"))
-                                    .map(names => Some(BankMoneySource(names)))
-              case _ => Rule[A, Option[BankMoneySource]](_ => Success(None))
-            }
-
-        val wholesalerMoneySource : Rule[A, Option[WholesalerMoneySource]]=
-          (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
-            case Some("Yes") => (__ \ "wholesalerNames")
-                                  .read(nameType("wholesalerNames"))
-                                  .map(names => Some(WholesalerMoneySource(names)))
-            case _ => Rule[A, Option[WholesalerMoneySource]](_ => Success(None))
-          }
-
-          val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] map {
-            case Some("Yes") => true
-            case _ => false
-          }
-
-      (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources))
-        .apply {(a:Traversable[String], b:(Option[BankMoneySource], Option[WholesalerMoneySource], Boolean)) =>
-          (a, b) match {
-            case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, bms, wms, cms)
-          }
+    val bToS: (Boolean) => Option[String] = {
+      case true => Some("Yes")
+      case _ => Some("No")
     }
-}
 
-    private implicit def write[A]
-    (implicit
-    m: cats.Monoid[A],
-    a: Path => WriteLike[Seq[String], A],
-    b: Path => WriteLike[String, A],
-    c: Path => WriteLike[Option[String], A]
-    ) : Write[WhichCurrencies, A] = To[A] { __ =>
-      (
-        (__ \ "currencies").write[Seq[String]] ~
+    val defaultFlagValue: (WhichCurrencies) => Option[String] = {
+      case x if ApplicationConfig.release7 && (x.customerMoneySource.contains(true) || x.bankMoneySource.isDefined || x.wholesalerMoneySource.isDefined) =>
+        Some("Yes")
+      case _ if ApplicationConfig.release7 =>
+        Some("No")
+      case _ => None
+    }
+
+    (
+      (__ \ "currencies").write[Seq[String]] ~
         (__ \ "bankMoneySource").write[Option[String]] ~
         (__ \ "bankNames").write[Option[String]] ~
         (__ \ "wholesalerMoneySource").write[Option[String]] ~
         (__ \ "wholesalerNames").write[Option[String]] ~
-        (__ \ "customerMoneySource").write[Option[String]]
+        (__ \ "customerMoneySource").write[Option[String]] ~
+        (__ \ "usesForeignCurrencies").write[Option[String]]
       ).apply(wc => (wc.currencies,
-                      wc.bankMoneySource.map(_ => "Yes"),
-                      wc.bankMoneySource.map(bms => bms.bankNames),
-                      wc.wholesalerMoneySource.map(_ => "Yes"),
-                      wc.wholesalerMoneySource.map(bms => bms.wholesalerNames),
-                      if (wc.customerMoneySource) Some("Yes") else None
-                      ))
+      wc.bankMoneySource.map(_ => "Yes"),
+      wc.bankMoneySource.map(bms => bms.bankNames),
+      wc.wholesalerMoneySource.map(_ => "Yes"),
+      wc.wholesalerMoneySource.map(bms => bms.wholesalerNames),
+      wc.customerMoneySource.map(_ => "Yes"),
+      wc.usesForeignCurrencies.fold[Option[String]](defaultFlagValue(wc))(bToS)
+      ))
+  }
+
+  implicit val bmsReader: Reads[Option[BankMoneySource]] = {
+
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    ((__ \ "bankMoneySource").readNullable[String] and
+      (__ \ "bankNames").readNullable[String])((a, b) => (a, b) match {
+      case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
+      case _ => None
+    })
+
+  }
+
+  implicit val bmsWriter = new Writes[Option[BankMoneySource]] {
+    override def writes(o: Option[BankMoneySource]): JsValue = o match {
+      case Some(x) => Json.obj("bankMoneySource" -> "Yes",
+        "bankNames" -> x.bankNames)
+      case _ => Json.obj()
     }
-
-  val formR: Rule[UrlFormEncoded, WhichCurrencies] = {
-    import jto.validation.forms.Rules._
-    implicitly
   }
 
-  val formW: Write[WhichCurrencies, UrlFormEncoded] = {
-    import jto.validation.forms.Writes._
-    implicitly
+  implicit val wsReader: Reads[Option[WholesalerMoneySource]] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    ((__ \ "wholesalerMoneySource").readNullable[String] and
+      (__ \ "wholesalerNames").readNullable[String])((a, b) => (a, b) match {
+      case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
+      case _ => None
+    })
   }
 
-  val jsonR: Reads[WhichCurrencies] = {
-    import utils.JsonMapping._
-    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
-
-    implicitly[Reads[WhichCurrencies]]
+  implicit val wsWriter = new Writes[Option[WholesalerMoneySource]] {
+    override def writes(o: Option[WholesalerMoneySource]): JsValue = o match {
+      case Some(x) => Json.obj("wholesalerMoneySource" -> "Yes",
+        "wholesalerNames" -> x.wholesalerNames)
+      case _ => Json.obj()
+    }
   }
 
+  val cmsReader: Reads[Boolean] = {
+    __.read[String] map {
+      case "Yes" => true
+      case _ => false
+    }
+  }
 
-  val jsonW: Writes[WhichCurrencies] = {
-    implicitly[Writes[WhichCurrencies]]
+  val cmsWriter = new Writes[Boolean] {
+    override def writes(o: Boolean): JsValue = o match {
+      case true => JsString("Yes")
+      case _ => JsNull
+    }
+  }
+
+  implicit val jsonR: Reads[WhichCurrencies] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    (
+      (__ \ "currencies").read[Seq[String]] and
+        (__ \ "usesForeignCurrencies").readNullable[Boolean] and
+        __.read[Option[BankMoneySource]] and
+        __.read[Option[WholesalerMoneySource]] and
+        (__ \ "customerMoneySource").readNullable(cmsReader)
+      )(WhichCurrencies.apply _)
+
+  }
+
+  implicit val jsonW: Writes[WhichCurrencies] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    (
+      (__ \ "currencies").write[Seq[String]] and
+        (__ \ "usesForeignCurrencies").writeNullable[Boolean] and
+        __.write[Option[BankMoneySource]] and
+        __.write[Option[WholesalerMoneySource]] and
+        (__ \ "customerMoneySource").writeNullable(cmsWriter)
+
+      )(x => (x.currencies, x.usesForeignCurrencies, x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
+
   }
 }
 
-object WhichCurrencies {
-  private object Cache extends WhichCurrencies0
-
-  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = Cache.formW
-  implicit val formR: Rule[UrlFormEncoded, WhichCurrencies] = Cache.formR
-  implicit val jsonR: Reads[WhichCurrencies] = Cache.jsonR
-  implicit val jsonW: Writes[WhichCurrencies] = Cache.jsonW
-}
+//object WhichCurrencies {
+//
+//  private object Cache extends WhichCurrencies0
+//
+//  implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = Cache.formW
+//  implicit val formR: Rule[UrlFormEncoded, WhichCurrencies] = Cache.formR
+//  implicit val jsonR: Reads[WhichCurrencies] = Cache.jsonR
+//  implicit val jsonW: Writes[WhichCurrencies] = Cache.jsonW
+//}

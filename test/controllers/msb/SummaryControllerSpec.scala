@@ -39,9 +39,10 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
       Some(WhichCurrencies(
         Seq("USD", "GBP", "EUR"),
+        None,
         Some(BankMoneySource("bank names")),
         Some(WholesalerMoneySource("Wholesaler Names")),
-        true)),
+        Some(true))),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
       branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),

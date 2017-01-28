@@ -4,6 +4,7 @@ import jto.validation._
 import jto.validation.forms._
 import jto.validation.ValidationError
 import play.api.libs.json.{Json, Reads, Writes}
+import utils.JsonMapping
 
 case class PaymentMethods(
                          courier: Boolean,
@@ -14,12 +15,8 @@ case class PaymentMethods(
 sealed trait PaymentMethods0 {
 
   // This could be made more generic...
-  import utils.MappingUtils.Implicits._
-  private implicit def r[I, O]
-  (implicit
-    r: Rule[I, O]
-  ): Rule[I, Option[O]] =
-    r.map(Some.apply).orElse(Rule(_ => Success(None)))
+  import JsonMapping._
+  import utils.MappingUtils.MonoidImplicits._
 
   private implicit def rule[A]
   (implicit
@@ -110,7 +107,7 @@ sealed trait PaymentMethods0 {
     val jsDetails = Json.obj("details" -> x.other)
     x.other.isDefined match {
       case true => jsMethods ++ jsDetails
-      case false => jsDetails
+      case false => jsMethods
     }
 
   }
