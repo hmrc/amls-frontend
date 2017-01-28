@@ -7,6 +7,7 @@ import jto.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
 import jto.validation.GenericRules
 import jto.validation.forms.PM._
+import play.api.libs.json.{Json, JsObject}
 
 import scala.collection.{GenTraversableOnce, TraversableLike}
 
@@ -125,6 +126,17 @@ trait MappingUtils {
     implicit def toFailureRule[A](f: (Path, Seq[ValidationError])): Rule[UrlFormEncoded, A] =
       Rule { _ => Failure(f) }
 
+
+    import cats.Monoid
+    implicit def jsonMonoid = new Monoid[JsObject] {
+      def combine(a1: JsObject, a2: JsObject) = a1 deepMerge a2
+      def empty = Json.obj()
+    }
+
+    implicit def urlMonoid = new Monoid[UrlFormEncoded] {
+      def combine(a1: UrlFormEncoded, a2: UrlFormEncoded) = a1.++:(a2)
+      def empty = Map.empty
+    }
 
     /*
    * Json reads implicits

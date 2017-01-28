@@ -45,7 +45,6 @@ class HvdSpec extends PlaySpec with MockitoSugar{
     "Serialise as expected" in {
       Json.toJson(completeModel) must be(completeJson)
     }
-
     "Deserialise as expected" in {
       completeJson.as[Hvd] must be(completeModel)
     }

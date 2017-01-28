@@ -3,7 +3,6 @@ package models.moneyservicebusiness
 import models.Country
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import play.api.libs.functional.Monoid
 import play.api.libs.json.{Json, Reads, Writes}
 import utils.{JsonMapping, TraversableValidators}
 
@@ -15,6 +14,7 @@ sealed trait BranchesOrAgents0 {
   val maxLength = 10
 
   import JsonMapping._
+  import utils.MappingUtils.Implicits._
 
   private implicit def rule[A]
   (implicit
@@ -52,16 +52,16 @@ sealed trait BranchesOrAgents0 {
     }
 
 
-  private implicit def write[A]
+  private implicit def write
   (implicit
-   mon: cats.Monoid[A],
-   a: Path => WriteLike[Boolean, A],
-   b: Path => WriteLike[Option[Seq[Country]], A]
-  ): Write[BranchesOrAgents, A] =
-    To[A] { __ =>
+   mon: cats.Monoid[UrlFormEncoded],
+   a: Path => WriteLike[Boolean, UrlFormEncoded],
+   b: Path => WriteLike[Option[Seq[Country]], UrlFormEncoded]
+  ): Write[BranchesOrAgents, UrlFormEncoded] =
+    To[UrlFormEncoded] { __ =>
       (
         (__ \ "hasCountries").write[Boolean].contramap[Option[Seq[_]]] {
-          case Some(x) if x.size == 0 => false
+          case Some(x) if x.isEmpty => false
           case Some(_) => true
           case None => false
         } ~
@@ -79,23 +79,13 @@ sealed trait BranchesOrAgents0 {
     implicitly
   }
 
-  implicit def formW (implicit
-                      w: Write[BranchesOrAgents, UrlFormEncoded]
-                     ) = Write[BranchesOrAgents, UrlFormEncoded] {x =>
-    val branches = x.branches.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
-    branches.nonEmpty match {
-      case true =>Map(
-        "hasCountries" -> Seq("true"),
-        "countries" -> branches
-      )
-      case false =>Map(
-        "hasCountries" -> Seq("false")
-      )
-    }
-
+  val formW: Write[BranchesOrAgents, UrlFormEncoded] = {
+    import cats.implicits._
+    import jto.validation.forms.Writes._
+    implicitly
   }
 
-  val jsonW: Writes[BranchesOrAgents] = Writes {x =>
+  val jsonW = Writes[BranchesOrAgents] {x =>
     val countries = x.branches.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
     countries.nonEmpty match {
       case true =>  Json.obj(

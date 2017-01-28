@@ -8,6 +8,7 @@ import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class CustomersOutsideUKSpec extends PlaySpec {
+
   "CustomersOutsideUK" must {
     val rule = implicitly[Rule[UrlFormEncoded, CustomersOutsideUK]]
     val write = implicitly[Write[CustomersOutsideUK, UrlFormEncoded]]
@@ -15,12 +16,13 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "round trip through Json correctly" in {
 
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath \ "countries")
+      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath)
     }
 
     "round trip through forms correctly" in {
 
-      val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
+      val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"), Country("India", "IN"))))
+      println(write.writes(model))
       rule.validate(write.writes(model)) mustBe Valid(model)
     }
 

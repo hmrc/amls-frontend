@@ -3,7 +3,7 @@ package models.hvd
 import jto.validation._
 import jto.validation.forms._
 import jto.validation.ValidationError
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 
 case class PaymentMethods(
                          courier: Boolean,
@@ -14,6 +14,7 @@ case class PaymentMethods(
 sealed trait PaymentMethods0 {
 
   // This could be made more generic...
+  import utils.MappingUtils.Implicits._
   private implicit def r[I, O]
   (implicit
     r: Rule[I, O]
@@ -67,13 +68,13 @@ sealed trait PaymentMethods0 {
       }
     }
 
-  private implicit def write[A]
+  private implicit def write
   (implicit
-   mon: cats.Monoid[A],
-   s: Path => WriteLike[Option[String], A],
-   b: Path => WriteLike[Boolean, A]
-  ): Write[PaymentMethods, A] =
-    To[A] { __ =>
+   mon: cats.Monoid[UrlFormEncoded],
+   s: Path => WriteLike[Option[String], UrlFormEncoded],
+   b: Path => WriteLike[Boolean, UrlFormEncoded]
+  ): Write[PaymentMethods, UrlFormEncoded] =
+    To[UrlFormEncoded] { __ =>
       (
         (__ \ "courier").write[Boolean] ~
         (__ \ "direct").write[Boolean] ~
@@ -91,16 +92,27 @@ sealed trait PaymentMethods0 {
   }
 
   val jsonR: Reads[PaymentMethods] = {
-   // import jto.validation.playjson.Rules.{pickInJson => _, _}
+    import utils.JsonMapping._
+    import jto.validation.playjson.Rules.{pickInJson => _, _}
     implicitly
   }
 
   val formW: Write[PaymentMethods, UrlFormEncoded] = {
+    import cats.implicits._
+    import jto.validation.forms.Writes._
     implicitly[Write[PaymentMethods, UrlFormEncoded]]
   }
 
-  val jsonW: Writes[PaymentMethods] = {
-    implicitly
+  val jsonW = Writes[PaymentMethods] {x =>
+    val jsMethods = Json.obj("courier" -> x.courier,
+      "direct" -> x.direct,
+      "other" -> x.other.isDefined)
+    val jsDetails = Json.obj("details" -> x.other)
+    x.other.isDefined match {
+      case true => jsMethods ++ jsDetails
+      case false => jsDetails
+    }
+
   }
 }
 
