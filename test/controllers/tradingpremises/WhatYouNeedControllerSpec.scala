@@ -19,7 +19,7 @@ class WhatYouNeedControllerSpec extends GenericTestHelper with MockitoSugar {
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController {
       override val dataCacheConnector = mockDataCacheConnector

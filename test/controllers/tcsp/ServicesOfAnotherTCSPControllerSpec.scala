@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class ServicesOfAnotherTCSPControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ServicesOfAnotherTCSPController {
       override val dataCacheConnector = mock[DataCacheConnector]

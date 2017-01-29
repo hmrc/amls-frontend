@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class BusinessUseAnIPSPControllerSpec  extends GenericTestHelper {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new BusinessUseAnIPSPController {
       override val dataCacheConnector = mock[DataCacheConnector]

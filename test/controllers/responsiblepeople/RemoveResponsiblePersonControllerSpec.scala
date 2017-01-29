@@ -26,7 +26,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RemoveResponsiblePersonController {
       override val dataCacheConnector = mock[DataCacheConnector]

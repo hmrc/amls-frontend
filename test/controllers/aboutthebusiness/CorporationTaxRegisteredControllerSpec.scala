@@ -7,7 +7,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -20,6 +20,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
   trait Fixture extends AuthorisedFixture {
     self =>
+    val request = addToken(authRequest)
 
     val controller = new CorporationTaxRegisteredController {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -28,7 +29,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
     }
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map(
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map(
     "Test.microservice.services.feature-toggle.business-matching-details-lookup" -> false
   ))
 
@@ -182,3 +183,4 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
   }
 
 }
+

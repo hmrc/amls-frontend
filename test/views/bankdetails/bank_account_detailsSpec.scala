@@ -8,9 +8,13 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import views.ViewFixture
+import views.Fixture
 
 class bank_account_detailsSpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "bank_account view " must{
     "have correct title" in new ViewFixture {

@@ -24,7 +24,7 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector
@@ -133,7 +133,7 @@ class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper w
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector

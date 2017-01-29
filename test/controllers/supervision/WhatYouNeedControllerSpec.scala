@@ -10,7 +10,7 @@ import utils.AuthorisedFixture
 class WhatYouNeedControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController {
       override val authConnector = self.authConnector

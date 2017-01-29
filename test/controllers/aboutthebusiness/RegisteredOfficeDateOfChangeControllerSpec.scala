@@ -26,7 +26,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends GenericTestHelper with 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeDateOfChangeController () {
       override val dataCacheConnector = mock[DataCacheConnector]

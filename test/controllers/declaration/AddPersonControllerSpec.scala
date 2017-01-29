@@ -27,7 +27,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val addPersonController = new AddPersonController {
       override val dataCacheConnector = mockDataCacheConnector
@@ -229,7 +229,7 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val addPersonController = new AddPersonController {
       override val dataCacheConnector = mockDataCacheConnector

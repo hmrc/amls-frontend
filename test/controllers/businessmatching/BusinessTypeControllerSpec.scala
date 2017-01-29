@@ -21,7 +21,7 @@ import scala.concurrent.Future
 class BusinessTypeControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new BusinessTypeController {
       override private[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]

@@ -6,12 +6,16 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{MustMatchers}
 import  utils.GenericTestHelper
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
 
 class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenPropertyChecks {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "summary view" when {
     "section is incomplete" must {

@@ -22,7 +22,7 @@ import scala.concurrent.Future
 class AgentCompanyNameControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new AgentCompanyNameController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]

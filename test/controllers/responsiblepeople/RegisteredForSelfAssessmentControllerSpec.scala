@@ -22,7 +22,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
   val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RegisteredForSelfAssessmentController {
       override val dataCacheConnector = mock[DataCacheConnector]

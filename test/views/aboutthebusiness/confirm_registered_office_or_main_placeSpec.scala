@@ -7,10 +7,14 @@ import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
 class confirm_registered_office_or_main_placeSpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "confirm_registered_office_or_main_place view" must {
     "have correct title" in new ViewFixture {

@@ -15,13 +15,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class BankAccountAddControllerSpec extends PlaySpec
-  with OneAppPerSuite
+class BankAccountAddControllerSpec extends GenericTestHelper
   with MockitoSugar
   with BeforeAndAfter {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new BankAccountAddController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

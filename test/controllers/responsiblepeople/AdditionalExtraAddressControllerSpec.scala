@@ -24,7 +24,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
   val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val additionalExtraAddressController = new AdditionalExtraAddressController {
       override val dataCacheConnector = mockDataCacheConnector

@@ -22,7 +22,7 @@ import scala.concurrent.Future
 class IdentifiySuspiciousActivityControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new IdentifySuspiciousActivityController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]

@@ -24,7 +24,7 @@ import scala.concurrent.Future
 class ActivityStartDateControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ActivityStartDateController {
       override val dataCache = mock[DataCacheConnector]

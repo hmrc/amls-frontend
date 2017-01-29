@@ -23,10 +23,8 @@ import scala.concurrent.Future
 
 class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSugar{
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
-
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeController () {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -34,6 +32,8 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
       override val statusService = mock[StatusService]
     }
   }
+
+  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -157,8 +157,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
 class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
-
+    self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeController() {
       override val dataCacheConnector = mock[DataCacheConnector]

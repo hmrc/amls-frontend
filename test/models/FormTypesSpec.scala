@@ -3,7 +3,7 @@ package models
 import org.scalatestplus.play.PlaySpec
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Invalid, Path, Valid}
-import play.api.data.validation.ValidationError
+import jto.validation.ValidationError
 
 class FormTypesSpec extends PlaySpec {
 

@@ -25,7 +25,7 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
   val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ExperienceTrainingController {
       override val dataCacheConnector = mock[DataCacheConnector]

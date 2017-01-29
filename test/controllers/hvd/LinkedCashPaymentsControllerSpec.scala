@@ -16,7 +16,7 @@ import scala.concurrent.Future
 class LinkedCashPaymentsControllerSpec extends GenericTestHelper {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new LinkedCashPaymentsController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

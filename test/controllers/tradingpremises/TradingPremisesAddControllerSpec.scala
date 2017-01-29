@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class TradingPremisesAddControllerSpec extends GenericTestHelper with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new TradingPremisesAddController {
       override val dataCacheConnector = mock[DataCacheConnector]

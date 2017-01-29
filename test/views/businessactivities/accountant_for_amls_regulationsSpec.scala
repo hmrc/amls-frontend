@@ -7,10 +7,14 @@ import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
 class accountant_for_amls_regulationsSpec extends GenericTestHelper with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "accountant_for_amls_regulations view" must {
     "have correct title" in new ViewFixture {

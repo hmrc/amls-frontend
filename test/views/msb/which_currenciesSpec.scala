@@ -6,10 +6,14 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import utils.GenericTestHelper
-import views.ViewFixture
+import views.Fixture
 
 
 class which_currenciesSpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 

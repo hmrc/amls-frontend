@@ -25,7 +25,7 @@ class ContactingYouControllerSpec extends GenericTestHelper with MockitoSugar wi
   val aboutTheBusinessWithData = AboutTheBusiness(contactingYou = contactingYou, registeredOffice = Some(ukAddress))
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ContactingYouController {
       override val dataCache = mock[DataCacheConnector]

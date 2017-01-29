@@ -7,10 +7,14 @@ import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
 class previously_registeredSpec extends GenericTestHelper with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "previously_registered view" must {
     "have correct title" in new ViewFixture {

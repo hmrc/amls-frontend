@@ -22,7 +22,7 @@ import scala.concurrent.Future
 class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new SendTheLargestAmountsOfMoneyController {
 

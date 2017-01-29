@@ -20,7 +20,7 @@ import scala.concurrent.Future
 class PercentageOfCashPaymentOver15000ControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new PercentageOfCashPaymentOver15000Controller {
       override val dataCacheConnector = mock[DataCacheConnector]

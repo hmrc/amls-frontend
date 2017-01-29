@@ -11,14 +11,14 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{GenericTestHelper, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class BranchesOrAgentsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class BranchesOrAgentsControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 

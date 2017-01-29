@@ -40,7 +40,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new LandingController {
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override val landingService = mock[LandingService]
@@ -218,7 +218,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new LandingController {
       override val landingService = mock[LandingService]
       override val authConnector = self.authConnector

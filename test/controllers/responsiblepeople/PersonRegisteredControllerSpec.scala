@@ -18,7 +18,7 @@ import scala.concurrent.Future
 class PersonRegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new PersonRegisteredController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

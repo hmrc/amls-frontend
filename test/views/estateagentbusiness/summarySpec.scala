@@ -4,11 +4,12 @@ import models.estateagentbusiness._
 import org.scalatest.{MustMatchers}
 import  utils.GenericTestHelper
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 class summarySpec extends GenericTestHelper with MustMatchers  {
 
-  trait TestFixture extends ViewFixture {
+  trait TestFixture extends Fixture {
+      implicit val requestWithToken = addToken(request)
     val validBusiness = EstateAgentBusiness(
       Some(Services(Set(Commercial, AssetManagement, Residential))),
       Some(ThePropertyOmbudsman),

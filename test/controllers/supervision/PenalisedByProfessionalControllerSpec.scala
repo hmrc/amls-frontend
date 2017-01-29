@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class PenalisedByProfessionalControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new PenalisedByProfessionalController {
       override val dataCacheConnector = mock[DataCacheConnector]

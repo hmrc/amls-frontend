@@ -96,28 +96,28 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given feedback with empty details" in {
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "01")) must
-        be(JsSuccess(First(None), JsPath \ "satisfaction"))
+        be(JsSuccess(First(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "02")) must
-        be(JsSuccess(Second(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Second(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "03")) must
-        be(JsSuccess(Third(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Third(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "04")) must
-        be(JsSuccess(Fourth(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Fourth(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "05")) must
-        be(JsSuccess(Fifth(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Fifth(None), JsPath))
     }
 
     "successfully validate given feedback with details" in {
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "01", "details" ->"123")) must
-        be(JsSuccess(First(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(First(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "02", "details" ->"123")) must
-        be(JsSuccess(Second(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Second(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "03", "details" ->"123")) must
-        be(JsSuccess(Third(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Third(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "04", "details" ->"123")) must
-        be(JsSuccess(Fourth(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Fourth(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "05", "details" ->"123")) must
-        be(JsSuccess(Fifth(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Fifth(Some("123")), JsPath \ "details"))
 
     }
 

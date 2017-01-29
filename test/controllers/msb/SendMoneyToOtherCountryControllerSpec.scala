@@ -20,7 +20,7 @@ import scala.concurrent.Future
 class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val cacheMap = mock[CacheMap]
     val controller = new SendMoneyToOtherCountryController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]

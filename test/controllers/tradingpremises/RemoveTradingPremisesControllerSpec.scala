@@ -22,7 +22,7 @@ import scala.concurrent.Future
 class RemoveTradingPremisesControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RemoveTradingPremisesController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]

@@ -23,7 +23,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new CurrentAddressDateOfChangeController() {
       override val dataCacheConnector = mock[DataCacheConnector]

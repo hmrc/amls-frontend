@@ -7,12 +7,13 @@ import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
 class redress_schemeSpec extends GenericTestHelper with MustMatchers  {
 
-  trait TestFixture extends ViewFixture {
+  trait TestFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
     val testScheme = Other("test scheme")
   }
 

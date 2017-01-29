@@ -16,7 +16,7 @@ import scala.concurrent.Future
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new CheckYourAnswersController {
       override val dataCacheConnector = mock[DataCacheConnector]

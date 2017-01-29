@@ -24,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = authRequest
 
     val testNotifications = NotificationRow(
       status = None,
@@ -165,7 +165,7 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 class NotificationsControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new NotificationsController {
       override val authConnector = self.authConnector

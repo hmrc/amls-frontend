@@ -11,6 +11,10 @@ import play.api.i18n.Messages
 
 class date_of_changeSpec extends GenericTestHelper with MustMatchers {
 
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
+
   "Date of Change View" must {
 
     val form2: ValidForm[DateOfChange] = Form2(DateOfChange(LocalDate.now()))

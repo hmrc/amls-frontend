@@ -20,7 +20,7 @@ class ExciseGoodsControllerSpec extends GenericTestHelper {
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new ExciseGoodsController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

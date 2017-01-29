@@ -22,7 +22,7 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
   val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new TrainingController {
       override val dataCacheConnector = mock[DataCacheConnector]

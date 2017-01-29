@@ -20,7 +20,7 @@ import scala.concurrent.Future
 class NationalityControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new NationalityController {
       override val dataCacheConnector = mock[DataCacheConnector]

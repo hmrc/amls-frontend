@@ -25,19 +25,19 @@ import play.api.i18n.Messages
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait Fixture extends AuthorisedFixture {
-  self =>
-  val controller = new RegistrationProgressController {
-    override val authConnector = self.authConnector
-    override protected[controllers] val service: ProgressService = mock[ProgressService]
-    override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
-  }
-
-  protected val mockCacheMap = mock[CacheMap]
-}
 
 class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
+  trait Fixture extends AuthorisedFixture {
+    self => val request = addToken(authRequest)
+    val controller = new RegistrationProgressController {
+      override val authConnector = self.authConnector
+      override protected[controllers] val service: ProgressService = mock[ProgressService]
+      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+    }
+
+    protected val mockCacheMap = mock[CacheMap]
+  }
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
@@ -228,6 +228,17 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
 }
 
 class RegistrationProgressControllerWithoutAmendmentsSpec extends GenericTestHelper with MustMatchers {
+  trait Fixture extends AuthorisedFixture {
+    self => val request = addToken(authRequest)
+    val controller = new RegistrationProgressController {
+      override val authConnector = self.authConnector
+      override protected[controllers] val service: ProgressService = mock[ProgressService]
+      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+    }
+
+    protected val mockCacheMap = mock[CacheMap]
+  }
 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 

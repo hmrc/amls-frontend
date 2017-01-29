@@ -27,7 +27,7 @@ class
 PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new PositionWithinBusinessController {
       override val dataCacheConnector = mock[DataCacheConnector]

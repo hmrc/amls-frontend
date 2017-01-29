@@ -20,7 +20,7 @@ import scala.concurrent.Future
 class IdentifyLinkedTransactionsControllerSpec extends GenericTestHelper with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val cacheMap = mock[CacheMap]
 

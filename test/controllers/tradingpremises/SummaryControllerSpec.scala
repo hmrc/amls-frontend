@@ -28,7 +28,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
   val mockCacheMap = mock[CacheMap]
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val summaryController = new SummaryController {
       override val dataCacheConnector = mockDataCacheConnector

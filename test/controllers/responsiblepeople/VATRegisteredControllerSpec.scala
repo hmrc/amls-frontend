@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new VATRegisteredController {
       override val dataCacheConnector = mock[DataCacheConnector]

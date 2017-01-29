@@ -38,7 +38,7 @@ class WhatDoesYourBusinessDoControllerSpec extends GenericTestHelper with Mockit
   }
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController {
       override val dataCacheConnector = mockDataCacheConnector

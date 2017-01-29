@@ -25,7 +25,7 @@ class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with Mocki
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new WhereAreTradingPremisesController {
       override val dataCacheConnector = mockDataCacheConnector

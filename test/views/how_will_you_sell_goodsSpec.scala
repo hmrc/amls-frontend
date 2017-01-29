@@ -14,8 +14,7 @@ import utils.GenericTestHelper
 class how_will_you_sell_goodsSpec extends GenericTestHelper with MustMatchers with MockitoSugar {
 
   trait HowWillYouSellGoodsViewFixture {
-    implicit val request : Request[_] = FakeRequest()
-
+    implicit val request : Request[_] = addToken(FakeRequest())
     val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Seq(Retail))), false)
     lazy val html = view.body
     lazy val doc = Jsoup.parse(html)

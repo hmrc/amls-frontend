@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new SubmissionController {
       override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
       override protected def authConnector: AuthConnector = self.authConnector

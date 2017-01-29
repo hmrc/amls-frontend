@@ -6,6 +6,10 @@ import play.api.i18n.Messages
 
 class startSpec extends GenericTestHelper with MustMatchers {
 
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
+
   "Landing Page View" must {
 
     "Have the correct title" in new ViewFixture {

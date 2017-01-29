@@ -18,7 +18,7 @@ import scala.concurrent.Future
 class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new AccountantForAMLSRegulationsController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

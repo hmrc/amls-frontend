@@ -24,7 +24,7 @@ import scala.concurrent.Future
 class ExpectedAMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ExpectedAMLSTurnoverController {
       override val dataCacheConnector = mock[DataCacheConnector]

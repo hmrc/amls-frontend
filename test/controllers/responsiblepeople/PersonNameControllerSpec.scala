@@ -25,7 +25,7 @@ class PersonNameControllerSpec extends GenericTestHelper with MockitoSugar {
   val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val personNameController = new PersonNameController {
       override val dataCacheConnector = mockDataCacheConnector

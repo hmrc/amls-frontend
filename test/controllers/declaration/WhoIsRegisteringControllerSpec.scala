@@ -25,7 +25,7 @@ import scala.concurrent.Future
 class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new  WhoIsRegisteringController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
@@ -267,7 +267,7 @@ class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper 
   implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new  WhoIsRegisteringController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

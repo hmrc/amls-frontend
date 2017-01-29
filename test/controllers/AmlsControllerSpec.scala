@@ -12,6 +12,7 @@ class AmlsControllerSpec extends GenericTestHelper {
     trait UnauthenticatedFixture extends MockitoSugar {
       self =>
       implicit val unauthenticatedRequest = FakeRequest()
+      val request = addToken(unauthenticatedRequest)
       val mockAuthConnector = mock[AuthConnector]
       val controller = new AmlsController {
         override protected def authConnector: AuthConnector = mockAuthConnector
@@ -20,7 +21,7 @@ class AmlsControllerSpec extends GenericTestHelper {
 
     "AmlsController" must {
       "load the unauthorised page with an unauthenticated request" in new UnauthenticatedFixture {
-          val result = controller.unauthorised(unauthenticatedRequest)
+          val result = controller.unauthorised(request)
           status(result) must be(OK)
           contentAsString(result) must include(Messages("unauthorised.title"))
         }

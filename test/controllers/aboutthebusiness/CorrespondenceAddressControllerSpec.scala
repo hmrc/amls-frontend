@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class CorrespondenceAddressControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new CorrespondenceAddressController {
       override val dataConnector: DataCacheConnector = mock[DataCacheConnector]
 

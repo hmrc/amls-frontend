@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new BusinessAppliedForPSRNumberController {
       override val dataCacheConnector = mock[DataCacheConnector]

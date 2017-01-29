@@ -16,7 +16,7 @@ import scala.concurrent.Future
 class SummaryControllerSpec extends GenericTestHelper {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]

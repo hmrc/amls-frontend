@@ -20,7 +20,7 @@ import scala.concurrent.Future
 class ExpectedThroughputControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ExpectedThroughputController {
       override val dataCacheConnector = mock[DataCacheConnector]

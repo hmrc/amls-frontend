@@ -18,7 +18,7 @@ import scala.concurrent.Future
 class RemoveBankDetailsControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RemoveBankDetailsController {
       override val dataCacheConnector: DataCacheConnector =  mock[DataCacheConnector]

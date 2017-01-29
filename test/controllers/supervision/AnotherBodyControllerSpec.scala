@@ -20,7 +20,7 @@ import scala.concurrent.Future
 class AnotherBodyControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new AnotherBodyController {
       override val dataCacheConnector = mock[DataCacheConnector]

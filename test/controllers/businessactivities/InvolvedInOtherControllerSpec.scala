@@ -24,7 +24,7 @@ import scala.concurrent.Future
 class InvolvedInOtherControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester{
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
      val controller = new InvolvedInOtherController {
       override val dataCacheConnector = mock[DataCacheConnector]

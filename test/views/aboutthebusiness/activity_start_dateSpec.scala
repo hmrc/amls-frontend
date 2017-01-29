@@ -7,11 +7,13 @@ import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
-import views.ViewFixture
+import views.Fixture
 
 
 class activity_start_dateSpec extends GenericTestHelper with MustMatchers {
-
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
   "activity_start_date view" must {
     "have correct title" in new ViewFixture {
 
