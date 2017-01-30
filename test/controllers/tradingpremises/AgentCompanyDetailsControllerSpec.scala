@@ -48,7 +48,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
       "display saved content" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyDetails("test", "12345678")))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -75,7 +75,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
         "there is no data at all at that index" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
             "agentCompanyName" -> "text",
-            "agentCompanyCRN" -> "crn"
+            "companyRegistrationNumber" -> "12345678"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -93,7 +93,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
 
           val newRequest = request.withFormUrlEncodedBody(
             "agentCompanyName" -> "text",
-            "agentCompanyCRN" -> "crn"
+            "companyRegistrationNumber" -> "12345678"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -111,7 +111,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
 
           val newRequest = request.withFormUrlEncodedBody(
             "agentCompanyName" -> "text",
-            "agentCompanyCRN" -> "crn"
+            "companyRegistrationNumber" -> "12345678"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -165,7 +165,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text")
+        val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremisesWithHasChangedFalse))))
@@ -183,7 +183,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = None,
-            agentCompanyName = Some(AgentCompanyName("text")),
+            agentCompanyName = Some(AgentCompanyDetails("text", "12345678")),
             agentPartnership = None
           ))))(any(), any(), any())
       }
@@ -204,7 +204,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
 
   val businessStructure = SoleProprietor
   val testAgentName = AgentName("test")
-  val testAgentCompanyName = AgentCompanyName("test")
+  val testAgentCompanyName = AgentCompanyDetails("test", "12345678")
   val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(

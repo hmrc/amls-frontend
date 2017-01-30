@@ -2,7 +2,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.TradingPremisesSection
-import models.tradingpremises.{AgentPartnership, AgentCompanyName, TradingPremises}
+import models.tradingpremises.{AgentPartnership, AgentCompanyDetails$, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._

@@ -1,7 +1,7 @@
 package views.tradingpremises
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.tradingpremises.AgentCompanyName
+import models.tradingpremises.AgentCompanyDetails
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.data.mapping.Path
@@ -15,7 +15,7 @@ class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPe
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[AgentCompanyName] = Form2(AgentCompanyName(""))
+      val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", ""))
 
       def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
 
@@ -25,7 +25,7 @@ class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPe
 
     "have correct heading" in new ViewFixture {
 
-      val form2: ValidForm[AgentCompanyName] = Form2(AgentCompanyName(""))
+      val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", ""))
 
       def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
 

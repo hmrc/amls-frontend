@@ -22,7 +22,7 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
 
           case Some(tp) => {
             val form = tp.agentCompanyName match {
-              case Some(data) => Form2[AgentCompanyName](data)
+              case Some(data) => Form2[AgentCompanyDetails](data)
               case None => EmptyForm
             }
             Ok(views.html.tradingpremises.agent_company_details(form, index, edit))
@@ -34,7 +34,7 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        Form2[AgentCompanyName](request.body) match {
+        Form2[AgentCompanyDetails](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.tradingpremises.agent_company_details(f, index, edit)))
           case ValidForm(_, data) => {

@@ -300,7 +300,7 @@ class AgentNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
   val businessStructure = SoleProprietor
   val testAgentName = AgentName("test")
-  val testAgentCompanyName = AgentCompanyName("test")
+  val testAgentCompanyName = AgentCompanyDetails("test", "12345678")
   val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(

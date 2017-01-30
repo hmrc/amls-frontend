@@ -29,7 +29,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
   val businessStructure = SoleProprietor
   val agentName = AgentName("test")
-  val agentCompanyName = AgentCompanyName("test")
+  val agentCompanyName = AgentCompanyDetails("test", "12345678")
   val agentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(
@@ -66,7 +66,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
       "startDate" ->"1990-02-24"),
     "businessStructure" -> Json.obj("agentsBusinessStructure" ->"01"),
     "agentName" -> Json.obj("agentName" ->"test"),
-    "agentCompanyName" -> Json.obj("agentCompanyName" ->"test"),
+    "agentCompanyName" -> Json.obj("agentCompanyName" ->"test", "companyRegistrationNumber" -> "12345678"),
     "agentPartnership" -> Json.obj("agentPartnership" ->"test"),
     "whatDoesYourBusinessDoAtThisAddress" ->Json.obj("activities" -> Json.arr("02","03","05")),
     "msbServices" -> Json.obj("msbServices"-> Json.arr("01","02")),
@@ -334,6 +334,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
               | "startDate":"1967-02-01",
               | "agentsBusinessStructure":"02",
               | "agentCompanyName":"REG Name Ltd.",
+              | "companyRegistrationNumber":"12345678",
               | "activities":["03","07","02","05","01","06","04"],
               | "msbServices":["01","02","03","04"]}
             """.stripMargin)
@@ -349,7 +350,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
               )),
               Some(LimitedLiabilityPartnership),
               None,
-              Some(AgentCompanyName("REG Name Ltd.")),
+              Some(AgentCompanyDetails("REG Name Ltd.", "12345678")),
               None,
               Some(WhatDoesYourBusinessDo(Set(
                     AccountancyServices,
