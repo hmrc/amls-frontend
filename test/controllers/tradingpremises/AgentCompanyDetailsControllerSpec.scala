@@ -19,18 +19,18 @@ import org.mockito.Matchers.{eq => meq, _}
 
 import scala.concurrent.Future
 
-class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
 
-    val controller = new AgentCompanyNameController {
+    val controller = new AgentCompanyDetailsController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
     }
   }
 
-  "AgentCompanyNameController" when {
+  "AgentCompanyDetailsController" when {
 
     val emptyCache = CacheMap("", Map.empty)
 
@@ -43,15 +43,9 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-
-        val title = s"${Messages("tradingpremises.agentcompanyname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-
-        document.title() must be(title)
-        document.select("input[type=text]").`val`() must be(empty)
       }
 
-      "display main Summary Page" in new Fixture {
+      "display saved content" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyName("test")))))))
@@ -61,11 +55,9 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${Messages("tradingpremises.agentcompanyname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-
-        document.title() must be(title)
-        document.select("input[type=text]").`val`() must be("test")
+        document.select("input[type=text]").first().`val`() must be("test")
       }
+
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -82,7 +74,8 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
-            "agentCompanyName" -> "text"
+            "agentCompanyName" -> "text",
+            "agentCompanyCRN" -> "crn"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -99,7 +92,8 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         "edit is false and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentCompanyName" -> "text"
+            "agentCompanyName" -> "text",
+            "agentCompanyCRN" -> "crn"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -116,7 +110,8 @@ class AgentCompanyNameControllerSpec extends PlaySpec with OneAppPerSuite with M
         "edit is true and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentCompanyName" -> "text"
+            "agentCompanyName" -> "text",
+            "agentCompanyCRN" -> "crn"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))

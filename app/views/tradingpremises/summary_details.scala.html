@@ -107,7 +107,7 @@
         @model.agentCompanyName.map { x =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.agentcompanyname.title"),
-                editUrl = controllers.tradingpremises.routes.AgentCompanyNameController.get(index, true).toString
+                editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
             ) {
                 <p>@x.agentCompanyName</p>
             }
