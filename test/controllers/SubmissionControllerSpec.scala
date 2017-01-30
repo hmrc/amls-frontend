@@ -4,7 +4,7 @@ import connectors.AmlsConnector
 import models.{AmendVariationResponse, SubscriptionResponse}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.libs.json.JsString
 import play.api.test.Helpers._
 import services.{StatusService, SubmissionService}
@@ -16,10 +16,10 @@ import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
-class SubmissionControllerSpec extends PlaySpec with OneAppPerSuite with ScalaFutures {
+class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new SubmissionController {
       override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
       override protected def authConnector: AuthConnector = self.authConnector

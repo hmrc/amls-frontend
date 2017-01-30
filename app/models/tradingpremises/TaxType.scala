@@ -1,11 +1,13 @@
 package models.tradingpremises
 
-import play.api.data.mapping.{Write, Path, From, Rule}
-import play.api.data.mapping.forms._
-import play.api.data.validation.ValidationError
+import jto.validation.{Write, Path, From, Rule}
+import jto.validation.forms._
+import jto.validation.ValidationError
 import play.api.i18n.{Messages, Lang}
 import play.api.libs.json.Writes
 import play.api.libs.json._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 sealed trait TaxType {
   def message(implicit lang: Lang): String =
@@ -28,7 +30,7 @@ object TaxType {
     (__ \ "taxType").read[String].flatMap[TaxType] {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
-      case _ => ValidationError("error.invalid")
+      case _ => play.api.data.validation.ValidationError("error.invalid")
     }
   }
 
@@ -38,7 +40,7 @@ object TaxType {
   }
 
   implicit val taxTypeRule: Rule[UrlFormEncoded, TaxType] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "taxType").read[String] flatMap {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax

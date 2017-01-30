@@ -1,5 +1,4 @@
 import sbt._
-import scala.language.reflectiveCalls
 
 object FrontendBuild extends Build with MicroService {
 
@@ -13,25 +12,23 @@ object FrontendBuild extends Build with MicroService {
 
 private object AppDependencies {
 
-  import play.PlayImport._
+  import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val playHealthVersion = "1.1.0"
-  private val govukTemplateVersion = "4.0.0"
-  private val playUiVersion = "4.17.2"
 
-  private val frontendBootstrapVersion = "6.7.0"
-  private val playPartialsVersion = "4.5.0"
-  private val playAuthorisedFrontendVersion = "5.5.0"
-  private val playConfigVersion = "2.1.0"
-  private val playJsonLoggerVersion = "2.1.1"
-  private val httpCachingClientVersion = "5.6.0"
-  private val playWhitelistFilterVersion = "1.1.0"
+  private val playHealthVersion = "2.0.0"
+  private val playJsonLoggerVersion = "3.0.0"
+  private val frontendBootstrapVersion = "7.10.0"
+  private val govukTemplateVersion = "5.0.0"
+  private val playUiVersion = "5.4.0"
+  private val playPartialsVersion = "5.2.0"
+  private val playAuthorisedFrontendVersion = "6.2.0"
+  private val playConfigVersion = "3.0.0"
 
-  private val metricsPlayVersion = "0.2.1"
-  private val metricsGraphiteVersion = "3.0.2"
+  private val httpCachingClientVersion = "6.1.0"
+  private val playWhitelistFilterVersion = "2.0.0"
 
-  private val validationVersion = "1.1"
+  private val validationVersion = "2.0.1"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
@@ -49,12 +46,10 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
 
-    "com.kenshoo" %% "metrics-play" % metricsPlayVersion,
-    "com.codahale.metrics" % "metrics-graphite" % metricsGraphiteVersion,
+    "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
+    "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
+    "io.github.jto" %% "validation-form"      % validationVersion excludeAll playJars
 
-    "io.github.jto" %% "validation-core" % validationVersion excludeAll playJars,
-    "io.github.jto" %% "validation-json" % validationVersion excludeAll playJars,
-    "io.github.jto" %% "validation-form" % validationVersion excludeAll playJars
   )
 
   trait ScopeDependencies {
@@ -62,24 +57,24 @@ private object AppDependencies {
     val dependencies: Seq[ModuleID]
   }
 
-  private val scalatestVersion = "2.2.5"
-  private val scalatestPlusPlayVersion = "1.2.0"
+  private val scalatestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
   private val jsoupVersion = "1.8.3"
-  private val hmrctestVersion = "1.6.0"
+  private val hmrctestVersion = "2.2.0"
   private val authTestVersion = "2.4.0"
 
   object Test {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
+        "uk.gov.hmrc" %% "hmrctest" % hmrctestVersion % scope,
         "org.scalatest" %% "scalatest" % scalatestVersion % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.5" % scope,
-        "org.scalatestplus" %% "play" % scalatestPlusPlayVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "uk.gov.hmrc" %% "hmrctest" % hmrctestVersion % scope
+        "org.mockito" % "mockito-all" % "1.10.19" % scope,
+        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope
       )
     }.dependencies
   }
@@ -89,7 +84,6 @@ private object AppDependencies {
       override lazy val scope = "it"
       override lazy val dependencies = Seq(
         "org.scalatest" %% "scalatest" % scalatestVersion % scope,
-        "org.scalatestplus" %% "play" % scalatestPlusPlayVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,

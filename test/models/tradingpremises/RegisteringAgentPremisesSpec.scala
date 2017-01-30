@@ -1,28 +1,28 @@
 package models.tradingpremises
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
 class RegisteringAgentPremisesSpec extends PlaySpec {
 
   "Form Validation" must {
     "Fail if neither option is picked" in {
-      RegisteringAgentPremises.formRule.validate(Map()) must be(Failure(Seq(
+      RegisteringAgentPremises.formRule.validate(Map()) must be(Invalid(Seq(
         (Path \ "agentPremises") -> Seq(ValidationError("error.required.tp.agent.premises")))))
     }
 
     "Succeed if yes option is picked" in {
-      RegisteringAgentPremises.formRule.validate(Map("agentPremises" -> Seq("true"))) must be(Success(RegisteringAgentPremises(true)))
+      RegisteringAgentPremises.formRule.validate(Map("agentPremises" -> Seq("true"))) must be(Valid(RegisteringAgentPremises(true)))
     }
 
     "Succeed if no option is picked" in {
-      RegisteringAgentPremises.formRule.validate(Map("agentPremises" -> Seq("false"))) must be(Success(RegisteringAgentPremises(false)))
+      RegisteringAgentPremises.formRule.validate(Map("agentPremises" -> Seq("false"))) must be(Valid(RegisteringAgentPremises(false)))
     }
 
     "Fail if an invalid value is passed" in {
-      RegisteringAgentPremises.formRule.validate(Map("agentPremises" -> Seq("random"))) must be(Failure(Seq(
+      RegisteringAgentPremises.formRule.validate(Map("agentPremises" -> Seq("random"))) must be(Invalid(Seq(
         (Path \ "agentPremises") -> Seq(ValidationError("error.required.tp.agent.premises")))))
     }
   }

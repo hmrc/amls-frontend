@@ -16,7 +16,7 @@
     attrMax: String = "",
     attrPattern: String = "",
     attrDescribedBy: String = ""
-)(implicit lang: Lang)
+)(implicit lang:Lang,  m: Messages)
 
 <div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}">
     <label class="form-label@if(bold){-bold}" for="@field.id">

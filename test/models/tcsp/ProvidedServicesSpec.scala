@@ -2,8 +2,8 @@ package models.tcsp
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
@@ -12,7 +12,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given one selected values" in {
       val urlFormEncoded = Map("services[]" -> Seq("01"))
-      val expected = Success(ProvidedServices(Set(PhonecallHandling)))
+      val expected = Valid(ProvidedServices(Set(PhonecallHandling)))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
@@ -20,13 +20,13 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map("services[]" -> Seq("01", "02", "03", "04", "05", "06", "07"))
       val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
                                          SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
-      val expected = Success(ProvidedServices(allServices))
+      val expected = Valid(ProvidedServices(allServices))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
     "successfully validate given other value" in {
       val urlFormEncoded = Map("services[]" -> Seq("08"), "details" -> Seq("other service"))
-      val expected = Success(ProvidedServices(Set(Other("other service"))))
+      val expected = Valid(ProvidedServices(Set(Other("other service"))))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
@@ -50,7 +50,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "show an error with an invalid value" in {
       val urlFormEncoded = Map("services[]" -> Seq("1738"))
-      val expected = Failure(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
+      val expected = Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
       ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
     }
 
@@ -58,7 +58,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
   }
 
   "Json read and writes" must {
-
+    import play.api.data.validation.ValidationError
     "Serialise single service as expected" in {
       Json.toJson(ProvidedServices(Set(EmailServer))) must be(Json.obj("services" -> Seq("03")))
     }
@@ -77,7 +77,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "Deserialise single service as expected" in {
       val json = Json.obj("services" -> Set("01"))
-      val expected = JsSuccess(ProvidedServices(Set(PhonecallHandling)), JsPath \ "services")
+      val expected = JsSuccess(ProvidedServices(Set(PhonecallHandling)), JsPath )
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 
@@ -85,13 +85,13 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("services" -> Seq("01", "02", "03", "04", "05", "06", "07"))
       val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
                                          SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
-      val expected = JsSuccess(ProvidedServices(allServices), JsPath \ "services")
+      val expected = JsSuccess(ProvidedServices(allServices), JsPath )
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 
     "Deserialise 'other' service as expected" in {
       val json = Json.obj("services" -> Set("08"), "details" -> "other service")
-      val expected = JsSuccess(ProvidedServices(Set(Other("other service"))), JsPath \ "services" \ "details")
+      val expected = JsSuccess(ProvidedServices(Set(Other("other service"))), JsPath )
       Json.fromJson[ProvidedServices](json) must be (expected)
     }
 

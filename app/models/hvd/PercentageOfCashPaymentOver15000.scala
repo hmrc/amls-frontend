@@ -1,8 +1,8 @@
 package models.hvd
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait PercentageOfCashPaymentOver15000
@@ -18,7 +18,7 @@ object PercentageOfCashPaymentOver15000 {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, PercentageOfCashPaymentOver15000] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "percentage").read[String].withMessage("error.required.hvd.percentage") flatMap {
       case "01" => First
       case "02" => Second
@@ -48,7 +48,7 @@ object PercentageOfCashPaymentOver15000 {
       case "04" => Fourth
       case "05" => Fifth
       case _ =>
-        ValidationError("error.invalid")
+        play.api.data.validation.ValidationError("error.invalid")
     }
   }
 

@@ -1,12 +1,12 @@
 package models.hvd
 
 import models.FormTypes._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 
 case class Products(items: Set[ItemType]) {
@@ -62,8 +62,8 @@ object Products{
   import utils.MappingUtils.Implicits._
 
   val maxDetailsLength = 255
-  val otherDetailsType = notEmptyStrip compose
-    notEmpty.withMessage("error.required.hvd.business.sell.other.details") compose
+  val otherDetailsType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.hvd.business.sell.other.details") andThen
     maxLength(maxDetailsLength).withMessage("error.invalid.hvd.business.sell.other.details")
 
   implicit val formRule: Rule[UrlFormEncoded, Products] =
@@ -82,7 +82,7 @@ object Products{
           case "10" => Rule[UrlFormEncoded, ItemType](_ => Success(MobilePhones))
           case "11" => Rule[UrlFormEncoded, ItemType](_ => Success(Clothing))
           case "12" =>
-            (__ \ "otherDetails").read(otherDetailsType) fmap Other.apply
+            (__ \ "otherDetails").read(otherDetailsType) map Other.apply
           case _ =>
             Rule[UrlFormEncoded, ItemType] { _ =>
               Failure(Seq((Path \ "products") -> Seq(ValidationError("error.invalid"))))
@@ -92,11 +92,11 @@ object Products{
         ) {
           case (m, n) =>
             n flatMap { x =>
-              m fmap {
+              m map {
                 _ + x
               }
             }
-        } fmap Products.apply
+        } map Products.apply
       }
     }
 
@@ -131,7 +131,7 @@ object Products{
         case "12" =>
           (JsPath \ "otherDetails").read[String].map(Other.apply _) map identity[ItemType]
         case _ =>
-          Reads(_ => JsError((JsPath \ "products") -> ValidationError("error.invalid")))
+          Reads(_ => JsError((JsPath \ "products") -> play.api.data.validation.ValidationError("error.invalid")))
       }.foldLeft[Reads[Set[ItemType]]](
         Reads[Set[ItemType]](_ => JsSuccess(Set.empty))
       ) {

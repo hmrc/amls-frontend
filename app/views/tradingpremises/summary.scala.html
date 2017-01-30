@@ -3,7 +3,7 @@
 @import models.tradingpremises._
 @import utils.StatusConstants
 
-@(model: Seq[TradingPremises], add: Boolean)(implicit request: Request[_], lang: Lang)
+@(model: Seq[TradingPremises], add: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading(if(add) "title.ya" else "title.cya", "summary.tradingpremises")

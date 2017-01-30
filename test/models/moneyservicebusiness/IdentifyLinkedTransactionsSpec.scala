@@ -1,8 +1,8 @@
 package models.moneyservicebusiness
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
 class IdentifyLinkedTransactionsSpec extends PlaySpec {
@@ -15,19 +15,19 @@ class IdentifyLinkedTransactionsSpec extends PlaySpec {
 
         val map = Map("linkedTxn" -> Seq("true"))
 
-        IdentifyLinkedTransactions.formRule.validate(map) must be(Success(IdentifyLinkedTransactions(true)))
+        IdentifyLinkedTransactions.formRule.validate(map) must be(Valid(IdentifyLinkedTransactions(true)))
       }
 
       "Successfully read form data for option no" in {
 
         val map = Map("linkedTxn" -> Seq("false"))
 
-        IdentifyLinkedTransactions.formRule.validate(map) must be(Success(IdentifyLinkedTransactions(false)))
+        IdentifyLinkedTransactions.formRule.validate(map) must be(Valid(IdentifyLinkedTransactions(false)))
       }
 
       "fail validation on missing field" in {
 
-        IdentifyLinkedTransactions.formRule.validate(Map.empty) must be(Failure(
+        IdentifyLinkedTransactions.formRule.validate(Map.empty) must be(Invalid(
           Seq( Path \ "linkedTxn" -> Seq(ValidationError("error.required.msb.linked.txn")))))
       }
 

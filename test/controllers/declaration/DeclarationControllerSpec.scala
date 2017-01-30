@@ -10,7 +10,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -20,11 +20,11 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class DeclarationControllerWithAmendmentToggleOffSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector
@@ -129,11 +129,11 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends PlaySpec with OneA
   }
 }
 
-class DeclarationControllerWithAmendmentToggleOnSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
+class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val declarationController = new DeclarationController {
       override val authConnector = self.authConnector

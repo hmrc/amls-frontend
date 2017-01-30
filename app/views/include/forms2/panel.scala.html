@@ -1,4 +1,4 @@
-@import play.api.data.mapping.forms.{PM, UrlFormEncoded}
+@import jto.validation.forms.{PM, UrlFormEncoded}
 
 @(
     panel: Boolean = true,
@@ -9,7 +9,7 @@
     wide: Boolean = false,
     gutter: Boolean = false,
     field: Option[forms.Field] = None
-)(content: Html)(implicit lang: Lang)
+)(content: Html)(implicit lang: Lang, m: Messages)
 
     @classDefs = {classes ++ defineClass(panel "panel-indent"), (wide, "panel-border-wide") (gutter, "panel-indent--gutter"), (field.get.hasErrors, "form-field--error"), (jsHidden, "amls-js-hidden"))}
 

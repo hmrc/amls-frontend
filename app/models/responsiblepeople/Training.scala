@@ -1,10 +1,10 @@
 package models.responsiblepeople
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
+import jto.validation._
+import jto.validation.forms.Rules._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation.forms.UrlFormEncoded
 
 
 sealed trait Training
@@ -19,15 +19,15 @@ object Training {
 
   val maxInformationTypeLength = 255
 
-  val informationType = notEmpty.withMessage("error.required.rp.training.information") compose
+  val informationType = notEmpty.withMessage("error.required.rp.training.information") andThen
     maxLength(maxInformationTypeLength).withMessage("error.invalid.length.rp.training.information")
 
 
   implicit val formRule: Rule[UrlFormEncoded, Training] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "training").read[Boolean].withMessage("error.required.rp.training") flatMap {
       case true =>
-        (__ \ "information").read(informationType) fmap (TrainingYes.apply)
+        (__ \ "information").read(informationType) map (TrainingYes.apply)
       case false => Rule.fromMapping { _ => Success(TrainingNo) }
     }
   }

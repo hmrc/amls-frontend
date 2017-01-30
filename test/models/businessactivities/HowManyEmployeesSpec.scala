@@ -1,14 +1,12 @@
 package models.businessactivities
 
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid, ValidationError}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 import scala.language.postfixOps
 
-class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class HowManyEmployeesSpec extends PlaySpec {
 
   "Form Validation" must {
 
@@ -17,7 +15,7 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       HowManyEmployees.formRule.validate(
         Map("employeeCount" -> Seq("123456789"),
           "employeeCountAMLSSupervision" -> Seq("12345678"))) must
-        be(Success(HowManyEmployees("123456789", "12345678")))
+        be(Valid(HowManyEmployees("123456789", "12345678")))
     }
 
     "write the model fields to url encoded response" in {
@@ -34,7 +32,7 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
         "employeeCountAMLSSupervision" -> Seq(""))
 
       HowManyEmployees.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "employeeCount") -> Seq(ValidationError("error.required.ba.employee.count1")),
           (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.required.ba.employee.count2"))
         )))
@@ -46,7 +44,7 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
         "employeeCountAMLSSupervision" -> Seq("ghjgj"))
 
       HowManyEmployees.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.invalid.ba.employee.count"))
         )))
     }
@@ -57,14 +55,14 @@ class HowManyEmployeesSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
         "employeeCountAMLSSupervision" -> Seq("111111111111"))
 
       HowManyEmployees.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("error.max.length.ba.employee.count"))
         )))
     }
   }
 
   "JSON read" must {
-
+  import play.api.data.validation.ValidationError
     "fail to validate when given employeeCountAMLSSupervision is missing" in {
       val json = Json.obj("employeeCount" -> "12345678901")
       Json.fromJson[HowManyEmployees](json) must

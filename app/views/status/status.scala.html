@@ -9,7 +9,7 @@
 @import models.status.{Current,SubmissionReady}
 @import config.ApplicationConfig
 
-@(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel, feeResponse: Option[FeeResponse], notifications: Boolean)(implicit request: Request[_])
+@(regNo: String, businessName: Option[String], completionState: CompletionStateViewModel, feeResponse: Option[FeeResponse], notifications: Boolean)(implicit request: Request[_],m:Messages)
 @borderClass(entry:(SubmissionStatus,CompletionState)) = {
     @entry match{
         case (NotCompleted,Current)=> {status-list--start}

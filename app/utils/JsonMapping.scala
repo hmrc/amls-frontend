@@ -1,14 +1,14 @@
 package utils
 
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json.{PathNode => _, _}
 
 trait JsonMapping {
 
   import play.api.libs.json
   import play.api.libs.json.{JsPath, JsValue, Reads, Writes, JsSuccess, JsError}
-  import play.api.data.mapping.{KeyPathNode, IdxPathNode, PathNode}
+  import jto.validation.{KeyPathNode, IdxPathNode, PathNode}
 
   def nodeToJsNode(n: PathNode): json.PathNode = {
     n match {
@@ -22,10 +22,18 @@ trait JsonMapping {
   private def pathToJsPath(p: Path): JsPath =
     JsPath(p.path.map(nodeToJsNode _))
 
-  implicit def errorConversion(errs: Seq[(Path, Seq[ValidationError])]): Seq[(JsPath, Seq[ValidationError])] =
+  def convertError(error: ValidationError): play.api.data.validation.ValidationError = {
+    play.api.data.validation.ValidationError(error.message, error.args)
+  }
+
+  implicit def convertValidationErros(errors: Seq[ValidationError]): Seq[play.api.data.validation.ValidationError] = {
+   errors.map(convertError(_))
+  }
+
+  implicit def errorConversion(errs: Seq[(Path, Seq[ValidationError])]): Seq[(JsPath, Seq[play.api.data.validation.ValidationError])] =
     errs map {
       case (path, errors) =>
-        (pathToJsPath(path), errors)
+        (pathToJsPath(path), convertValidationErros(errors))
     }
 
   implicit def genericJsonR[A]
@@ -35,10 +43,8 @@ trait JsonMapping {
     Reads {
       json =>
         rule.validate(json) match {
-          case Success(a) =>
-            JsSuccess(a)
-          case Failure(errors) =>
-            JsError(errors)
+          case Success(x) => JsSuccess(x)
+          case Failure(error) => JsError(error)
         }
     }
 
@@ -74,7 +80,7 @@ trait JsonMapping {
         case None => Failure(Seq(Path -> Seq(ValidationError("error.required"))))
         case Some(js) => Success(js)
       }
-    }.compose(r)
+    }.andThen(r)
   }
 }
 

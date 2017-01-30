@@ -2,8 +2,8 @@ package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
@@ -11,7 +11,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
   "Form Validation" must {
     "successfully validate given an enum value" in {
       InvolvedInOther.formRule.validate(Map("involvedInOther" -> Seq("false"))) must
-        be(Success(InvolvedInOtherNo))
+        be(Valid(InvolvedInOtherNo))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -21,7 +21,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       )
 
       InvolvedInOther.formRule.validate(data) must
-        be(Success(InvolvedInOtherYes("test")))
+        be(Valid(InvolvedInOtherYes("test")))
     }
 
     "fail to validate given an `Yes` with no value" in {
@@ -32,7 +32,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       )
 
       InvolvedInOther.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "details") -> Seq(ValidationError("error.required.ba.involved.in.other.text"))
         )))
     }
@@ -45,7 +45,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       )
 
       InvolvedInOther.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.255"))
         )))
     }
@@ -53,7 +53,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
     "fail to validate mandatory field" in {
 
       InvolvedInOther.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "involvedInOther") -> Seq(ValidationError("error.required.ba.involved.in.other"))
         )))
     }
@@ -77,7 +77,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[InvolvedInOther](Json.obj("involvedInOther" -> false)) must
-        be(JsSuccess(InvolvedInOtherNo, JsPath \ "involvedInOther"))
+        be(JsSuccess(InvolvedInOtherNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -85,7 +85,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("involvedInOther" -> true, "details" ->"test")
 
       Json.fromJson[InvolvedInOther](json) must
-        be(JsSuccess(InvolvedInOtherYes("test"), JsPath \ "involvedInOther" \ "details"))
+        be(JsSuccess(InvolvedInOtherYes("test"), JsPath \ "details"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -93,7 +93,7 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("involvedInOther" -> true)
 
       Json.fromJson[InvolvedInOther](json) must
-        be(JsError((JsPath \ "involvedInOther" \ "details") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "details") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

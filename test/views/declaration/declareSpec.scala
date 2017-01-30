@@ -1,12 +1,16 @@
 package views.declaration
 
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
-class declareSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class declareSpec extends GenericTestHelper with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "declaration view" must {
     "have correct title" in new ViewFixture {

@@ -2,8 +2,8 @@ package models.responsiblepeople
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
@@ -18,10 +18,10 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
     val MoreThanThreeForm = Map(FieldName -> Seq("04"))
 
     "successfully validate given an enum value" in {
-      TimeAtAddress.formRule.validate(ZeroToFiveForm)    must be(Success(TimeAtAddress.ZeroToFiveMonths))
-      TimeAtAddress.formRule.validate(SixToElevenForm)   must be(Success(TimeAtAddress.SixToElevenMonths))
-      TimeAtAddress.formRule.validate(OneToThreeForm)    must be(Success(TimeAtAddress.OneToThreeYears))
-      TimeAtAddress.formRule.validate(MoreThanThreeForm) must be(Success(TimeAtAddress.ThreeYearsPlus))
+      TimeAtAddress.formRule.validate(ZeroToFiveForm)    must be(Valid(TimeAtAddress.ZeroToFiveMonths))
+      TimeAtAddress.formRule.validate(SixToElevenForm)   must be(Valid(TimeAtAddress.SixToElevenMonths))
+      TimeAtAddress.formRule.validate(OneToThreeForm)    must be(Valid(TimeAtAddress.OneToThreeYears))
+      TimeAtAddress.formRule.validate(MoreThanThreeForm) must be(Valid(TimeAtAddress.ThreeYearsPlus))
     }
 
     "write correct data from enum value" in {
@@ -33,12 +33,12 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
     "throw error on invalid data" in {
       TimeAtAddress.formRule.validate(Map(FieldName -> Seq("20"))) must
-        be(Failure(Seq((Path \ FieldName, Seq(ValidationError("error.invalid"))))))
+        be(Invalid(Seq((Path \ FieldName, Seq(ValidationError("error.invalid"))))))
     }
 
     "throw error on empty data" in {
       TimeAtAddress.formRule.validate(Map.empty) must
-        be(Failure(Seq((Path \ FieldName, Seq(ValidationError("error.required.rp.wherepersonlives.howlonglived"))))))
+        be(Invalid(Seq((Path \ FieldName, Seq(ValidationError("error.required.rp.wherepersonlives.howlonglived"))))))
     }
   }
 
@@ -51,10 +51,10 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
 
-      Json.fromJson[TimeAtAddress](ZeroToFiveJson) must be(JsSuccess(TimeAtAddress.ZeroToFiveMonths, JsPath \ FieldName))
-      Json.fromJson[TimeAtAddress](SixToElevenJson) must be(JsSuccess(TimeAtAddress.SixToElevenMonths, JsPath \ FieldName))
-      Json.fromJson[TimeAtAddress](OneToThreeJson) must be(JsSuccess(TimeAtAddress.OneToThreeYears, JsPath \ FieldName))
-      Json.fromJson[TimeAtAddress](MoreThanThreeJson) must be(JsSuccess(TimeAtAddress.ThreeYearsPlus, JsPath \ FieldName))
+      Json.fromJson[TimeAtAddress](ZeroToFiveJson) must be(JsSuccess(TimeAtAddress.ZeroToFiveMonths, JsPath))
+      Json.fromJson[TimeAtAddress](SixToElevenJson) must be(JsSuccess(TimeAtAddress.SixToElevenMonths, JsPath))
+      Json.fromJson[TimeAtAddress](OneToThreeJson) must be(JsSuccess(TimeAtAddress.OneToThreeYears, JsPath))
+      Json.fromJson[TimeAtAddress](MoreThanThreeJson) must be(JsSuccess(TimeAtAddress.ThreeYearsPlus, JsPath))
     }
 
     "write the correct value" in {
@@ -66,7 +66,7 @@ class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[TimeAtAddress](Json.obj(FieldName -> "20")) must
-        be(JsError(JsPath \ FieldName, ValidationError("error.invalid")))
+        be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 }

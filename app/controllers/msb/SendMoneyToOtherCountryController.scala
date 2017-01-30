@@ -68,9 +68,9 @@ trait SendMoneyToOtherCountryController extends BaseController {
                 ) map {
                   _ =>
                     if (edit) {
-                      editRouting(data.money, services.services, msb)
+                      editRouting(data.money, services.msbServices, msb)
                     } else {
-                      standardRouting(data.money, services.services)
+                      standardRouting(data.money, services.msbServices)
                     }
                 }
               }

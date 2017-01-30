@@ -1,9 +1,9 @@
 package models.aboutthebusiness
 
 import models.Country
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{Path, From, Rule, Write}
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Path, From, Rule, Write}
+import jto.validation.ValidationError
 import play.api.libs.json.{Reads, Writes}
 
 sealed trait CorrespondenceAddress {
@@ -55,7 +55,7 @@ case class NonUKCorrespondenceAddress(
 object CorrespondenceAddress {
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddress] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       import models.FormTypes._
       import utils.MappingUtils.Implicits._
       val nameMaxLength = 140
@@ -65,19 +65,19 @@ object CorrespondenceAddress {
 
       (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
         case true => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose businessNameType) ~
-            (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
+            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
+            (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLine3").read(optionR(validateAddress)) ~
             (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "postCode").read(postcodeType)
           )(UKCorrespondenceAddress.apply _)
         case false => (
-            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") compose nameType) ~
-            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") compose businessNameType) ~
-            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) ~
-            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) ~
+            (__ \ "yourName").read(notEmpty.withMessage("error.required.yourname") andThen nameType) ~
+            (__ \ "businessName").read(notEmpty.withMessage("error.required.name.of.business") andThen businessNameType) ~
+            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
               (__ \ "country").read[Country]

@@ -1,6 +1,7 @@
 package models.responsiblepeople
 
 import play.Logger
+import play.api.libs.json.Reads
 import typeclasses.MongoKey
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -85,6 +86,8 @@ object ResponsiblePeople {
       _.hasChanged
     }
   }
+
+  implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePeople]]
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "responsiblepeople"

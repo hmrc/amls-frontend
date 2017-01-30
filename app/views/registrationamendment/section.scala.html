@@ -1,6 +1,6 @@
 @import models.registrationprogress._
 
-@(name: String, status: Status, hasChanged: Boolean, call: Call)(implicit request: Request[_], lang: Lang)
+@(name: String, status: Status, hasChanged: Boolean, call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @progressClass(status:Status) = {
 @status match{

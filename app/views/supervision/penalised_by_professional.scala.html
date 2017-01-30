@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
     s"""${f("professionalBody").id}-fieldset"""

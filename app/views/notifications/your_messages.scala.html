@@ -1,7 +1,7 @@
 @import include._
 @import models.notifications._
 
-@(businessName: String, notifications: Seq[NotificationRow])(implicit request: Request[_])
+@(businessName: String, notifications: Seq[NotificationRow])(implicit request: Request[_],m:Messages)
 
 @header = {
 @heading("notifications.header", "summary.status")

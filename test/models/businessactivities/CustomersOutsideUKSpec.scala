@@ -2,13 +2,12 @@ package models.businessactivities
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.forms._
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsSuccess, Json}
+import jto.validation.forms._
+import jto.validation._
+import jto.validation.ValidationError
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class CustomersOutsideUKSpec extends PlaySpec {
-
 
   "CustomersOutsideUK" must {
     val rule = implicitly[Rule[UrlFormEncoded, CustomersOutsideUK]]
@@ -17,15 +16,13 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "round trip through Json correctly" in {
 
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-
-      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model)
+      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath)
     }
 
     "round trip through forms correctly" in {
 
-      val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-
-      rule.validate(write.writes(model)) mustBe Success(model)
+      val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"), Country("India", "IN"))))
+      rule.validate(write.writes(model)) mustBe Valid(model)
     }
 
     "successfully validate when isOutside is false" in {
@@ -36,7 +33,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       val model: CustomersOutsideUK = CustomersOutsideUK(None)
 
-      rule.validate(form) mustBe Success(model)
+      rule.validate(form) mustBe Valid(model)
     }
 
     "successfully validate when isOutside is true and there is at least 1 country selected" in {
@@ -51,7 +48,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
           Some(Seq(Country("United Kingdom", "GB")))
         )
 
-      rule.validate(form) mustBe Success(model)
+      rule.validate(form) mustBe Valid(model)
     }
 
     "fail to validate when isOutside is true and there are no countries selected" in {
@@ -61,7 +58,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
         "countries" -> Seq.empty
       )
 
-      rule.validate(form) mustBe Failure(
+      rule.validate(form) mustBe Invalid(
         Seq((Path \ "countries") -> Seq(ValidationError("error.invalid.ba.select.country")))
       )
     }
@@ -73,7 +70,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
         "countries[]" -> Seq.fill(11)("GB")
       )
 
-      rule.validate(form) mustBe Failure(
+      rule.validate(form) mustBe Invalid(
         Seq((Path \ "countries") -> Seq(ValidationError("error.maxLength", 10)))
       )
     }
@@ -82,7 +79,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       val form: UrlFormEncoded = Map.empty
 
-      rule.validate(form) mustBe Failure(
+      rule.validate(form) mustBe Invalid(
         Seq((Path \ "isOutside") -> Seq(ValidationError("error.required.ba.select.country")))
       )
     }
@@ -94,7 +91,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
         "countries[]" -> Seq("GB", "", "US", "")
       )
 
-      rule.validate(form) mustBe Success(CustomersOutsideUK(Some(Seq(
+      rule.validate(form) mustBe Valid(CustomersOutsideUK(Some(Seq(
         Country("United Kingdom", "GB"),
         Country("United States", "US")
       ))))
@@ -108,7 +105,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
         "countries[1]" -> Seq("")
       )
 
-      rule.validate(form) mustBe Success(CustomersOutsideUK(Some(Seq(
+      rule.validate(form) mustBe Valid(CustomersOutsideUK(Some(Seq(
         Country("United Kingdom", "GB")
       ))))
     }

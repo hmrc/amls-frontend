@@ -1,6 +1,6 @@
 @import forms._
 
-@(form: Form2[_])(implicit lang: Lang)
+@(form: Form2[_])(implicit lang:Lang,  m: Messages)
 
 @if(form.errors.nonEmpty) {
     <div class="flash amls-error-summary" role="alert" aria-labelledby="error-summary-heading" tabindex="-1">

@@ -1,7 +1,8 @@
 package models.status
 
 import play.api.i18n.Messages
-
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 import scala.collection.immutable.ListMap
 
 sealed trait CompletionState {

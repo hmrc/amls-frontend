@@ -1,7 +1,7 @@
 package models.aboutthebusiness
 
-import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, To, Write}
+import jto.validation.forms._
+import jto.validation.{From, Rule, To, Write}
 import play.api.libs.json.Json
 
 case class ContactingYou(
@@ -20,10 +20,10 @@ object ContactingYou {
   implicit val formats = Json.format[ContactingYou]
 
   implicit val formWrites: Write[ContactingYou, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
+    import jto.validation.forms.Writes._
+    import scala.Function.unlift
     (
-      (__ \ "phoneNumber").write[String] and
+      (__ \ "phoneNumber").write[String] ~
         (__ \ "email").write[String]
       ) (unlift(ContactingYou.unapply _))
   }
@@ -43,10 +43,10 @@ object ContactingYouForm {
   implicit val formRule: Rule[UrlFormEncoded, ContactingYouForm] =
     From[UrlFormEncoded] { __ =>
       import models.FormTypes._
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (
-        (__ \ "phoneNumber").read(phoneNumberType) and
-          (__ \ "email").read(emailType) and
+        (__ \ "phoneNumber").read(phoneNumberType) ~
+          (__ \ "email").read(emailType) ~
           (__ \ "letterToThisAddress").read[Boolean].withMessage("error.required.rightaddress")
         )(ContactingYouForm.apply _)
     }

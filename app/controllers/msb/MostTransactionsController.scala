@@ -67,8 +67,8 @@ trait MostTransactionsController extends BaseController {
                 ) map {
                   _ =>
                     edit match {
-                      case false => standardRouting(services.services)
-                      case true => editRouting(services.services, msb)
+                      case false => standardRouting(services.msbServices)
+                      case true => editRouting(services.msbServices, msb)
                     }
                 }
               }

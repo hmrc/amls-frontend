@@ -1,9 +1,9 @@
 package models.responsiblepeople
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import play.api.data.mapping.forms.Rules._
+import jto.validation.forms.Rules._
 import play.api.libs.functional.syntax._
 import utils.MappingUtils.Implicits._
 
@@ -19,21 +19,21 @@ object IsKnownByOtherNames {
 
   val maxNameTypeLength = 35
 
-  val otherFirstNameType  = notEmpty.withMessage("error.required.otherfirstnames") compose
+  val otherFirstNameType  = notEmpty.withMessage("error.required.otherfirstnames") andThen
     maxLength(maxNameTypeLength).withMessage("error.invalid.length.firstname")
 
   val otherMiddleNameType  = maxLength(maxNameTypeLength).withMessage("error.invalid.length.middlename")
 
-  val otherLastNameType  = notEmpty.withMessage("error.required.otherlastnames") compose
+  val otherLastNameType  = notEmpty.withMessage("error.required.otherlastnames") andThen
     maxLength(maxNameTypeLength).withMessage("error.invalid.length.lastname")
 
   implicit val formRule: Rule[UrlFormEncoded, IsKnownByOtherNames] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     import utils.MappingUtils.Implicits._
     (__ \ "isKnownByOtherNames").read[Boolean].withMessage("error.required.rp.isknownbyothernames") flatMap {
       case true => (
-        (__ \ "otherfirstnames").read(otherFirstNameType) and
-        (__ \ "othermiddlenames").read(optionR(otherMiddleNameType)) and
+        (__ \ "otherfirstnames").read(otherFirstNameType) ~
+        (__ \ "othermiddlenames").read(optionR(otherMiddleNameType)) ~
         (__ \ "otherlastnames").read(otherLastNameType)
         )(IsKnownByOtherNamesYes.apply _)
       case false => Rule.fromMapping { _ => Success(IsKnownByOtherNamesNo) }

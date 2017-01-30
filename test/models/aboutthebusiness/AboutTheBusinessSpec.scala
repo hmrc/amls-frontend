@@ -1,11 +1,9 @@
 package models.aboutthebusiness
 
-import models.Country
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsNull, Json}
-import sun.util.resources.LocaleData
 
 class AboutTheBusinessSpec extends PlaySpec with MockitoSugar {
 

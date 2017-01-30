@@ -1,7 +1,7 @@
 package models.responsiblepeople
 
-import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, Write}
+import jto.validation.forms._
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class PersonRegistered(registerAnotherPerson: Boolean)
@@ -13,8 +13,8 @@ object PersonRegistered {
 
   implicit val formRule: Rule[UrlFormEncoded, PersonRegistered] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
-      (__ \ "registerAnotherPerson").read[Boolean].withMessage("error.required.rp.register.another.person") fmap PersonRegistered.apply
+      import jto.validation.forms.Rules._
+      (__ \ "registerAnotherPerson").read[Boolean].withMessage("error.required.rp.register.another.person") map PersonRegistered.apply
     }
 
   implicit val formWrites: Write[PersonRegistered, UrlFormEncoded] =

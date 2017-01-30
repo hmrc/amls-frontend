@@ -7,7 +7,7 @@
     bold: Boolean = false,
     classes: Seq[String] = Seq.empty,
     requiredField: Boolean = true
-)(implicit lang: Lang)
+)(implicit lang:Lang,  m: Messages)
 
 <div class="form-group @if(field.hasErrors) {form-field--error}">
     <label>

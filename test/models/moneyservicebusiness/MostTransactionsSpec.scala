@@ -2,9 +2,9 @@ package models.moneyservicebusiness
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsError, JsSuccess, Json}
 
 class MostTransactionsSpec extends PlaySpec {
@@ -27,7 +27,7 @@ class MostTransactionsSpec extends PlaySpec {
       val model: MostTransactions =
         MostTransactions(Seq(Country("United Kingdom", "GB")))
 
-      rule.validate(write.writes(model)) mustEqual Success(model)
+      rule.validate(write.writes(model)) mustEqual Valid(model)
     }
 
     "fail to validate when there are no countries" in {
@@ -36,7 +36,7 @@ class MostTransactionsSpec extends PlaySpec {
         "mostTransactionsCountries" -> Seq.empty
       )
 
-      rule.validate(form) mustEqual Failure(
+      rule.validate(form) mustEqual Invalid(
         Seq((Path \ "mostTransactionsCountries") -> Seq(ValidationError("error.required.countries.msb.most.transactions")))
       )
     }
@@ -48,7 +48,7 @@ class MostTransactionsSpec extends PlaySpec {
         "mostTransactionsCountries[]" -> Seq.fill(4)("GB")
       )
 
-      rule.validate(form) mustEqual Failure(
+      rule.validate(form) mustEqual Invalid(
         Seq((Path \ "mostTransactionsCountries") -> Seq(ValidationError("error.maxLength", 3)))
       )
     }
@@ -82,7 +82,7 @@ class MostTransactionsSpec extends PlaySpec {
             "mostTransactionsCountries[1]" -> Seq("MK"),
             "mostTransactionsCountries[2]" -> Seq("JO")
           )
-        ) must be(Success(MostTransactions(Seq(
+        ) must be(Valid(MostTransactions(Seq(
           Country("United Kingdom", "GB"),
           Country("Macedonia, the Former Yugoslav Republic of", "MK"),
           Country("Jordan", "JO")
@@ -103,7 +103,7 @@ class MostTransactionsSpec extends PlaySpec {
             "mostTransactionsCountries[2]" -> Seq("MK")
           )
         )
-        x must be (Failure(Seq((Path \ "mostTransactionsCountries" \ 1) -> Seq(ValidationError("error.invalid.country")))))
+        x must be (Invalid(Seq((Path \ "mostTransactionsCountries" \ 1) -> Seq(ValidationError("error.invalid.country")))))
       }
     }
   }

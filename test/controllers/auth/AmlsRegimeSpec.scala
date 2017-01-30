@@ -1,10 +1,10 @@
 package controllers.auth
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{OrgAccount, SaAccount, CtAccount, Accounts}
 
-class AmlsRegimeSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class AmlsRegimeSpec extends GenericTestHelper with MockitoSugar {
 
   "AmlsRegimeSpec" should {
 

@@ -1,6 +1,6 @@
 @import models.registrationprogress._
 
-@(name: String, status: Status, call: Call)(implicit request: Request[_], lang: Lang)
+@(name: String, status: Status, call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
 
 <li>
     @status match {

@@ -1,8 +1,8 @@
 package models.declaration
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules.{minLength => _}
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules.{minLength => _}
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.Json
 
 case class WhoIsRegistering(person : String)
@@ -15,11 +15,11 @@ object WhoIsRegistering {
 
   implicit val formRule: Rule[UrlFormEncoded, WhoIsRegistering] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
-      (__ \ "person").read[String].withMessage("error.required.declaration.who.is.registering") fmap WhoIsRegistering.apply
+      import jto.validation.forms.Rules._
+      (__ \ "person").read[String].withMessage("error.required.declaration.who.is.registering") map WhoIsRegistering.apply
     }
   implicit val formWrites: Write[WhoIsRegistering, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
         (__ \ "person").write[String] contramap{x =>x.person}
   }
 

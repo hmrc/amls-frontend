@@ -3,15 +3,19 @@ package views.bankdetails
 import models.bankdetails._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
 
-class summarySpec extends WordSpec with MustMatchers with OneAppPerSuite with TableDrivenPropertyChecks {
+class summarySpec extends GenericTestHelper with MustMatchers  with TableDrivenPropertyChecks {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "summary view" when {
     "section is incomplete" must {

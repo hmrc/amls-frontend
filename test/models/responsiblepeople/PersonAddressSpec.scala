@@ -2,8 +2,8 @@ package models.responsiblepeople
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class PersonAddressSpec extends PlaySpec {
@@ -93,12 +93,12 @@ class PersonAddressSpec extends PlaySpec {
 
     "Form validation" must {
       "Read UK Address" in {
-        PersonAddress.formRule.validate(DefaultUKModel) must be (Success(DefaultUKAddress))
+        PersonAddress.formRule.validate(DefaultUKModel) must be (Valid(DefaultUKAddress))
       }
 
       "throw error when mandatory fields are missing" in {
         PersonAddress.formRule.validate(Map.empty) must be
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           ))
       }
@@ -106,7 +106,7 @@ class PersonAddressSpec extends PlaySpec {
       "throw error when there is an invalid data" in {
         val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
         PersonAddress.formRule.validate(model) must be(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           )))
       }
@@ -114,7 +114,7 @@ class PersonAddressSpec extends PlaySpec {
       "throw error when length of country exceeds max length" in {
        val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
         PersonAddress.formRule.validate(model) must be(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
           )))
       }
@@ -128,7 +128,7 @@ class PersonAddressSpec extends PlaySpec {
         )
 
         PersonAddress.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
             (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
             (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
@@ -144,7 +144,7 @@ class PersonAddressSpec extends PlaySpec {
         )
 
         PersonAddress.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
             (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
             (Path \ "country") -> Seq(ValidationError("error.required.country"))
@@ -153,7 +153,7 @@ class PersonAddressSpec extends PlaySpec {
 
 
       "Read Non UK Address" in {
-        PersonAddress.formRule.validate(DefaultNonUKModel) must be (Success(DefaultNonUKAddress))
+        PersonAddress.formRule.validate(DefaultNonUKModel) must be (Valid(DefaultNonUKAddress))
       }
 
       "write correct UK Address" in {

@@ -2,7 +2,7 @@
 @import forms2._
 @import models.asp._
 
-@(model: Asp)(implicit request: Request[_], lang: Lang)
+@(model: Asp)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.asp")

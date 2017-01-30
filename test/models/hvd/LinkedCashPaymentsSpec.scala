@@ -1,8 +1,8 @@
 package models.hvd
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
 class LinkedCashPaymentsSpec extends PlaySpec {
@@ -16,7 +16,7 @@ class LinkedCashPaymentsSpec extends PlaySpec {
           "linkedCashPayments" -> Seq("true")
         }
 
-        LinkedCashPayments.formRule.validate(map) must be(Success(LinkedCashPayments(true)))
+        LinkedCashPayments.formRule.validate(map) must be(Valid(LinkedCashPayments(true)))
       }
 
       "successfully validate given an valid 'no' option" in {
@@ -24,11 +24,11 @@ class LinkedCashPaymentsSpec extends PlaySpec {
           "linkedCashPayments" -> Seq("false")
         }
 
-        LinkedCashPayments.formRule.validate(map) must be(Success(LinkedCashPayments(false)))
+        LinkedCashPayments.formRule.validate(map) must be(Valid(LinkedCashPayments(false)))
       }
 
       "fail validation when no option selected" in {
-        LinkedCashPayments.formRule.validate(Map.empty) must be(Failure(
+        LinkedCashPayments.formRule.validate(Map.empty) must be(Invalid(
           Seq(Path \ "linkedCashPayments" -> Seq(ValidationError("error.required.hvd.linked.cash.payment")))))
 
       }

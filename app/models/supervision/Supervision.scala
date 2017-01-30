@@ -44,6 +44,7 @@ object Supervision {
   import play.api.libs.json._
 
   val key = "supervision"
+  implicit val formatOption = Reads.optionWithNull[Supervision]
 
   implicit val mongoKey = new MongoKey[Supervision] {
     override def apply(): String = "supervision"

@@ -4,7 +4,7 @@ import connectors.DataCacheConnector
 import models.businessmatching._
 import models.tradingpremises.TradingPremises
 import org.scalatest.prop.PropertyChecks
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -14,10 +14,10 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.concurrent.Future
 
 
-class TradingPremisesAddControllerSpec extends PlaySpec with OneAppPerSuite with PropertyChecks {
+class TradingPremisesAddControllerSpec extends GenericTestHelper with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new TradingPremisesAddController {
       override val dataCacheConnector = mock[DataCacheConnector]

@@ -2,9 +2,9 @@ package models.tradingpremises
 
 import models.{DateOfChange, FormTypes}
 import org.joda.time.LocalDate
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
 import play.api.libs.json.{Reads, Writes}
 import utils.MappingUtils.Implicits._
 
@@ -19,7 +19,7 @@ case class YourTradingPremises(
 object YourTradingPremises {
 
   val maxLengthPremisesTradingName = 120
-  val premisesTradingNameType = FormTypes.notEmptyStrip.withMessage("error.required.tp.trading.name") compose
+  val premisesTradingNameType = FormTypes.notEmptyStrip compose notEmpty.withMessage("error.required.tp.trading.name") compose
     maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name")
 
   implicit val reads: Reads[YourTradingPremises] = {
@@ -49,7 +49,7 @@ object YourTradingPremises {
   implicit val formR: Rule[UrlFormEncoded, YourTradingPremises] =
     From[UrlFormEncoded] { __ =>
       import models.FormTypes._
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (
         (__ \ "tradingName").read(premisesTradingNameType) ~
           __.read[Address] ~
@@ -66,7 +66,7 @@ object YourTradingPremises {
   implicit val formW: Write[YourTradingPremises, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
       import models.FormTypes.localDateWrite
-      import play.api.data.mapping.forms.Writes._
+      import jto.validation.forms.Writes._
       import play.api.libs.functional.syntax.unlift
       (
         (__ \ "tradingName").write[String] ~

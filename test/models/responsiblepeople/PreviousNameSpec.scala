@@ -2,12 +2,11 @@ package models.responsiblepeople
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import org.specs2.mock.mockito.MockitoMatchers
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 
-class PreviousNameSpec extends PlaySpec with MockitoMatchers {
+class PreviousNameSpec extends PlaySpec {
 
   "PreviousName" must {
 
@@ -39,7 +38,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = Some("Marty"),
             middleName = Some("Mc"),
             lastName = Some("Fly"),
@@ -62,7 +61,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = Some("Marty"),
             middleName = None,
             lastName = None,
@@ -83,7 +82,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = None,
             middleName = Some("Mc"),
             lastName = None,
@@ -104,7 +103,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Success(PreviousName(
+          Valid(PreviousName(
             firstName = None,
             middleName = None,
             lastName = Some("Fly"),
@@ -127,7 +126,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Failure(Seq(
+          Invalid(Seq(
             Path -> Seq(ValidationError("error.rp.previous.invalid"))
           ))
         )
@@ -146,7 +145,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
           ))
         )
@@ -165,7 +164,7 @@ class PreviousNameSpec extends PlaySpec with MockitoMatchers {
 
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
-          Failure(Seq(
+          Invalid(Seq(
             (Path) -> Seq(ValidationError("error.rp.previous.invalid")),
             (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
         )

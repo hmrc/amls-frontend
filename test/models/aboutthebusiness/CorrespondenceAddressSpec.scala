@@ -1,12 +1,14 @@
 package models.aboutthebusiness
 
+import cats.data.Validated.{Invalid, Valid}
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.Path
+import jto.validation.ValidationError
+import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.{JsSuccess, Json}
 
-class CorrespondenceAddressSpec extends PlaySpec {
+class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
 
   "CorrespondenceAddress" must {
 
@@ -36,7 +38,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
     "Form validation" must {
       "throw error when mandatory fields are missing" in {
         CorrespondenceAddress.formRule.validate(Map.empty) must be
-        Failure(Seq(
+        Invalid(Seq(
           (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
         ))
       }
@@ -44,7 +46,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
       "throw error when there is an invalid data" in {
         val model = DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
         CorrespondenceAddress.formRule.validate(model) must be(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           )))
       }
@@ -63,7 +65,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
           )
 
           CorrespondenceAddress.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "yourName") -> Seq(ValidationError("error.required.yourname")),
               (Path \ "businessName") -> Seq(ValidationError("error.required.name.of.business")),
               (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
@@ -85,7 +87,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
           )
 
           CorrespondenceAddress.formRule.validate(model) must be(
-            Failure(Seq(
+            Invalid(Seq(
               (Path \ "yourName") -> Seq(ValidationError("error.invalid.yourname")),
               (Path \ "businessName") -> Seq(ValidationError("error.invalid.name.of.business")),
               (Path \ "addressLine1") -> Seq(ValidationError("error.max.length.address.line")),
@@ -97,7 +99,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
         }
 
         "Read UK Address" in {
-          CorrespondenceAddress.formRule.validate(DefaultUKModel) must be(Success(DefaultUKAddress))
+          CorrespondenceAddress.formRule.validate(DefaultUKModel) must be(Valid(DefaultUKAddress))
         }
 
         "write correct UK Address" in {
@@ -120,7 +122,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
           )
 
           CorrespondenceAddress.formRule.validate(model) must be(
-            Failure(Seq(
+            Invalid(Seq(
               (Path \ "yourName") -> Seq(ValidationError("error.invalid.yourname")),
               (Path \ "businessName") -> Seq(ValidationError("error.invalid.name.of.business")),
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line")),
@@ -142,7 +144,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
           )
 
           CorrespondenceAddress.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "yourName") -> Seq(ValidationError("error.required.yourname")),
               (Path \ "businessName") -> Seq(ValidationError("error.required.name.of.business")),
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
@@ -152,7 +154,7 @@ class CorrespondenceAddressSpec extends PlaySpec {
         }
 
         "Read Non UK Address" in {
-          CorrespondenceAddress.formRule.validate(DefaultNonUKModel) must be(Success(DefaultNonUKAddress))
+          CorrespondenceAddress.formRule.validate(DefaultNonUKModel) must be(Valid(DefaultNonUKAddress))
         }
 
         "write correct Non UK Address" in {
