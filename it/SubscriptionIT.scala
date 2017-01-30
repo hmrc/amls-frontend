@@ -1,19 +1,4 @@
-import connectors.AmlsConnector
-import models.SubscriptionRequest
-import models.estateagentbusiness._
-import org.scalatest.time.{Seconds, Span}
-import org.scalatest.{Ignore, BeforeAndAfterEach, MustMatchers, WordSpec}
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import org.specs2.mock.Mockito
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import uk.gov.hmrc.domain.{TaxIdentifier, SaUtr}
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import uk.gov.hmrc.play.http.{HttpPost, HeaderCarrier}
-import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.it.{ExternalService, MicroServiceEmbeddedServer}
-import uk.gov.hmrc.test.it.{AuthorisationHeader, FrontendCookieHelper}
 
 
 
