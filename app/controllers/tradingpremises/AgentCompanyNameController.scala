@@ -24,7 +24,7 @@ import scala.concurrent.Future
               case Some(data) => Form2[AgentCompanyName](data)
               case None => EmptyForm
             }
-            Ok(views.html.tradingpremises.agent_company_name(form, index, edit))
+            Ok(views.html.tradingpremises.agent_company_details(form, index, edit))
           }
           case None => NotFound(notFoundView)
         }
@@ -34,7 +34,7 @@ import scala.concurrent.Future
     implicit authContext => implicit request => {
       Form2[AgentCompanyName](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.agent_company_name(f, index,edit)))
+          Future.successful(BadRequest(views.html.tradingpremises.agent_company_details(f, index,edit)))
         case ValidForm(_, data) => {
           for {
             result <- updateDataStrict[TradingPremises](index) { tp =>

@@ -1,0 +1,33 @@
+@import forms.Form2
+@import include.{main, heading}
+@import include.forms2._
+
+@(f: Form2[_], index:Int, edit: Boolean)(implicit request: Request[_], lang: Lang)
+
+@header = {
+    @errorSummary(f)
+    @heading("tradingpremises.youragent.company.details.title", "summary.tradingpremises")
+}
+
+@main(
+    title = Messages("tradingpremises.youragent.company.details.title") + " - " + Messages("summary.tradingpremises"),
+    heading = header
+) {
+
+    @form(f, controllers.tradingpremises.routes.AgentCompanyNameController.post(index,edit)) {
+
+        @input(
+            labelText = "tradingpremises.youragent.company.name",
+            field = f("agentCompanyName"),
+            hintText = "tradingpremises.agentcompanyname.lbl.hint"
+        )
+
+        @input(
+            labelText = "tradingpremises.youragent.company.crn",
+            field = f("agentCompanyCRN"),
+            hintText = "lbl.hint.crn"
+        )
+
+        @submit(edit)
+    }
+}
