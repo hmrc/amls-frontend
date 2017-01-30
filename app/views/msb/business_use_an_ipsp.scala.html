@@ -13,7 +13,7 @@
     heading = header
 ) {
 
-    <p class="form-hint">@Messages("msb.throughput.ipsp.hint")</p>
+    <span class="form-hint">@Messages("msb.throughput.ipsp.hint")</span>
 
     @form(f, controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 
@@ -39,12 +39,22 @@
         }
 
         @fieldset(
-            legend = "msb.ipsp.text",
+            legend = "msb.ipsp.title",
             legendHidden = true,
             f = f(s"""${f("name").id}-fieldset""")
         ) {
-            @input(f("name"), "msb.ipsp.name.lbl", bold = false)
-            @input(f("referenceNumber"), "msb.ipsp.referenceNumber.lbl", hintText = "msb.ipsp.referenceNumber.hint", bold = false)
+            @input(
+                f("name"),
+                labelText = "msb.ipsp.name.lbl",
+                bold = false
+            )
+
+            @input(
+                f("referenceNumber"),
+                labelText = "msb.ipsp.referenceNumber.lbl",
+                hintText = "msb.ipsp.referenceNumber.hint",
+                bold = false
+            )
         }
 
         @submit(edit)

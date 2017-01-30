@@ -13,37 +13,44 @@
     heading = header
 ) {
 
+    <p>@Messages("lbl.select.all")</p>
+
     @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
         @fieldset(
-            f = f("services"),
-            legend = "lbl.select.all",
+            f = f("redundantvalue"),
+            legend = "asp.services.title",
+            legendHidden = true,
             panel = false
         ) {
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.01",
-                value = "01"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.02",
-                value = "02"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.03",
-                value = "03"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.04",
-                value = "04"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.05",
-                value = "05"
-            )
+            @errorGroup(
+                 field = f("services")
+            ) {
+                @checkbox(
+                    f = f("services[]"),
+                    labelText = "asp.service.lbl.01",
+                    value = "01"
+                )
+                @checkbox(
+                    f = f("services[]"),
+                    labelText = "asp.service.lbl.02",
+                    value = "02"
+                )
+                @checkbox(
+                    f = f("services[]"),
+                    labelText = "asp.service.lbl.03",
+                    value = "03"
+                )
+                @checkbox(
+                    f = f("services[]"),
+                    labelText = "asp.service.lbl.04",
+                    value = "04"
+                )
+                @checkbox(
+                    f = f("services[]"),
+                    labelText = "asp.service.lbl.05",
+                    value = "05"
+                )
+            }
         }
         @submit(edit)
     }

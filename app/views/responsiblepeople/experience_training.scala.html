@@ -16,33 +16,29 @@
     heading = header
 ) {
 
-
-        <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
-        <ul class="list list-bullet">
-            @bamodel.businessActivities.map { ba =>
-            <li>@Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))</li>
-            }
-        </ul>
-
-
+    <p>@Messages("responsiblepeople.experiencetraining.businessactivities")</p>
+    <ul class="list list-bullet">
+        @bamodel.businessActivities.map { ba =>
+        <li>@Messages("businessmatching.registerservices.servicename.lbl."+bamodel.getValue(ba))</li>
+        }
+    </ul>
 
     @form(f, controllers.responsiblepeople.routes.ExperienceTrainingController.post(index, edit)) {
 
         @fieldset(
             f = f("experienceTraining"),
             legend = "responsiblepeople.experiencetraining.title",
-            legendHidden=true,
-            panel=false) {
-
+            legendHidden = true,
+            panel = false
+        ) {
             @radio(f("experienceTraining"), "lbl.yes", "true", target = ".more-information", inline=true)
             @radio(f("experienceTraining"), "lbl.no", "false", inline=true)
-
         }
 
         @fieldset(
             legend = "responsiblepeople.experiencetraining.information",
-            jsHidden = false,
-            classes=Seq("more-information"),
+            jsHidden = true,
+            classes = Seq("more-information"),
             f = f("experienceInformation-fieldset")
         ) {
             @textarea(f("experienceInformation"), bold = false, largeWidth = true, cols = "30", rows ="8")
