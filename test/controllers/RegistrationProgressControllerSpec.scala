@@ -39,7 +39,7 @@ class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper
     protected val mockCacheMap = mock[CacheMap]
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   "RegistrationProgressController" when {
     "the user is enrolled into the AMLS Account" must {
@@ -240,7 +240,7 @@ class RegistrationProgressControllerWithoutAmendmentsSpec extends GenericTestHel
     protected val mockCacheMap = mock[CacheMap]
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   "RegistrationProgressController" when {
     "there has already been a submission" must {

@@ -1,6 +1,6 @@
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -46,12 +46,14 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
               _ <- dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
                 aboutTheBusiness.registeredOffice(data))
               status <- statusService.getStatus
-            } yield status match {
-              case SubmissionDecisionApproved if redirectToDateOfChange[RegisteredOffice](aboutTheBusiness.registeredOffice, data) =>
-                Redirect(routes.RegisteredOfficeDateOfChangeController.get())
-              case _ => edit match {
-                case true => Redirect(routes.SummaryController.get())
-                case false => Redirect(routes.ContactingYouController.get(edit))
+            } yield {
+              status match {
+                case SubmissionDecisionApproved if redirectToDateOfChange[RegisteredOffice](aboutTheBusiness.registeredOffice, data) =>
+                  Redirect(routes.RegisteredOfficeDateOfChangeController.get())
+                case _ => edit match {
+                  case true => Redirect(routes.SummaryController.get())
+                  case false => Redirect(routes.ContactingYouController.get(edit))
+                }
               }
             }
           }

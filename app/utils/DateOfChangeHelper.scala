@@ -10,7 +10,6 @@ import play.api.i18n.Messages.Implicits._
 trait DateOfChangeHelper {
 
   def redirectToDateOfChange[A](a: Option[A], b: A) = {
-    println(s"hkhkjhhkjhk"+a.contains(b) +"aahsjahsjahsj"+ ApplicationConfig.release7)
     ApplicationConfig.release7 && !a.contains(b)
   }
 

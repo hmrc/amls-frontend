@@ -37,7 +37,7 @@ class StatusControllerWithoutNotificationsSpec extends GenericTestHelper with Mo
     }
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
 
   "StatusControllerWithoutNotificationsSpec" must {
     "hide notifications when notifications toggle is off" in new Fixture {

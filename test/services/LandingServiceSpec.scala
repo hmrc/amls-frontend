@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
+import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {

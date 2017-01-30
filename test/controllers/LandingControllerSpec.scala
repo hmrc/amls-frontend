@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -211,9 +211,8 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
   val businessCustomerUrl = "TestUrl"
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "Test.microservice.services.feature-toggle.amendments" -> true,
-    "Test.microservice.services.business-customer.url" -> businessCustomerUrl
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.amendments" -> true
   ))
 
 
@@ -467,7 +466,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
             val result = controller.get()(request)
             status(result) must be (SEE_OTHER)
-            redirectLocation(result) must be (Some(businessCustomerUrl))
+            redirectLocation(result) must be (Some("http://localhost:9923/business-customer/amls"))
           }
         }
       }

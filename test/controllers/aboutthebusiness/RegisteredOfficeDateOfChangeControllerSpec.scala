@@ -23,7 +23,7 @@ import scala.concurrent.Future
 
 class RegisteredOfficeDateOfChangeControllerSpec extends GenericTestHelper with  MockitoSugar{
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

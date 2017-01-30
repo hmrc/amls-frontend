@@ -37,7 +37,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
     }
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   "StatusController" must {
     "hide amendment/variation link when amendments toggle is off" in new Fixture {

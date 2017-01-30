@@ -35,7 +35,7 @@ class CurrentAddressControllerNoRelease7Spec extends GenericTestHelper with Mock
     }
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
 
   val emptyCache = CacheMap("", Map.empty)
 

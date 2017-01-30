@@ -37,7 +37,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
     }
   }
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   val emptyCache = CacheMap("", Map.empty)
 

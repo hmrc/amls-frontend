@@ -7,6 +7,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.guice.GuiceApplicationBuilder
 import utils.GenericTestHelper
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -27,10 +28,15 @@ class CorporationTaxRegisteredControllerRelease7Spec extends GenericTestHelper w
     }
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map(
+
+  implicit override lazy val app = new GuiceApplicationBuilder().
+    configure(Map("Test.microservice.services.feature-toggle.business-matching-details-lookup" -> true)).build()
+
+
+ /* override lazy val app = FakeApplication(additionalConfiguration = Map(
     "Test.microservice.services.feature-toggle.business-matching-details-lookup" -> true
   ))
-
+*/
 
   val emptyCache = CacheMap("", Map.empty)
 

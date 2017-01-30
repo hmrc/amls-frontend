@@ -189,7 +189,7 @@ class NotificationsControllerWithoutNotificationsSpec extends GenericTestHelper 
     )
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
 
   "NotificationsControllerWithoutNotificationsSpec" must {
     "respond with not found when toggle is off" when {

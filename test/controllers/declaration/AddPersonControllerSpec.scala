@@ -223,7 +223,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
 class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with MockitoSugar {
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]

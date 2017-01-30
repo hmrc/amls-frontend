@@ -8,7 +8,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class DateOfChangeHelperRelease7Spec extends UnitSpec with OneAppPerSuite with MockitoSugar {
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
 
   "DateOfChangeHelper" should {
 

@@ -21,7 +21,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -130,7 +130,7 @@ class DeclarationControllerWithAmendmentToggleOffSpec extends GenericTestHelper 
 }
 
 class DeclarationControllerWithAmendmentToggleOnSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

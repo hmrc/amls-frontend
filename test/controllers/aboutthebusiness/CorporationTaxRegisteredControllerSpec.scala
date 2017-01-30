@@ -7,6 +7,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.guice.GuiceApplicationBuilder
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
@@ -29,7 +30,7 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
     }
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map(
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
     "Test.microservice.services.feature-toggle.business-matching-details-lookup" -> false
   ))
 
@@ -153,34 +154,6 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
       val document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#corporationTaxReference]").html() must include(Messages("error.invalid.atb.corporation.tax.number"))
     }
-
-    "on get retrieve the corporation tax reference from business customer api if no previous entry and feature flag is high" in new Fixture {
-
-      running(FakeApplication(additionalConfiguration = Map(
-        "Test.microservice.services.feature-toggle.business-matching-details-lookup" -> true
-      ))) {
-
-        val reviewDetailsModel = mock[BusinessMatchingReviewDetails]
-        when(reviewDetailsModel.utr) thenReturn Some("0987654321")
-
-        when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(Some(reviewDetailsModel))
-
-        val data = AboutTheBusiness(corporationTaxRegistered = None)
-
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(data)))
-
-        val result = controller.get()(request)
-
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
-        document.getElementById("corporationTaxReference").`val` must be("0987654321")
-      }
-    }
-
   }
 
 }
-

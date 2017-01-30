@@ -5,9 +5,7 @@ import connectors.DataCacheConnector
 import models.{Country, DateOfChange}
 import models.aboutthebusiness._
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -32,8 +30,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
       override val statusService = mock[StatusService]
     }
   }
-
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -48,7 +45,7 @@ class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSuga
 
     "load the where is your registered office or main place of business place page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -166,7 +163,7 @@ class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  M
     }
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
 
   val emptyCache = CacheMap("", Map.empty)
 

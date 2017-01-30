@@ -264,7 +264,7 @@ class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar
 
 class WhoIsRegisteringControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
