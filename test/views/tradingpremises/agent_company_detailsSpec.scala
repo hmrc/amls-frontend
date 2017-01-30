@@ -41,20 +41,17 @@ class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPe
       val agentCompanyCRNField = "agentCompanyCRNField"
 
       val form2: InvalidForm = InvalidForm(
-        Map("thing" -> Seq("thing")),
-        Seq(
-          (Path \ agentCompanyNameField, Seq(ValidationError(messageKey1))),
-          (Path \ agentCompanyCRNField, Seq(ValidationError(messageKey2)))
-        )
-      )
+        Map("a" -> Seq("a")),
+        Seq((Path \ agentCompanyNameField, Seq(ValidationError(messageKey1))),
+          (Path \ agentCompanyCRNField, Seq(ValidationError(messageKey2)))))
 
       def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
 
       errorSummary.html() must include(messageKey1)
       errorSummary.html() must include(messageKey2)
 
-      doc.getElementsByClass("error-notification").first().html() must include(messageKey1)
-      doc.getElementsByClass("error-notification").last().html() must include(messageKey2)
+      doc.getElementsByClass("form-field--error").first().html() must include(messageKey1)
+      doc.html() must include("dhjkuyftxdrxtcfgh")
     }
   }
 }

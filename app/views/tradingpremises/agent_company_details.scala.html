@@ -16,17 +16,26 @@
 
     @form(f, controllers.tradingpremises.routes.AgentCompanyDetailsController.post(index,edit)) {
 
-        @input(
-            labelText = "tradingpremises.youragent.company.name",
-            field = f("agentCompanyName"),
-            hintText = "tradingpremises.agentcompanyname.lbl.hint"
-        )
+        @fieldset(
+            legend = "tradingpremises.youragent.company.details.title",
+            legendHidden = true,
+            panel = false,
+            f = f(s"""${f("agentCompanyName").id}-fieldset""")
+        ){
 
-        @input(
-            labelText = "tradingpremises.youragent.company.crn",
-            field = f("companyRegistrationNumber"),
-            hintText = "lbl.hint.crn"
-        )
+            @input(
+                field = f("agentCompanyName"),
+                labelText = "tradingpremises.youragent.company.name",
+                hintText = "tradingpremises.agentcompanyname.lbl.hint"
+            )
+
+            @input(
+                field = f("companyRegistrationNumber"),
+                labelText = "tradingpremises.youragent.crn",
+                hintText = "lbl.hint.crn"
+            )
+
+        }
 
         @submit(edit)
     }
