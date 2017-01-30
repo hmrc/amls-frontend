@@ -6,7 +6,7 @@ import models.status.{SubmissionDecisionRejected, SubmissionDecisionApproved, No
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -16,10 +16,10 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class TransactionsInNext12MonthsControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar  {
+class TransactionsInNext12MonthsControllerSpec extends GenericTestHelper with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new TransactionsInNext12MonthsController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]

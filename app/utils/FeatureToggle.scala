@@ -1,6 +1,6 @@
 package utils
 
-import play.api.Play
+import play.api.http.{Status, DefaultHttpErrorHandler}
 import play.api.mvc._
 
 case class FeatureToggle(feature: Boolean) {
@@ -11,7 +11,6 @@ case class FeatureToggle(feature: Boolean) {
 object FeatureToggle {
   val notFound = Action.async {
     request =>
-      import play.api.Play.current
-      Play.global.onHandlerNotFound(request)
+      DefaultHttpErrorHandler.onClientError(request, Status.NOT_FOUND, "")
   }
 }

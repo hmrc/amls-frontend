@@ -1,11 +1,10 @@
 package models.bankdetails
 
 import models.FormTypes._
-import models.FormTypes
-import play.api.data.validation.ValidationError
+import jto.validation.ValidationError
 import play.api.libs.json._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
 
 
 sealed trait Account
@@ -16,16 +15,16 @@ object Account {
 
   implicit val formRead: Rule[UrlFormEncoded, Account] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") flatMap {
         case true =>
           (
-            (__ \ "accountNumber").read(ukBankAccountNumberType) and
+            (__ \ "accountNumber").read(ukBankAccountNumberType) ~
             (__ \ "sortCode").read(sortCodeType)
 
             ) (UKAccount.apply _)
         case false =>
-          ((__ \ "IBANNumber").read(optionR(ibanType)) and
+          ((__ \ "IBANNumber").read(optionR(ibanType)) ~
             (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
             case (Some(iban), _) => NonUKIBANNumber(iban)
             case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
@@ -63,8 +62,8 @@ object Account {
 
       case false =>
         (__ \ "isIBAN").read[Boolean] flatMap {
-          case true => (__ \ "IBANNumber").read[String] fmap  NonUKIBANNumber.apply
-          case false =>  (__ \ "nonUKAccountNumber").read[String] fmap  NonUKAccountNumber.apply
+          case true => (__ \ "IBANNumber").read[String] map  NonUKIBANNumber.apply
+          case false =>  (__ \ "nonUKAccountNumber").read[String] map  NonUKAccountNumber.apply
         }
     }
   }
@@ -119,16 +118,16 @@ object BankAccount {
   val key = "bank-account"
 
   implicit val formRule: Rule[UrlFormEncoded, BankAccount] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    ((__ \ "accountName").read(accountNameType) and
+    import jto.validation.forms.Rules._
+    ((__ \ "accountName").read(accountNameType) ~
       __.read[Account]
       ).apply(BankAccount.apply _)
   }
 
   implicit val formWrite: Write[BankAccount, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
-    ((__ \ "accountName").write[String] and
+    ((__ \ "accountName").write[String] ~
       __.write[Account]
       ) (unlift(BankAccount.unapply _))
   }

@@ -6,6 +6,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
+import  utils.GenericTestHelper
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -14,13 +15,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class BankAccountAddControllerSpec extends PlaySpec
-  with OneAppPerSuite
+class BankAccountAddControllerSpec extends GenericTestHelper
   with MockitoSugar
   with BeforeAndAfter {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new BankAccountAddController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

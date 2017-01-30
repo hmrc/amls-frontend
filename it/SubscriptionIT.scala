@@ -4,8 +4,8 @@ import models.estateagentbusiness._
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{Ignore, BeforeAndAfterEach, MustMatchers, WordSpec}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import org.specs2.mock.Mockito
+import  utils.GenericTestHelper
+import org.mockito.Mockito._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.{TaxIdentifier, SaUtr}
@@ -18,9 +18,9 @@ import uk.gov.hmrc.test.it.{AuthorisationHeader, FrontendCookieHelper}
 
 
 class IntegrationServer(override val testName : String) extends MicroServiceEmbeddedServer {
-  override protected val externalServices: Seq[ExternalService] =
+  override protected val externalServices: Seq[ExternalService] = Seq.empty
 
-    Seq("amls-stub", "auth").map(ExternalService.runFromJar(_)) ++ Seq("amls").map(ExternalService.runFromSource(_))
+    //Seq("amls-stub", "auth").map(ExternalService.runFromJar(_)) ++ Seq("amls").map(ExternalService.runFromSource(_))
 }
 
 

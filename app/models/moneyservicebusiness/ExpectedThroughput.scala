@@ -1,8 +1,8 @@
 package models.moneyservicebusiness
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait ExpectedThroughput
@@ -21,7 +21,7 @@ object ExpectedThroughput {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ExpectedThroughput] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "throughput").read[String].withMessage("error.required.msb.throughput") flatMap {
       case "01" => First
       case "02" => Second
@@ -56,7 +56,7 @@ object ExpectedThroughput {
       case "06" => Sixth
       case "07" => Seventh
       case _ =>
-        ValidationError("error.invalid")
+        play.api.data.validation.ValidationError("error.invalid")
     }
   }
 

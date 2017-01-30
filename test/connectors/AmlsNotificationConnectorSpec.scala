@@ -29,13 +29,13 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       None,
       None,
       CredentialStrength.Weak,
-      ConfidenceLevel.L50),
+      ConfidenceLevel.L50, ""),
     Principal(
       None,
       Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
     None,
     None,
-    None)
+    None, None)
 
   private trait Fixture {
     val mockConnector =  mock[HttpGet]

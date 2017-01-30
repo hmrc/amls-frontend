@@ -1,7 +1,7 @@
 package models
 
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.api.libs.json._
 
@@ -21,10 +21,10 @@ object Country {
         case e @ Country(_, c) if c == code =>
           JsSuccess(e)
       } getOrElse {
-        JsError(JsPath -> ValidationError("error.invalid"))
+        JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid"))
       }
     case _ =>
-      JsError(JsPath -> ValidationError("error.invalid"))
+      JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid"))
   }
 
   implicit val formWrites: Write[Country, String] =
@@ -32,23 +32,23 @@ object Country {
 
   implicit val formRule: Rule[String, Country] =
     Rule {
-      case "" => Failure(Seq(Path -> Seq(ValidationError(Messages("error.required.country")))))
+      case "" => Failure(Seq(Path -> Seq(ValidationError("error.required.country"))))
       case code =>
         countries.collectFirst {
           case e @ Country(_, c) if c == code =>
             Success(e)
         } getOrElse {
-          Failure(Seq(Path -> Seq(ValidationError(Messages("error.invalid.country")))))
+          Failure(Seq(Path -> Seq(ValidationError("error.invalid.country"))))
         }
     }
 
   implicit val jsonW: Write[Country, JsValue] = {
-    import play.api.data.mapping.json.Writes.string
-    formWrites compose string
+    import jto.validation.playjson.Writes.string
+    formWrites andThen string
   }
 
   implicit val jsonR: Rule[JsValue, Country] = {
-    import play.api.data.mapping.json.Rules.stringR
-    stringR compose formRule
+    import jto.validation.playjson.Rules.stringR
+    stringR andThen formRule
   }
 }

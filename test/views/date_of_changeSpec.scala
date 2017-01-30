@@ -3,13 +3,17 @@ package views
 import forms.{Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
 
-class date_of_changeSpec extends WordSpec with MustMatchers with OneAppPerSuite{
+class date_of_changeSpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "Date of Change View" must {
 

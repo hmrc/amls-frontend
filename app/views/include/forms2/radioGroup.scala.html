@@ -1,7 +1,7 @@
 @(
   f: forms.Field,
   classes: Seq[String] = Seq("form-field")
-)(content: Html)(implicit lang: Lang)
+)(content: Html)(implicit lang:Lang,  m: Messages)
 
 <fieldset class="@classes.mkString(" ") @if(f.hasErrors){form-field--error}" id="@f.id">
     @if(f.hasErrors) {

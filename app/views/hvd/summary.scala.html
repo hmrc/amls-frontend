@@ -4,7 +4,7 @@
 @import models.hvd.PercentageOfCashPaymentOver15000._
 @import utils.DateHelper
 
-@(model: Hvd, isEditable:Boolean)(implicit request: Request[_], lang: Lang)
+@(model: Hvd, isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.hvd")

@@ -1,7 +1,7 @@
 package models.aboutthebusiness
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait CorporationTaxRegistered
@@ -16,10 +16,10 @@ object CorporationTaxRegistered {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, CorporationTaxRegistered] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "registeredForCorporationTax").read[Boolean].withMessage("error.required.atb.corporation.tax") flatMap {
       case true =>
-        (__ \ "corporationTaxReference").read(corporationTaxType) fmap CorporationTaxRegisteredYes.apply
+        (__ \ "corporationTaxReference").read(corporationTaxType) map CorporationTaxRegisteredYes.apply
       case false => Rule.fromMapping { _ => Success(CorporationTaxRegisteredNo) }
     }
   }

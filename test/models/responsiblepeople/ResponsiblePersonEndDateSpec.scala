@@ -1,10 +1,9 @@
 package models.responsiblepeople
 
-import models.responsiblepeople.ResponsiblePersonEndDate
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -31,7 +30,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
       )
 
       ResponsiblePersonEndDate.formRule.validate(validModel) must be(
-        Success(ResponsiblePersonEndDate(new LocalDate(validYear, validMonth, validDay))))
+        Valid(ResponsiblePersonEndDate(new LocalDate(validYear, validMonth, validDay))))
     }
 
     "successfully write the model" in {
@@ -52,7 +51,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Invalid(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "month entered is invalid" in {
@@ -63,7 +62,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Invalid(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "year entered is too long" in {
@@ -74,7 +73,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Invalid(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "year entered is too short" in {
@@ -85,7 +84,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(errorDayModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          Invalid(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
       "all fields are empty" in {
@@ -96,7 +95,7 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
         )
 
         ResponsiblePersonEndDate.formRule.validate(noContentModel) must be(
-          Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
+          Invalid(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
         )
       }
     }

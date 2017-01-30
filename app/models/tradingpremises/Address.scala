@@ -1,8 +1,8 @@
 package models.tradingpremises
 
 import models.DateOfChange
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, To, Write}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, To, Write}
 import play.api.libs.json.{Json, Reads, Writes}
 
 case class Address(
@@ -35,19 +35,19 @@ object Address {
   implicit val formR: Rule[UrlFormEncoded, Address] =
     From[UrlFormEncoded] { __ =>
       import models.FormTypes._
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (
-        (__ \ "addressLine1").read(notEmptyStrip.withMessage("error.required.address.line1") compose validateAddress) ~
-          (__ \ "addressLine2").read(notEmptyStrip.withMessage("error.required.address.line2") compose validateAddress) ~
-          (__ \ "addressLine3").read(optionR(notEmptyStrip compose validateAddress)) ~
-          (__ \ "addressLine4").read(optionR(notEmptyStrip compose validateAddress)) ~
+        (__ \ "addressLine1").read(notEmptyStrip.withMessage("error.required.address.line1") andThen validateAddress) ~
+          (__ \ "addressLine2").read(notEmptyStrip.withMessage("error.required.address.line2") andThen validateAddress) ~
+          (__ \ "addressLine3").read(optionR(notEmptyStrip andThen validateAddress)) ~
+          (__ \ "addressLine4").read(optionR(notEmptyStrip andThen validateAddress)) ~
           (__ \ "postcode").read(postcodeType)
         )(Address.applyWithoutDateOfChange _)
     }
 
   implicit val formW: Write[Address, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Writes._
+      import jto.validation.forms.Writes._
       import play.api.libs.functional.syntax.unlift
       (
         (__ \ "addressLine1").write[String] ~

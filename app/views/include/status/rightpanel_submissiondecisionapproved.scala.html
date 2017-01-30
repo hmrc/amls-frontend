@@ -3,7 +3,7 @@
 @import forms2._
 @import models.FeeResponse
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_], lang: Lang)
+@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
 
 <p>@Messages("status.submissiondecisionapproved.description")</p>
 <p>@Messages("status.submissiondecisionapproved.description2")</p>

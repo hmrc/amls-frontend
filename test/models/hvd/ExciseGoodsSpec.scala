@@ -1,8 +1,8 @@
 package models.hvd
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
 class ExciseGoodsSpec extends PlaySpec {
@@ -16,7 +16,7 @@ class ExciseGoodsSpec extends PlaySpec {
           "exciseGoods" -> Seq("true")
         }
 
-        ExciseGoods.formRule.validate(map) must be(Success(ExciseGoods(true)))
+        ExciseGoods.formRule.validate(map) must be(Valid(ExciseGoods(true)))
       }
 
       "successfully validate given an valid 'no' option" in {
@@ -24,12 +24,12 @@ class ExciseGoodsSpec extends PlaySpec {
           "exciseGoods" -> Seq("false")
         }
 
-        ExciseGoods.formRule.validate(map) must be(Success(ExciseGoods(false)))
+        ExciseGoods.formRule.validate(map) must be(Valid(ExciseGoods(false)))
       }
 
       "fail when neither option has been selected" in {
 
-        ExciseGoods.formRule.validate(Map.empty) must be(Failure(
+        ExciseGoods.formRule.validate(Map.empty) must be(Invalid(
           Seq(Path \ "exciseGoods" -> Seq(ValidationError("error.required.hvd.excise.goods")))))
 
       }

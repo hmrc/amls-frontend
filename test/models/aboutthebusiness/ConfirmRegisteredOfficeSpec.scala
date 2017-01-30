@@ -1,9 +1,10 @@
 package models.aboutthebusiness
 
+import cats.data.Validated.{Invalid, Valid}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.Path
+import jto.validation.ValidationError
 
 class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
   "RegOfficeOrMainPlaceOfBusiness" must {
@@ -16,7 +17,7 @@ class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         )
 
         ConfirmRegisteredOffice.formRule.validate(data) must
-          be(Success(ConfirmRegisteredOffice(true)))
+          be(Valid(ConfirmRegisteredOffice(true)))
       }
 
       "given a 'false' value" in {
@@ -26,7 +27,7 @@ class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         )
 
         ConfirmRegisteredOffice.formRule.validate(data) must
-          be(Success(ConfirmRegisteredOffice(false)))
+          be(Valid(ConfirmRegisteredOffice(false)))
       }
     }
 
@@ -34,7 +35,7 @@ class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       "given missing data represented by an empty Map" in {
 
         ConfirmRegisteredOffice.formRule.validate(Map.empty) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required.atb.confirm.office"))
           )))
       }
@@ -46,7 +47,7 @@ class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         )
 
         ConfirmRegisteredOffice.formRule.validate(data) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "isRegOfficeOrMainPlaceOfBusiness") -> Seq(ValidationError("error.required.atb.confirm.office"))
           )))
       }

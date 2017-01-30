@@ -1,7 +1,7 @@
 package forms
 
-import play.api.data.mapping.forms.PM
-import play.api.data.mapping.{ValidationError, Path}
+import jto.validation.forms.PM
+import jto.validation.{ValidationError, Path}
 import play.api.i18n.Lang
 
 sealed trait Field {

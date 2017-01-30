@@ -6,17 +6,17 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 
 
 import scala.concurrent.Future
 
-class ConfirmRegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ConfirmRegisteredOfficeController {
       override val dataCache = mock[DataCacheConnector]

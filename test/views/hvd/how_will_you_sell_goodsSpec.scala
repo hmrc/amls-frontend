@@ -2,15 +2,19 @@ package views.hvd
 
 import forms.{InvalidForm, ValidForm, Form2}
 import models.hvd.{Wholesale, Retail, HowWillYouSellGoods}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
-class how_will_you_sell_goodsSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class how_will_you_sell_goodsSpec extends GenericTestHelper with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "how_will_you_sell_goods view" must {
     "have correct title" in new ViewFixture {

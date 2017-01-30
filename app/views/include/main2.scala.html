@@ -13,7 +13,7 @@
     linkElement : Option[Html] = None,
     nameBusiness : Option[String] = None,
     userLoggedIn : Boolean = true
-)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_])
+)(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
 
 @styles = {
     <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>

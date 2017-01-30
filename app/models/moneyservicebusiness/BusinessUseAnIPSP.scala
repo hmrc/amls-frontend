@@ -1,8 +1,8 @@
 package models.moneyservicebusiness
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait BusinessUseAnIPSP
@@ -17,22 +17,22 @@ object BusinessUseAnIPSP {
   import utils.MappingUtils.Implicits._
 
   private val maxNameTypeLength = 140
-  private val nameType = notEmptyStrip compose
-    notEmpty.withMessage("error.required.msb.ipsp.name") compose
+  private val nameType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.msb.ipsp.name") andThen
     maxLength(maxNameTypeLength).withMessage("error.invalid.msb.ipsp.name")
 
   val referenceTypeRegex = "^[0-9]{15}$".r
   private val referenceNumRegex = regexWithMsg(referenceTypeRegex, "error.required.msb.ipsp.reference")
 
-  val referenceType = notEmptyStrip compose
-    notEmpty.withMessage("error.required.msb.ipsp.reference") compose referenceNumRegex
+  val referenceType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.msb.ipsp.reference") andThen referenceNumRegex
 
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessUseAnIPSP] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "useAnIPSP").read[Boolean].withMessage("error.required.msb.ipsp") flatMap {
       case true =>
-        ((__ \ "name").read(nameType) and
+        ((__ \ "name").read(nameType) ~
           (__ \ "referenceNumber").read(referenceType)) (BusinessUseAnIPSPYes.apply _)
       case false => Rule.fromMapping { _ => Success(BusinessUseAnIPSPNo) }
     }

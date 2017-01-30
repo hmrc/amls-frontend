@@ -92,6 +92,8 @@ object MoneyServiceBusiness {
 
   val key = "msb"
 
+  implicit val formatOption = Reads.optionWithNull[MoneyServiceBusiness]
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = key
     val notStarted = Section(messageKey, NotStarted, false, controllers.msb.routes.WhatYouNeedController.get())

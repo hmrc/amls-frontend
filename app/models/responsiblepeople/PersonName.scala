@@ -1,8 +1,8 @@
 package models.responsiblepeople
 
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms._
-import play.api.data.mapping._
+import jto.validation.forms.Rules._
+import jto.validation.forms._
+import jto.validation._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import models.FormTypes._
@@ -28,7 +28,7 @@ object PersonName {
 
       val otherNamesLength = 140
       val otherNamesType =
-        required("error.required.rp.otherNames") compose
+        required("error.required.rp.otherNames") andThen
           maxWithMsg(otherNamesLength, "error.invalid.length.otherNames")
 
       (
@@ -37,13 +37,13 @@ object PersonName {
         (__ \ "lastName").read(lastNameType) ~
         (__ \ "hasPreviousName").read[Boolean].withMessage("error.required.rp.hasPreviousName").flatMap[Option[PreviousName]] {
           case true =>
-            (__ \ "previous").read[PreviousName] fmap Some.apply
+            (__ \ "previous").read[PreviousName] map Some.apply
           case false =>
             Rule(_ => Success(None))
         } ~
         (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames").flatMap[Option[String]] {
           case true =>
-            (__ \ "otherNames").read(otherNamesType) fmap Some.apply
+            (__ \ "otherNames").read(otherNamesType) map Some.apply
           case false =>
             Rule(_ => Success(None))
         }

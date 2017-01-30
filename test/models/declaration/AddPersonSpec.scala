@@ -2,8 +2,8 @@ package models.declaration
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class AddPersonSpec extends PlaySpec with MockitoSugar {
@@ -18,7 +18,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
           "lastName" -> Seq("Doe"),
           "roleWithinBusiness" -> Seq("01")
         )
-        AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", Some("Envy"), "Doe", BeneficialShareholder)))
+        AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("John", Some("Envy"), "Doe", BeneficialShareholder)))
       }
 
       "a middle name is not provided" in {
@@ -27,7 +27,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
           "lastName" -> Seq("Doe"),
           "roleWithinBusiness" -> Seq("01")
         )
-        AddPerson.formRule.validate(urlFormEncoded) must be(Success(AddPerson("John", None, "Doe", BeneficialShareholder)))
+        AddPerson.formRule.validate(urlFormEncoded) must be(Valid(AddPerson("John", None, "Doe", BeneficialShareholder)))
       }
     }
 
@@ -35,7 +35,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
       "fields are missing represented by an empty Map" in {
 
         AddPerson.formRule.validate(Map.empty) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required")),
             (Path \ "lastName") -> Seq(ValidationError("error.required")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.required"))
@@ -51,7 +51,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
           "roleWithinBusiness" -> Seq("")
         )
         AddPerson.formRule.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required")),
             (Path \ "lastName") -> Seq(ValidationError("error.required")),
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
@@ -66,7 +66,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.required"))
           )))
       }
@@ -79,7 +79,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "lastName") -> Seq(ValidationError("error.required"))
           )))
       }
@@ -92,7 +92,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.required"))
           )))
       }
@@ -106,7 +106,7 @@ class AddPersonSpec extends PlaySpec with MockitoSugar {
         )
 
         AddPerson.formRule.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "firstName") -> Seq(ValidationError("error.maxLength", 35)),
             (Path \ "lastName") -> Seq(ValidationError("error.maxLength", 35))
           )))

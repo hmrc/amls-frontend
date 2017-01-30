@@ -3,8 +3,8 @@ package models.responsiblepeople
 import models.Country
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 
@@ -14,12 +14,12 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
 
     "successfully pass validation for British" in {
       val urlFormEncoded = Map("nationality" -> Seq("01"))
-      Nationality.formRule.validate(urlFormEncoded) must be(Success(British))
+      Nationality.formRule.validate(urlFormEncoded) must be(Valid(British))
     }
 
     "successfully pass validation for Irish" in {
       val urlFormEncoded = Map("nationality" -> Seq("02"))
-      Nationality.formRule.validate(urlFormEncoded) must be(Success(Irish))
+      Nationality.formRule.validate(urlFormEncoded) must be(Valid(Irish))
     }
 
     "successfully pass validation for otherCountry" in {
@@ -27,7 +27,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
         "nationality" -> Seq("03"),
         "otherCountry" -> Seq("GB")
       )
-      Nationality.formRule.validate(urlFormEncoded) must be(Success(OtherCountry(Country("United Kingdom", "GB"))))
+      Nationality.formRule.validate(urlFormEncoded) must be(Valid(OtherCountry(Country("United Kingdom", "GB"))))
     }
 
     "fail validation if not Other value" in {
@@ -35,13 +35,13 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
         "nationality" -> Seq("03"),
         "otherCountry" -> Seq("")
       )
-      Nationality.formRule.validate(urlFormEncoded) must be(Failure(Seq(
+      Nationality.formRule.validate(urlFormEncoded) must be(Invalid(Seq(
         (Path \ "otherCountry") -> Seq(ValidationError("error.required.country"))
       )))
     }
 
     "fail validation when user has not selected atleast one of the option" in {
-      Nationality.formRule.validate(Map.empty) must be(Failure(Seq(
+      Nationality.formRule.validate(Map.empty) must be(Invalid(Seq(
         (Path \ "nationality") -> Seq(ValidationError("error.required.nationality"))
       )))
     }
@@ -51,7 +51,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
       val urlFormEncoded = Map("nationality" -> Seq("10"))
 
       Nationality.formRule.validate(urlFormEncoded) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "nationality") -> Seq(ValidationError("error.invalid"))
         )))
     }
@@ -79,23 +79,23 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
 
     "Read json and write the option British successfully" in {
 
-      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(British)) must be(JsSuccess(British, JsPath \ "nationality"))
+      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(British)) must be(JsSuccess(British, JsPath))
     }
 
     "Read json and write the option Irish successfully" in {
 
-      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(Irish)) must be(JsSuccess(Irish, JsPath \ "nationality"))
+      Nationality.jsonReads.reads(Nationality.jsonWrites.writes(Irish)) must be(JsSuccess(Irish, JsPath))
     }
 
     "Read read and write the option `other country` successfully" in {
       val json = Nationality.jsonWrites.writes(OtherCountry(Country("United Kingdom", "GB")))
       Nationality.jsonReads.reads(json) must be(
-        JsSuccess(OtherCountry(Country("United Kingdom", "GB")), JsPath \ "nationality" \ "otherCountry"))
+        JsSuccess(OtherCountry(Country("United Kingdom", "GB")), JsPath \ "otherCountry"))
     }
 
     "fail to validate given an invalid value supplied that is not matching to any nationality" in {
 
-      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath \ "nationality", List(ValidationError("error.invalid"))))))
+      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath, List(play.api.data.validation.ValidationError("error.invalid"))))))
 
     }
   }

@@ -2,10 +2,10 @@ package models.responsiblepeople
 
 import models.FormTypes._
 import org.joda.time.LocalDate
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json.{Json, Reads, Writes, _}
 import utils.TraversableValidators._
 
@@ -64,7 +64,7 @@ object PositionWithinBusiness {
       case JsString("04") => JsSuccess(NominatedOfficer)
       case JsString("05") => JsSuccess(Partner)
       case JsString("06") => JsSuccess(SoleProprietor)
-      case _ => JsError((JsPath \ "positions") -> ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid"))
     }
 
   implicit val jsonWrites = Writes[PositionWithinBusiness] {
@@ -89,7 +89,7 @@ object Positions {
       ((__ \ "positions")
         .read(minLengthR[Set[PositionWithinBusiness]](1)
           .withMessage("error.required.positionWithinBusiness")) ~
-        (__ \ "startDate").read(localDateRule.fmap { x: LocalDate => Some(x) })) (Positions.apply _)
+        (__ \ "startDate").read(localDateRule.map { x: LocalDate => Some(x) })) (Positions.apply _)
     }
 
   implicit def formWrites

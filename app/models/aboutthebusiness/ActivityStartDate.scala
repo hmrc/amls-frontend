@@ -1,8 +1,8 @@
 package models.aboutthebusiness
 
 import org.joda.time.{DateTimeFieldType, LocalDate}
-import play.api.data.mapping.{To, Write, From, Rule}
-import play.api.data.mapping.forms._
+import jto.validation.{To, Write, From, Rule}
+import jto.validation.forms._
 import play.api.libs.json.Json
 import models.FormTypes._
 
@@ -13,8 +13,8 @@ object ActivityStartDate {
   implicit val format =  Json.format[ActivityStartDate]
 
   implicit val formRule: Rule[UrlFormEncoded, ActivityStartDate] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-      (__ \ "startDate").read(localDateRule) fmap ActivityStartDate.apply
+    import jto.validation.forms.Rules._
+      (__ \ "startDate").read(localDateRule) map ActivityStartDate.apply
   }
 
   implicit val formWrites: Write[ActivityStartDate, UrlFormEncoded] =

@@ -1,7 +1,7 @@
 package models.businessactivities
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.functional.syntax._
 
 case class WhoIsYourAccountant(accountantsName: String,
@@ -27,7 +27,7 @@ object WhoIsYourAccountant {
 
   implicit val jsonReads : Reads[WhoIsYourAccountant] =
     ((__ \ "accountantsName").read[String] and
-     (__ \ "accountantsTradingName").read[Option[String]] and
+     (__ \ "accountantsTradingName").readNullable[String] and
      __.read[AccountantsAddress])(WhoIsYourAccountant.apply _)
 
 
@@ -59,13 +59,13 @@ object WhoIsYourAccountant {
 
   implicit val formRule: Rule[UrlFormEncoded, WhoIsYourAccountant] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
 
       val nameTypeLength = 140
-      val nameType = notEmpty compose maxLength(nameTypeLength)
+      val nameType = notEmpty andThen maxLength(nameTypeLength)
 
-      ((__ \ "name").read(nameType) and
-        (__ \ "tradingName").read(optionR(nameType)) and
+      ((__ \ "name").read(nameType) ~
+        (__ \ "tradingName").read(optionR(nameType)) ~
         __.read[AccountantsAddress])(WhoIsYourAccountant.apply _)
     }
 }

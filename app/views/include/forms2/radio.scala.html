@@ -4,7 +4,7 @@
     value: String,
     target: String = "",
     inline: Boolean = false
-)(implicit lang: Lang)
+)(implicit lang:Lang,  m: Messages)
 
 <label class="block-label@if(inline){ block-label--inline}" for="@{f.id}-@value">
     <input

@@ -14,7 +14,7 @@ import org.scalatest.{MustMatchers, WordSpecLike}
 import org.scalatestplus.play.OneAppPerSuite
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{StatusConstants, AuthorisedFixture}
+import utils.{GenericTestHelper, StatusConstants, AuthorisedFixture}
 import play.api.test.Helpers._
 import org.mockito.Matchers.{eq => meq, _}
 import play.api.i18n.Messages
@@ -22,11 +22,11 @@ import play.api.i18n.Messages
 
 import scala.concurrent.Future
 
-class RemoveResponsiblePersonControllerSpec extends WordSpecLike
-  with MustMatchers with MockitoSugar with ScalaFutures with OneAppPerSuite with PropertyChecks {
+class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
+  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RemoveResponsiblePersonController {
       override val dataCacheConnector = mock[DataCacheConnector]

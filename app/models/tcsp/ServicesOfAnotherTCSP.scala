@@ -1,8 +1,8 @@
 package models.tcsp
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait ServicesOfAnotherTCSP
@@ -19,13 +19,13 @@ object ServicesOfAnotherTCSP {
 
   val service = notEmpty
     .withMessage("error.required.tcsp.mlr.reference.number")
-    .compose(pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number"))
+    .andThen(pattern(mlrPattern).withMessage("error.invalid.tcsp.mlr.reference.number"))
 
   implicit val formRule: Rule[UrlFormEncoded, ServicesOfAnotherTCSP] = From[UrlFormEncoded] { __ =>
-  import play.api.data.mapping.forms.Rules._
+  import jto.validation.forms.Rules._
     (__ \ "servicesOfAnotherTCSP").read[Boolean].withMessage("error.required.tcsp.services.another.tcsp") flatMap {
       case true =>
-       (__ \ "mlrRefNumber").read(service) fmap ServicesOfAnotherTCSPYes.apply
+       (__ \ "mlrRefNumber").read(service) map ServicesOfAnotherTCSPYes.apply
       case false => Rule.fromMapping { _ => Success(ServicesOfAnotherTCSPNo) }
     }
   }

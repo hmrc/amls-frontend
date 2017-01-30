@@ -9,7 +9,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -18,10 +18,10 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new SummaryController {
       override val dataCache = mock[DataCacheConnector]
@@ -39,9 +39,10 @@ class SummaryControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSug
       identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
       Some(WhichCurrencies(
         Seq("USD", "GBP", "EUR"),
+        usesForeignCurrencies = Some(false),
         Some(BankMoneySource("bank names")),
         Some(WholesalerMoneySource("Wholesaler Names")),
-        true)),
+        Some(true))),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
       branchesOrAgents = Some(BranchesOrAgents(Some(Seq(Country("United Kingdom", "GB"))))),

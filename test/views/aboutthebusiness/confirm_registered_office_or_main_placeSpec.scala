@@ -1,16 +1,20 @@
 package views.aboutthebusiness
 
 import forms.{InvalidForm, ValidForm, Form2}
-import models.aboutthebusiness.{RegisteredOfficeUK, ConfirmRegisteredOffice, RegisteredOffice}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import models.aboutthebusiness.{RegisteredOfficeUK, ConfirmRegisteredOffice}
+import org.scalatest.MustMatchers
+import  utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
-class confirm_registered_office_or_main_placeSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class confirm_registered_office_or_main_placeSpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "confirm_registered_office_or_main_place view" must {
     "have correct title" in new ViewFixture {

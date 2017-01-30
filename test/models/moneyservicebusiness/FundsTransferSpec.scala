@@ -2,8 +2,8 @@ package models.moneyservicebusiness
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 
 class FundsTransferSpec extends PlaySpec {
   "FundsTransfer" must {
@@ -14,7 +14,7 @@ class FundsTransferSpec extends PlaySpec {
       )
 
       FundsTransfer.formRule.validate(data) must
-      be(Success(FundsTransfer(true)))
+      be(Valid(FundsTransfer(true)))
     }
 
     "successfully validate when user selects 'no' option" in {
@@ -23,12 +23,12 @@ class FundsTransferSpec extends PlaySpec {
       )
 
       FundsTransfer.formRule.validate(data) must
-      be(Success(FundsTransfer(false)))
+      be(Valid(FundsTransfer(false)))
     }
 
     "fail validation when data is invalid" in {
       FundsTransfer.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
         (Path \ "transferWithoutFormalSystems") -> Seq(ValidationError("error.required.msb.fundsTransfer"))
         )))
     }

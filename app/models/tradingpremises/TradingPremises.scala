@@ -65,6 +65,8 @@ object TradingPremises {
 
   val key = "trading-premises"
 
+  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
+
   def anyChanged(newModel: Seq[TradingPremises]): Boolean = {
     newModel exists { _.hasChanged }
   }
@@ -99,7 +101,7 @@ object TradingPremises {
     import play.api.libs.json._
 
     def backCompatibleReads[T](fieldName : String)(implicit rds:Reads[T]) = {
-      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read[Option[T]]
+      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read(Reads.optionNoError[T])
     }
 
     (

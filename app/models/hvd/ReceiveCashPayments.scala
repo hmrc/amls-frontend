@@ -1,95 +1,82 @@
 package models.hvd
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms._
-import play.api.libs.functional.Monoid
+import jto.validation._
+import jto.validation.forms._
 import play.api.libs.json.{Writes, _}
 
 case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
 sealed trait ReceiveCashPayments0 {
 
-  private implicit def rule[A]
-  (implicit
-   b: Path => Rule[A, Boolean],
-   aR: Path => Rule[A, A],
-   paymentMethodsR: Rule[A, PaymentMethods]
-  ): Rule[A, ReceiveCashPayments] =
-    From[A] { __ =>
 
-      import utils.MappingUtils.Implicits.RichRule
+  implicit val formRule: Rule[UrlFormEncoded, ReceiveCashPayments] = From[UrlFormEncoded] { __ =>
+    import utils.MappingUtils.Implicits.RichRule
 
-      val booleanR = b andThen { _ withMessage "error.required.hvd.receive.cash.payments" }
+    import jto.validation.forms.Rules._
 
-      (__ \ "receivePayments").read(booleanR).flatMap[Option[PaymentMethods]] {
-        case true =>
-          (__ \ "paymentMethods").read[A] compose paymentMethodsR.repath((Path \ "paymentMethods") ++ _) fmap Some.apply
-        case false =>
-          Rule(_ => Success(None))
-      } fmap ReceiveCashPayments.apply
+    (__ \ "receivePayments").read[Boolean].withMessage("error.required.hvd.receive.cash.payments") flatMap{
+      case true =>
+        (__ \ "paymentMethods").read[PaymentMethods] fmap (x => ReceiveCashPayments(Some(x)))
+      case false => Rule.fromMapping { _ => Success(ReceiveCashPayments(None)) }
     }
+  }
 
-  private implicit def opW[I, O]
-  (implicit
-   mon: Monoid[O],
-   w: Write[I, O]
-  ): Write[Option[I], O] =
-    Write {
-      case Some(i) =>
-        w.writes(i)
-      case None =>
-        mon.identity
+  implicit val jsonReads: Reads[ReceiveCashPayments] =
+    (__ \ "receivePayments").read[Boolean] flatMap {
+      case true => (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
+      case false => Reads(_ => JsSuccess(ReceiveCashPayments(None)))
     }
 
   private implicit def write[A]
   (implicit
-   mon: Monoid[A],
-   b: Path => Write[Boolean, A],
-   aW: Path => Write[A, A],
-   paymentMethodsW: Write[Option[PaymentMethods], A]
+   mon:cats.Monoid[A],
+   a: Path => WriteLike[Boolean, A],
+   b: Path => WriteLike[Option[PaymentMethods] , A]
   ): Write[ReceiveCashPayments, A] =
     To[A] { __ =>
-
-      import utils.MappingUtils.Implicits.RichWrite
-
       (
         (__ \ "receivePayments").write[Boolean].contramap[Option[_]] {
           case Some(_) => true
           case None => false
-        } and
-          (__ \ "paymentMethods").write[A].andThen(paymentMethodsW)
-      )(a => (a.paymentMethods, a.paymentMethods))
+        } ~
+          (__ \ "paymentMethods").write[Option[PaymentMethods]]
+        )(a => (a.paymentMethods, a.paymentMethods))
     }
 
   val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
+ val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
+    import cats.implicits._
+    import utils.MappingUtils.MonoidImplicits.urlMonoid
+    import jto.validation.forms.Writes._
+    implicitly
+  }
   val jsonR: Reads[ReceiveCashPayments] = {
-    import play.api.data.mapping.json.Rules.{pickInJson => _, _}
-    import utils.JsonMapping.{genericJsonR, pickInJson}
     implicitly[Reads[ReceiveCashPayments]]
   }
-
-  val formW: Write[ReceiveCashPayments, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
-    implicitly[Write[ReceiveCashPayments, UrlFormEncoded]]
+  val jsonW = Writes[ReceiveCashPayments] {x =>
+   x.paymentMethods match {
+     case Some(paymentMtds) => Json.obj("receivePayments" -> true,
+       "paymentMethods" -> Json.obj("courier" -> paymentMtds.courier,
+       "direct" -> paymentMtds.direct,
+       "other" -> paymentMtds.other.isDefined,
+       "details" -> paymentMtds.other
+     ))
+     case None =>  Json.obj("receivePayments" -> false, "paymentMethods" -> Json.obj())
+   }
   }
 
-  val jsonW: Writes[ReceiveCashPayments] = {
-    import utils.JsonMapping.genericJsonW
-    import play.api.data.mapping.json.Writes._
-    implicitly[Writes[ReceiveCashPayments]]
-  }
 }
 
 object ReceiveCashPayments {
 
   private object Cache extends ReceiveCashPayments0
 
-  implicit val formR = Cache.formR
-  implicit val formW = Cache.formW
-  implicit val jsonR = Cache.jsonR
-  implicit val jsonW = Cache.jsonW
+  implicit val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = Cache.formR
+  implicit val jsonR: Reads[ReceiveCashPayments] = Cache.jsonR
+  implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formW
+  implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 }

@@ -8,17 +8,17 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class TcspTypesControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new TcspTypesController {
       override val dataCacheConnector:DataCacheConnector = mock[DataCacheConnector]

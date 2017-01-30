@@ -1,14 +1,16 @@
 package models.tcsp
 
 import models.FormTypes._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import play.api.i18n.{Messages, Lang}
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 sealed trait TcspService {
 
@@ -54,8 +56,8 @@ object ProvidedServices {
   import utils.MappingUtils.Implicits._
 
   val serviceDetailsMaxLength = 255
-  val serviceDetailsType = notEmptyStrip compose
-                           notEmpty.withMessage("error.required.tcsp.provided_services.details") compose
+  val serviceDetailsType = notEmptyStrip andThen
+                           notEmpty.withMessage("error.required.tcsp.provided_services.details") andThen
                            maxLength(serviceDetailsMaxLength)
 
   val serviceType = minLengthR[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")
@@ -72,7 +74,7 @@ object ProvidedServices {
               case "06" => Rule[UrlFormEncoded, TcspService](_ => Success(Receptionist))
               case "07" => Rule[UrlFormEncoded, TcspService](_ => Success(ConferenceRooms))
               case "08" =>
-                (__ \ "details").read(serviceDetailsType) fmap Other.apply
+                (__ \ "details").read(serviceDetailsType) map Other.apply
               case _ =>
                 Rule[UrlFormEncoded, TcspService] { _ =>
                   Failure(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
@@ -82,11 +84,11 @@ object ProvidedServices {
             ) {
               case (m, n) =>
                   n flatMap { x =>
-                    m fmap {
+                    m map {
                       _ + x
                     }
                   }
-            } fmap ProvidedServices.apply
+            } map ProvidedServices.apply
           }
     }
 
@@ -114,7 +116,7 @@ object ProvidedServices {
             case "08" =>
               (JsPath \ "details").read[String].map (Other.apply  _) map identity[TcspService]
             case _ =>
-              Reads(_ => JsError((JsPath \ "services") -> ValidationError("error.invalid")))
+              Reads(_ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid")))
           }.foldLeft[Reads[Set[TcspService]]](
             Reads[Set[TcspService]](_ => JsSuccess(Set.empty))
          ){

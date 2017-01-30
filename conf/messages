@@ -266,6 +266,7 @@ error.invalid.msb.wc.bankNames = Enter the banks’ names
 error.invalid.msb.wc.bankNames.too-long = You can’t enter more than 140 characters for the bank names
 error.invalid.msb.wc.wholesalerNames = Enter the wholesalers’ names
 error.invalid.msb.wc.wholesalerNames.too-long = You can’t enter more than 140 characters for the wholesaler names
+error.required.msb.wc.foreignCurrencies = Select yes if you deal in physical foreign currencies
 error.required.countries.msb.most.transactions = Enter at least one country.
 
 ############################### High Value Dealer ###############################
@@ -1256,6 +1257,7 @@ msb.which_currencies.source.which_banks = Which Banks?
 msb.which_currencies.source.wholesalers = Currency wholesalers
 msb.which_currencies.source.which_wholesalers = Which currency wholesalers?
 msb.which_currencies.source.customers = Customers selling their foreign currency
+msb.which_currencies.foreign_currencies_question = Do you deal in physical foreign currencies?
 msb.ipsp.title = Does your business use an Intermediary Payment Service Provider (IPSP)?
 msb.ipsp.text = An Intermediary Payment Service Provider is involved in the transfer of funds, but isn’t the Payment Service Provider for the payer or the payee.
 msb.ipsp.name.lbl = IPSP’s name
