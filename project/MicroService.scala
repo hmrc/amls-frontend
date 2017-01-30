@@ -45,6 +45,7 @@ trait MicroService {
     .settings(publishingSettings: _*)
     .settings(nexusPublishingSettings: _*)
     .settings(defaultSettings(): _*)
+    .settings(version := appVersion)
     .settings(
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
