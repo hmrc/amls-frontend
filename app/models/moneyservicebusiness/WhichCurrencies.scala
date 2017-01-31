@@ -18,7 +18,8 @@ case class WhichCurrencies(currencies: Seq[String],
 
 object WhichCurrencies {
 
-  type MoneySource = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
+  type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
+  type WhichCurrenciesValidation = (Option[Boolean], Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
 
   val emptyToNone: String => Option[String] = { x =>
     x.trim() match {
@@ -37,12 +38,21 @@ object WhichCurrencies {
     TraversableValidators.minLengthR[Seq[String]](1) compose
     GenericRules.traversableR(GenericValidators.inList(currencies))
 
-  private val validateMoneySources: ValidationRule[MoneySource] = Rule[MoneySource, MoneySource] {
+  private val validateMoneySources: ValidationRule[MoneySourceValidation] = Rule[MoneySourceValidation, MoneySourceValidation] {
       case x@(Some(_), _, _) => Success(x)
       case x@(_, Some(_), _) => Success(x)
       case x@(_, _, Some(true)) => Success(x)
       case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
     }
+
+
+  private val validateWhichCurrencies: ValidationRule[WhichCurrenciesValidation] = Rule[WhichCurrenciesValidation, WhichCurrenciesValidation] {
+    case x@(Some(true), Some(b), _, _) => Success(x)
+    case x@(Some(true), _, Some(c), _) => Success(x)
+    case x@(Some(true), _, _, Some(d)) => Success(x)
+    case x@(Some(false), _, _, _) => Success((Some(false), None, None, None))
+    case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+  }
 
   implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
@@ -52,8 +62,8 @@ object WhichCurrencies {
     val usesForeignCurrencies = ApplicationConfig.release7 match {
       case true =>
         (__ \ "usesForeignCurrencies").read[String] withMessage "error.required.msb.wc.foreignCurrencies" fmap {
-          case "Yes" => Some(true)
-          case _ => Some(false)
+          case "Yes" => Option(true)
+          case _ => Option(false)
         }
       case _ => Rule[UrlFormEncoded, Option[Boolean]](_ => Success(None))
     }
@@ -79,24 +89,17 @@ object WhichCurrencies {
       case _ => None
     }
 
-    def build(foreignCurrencyFlag: Option[Boolean]) =
-      (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
-        .apply { (a: Traversable[String], b: MoneySource) =>
+    ApplicationConfig.release7 match {
+      case true => (currencies ~ ((usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateWhichCurrencies)).apply {
+        (a, b) => WhichCurrencies(a.toSeq, b._1, b._2, b._3, b._4)
+      }
+
+      case _ => (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
+        .apply { (a: Traversable[String], b: MoneySourceValidation) =>
           (a, b) match {
-            case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, foreignCurrencyFlag, bms, wms, cms)
+            case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, None, bms, wms, cms)
           }
         }
-
-    ApplicationConfig.release7 match {
-      case true =>
-        usesForeignCurrencies flatMap {
-          case flag@Some(true) => build(flag)
-          case flag =>
-            currencies compose Rule.fromMapping[Traversable[String], WhichCurrencies] { c =>
-              Success(WhichCurrencies(c.toSeq, flag, None, None, None))
-            }
-        }
-      case _ => build(None)
     }
 
   }
