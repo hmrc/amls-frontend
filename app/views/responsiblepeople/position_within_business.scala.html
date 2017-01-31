@@ -60,6 +60,28 @@
                             value = "04"
                         )
                     }
+                    case (BusinessType.LPrLLP) => {
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.01",
+                            value = "01"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.02",
+                            value = "02"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.04",
+                            value = "04"
+                        )
+                        @checkbox(
+                            f = f("positions[]"),
+                            labelText = "responsiblepeople.position_within_business.lbl.07",
+                            value = "07"
+                        )
+                    }
                     case (BusinessType.LPrLLP | BusinessType.UnincorporatedBody | BusinessType.LimitedCompany) => {
                         @checkbox(
                             f = f("positions[]"),

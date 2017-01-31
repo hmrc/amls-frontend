@@ -7,6 +7,7 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json.{Json, Reads, Writes, _}
+import cats.data.Validated.{Valid, Invalid}
 import utils.TraversableValidators._
 
 import scala.collection.immutable.HashSet
@@ -34,17 +35,20 @@ case object Partner extends PositionWithinBusiness
 
 case object SoleProprietor extends PositionWithinBusiness
 
+case object DesignatedMember extends PositionWithinBusiness
+
 object PositionWithinBusiness {
 
   implicit val formRule = Rule[String, PositionWithinBusiness] {
-    case "01" => Success(BeneficialOwner)
-    case "02" => Success(Director)
-    case "03" => Success(InternalAccountant)
-    case "04" => Success(NominatedOfficer)
-    case "05" => Success(Partner)
-    case "06" => Success(SoleProprietor)
+    case "01" => Valid(BeneficialOwner)
+    case "02" => Valid(Director)
+    case "03" => Valid(InternalAccountant)
+    case "04" => Valid(NominatedOfficer)
+    case "05" => Valid(Partner)
+    case "06" => Valid(SoleProprietor)
+    case "07" => Valid(DesignatedMember)
     case _ =>
-      Failure(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid"))))
+      Invalid(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val formWrite = Write[PositionWithinBusiness, String] {
@@ -54,6 +58,7 @@ object PositionWithinBusiness {
     case NominatedOfficer => "04"
     case Partner => "05"
     case SoleProprietor => "06"
+    case DesignatedMember => "07"
   }
 
   implicit val jsonReads: Reads[PositionWithinBusiness] =
@@ -64,6 +69,7 @@ object PositionWithinBusiness {
       case JsString("04") => JsSuccess(NominatedOfficer)
       case JsString("05") => JsSuccess(Partner)
       case JsString("06") => JsSuccess(SoleProprietor)
+      case JsString("07") => JsSuccess(DesignatedMember)
       case _ => JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid"))
     }
 
@@ -74,6 +80,7 @@ object PositionWithinBusiness {
     case NominatedOfficer => JsString("04")
     case Partner => JsString("05")
     case SoleProprietor => JsString("06")
+    case DesignatedMember => JsString("07")
   }
 }
 

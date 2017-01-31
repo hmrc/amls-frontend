@@ -20,6 +20,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
         PositionWithinBusiness.formRule.validate("04") must be (Valid(NominatedOfficer))
         PositionWithinBusiness.formRule.validate("05") must be (Valid(Partner))
         PositionWithinBusiness.formRule.validate("06") must be (Valid(SoleProprietor))
+        PositionWithinBusiness.formRule.validate("07") must be (Valid(DesignatedMember))
       }
 
       "fail to validate an empty string" in {
@@ -45,6 +46,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
       PositionWithinBusiness.formWrite.writes(NominatedOfficer) must be("04")
       PositionWithinBusiness.formWrite.writes(Partner) must be("05")
       PositionWithinBusiness.formWrite.writes(SoleProprietor) must be("06")
+      PositionWithinBusiness.formWrite.writes(DesignatedMember) must be("07")
     }
 
   }
@@ -96,6 +98,11 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
         be(JsSuccess(SoleProprietor))
     }
 
+    "successfully validate given a DesignatedMember value" in {
+      Json.fromJson[PositionWithinBusiness](JsString("07")) must
+        be(JsSuccess(DesignatedMember))
+    }
+
     "fail to validate when given an empty value" in {
       Json.fromJson[PositionWithinBusiness](JsString("")) must
         be(JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid")))
@@ -123,6 +130,10 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value for SoleProprietor" in {
       Json.toJson(SoleProprietor) must be(JsString("06"))
+    }
+
+    "write the correct value for DesignatedMember" in {
+      Json.toJson(DesignatedMember) must be(JsString("07"))
     }
   }
 

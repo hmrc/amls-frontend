@@ -1,8 +1,9 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
+@import models.businessmatching.{BusinessType, BusinessMatching}
 
-@(content: (String,String), f: Form2[_])(implicit request: Request[_],m:Messages, lang: Lang)
+@(content: (String,String), businessType: Option[BusinessType], f: Form2[_])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
     s"""${f("other").id}-fieldset"""
@@ -59,6 +60,9 @@
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.05", "05")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
+            @if(businessType.contains(BusinessType.LPrLLP)) {
+                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.09", "09")
+            }
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
         }
 

@@ -4,6 +4,9 @@ import java.util.UUID
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
+import models.Country
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.{AddPerson, Director}
 import models.status.{SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
@@ -11,7 +14,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -47,9 +50,12 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "on get display the persons page" when {
       "status is pending" in new Fixture {
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+        val businessMatching = BusinessMatching(Some(reviewDtls))
 
-        when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
 
         when(addPersonController.statusService.getStatus(any(),any(),any()))
           .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -58,13 +64,14 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.select("input[value=09]").isEmpty must be(false)
         document.title() must be (Messages("declaration.addperson.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
         contentAsString(result) must include(Messages("submit.amendment.application"))
       }
       "status is pre-submission" in new Fixture {
 
-        when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
         when(addPersonController.statusService.getStatus(any(),any(),any()))
@@ -74,6 +81,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
+        document.select("input[value=09]").isEmpty must be(true)
         document.title() must be (Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
         contentAsString(result) must include(Messages("submit.registration"))
@@ -82,7 +90,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "on get display the persons page with blank fields" in new Fixture {
 
-      when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+      when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(addPersonController.statusService.getStatus(any(),any(),any()))
@@ -101,7 +109,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "on getWithAmendment display the persons page with blank fields" in new Fixture {
 
-      when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+      when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       when(addPersonController.statusService.getStatus(any(),any(),any()))
@@ -244,7 +252,7 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
     "on get display the persons page" when {
       "status is pending" in new Fixture {
 
-        when(addPersonController.dataCacheConnector.fetch[AddPerson](any())
+        when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
 
         when(addPersonController.statusService.getStatus(any(), any(), any()))
