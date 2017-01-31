@@ -11,6 +11,14 @@
     s"""${f("specifyOtherBusiness").id}-panel"""
 }
 
+@target = @{
+    s"""${f("businessType").id}-panel"""
+}
+
+@target1 = @{
+    s"""${f("specifyOtherBusiness").id}-panel"""
+}
+
 @header = {
     @errorSummary(f)
     @heading("supervision.memberofprofessionalbody.title", "summary.supervision")
