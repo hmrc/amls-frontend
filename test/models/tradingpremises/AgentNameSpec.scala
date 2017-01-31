@@ -19,6 +19,19 @@ class AgentNameSpec extends PlaySpec {
       AgentName.formReads.validate(formInput) must be(Valid(AgentName("sometext", None)))
     }
 
+    "validate form Read with agent dob" in {
+
+      val formInput = Map(
+        "agentName" -> Seq("sometext"),
+        "agentDateOfBirth.day" -> Seq("15"),
+        "agentDateOfBirth.month" -> Seq("2"),
+        "agentDateOfBirth.year" -> Seq("1956")
+      )
+
+      AgentName.formReads.validate(formInput) must be(Valid(AgentName("sometext", None, Some(new LocalDate("1956-02-15")))))
+
+    }
+
     "throw error when required field is missing" in {
       val formInput = Map("agentName" -> Seq(""))
       AgentName.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentName", Seq(ValidationError("error.required.tp.agent.name"))))))
@@ -41,6 +54,15 @@ class AgentNameSpec extends PlaySpec {
         AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1)))))) must be(
         JsSuccess(
           AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1))))))
+    }
+
+    "Succesfully read/write Json data with agent dob" in {
+
+      AgentName.format.reads(AgentName.format.writes(
+        AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1))), Some(new LocalDate(2015,10,10))))) must be(
+        JsSuccess(
+          AgentName("test", Some(DateOfChange(new LocalDate(2017,1,1))),Some(new LocalDate(2015,10,10)))))
+
     }
 
   }
