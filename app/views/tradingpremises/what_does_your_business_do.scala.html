@@ -16,11 +16,14 @@
     heading = header
 ) {
 
+    <p>@Messages("lbl.select.all")</p>
+
     @form(f, controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.post(index, edit)) {
 
         @fieldset(
             f = f("activities"),
-            legend = "lbl.select.all",
+            legend = "tradingpremises.whatdoesyourbusinessdo.title",
+            legendHidden = true,
             panel = false
         ) {
             @model.businessActivities.map { ba =>
