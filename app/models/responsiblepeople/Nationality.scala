@@ -1,9 +1,9 @@
 package models.responsiblepeople
 
 import models.Country
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait Nationality
@@ -20,12 +20,12 @@ object Nationality {
 
   implicit val formRule: Rule[UrlFormEncoded, Nationality] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (readerURLFormEncoded \ "nationality").read[String].withMessage("error.required.nationality") flatMap {
         case "01" => British
         case "02" => Irish
         case "03" =>
-          (readerURLFormEncoded \ "otherCountry").read[Country] fmap OtherCountry.apply
+          (readerURLFormEncoded \ "otherCountry").read[Country] map OtherCountry.apply
         case _ =>
           (Path \ "nationality") -> Seq(ValidationError("error.invalid"))
       }
@@ -45,7 +45,7 @@ object Nationality {
       case "01" => British
       case "02" => Irish
       case "03" => (JsPath \ "otherCountry").read[Country] map OtherCountry.apply
-      case _ => ValidationError("error.invalid")
+      case _ => play.api.data.validation.ValidationError("error.invalid")
     }
   }
 

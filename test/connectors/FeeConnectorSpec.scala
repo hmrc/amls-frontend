@@ -35,13 +35,13 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       None,
       None,
       CredentialStrength.Weak,
-      ConfidenceLevel.L50),
+      ConfidenceLevel.L50, ""),
     Principal(
       None,
       Accounts(org = Some(OrgAccount("Link", Org("TestOrgRef"))))),
     None,
     None,
-    None)
+    None, None)
 
   "FeeConnector" must {
     val amlsRegistrationNumber = "XAML00000567890"

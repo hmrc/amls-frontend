@@ -1,8 +1,8 @@
 package models.moneyservicebusiness
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, Json, JsPath, JsSuccess}
 
 class ExpectedThroughputSpec extends PlaySpec {
@@ -13,25 +13,25 @@ class ExpectedThroughputSpec extends PlaySpec {
       "successfully validate given an enum value" in {
 
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("01"))) must
-          be(Success(ExpectedThroughput.First))
+          be(Valid(ExpectedThroughput.First))
 
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("02"))) must
-          be(Success(ExpectedThroughput.Second))
+          be(Valid(ExpectedThroughput.Second))
 
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("03"))) must
-          be(Success(ExpectedThroughput.Third))
+          be(Valid(ExpectedThroughput.Third))
 
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("04"))) must
-          be(Success(ExpectedThroughput.Fourth))
+          be(Valid(ExpectedThroughput.Fourth))
 
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("05"))) must
-          be(Success(ExpectedThroughput.Fifth))
+          be(Valid(ExpectedThroughput.Fifth))
 
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("06"))) must
-          be(Success(ExpectedThroughput.Sixth))
+          be(Valid(ExpectedThroughput.Sixth))
 
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("07"))) must
-          be(Success(ExpectedThroughput.Seventh))
+          be(Valid(ExpectedThroughput.Seventh))
       }
 
       "write correct data from enum value" in {
@@ -61,12 +61,12 @@ class ExpectedThroughputSpec extends PlaySpec {
 
       "throw error on invalid data" in {
         ExpectedThroughput.formRule.validate(Map("throughput" -> Seq("20"))) must
-          be(Failure(Seq((Path \ "throughput", Seq(ValidationError("error.invalid"))))))
+          be(Invalid(Seq((Path \ "throughput", Seq(ValidationError("error.invalid"))))))
       }
 
       "throw error on empty data" in {
         ExpectedThroughput.formRule.validate(Map.empty) must
-          be(Failure(Seq((Path \ "throughput", Seq(ValidationError("error.required.msb.throughput"))))))
+          be(Invalid(Seq((Path \ "throughput", Seq(ValidationError("error.required.msb.throughput"))))))
       }
     }
 
@@ -75,25 +75,25 @@ class ExpectedThroughputSpec extends PlaySpec {
       "successfully validate given an enum value" in {
 
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "01")) must
-          be(JsSuccess(ExpectedThroughput.First, JsPath \ "throughput"))
+          be(JsSuccess(ExpectedThroughput.First, JsPath))
 
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "02")) must
-          be(JsSuccess(ExpectedThroughput.Second, JsPath \ "throughput"))
+          be(JsSuccess(ExpectedThroughput.Second, JsPath))
 
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "03")) must
-          be(JsSuccess(ExpectedThroughput.Third, JsPath \ "throughput"))
+          be(JsSuccess(ExpectedThroughput.Third, JsPath))
 
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "04")) must
-          be(JsSuccess(ExpectedThroughput.Fourth, JsPath \ "throughput"))
+          be(JsSuccess(ExpectedThroughput.Fourth, JsPath))
 
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "05")) must
-          be(JsSuccess(ExpectedThroughput.Fifth, JsPath \ "throughput"))
+          be(JsSuccess(ExpectedThroughput.Fifth, JsPath))
 
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "06")) must
-          be(JsSuccess(ExpectedThroughput.Sixth, JsPath \ "throughput"))
+          be(JsSuccess(ExpectedThroughput.Sixth, JsPath))
 
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "07")) must
-          be(JsSuccess(ExpectedThroughput.Seventh, JsPath \ "throughput"))
+          be(JsSuccess(ExpectedThroughput.Seventh, JsPath))
       }
 
       "write the correct value" in {
@@ -122,7 +122,7 @@ class ExpectedThroughputSpec extends PlaySpec {
 
       "throw error for invalid data" in {
         Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "20")) must
-          be(JsError(JsPath \ "throughput", ValidationError("error.invalid")))
+          be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
       }
     }
    

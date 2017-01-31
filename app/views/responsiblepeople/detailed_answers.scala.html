@@ -4,7 +4,7 @@
 @import controllers.responsiblepeople.routes._
 @import utils.DateHelper
 
-@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean)(implicit request: Request[_], lang: Lang)
+@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",

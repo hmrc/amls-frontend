@@ -1,4 +1,4 @@
-@(edit: Boolean = false, buttonMessageKey : Option[String] = None)(implicit lang: Lang)
+@(edit: Boolean = false, buttonMessageKey : Option[String] = None)(implicit lang:Lang,  m: Messages)
 <div class="form-group-footer">
     <button type="submit" name="submit" class="button" >
         @Messages(buttonMessageKey.getOrElse(if (edit) "button.saveandreturn" else "button.saveandcontinue"))

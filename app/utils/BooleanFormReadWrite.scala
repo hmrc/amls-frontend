@@ -1,9 +1,9 @@
 package utils
 
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, Write}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, Write}
 import utils.MappingUtils.Implicits._
-import play.api.data.mapping.forms.Rules._
+import jto.validation.forms.Rules._
 
 object BooleanFormReadWrite {
    def formWrites(fieldName:String) : Write[Boolean, UrlFormEncoded] = Write{data : Boolean => Map(fieldName -> Seq(data.toString))}

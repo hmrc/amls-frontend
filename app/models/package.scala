@@ -1,5 +1,5 @@
 import org.joda.time.LocalDate
-import play.api.data.mapping.Rule
+import jto.validation.Rule
 
 package object models {
 

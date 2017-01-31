@@ -1,8 +1,8 @@
 package models.tradingpremises
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class BusinessStructureSpec extends PlaySpec {
@@ -11,11 +11,11 @@ class BusinessStructureSpec extends PlaySpec {
 
     "Read Form data successfully" in {
 
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("01"))) must be(Success(SoleProprietor))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("02"))) must be(Success(LimitedLiabilityPartnership))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("03"))) must be(Success(Partnership))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("04"))) must be(Success(IncorporatedBody))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("05"))) must be(Success(UnincorporatedBody))
+      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("01"))) must be(Valid(SoleProprietor))
+      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("02"))) must be(Valid(LimitedLiabilityPartnership))
+      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("03"))) must be(Valid(Partnership))
+      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("04"))) must be(Valid(IncorporatedBody))
+      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("05"))) must be(Valid(UnincorporatedBody))
     }
 
     "Write Form data successfully" in {
@@ -28,29 +28,29 @@ class BusinessStructureSpec extends PlaySpec {
     }
 
     "Fail on invalid data" in {
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("11"))) must be(Failure(List(
+      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("11"))) must be(Invalid(List(
         (Path \ "agentsBusinessStructure", List(ValidationError("error.invalid"))))))
     }
     "Fail on missing mandatory field" in {
-      BusinessStructure.agentsBusinessStructureRule.validate(Map.empty) must be(Failure(List(
+      BusinessStructure.agentsBusinessStructureRule.validate(Map.empty) must be(Invalid(List(
         (Path \ "agentsBusinessStructure", List(ValidationError("error.required.tp.select.business.structure"))))))
     }
 
     "Read JSON data successfully" in {
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "01")) must be(JsSuccess(SoleProprietor,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "02")) must be(JsSuccess(LimitedLiabilityPartnership,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "03")) must be(JsSuccess(Partnership,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "04")) must be(JsSuccess(IncorporatedBody,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
 
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "05")) must be(JsSuccess(UnincorporatedBody,
-        JsPath \ "agentsBusinessStructure"))
+        JsPath))
     }
 
     "Write JSON data successfully" in {
@@ -64,7 +64,7 @@ class BusinessStructureSpec extends PlaySpec {
 
     "throw error for invalid data" in {
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "20")) must
-        be(JsError(JsPath \ "agentsBusinessStructure", ValidationError("error.invalid")))
+        be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 

@@ -1,7 +1,7 @@
 package forms
 
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import jto.validation.Path
+import jto.validation.ValidationError
 
 trait FormHelpers {
 

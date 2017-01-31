@@ -2,15 +2,20 @@ package views.aboutthebusiness
 
 import forms.{InvalidForm, ValidForm, Form2}
 import models.aboutthebusiness.{UKCorrespondenceAddress, CorrespondenceAddress}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
-class correspondence_addressSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class correspondence_addressSpec extends GenericTestHelper with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
+
 
   "correspondence_address view" must {
     "have correct title" in new ViewFixture {

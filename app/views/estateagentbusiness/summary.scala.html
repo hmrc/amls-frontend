@@ -2,7 +2,7 @@
 @import forms2._
 @import models.estateagentbusiness._
 
-@(model: EstateAgentBusiness)(implicit request: Request[_], lang: Lang)
+@(model: EstateAgentBusiness)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.estateagentbusiness")

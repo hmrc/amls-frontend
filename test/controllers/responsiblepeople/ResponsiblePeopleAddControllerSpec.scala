@@ -11,18 +11,18 @@ import org.scalatest.prop.{PropertyChecks, TableDrivenPropertyChecks}
 import org.scalatest.{Pending, WordSpecLike}
 import org.scalatestplus.play.{ OneAppPerSuite}
 import play.api.mvc.Call
-import utils.AuthorisedFixture
+import utils.{GenericTestHelper, AuthorisedFixture}
 import play.api.test.Helpers._
 import org.scalacheck.Gen
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
-class ResponsiblePeopleAddControllerSpec extends WordSpecLike
-  with MustMatchers with MockitoSugar with ScalaFutures with OneAppPerSuite with PropertyChecks {
+class ResponsiblePeopleAddControllerSpec extends GenericTestHelper
+  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new ResponsiblePeopleAddController {
       override val dataCacheConnector = mock[DataCacheConnector]

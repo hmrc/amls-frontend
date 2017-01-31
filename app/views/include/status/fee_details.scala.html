@@ -3,7 +3,7 @@
 @import models.confirmation.Currency
 @import config.ApplicationConfig
 
-@(feeResponse: FeeResponse)(implicit request: Request[_], lang: Lang)
+@(feeResponse: FeeResponse)(implicit request: Request[_],m:Messages, lang: Lang)
 
 <p>@Messages("fee.details.heading")</p>
 

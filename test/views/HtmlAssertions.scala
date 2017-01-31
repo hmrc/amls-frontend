@@ -4,6 +4,8 @@ import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import scala.collection.JavaConversions._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 trait HtmlAssertions {
   self:MustMatchers =>

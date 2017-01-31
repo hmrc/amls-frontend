@@ -1,10 +1,9 @@
 package models.moneyservicebusiness
 
-import config.ApplicationConfig
 import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
+import org.scalatestplus.play.{OneAppPerSuite}
 import play.api.libs.json.Json
 import play.api.test.FakeApplication
 
@@ -39,7 +38,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       }
 
       "Read correctly from a form" in {
-        WhichCurrencies.formR.validate(fullFormData) must be(Success(fullModel))
+        WhichCurrencies.formR.validate(fullFormData) must be(Valid(fullModel))
       }
 
       "Round trip through Json correctly" in {
@@ -58,7 +57,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
 
       "fail validation" in {
 
-        WhichCurrencies.formR.validate(form) must be(Failure(Seq(Path \ "usesForeignCurrencies" -> Seq(ValidationError("error.required.msb.wc.foreignCurrencies")))))
+        WhichCurrencies.formR.validate(form) must be(Invalid(Seq(Path \ "usesForeignCurrencies" -> Seq(ValidationError("error.required.msb.wc.foreignCurrencies")))))
 
       }
 
@@ -109,7 +108,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       }
 
       "Read correctly from a form" in {
-        WhichCurrencies.formR.validate(formData) must be(Success(model))
+        WhichCurrencies.formR.validate(formData) must be(Valid(model))
       }
 
       "Round trip through Json correctly" in {
@@ -137,7 +136,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "fail validation" in {
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames")))))
       }
     }
 
@@ -152,7 +151,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "fail validation" in {
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames")))))
       }
     }
 
@@ -170,7 +169,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames.too-long")))))
       }
     }
 
@@ -188,7 +187,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "fail validation" in {
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
       }
     }
 
@@ -206,7 +205,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "fail validation " in {
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames.too-long")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "wholesalerNames") -> Seq(ValidationError("error.invalid.msb.wc.wholesalerNames.too-long")))))
       }
     }
 
@@ -219,7 +218,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
           "usesForeignCurrencies" -> Seq("Yes")
         )
 
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources")))))
       }
     }
 
@@ -234,7 +233,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
           "usesForeignCurrencies" -> Seq("Yes")
         )
 
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq((Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")))))
       }
     }
 
@@ -249,7 +248,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "fail validation with error messages" in {
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
           (Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))
         )))
@@ -268,7 +267,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
       )
 
       "fail validation with both error messages" in {
-        WhichCurrencies.formR.validate(formData) must be(Failure(Seq(
+        WhichCurrencies.formR.validate(formData) must be(Invalid(Seq(
           (Path \ "currencies") -> Seq(ValidationError("error.invalid.msb.wc.currencies")),
           (Path \ "bankNames") -> Seq(ValidationError("error.invalid.msb.wc.bankNames"))
         )))
@@ -288,7 +287,7 @@ class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite
 
         val model = WhichCurrencies(Seq("GBP", "EUR", "USD"), usesForeignCurrencies = Some(false), None, None, None)
 
-        WhichCurrencies.formR.validate(formData) must be(Success(model))
+        WhichCurrencies.formR.validate(formData) must be(Valid(model))
 
       }
 

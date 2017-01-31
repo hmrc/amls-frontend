@@ -2,8 +2,8 @@ package models.aboutthebusiness
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
@@ -14,7 +14,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       "successfully validate given a 'no' value" in {
 
         PreviouslyRegistered.formRule.validate(Map("previouslyRegistered" -> Seq("false"))) must
-          be(Success(PreviouslyRegisteredNo))
+          be(Valid(PreviouslyRegisteredNo))
       }
 
       "successfully validate given an `Yes` value with 8 characters" in {
@@ -25,7 +25,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         PreviouslyRegistered.formRule.validate(data) must
-          be(Success(PreviouslyRegisteredYes("1" * 8)))
+          be(Valid(PreviouslyRegisteredYes("1" * 8)))
       }
 
       "successfully validate given an `Yes` value with 15 characters" in {
@@ -36,7 +36,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         )
 
         PreviouslyRegistered.formRule.validate(data) must
-          be(Success(PreviouslyRegisteredYes("1" * 15)))
+          be(Valid(PreviouslyRegisteredYes("1" * 15)))
       }
     }
 
@@ -48,7 +48,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           "prevMLRRegNo" -> Seq("1" * 20)
         )
 
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
         )))
       }
@@ -58,7 +58,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           "prevMLRRegNo" -> Seq("1" * 5)
         )
 
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
         )))
       }
@@ -68,7 +68,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           "prevMLRRegNo" -> Seq("1" * 11)
         )
 
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
         )))
       }
@@ -78,7 +78,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           "prevMLRRegNo" -> Seq("1ghy7cnj&")
         )
 
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
         )))
       }
@@ -86,7 +86,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       "given an empty map" in {
 
         PreviouslyRegistered.formRule.validate(Map.empty) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "previouslyRegistered") -> Seq(ValidationError("error.required.atb.previously.registered"))
           )))
       }
@@ -99,7 +99,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           )
 
           PreviouslyRegistered.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.required.atb.mlr.number"))
             )))
         }
@@ -111,7 +111,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           )
 
           PreviouslyRegistered.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.atb.mlr.number"))
             )))
         }
@@ -122,7 +122,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
           )
 
           PreviouslyRegistered.formRule.validate(data) must
-            be(Failure(Seq(
+            be(Invalid(Seq(
               (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.required"))
             )))
         }
@@ -149,7 +149,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[PreviouslyRegistered](Json.obj("previouslyRegistered" -> false)) must
-        be(JsSuccess(PreviouslyRegisteredNo, JsPath \ "previouslyRegistered"))
+        be(JsSuccess(PreviouslyRegisteredNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -157,7 +157,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("previouslyRegistered" -> true, "prevMLRRegNo" -> "12345678")
 
       Json.fromJson[PreviouslyRegistered](json) must
-        be(JsSuccess(PreviouslyRegisteredYes("12345678"), JsPath \ "previouslyRegistered" \ "prevMLRRegNo"))
+        be(JsSuccess(PreviouslyRegisteredYes("12345678"), JsPath \ "prevMLRRegNo"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -165,7 +165,7 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("previouslyRegistered" -> true)
 
       Json.fromJson[PreviouslyRegistered](json) must
-        be(JsError((JsPath \ "previouslyRegistered" \ "prevMLRRegNo") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "prevMLRRegNo") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

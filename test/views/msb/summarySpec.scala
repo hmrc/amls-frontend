@@ -6,10 +6,15 @@ import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
-import views.ViewFixture
+import utils.GenericTestHelper
+import views.Fixture
 
 
-class summarySpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class summarySpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 

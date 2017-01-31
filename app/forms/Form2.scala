@@ -1,9 +1,8 @@
 package forms
 
-import play.api.data.mapping
-import play.api.data.mapping._
-import play.api.data.mapping.forms.{PM, UrlFormEncoded}
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.{PM, UrlFormEncoded}
+import jto.validation.ValidationError
 import play.api.mvc.AnyContent
 
 sealed trait Form2[+A] {
@@ -23,7 +22,7 @@ sealed trait CompletedForm[+A] extends Form2[A]
 case class ValidForm[A](data: UrlFormEncoded, model: A) extends CompletedForm[A] {
 
   override def errors: Seq[(Path, Seq[ValidationError])] = Seq.empty
-  override def errors(path: Path): Seq[mapping.ValidationError] = Seq.empty
+  override def errors(path: Path): Seq[ValidationError] = Seq.empty
 
   override def apply(path: Path): Field =
     data.get(PM.asKey(path)).fold[Field](InvalidField(path, Seq.empty, Seq.empty)) {
@@ -50,8 +49,8 @@ case class InvalidForm(
 object EmptyForm extends Form2[Nothing] {
   override val data: UrlFormEncoded = Map.empty
   override def apply(path: Path): Field = InvalidField(path, Seq.empty, Seq.empty)
-  override def errors(path: Path): Seq[mapping.ValidationError] = Seq.empty
-  override val errors: Seq[(Path, Seq[mapping.ValidationError])] = Seq.empty
+  override def errors(path: Path): Seq[ValidationError] = Seq.empty
+  override val errors: Seq[(Path, Seq[ValidationError])] = Seq.empty
 }
 
 object Form2 {

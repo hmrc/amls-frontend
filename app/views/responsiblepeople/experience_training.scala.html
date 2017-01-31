@@ -4,7 +4,7 @@
 @import models.businessmatching._
 
 
-@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)

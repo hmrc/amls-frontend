@@ -3,7 +3,7 @@
     classes: Seq[String] = Seq.empty,
     editUrl: String = "",
     removeUrl: String = ""
-)(content: Html)(implicit lang: Lang)
+)(content: Html)(implicit lang:Lang,  m: Messages)
 
 <section class="check-your-answers @classes.mkString(" ")">
     @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}

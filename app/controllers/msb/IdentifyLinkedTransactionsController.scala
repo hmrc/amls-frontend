@@ -81,9 +81,9 @@ trait IdentifyLinkedTransactionsController extends BaseController {
                 ) map {
                   _ =>
                     if (edit) {
-                      editRouting(services.services, msb)
+                      editRouting(services.msbServices, msb)
                     } else {
-                      standardRouting(services.services)
+                      standardRouting(services.msbServices)
                     }
                 }
               }

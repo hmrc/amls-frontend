@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite {
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.amounts.registration" -> 100))
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.amounts.registration" -> 100))
 
   trait Fixture {
 
@@ -847,7 +847,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
         result match {
           case Some((_, _, rows)) => {
-            println(rows)
             rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
             rows.count(_.label.equals("confirmation.unpaidpeople")) must be(1)
           }

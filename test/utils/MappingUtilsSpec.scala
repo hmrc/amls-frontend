@@ -1,7 +1,7 @@
 package utils
 
 import org.scalatest.MustMatchers
-import play.api.data.mapping.{Path, Write}
+import jto.validation.{Path, Write}
 import org.scalatest.WordSpec
 
 

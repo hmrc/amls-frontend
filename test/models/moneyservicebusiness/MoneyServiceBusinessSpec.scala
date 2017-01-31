@@ -4,14 +4,14 @@ import models.Country
 import models.businessmatching._
 import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import play.api.mvc.Call
 
-class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServiceBusinessTestData {
+class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServiceBusinessTestData with OneAppPerSuite{
 
   "MoneyServiceBusiness" should {
 

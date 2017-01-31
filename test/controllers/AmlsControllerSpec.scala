@@ -1,17 +1,18 @@
 package controllers
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.GenericTestHelper
 
-class AmlsControllerSpec extends PlaySpec with OneAppPerSuite {
+class AmlsControllerSpec extends GenericTestHelper {
 
     trait UnauthenticatedFixture extends MockitoSugar {
       self =>
       implicit val unauthenticatedRequest = FakeRequest()
+      val request = addToken(unauthenticatedRequest)
       val mockAuthConnector = mock[AuthConnector]
       val controller = new AmlsController {
         override protected def authConnector: AuthConnector = mockAuthConnector
@@ -20,7 +21,7 @@ class AmlsControllerSpec extends PlaySpec with OneAppPerSuite {
 
     "AmlsController" must {
       "load the unauthorised page with an unauthenticated request" in new UnauthenticatedFixture {
-          val result = controller.unauthorised(unauthenticatedRequest)
+          val result = controller.unauthorised(request)
           status(result) must be(OK)
           contentAsString(result) must include(Messages("unauthorised.title"))
         }

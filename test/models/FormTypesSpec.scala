@@ -1,48 +1,47 @@
 package models
 
 import org.scalatestplus.play.PlaySpec
-import org.specs2.mock.mockito.MockitoMatchers
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 
-class FormTypesSpec extends PlaySpec with MockitoMatchers {
+class FormTypesSpec extends PlaySpec {
 
   import FormTypes._
 
   "successfully validate the first name" in {
-    firstNameType.validate("John") must be(Success("John"))
+    firstNameType.validate("John") must be(Valid("John"))
   }
 
   "fail validation if the first name is not provided" in {
-    firstNameType.validate("") must be(Failure(Seq(Path -> Seq(ValidationError("error.required.firstname")))))
+    firstNameType.validate("") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required.firstname")))))
   }
 
   "fail validation if the first name is more than 35 characters" in {
     firstNameType.validate("JohnJohnJohnJohnJohnJohnJohnJohnJohnJohn") must
-      be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.firstname")))))
+      be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.firstname")))))
   }
 
   "successfully validate the middle name" in {
-    middleNameType.validate("John") must be(Success("John"))
+    middleNameType.validate("John") must be(Valid("John"))
   }
 
   "fail validation if the middle name is more than 35 characters" in {
     middleNameType.validate("EnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvyEnvy") must
-      be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
+      be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.middlename")))))
   }
 
   "successfully validate the last name" in {
-    lastNameType.validate("Doe") must be(Success("Doe"))
+    lastNameType.validate("Doe") must be(Valid("Doe"))
   }
 
   "fail validation if the last name is not provided" in {
-    lastNameType.validate("") must be(Failure(Seq(Path -> Seq(ValidationError("error.required.lastname")))))
+    lastNameType.validate("") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required.lastname")))))
   }
 
   "fail validation if the last name is more than 35 characters" in {
     lastNameType.validate("DoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoeDoe") must
-      be(Failure(Seq(Path -> Seq(ValidationError("error.invalid.length.lastname")))))
+      be(Invalid(Seq(Path -> Seq(ValidationError("error.invalid.length.lastname")))))
   }
 
   "validPostCodeType" must {
@@ -50,13 +49,13 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "successfully validate" in {
 
       postcodeType.validate("177A") must
-        be(Success("177A"))
+        be(Valid("177A"))
     }
 
     "fail to validate an empty string" in {
 
       postcodeType.validate("") must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.required.postcode"))
         )))
     }
@@ -64,7 +63,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate a string longer than 10" in {
 
       postcodeType.validate("a" * 11) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.invalid.postcode"))
         )))
     }
@@ -75,13 +74,13 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "successfully validate" in {
 
       vrnType.validate("123456789") must
-        be(Success("123456789"))
+        be(Valid("123456789"))
     }
 
     "fail to validate an empty string" in {
 
       vrnType.validate("") must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.required.vat.number"))
         )))
     }
@@ -89,7 +88,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate a string longer than 9" in {
 
       vrnType.validate("1" * 10) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.invalid.vat.number"))
         )))
     }
@@ -101,13 +100,13 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "successfully validate" in {
 
       phoneNumberType.validate("1234567890") must
-        be(Success("1234567890"))
+        be(Valid("1234567890"))
     }
 
     "fail to validate an empty string" in {
 
       phoneNumberType.validate("") must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.required.rp.phone"))
         )))
     }
@@ -115,7 +114,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate a string longer than 30" in {
 
       phoneNumberType.validate("1" * 31) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.max.length.rp.phone"))
         )))
     }
@@ -129,13 +128,13 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     validEmailAddresses.foreach { testData =>
       s"succesfully validate $testData" in {
         emailType.validate(testData) must
-          be(Success(testData))
+          be(Valid(testData))
       }
     }
 
     invalidEmailAddresses.foreach { testData =>
       s"fail to validate $testData" in {
-        emailType.validate(testData) must be(Failure(Seq(
+        emailType.validate(testData) must be(Invalid(Seq(
           Path -> Seq(ValidationError("error.invalid.rp.email"))
         )))
       }
@@ -143,7 +142,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "fail to validate an empty string" in {
       emailType.validate("") must
-        equal(Failure(Seq(
+        equal(Invalid(Seq(
           Path -> Seq(ValidationError("error.required.rp.email"))
         )))
     }
@@ -151,7 +150,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate a string longer than 100" in {
 
       emailType.validate("1" * 101) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.max.length.rp.email"))
         )))
     }
@@ -161,13 +160,13 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "successfully validate" in {
 
       yearType.validate("1934") must
-        be(Success("1934"))
+        be(Valid("1934"))
     }
 
     "fail to validate an empty string" in {
 
       yearType.validate("") must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.required.tp.year"))
         )))
     }
@@ -175,7 +174,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate a string longer than 4 digits" in {
 
       yearType.validate("19999") must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.invalid.tp.year"))
         )))
     }
@@ -183,7 +182,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate a string shorter than 4 digits" in {
 
       yearType.validate("1") must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.invalid.tp.year"))
         )))
     }
@@ -203,7 +202,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "successfully validate" in {
       localDateRule.validate(data) must
-        be(Success(model))
+        be(Valid(model))
     }
 
     "fail to validate an invalid month" in {
@@ -211,7 +210,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("24"),
         "month" -> Seq("13"),
         "year" -> Seq("1990")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
@@ -221,7 +220,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("45"),
         "month" -> Seq("11"),
         "year" -> Seq("1990")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
@@ -231,7 +230,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("24"),
         "month" -> Seq("11"),
         "year" -> Seq("16")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
@@ -241,14 +240,14 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("24"),
         "month" -> Seq("11"),
         "year" -> Seq("20166")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
     "fail to validate missing fields" in {
       localDateRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
     }
@@ -266,7 +265,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       val result = FormTypes.premisesEndDateRule.validate(form)
 
-      result mustBe Failure(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy")))))
+      result mustBe Invalid(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy")))))
 
     }
 
@@ -285,7 +284,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
       val result = FormTypes.peopleEndDateRule.validate(form)
 
-      result mustBe Failure(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.rp.date.after.start", "User 1", startDate.toString("dd-MM-yyyy")))))
+      result mustBe Invalid(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.rp.date.after.start", "User 1", startDate.toString("dd-MM-yyyy")))))
 
     }
   }
@@ -302,7 +301,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("1"),
         "month" -> Seq("1"),
         "year" -> Seq("2020")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.future.date"))
       )))
     }
@@ -312,7 +311,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("24"),
         "month" -> Seq("13"),
         "year" -> Seq("1990")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
@@ -322,7 +321,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("45"),
         "month" -> Seq("11"),
         "year" -> Seq("1990")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
@@ -332,7 +331,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("24"),
         "month" -> Seq("11"),
         "year" -> Seq("16")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
@@ -342,14 +341,14 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
         "day" -> Seq("24"),
         "month" -> Seq("11"),
         "year" -> Seq("10166")
-      )) must be(Failure(Seq(
+      )) must be(Invalid(Seq(
         Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
       )))
     }
 
     "fail to validate missing fields" in {
       localDateFutureRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
     }
@@ -377,12 +376,12 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
     "must be mandatory" in {
       accountNameType.validate("") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
     }
 
     "be not more than 40 characters" in {
       accountNameType.validate("This name is definitely longer than 40 characters.") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
       )
     }
   }
@@ -390,29 +389,29 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
   "sortCode must" must {
 
     "validate when 6 digits are supplied without - " in {
-      sortCodeType.validate("654321") must be(Success("654321"))
+      sortCodeType.validate("654321") must be(Valid("654321"))
     }
 
     "fail validation when more than 6 digits are supplied without - " in {
       sortCodeType.validate("87654321") must be(
-      Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+      Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
     }
 
     "fail when 8 non digits are supplied with - " in {
       sortCodeType.validate("ab-cd-ef") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
     }
 
     "pass validation when dashes are used to seperate number groups" in {
-      sortCodeType.validate("65-43-21") must be(Success("654321"))
+      sortCodeType.validate("65-43-21") must be(Valid("654321"))
     }
     "pass validation when spaces are used to seperate number groups" in {
-      sortCodeType.validate("65 43 21") must be(Success("654321"))
+      sortCodeType.validate("65 43 21") must be(Valid("654321"))
     }
 
     "fail validation for sort code with any other pattern" in {
       sortCodeType.validate("8712341241431243124124654321") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
       )
     }
   }
@@ -420,58 +419,58 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
   "removeCharacterRule" must {
     "strip the character from the incoming string" in {
       val inputStr = "=AAAA==BBBB==CCCC=="
-      removeCharacterRule('=').validate(inputStr)  must be (Success("AAAABBBBCCCC"))
+      removeCharacterRule('=').validate(inputStr)  must be (Valid("AAAABBBBCCCC"))
     }
   }
 
   "removeDashRule" must {
     "strip dashes from the incoming string" in {
       val inputStr = "-AAAA---BBBB--CCCC---"
-      removeDashRule.validate(inputStr)  must be (Success("AAAABBBBCCCC"))
+      removeDashRule.validate(inputStr)  must be (Valid("AAAABBBBCCCC"))
     }
   }
 
   "removeSpacesRule" must {
     "strip space s from the incoming string" in {
       val inputStr = " AAAA   BBBB CCCC  "
-      removeSpacesRule.validate(inputStr)  must be (Success("AAAABBBBCCCC"))    }
+      removeSpacesRule.validate(inputStr)  must be (Valid("AAAABBBBCCCC"))    }
   }
 
   "UK Bank Account must successfully" must {
 
     "validate when 8 digits are supplied " in {
-      ukBankAccountNumberType.validate("87654321") must be(Success("87654321"))
+      ukBankAccountNumberType.validate("87654321") must be(Valid("87654321"))
     }
 
     "fail validation when less than 8 characters are supplied" in {
       ukBankAccountNumberType.validate("123456") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
     }
 
     "fail validation when more than 8 characters are supplied" in {
       ukBankAccountNumberType.validate("1234567890") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
     }
   }
 
   "For the Overseas Bank Account" must {
 
     "validate IBAN supplied " in {
-      ibanType.validate("IBAN_4323268686686") must be(Success("IBAN_4323268686686"))
+      ibanType.validate("IBAN_4323268686686") must be(Valid("IBAN_4323268686686"))
     }
 
     "fail validation if IBAN is longer than the permissible length" in {
       ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.iban")))))
     }
 
     "validate Non UK Account supplied " in {
-      nonUKBankAccountNumberType.validate("IND22380310500093") must be(Success("IND22380310500093"))
+      nonUKBankAccountNumberType.validate("IND22380310500093") must be(Valid("IND22380310500093"))
     }
 
     "fail validation if Non UK Account is longer than the permissible length" in {
       nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.account")))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.account")))))
     }
 
   }
@@ -479,33 +478,33 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
   "For the Declaration Add Persons 'name' fields" must {
 
     "fail validation if blank value is supplied for the name" in {
-      declarationNameType.validate(" ") must be(Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+      declarationNameType.validate(" ") must be(Invalid(Seq(Path -> Seq(ValidationError("error.required")))))
     }
 
     "pass validation if name supplied is 255 characters" in {
-      declarationNameType.validate("1" * maxNameTypeLength) must be(Success("1" * maxNameTypeLength))
+      declarationNameType.validate("1" * maxNameTypeLength) must be(Valid("1" * maxNameTypeLength))
     }
 
     "validate other value length supplied" in {
       declarationNameType.validate("1" * (maxNameTypeLength + 1)) must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxNameTypeLength)))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", maxNameTypeLength)))))
     }
   }
 
   "For the Declaration Add Persons page, business activity 'other' field" must {
 
     "pass validation if value length supplied is 255 characters" in {
-      roleWithinBusinessOtherType.validate("1" * 255) must be(Success("1" * 255))
+      roleWithinBusinessOtherType.validate("1" * 255) must be(Valid("1" * 255))
     }
 
     "validate other value length supplied" in {
       roleWithinBusinessOtherType.validate("1" * 256) must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.maxLength", maxRoleWithinBusinessOtherType)))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", maxRoleWithinBusinessOtherType)))))
     }
 
     "fail validation if business type field is not selected" in {
       roleWithinBusinessOtherType.validate("") must be(
-        Failure(Seq(Path -> Seq(ValidationError("error.required")))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.required")))))
     }
   }
 
@@ -514,21 +513,21 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "successfully validate" in {
 
       ninoType.validate("AB123456B") must
-        be(Success("AB123456B"))
+        be(Valid("AB123456B"))
     }
 
     "successfully validate disregarding case" in {
-      ninoType.validate("ab123456c") mustBe Success("AB123456C")
+      ninoType.validate("ab123456c") mustBe Valid("AB123456C")
     }
 
     "successfully validate nino including spaces and dashes" in {
-      ninoType.validate("AB 36 72- 73 B") mustBe Success("AB367273B")
+      ninoType.validate("AB 36 72- 73 B") mustBe Valid("AB367273B")
     }
 
     "fail to validate an empty string" in {
 
       ninoType.validate("") must
-        equal(Failure(Seq(
+        equal(Invalid(Seq(
           Path -> Seq(ValidationError("error.required.nino"))
         )))
     }
@@ -536,7 +535,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail validation on exceeding maxlength" in {
 
       ninoType.validate("1" * 10) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.invalid.nino"))
         )))
     }
@@ -544,7 +543,7 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
     "fail to validate invalid data" in {
 
       ninoType.validate("1@@@@@") must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           Path -> Seq(ValidationError("error.invalid.nino"))
         )))
     }
@@ -553,11 +552,11 @@ class FormTypesSpec extends PlaySpec with MockitoMatchers {
 
   "Uk passport number" must {
     "successfully validate numbers" in {
-      ukPassportType.validate("123456789") mustBe Success("123456789")
+      ukPassportType.validate("123456789") mustBe Valid("123456789")
     }
 
     "fail when the passport number includes letters" in {
-      ukPassportType.validate("123abc789") mustBe Failure(
+      ukPassportType.validate("123abc789") mustBe Invalid(
         Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
       )
     }

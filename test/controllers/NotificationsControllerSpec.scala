@@ -12,12 +12,11 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import  utils.GenericTestHelper
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.AuthEnrolmentsService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http.HeaderCarrier
 import utils.AuthorisedFixture
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = authRequest
 
     val testNotifications = NotificationRow(
       status = None,
@@ -163,10 +162,10 @@ class NotificationsControllerSpec extends PlaySpec with MockitoSugar with OneApp
 
 }
 
-class NotificationsControllerWithoutNotificationsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class NotificationsControllerWithoutNotificationsSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new NotificationsController {
       override val authConnector = self.authConnector
@@ -190,7 +189,7 @@ class NotificationsControllerWithoutNotificationsSpec extends PlaySpec with OneA
     )
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.notifications" -> false) )
 
   "NotificationsControllerWithoutNotificationsSpec" must {
     "respond with not found when toggle is off" when {

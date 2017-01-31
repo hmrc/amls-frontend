@@ -3,7 +3,7 @@
 @import models.businessactivities._
 @import models.businessmatching.{BusinessActivities => BMBusinessActivities}
 
-@(model: BusinessActivities, bmBusinessActivities:Option[BMBusinessActivities], isEditable:Boolean)(implicit request: Request[_], lang: Lang)
+@(model: BusinessActivities, bmBusinessActivities:Option[BMBusinessActivities], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.businessactivities")

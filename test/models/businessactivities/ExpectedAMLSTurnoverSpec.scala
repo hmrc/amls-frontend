@@ -2,8 +2,8 @@ package models.businessactivities
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
@@ -13,25 +13,25 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("01"))) must
-        be(Success(ExpectedAMLSTurnover.First))
+        be(Valid(ExpectedAMLSTurnover.First))
 
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("02"))) must
-        be(Success(ExpectedAMLSTurnover.Second))
+        be(Valid(ExpectedAMLSTurnover.Second))
 
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("03"))) must
-        be(Success(ExpectedAMLSTurnover.Third))
+        be(Valid(ExpectedAMLSTurnover.Third))
 
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("04"))) must
-        be(Success(ExpectedAMLSTurnover.Fourth))
+        be(Valid(ExpectedAMLSTurnover.Fourth))
 
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("05"))) must
-        be(Success(ExpectedAMLSTurnover.Fifth))
+        be(Valid(ExpectedAMLSTurnover.Fifth))
 
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("06"))) must
-        be(Success(ExpectedAMLSTurnover.Sixth))
+        be(Valid(ExpectedAMLSTurnover.Sixth))
 
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("07"))) must
-        be(Success(ExpectedAMLSTurnover.Seventh))
+        be(Valid(ExpectedAMLSTurnover.Seventh))
     }
 
     "write correct data from enum value" in {
@@ -61,12 +61,12 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "throw error on invalid data" in {
       ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("20"))) must
-        be(Failure(Seq((Path \ "expectedAMLSTurnover", Seq(ValidationError("error.invalid"))))))
+        be(Invalid(Seq((Path \ "expectedAMLSTurnover", Seq(ValidationError("error.invalid"))))))
     }
 
     "throw error on empty data" in {
       ExpectedAMLSTurnover.formRule.validate(Map.empty) must
-        be(Failure(Seq((Path \ "expectedAMLSTurnover", Seq(ValidationError("error.required.ba.turnover.from.mlr"))))))
+        be(Invalid(Seq((Path \ "expectedAMLSTurnover", Seq(ValidationError("error.required.ba.turnover.from.mlr"))))))
     }
   }
 
@@ -75,25 +75,25 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "01")) must
-        be(JsSuccess(ExpectedAMLSTurnover.First, JsPath \ "expectedAMLSTurnover"))
+        be(JsSuccess(ExpectedAMLSTurnover.First, JsPath))
 
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "02")) must
-        be(JsSuccess(ExpectedAMLSTurnover.Second, JsPath \ "expectedAMLSTurnover"))
+        be(JsSuccess(ExpectedAMLSTurnover.Second, JsPath))
 
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "03")) must
-        be(JsSuccess(ExpectedAMLSTurnover.Third, JsPath \ "expectedAMLSTurnover"))
+        be(JsSuccess(ExpectedAMLSTurnover.Third, JsPath))
 
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "04")) must
-        be(JsSuccess(ExpectedAMLSTurnover.Fourth, JsPath \ "expectedAMLSTurnover"))
+        be(JsSuccess(ExpectedAMLSTurnover.Fourth, JsPath))
 
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "05")) must
-        be(JsSuccess(ExpectedAMLSTurnover.Fifth, JsPath \ "expectedAMLSTurnover"))
+        be(JsSuccess(ExpectedAMLSTurnover.Fifth, JsPath))
 
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "06")) must
-        be(JsSuccess(ExpectedAMLSTurnover.Sixth, JsPath \ "expectedAMLSTurnover"))
+        be(JsSuccess(ExpectedAMLSTurnover.Sixth, JsPath))
 
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "07")) must
-        be(JsSuccess(ExpectedAMLSTurnover.Seventh, JsPath \ "expectedAMLSTurnover"))
+        be(JsSuccess(ExpectedAMLSTurnover.Seventh, JsPath))
     }
 
     "write the correct value" in {
@@ -122,7 +122,7 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[ExpectedAMLSTurnover](Json.obj("expectedAMLSTurnover" -> "20")) must
-        be(JsError(JsPath \ "expectedAMLSTurnover", ValidationError("error.invalid")))
+        be(JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 }

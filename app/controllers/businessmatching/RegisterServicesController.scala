@@ -26,7 +26,7 @@ trait RegisterServicesController extends BaseController {
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       Form2[BusinessActivities](request.body) match {
         case invalidForm: InvalidForm =>
           Future.successful(BadRequest(register_services(invalidForm, edit)))

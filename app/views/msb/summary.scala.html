@@ -4,7 +4,7 @@
 @import models.businessmatching._
 @import models.Country
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_], lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.msb")
@@ -62,7 +62,7 @@
             }
         }
 
-        @if(services.services.contains(TransmittingMoney)) {
+        @if(services.msbServices.contains(TransmittingMoney)) {
             @model.businessUseAnIPSP.map { ipsp =>
                 @checkYourAnswers(
                     question = Messages("msb.ipsp.title"),
@@ -142,7 +142,7 @@
             }
         }
 
-        @if(services.services.contains(CurrencyExchange)) {
+        @if(services.msbServices.contains(CurrencyExchange)) {
             @model.ceTransactionsInNext12Months.map{ trans =>
                 @checkYourAnswers(
                     question = Messages("msb.ce.transactions.expected.in.12.months.title"),

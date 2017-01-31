@@ -32,6 +32,7 @@ class AmendVariationResponseSpec extends PlaySpec {
 
     }
 
+
     "Deserialize correctly where Fit and Proper Fee is fpFee" in {
 
       val json =

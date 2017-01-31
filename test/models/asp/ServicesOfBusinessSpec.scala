@@ -4,8 +4,8 @@ import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
@@ -14,7 +14,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
     val businessServices: Set[Service] = Set(Accountancy, PayrollServices, BookKeeping, Auditing, FinancialOrTaxAdvice)
 
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
 
     "validate model with few check box selected" in {
 
@@ -23,13 +23,13 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
       )
 
       ServicesOfBusiness.formReads.validate(model) must
-        be(Success(ServicesOfBusiness(businessServices)))
+        be(Valid(ServicesOfBusiness(businessServices)))
     }
 
     "fail to validate on empty Map" in {
 
       ServicesOfBusiness.formReads.validate(Map.empty) must
-        be(Failure(Seq((Path \ "services") -> Seq(ValidationError("error.required.asp.business.services")))))
+        be(Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.required.asp.business.services")))))
 
     }
 
@@ -39,7 +39,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
       )
 
       ServicesOfBusiness.formReads.validate(model) must
-        be(Failure(Seq((Path \ "services" \ 1 \ "services", Seq(ValidationError("error.invalid"))))))
+        be(Invalid(Seq((Path \ "services" \ 1 \ "services", Seq(ValidationError("error.invalid"))))))
     }
 
     "write correct data for services value" in {
@@ -74,7 +74,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
       "fail when on invalid data" in {
 
         Json.fromJson[ServicesOfBusiness](Json.obj("services" -> Seq("40"))) must
-          be(JsError(((JsPath \ "services")(0) \ "services") -> ValidationError("error.invalid")))
+          be(JsError(((JsPath \ "services")(0) \ "services") -> play.api.data.validation.ValidationError("error.invalid")))
       }
 
       "successfully validate json write" in {

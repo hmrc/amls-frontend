@@ -2,8 +2,8 @@ package models.businessactivities
 
 import models.{Country, FormTypes}
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Success, Failure, Path}
-import play.api.data.validation.ValidationError
+import jto.validation.{Valid, Invalid, Path}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class AccountantsAddressSpec extends PlaySpec {
@@ -88,12 +88,12 @@ class AccountantsAddressSpec extends PlaySpec {
 
     "Form validation" must {
       "Read UK Address" in {
-        AccountantsAddress.formRule.validate(DefaultUKModel) must be (Success(DefaultUKAddress))
+        AccountantsAddress.formRule.validate(DefaultUKModel) must be (Valid(DefaultUKAddress))
       }
 
       "throw error when mandatory fields are missing" in {
         AccountantsAddress.formRule.validate(Map.empty) must be(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           )))
       }
@@ -101,7 +101,7 @@ class AccountantsAddressSpec extends PlaySpec {
       "throw error when there is an invalid data" in {
         val model =  DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
         AccountantsAddress.formRule.validate(model) must be(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           )))
       }
@@ -109,13 +109,13 @@ class AccountantsAddressSpec extends PlaySpec {
       "throw error when length of country exceeds max length" in {
         val model =  DefaultNonUKModel ++ Map("country" -> Seq("HGHHHH"))
         AccountantsAddress.formRule.validate(model) must be(
-          Failure(Seq(
+          Invalid(Seq(
             (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
           )))
       }
 
       "Read Non UK Address" in {
-        AccountantsAddress.formRule.validate(DefaultNonUKModel) must be (Success(DefaultNonUKAddress))
+        AccountantsAddress.formRule.validate(DefaultNonUKModel) must be (Valid(DefaultNonUKAddress))
       }
 
     }

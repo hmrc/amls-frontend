@@ -1,7 +1,7 @@
 package models.declaration
 
-import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, To, Write}
+import jto.validation.forms._
+import jto.validation.{From, Rule, To, Write}
 
 case class AddPerson(firstName: String,
                      middleName: Option[String],
@@ -18,22 +18,22 @@ object AddPerson {
   //TODO: Update these read types to use correct name types.
   implicit val formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
     import models.FormTypes._
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (
-      (__ \ "firstName").read(declarationNameType) and
-        (__ \ "middleName").read(optionR(declarationNameType)) and
-        (__ \ "lastName").read(declarationNameType) and
+      (__ \ "firstName").read(declarationNameType) ~
+        (__ \ "middleName").read(optionR(declarationNameType)) ~
+        (__ \ "lastName").read(declarationNameType) ~
         __.read[RoleWithinBusiness]
       ) (AddPerson.apply _)
   }
 
   implicit val formWrites: Write[AddPerson, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
-      (__ \ "firstName").write[String] and
-        (__ \ "middleName").write[Option[String]] and
-        (__ \ "lastName").write[String] and
+      (__ \ "firstName").write[String] ~
+        (__ \ "middleName").write[Option[String]] ~
+        (__ \ "lastName").write[String] ~
         __.write[RoleWithinBusiness]
       ) (unlift(AddPerson.unapply))
   }

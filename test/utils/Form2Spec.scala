@@ -3,8 +3,8 @@ package utils
 import _root_.forms.{ValidField, InvalidForm, ValidForm, Form2}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 
 class Form2Spec extends PlaySpec with MockitoSugar {
 
@@ -13,18 +13,18 @@ class Form2Spec extends PlaySpec with MockitoSugar {
   trait Fixture {
 
     implicit val formRule: Rule[UrlFormEncoded, Foobar] = From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (
-        (__ \ "services").read[String] and
+        (__ \ "services").read[String] ~
           (__ \ "f").read[String]
         )(Foobar.apply _)
     }
 
     implicit val formWrites: Write[Foobar, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Writes._
+      import jto.validation.forms.Writes._
       import play.api.libs.functional.syntax.unlift
       (
-        (__ \ "services").write[String] and
+        (__ \ "services").write[String] ~
           (__ \ "f").write[String]
         )(unlift(Foobar.unapply _))
     }

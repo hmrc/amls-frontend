@@ -2,8 +2,8 @@ package models.businessactivities
 
 import org.scalatestplus.play.PlaySpec
 
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -14,18 +14,18 @@ class NCARegisteredSpec extends PlaySpec {
     "successfully validate given an true value" in {
       val data = Map("ncaRegistered" -> Seq("true"))
       val result = NCARegistered.formRule.validate(data)
-      result mustBe Success(NCARegistered(true))
+      result mustBe Valid(NCARegistered(true))
     }
 
     "fail validation for empty data" in {
       val result = NCARegistered.formRule.validate(Map.empty)
-      result mustBe Failure(Seq((Path \ "ncaRegistered", Seq(ValidationError("error.required.ba.select.nca")))))
+      result mustBe Invalid(Seq((Path \ "ncaRegistered", Seq(ValidationError("error.required.ba.select.nca")))))
     }
 
     "successfully validate given a false value" in {
       val data = Map("ncaRegistered" -> Seq("false"))
       val result = NCARegistered.formRule.validate(data)
-      result mustBe Success(NCARegistered(false))
+      result mustBe Valid(NCARegistered(false))
     }
 
     "write correct data from true value" in {

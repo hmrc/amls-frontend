@@ -7,19 +7,19 @@ import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class WhatYouNeedControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class WhatYouNeedControllerSpec extends GenericTestHelper with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController {
       override val dataCacheConnector = mockDataCacheConnector

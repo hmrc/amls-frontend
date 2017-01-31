@@ -13,7 +13,7 @@ import org.scalatestplus.play.OneAppPerSuite
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{GenericTestHelper, AuthorisedFixture}
 import play.api.test.Helpers._
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.http.HeaderNames.LOCATION
@@ -21,16 +21,15 @@ import views.html.msb.which_currencies
 
 import scala.concurrent.Future
 
-class WhichCurrencyControllerSpec extends WordSpec
+class WhichCurrencyControllerSpec extends GenericTestHelper
                                     with MockitoSugar
                                     with MustMatchers
-                                    with OneAppPerSuite
                                     with PatienceConfiguration
                                     with IntegrationPatience
                                     with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 

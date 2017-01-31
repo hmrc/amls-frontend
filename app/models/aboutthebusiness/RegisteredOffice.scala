@@ -4,8 +4,8 @@ import models.{Country, DateOfChange}
 import models.FormTypes._
 import models.businesscustomer.Address
 import org.joda.time.LocalDate
-import play.api.data.mapping._
-import play.api.data.mapping.forms._
+import jto.validation._
+import jto.validation.forms._
 import play.api.libs.json.{JsNull, Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
@@ -55,24 +55,24 @@ object RegisteredOffice {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "isUK").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") flatMap {
       case true =>
         (
-          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
-            (__ \ "addressLine3").read(optionR(validateAddress)) and
-            (__ \ "addressLine4").read(optionR(validateAddress)) and
+          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+            (__ \ "addressLine3").read(optionR(validateAddress)) ~
+            (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "postCode").read(postcodeType)
           ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], postCode: String) =>
             RegisteredOfficeUK(addr1, addr2, addr3, addr4, postCode, None))
 
       case false =>
         (
-          (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
-            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
-            (__ \ "addressLineNonUK3").read(optionR(validateAddress)) and
-            (__ \ "addressLineNonUK4").read(optionR(validateAddress)) and
+          (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+            (__ \ "addressLineNonUK3").read(optionR(validateAddress)) ~
+            (__ \ "addressLineNonUK4").read(optionR(validateAddress)) ~
             (__ \ "country").read[Country]
           ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: Country) =>
           RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))

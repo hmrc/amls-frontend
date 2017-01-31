@@ -37,7 +37,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
   def post(index: Int, edit: Boolean = false) =
     Authorised.async {
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       implicit authContext => implicit request =>
         Form2[Positions](request.body) match {
           case f: InvalidForm =>

@@ -1,13 +1,11 @@
 package models.notifications
 
+import jto.validation.ValidationError
 import org.joda.time.{DateTime, DateTimeZone}
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import org.specs2.mock.mockito.MockitoMatchers
-import ContactType._
-import play.api.data.validation.ValidationError
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSuite {
+class NotificationRowSpec extends PlaySpec {
 
   val testNotifications = NotificationRow(
     Some(
@@ -42,7 +40,7 @@ class NotificationRowSpec extends PlaySpec with MockitoMatchers with OneAppPerSu
     }
 
     "fail with error when status value is passed incorrectly" in {
-      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath  \"contact_type",List(ValidationError("error.invalid"))))))
+      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath  \"contact_type",List(play.api.data.validation.ValidationError("error.invalid"))))))
     }
 
     "format the date for the table of messages" in {

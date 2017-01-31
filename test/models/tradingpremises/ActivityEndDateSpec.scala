@@ -2,8 +2,8 @@ package models.tradingpremises
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -21,7 +21,7 @@ class ActivityEndDateSpec extends PlaySpec {
         )
 
         // scalastyle:off
-        ActivityEndDate.formRule.validate(model) must be (Success(ActivityEndDate(new LocalDate(1990, 2, 24))))
+        ActivityEndDate.formRule.validate(model) must be (Valid(ActivityEndDate(new LocalDate(1990, 2, 24))))
 
       }
 
@@ -31,7 +31,7 @@ class ActivityEndDateSpec extends PlaySpec {
           "endDate.month" -> Seq("2"),
           "endDate.year" -> Seq("1990")
         )
-        ActivityEndDate.formRule.validate(model) must be(Failure(Seq(Path \ "endDate" -> Seq(
+        ActivityEndDate.formRule.validate(model) must be(Invalid(Seq(Path \ "endDate" -> Seq(
           ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
 
       }
@@ -42,7 +42,7 @@ class ActivityEndDateSpec extends PlaySpec {
           "endDate.month" -> Seq(""),
           "endDate.year" -> Seq("")
         )
-        ActivityEndDate.formRule.validate(model) must be(Failure(Seq(
+        ActivityEndDate.formRule.validate(model) must be(Invalid(Seq(
           Path \ "endDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
           )))
 
@@ -61,7 +61,6 @@ class ActivityEndDateSpec extends PlaySpec {
     "Json" should {
 
       "Read and write successfully" in {
-
         ActivityEndDate.format.reads(ActivityEndDate.format.writes(ActivityEndDate(new LocalDate(1990, 2, 24)))) must be(
           JsSuccess(ActivityEndDate(new LocalDate(1990, 2, 24)), JsPath \ "endDate"))
 

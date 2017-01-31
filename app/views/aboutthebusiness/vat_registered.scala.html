@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("vrnNumber").id}-panel"""

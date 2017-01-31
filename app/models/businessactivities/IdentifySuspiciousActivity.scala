@@ -1,7 +1,7 @@
 package models.businessactivities
 
-import play.api.data.mapping.forms._
-import play.api.data.mapping.{From, Rule, Write}
+import jto.validation.forms._
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class IdentifySuspiciousActivity(hasWrittenGuidance: Boolean)
@@ -12,9 +12,9 @@ object IdentifySuspiciousActivity {
 
   implicit val formRule: Rule[UrlFormEncoded, IdentifySuspiciousActivity] =
     From[UrlFormEncoded] { __ =>
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       import utils.MappingUtils.Implicits._
-      (__ \ "hasWrittenGuidance").read[Boolean].withMessage("error.required.ba.suspicious.activity") fmap (IdentifySuspiciousActivity.apply)
+      (__ \ "hasWrittenGuidance").read[Boolean].withMessage("error.required.ba.suspicious.activity") map (IdentifySuspiciousActivity.apply)
     }
 
   implicit val formWrites: Write[IdentifySuspiciousActivity, UrlFormEncoded] =

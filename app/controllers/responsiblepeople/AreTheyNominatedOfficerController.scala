@@ -6,8 +6,8 @@ import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
-import play.api.data.mapping.{From, Rule, Write}
-import play.api.data.mapping.forms._
+import jto.validation.{From, Rule, Write}
+import jto.validation.forms._
 import play.api.mvc.{Request, Result}
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.are_they_nominated_officer
@@ -16,10 +16,10 @@ import scala.concurrent.Future
 
 object BooleanFormReadWrite {
 
-  import play.api.data.mapping.forms.UrlFormEncoded
-  import play.api.data.mapping.{From, Rule, Write}
+  import jto.validation.forms.UrlFormEncoded
+  import jto.validation.{From, Rule, Write}
   import utils.MappingUtils.Implicits._
-  import play.api.data.mapping.forms.Rules._
+  import jto.validation.forms.Rules._
 
   def formWrites(fieldName: String): Write[Option[Boolean], UrlFormEncoded] = Write { data: Option[Boolean] => Map(fieldName -> Seq(data.toString)) }
 
@@ -46,7 +46,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
 
   def post(index: Int, edit: Boolean = false) =
     Authorised.async {
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       implicit authContext => implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>

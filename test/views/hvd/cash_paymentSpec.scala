@@ -3,15 +3,19 @@ package views.hvd
 import forms.{InvalidForm, ValidForm, Form2}
 import models.hvd.{CashPaymentYes, CashPayment}
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
 
-class cash_paymentSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class cash_paymentSpec extends GenericTestHelper with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "cash_payment view" must {
     "have correct title" in new ViewFixture {

@@ -1,9 +1,8 @@
 package models.asp
 
 import models.DateOfChange
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
 import play.api.libs.json._
 import utils.TraversableValidators._
 
@@ -41,6 +40,7 @@ object Service {
       case FinancialOrTaxAdvice => "05"
   }
 
+  import play.api.data.validation.ValidationError
   implicit val jsonServiceReads: Reads[Service] =
     Reads {
       case JsString("01") => JsSuccess(Accountancy)

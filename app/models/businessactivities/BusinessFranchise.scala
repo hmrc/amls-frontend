@@ -1,9 +1,9 @@
 package models.businessactivities
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait BusinessFranchise
@@ -18,14 +18,14 @@ object BusinessFranchise {
   import utils.MappingUtils.Implicits._
 
   val maxFranchiseName = 140
-  val franchiseNameType =  notEmptyStrip compose notEmpty.withMessage("error.required.ba.franchise.name") compose
+  val franchiseNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.ba.franchise.name") andThen
     maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name")
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessFranchise] = From[UrlFormEncoded] { __ =>
-  import play.api.data.mapping.forms.Rules._
+  import jto.validation.forms.Rules._
     (__ \ "businessFranchise").read[Boolean].withMessage("error.required.ba.is.your.franchise") flatMap {
       case true =>
-        (__ \ "franchiseName").read(franchiseNameType) fmap BusinessFranchiseYes.apply
+        (__ \ "franchiseName").read(franchiseNameType) map BusinessFranchiseYes.apply
       case false => Rule.fromMapping { _ => Success(BusinessFranchiseNo) }
     }
   }

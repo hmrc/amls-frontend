@@ -2,7 +2,7 @@
 @import forms2._
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
-@(model: BusinessMatching)(implicit request: Request[_])
+@(model: BusinessMatching)(implicit request: Request[_],messages:Messages)
 
 @header = {
     @heading("title.cya", "summary.businessmatching")
@@ -84,7 +84,7 @@
                     editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString
                 ) {
                     <ul class="list list--comma">
-                    @services.services.map { svc =>
+                    @services.msbServices.map { svc =>
                         <li>@svc match {
                             case TransmittingMoney => {@Messages("services.list.lbl.01")}
                             case CurrencyExchange => {@Messages("services.list.lbl.02")}
@@ -95,7 +95,7 @@
                     </ul>
                 }
 
-                @if(services.services.contains(TransmittingMoney)) {
+                @if(services.msbServices.contains(TransmittingMoney)) {
                     @model.businessAppliedForPSRNumber.map { psr =>
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),

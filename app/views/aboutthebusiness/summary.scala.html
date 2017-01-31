@@ -3,7 +3,7 @@
 @import models.aboutthebusiness._
 @import utils._
 
-@(model: AboutTheBusiness)(implicit request: Request[_], lang: Lang)
+@(model: AboutTheBusiness)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.aboutbusiness")

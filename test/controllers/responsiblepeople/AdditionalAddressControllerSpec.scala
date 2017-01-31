@@ -10,7 +10,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -18,13 +18,13 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class AdditionalAddressControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val additionalAddressController = new AdditionalAddressController {
       override val dataCacheConnector = mockDataCacheConnector

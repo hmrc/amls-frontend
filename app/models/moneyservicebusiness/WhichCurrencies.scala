@@ -2,9 +2,11 @@ package models.moneyservicebusiness
 
 import config.ApplicationConfig
 import models._
-import play.api.data.mapping.GenericRules._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import config.ApplicationConfig
+import models._
+import jto.validation.GenericRules._
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
@@ -55,7 +57,7 @@ object WhichCurrencies {
   }
 
   implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
 
     val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
 
@@ -105,7 +107,7 @@ object WhichCurrencies {
   }
 
   implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
 
     val bToS: (Boolean) => Option[String] = {
       case true => Some("Yes")

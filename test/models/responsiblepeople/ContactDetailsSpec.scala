@@ -2,8 +2,8 @@ package models.responsiblepeople
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class ContactDetailsSpec extends PlaySpec with MockitoSugar {
@@ -17,7 +17,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           "emailAddress" -> Seq("myname@example.com")
         )
 
-        ContactDetails.formReads.validate(urlFormEncoded) must be(Success(ContactDetails("07702755869", "myname@example.com")))
+        ContactDetails.formReads.validate(urlFormEncoded) must be(Valid(ContactDetails("07702755869", "myname@example.com")))
       }
 
       "fail validation when no option is selected" in {
@@ -28,7 +28,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactDetails.formReads.validate(emptyForm) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.required.rp.phone")),
             (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
           )))
@@ -42,7 +42,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.required.rp.phone"))
           )))
       }
@@ -55,7 +55,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
         )
 
         ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
           )))
       }
@@ -67,7 +67,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           "emailAddress" -> Seq("invalid-email.com")
         )
         ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "emailAddress") -> Seq(ValidationError("error.invalid.rp.email"))
           )))
       }
@@ -79,7 +79,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           "emailAddress" -> Seq("myname@example.com")
         )
         ContactDetails.formReads.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "phoneNumber") -> Seq(ValidationError("error.invalid.rp.phone"))
           )))
       }

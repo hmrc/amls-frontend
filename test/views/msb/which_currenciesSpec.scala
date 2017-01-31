@@ -1,17 +1,19 @@
 package views.msb
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{Form2, ValidForm}
 import models.moneyservicebusiness.WhichCurrencies
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
-import views.ViewFixture
+import utils.GenericTestHelper
+import views.Fixture
 
 
-class which_currenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class which_currenciesSpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 

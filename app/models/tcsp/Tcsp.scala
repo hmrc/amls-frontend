@@ -4,6 +4,8 @@ import models.registrationprogress.{Started, Completed, NotStarted, Section}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+import scala.collection.Seq
+
 case class Tcsp (tcspTypes: Option[TcspTypes] = None,
                  providedServices: Option[ProvidedServices] = None,
                  servicesOfAnotherTCSP: Option[ServicesOfAnotherTCSP] = None,
@@ -29,6 +31,8 @@ object Tcsp {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+
+  implicit val formatOption = Reads.optionWithNull[Tcsp]
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "tcsp"

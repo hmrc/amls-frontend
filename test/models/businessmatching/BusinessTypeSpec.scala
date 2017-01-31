@@ -3,8 +3,8 @@ package models.businessmatching
 import models.businessmatching.BusinessType._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 
 class BusinessTypeSpec extends PlaySpec with MockitoSugar {
 
@@ -14,36 +14,36 @@ class BusinessTypeSpec extends PlaySpec with MockitoSugar {
       "successfully validate given a valid enum value" in {
 
         BusinessType.formR.validate(Map("businessType" -> Seq("01"))) must
-          be(Success(LimitedCompany))
+          be(Valid(LimitedCompany))
 
         BusinessType.formR.validate(Map("businessType" -> Seq("02"))) must
-          be(Success(SoleProprietor))
+          be(Valid(SoleProprietor))
 
         BusinessType.formR.validate(Map("businessType" -> Seq("03"))) must
-          be(Success(Partnership))
+          be(Valid(Partnership))
 
         BusinessType.formR.validate(Map("businessType" -> Seq("04"))) must
-          be(Success(LPrLLP))
+          be(Valid(LPrLLP))
 
         BusinessType.formR.validate(Map("businessType" -> Seq("05"))) must
-          be(Success(UnincorporatedBody))
+          be(Valid(UnincorporatedBody))
       }
     }
 
     "fail validation" when {
       "fail validation when given invalid data" in {
         BusinessType.formR.validate(Map("businessType" -> Seq("20"))) must
-          be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.invalid"))))))
+          be(Invalid(Seq((Path \ "businessType", Seq(ValidationError("error.invalid"))))))
       }
 
       "fail validation when given missing data represented by an empty Map" in {
         BusinessType.formR.validate(Map.empty) must
-          be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.required"))))))
+          be(Invalid(Seq((Path \ "businessType", Seq(ValidationError("error.required"))))))
       }
 
       "fail validation when given missing data represented by an empty string" in {
         BusinessType.formR.validate(Map("businessType" -> Seq(""))) must
-          be(Failure(Seq((Path \ "businessType", Seq(ValidationError("error.invalid"))))))
+          be(Invalid(Seq((Path \ "businessType", Seq(ValidationError("error.invalid"))))))
       }
     }
 

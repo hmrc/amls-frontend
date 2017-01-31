@@ -1,14 +1,15 @@
 package models.businessmatching
 
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
+import play.api.i18n.Messages
 import play.api.libs.json._
+import utils.GenericTestHelper
 
 
-class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
-  import play.api.data.mapping.forms.Rules._
+class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
+  import jto.validation.forms.Rules._
 
   "BusinessActivitiesSpec" must {
     "successfully validate" when {
@@ -16,22 +17,22 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
         val model1 = Map("businessActivities[]" -> Seq("03", "01", "02"))
 
         BusinessActivities.formReads.validate(model1) must
-          be(Success(BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, BillPaymentServices))))
+          be(Valid(BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, BillPaymentServices))))
 
         val model2 = Map("businessActivities[]" -> Seq("04", "05", "06"))
 
         BusinessActivities.formReads.validate(model2) must
-          be(Success(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))))
+          be(Valid(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))))
 
         BusinessActivities.formReads.validate(Map("businessActivities[]" -> Seq("07"))) must
-          be(Success(BusinessActivities(Set(TelephonePaymentService))))
+          be(Valid(BusinessActivities(Set(TelephonePaymentService))))
       }
 
       "residential business activity check box is selected" in {
         val model = Map("businessActivities" -> Seq("07"))
 
         BusinessActivities.formReads.validate(model) must
-          be(Success(BusinessActivities(Set(TelephonePaymentService))))
+          be(Valid(BusinessActivities(Set(TelephonePaymentService))))
       }
     }
 
@@ -39,7 +40,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
       "given missing data represented by an empty Map" in {
 
         BusinessActivities.formReads.validate(Map.empty) must
-          be(Failure(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service")))))
+          be(Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service")))))
       }
 
       "given invalid data" in {
@@ -47,7 +48,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
         val model = Map("businessActivities[]" -> Seq("01", "99", "03"))
 
         BusinessActivities.formReads.validate(model) must
-          be(Failure(Seq((Path \ "businessActivities" \ 1 \ "businessActivities") -> Seq(ValidationError("error.invalid")))))
+          be(Invalid(Seq((Path \ "businessActivities" \ 1 \ "businessActivities") -> Seq(ValidationError("error.invalid")))))
       }
     }
 
@@ -82,13 +83,13 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
     }
 
     "get the message for each activity type" in {
-      AccountancyServices.getMessage must be("businessmatching.registerservices.servicename.lbl.01")
-      BillPaymentServices.getMessage must be("businessmatching.registerservices.servicename.lbl.02")
-      EstateAgentBusinessService.getMessage must be("businessmatching.registerservices.servicename.lbl.03")
-      HighValueDealing.getMessage must be("businessmatching.registerservices.servicename.lbl.04")
-      MoneyServiceBusiness.getMessage must be("businessmatching.registerservices.servicename.lbl.05")
-      TrustAndCompanyServices.getMessage must be("businessmatching.registerservices.servicename.lbl.06")
-      TelephonePaymentService.getMessage must be("businessmatching.registerservices.servicename.lbl.07")
+      AccountancyServices.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.01"))
+      BillPaymentServices.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.02"))
+      EstateAgentBusinessService.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.03"))
+      HighValueDealing.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.04"))
+      MoneyServiceBusiness.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.05"))
+      TrustAndCompanyServices.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.06"))
+      TelephonePaymentService.getMessage must be(Messages("businessmatching.registerservices.servicename.lbl.07"))
 
     }
 
@@ -110,7 +111,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
       "fail when on invalid data" in {
         Json.fromJson[BusinessActivities](Json.obj("businessActivity" -> "01")) must
-          be(JsError((JsPath \ "businessActivities") -> ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "businessActivities") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
     }
 
@@ -127,7 +128,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar {
 
     "throw error for invalid data" in {
       Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq(JsString("20")))) must
-        be(JsError((JsPath \ "businessActivities") (0) \ "businessActivities", ValidationError("error.invalid")))
+        be(JsError((JsPath \ "businessActivities") (0) \ "businessActivities", play.api.data.validation.ValidationError("error.invalid")))
     }
   }
 }

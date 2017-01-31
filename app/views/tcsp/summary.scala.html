@@ -2,7 +2,7 @@
 @import forms2._
 @import models.tcsp._
 
-@(model: Tcsp)(implicit request: Request[_], lang: Lang)
+@(model: Tcsp)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.tcsp")

@@ -2,7 +2,7 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(title: String, heading: String)(implicit request: Request[_])
+@(title: String, heading: String)(implicit request: Request[_],m:Messages)
 
 @main(
 title = Messages(title)

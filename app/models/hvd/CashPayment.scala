@@ -2,8 +2,8 @@ package models.hvd
 
 import models.FormTypes._
 import org.joda.time.{DateTimeFieldType, LocalDate}
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
 import play.api.libs.json.{Reads}
 
 sealed trait CashPayment
@@ -17,10 +17,10 @@ object CashPayment {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, CashPayment] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "acceptedAnyPayment").read[Boolean].withMessage("error.required.hvd.accepted.cash.payment") flatMap {
       case true =>
-        (__ \ "paymentDate").read(localDateRule) fmap CashPaymentYes.apply
+        (__ \ "paymentDate").read(localDateRule) map CashPaymentYes.apply
       case false => Rule.fromMapping { _ => Success(CashPaymentNo) }
     }
   }

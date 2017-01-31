@@ -1,7 +1,7 @@
 package models.moneyservicebusiness
 
+import cats.data.Validated.Valid
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.data.mapping.Success
 import play.api.libs.json.Json
 import play.api.test.FakeApplication
 
@@ -33,7 +33,7 @@ class WhichCurrenciesPreRelease7Spec extends PlaySpec with OneAppPerSuite {
           "customerMoneySource" -> Seq("Yes")
         )
 
-        WhichCurrencies.formR.validate(formData) must be(Success(model))
+        WhichCurrencies.formR.validate(formData) must be(Valid(model))
 
       }
 

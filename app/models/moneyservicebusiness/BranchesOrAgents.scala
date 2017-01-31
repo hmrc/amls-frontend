@@ -1,10 +1,9 @@
 package models.moneyservicebusiness
 
 import models.Country
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.libs.functional.Monoid
-import play.api.libs.json.{Reads, Writes}
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import play.api.libs.json.{Json, Reads, Writes}
 import utils.{JsonMapping, TraversableValidators}
 
 case class BranchesOrAgents(branches: Option[Seq[Country]])
@@ -15,6 +14,7 @@ sealed trait BranchesOrAgents0 {
   val maxLength = 10
 
   import JsonMapping._
+  import utils.MappingUtils.MonoidImplicits._
 
   private implicit def rule[A]
   (implicit
@@ -38,54 +38,65 @@ sealed trait BranchesOrAgents0 {
         }
 
       val countrySeqR = {
-        (seqToOptionSeq[String] compose flattenR[String] compose cR)
-          .compose(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.countries.msb.branchesOrAgents")
-          .compose(maxLengthR[Seq[Country]](maxLength))
+        (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
+          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.countries.msb.branchesOrAgents")
+          .andThen(maxLengthR[Seq[Country]](maxLength))
       }
 
       (__ \ "hasCountries").read(boolR).flatMap[Option[Seq[Country]]] {
         case true =>
-          (__ \ "countries").read(countrySeqR) fmap Some.apply
+          (__ \ "countries").read(countrySeqR) map Some.apply
         case false =>
           Rule(_ => Success(None))
-      } fmap BranchesOrAgents.apply
+      } map BranchesOrAgents.apply
     }
 
-  private implicit def write[A]
+
+  private implicit def write
   (implicit
-   mon: Monoid[A],
-   a: Path => WriteLike[Boolean, A],
-   b: Path => WriteLike[Option[Seq[Country]], A]
-  ): Write[BranchesOrAgents, A] =
-    To[A] { __ =>
+   mon: cats.Monoid[UrlFormEncoded],
+   a: Path => WriteLike[Boolean, UrlFormEncoded],
+   b: Path => WriteLike[Option[Seq[Country]], UrlFormEncoded]
+  ): Write[BranchesOrAgents, UrlFormEncoded] =
+    To[UrlFormEncoded] { __ =>
       (
         (__ \ "hasCountries").write[Boolean].contramap[Option[Seq[_]]] {
-          case Some(x) if x.size == 0 => false
+          case Some(x) if x.isEmpty => false
           case Some(_) => true
           case None => false
-        } and
-        (__ \ "countries").write[Option[Seq[Country]]]
-      )(a => (a.branches, a.branches))
+        } ~
+          (__ \ "countries").write[Option[Seq[Country]]]
+        )(a => (a.branches, a.branches))
     }
 
   val formR: Rule[UrlFormEncoded, BranchesOrAgents] = {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicitly
   }
 
   val jsonR: Reads[BranchesOrAgents] = {
-    import play.api.data.mapping.json.Rules.{JsValue => _, pickInJson => _, _}
+    import jto.validation.playjson.Rules.{JsValue => _, pickInJson => _, _}
     implicitly
   }
 
   val formW: Write[BranchesOrAgents, UrlFormEncoded] = {
-    import play.api.data.mapping.forms.Writes._
+    import cats.implicits._
+    import jto.validation.forms.Writes._
     implicitly
   }
 
-  val jsonW: Writes[BranchesOrAgents] = {
-    import play.api.data.mapping.json.Writes._
-    implicitly
+  val jsonW = Writes[BranchesOrAgents] {x =>
+    val countries = x.branches.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
+    countries.nonEmpty match {
+      case true =>  Json.obj(
+        "hasCountries" -> true,
+        "countries" -> countries
+      )
+      case false =>
+        Json.obj(
+          "hasCountries" -> false
+        )
+    }
   }
 }
 
