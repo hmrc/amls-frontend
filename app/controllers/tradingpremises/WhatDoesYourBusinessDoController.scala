@@ -103,7 +103,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                       tp.yourTradingPremises,
                       tp.businessStructure,
                       tp.agentName,
-                      tp.agentCompanyName,
+                      tp.agentCompanyDetails,
                       tp.agentPartnership,
                       Some(data),
                       None,

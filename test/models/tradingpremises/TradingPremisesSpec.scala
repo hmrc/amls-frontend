@@ -29,7 +29,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
   val businessStructure = SoleProprietor
   val agentName = AgentName("test")
-  val agentCompanyName = AgentCompanyDetails("test", "12345678")
+  val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val agentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(
@@ -66,7 +66,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
       "startDate" ->"1990-02-24"),
     "businessStructure" -> Json.obj("agentsBusinessStructure" ->"01"),
     "agentName" -> Json.obj("agentName" ->"test"),
-    "agentCompanyName" -> Json.obj("agentCompanyName" ->"test", "companyRegistrationNumber" -> "12345678"),
+    "agentCompanyDetails" -> Json.obj("agentCompanyName" ->"test", "companyRegistrationNumber" -> "12345678"),
     "agentPartnership" -> Json.obj("agentPartnership" ->"test"),
     "whatDoesYourBusinessDoAtThisAddress" ->Json.obj("activities" -> Json.arr("02","03","05")),
     "msbServices" -> Json.obj("msbServices"-> Json.arr("01","02")),
@@ -92,8 +92,8 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
 
     "return a tp model with the given 'agent company name' data" in {
       val tp = TradingPremises(None, None, None)
-      val newTP = tp.agentCompanyName(agentCompanyName)
-      newTP must be (tp.copy(agentCompanyName = Some(agentCompanyName), hasChanged = true))
+      val newTP = tp.agentCompanyDetails(agentCompanyName)
+      newTP must be (tp.copy(agentCompanyDetails = Some(agentCompanyName), hasChanged = true))
     }
 
     "return a tp model with the given 'agent partnership' data" in {
@@ -132,13 +132,11 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
     }
 
     "deserialise correctly when hasChanged field is missing from the Json" in {
-      (completeJson - "hasChanged").as[TradingPremises] must
-        be(completeModel)
+      (completeJson - "hasChanged").as[TradingPremises] must be(completeModel)
     }
 
     "Deserialise as expected" in {
-      completeJson.as[TradingPremises] must
-        be(completeModel)
+      completeJson.as[TradingPremises] must be(completeModel)
       TradingPremises.writes.writes(completeModel) must be(completeJson)
     }
 
@@ -350,7 +348,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
               )),
               Some(LimitedLiabilityPartnership),
               None,
-              Some(AgentCompanyDetails("REG Name Ltd.", "12345678")),
+              Some(AgentCompanyDetails("REG Name Ltd.", Some("12345678"))),
               None,
               Some(WhatDoesYourBusinessDo(Set(
                     AccountancyServices,

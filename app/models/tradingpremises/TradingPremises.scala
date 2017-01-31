@@ -13,7 +13,7 @@ case class TradingPremises(
                             yourTradingPremises: Option[YourTradingPremises] = None,
                             businessStructure: Option[BusinessStructure] = None,
                             agentName: Option[AgentName] = None,
-                            agentCompanyName: Option[AgentCompanyDetails] = None,
+                            agentCompanyDetails: Option[AgentCompanyDetails] = None,
                             agentPartnership: Option[AgentPartnership] = None,
                             whatDoesYourBusinessDoAtThisAddress : Option[WhatDoesYourBusinessDo] = None,
                             msbServices: Option[MsbServices] = None,
@@ -29,8 +29,8 @@ case class TradingPremises(
   def agentName(p: AgentName): TradingPremises =
     this.copy(agentName = Some(p), hasChanged = hasChanged || !this.agentName.contains(p))
 
-  def agentCompanyName(p: AgentCompanyDetails): TradingPremises =
-    this.copy(agentCompanyName = Some(p), hasChanged = hasChanged || !this.agentCompanyName.contains(p))
+  def agentCompanyDetails(p: AgentCompanyDetails): TradingPremises =
+    this.copy(agentCompanyDetails = Some(p), hasChanged = hasChanged || !this.agentCompanyDetails.contains(p))
 
   def agentPartnership(p: AgentPartnership): TradingPremises =
     this.copy(agentPartnership = Some(p), hasChanged = hasChanged || !this.agentPartnership.contains(p))

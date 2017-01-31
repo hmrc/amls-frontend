@@ -48,7 +48,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
       "display saved content" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyName = Some(AgentCompanyDetails("test", "12345678")))))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -183,7 +183,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = None,
-            agentCompanyName = Some(AgentCompanyDetails("text", "12345678")),
+            agentCompanyDetails = Some(AgentCompanyDetails("text", Some("12345678"))),
             agentPartnership = None
           ))))(any(), any(), any())
       }
@@ -204,7 +204,7 @@ class AgentCompanyDetailsControllerSpec extends PlaySpec with OneAppPerSuite wit
 
   val businessStructure = SoleProprietor
   val testAgentName = AgentName("test")
-  val testAgentCompanyName = AgentCompanyDetails("test", "12345678")
+  val testAgentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(

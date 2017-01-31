@@ -15,7 +15,7 @@ class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPe
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", ""))
+      val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", None))
 
       def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
 
@@ -25,7 +25,7 @@ class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPe
 
     "have correct heading" in new ViewFixture {
 
-      val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", ""))
+      val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", None))
 
       def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
 

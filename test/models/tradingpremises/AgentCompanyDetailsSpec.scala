@@ -3,7 +3,7 @@ package models.tradingpremises
 import org.scalatestplus.play.PlaySpec
 import play.api.data.mapping.{Failure, Path, Success}
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsSuccess}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class AgentCompanyDetailsSpec extends PlaySpec {
 
@@ -11,7 +11,7 @@ class AgentCompanyDetailsSpec extends PlaySpec {
 
     "validate form Read" in {
       val formInput = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("12345678"))
-      AgentCompanyDetails.formReads.validate(formInput) must be(Success(AgentCompanyDetails("sometext", "12345678")))
+      AgentCompanyDetails.formReads.validate(formInput) must be(Success(AgentCompanyDetails("sometext", Some("12345678"))))
     }
 
     "throw error" when {
@@ -72,7 +72,7 @@ class AgentCompanyDetailsSpec extends PlaySpec {
     }
 
     "validate form write" in {
-      AgentCompanyDetails.formWrites.writes(AgentCompanyDetails("sometext", "12345678")) must be(
+      AgentCompanyDetails.formWrites.writes(AgentCompanyDetails("sometext", Some("12345678"))) must be(
         Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("12345678")))
     }
 
@@ -81,8 +81,8 @@ class AgentCompanyDetailsSpec extends PlaySpec {
 
   "Json Validation" must {
     "Successfully read/write Json data" in {
-      AgentCompanyDetails.format.reads(AgentCompanyDetails.format.writes(
-        AgentCompanyDetails("test", "12345678"))) must be(JsSuccess(AgentCompanyDetails("test", "12345678")))
+      Json.fromJson[AgentCompanyDetails](Json.toJson[AgentCompanyDetails](
+        AgentCompanyDetails("test", "12345678"))) must be(JsSuccess(AgentCompanyDetails("test", Some("12345678"))))
     }
   }
 }

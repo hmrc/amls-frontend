@@ -21,7 +21,7 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
         getData[TradingPremises](index) map {
 
           case Some(tp) => {
-            val form = tp.agentCompanyName match {
+            val form = tp.agentCompanyDetails match {
               case Some(data) => Form2[AgentCompanyDetails](data)
               case None => EmptyForm
             }

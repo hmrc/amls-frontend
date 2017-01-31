@@ -44,7 +44,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
             tradingPremises <- getData[TradingPremises](index)
             _ <- updateDataStrict[TradingPremises](index) { tp =>
               TradingPremises(tp.registeringAgentPremises,
-                Some(ytp), tp.businessStructure, tp.agentName, tp.agentCompanyName,
+                Some(ytp), tp.businessStructure, tp.agentName, tp.agentCompanyDetails,
                 tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices, hasChanged = true, tp.lineId, tp.status, tp.endDate)
             }
             status <- statusService.getStatus

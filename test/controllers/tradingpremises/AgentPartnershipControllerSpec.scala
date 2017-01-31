@@ -186,7 +186,7 @@ class AgentPartnershipControllerSpec extends PlaySpec with OneAppPerSuite with M
             hasChanged = true,
             agentPartnership = Some(AgentPartnership("text")),
             agentName = None,
-            agentCompanyName = None
+            agentCompanyDetails = None
           ))))(any(), any(), any())
       }
     }

@@ -7,9 +7,12 @@ import play.api.data.mapping.forms.UrlFormEncoded
 import play.api.libs.json._
 import typeclasses.MongoKey
 
-case class AgentCompanyDetails(agentCompanyName: String, companyRegistrationNumber: String)
+case class AgentCompanyDetails(agentCompanyName: String, companyRegistrationNumber: Option[String])
 
 object AgentCompanyDetails {
+
+  def apply(agentCompanyName: String, companyRegistrationNumber: String): AgentCompanyDetails =
+    new AgentCompanyDetails(agentCompanyName, Some(companyRegistrationNumber))
 
   import utils.MappingUtils.Implicits._
 
@@ -25,7 +28,6 @@ object AgentCompanyDetails {
   implicit val mongoKey = new MongoKey[AgentCompanyDetails] {
     override def apply(): String = "agent-company-name"
   }
-  implicit val format = Json.format[AgentCompanyDetails]
 
   implicit val formReads: Rule[UrlFormEncoded, AgentCompanyDetails] = From[UrlFormEncoded] { __ =>
     import play.api.data.mapping.forms.Rules._
@@ -36,6 +38,25 @@ object AgentCompanyDetails {
   }
 
   implicit val formWrites: Write[AgentCompanyDetails, UrlFormEncoded] = Write {
-    case AgentCompanyDetails(name, crn) => Map("agentCompanyName" -> Seq(name), "companyRegistrationNumber" -> Seq(crn))
+    case AgentCompanyDetails(name, Some(crn)) => Map("agentCompanyName" -> Seq(name), "companyRegistrationNumber" -> Seq(crn))
+    case AgentCompanyDetails(name, _) => Map("agentCompanyName" -> Seq(name))
+  }
+
+  implicit val reads: Reads[AgentCompanyDetails] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      (__ \ "agentCompanyName").read[String] and
+        (__ \ "companyRegistrationNumber").readNullable[String]
+      )(AgentCompanyDetails.apply(_, _))
+  }
+
+  implicit val writes: Writes[AgentCompanyDetails] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+    (
+      (__ \ "agentCompanyName").write[String] and
+        (__ \ "companyRegistrationNumber").writeNullable[String]
+      )(unlift(AgentCompanyDetails.unapply))
   }
 }
