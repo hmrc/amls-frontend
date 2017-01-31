@@ -3,6 +3,7 @@ package models.businessmatching
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait BusinessType
 
@@ -20,14 +21,14 @@ object BusinessType {
   implicit val formR: Rule[UrlFormEncoded, BusinessType] =
     From[UrlFormEncoded] { __ =>
       (__ \ "businessType").read[String] flatMap {
-        case "01" => Rule(_ => Success(LimitedCompany))
-        case "02" => Rule(_ => Success(SoleProprietor))
-        case "03" => Rule(_ => Success(Partnership))
-        case "04" => Rule(_ => Success(LPrLLP))
-        case "05" => Rule(_ => Success(UnincorporatedBody))
+        case "01" => Rule(_ => Valid(LimitedCompany))
+        case "02" => Rule(_ => Valid(SoleProprietor))
+        case "03" => Rule(_ => Valid(Partnership))
+        case "04" => Rule(_ => Valid(LPrLLP))
+        case "05" => Rule(_ => Valid(UnincorporatedBody))
         case _ =>
           Rule { _ =>
-            Failure(Seq(Path \ "businessType" -> Seq(ValidationError("error.invalid"))))
+            Invalid(Seq(Path \ "businessType" -> Seq(ValidationError("error.invalid"))))
           }
       }
     }

@@ -5,6 +5,7 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait BusinessAppliedForPSRNumber
 case class BusinessAppliedForPSRNumberYes(regNumber: String) extends BusinessAppliedForPSRNumber
@@ -23,7 +24,7 @@ object BusinessAppliedForPSRNumber {
     (__ \ "appliedFor").read[Boolean].withMessage("error.required.msb.psr.options") flatMap {
       case true =>
          (__ \ "regNumber").read(registrationNumberType) map BusinessAppliedForPSRNumberYes.apply
-      case false => Rule.fromMapping { _ => Success(BusinessAppliedForPSRNumberNo) }
+      case false => Rule.fromMapping { _ => Valid(BusinessAppliedForPSRNumberNo) }
     }
   }
 

@@ -4,6 +4,7 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait ServicesOfAnotherTCSP
 
@@ -26,7 +27,7 @@ object ServicesOfAnotherTCSP {
     (__ \ "servicesOfAnotherTCSP").read[Boolean].withMessage("error.required.tcsp.services.another.tcsp") flatMap {
       case true =>
        (__ \ "mlrRefNumber").read(service) map ServicesOfAnotherTCSPYes.apply
-      case false => Rule.fromMapping { _ => Success(ServicesOfAnotherTCSPNo) }
+      case false => Rule.fromMapping { _ => Valid(ServicesOfAnotherTCSPNo) }
     }
   }
 

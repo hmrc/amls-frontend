@@ -6,6 +6,7 @@ import play.api.libs.json._
 import jto.validation.forms.Rules._
 import play.api.libs.functional.syntax._
 import utils.MappingUtils.Implicits._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait IsKnownByOtherNames
 
@@ -36,7 +37,7 @@ object IsKnownByOtherNames {
         (__ \ "othermiddlenames").read(optionR(otherMiddleNameType)) ~
         (__ \ "otherlastnames").read(otherLastNameType)
         )(IsKnownByOtherNamesYes.apply _)
-      case false => Rule.fromMapping { _ => Success(IsKnownByOtherNamesNo) }
+      case false => Rule.fromMapping { _ => Valid(IsKnownByOtherNamesNo) }
     }
   }
 

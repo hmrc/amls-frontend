@@ -4,6 +4,7 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import cats.data.Validated.{Invalid, Valid}
 import play.api.libs.json._
 
 sealed trait BusinessFranchise
@@ -26,7 +27,7 @@ object BusinessFranchise {
     (__ \ "businessFranchise").read[Boolean].withMessage("error.required.ba.is.your.franchise") flatMap {
       case true =>
         (__ \ "franchiseName").read(franchiseNameType) map BusinessFranchiseYes.apply
-      case false => Rule.fromMapping { _ => Success(BusinessFranchiseNo) }
+      case false => Rule.fromMapping { _ => Valid(BusinessFranchiseNo) }
     }
   }
 

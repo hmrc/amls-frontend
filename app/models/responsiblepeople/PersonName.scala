@@ -6,6 +6,7 @@ import jto.validation._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import models.FormTypes._
+import cats.data.Validated.{Invalid, Valid}
 
 case class PersonName(
                        firstName: String,
@@ -39,13 +40,13 @@ object PersonName {
           case true =>
             (__ \ "previous").read[PreviousName] map Some.apply
           case false =>
-            Rule(_ => Success(None))
+            Rule(_ => Valid(None))
         } ~
         (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames").flatMap[Option[String]] {
           case true =>
             (__ \ "otherNames").read(otherNamesType) map Some.apply
           case false =>
-            Rule(_ => Success(None))
+            Rule(_ => Valid(None))
         }
       )(PersonName.apply _)
     }

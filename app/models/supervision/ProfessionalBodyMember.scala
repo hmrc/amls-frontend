@@ -8,6 +8,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait ProfessionalBodyMember
 
@@ -79,27 +80,27 @@ object ProfessionalBodyMember {
         case true =>
           (__ \ "businessType").read(minLengthR[Set[String]](1).withMessage("error.required.supervision.one.professional.body")) flatMap { z =>
             z.map {
-              case "01" => Rule[UrlFormEncoded, BusinessType](_ => Success(AccountingTechnicians))
-              case "02" => Rule[UrlFormEncoded, BusinessType](_ => Success(CharteredCertifiedAccountants))
-              case "03" => Rule[UrlFormEncoded, BusinessType](_ => Success(InternationalAccountants))
-              case "04" => Rule[UrlFormEncoded, BusinessType](_ => Success(TaxationTechnicians))
-              case "05" => Rule[UrlFormEncoded, BusinessType](_ => Success(ManagementAccountants))
-              case "06" => Rule[UrlFormEncoded, BusinessType](_ => Success(InstituteOfTaxation))
-              case "07" => Rule[UrlFormEncoded, BusinessType](_ => Success(Bookkeepers))
-              case "08" => Rule[UrlFormEncoded, BusinessType](_ => Success(AccountantsIreland))
-              case "09" => Rule[UrlFormEncoded, BusinessType](_ => Success(AccountantsScotland))
-              case "10" => Rule[UrlFormEncoded, BusinessType](_ => Success(AccountantsEnglandandWales))
-              case "11" => Rule[UrlFormEncoded, BusinessType](_ => Success(FinancialAccountants))
-              case "12" => Rule[UrlFormEncoded, BusinessType](_ => Success(AssociationOfBookkeepers))
-              case "13" => Rule[UrlFormEncoded, BusinessType](_ => Success(LawSociety))
+              case "01" => Rule[UrlFormEncoded, BusinessType](_ => Valid(AccountingTechnicians))
+              case "02" => Rule[UrlFormEncoded, BusinessType](_ => Valid(CharteredCertifiedAccountants))
+              case "03" => Rule[UrlFormEncoded, BusinessType](_ => Valid(InternationalAccountants))
+              case "04" => Rule[UrlFormEncoded, BusinessType](_ => Valid(TaxationTechnicians))
+              case "05" => Rule[UrlFormEncoded, BusinessType](_ => Valid(ManagementAccountants))
+              case "06" => Rule[UrlFormEncoded, BusinessType](_ => Valid(InstituteOfTaxation))
+              case "07" => Rule[UrlFormEncoded, BusinessType](_ => Valid(Bookkeepers))
+              case "08" => Rule[UrlFormEncoded, BusinessType](_ => Valid(AccountantsIreland))
+              case "09" => Rule[UrlFormEncoded, BusinessType](_ => Valid(AccountantsScotland))
+              case "10" => Rule[UrlFormEncoded, BusinessType](_ => Valid(AccountantsEnglandandWales))
+              case "11" => Rule[UrlFormEncoded, BusinessType](_ => Valid(FinancialAccountants))
+              case "12" => Rule[UrlFormEncoded, BusinessType](_ => Valid(AssociationOfBookkeepers))
+              case "13" => Rule[UrlFormEncoded, BusinessType](_ => Valid(LawSociety))
               case "14" =>
                 (__ \ "specifyOtherBusiness").read(specifyOtherType) map Other.apply
               case _ =>
                 Rule[UrlFormEncoded, BusinessType] { _ =>
-                  Failure(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid"))))
+                  Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid"))))
                 }
             }.foldLeft[Rule[UrlFormEncoded, Set[BusinessType]]](
-              Rule[UrlFormEncoded, Set[BusinessType]](_ => Success(Set.empty))
+              Rule[UrlFormEncoded, Set[BusinessType]](_ => Valid(Set.empty))
             ) {
               case (m, n) =>
                 n flatMap { x =>
@@ -110,7 +111,7 @@ object ProfessionalBodyMember {
             } map ProfessionalBodyMemberYes.apply
           }
 
-        case false => Rule.fromMapping { _ => Success(ProfessionalBodyMemberNo) }
+        case false => Rule.fromMapping { _ => Valid(ProfessionalBodyMemberNo) }
       }
     }
 

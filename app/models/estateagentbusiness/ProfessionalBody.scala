@@ -4,6 +4,7 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait ProfessionalBody
 
@@ -24,7 +25,7 @@ object ProfessionalBody {
     (__ \ "penalised").read[Boolean].withMessage("error.required.eab.penalised.by.professional.body") flatMap {
       case true =>
         (__ \ "professionalBody").read(penalisedType) map ProfessionalBodyYes.apply
-      case false => Rule.fromMapping { _ => Success(ProfessionalBodyNo) }
+      case false => Rule.fromMapping { _ => Valid(ProfessionalBodyNo) }
     }
   }
 
