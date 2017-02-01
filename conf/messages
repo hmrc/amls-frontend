@@ -168,7 +168,7 @@ error.required.tp.register.another.premises = Select yes or no to the question: 
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
 
-###############################  Estate Agent Business ###############################
+###############################  Estate Agency Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
 error.required.eab.which.redress.scheme = Select which redress scheme.
 error.required.eab.redress.scheme.name = Enter the name of the redress scheme
