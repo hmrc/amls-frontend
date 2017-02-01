@@ -64,7 +64,6 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=09]").isEmpty must be(false)
         document.title() must be (Messages("declaration.addperson.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
         contentAsString(result) must include(Messages("submit.amendment.application"))
@@ -81,7 +80,6 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=09]").isEmpty must be(true)
         document.title() must be (Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
         contentAsString(result) must include(Messages("submit.registration"))

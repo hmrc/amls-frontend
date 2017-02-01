@@ -39,6 +39,7 @@ object RoleWithinBusiness {
         case "05" => NominatedOfficer
         case "06" => Partner
         case "07" => SoleProprietor
+        case "08" =>
           (readerURLFormEncoded \ "roleWithinBusinessOther").read(roleWithinBusinessOtherType) map Other.apply
         case _ =>
           (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))

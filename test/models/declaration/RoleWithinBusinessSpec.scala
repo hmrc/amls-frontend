@@ -46,11 +46,6 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       RoleWithinBusiness.formRule.validate(urlFormEncoded) must be(Valid(SoleProprietor))
     }
 
-    "successfully pass validation for Designated Member" in {
-      val urlFormEncoded = Map("roleWithinBusiness" -> Seq("09"))
-      RoleWithinBusiness.formRule.validate(urlFormEncoded) must be(Valid(DesignatedMember))
-    }
-
     "successfully pass validation for Other value" in {
       val urlFormEncoded = Map(
         "roleWithinBusiness" -> Seq("08"),
@@ -109,11 +104,6 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
     "load the correct value in the form for SoleProprietor" in {
       RoleWithinBusiness.formWrite.writes(SoleProprietor) must be(Map("roleWithinBusiness" -> Seq("07")))
     }
-
-    "load the correct value in the form for Designated Member" in {
-      RoleWithinBusiness.formWrite.writes(DesignatedMember) must be(Map("roleWithinBusiness" -> Seq("09")))
-    }
-
 
     "load the correct value in the form for Other value" in {
       RoleWithinBusiness.formWrite.writes(Other("some value")) must be(Map(
@@ -189,14 +179,6 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
         be(JsSuccess(Other("any other value"), JsPath \ "roleWithinBusinessOther"))
     }
 
-
-    "Read the json and return the DesignatedMember domain object successfully for the DesignatedMember" in {
-      val json = Json.obj(
-        "roleWithinBusiness" -> "09"
-      )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(DesignatedMember, JsPath))
-    }
-
     "Read the json and return error if an invalid value is found" in {
       val json = Json.obj(
         "roleWithinBusiness" -> "10"
@@ -266,15 +248,6 @@ class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar {
       val roleWithinBusiness: RoleWithinBusiness = SoleProprietor
       val json = Json.obj(
         "roleWithinBusiness" -> "07"
-      )
-      RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
-    }
-
-    "Write the json successfully from the DesignatedMember domain object created" in {
-
-      val roleWithinBusiness: RoleWithinBusiness = DesignatedMember
-      val json = Json.obj(
-        "roleWithinBusiness" -> "09"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
     }
