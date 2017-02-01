@@ -445,7 +445,7 @@ select {
 /* form errors */
 .amls-error-summary {
     background-color: #fff;
-    border: 5px solid #b10e1e;
+    border: 4px solid #b10e1e;
 }
 
 .amls-error-summary li {
@@ -457,7 +457,7 @@ select {
 }
 
 .form-field--error {
-    border-left-width: 5px;
+    border-left-width: 4px;
     border-color: #b10e1e;
 }
 

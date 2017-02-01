@@ -17,12 +17,13 @@
     @form(f, controllers.msb.routes.TransactionsInNext12MonthsController.post(edit)) {
 
         @input(
-                field = f("txnAmount"),
-                labelText = "msb.transactions.expected.title",
-                labelHidden = true,
-                bold = false
-            )
-
+            field = f("txnAmount"),
+            attrType = "number",
+            classes = Seq("input--no-spinner"),
+            labelText = "msb.transactions.expected.title",
+            labelHidden = true,
+            bold = false
+        )
 
         @submit(edit)
     }
