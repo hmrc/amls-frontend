@@ -77,7 +77,7 @@
                             labelText = "responsiblepeople.position_within_business.lbl.04",
                             value = "04"
                         )
-                        @if(ApplicationConfig.release7) {
+                        @if(ApplicationConfig.release7 && (businessType == BusinessType.LPrLLP)) {
                             @checkbox(
                                 f = f("positions[]"),
                                 labelText = "responsiblepeople.position_within_business.lbl.07",
