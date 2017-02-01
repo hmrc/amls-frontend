@@ -1,6 +1,7 @@
 package models.tradingpremises
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import play.api.data.mapping.Rule
 import play.api.libs.json.{Format, JsArray, Json, Writes}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -102,12 +103,20 @@ object TradingPremises {
       (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read[Option[T]]
     }
 
+    def readAgentCompanyDetails = {
+      (__ \ "agentCompanyDetails").read[AgentCompanyDetails].map[Option[AgentCompanyDetails]]{Some(_)} orElse
+        (__ \ "agentCompanyName").readNullable[String].map[Option[AgentCompanyDetails]]{
+          case Some(name) => Some(AgentCompanyDetails(name, None))
+          case _ => None
+        }
+    }
+
     (
       backCompatibleReads[RegisteringAgentPremises]("registeringAgentPremises") and
         backCompatibleReads[YourTradingPremises]("yourTradingPremises") and
         backCompatibleReads[BusinessStructure]("businessStructure") and
         backCompatibleReads[AgentName]("agentName") and
-        backCompatibleReads[AgentCompanyDetails]("agentCompanyName") and
+        readAgentCompanyDetails and
         backCompatibleReads[AgentPartnership]("agentPartnership") and
         backCompatibleReads[WhatDoesYourBusinessDo]("whatDoesYourBusinessDoAtThisAddress") and
         backCompatibleReads[MsbServices]("msbServices") and

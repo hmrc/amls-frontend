@@ -140,7 +140,13 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
       TradingPremises.writes.writes(completeModel) must be(completeJson)
     }
 
-    "isComplete" must {
+    "Deserialise as expected with agentCompanyDetails"
+
+    "Deserialise as expected with agentCompanyName"
+
+    "Deserialise as expected with neither agentCompanyDetails nor agentCompanyName"
+
+      "isComplete" must {
       "return true when tradingPremises contains complete data" in {
         completeModel.isComplete must be(true)
       }
@@ -348,7 +354,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
               )),
               Some(LimitedLiabilityPartnership),
               None,
-              Some(AgentCompanyDetails("REG Name Ltd.", Some("12345678"))),
+              Some(AgentCompanyDetails("REG Name Ltd.", None)),
               None,
               Some(WhatDoesYourBusinessDo(Set(
                     AccountancyServices,
