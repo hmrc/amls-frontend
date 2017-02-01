@@ -38,18 +38,21 @@
             panel = false,
             f = f("redundantvalue")
         ) {
-            @radio(
-                f = f("usesForeignCurrencies"),
-                labelText = "lbl.yes",
-                value = "Yes",
-                target = "#usesForeignCurrency-fieldset",
-                inline = true )
 
-            @radio(
-                f = f("usesForeignCurrencies"),
-                labelText = "lbl.no",
-                value = "No",
-                inline = true )
+            @errorGroup(f("usesForeignCurrencies")) {
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.yes",
+                    value = "Yes",
+                    target = "#usesForeignCurrency-fieldset",
+                    inline = true )
+
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.no",
+                    value = "No",
+                    inline = true )
+            }
 
             @panel(
                 field = Some(f("usesForeignCurrency-fieldset")),
