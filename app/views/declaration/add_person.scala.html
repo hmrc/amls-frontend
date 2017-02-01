@@ -60,9 +60,6 @@
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.05", "05")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.06", "06")
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.07", "07")
-            @if(businessType.contains(BusinessType.LPrLLP)) {
-                @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.09", "09")
-            }
             @radio(f("roleWithinBusiness"), "declaration.addperson.lbl.08", "08", target = s"#$target")
         }
 
