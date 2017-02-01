@@ -21,8 +21,6 @@ case object Partner extends RoleWithinBusiness
 
 case object SoleProprietor extends RoleWithinBusiness
 
-case object DesignatedMember extends RoleWithinBusiness
-
 case class Other(value: String) extends RoleWithinBusiness
 
 object RoleWithinBusiness {
@@ -41,8 +39,6 @@ object RoleWithinBusiness {
         case "05" => NominatedOfficer
         case "06" => Partner
         case "07" => SoleProprietor
-        case "09" => DesignatedMember
-        case "08" =>
           (readerURLFormEncoded \ "roleWithinBusinessOther").read(roleWithinBusinessOtherType) map Other.apply
         case _ =>
           (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
@@ -57,7 +53,6 @@ object RoleWithinBusiness {
     case NominatedOfficer => "roleWithinBusiness" -> "05"
     case Partner => "roleWithinBusiness" -> "06"
     case SoleProprietor => "roleWithinBusiness" -> "07"
-    case DesignatedMember => "roleWithinBusiness" -> "09"
     case Other(value) => Map("roleWithinBusiness" -> "08",
       "roleWithinBusinessOther" -> value)
   }
@@ -74,7 +69,6 @@ object RoleWithinBusiness {
       case "05" => NominatedOfficer
       case "06" => Partner
       case "07" => SoleProprietor
-      case "09" => DesignatedMember
       case "08" => (JsPath \ "roleWithinBusinessOther").read[String] map {
         Other(_)
       }
@@ -90,7 +84,6 @@ object RoleWithinBusiness {
     case NominatedOfficer => Json.obj("roleWithinBusiness" -> "05")
     case Partner => Json.obj("roleWithinBusiness" -> "06")
     case SoleProprietor => Json.obj("roleWithinBusiness" -> "07")
-    case DesignatedMember => Json.obj("roleWithinBusiness" -> "09")
     case Other(value) => Json.obj(
       "roleWithinBusiness" -> "08",
       "roleWithinBusinessOther" -> value
