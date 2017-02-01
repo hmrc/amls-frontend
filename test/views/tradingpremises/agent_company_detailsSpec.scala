@@ -11,8 +11,7 @@ import views.ViewFixture
 
 class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPerSuite {
 
-  "experience_training view" must {
-
+  "add_person view" must {
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", None))
@@ -30,28 +29,30 @@ class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPe
       def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
 
       heading.html() must be(Messages("tradingpremises.youragent.company.details.title"))
+      subHeading.html() must include(Messages("summary.tradingpremises"))
     }
 
-    "show errors in correct places when validation fails" in new ViewFixture {
 
-      val messageKey1 = "definitely not a message key"
-      val messageKey2 = "definitely not another message key"
+    "show errors in the correct locations" in new ViewFixture {
 
-      val agentCompanyNameField = "agentCompanyName"
-      val agentCompanyCRNField = "agentCompanyCRNField"
-
-      val form2: InvalidForm = InvalidForm(
-        Map("a" -> Seq("a")),
-        Seq((Path \ agentCompanyNameField, Seq(ValidationError(messageKey1))),
-          (Path \ agentCompanyCRNField, Seq(ValidationError(messageKey2)))))
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "agentCompanyName") -> Seq(ValidationError("not a message Key")),
+          (Path \ "companyRegistrationNumber") -> Seq(ValidationError("second not a message Key"))
+        ))
 
       def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
 
-      errorSummary.html() must include(messageKey1)
-      errorSummary.html() must include(messageKey2)
+      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("second not a message Key")
 
-      doc.getElementsByClass("form-field--error").first().html() must include(messageKey1)
-      doc.html() must include("dhjkuyftxdrxtcfgh")
+      doc.getElementById("agentCompanyName")
+        .parent()
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
+      doc.getElementById("companyRegistrationNumber")
+        .parent()
+        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
     }
   }
 }
