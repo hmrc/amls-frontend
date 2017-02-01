@@ -742,7 +742,7 @@ estateagentbusiness.penalisedunderestateagentsact.banned = being banned from tak
 estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl = Give a brief overview of what the penalty was, and when it occurred.
 estateagentbusiness.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
 estateagentbusiness.penalisedbyprofessional.heading = Has the business, or anyone in the business, ever been penalised by a professional body?
-estateagentbusiness.penalisedbyprofessional.subtitle = The penalty should relate to estate agent business activities. Examples of a penalty include:
+estateagentbusiness.penalisedbyprofessional.subtitle = The penalty should relate to estate agency business activities. Examples of a penalty include:
 estateagentbusiness.penalisedbyprofessional.line_1 = a fine
 estateagentbusiness.penalisedbyprofessional.line_2 = a warning
 estateagentbusiness.penalisedbyprofessional.line_3 = suspension
@@ -765,7 +765,7 @@ estateagentbusiness.redress.lbl.03 = Property Redress Scheme
 estateagentbusiness.redress.lbl.04 = Other
 estateagentbusiness.registered.redress.title = Is this business registered with a redress scheme?
 estateagentbusiness.registered.redress.heading = Is this business registered with a redress scheme?
-estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agent business and its customers.
+estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agency business and its customers.
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.businessType.title = What’s your business structure?
