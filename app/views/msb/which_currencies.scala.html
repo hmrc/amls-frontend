@@ -45,13 +45,15 @@
                     labelText = "lbl.yes",
                     value = "Yes",
                     target = "#usesForeignCurrency-fieldset",
-                    inline = true )
+                    inline = true
+                )
 
                 @radio(
                     f = f("usesForeignCurrencies"),
                     labelText = "lbl.no",
                     value = "No",
-                    inline = true )
+                    inline = true
+                )
             }
 
             @panel(
@@ -82,25 +84,27 @@
             f = f("bankMoneySource"),
             labelText = "msb.which_currencies.source.banks",
             value = "Yes",
-            target = ".form-group:has(#bankNames)"
+            target = "[data-reveal='banks']"
         )
         @input(
             field = f("bankNames"),
             labelText = "msb.which_currencies.source.which_banks",
             panel = true,
-            jsHidden = true
+            jsHidden = true,
+            data = "banks"
         )
         @checkbox(
             f = f("wholesalerMoneySource"),
             labelText = "msb.which_currencies.source.wholesalers",
             value = "Yes",
-            target = ".form-group:has(#wholesalerNames)"
+            target = "[data-reveal='wholesalers']"
         )
         @input(
             field = f("wholesalerNames"),
             labelText = "msb.which_currencies.source.which_wholesalers",
             panel = true,
-            jsHidden = true
+            jsHidden = true,
+            data = "wholesalers"
         )
         @checkbox(
             f = f("customerMoneySource"),
