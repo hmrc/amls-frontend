@@ -3,6 +3,10 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
+@target = @{
+    s"""${f("agent").id}-options"""
+}
+
 @header = {
     @errorSummary(f)
     @heading("tcsp.kind.of.service.provider.title", "summary.tcsp")
@@ -17,68 +21,71 @@
 
     @form(f, controllers.tcsp.routes.TcspTypesController.post(edit)) {
 
+        @fieldset(
+            f = f("serviceProviders"),
+            legend = "tcsp.kind.of.service.provider.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
+            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
+            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
+            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
+            @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#$target")
+        }
+
+        @panel(
+            field = Some(f(s"$target")),
+            jsHidden = true
+        ) {
             @fieldset(
-                "tcsp.kind.of.service.provider.title",
-                f = f("serviceProviders"),
-                panel = false,
-                legendHidden = true
+                legend = "tcsp.off-the-shelf.companies.lbl",
+                f = f("onlyOffTheShelfCompsSold-fieldset"),
+                classes = Seq("form-group"),
+                panel = false
             ) {
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.01", "01")
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.02", "02")
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.03", "03")
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.04", "04")
-                @checkbox(f("serviceProviders[]"), "tcsp.service.provider.lbl.05", "05", target = s"#${f("agent").id}-options")
+                @errorGroup(
+                    field = f("onlyOffTheShelfCompsSold")
+                ) {
+                    @radio(
+                        f = f("onlyOffTheShelfCompsSold"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("onlyOffTheShelfCompsSold"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        inline = true
+                    )
+                }
             }
 
-
-
-                <div id="@{s"""${f("agent").id}-options"""}">
-
-                @panel(
-                    jsHidden = false
+            @fieldset(
+                legend = "tcsp.create.complex.corporate.structures.lbl",
+                f = f("complexCorpStructureCreation-fieldset"),
+                classes = Seq("form-group"),
+                panel = false
+            ) {
+                @errorGroup(
+                    field = f("complexCorpStructureCreation")
                 ) {
-
-                    <div class="form-field-group">
-                    @fieldset(
-                        "tcsp.off-the-shelf.companies.lbl",
-                        f = f("onlyOffTheShelfCompsSold"),
-                        panel = false
-                    ) {
-                        @radio(
-                            f = f("onlyOffTheShelfCompsSold"),
-                            labelText = "lbl.yes",
-                            value = "true",
-                            inline = true
-                        )
-                        @radio(
-                            f = f("onlyOffTheShelfCompsSold"),
-                            labelText = "lbl.no",
-                            value = "false",
-                            inline = true
-                        )
-                    }
-                    </div>
-
-                    @fieldset(
-                        "tcsp.create.complex.corporate.structures.lbl",
+                    @radio(
                         f = f("complexCorpStructureCreation"),
-                        panel = false
-                    ) {
-                        @radio(
-                            f = f("complexCorpStructureCreation"),
-                            labelText = "lbl.yes",
-                            value = "true",
-                            inline = true
-                        )
-                        @radio(
-                            f = f("complexCorpStructureCreation"),
-                            labelText = "lbl.no",
-                            value = "false",
-                            inline = true
-                        )
-                    }
+                        labelText = "lbl.yes",
+                        value = "true",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("complexCorpStructureCreation"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        inline = true
+                    )
                 }
-            </div>
+            }
+        }
 
         @submit(false)
     }
