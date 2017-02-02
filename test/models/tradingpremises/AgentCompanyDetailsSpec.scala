@@ -57,9 +57,9 @@ class AgentCompanyDetailsSpec extends PlaySpec {
           Path \ "agentCompanyName",
           Seq(ValidationError("error.required.tp.agent.registered.company.name"))
         ), (
-            Path \ "companyRegistrationNumber",
-            Seq(ValidationError("error.required"))
-          )
+          Path \ "companyRegistrationNumber",
+          Seq(ValidationError("error.required"))
+        )
         )))
       }
 
