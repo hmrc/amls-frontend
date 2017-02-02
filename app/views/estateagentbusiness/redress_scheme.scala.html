@@ -24,7 +24,7 @@
             legend = "estateagentbusiness.registered.redress.title",
             panel = false,
             legendHidden = true
-        ){
+        ) {
             @radio(
                 f = f("isRedress"),
                 labelText = "lbl.yes",
@@ -66,23 +66,19 @@
                 value = "04",
                 target = s".other-fieldset"
             )
+        }
 
-            @fieldset(
+        @fieldset(
             legend = "estateagentbusiness.redress.lbl.04",
             legendHidden = true,
             classes = Seq("other-fieldset"),
-            f = f("other-fieldset"),
-            panel = false
+            f = f("other-fieldset")
         ) {
             @input(
                 field = f("other"),
                 labelText = "lbl.pleasespecify"
             )
         }
-
-        }
-
-
 
         @submit(edit)
     }

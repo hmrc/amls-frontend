@@ -4,7 +4,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @target = @{
-    s"""${f("utrNumber").id}-fieldset"""
+    s"""${f("anotherBody").id}-panel"""
 }
 
 @header = {
@@ -42,21 +42,27 @@
             )
         }
 
-        @fieldset(
-            legend = "supervision.another_body.lbl.supervisor",
-            legendHidden = true,
-            classes = Seq("visuallyhidden-legend"),
-            f = f(target)
+        @panel(
+            field = Some(f(s"$target"))
         ) {
 
-            @input(f("supervisorName"), "supervision.another_body.lbl.supervisor", bold = false)
+            @errorGroup(
+                field = f("supervisor-panel")
+            ) {
+                @input(
+                    field = f("supervisorName"),
+                    labelText = "supervision.another_body.lbl.supervisor",
+                    bold = false,
+                    panel = false
+                )
+            }
 
             @date(
                 f = f,
                 p = "startDate",
                 labelText = "supervision.another_body.startDate.lbl",
                 hintText = "supervision.another_body.startDate.hint",
-                false
+                example = false
             )
 
             @date(
@@ -64,11 +70,17 @@
                 p = "endDate",
                 labelText = "supervision.another_body.endDate.lbl",
                 hintText = "supervision.another_body.endDate.hint",
-                false
+                example = false
             )
 
-            @textarea(f("endingReason"), "supervision.another_body.endingReason.lbl", bold = false, largeWidth = true, cols = "30", rows = "8")
-
+            @textarea(
+                field = f("endingReason"),
+                labelText = "supervision.another_body.endingReason.lbl",
+                bold = false,
+                largeWidth = true,
+                cols = "30",
+                rows = "8"
+            )
         }
 
         @submit(edit)
