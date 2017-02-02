@@ -2,8 +2,8 @@ package models.businessactivities
 
 import models.Country
 import models.FormTypes._
-import play.api.data.mapping.{From, Rule}
-import play.api.data.mapping.forms._
+import jto.validation.{From, Rule}
+import jto.validation.forms._
 import play.api.libs.json.{Writes, Reads}
 
 sealed trait AccountantsAddress {
@@ -47,23 +47,23 @@ case class NonUkAccountantsAddress(
 object AccountantsAddress {
 
   implicit val formRule: Rule[UrlFormEncoded, AccountantsAddress] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     import utils.MappingUtils.Implicits._
     (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
       case true =>
         (
-          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
-            (__ \ "addressLine3").read(optionR(validateAddress)) and
-            (__ \ "addressLine4").read(optionR(validateAddress)) and
+          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+            (__ \ "addressLine3").read(optionR(validateAddress)) ~
+            (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "postCode").read(postcodeType)
           ) (UkAccountantsAddress.apply _)
       case false =>
         (
-          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") compose validateAddress) and
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") compose validateAddress) and
-            (__ \ "addressLine3").read(optionR(validateAddress)) and
-            (__ \ "addressLine4").read(optionR(validateAddress)) and
+          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress) ~
+            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress) ~
+            (__ \ "addressLine3").read(optionR(validateAddress)) ~
+            (__ \ "addressLine4").read(optionR(validateAddress)) ~
             (__ \ "country").read[Country]
           ) (NonUkAccountantsAddress.apply _)
     }

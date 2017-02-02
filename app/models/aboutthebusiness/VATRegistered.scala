@@ -1,8 +1,8 @@
 package models.aboutthebusiness
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait VATRegistered
@@ -17,10 +17,10 @@ object VATRegistered {
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, VATRegistered] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (__ \ "registeredForVAT").read[Boolean].withMessage("error.required.atb.registered.for.vat") flatMap {
       case true =>
-        (__ \ "vrnNumber").read(vrnType) fmap VATRegisteredYes.apply
+        (__ \ "vrnNumber").read(vrnType) map VATRegisteredYes.apply
       case false => Rule.fromMapping { _ => Success(VATRegisteredNo) }
     }
   }

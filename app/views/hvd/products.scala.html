@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -16,6 +16,7 @@
     <span class="form-hint">@Messages("lbl.select.all")</span>
 
     @form(f, controllers.hvd.routes.ProductsController.post(edit)) {
+
         @fieldset(
             f = f("products"),
             legend = "hvd.products.title",
@@ -34,19 +35,19 @@
             @checkbox(f = f("products[]"), labelText = "hvd.products.option.10", value = "10")
             @checkbox(f = f("products[]"), labelText = "hvd.products.option.11", value = "11")
             @checkbox(f = f("products[]"), labelText = "hvd.products.option.12", value = "12", target = s".otherDetails-fieldset")
+        }
 
-            @fieldset(
-                legend = "lbl.give.details",
-                legendHidden = true,
-                jsHidden = true,
-                classes = Seq("otherDetails-fieldset"),
-                f = f("otherDetails-fieldset")
-            ) {
-                @input(
-                    field = f("otherDetails"),
-                    labelText = "lbl.give.details"
-                )
-            }
+        @fieldset(
+            legend = "lbl.give.details",
+            legendHidden = true,
+            jsHidden = true,
+            classes = Seq("otherDetails-fieldset"),
+            f = f("otherDetails-fieldset")
+        ) {
+            @input(
+                field = f("otherDetails"),
+                labelText = "lbl.give.details"
+            )
         }
 
         @submit()

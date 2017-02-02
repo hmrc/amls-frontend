@@ -1,7 +1,15 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@target = @{
+    s"""${f("businessType").id}-panel"""
+}
+
+@target1 = @{
+    s"""${f("specifyOtherBusiness").id}-panel"""
+}
 
 @header = {
     @errorSummary(f)
@@ -25,7 +33,7 @@
                 f = f("isAMember"),
                 labelText = "lbl.yes",
                 value = "true",
-                target = s".businessType-fieldset",
+                target = s"#$target",
                 inline = true
             )
             @radio(
@@ -36,32 +44,36 @@
             )
         }
 
-
-        @fieldset(
-            legend = "lbl.select.all",
-            f = f("businessType"),
-            classes = Seq("businessType-fieldset")
+        @panel(
+            field = Some(f(s"$target"))
         ) {
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.04", "04")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.05", "05")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.06", "06")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.07", "07")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.08", "08")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.09", "09")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.10", "10")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.11", "11")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
-            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s".specifyOtherBusiness-fieldset")
+            <p>@Messages("lbl.select.all")</p>
 
             @fieldset(
-                legend = "lbl.pleasespecify",
+                legend = "supervision.memberofprofessionalbody.title",
                 legendHidden = true,
-                classes = Seq("specifyOtherBusiness-fieldset"),
-                f = f("specifyOtherBusiness-fieldset")
+                f = f("businessType"),
+                panel = false
+            ) {
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.04", "04")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.05", "05")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.06", "06")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.07", "07")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.08", "08")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.09", "09")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.10", "10")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.11", "11")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
+                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#$target1")
+            }
+            @panel(
+                field = Some(f(s"$target1")),
+                panel = false,
+                jsHidden = true
             ) {
                 @input(
                     field = f("specifyOtherBusiness"),
@@ -69,9 +81,6 @@
                 )
             }
         }
-
-
-
 
         @submit(edit)
     }

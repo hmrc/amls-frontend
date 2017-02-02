@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], index: Int)(implicit request: Request[_])
+@(f: forms.Form2[_], index: Int)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -24,22 +24,26 @@
         }
 
         @fieldset(
-            f = f("registerAnotherPremises"),
+            f = f("redundantvalue"),
             legend = "tradingpremises.want.to.register.another.premises",
             panel = false
         ) {
-            @radio(
-                f = f("registerAnotherPremises"),
-                labelText = "lbl.yes",
-                inline = true,
-                value = "true"
-            )
-            @radio(
-                f = f("registerAnotherPremises"),
-                labelText = "lbl.no",
-                inline = true,
-                value = "false"
-            )
+            @errorGroup(
+                field = f("registerAnotherPremises")
+            ) {
+                @radio(
+                    f = f("registerAnotherPremises"),
+                    labelText = "lbl.yes",
+                    inline = true,
+                    value = "true"
+                )
+                @radio(
+                    f = f("registerAnotherPremises"),
+                    labelText = "lbl.no",
+                    inline = true,
+                    value = "false"
+                )
+            }
         }
         @submit()
     }

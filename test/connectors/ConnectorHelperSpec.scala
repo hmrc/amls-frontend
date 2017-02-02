@@ -19,13 +19,13 @@ class ConnectorHelperSpec extends PlaySpec with MockitoSugar with ScalaFutures {
           None,
           None,
           CredentialStrength.Weak,
-          ConfidenceLevel.L50),
+          ConfidenceLevel.L50, ""),
         Principal(
           None,
           Accounts(sa = Some(SaAccount("Link", SaUtr("saRef"))))),
         None,
         None,
-        None)
+        None, None)
       ConnectorHelper.accountTypeAndId(saAcct) must be(("sa", "saRef"))
     }
   }
@@ -40,13 +40,13 @@ class ConnectorHelperSpec extends PlaySpec with MockitoSugar with ScalaFutures {
           None,
           None,
           CredentialStrength.Weak,
-          ConfidenceLevel.L50),
+          ConfidenceLevel.L50, ""),
         Principal(
           None,
           Accounts(ct = Some(CtAccount("Link", CtUtr("ctRef"))))),
         None,
         None,
-        None)
+        None, None)
       ConnectorHelper.accountTypeAndId(ctAcct) must be(("ct", "ctRef"))
     }
   }
@@ -60,13 +60,13 @@ class ConnectorHelperSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         None,
         None,
         CredentialStrength.Weak,
-        ConfidenceLevel.L50),
+        ConfidenceLevel.L50, ""),
       Principal(
         None,
         Accounts(ct = None)),
       None,
       None,
-      None)
+      None, None)
     an[IllegalArgumentException] should be thrownBy ConnectorHelper.accountTypeAndId(ctAcct)
   }
 }

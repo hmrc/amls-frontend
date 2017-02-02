@@ -2,8 +2,8 @@ package models
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import SatisfactionSurvey._
 class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
@@ -13,41 +13,41 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given feedback with empty details" in {
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("01"), "details" -> Seq(""))) must
-        be(Success(First(None)))
+        be(Valid(First(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("02"), "details" -> Seq(""))) must
-        be(Success(Second(None)))
+        be(Valid(Second(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("03"), "details" -> Seq(""))) must
-        be(Success(Third(None)))
+        be(Valid(Third(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("04"), "details" -> Seq(""))) must
-        be(Success(Fourth(None)))
+        be(Valid(Fourth(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("05"), "details" -> Seq(""))) must
-        be(Success(Fifth(None)))
+        be(Valid(Fifth(None)))
     }
 
     "successfully validate given feedback with details" in {
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("01"), "details" -> Seq("123"))) must
-        be(Success(First(Some("123"))))
+        be(Valid(First(Some("123"))))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("02"), "details" -> Seq("123"))) must
-        be(Success(Second(Some("123"))))
+        be(Valid(Second(Some("123"))))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("03"), "details" -> Seq("123"))) must
-        be(Success(Third(Some("123"))))
+        be(Valid(Third(Some("123"))))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("04"), "details" -> Seq("123"))) must
-        be(Success(Fourth(Some("123"))))
+        be(Valid(Fourth(Some("123"))))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("05"), "details" -> Seq("123"))) must
-        be(Success(Fifth(Some("123"))))
+        be(Valid(Fifth(Some("123"))))
     }
 
     "successfully validate missing mandatory details" in {
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("01"))) must
-        be(Success(First(None)))
+        be(Valid(First(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("02"))) must
-        be(Success(Second(None)))
+        be(Valid(Second(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("03"))) must
-        be(Success(Third(None)))
+        be(Valid(Third(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("04"))) must
-        be(Success(Fourth(None)))
+        be(Valid(Fourth(None)))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("05"))) must
-        be(Success(Fifth(None)))
+        be(Valid(Fifth(None)))
     }
 
     "fail to validate missing mandatory satisfaction" in {
@@ -55,37 +55,37 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
         "details" -> Seq("")
       )
       SatisfactionSurvey.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "satisfaction") -> Seq(ValidationError("error.survey.satisfaction.required"))
         )))
     }
 
     "fail to validate empty data" in {
       SatisfactionSurvey.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "satisfaction") -> Seq(ValidationError("error.survey.satisfaction.required"))
         )))
     }
 
     "fail to validate details over max value" in {
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("01"),"details" -> Seq("zzxczxczx"*150))) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("02"),"details" -> Seq("zzxczxczx"*150))) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("03"),"details" -> Seq("zzxczxczx"*150))) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("04"),"details" -> Seq("zzxczxczx"*150))) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
       SatisfactionSurvey.formRule.validate(Map("satisfaction" -> Seq("05"),"details" -> Seq("zzxczxczx"*150))) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "details") -> Seq(ValidationError("error.invalid.maxlength.1200"))
         )))
     }
@@ -96,35 +96,35 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given feedback with empty details" in {
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "01")) must
-        be(JsSuccess(First(None), JsPath \ "satisfaction"))
+        be(JsSuccess(First(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "02")) must
-        be(JsSuccess(Second(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Second(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "03")) must
-        be(JsSuccess(Third(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Third(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "04")) must
-        be(JsSuccess(Fourth(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Fourth(None), JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "05")) must
-        be(JsSuccess(Fifth(None), JsPath \ "satisfaction"))
+        be(JsSuccess(Fifth(None), JsPath))
     }
 
     "successfully validate given feedback with details" in {
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "01", "details" ->"123")) must
-        be(JsSuccess(First(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(First(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "02", "details" ->"123")) must
-        be(JsSuccess(Second(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Second(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "03", "details" ->"123")) must
-        be(JsSuccess(Third(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Third(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "04", "details" ->"123")) must
-        be(JsSuccess(Fourth(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Fourth(Some("123")), JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "05", "details" ->"123")) must
-        be(JsSuccess(Fifth(Some("123")), JsPath \ "satisfaction" \ "details"))
+        be(JsSuccess(Fifth(Some("123")), JsPath \ "details"))
 
     }
 
     "fail to validate given no data" in {
       val json = Json.obj()
       Json.fromJson[SatisfactionSurvey](json) must
-        be(JsError((JsPath \ "satisfaction") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "satisfaction") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
   }

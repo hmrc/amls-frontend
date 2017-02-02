@@ -67,8 +67,8 @@ object BankDetails {
   }
 
   implicit val reads: Reads[BankDetails] = (
-      ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read[Option[BankAccountType]]) ~
-      ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read[Option[BankAccount]]) ~
+      ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
+      ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read(Reads.optionNoError[BankAccount])) ~
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "status").readNullable[String]

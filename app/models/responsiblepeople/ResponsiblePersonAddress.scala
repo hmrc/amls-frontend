@@ -1,7 +1,7 @@
 package models.responsiblepeople
 
-import play.api.data.mapping.{To, Write, From, Rule}
-import play.api.data.mapping.forms._
+import jto.validation.{To, Write, From, Rule}
+import jto.validation.forms._
 
 
 case class ResponsiblePersonAddress(personAddress: PersonAddress,
@@ -13,18 +13,18 @@ object ResponsiblePersonAddress {
 
   implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonAddress] = From[UrlFormEncoded] { __ =>
 
-  import play.api.data.mapping.forms.Rules._
+  import jto.validation.forms.Rules._
   (
-    (__).read[PersonAddress] and
+    (__).read[PersonAddress] ~
       (__).read[TimeAtAddress]
     ) (ResponsiblePersonAddress.apply _)
 }
 
   implicit val formWrites: Write[ResponsiblePersonAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Writes._
+    import jto.validation.forms.Writes._
     import play.api.libs.functional.syntax.unlift
     (
-        (__).write[PersonAddress] and
+        (__).write[PersonAddress] ~
           (__).write[TimeAtAddress]
       ) (unlift(ResponsiblePersonAddress.unapply))
   }

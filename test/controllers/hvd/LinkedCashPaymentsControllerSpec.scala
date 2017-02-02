@@ -5,7 +5,7 @@ import models.hvd.{LinkedCashPayments, Hvd}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -13,10 +13,10 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class LinkedCashPaymentsControllerSpec extends PlaySpec  with OneAppPerSuite {
+class LinkedCashPaymentsControllerSpec extends GenericTestHelper {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new LinkedCashPaymentsController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector

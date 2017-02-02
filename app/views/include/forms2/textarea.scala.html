@@ -12,7 +12,7 @@
     maxLength: String = "",
     charCount: Boolean = false,
     largeWidth: Boolean = false
-)(implicit lang: Lang)
+)(implicit lang:Lang,  m: Messages)
 
 <div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter}>
     <label>

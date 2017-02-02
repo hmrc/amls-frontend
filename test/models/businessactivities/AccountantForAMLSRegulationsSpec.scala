@@ -1,8 +1,8 @@
 package models.businessactivities
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -13,18 +13,18 @@ class AccountantForAMLSRegulationsSpec extends PlaySpec {
     "successfully validate given an true value" in {
       val data = Map("accountantForAMLSRegulations" -> Seq("true"))
       val result = AccountantForAMLSRegulations.formRule.validate(data)
-      result mustBe Success(AccountantForAMLSRegulations(true))
+      result mustBe Valid(AccountantForAMLSRegulations(true))
     }
 
     "successfully validate given a false value" in {
       val data = Map("accountantForAMLSRegulations" -> Seq("false"))
       val result = AccountantForAMLSRegulations.formRule.validate(data)
-      result mustBe Success(AccountantForAMLSRegulations(false))
+      result mustBe Valid(AccountantForAMLSRegulations(false))
     }
 
     "fail validation when mandatory field is missing" in {
       val result = AccountantForAMLSRegulations.formRule.validate(Map.empty)
-      result mustBe Failure(Seq(
+      result mustBe Invalid(Seq(
         (Path \ "accountantForAMLSRegulations") -> Seq(ValidationError("error.required.ba.business.use.accountant"))
       ))
     }

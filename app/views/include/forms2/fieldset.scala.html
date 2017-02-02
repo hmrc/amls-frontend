@@ -9,7 +9,7 @@
     bold: Boolean = false,
     hint: String = "",
     f: forms.Field
-)(content: Html)(implicit lang: Lang)
+)(content: Html)(implicit lang:Lang,  m: Messages)
 
 <fieldset
     @if(f.id.nonEmpty){ id="@f.id"}

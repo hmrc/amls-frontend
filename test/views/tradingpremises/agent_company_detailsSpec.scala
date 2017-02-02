@@ -1,15 +1,19 @@
 package views.tradingpremises
 
 import forms.{Form2, InvalidForm, ValidForm}
+import org.scalatest.MustMatchers
+import utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
 import models.tradingpremises.AgentCompanyDetails
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
-class agent_company_detailsSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class agent_company_detailsSpec extends GenericTestHelper with MustMatchers {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "add_person view" must {
     "have correct title" in new ViewFixture {

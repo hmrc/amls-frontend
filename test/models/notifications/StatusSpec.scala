@@ -2,7 +2,7 @@ package models.notifications
 
 import models.notifications.StatusType.{Approved, Revoked, Rejected, DeRegistered, Expired}
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsString, JsSuccess}
 
 class StatusSpec extends PlaySpec {
@@ -40,7 +40,7 @@ class StatusSpec extends PlaySpec {
     }
 
     "fail with error when status value is passed incorrectly" in {
-      StatusType.jsonReads.reads(JsString("12")) must be(JsError(List((JsPath ,List(ValidationError("error.invalid"))))))
+      StatusType.jsonReads.reads(JsString("12")) must be(JsError(List((JsPath ,List(play.api.data.validation.ValidationError("error.invalid"))))))
 
     }
   }

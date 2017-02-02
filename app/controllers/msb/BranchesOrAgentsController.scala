@@ -5,8 +5,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
-import play.api.data.mapping.Write
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation.Write
+import jto.validation.forms.UrlFormEncoded
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future

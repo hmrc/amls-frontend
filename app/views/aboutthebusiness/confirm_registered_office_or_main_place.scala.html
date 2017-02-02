@@ -2,8 +2,9 @@
 @import include.{main, heading, registered_office_helper}
 @import include.forms2._
 @import models.aboutthebusiness._
+@import play.api.i18n.Messages
 
-@(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_], lang: Lang)
+@(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)

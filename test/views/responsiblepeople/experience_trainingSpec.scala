@@ -3,14 +3,18 @@ package views.responsiblepeople
 import forms.{Form2, InvalidForm, ValidForm}
 import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessActivity}
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.mapping.Path
-import play.api.data.validation.ValidationError
+import org.scalatest.{MustMatchers}
+import  utils.GenericTestHelper
+import jto.validation.Path
+import jto.validation.ValidationError
 import play.api.i18n.Messages
-import views.ViewFixture
+import views.Fixture
 
-class experience_trainingSpec extends WordSpec with MustMatchers with OneAppPerSuite {
+class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
 
   "experience_training view" must {
 

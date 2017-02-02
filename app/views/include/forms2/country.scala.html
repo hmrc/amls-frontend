@@ -6,7 +6,7 @@
     hintText: String = "",
     bold: Boolean = false,
     classes: Seq[String] = Seq.empty
-)(implicit lang: Lang)
+)(implicit lang:Lang,  m: Messages)
 
 <div class="form-field-group @if(field.hasErrors) {form-field--error}">
     <label for="@field.id">

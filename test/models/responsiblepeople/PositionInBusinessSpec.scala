@@ -3,8 +3,8 @@ package models.responsiblepeople
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
@@ -14,24 +14,24 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
     "PositionInBusiness" must {
 
       "successfully validate" in {
-        PositionWithinBusiness.formRule.validate("01") must be (Success(BeneficialOwner))
-        PositionWithinBusiness.formRule.validate("02") must be (Success(Director))
-        PositionWithinBusiness.formRule.validate("03") must be (Success(InternalAccountant))
-        PositionWithinBusiness.formRule.validate("04") must be (Success(NominatedOfficer))
-        PositionWithinBusiness.formRule.validate("05") must be (Success(Partner))
-        PositionWithinBusiness.formRule.validate("06") must be (Success(SoleProprietor))
+        PositionWithinBusiness.formRule.validate("01") must be (Valid(BeneficialOwner))
+        PositionWithinBusiness.formRule.validate("02") must be (Valid(Director))
+        PositionWithinBusiness.formRule.validate("03") must be (Valid(InternalAccountant))
+        PositionWithinBusiness.formRule.validate("04") must be (Valid(NominatedOfficer))
+        PositionWithinBusiness.formRule.validate("05") must be (Valid(Partner))
+        PositionWithinBusiness.formRule.validate("06") must be (Valid(SoleProprietor))
       }
 
       "fail to validate an empty string" in {
         PositionWithinBusiness.formRule.validate("") must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }
 
       "fail to validate an invalid string" in {
         PositionWithinBusiness.formRule.validate("10") must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "positions") -> Seq(ValidationError("error.invalid"))
           )))
       }
@@ -98,7 +98,7 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
     "fail to validate when given an empty value" in {
       Json.fromJson[PositionWithinBusiness](JsString("")) must
-        be(JsError((JsPath \ "positions") -> ValidationError("error.invalid")))
+        be(JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid")))
     }
 
     "write the correct value for BeneficialOwner" in {

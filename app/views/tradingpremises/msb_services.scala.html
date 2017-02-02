@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], index: Int, edit: Boolean, changed: Boolean)(implicit request: Request[_])
+@(f: Form2[_], index: Int, edit: Boolean, changed: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -14,17 +14,24 @@
     heading = header
 ) {
 
+    <p>@Messages("lbl.select.all")</p>
+
     @form(f, controllers.tradingpremises.routes.MSBServicesController.post(index, edit, changed)) {
 
         @fieldset(
-            f = f("msbServices"),
-            legend = "lbl.select.all",
+            f = f("redundantvalue"),
+            legend = "tradingpremises.msb.services.title",
+            legendHidden = true,
             panel = false
         ) {
-            @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
-            @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
-            @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
-            @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
+            @errorGroup(
+                field = f("msbServices")
+            ) {
+                @checkbox(f("msbServices[]"), "msb.services.list.lbl.01", "01")
+                @checkbox(f("msbServices[]"), "msb.services.list.lbl.02", "02")
+                @checkbox(f("msbServices[]"), "msb.services.list.lbl.03", "03")
+                @checkbox(f("msbServices[]"), "msb.services.list.lbl.04", "04")
+            }
         }
 
       @submit(edit)

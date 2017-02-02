@@ -1,6 +1,6 @@
 @(
     dataAddBtnText: String = ""
-)(content: Html)(implicit lang: Lang)
+)(content: Html)(implicit lang:Lang,  m: Messages)
 
 <div data-add-one="@Messages(dataAddBtnText)">
   @content

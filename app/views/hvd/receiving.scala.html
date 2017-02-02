@@ -1,7 +1,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
   @errorSummary(f)
@@ -18,30 +18,30 @@
   @form(f, controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
 
     @fieldset(
-      f = f("receivePayments"),
-      legend = "hvd.receiving.title",
-      legendHidden = true,
-      panel = false
+        f = f("receivePayments"),
+        legend = "hvd.receiving.title",
+        legendHidden = true,
+        panel = false
     ) {
         @radio(
-          f = f("receivePayments"),
-          labelText = "lbl.yes",
-          value = "true",
-          inline = true,
-          target = s".paymentMethods-fieldset"
+            f = f("receivePayments"),
+            labelText = "lbl.yes",
+            value = "true",
+            inline = true,
+            target = s".paymentMethods-fieldset"
         )
         @radio(
-          f = f("receivePayments"),
-          labelText = "lbl.no",
-          value = "false",
-          inline = true
+            f = f("receivePayments"),
+            labelText = "lbl.no",
+            value = "false",
+            inline = true
         )
     }
-
 
     @fieldset(
           f = f("paymentMethods"),
           legend = "hvd.receiving.expect.to.receive",
+          legendHidden = true,
           classes = Seq("paymentMethods-fieldset"),
           hint = "lbl.select.all"
       ) {
@@ -61,19 +61,24 @@
             value = "true",
             target = s".receive-payments-other-fieldset"
           )
+    }
 
-          @fieldset(
-            legend = "hvd.receiving.give.details",
-            legendHidden = true,
-            panel = false,
-            classes = Seq("receive-payments-other-fieldset"),
-            f = f("paymentMethods-details-fieldset")
-          ) {
-              @input(
+    @fieldset(
+        legend = "hvd.receiving.give.details",
+        legendHidden = true,
+        jsHidden = true,
+        panel = false,
+        classes = Seq("receive-payments-other-fieldset"),
+        f = f("paymentMethods-details-fieldset")
+    ) {
+        @panel(
+            jsHidden = false
+        ) {
+            @input(
                 field = f("paymentMethods.details"),
                 labelText = "hvd.receiving.give.details.lbl"
-              )
-          }
+            )
+        }
     }
 
     @submit(edit)

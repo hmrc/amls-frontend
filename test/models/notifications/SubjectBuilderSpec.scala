@@ -5,7 +5,7 @@ import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
 
 
-class SubjectBuilderSpec extends WordSpec with MustMatchers{
+class SubjectBuilderSpec extends WordSpec with MustMatchers {
   "SubjectBuilder" must {
     case class TestableSubjectBuilder(contactType: Option[ContactType], variation: Boolean) extends SubjectBuilder
 

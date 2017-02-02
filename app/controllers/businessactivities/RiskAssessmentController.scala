@@ -28,7 +28,7 @@ trait RiskAssessmentController extends BaseController {
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     implicit authContext => implicit request =>
       Form2[RiskAssessmentPolicy](request.body) match {
         case f: InvalidForm =>

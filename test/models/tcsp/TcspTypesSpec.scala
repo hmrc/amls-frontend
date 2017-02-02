@@ -1,8 +1,8 @@
 package models.tcsp
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, JsPath, JsError, Json}
 
 class TcspTypesSpec extends PlaySpec {
@@ -21,7 +21,7 @@ class TcspTypesSpec extends PlaySpec {
         )
 
         TcspTypes.formReads.validate(model) mustBe
-        Success(Services)
+        Valid(Services)
       }
 
       "read invalid form data and return failure message for required fields" in {
@@ -32,14 +32,14 @@ class TcspTypesSpec extends PlaySpec {
         )
 
         TcspTypes.formReads.validate(model) mustBe
-          Failure(Seq((Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("error.required.tcsp.off.the.shelf.companies")),
+          Invalid(Seq((Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("error.required.tcsp.off.the.shelf.companies")),
             (Path \ "complexCorpStructureCreation") -> Seq(ValidationError("error.required.tcsp.complex.corporate.structures"))))
       }
 
       "return failure message when user has not selected any of the services" in {
 
         TcspTypes.formReads.validate(Map.empty) mustBe
-          Failure(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.required.tcsp.service.providers"))))
+          Invalid(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.required.tcsp.service.providers"))))
       }
 
       "return failure message when user has filled invalid data" in {
@@ -49,7 +49,7 @@ class TcspTypesSpec extends PlaySpec {
         )
 
         TcspTypes.formReads.validate(model) mustBe
-          Failure(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.invalid"))))
+          Invalid(Seq((Path \ "serviceProviders") -> Seq(ValidationError("error.invalid"))))
       }
 
       "write correct data" in {
@@ -67,7 +67,7 @@ class TcspTypesSpec extends PlaySpec {
     }
 
     "Json Validation" must {
-
+      import play.api.data.validation.ValidationError
       "successfully validate given values with option CompanyDirectorEtc" in {
         val json =  Json.obj(
           "serviceProviders" -> Seq("01","02","03","04", "05"),
@@ -76,7 +76,7 @@ class TcspTypesSpec extends PlaySpec {
         )
 
         Json.fromJson[TcspTypes](json) must
-          be(JsSuccess(Services, JsPath \ "serviceProviders"))
+          be(JsSuccess(Services, JsPath))
       }
 
       "Read and Write Json valid data successfully" in {
@@ -87,7 +87,7 @@ class TcspTypesSpec extends PlaySpec {
       "throw error message on reading invalid data" in {
 
         Json.fromJson[TcspTypes](Json.obj("serviceProviders" -> Seq("40"))) must
-          be(JsError((JsPath \ "serviceProviders") \ "serviceProviders" -> ValidationError("error.invalid")))
+          be(JsError((JsPath) \ "serviceProviders" -> ValidationError("error.invalid")))
 
       }
     }

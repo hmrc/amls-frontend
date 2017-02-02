@@ -3,7 +3,7 @@
 @import include.forms2._
 @import models.registrationprogress.Section
 
-@(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_])
+@(sections: Seq[Section], declarationAvailable: Boolean)(implicit request: Request[_],m:Messages)
 
 @main2(
     title = Messages("amendment.title") + " - " + Messages("title.yapp")
@@ -23,7 +23,7 @@
     <div class="grid-layout grid-layout--stacked">
 
         @* Main section *@
-        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend" role="menu">
+        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps progress-steps__amend">
             @sections.map { case Section(name, status, hasChanged, call) =>
                 @section(name, status, hasChanged, call)
             }

@@ -14,7 +14,7 @@ import play.api.test.FakeApplication
 import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
-import utils.AuthorisedFixture
+import utils.{GenericTestHelper, AuthorisedFixture}
 import play.api.test.Helpers._
 import play.api.http.Status.OK
 import org.mockito.Mockito._
@@ -25,21 +25,21 @@ import play.api.i18n.Messages
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait Fixture extends AuthorisedFixture {
-  self =>
-  val controller = new RegistrationProgressController {
-    override val authConnector = self.authConnector
-    override protected[controllers] val service: ProgressService = mock[ProgressService]
-    override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+
+class RegistrationProgressControllerWithAmendmentsSpec extends GenericTestHelper with MustMatchers with MockitoSugar{
+  trait Fixture extends AuthorisedFixture {
+    self => val request = addToken(authRequest)
+    val controller = new RegistrationProgressController {
+      override val authConnector = self.authConnector
+      override protected[controllers] val service: ProgressService = mock[ProgressService]
+      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+    }
+
+    protected val mockCacheMap = mock[CacheMap]
   }
 
-  protected val mockCacheMap = mock[CacheMap]
-}
-
-class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite with MockitoSugar{
-
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> true) )
 
   "RegistrationProgressController" when {
     "the user is enrolled into the AMLS Account" must {
@@ -227,9 +227,20 @@ class RegistrationProgressControllerWithAmendmentsSpec extends WordSpec with Mus
   }
 }
 
-class RegistrationProgressControllerWithoutAmendmentsSpec extends WordSpec with MustMatchers with OneAppPerSuite{
+class RegistrationProgressControllerWithoutAmendmentsSpec extends GenericTestHelper with MustMatchers {
+  trait Fixture extends AuthorisedFixture {
+    self => val request = addToken(authRequest)
+    val controller = new RegistrationProgressController {
+      override val authConnector = self.authConnector
+      override protected[controllers] val service: ProgressService = mock[ProgressService]
+      override protected[controllers] val dataCache: DataCacheConnector = mock[DataCacheConnector]
+      override protected[controllers] val enrolmentsService : AuthEnrolmentsService = mock[AuthEnrolmentsService]
+    }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+    protected val mockCacheMap = mock[CacheMap]
+  }
+
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   "RegistrationProgressController" when {
     "there has already been a submission" must {

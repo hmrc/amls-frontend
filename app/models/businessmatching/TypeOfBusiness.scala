@@ -1,8 +1,8 @@
 package models.businessmatching
 
 import models.FormTypes._
-import play.api.data.mapping.{Write, From, Rule}
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation.{Write, From, Rule}
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.Json
 
 case class TypeOfBusiness(typeOfBusiness: String)
@@ -12,8 +12,8 @@ object TypeOfBusiness{
   implicit val format = Json.format[TypeOfBusiness]
 
   implicit val formRead:Rule[UrlFormEncoded, TypeOfBusiness] = From[UrlFormEncoded] {__ =>
-    import play.api.data.mapping.forms.Rules._
-    (__ \ "typeOfBusiness").read(typeOfBusinessType) fmap TypeOfBusiness.apply
+    import jto.validation.forms.Rules._
+    (__ \ "typeOfBusiness").read(typeOfBusinessType) map TypeOfBusiness.apply
   }
 
   implicit val formWrite: Write[TypeOfBusiness, UrlFormEncoded] = Write {

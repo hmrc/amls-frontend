@@ -1,8 +1,8 @@
 package models.declaration
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait RoleWithinBusiness
@@ -30,7 +30,7 @@ object RoleWithinBusiness {
   implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusiness] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
       import models.FormTypes._
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
       (readerURLFormEncoded \ "roleWithinBusiness").read[String] flatMap {
         case "01" => BeneficialShareholder
         case "02" => Director
@@ -40,7 +40,7 @@ object RoleWithinBusiness {
         case "06" => Partner
         case "07" => SoleProprietor
         case "08" =>
-          (readerURLFormEncoded \ "roleWithinBusinessOther").read(roleWithinBusinessOtherType) fmap Other.apply
+          (readerURLFormEncoded \ "roleWithinBusinessOther").read(roleWithinBusinessOtherType) map Other.apply
         case _ =>
           (Path \ "roleWithinBusiness") -> Seq(ValidationError("error.invalid"))
       }
@@ -73,7 +73,7 @@ object RoleWithinBusiness {
       case "08" => (JsPath \ "roleWithinBusinessOther").read[String] map {
         Other(_)
       }
-      case _ => ValidationError("error.invalid")
+      case _ => play.api.data.validation.ValidationError("error.invalid")
     }
   }
 

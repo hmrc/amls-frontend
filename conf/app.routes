@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET         /assets/*file                                               controllers.AssetsController.at(path="/public", file)
+GET         /assets/*file                                               @controllers.AssetsController.at(path="/public", file)
 
 GET         /                                                           controllers.LandingController.start()
 

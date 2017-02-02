@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -16,7 +16,14 @@
 
     @form(f, controllers.msb.routes.CETransactionsInNext12MonthsController.post(edit)) {
 
-        @input(f("ceTransaction"), labelText = "msb.ce.transactions.expected.in.12.months.title", labelHidden = true)
+        @input(
+            field = f("ceTransaction"),
+            attrType = "number",
+            classes = Seq("input--no-spinner"),
+            labelText = "msb.ce.transactions.expected.in.12.months.title",
+            labelHidden = true
+        )
+
         @submit(edit)
     }
 }

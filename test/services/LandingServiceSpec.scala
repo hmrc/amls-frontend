@@ -21,7 +21,6 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
-import org.specs2.execute.ResultExecution.ExecutableResult
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}

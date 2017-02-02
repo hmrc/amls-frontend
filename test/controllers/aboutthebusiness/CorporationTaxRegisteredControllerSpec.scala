@@ -7,7 +7,8 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.inject.guice.GuiceApplicationBuilder
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -16,10 +17,11 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self =>
+    val request = addToken(authRequest)
 
     val controller = new CorporationTaxRegisteredController {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -152,33 +154,6 @@ class CorporationTaxRegisteredControllerSpec extends PlaySpec with OneAppPerSuit
       val document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#corporationTaxReference]").html() must include(Messages("error.invalid.atb.corporation.tax.number"))
     }
-
-    "on get retrieve the corporation tax reference from business customer api if no previous entry and feature flag is high" in new Fixture {
-
-      running(FakeApplication(additionalConfiguration = Map(
-        "Test.microservice.services.feature-toggle.business-matching-details-lookup" -> true
-      ))) {
-
-        val reviewDetailsModel = mock[BusinessMatchingReviewDetails]
-        when(reviewDetailsModel.utr) thenReturn Some("0987654321")
-
-        when(controller.businessMatchingConnector.getReviewDetails(any())) thenReturn Future.successful(Some(reviewDetailsModel))
-
-        val data = AboutTheBusiness(corporationTaxRegistered = None)
-
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(data)))
-
-        val result = controller.get()(request)
-
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
-        document.getElementById("corporationTaxReference").`val` must be("0987654321")
-      }
-    }
-
   }
 
 }

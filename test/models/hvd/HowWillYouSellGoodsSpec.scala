@@ -2,8 +2,8 @@ package models.hvd
 
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.Json
 
 
@@ -25,26 +25,26 @@ class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers{
     }
 
     "read from the expected form"  in {
-      HowWillYouSellGoods.formR.validate(fullForm)  must be (Success(fullData))
+      HowWillYouSellGoods.formR.validate(fullForm)  must be (Valid(fullData))
     }
 
     "round trip through Url encoded form" in {
       HowWillYouSellGoods.formW.writes(
         HowWillYouSellGoods.formR.validate(fullForm) match {
-          case Success(x) => x
+          case Valid(x) => x
           case _ => HowWillYouSellGoods(Seq.empty)
         }
       ) must be (fullForm)
 
       HowWillYouSellGoods.formR.validate(
         HowWillYouSellGoods.formW.writes(fullData)
-      ) must be (Success(fullData))
+      ) must be (Valid(fullData))
     } 
 
     "fail form validation of no channels are selected" in {
       val testForm = Map[String,Seq[String]]()
 
-      HowWillYouSellGoods.formR.validate(testForm) must be (Failure(Seq((Path \ "salesChannels") -> Seq(ValidationError("error.required.hvd.how-will-you-sell-goods")))))
+      HowWillYouSellGoods.formR.validate(testForm) must be (Invalid(Seq((Path \ "salesChannels") -> Seq(ValidationError("error.required.hvd.how-will-you-sell-goods")))))
     }
   }
 }

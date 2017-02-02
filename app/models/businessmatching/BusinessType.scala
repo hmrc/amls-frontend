@@ -1,14 +1,14 @@
 package models.businessmatching
 
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
 import play.api.libs.json._
 
 sealed trait BusinessType
 
 object BusinessType {
 
-  import play.api.data.mapping.forms.Rules._
+  import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 
   case object SoleProprietor extends BusinessType
@@ -61,6 +61,6 @@ object BusinessType {
     case JsString("LLP") => JsSuccess(LPrLLP)
     case JsString("Unincorporated Body") => JsSuccess(UnincorporatedBody)
     case _ =>
-      JsError(JsPath -> ValidationError("error.invalid"))
+      JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid"))
   }
 }

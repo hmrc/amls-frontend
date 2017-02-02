@@ -8,11 +8,13 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.StatusConstants
+import utils.{StatusConstants}
 
-class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar{
+
+class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar with OneAppPerSuite {
 
   val ytp = YourTradingPremises(
     "foo",

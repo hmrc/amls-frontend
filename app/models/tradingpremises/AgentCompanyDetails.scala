@@ -1,9 +1,9 @@
 package models.tradingpremises
 
 import models.FormTypes._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import typeclasses.MongoKey
 
@@ -30,7 +30,7 @@ object AgentCompanyDetails {
   }
 
   implicit val formReads: Rule[UrlFormEncoded, AgentCompanyDetails] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
+    import jto.validation.forms.Rules._
     (
       (__ \ "agentCompanyName").read(agentsRegisteredCompanyNameType) ~
         (__ \ "companyRegistrationNumber").read(agentsRegisteredCompanyCRNType)

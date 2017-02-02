@@ -1,7 +1,7 @@
 package models
 
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.data.validation.ValidationError
+import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait ResponseType
@@ -24,7 +24,7 @@ object ResponseType {
       case "SubscriptionReponse" => SubscriptionResponseType
       case "AmendOrVariationResponse" => AmendOrVariationResponseType
       case _ =>
-        ValidationError("error.invalid")
+        play.api.data.validation.ValidationError("error.invalid")
     }
   }
 }

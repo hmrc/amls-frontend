@@ -1,12 +1,12 @@
 package models.supervision
 
 import models.FormTypes._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping._
-import play.api.data.validation.ValidationError
+import jto.validation.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
+import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 
 sealed trait ProfessionalBodyMember
@@ -69,8 +69,8 @@ object ProfessionalBodyMember {
   import utils.MappingUtils.Implicits._
 
   val maxSpecidyDetailsLength = 255
-  val specifyOtherType = notEmptyStrip compose
-    notEmpty.withMessage("error.required.supervision.business.details") compose
+  val specifyOtherType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.supervision.business.details") andThen
     maxLength(maxSpecidyDetailsLength).withMessage("error.invalid.supervision.business.details")
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBodyMember] =
@@ -93,7 +93,7 @@ object ProfessionalBodyMember {
               case "12" => Rule[UrlFormEncoded, BusinessType](_ => Success(AssociationOfBookkeepers))
               case "13" => Rule[UrlFormEncoded, BusinessType](_ => Success(LawSociety))
               case "14" =>
-                (__ \ "specifyOtherBusiness").read(specifyOtherType) fmap Other.apply
+                (__ \ "specifyOtherBusiness").read(specifyOtherType) map Other.apply
               case _ =>
                 Rule[UrlFormEncoded, BusinessType] { _ =>
                   Failure(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid"))))
@@ -103,11 +103,11 @@ object ProfessionalBodyMember {
             ) {
               case (m, n) =>
                 n flatMap { x =>
-                  m fmap {
+                  m map {
                     _ + x
                   }
                 }
-            } fmap ProfessionalBodyMemberYes.apply
+            } map ProfessionalBodyMemberYes.apply
           }
 
         case false => Rule.fromMapping { _ => Success(ProfessionalBodyMemberNo) }
@@ -150,7 +150,7 @@ object ProfessionalBodyMember {
           case "14" =>
             (JsPath \ "specifyOtherBusiness").read[String].map(Other.apply _) map identity[BusinessType]
           case _ =>
-            Reads(_ => JsError((JsPath \ "businessType") -> ValidationError("error.invalid")))
+            Reads(_ => JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
         }.foldLeft[Reads[Set[BusinessType]]](
           Reads[Set[BusinessType]](_ => JsSuccess(Set.empty))
         ) {

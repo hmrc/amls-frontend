@@ -3,8 +3,8 @@ package models.tradingpremises
 import models.responsiblepeople.PremisesRegistered
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 
 class PremisesRegisteredSpec extends PlaySpec with MockitoSugar {
 
@@ -16,7 +16,7 @@ class PremisesRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       PremisesRegistered.formRule.validate(data) must
-        be(Success(PremisesRegistered(true)))
+        be(Valid(PremisesRegistered(true)))
     }
 
     "successfully validate given a data model" in {
@@ -26,13 +26,13 @@ class PremisesRegisteredSpec extends PlaySpec with MockitoSugar {
       )
 
       PremisesRegistered.formRule.validate(data) must
-        be(Success(PremisesRegistered(true)))
+        be(Valid(PremisesRegistered(true)))
     }
 
     "fail to validate when given invalid data" in {
 
       PremisesRegistered.formRule.validate(Map.empty) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "registerAnotherPremises") -> Seq(ValidationError("error.required.tp.register.another.premises"))
         )))
     }

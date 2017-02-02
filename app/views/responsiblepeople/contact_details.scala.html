@@ -3,7 +3,7 @@
 @import include.forms2._
 @import models.aboutthebusiness._
 
-@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_], lang:Lang)
+@(f: Form2[_], edit: Boolean, index: Int)(implicit request: Request[_],m:Messages, lang:Lang)
 
 @header = {
     @errorSummary(f)
@@ -24,19 +24,27 @@
     }
 
     @form(f, controllers.responsiblepeople.routes.ContactDetailsController.post(index, edit)) {
-        @input(
-            field = f("phoneNumber"),
-            labelText = Messages("responsiblepeople.contact_details.phone.lbl"),
-            hintText = "aboutthebusiness.contactingyou.phone.hint"
 
-        )
+        @fieldset(
+            legend = "responsiblepeople.contact_details.title",
+            f = f("contact-details"),
+            legendHidden = true,
+            panel = false
+        ) {
+            @input(
+                field = f("phoneNumber"),
+                labelText = Messages("responsiblepeople.contact_details.phone.lbl"),
+                hintText = "aboutthebusiness.contactingyou.phone.hint"
 
-        @input(
-            field = f("emailAddress"),
-            labelText = Messages("responsiblepeople.contact_details.email.lbl"),
-            hintText = "aboutthebusiness.contactingyou.email.hint"
+            )
 
-        )
+            @input(
+                field = f("emailAddress"),
+                labelText = Messages("responsiblepeople.contact_details.email.lbl"),
+                hintText = "aboutthebusiness.contactingyou.email.hint"
+
+            )
+        }
 
         @submit()
     }

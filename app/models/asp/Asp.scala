@@ -27,6 +27,8 @@ object Asp {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
+  implicit val formatOption = Reads.optionWithNull[Asp]
+
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "asp"
     val notStarted = Section(messageKey, NotStarted, false, controllers.asp.routes.WhatYouNeedController.get())

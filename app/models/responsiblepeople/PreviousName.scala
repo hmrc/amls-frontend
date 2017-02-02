@@ -1,9 +1,9 @@
 package models.responsiblepeople
 
 import org.joda.time.LocalDate
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.ValidationError
 import play.api.libs.json.Json
 import utils.DateHelper
 
@@ -34,7 +34,7 @@ object PreviousName {
   implicit val formR: Rule[UrlFormEncoded, PreviousName] =
     From[UrlFormEncoded] { __ =>
 
-      import play.api.data.mapping.forms.Rules._
+      import jto.validation.forms.Rules._
 
       type I = (Option[String], Option[String], Option[String])
 
@@ -57,7 +57,7 @@ object PreviousName {
         (__ \ "firstName").read(optionR(firstNameType)) ~
         (__ \ "middleName").read(optionR(middleNameType)) ~
         (__ \ "lastName").read(optionR(lastNameType))
-      ).tupled compose iR) ~ (
+      ).tupled andThen iR) ~ (
         (__ \ "date").read(localDateRule)
       ))(builder)
     }
@@ -65,7 +65,7 @@ object PreviousName {
   implicit val formW: Write[PreviousName, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
 
-      import play.api.data.mapping.forms.Writes._
+      import jto.validation.forms.Writes._
       import play.api.libs.functional.syntax._
 
       (

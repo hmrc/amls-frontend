@@ -3,27 +3,24 @@ package views
 
 import java.net.URI
 
-import forms.Form2
-import models.hvd.{Retail, Hvd, HowWillYouSellGoods}
+import models.hvd.{HowWillYouSellGoods, Retail}
 import org.jsoup.Jsoup
-import org.scalatest.{fixture, WordSpec, MustMatchers}
+import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite}
-import play.api.mvc.{Headers, RequestHeader, Request}
+import play.api.mvc.Request
 import play.api.test.FakeRequest
+import utils.GenericTestHelper
 
+class how_will_you_sell_goodsSpec extends GenericTestHelper with MustMatchers with MockitoSugar {
 
+  trait HowWillYouSellGoodsViewFixture {
+    implicit val request : Request[_] = addToken(FakeRequest())
+    val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Seq(Retail))), false)
+    lazy val html = view.body
+    lazy val doc = Jsoup.parse(html)
+    lazy val form = doc.getElementsByTag("form").first()
+  }
 
-trait HowWillYouSellGoodsViewFixture {
-  implicit val request : Request[_] = FakeRequest()
-
-  val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Seq(Retail))), false)
-  lazy val html = view.body
-  lazy val doc = Jsoup.parse(html)
-  lazy val form = doc.getElementsByTag("form").first()
-}
-
-class how_will_you_sell_goodsSpec extends WordSpec with MustMatchers with MockitoSugar with OneAppPerSuite{
   "how will you sell goods view" should {
     "contain a form" which {
       "posts it's data" in new HowWillYouSellGoodsViewFixture {

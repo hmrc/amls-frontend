@@ -2,9 +2,9 @@ package models.moneyservicebusiness
 
 import models.Country
 import models.FormTypes._
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{From, Rule, Success, Write}
-import play.api.data.mapping._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Rule, Success, Write}
+import jto.validation._
 import play.api.libs.json.{Json, Reads, Writes}
 
 case class SendTheLargestAmountsOfMoney (
@@ -28,9 +28,9 @@ object SendTheLargestAmountsOfMoney {
 
   implicit val formRule: Rule[UrlFormEncoded, SendTheLargestAmountsOfMoney] = From[UrlFormEncoded] { __ =>
     import utils.MappingUtils.Implicits._
-    import play.api.data.mapping.forms.Rules._
-        ((__ \ "country_1").read[Country].withMessage("error.required.country.name") and
-          (__ \ "country_2").read[Option[Country]] and
+    import jto.validation.forms.Rules._
+        ((__ \ "country_1").read[Country].withMessage("error.required.country.name") ~
+          (__ \ "country_2").read[Option[Country]] ~
           (__ \ "country_3").read[Option[Country]]
           )(SendTheLargestAmountsOfMoney.apply _)
     }

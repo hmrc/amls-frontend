@@ -5,13 +5,11 @@ import connectors.DataCacheConnector
 import models.{Country, DateOfChange}
 import models.aboutthebusiness._
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -21,12 +19,10 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  MockitoSugar{
-
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true) )
+class RegisteredOfficeControllerSpec extends GenericTestHelper with  MockitoSugar{
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeController () {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -34,6 +30,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
       override val statusService = mock[StatusService]
     }
   }
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> true))
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -48,7 +45,7 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
 
     "load the where is your registered office or main place of business place page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
+       when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -154,11 +151,10 @@ class RegisteredOfficeControllerSpec extends PlaySpec with OneAppPerSuite with  
   }
 }
 
-class RegisteredOfficeControllerNoRelease7Spec extends PlaySpec with OneAppPerSuite with  MockitoSugar {
+class RegisteredOfficeControllerNoRelease7Spec extends GenericTestHelper with  MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
-
+    self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeController() {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -167,7 +163,7 @@ class RegisteredOfficeControllerNoRelease7Spec extends PlaySpec with OneAppPerSu
     }
   }
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.release7" -> false))
 
   val emptyCache = CacheMap("", Map.empty)
 

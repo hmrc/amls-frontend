@@ -67,22 +67,22 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   def amendmentsToggle: Boolean = {
     val value = getConfBool("feature-toggle.amendments", false)
-    Logger.info(s"[ApplicationConfig][amendments] $value")
     value
   }
 
   override def enrolmentToggle: Boolean = {
     val value = getConfBool("feature-toggle.gg-enrolment", false)
-    Logger.info(s"[ApplicationConfig][gg-enrolment] $value")
     value
   }
 
   override def businessMatchingDetailsToggle: Boolean = {
     val value = getConfBool("feature-toggle.business-matching-details-lookup", defBool = false)
-    Logger.info(s"s[ApplicationConfig][business-matching-details-lookup] $value")
     value
   }
 
-  override def release7 = getConfBool("feature-toggle.release7", false)
+  override def release7:Boolean = {
+    val value = getConfBool("feature-toggle.release7", false)
+    value
+  }
 
 }

@@ -7,8 +7,8 @@ import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 
 
-trait ViewFixture extends MustMatchers{
-  implicit val request : Request[_] = FakeRequest()
+trait Fixture extends MustMatchers {
+  implicit val request = FakeRequest()
 
   def view: HtmlFormat.Appendable
   lazy val html = view.body

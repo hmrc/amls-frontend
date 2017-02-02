@@ -1,12 +1,13 @@
 package utils
 
-import play.api.data.mapping._
-import play.api.data.mapping.forms.PM.PM
-import play.api.data.mapping.forms._
-import play.api.data.validation.ValidationError
+import jto.validation._
+import jto.validation.forms.PM.PM
+import jto.validation.forms._
+import jto.validation.ValidationError
 import play.api.libs.functional.{Functor, Monoid}
-import play.api.data.mapping.GenericRules
-import play.api.data.mapping.forms.PM._
+import jto.validation.GenericRules
+import jto.validation.forms.PM._
+import play.api.libs.json.{JsValue, Json, JsObject}
 
 import scala.collection.{GenTraversableOnce, TraversableLike}
 
@@ -125,8 +126,7 @@ trait MappingUtils {
     implicit def toFailureRule[A](f: (Path, Seq[ValidationError])): Rule[UrlFormEncoded, A] =
       Rule { _ => Failure(f) }
 
-
-    /*
+   /*
    * Json reads implicits
    */
 
@@ -135,7 +135,7 @@ trait MappingUtils {
     implicit def toReadsSuccess[A, B <: A](b: B): Reads[A] =
       Reads { _ => JsSuccess(b) }
 
-    implicit def toReadsFailure[A](f: ValidationError): Reads[A] =
+    implicit def toReadsFailure[A](f: play.api.data.validation.ValidationError): Reads[A] =
       Reads { _ => JsError(f) }
 
     implicit class RichRule[I, O](rule: Rule[I, O]) {
@@ -151,7 +151,7 @@ trait MappingUtils {
         }
 
       def validateWith(msg: String = "error.invalid")(fn: O => Boolean): Rule[I, O] =
-        rule compose Rule[O, O] {
+        rule andThen Rule[O, O] {
           case a if fn(a) =>
             Success(a)
           case a =>
@@ -169,6 +169,32 @@ trait MappingUtils {
     }
   }
 
+  object MonoidImplicits {
+    import cats.Monoid
+    implicit def jsonMonoid = new Monoid[JsValue] {
+      def combine(a1: JsValue, a2: JsValue) = {
+        a1.as[JsObject] deepMerge a2.as[JsObject]
+      }
+      def empty = {
+        Json.obj()
+      }
+    }
+
+    implicit def jsonObjMonoid = new Monoid[JsObject] {
+      def combine(a1: JsObject, a2: JsObject) = {
+        a1 deepMerge a2
+      }
+      def empty = {
+        Json.obj()
+      }
+    }
+
+    implicit def urlMonoid = new Monoid[UrlFormEncoded] {
+      def combine(a1: UrlFormEncoded, a2: UrlFormEncoded) = a1.++:(a2)
+      def empty = Map.empty
+    }
+  }
+
   object JsConstraints {
 
     import play.api.libs.json.Reads
@@ -176,7 +202,7 @@ trait MappingUtils {
     import play.api.libs.json.Reads._
 
     def nonEmpty[M](implicit reads: Reads[M], p: M => TraversableLike[_, M]) =
-      filter[M](ValidationError("error.required"))(_.isEmpty)
+      filter[M](play.api.data.validation.ValidationError("error.required"))(_.isEmpty)
   }
 
 

@@ -2,8 +2,8 @@ package models.supervision
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 
@@ -20,7 +20,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Success(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))))
+        be(Valid(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))))
 
     }
 
@@ -31,7 +31,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Success(ProfessionalBodyMemberNo))
+        be(Valid(ProfessionalBodyMemberNo))
 
     }
 
@@ -43,7 +43,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       )
 
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
+        be(Invalid(List(( Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
 
     }
 
@@ -55,7 +55,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "specifyOtherBusiness" -> Seq("")
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
+        be(Invalid(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
     }
 
     "fail validation when field is business a member of professional body selected and specifyOther exceeds max length" in {
@@ -66,7 +66,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "specifyOtherBusiness" -> Seq("test"*200)
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
+        be(Invalid(List(( Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
     }
 
     "fail validation when none of the check boxes selected" in {
@@ -77,13 +77,13 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "specifyOtherBusiness" -> Seq("test")
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(List(( Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
+        be(Invalid(List(( Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
     }
 
     "fail to validate on empty Map" in {
 
       ProfessionalBodyMember.formRule.validate(Map.empty) must
-        be(Failure(Seq((Path \ "isAMember") -> Seq(ValidationError("error.required.supervision.business.a.member")))))
+        be(Invalid(Seq((Path \ "isAMember") -> Seq(ValidationError("error.required.supervision.business.a.member")))))
 
     }
 
@@ -94,7 +94,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "businessType[]" -> Seq("01", "20")
       )
       ProfessionalBodyMember.formRule.validate(model) must
-        be(Failure(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
+        be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
 
     }
 
@@ -148,14 +148,14 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
           "businessType" -> Seq("01","02"))
 
         Json.fromJson[ProfessionalBodyMember](json) must
-          be(JsSuccess(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants)), JsPath \ "isAMember" \ "businessType"))
+          be(JsSuccess(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants)), JsPath))
       }
 
       "successfully validate given values with option No" in {
         val json =  Json.obj("isAMember" -> false)
 
         Json.fromJson[ProfessionalBodyMember](json) must
-          be(JsSuccess(ProfessionalBodyMemberNo, JsPath \ "isAMember"))
+          be(JsSuccess(ProfessionalBodyMemberNo, JsPath))
       }
 
       "successfully validate given values with option Digital software" in {
@@ -164,18 +164,18 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         "specifyOtherBusiness" -> "test")
 
         Json.fromJson[ProfessionalBodyMember](json) must
-          be(JsSuccess(ProfessionalBodyMemberYes(Set(Other("test"), AssociationOfBookkeepers)), JsPath \ "isAMember" \ "businessType" \ "specifyOtherBusiness"))
+          be(JsSuccess(ProfessionalBodyMemberYes(Set(Other("test"), AssociationOfBookkeepers)), JsPath ))
       }
 
       "fail when on path is missing" in {
         Json.fromJson[ProfessionalBodyMember](Json.obj("isAMember" -> true,
           "transaction" -> Seq("01"))) must
-          be(JsError((JsPath \ "isAMember" \ "businessType") -> ValidationError("error.path.missing")))
+          be(JsError((JsPath \"businessType") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[ProfessionalBodyMember](Json.obj("isAMember" -> true,"businessType" -> Seq("40"))) must
-          be(JsError(((JsPath \ "isAMember" \ "businessType") \ "businessType") -> ValidationError("error.invalid")))
+          be(JsError(((JsPath ) \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
       }
 
       "write valid data in using json write" in {

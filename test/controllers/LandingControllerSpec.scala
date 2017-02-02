@@ -21,7 +21,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
@@ -35,12 +35,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
+  override lazy val app = FakeApplication(additionalConfiguration = Map("Test.microservice.services.feature-toggle.amendments" -> false) )
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new LandingController {
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override val landingService = mock[LandingService]
@@ -207,18 +207,17 @@ class LandingControllerWithoutAmendmentsSpec extends PlaySpec with OneAppPerSuit
   }
 }
 
-class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
+class LandingControllerWithAmendmentsSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
 
   val businessCustomerUrl = "TestUrl"
 
-  implicit override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "Test.microservice.services.feature-toggle.amendments" -> true,
-    "Test.microservice.services.business-customer.url" -> businessCustomerUrl
+  override lazy val app = FakeApplication(additionalConfiguration = Map(
+    "Test.microservice.services.feature-toggle.amendments" -> true
   ))
 
 
   trait Fixture extends AuthorisedFixture {
-    self =>
+    self => val request = addToken(authRequest)
     val controller = new LandingController {
       override val landingService = mock[LandingService]
       override val authConnector = self.authConnector
@@ -467,7 +466,7 @@ class LandingControllerWithAmendmentsSpec extends PlaySpec with OneAppPerSuite w
 
             val result = controller.get()(request)
             status(result) must be (SEE_OTHER)
-            redirectLocation(result) must be (Some(businessCustomerUrl))
+            redirectLocation(result) must be (Some("http://localhost:9923/business-customer/amls"))
           }
         }
       }

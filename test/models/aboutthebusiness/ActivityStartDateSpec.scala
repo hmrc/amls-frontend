@@ -2,8 +2,9 @@ package models.aboutthebusiness
 
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path}
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
@@ -20,7 +21,7 @@ class ActivityStartDateSpec extends PlaySpec {
           "startDate.year" -> Seq("1990")
         )
 
-        ActivityStartDate.formRule.validate(model) must be(Success(ActivityStartDate(new LocalDate(1990, 2, 24))))
+        ActivityStartDate.formRule.validate(model) must be(Valid(ActivityStartDate(new LocalDate(1990, 2, 24))))
       }
     }
 
@@ -33,7 +34,7 @@ class ActivityStartDateSpec extends PlaySpec {
           "startDate.year" -> Seq("1990")
         )
 
-        ActivityStartDate.formRule.validate(model) must be(Failure(Seq(Path \ "startDate" -> Seq(
+        ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(Path \ "startDate" -> Seq(
           ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
       }
 
@@ -44,14 +45,14 @@ class ActivityStartDateSpec extends PlaySpec {
           "startDate.month" -> Seq(""),
           "startDate.year" -> Seq("")
         )
-        ActivityStartDate.formRule.validate(model) must be(Failure(Seq(
+        ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
           Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
       }
 
       "given missing data represented by an empty Map" in {
 
-        ActivityStartDate.formRule.validate(Map.empty) must be(Failure(Seq(
+        ActivityStartDate.formRule.validate(Map.empty) must be(Invalid(Seq(
           Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
         )))
       }

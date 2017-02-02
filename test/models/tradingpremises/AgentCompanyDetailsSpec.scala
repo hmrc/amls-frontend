@@ -1,9 +1,10 @@
 package models.tradingpremises
 
+import play.api.libs.json.Json
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsSuccess, Json}
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
+import play.api.libs.json.JsSuccess
 
 class AgentCompanyDetailsSpec extends PlaySpec {
 
@@ -11,14 +12,14 @@ class AgentCompanyDetailsSpec extends PlaySpec {
 
     "validate form Read" in {
       val formInput = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("12345678"))
-      AgentCompanyDetails.formReads.validate(formInput) must be(Success(AgentCompanyDetails("sometext", Some("12345678"))))
+      AgentCompanyDetails.formReads.validate(formInput) must be(Valid(AgentCompanyDetails("sometext", Some("12345678"))))
     }
 
     "throw error" when {
 
       "name field is missing" in {
         val formInput = Map("agentCompanyName" -> Seq(""), "companyRegistrationNumber" -> Seq("12345678"))
-        AgentCompanyDetails.formReads.validate(formInput) must be(Failure(Seq((
+        AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
           Path \ "agentCompanyName",
           Seq(ValidationError("error.required.tp.agent.registered.company.name"))
         ))))
@@ -26,7 +27,7 @@ class AgentCompanyDetailsSpec extends PlaySpec {
 
       "crn field is missing" in {
         val formInput = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq(""))
-        AgentCompanyDetails.formReads.validate(formInput) must be(Failure(Seq((
+        AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
           Path \ "companyRegistrationNumber",
           Seq(ValidationError("error.required.bm.registration.number"))
         ))))
@@ -35,24 +36,24 @@ class AgentCompanyDetailsSpec extends PlaySpec {
       "given a value with length greater than 8" in {
         val data = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("1" * 9))
         val result = AgentCompanyDetails.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
       }
 
       "given a value with length less than 8" in {
         val data = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("1" * 7))
         val result = AgentCompanyDetails.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
       }
 
       "given a value containing non-alphanumeric characters" in {
         val data = Map("agentCompanyName" -> Seq("sometext"), "companyRegistrationNumber" -> Seq("1234567!"))
         val result = AgentCompanyDetails.formReads.validate(data)
-        result mustBe Failure(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
+        result mustBe Invalid(Seq((Path \ "companyRegistrationNumber") -> Seq(ValidationError("error.invalid.bm.registration.number"))))
       }
 
       "both fields missing" in {
         val formInput = Map("agentCompanyName" -> Seq(""))
-        AgentCompanyDetails.formReads.validate(formInput) must be(Failure(Seq((
+        AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
           Path \ "agentCompanyName",
           Seq(ValidationError("error.required.tp.agent.registered.company.name"))
         ), (
@@ -64,7 +65,7 @@ class AgentCompanyDetailsSpec extends PlaySpec {
 
       "input exceeds max length" in {
         val formInput = Map("agentCompanyName" -> Seq("sometesttexttest" * 11), "companyRegistrationNumber" -> Seq("12345678"))
-        AgentCompanyDetails.formReads.validate(formInput) must be(Failure(Seq((
+        AgentCompanyDetails.formReads.validate(formInput) must be(Invalid(Seq((
           Path \ "agentCompanyName") -> Seq(ValidationError("error.invalid.tp.agent.registered.company.name")
         ))))
       }

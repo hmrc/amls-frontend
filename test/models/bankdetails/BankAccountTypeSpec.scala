@@ -2,8 +2,8 @@ package models.bankdetails
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play. PlaySpec
-import play.api.data.mapping.{Path, Failure, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Path, Invalid, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
@@ -16,7 +16,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
         )
 
         BankAccountType.formReads.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
           )))
       }
@@ -27,7 +27,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
         )
 
         BankAccountType.formReads.validate(urlFormEncoded) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             (Path \ "bankAccountType") -> Seq(ValidationError("error.bankdetails.accounttype"))
           )))
       }
@@ -38,15 +38,15 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
   "BankAccountType" must {
 
     "successfully validate form Read" in {
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("01"))) must be (Success(Some(PersonalAccount)))
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("02"))) must be (Success(Some(BelongsToBusiness)))
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("03"))) must be (Success(Some(BelongsToOtherBusiness)))
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("04"))) must be (Success(None))
+      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("01"))) must be (Valid(Some(PersonalAccount)))
+      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("02"))) must be (Valid(Some(BelongsToBusiness)))
+      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("03"))) must be (Valid(Some(BelongsToOtherBusiness)))
+      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("04"))) must be (Valid(None))
 
     }
 
     "fail on invalid selection" in {
-        BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("05"))) must be(Failure(Seq(
+        BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("05"))) must be(Invalid(Seq(
             (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
           )))
     }
@@ -60,17 +60,17 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
 
     "validate Json read" in {
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "01")) must
-        be (JsSuccess(PersonalAccount, JsPath \ "bankAccountType"))
+        be (JsSuccess(PersonalAccount, JsPath))
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "02")) must
-        be (JsSuccess(BelongsToBusiness, JsPath \ "bankAccountType"))
+        be (JsSuccess(BelongsToBusiness, JsPath))
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "03")) must
-        be (JsSuccess(BelongsToOtherBusiness, JsPath \ "bankAccountType"))
+        be (JsSuccess(BelongsToOtherBusiness, JsPath))
 
     }
 
     "fail Json read on invalid data" in  {
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" ->"10")) must
-        be (JsError(JsPath \ "bankAccountType", ValidationError("error.invalid")))
+        be (JsError(JsPath, play.api.data.validation.ValidationError("error.invalid")))
     }
 
     "write correct Json value" in  {

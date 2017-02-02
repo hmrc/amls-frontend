@@ -2,8 +2,8 @@ package models.responsiblepeople
 
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.mapping.{Failure, Path, Success}
-import play.api.data.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid}
+import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
@@ -15,13 +15,13 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       "successfully validate" in {
 
         ExperienceTraining.experienceInformationType.validate("did the training for the business activities. Dont know when") must
-          be(Success("did the training for the business activities. Dont know when"))
+          be(Valid("did the training for the business activities. Dont know when"))
       }
 
       "fail to validate an empty string" in {
 
         ExperienceTraining.experienceInformationType.validate("") must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             Path -> Seq(ValidationError("error.required.rp.experiencetraining.information"))
           )))
       }
@@ -29,7 +29,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       "fail to validate a string longer than 255 characters" in {
 
         ExperienceTraining.experienceInformationType.validate("A" * 256) must
-          be(Failure(Seq(
+          be(Invalid(Seq(
             Path -> Seq(ValidationError("error.invalid.length.rp.experiencetraining.information"))
           )))
       }
@@ -37,7 +37,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an enum value" in {
       ExperienceTraining.formRule.validate(Map("experienceTraining" -> Seq("false"))) must
-        be(Success(ExperienceTrainingNo))
+        be(Valid(ExperienceTrainingNo))
     }
 
     "successfully validate given a `Yes` value" in {
@@ -46,7 +46,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
         "experienceInformation" -> Seq("0123456789")
       )
 
-      ExperienceTraining.formRule.validate(data) must be(Success(ExperienceTrainingYes("0123456789")))
+      ExperienceTraining.formRule.validate(data) must be(Valid(ExperienceTrainingYes("0123456789")))
     }
 
     "successfully validate given a `No` value" in {
@@ -54,7 +54,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
         "experienceTraining" -> Seq("false")
       )
 
-      ExperienceTraining.formRule.validate(data) must be(Success(ExperienceTrainingNo))
+      ExperienceTraining.formRule.validate(data) must be(Valid(ExperienceTrainingNo))
     }
 
     "fail to validate given a `Yes` with no value" in {
@@ -64,7 +64,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       )
 
       ExperienceTraining.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "experienceInformation") -> Seq(ValidationError("error.required"))
         )))
     }
@@ -74,7 +74,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       val data: Map[String, Seq[String]] = Map.empty[String, Seq[String]]
 
       ExperienceTraining.formRule.validate(data) must
-        be(Failure(Seq(
+        be(Invalid(Seq(
           (Path \ "experienceTraining") -> Seq(ValidationError("error.required.rp.experiencetraining"))
         )))
     }
@@ -97,7 +97,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[ExperienceTraining](Json.obj("experienceTraining" -> false)) must
-        be(JsSuccess(ExperienceTrainingNo, JsPath \ "experienceTraining"))
+        be(JsSuccess(ExperienceTrainingNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -105,7 +105,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("experienceTraining" -> true, "experienceInformation" -> "0123456789")
 
       Json.fromJson[ExperienceTraining](json) must
-        be(JsSuccess(ExperienceTrainingYes("0123456789"), JsPath \ "experienceTraining" \ "experienceInformation"))
+        be(JsSuccess(ExperienceTrainingYes("0123456789"), JsPath \ "experienceInformation"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -113,7 +113,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("experienceTraining" -> true)
 
       Json.fromJson[ExperienceTraining](json) must
-        be(JsError((JsPath \ "experienceTraining" \ "experienceInformation") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "experienceInformation") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "write the correct value for Yes" in {
@@ -131,7 +131,7 @@ class ExperienceTrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("experienceTraining" -> false)
 
       Json.fromJson[ExperienceTraining](json) must
-        be(JsSuccess(ExperienceTrainingNo, JsPath \ "experienceTraining"))
+        be(JsSuccess(ExperienceTrainingNo, JsPath))
 
     }
 

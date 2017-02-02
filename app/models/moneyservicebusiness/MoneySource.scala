@@ -1,8 +1,8 @@
 package models.moneyservicebusiness
 
 
-import play.api.data.mapping.forms.UrlFormEncoded
-import play.api.data.mapping.{Path, RuleLike, Rule, From}
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Path, RuleLike, Rule, From}
 import play.api.libs.json.{Reads, Format}
 
 

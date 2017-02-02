@@ -2,7 +2,7 @@
 @import include._
 @import include.forms2._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang: Lang, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -17,12 +17,13 @@
     @form(f, controllers.msb.routes.TransactionsInNext12MonthsController.post(edit)) {
 
         @input(
-                field = f("txnAmount"),
-                labelText = "msb.transactions.expected.title",
-                labelHidden = true,
-                bold = false
-            )
-
+            field = f("txnAmount"),
+            attrType = "number",
+            classes = Seq("input--no-spinner"),
+            labelText = "msb.transactions.expected.title",
+            labelHidden = true,
+            bold = false
+        )
 
         @submit(edit)
     }

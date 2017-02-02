@@ -1,12 +1,14 @@
 @import forms.{Field, Form2}
 
-@(field: Field)(content: Html)(implicit request: Request[_], lang: Lang)
+@(field: Field)(content: Html)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @if(field.hasErrors) {
-    <div id="@field.id" class="form-field form-field--error">
+    <div id="@field.id" class="form-group form-field--error">
         <span class="error-notification">@field.error</span>
         @content
     </div>
 } else {
-    @content
+    <div class="form-group">
+        @content
+    </div>
 }

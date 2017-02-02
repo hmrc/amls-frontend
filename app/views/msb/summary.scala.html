@@ -4,7 +4,7 @@
 @import models.businessmatching._
 @import models.Country
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_], lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.msb")
@@ -62,7 +62,7 @@
             }
         }
 
-        @if(services.services.contains(TransmittingMoney)) {
+        @if(services.msbServices.contains(TransmittingMoney)) {
             @model.businessUseAnIPSP.map { ipsp =>
                 @checkYourAnswers(
                     question = Messages("msb.ipsp.title"),
@@ -142,7 +142,7 @@
             }
         }
 
-        @if(services.services.contains(CurrencyExchange)) {
+        @if(services.msbServices.contains(CurrencyExchange)) {
             @model.ceTransactionsInNext12Months.map{ trans =>
                 @checkYourAnswers(
                     question = Messages("msb.ce.transactions.expected.in.12.months.title"),
@@ -162,20 +162,24 @@
                         <li>@cur</li>
                         }
                     </ul>
-                    @checkYourAnswersExtra(
-                        question = Messages("msb.which_currencies.who")
-                    ) {
-                        <ul class="list">
-                        @wc.bankMoneySource.map { bms =>
-                            <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+
+                    @if(config.ApplicationConfig.release7) {
+                        @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
+                            @checkYourAnswersExtra(
+                                question = Messages("msb.which_currencies.foreign_currencies_question")
+                            ) {
+                                <p>@usesForeignCurrencies match {
+                                    case true => {@Messages("lbl.yes")}
+                                    case _ => {@Messages("lbl.no")}
+                                }</p>
+                            }
+
+                            @if(usesForeignCurrencies) {
+                                @whoUsesCurrencies(wc)
+                            }
                         }
-                        @wc.wholesalerMoneySource.map { wms =>
-                            <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
-                        }
-                        @if(wc.customerMoneySource) {
-                            <li>@Messages("msb.which_currencies.source.customers")</li>
-                        }
-                        </ul>
+                    } else {
+                        @whoUsesCurrencies(wc)
                     }
                 }
             }
@@ -187,4 +191,22 @@
         attrRole = true,
         linkText = Messages("button.checkyouranswers.acceptandcomplete")
     )
+}
+
+@whoUsesCurrencies(wc: WhichCurrencies) = {
+    @checkYourAnswersExtra(
+        question = Messages("msb.which_currencies.who")
+    ) {
+        <ul class="list">
+            @wc.bankMoneySource.map { bms =>
+            <li>@Messages("msb.which_currencies.source.banks"): @bms.bankNames</li>
+            }
+            @wc.wholesalerMoneySource.map { wms =>
+            <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
+            }
+            @if(wc.customerMoneySource) {
+            <li>@Messages("msb.which_currencies.source.customers")</li>
+            }
+        </ul>
+    }
 }

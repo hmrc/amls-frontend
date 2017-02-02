@@ -20,3 +20,4 @@ To start the app locally, kill the service AMLS_FRONTEND and then start using th
 To update Service Manager, do as below
 
  sudo pip install servicemanager --upgrade
+

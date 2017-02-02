@@ -3,7 +3,7 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_])
+@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow])(implicit request: Request[_],m:Messages)
 
 @main(
     title = Messages("confirmation.variation.title")

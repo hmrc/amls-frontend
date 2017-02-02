@@ -2,6 +2,8 @@ package config
 
 import play.api.mvc.{Filters, EssentialAction, WithFilters, Request}
 import play.api.{Configuration, Application}
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 import play.twirl.api.Html
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector

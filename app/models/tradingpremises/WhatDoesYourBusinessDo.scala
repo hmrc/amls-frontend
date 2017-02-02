@@ -2,9 +2,9 @@ package models.tradingpremises
 
 import models.DateOfChange
 import models.businessmatching.BusinessActivity
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules.{minLength => _, _}
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.Rules.{minLength => _, _}
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.Json
 import utils.TraversableValidators.minLengthR
 
@@ -17,7 +17,7 @@ object WhatDoesYourBusinessDo {
   implicit val formRule : Rule[UrlFormEncoded, WhatDoesYourBusinessDo] = From[UrlFormEncoded] { __ =>
     (__ \ "activities")
       .read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.tp.activity.your.business.do"))
-      .fmap((activities) => WhatDoesYourBusinessDo(activities, None))
+      .map((activities) => WhatDoesYourBusinessDo(activities, None))
   }
 
   implicit val formWrite = Write[WhatDoesYourBusinessDo, UrlFormEncoded] { data =>

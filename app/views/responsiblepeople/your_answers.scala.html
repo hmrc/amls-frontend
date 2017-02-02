@@ -3,7 +3,7 @@
 @import models.responsiblepeople.ResponsiblePeople
 @import utils.StatusConstants
 
-@(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_])
+@(responsiblePeople: Seq[ResponsiblePeople])(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.ya", "summary.responsiblepeople")
@@ -30,9 +30,7 @@
                         item = pn.fullName,
                         editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1, true).toString,
                         removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).toString
-                    ) {
-
-                    }
+                    )
                 }
             }
         }

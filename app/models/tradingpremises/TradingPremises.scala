@@ -1,8 +1,6 @@
 package models.tradingpremises
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.data.mapping.Rule
-import play.api.libs.json.{Format, JsArray, Json, Writes}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -66,6 +64,8 @@ object TradingPremises {
 
   val key = "trading-premises"
 
+  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
+
   def anyChanged(newModel: Seq[TradingPremises]): Boolean = {
     newModel exists { _.hasChanged }
   }
@@ -100,7 +100,7 @@ object TradingPremises {
     import play.api.libs.json._
 
     def backCompatibleReads[T](fieldName : String)(implicit rds:Reads[T]) = {
-      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read[Option[T]]
+      (__ \ fieldName).read[T].map[Option[T]]{Some(_)} orElse __.read(Reads.optionNoError[T])
     }
 
     def readAgentCompanyDetails = {

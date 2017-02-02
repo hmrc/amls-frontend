@@ -1,11 +1,11 @@
 package models.tradingpremises
 
 import models.FormTypes._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.Rules._
+import jto.validation._
+import jto.validation.forms.Rules._
 import play.api.libs.json._
-import play.api.data.mapping._
-import play.api.data.mapping.forms.UrlFormEncoded
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import typeclasses.MongoKey
 import utils.{JsonMapping, TraversableValidators}
@@ -18,7 +18,7 @@ object AgentPartnership {
 
   val maxAgentPartnershipLength = 140
 
-  val agentsPartnershipType =  notEmptyStrip compose notEmpty.withMessage("error.required.tp.agent.partnership") compose
+  val agentsPartnershipType =  notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.partnership") andThen
     maxLength(maxAgentPartnershipLength).withMessage("error.invalid.tp.agent.partnership")
 
   implicit val mongoKey = new MongoKey[AgentPartnership] {
@@ -27,8 +27,8 @@ object AgentPartnership {
   implicit val format = Json.format[AgentPartnership]
 
   implicit val formReads: Rule[UrlFormEncoded, AgentPartnership] = From[UrlFormEncoded] { __ =>
-    import play.api.data.mapping.forms.Rules._
-    (__ \ "agentPartnership").read(agentsPartnershipType) fmap AgentPartnership.apply
+    import jto.validation.forms.Rules._
+    (__ \ "agentPartnership").read(agentsPartnershipType) map AgentPartnership.apply
   }
 
   implicit val formWrites: Write[AgentPartnership, UrlFormEncoded] = Write {

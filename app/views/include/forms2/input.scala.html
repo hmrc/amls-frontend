@@ -15,10 +15,11 @@
     attrMin: String = "",
     attrMax: String = "",
     attrPattern: String = "",
-    attrDescribedBy: String = ""
-)(implicit lang: Lang)
+    attrDescribedBy: String = "",
+    data: String = ""
+)(implicit lang:Lang,  m: Messages)
 
-<div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}">
+<div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}"@if(data){ data-reveal="@data"}>
     <label class="form-label@if(bold){-bold}" for="@field.id">
         @if(labelText.nonEmpty) {
             @if(labelHidden) {<span class="visuallyhidden">}
