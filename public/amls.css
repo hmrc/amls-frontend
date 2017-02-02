@@ -673,11 +673,7 @@ fieldset .panel-indent {
   .check-your-answers--header .heading-xsmall {
     font-size: 14px;
   }
-  form input[type="text"].form-control,
-  form input[type="tel"].form-control,
-  form .form-group-day input[type="number"].form-control,
-  form .form-group-month input[type="number"].form-control,
-  form .form-group-year input[type="number"].form-control {
+  form .form-control {
     width: 100%;
   }
 }

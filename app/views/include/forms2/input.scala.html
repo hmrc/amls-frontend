@@ -33,7 +33,7 @@
             <span class="error-notification">@field.error</span>
         }
     </label>
-    <input name="@field.name" class="form-control @classes.mkString(" ")"
+    <input name="@field.name" class="form-control @if(attrType=="number"){ input--no-spinner} @classes.mkString(" ")"
             value="@field.value" id="@field.id"
             @if(hintText.nonEmpty) { aria-describedby="@{field.id}-hint" }
             @if(attrDescribedBy.nonEmpty) { aria-describedby="@attrDescribedBy-hint" }
