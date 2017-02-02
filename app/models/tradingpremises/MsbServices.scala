@@ -9,6 +9,7 @@ import play.api.libs.json._
 import utils.TraversableValidators
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait MsbService
 
@@ -22,11 +23,11 @@ case class MsbServices(services : Set[MsbService])
 object MsbService {
 
   implicit val serviceR = Rule[String, MsbService] {
-    case "01" => Success(TransmittingMoney)
-    case "02" => Success(CurrencyExchange)
-    case "03" => Success(ChequeCashingNotScrapMetal)
-    case "04" => Success(ChequeCashingScrapMetal)
-    case _ => Failure(Seq(Path -> Seq(ValidationError("error.invalid"))))
+    case "01" => Valid(TransmittingMoney)
+    case "02" => Valid(CurrencyExchange)
+    case "03" => Valid(ChequeCashingNotScrapMetal)
+    case "04" => Valid(ChequeCashingScrapMetal)
+    case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val serviceW = Write[MsbService, String] {

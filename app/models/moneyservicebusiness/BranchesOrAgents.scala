@@ -5,6 +5,7 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.{Json, Reads, Writes}
 import utils.{JsonMapping, TraversableValidators}
+import cats.data.Validated.{Invalid, Valid}
 
 case class BranchesOrAgents(branches: Option[Seq[Country]])
 
@@ -47,7 +48,7 @@ sealed trait BranchesOrAgents0 {
         case true =>
           (__ \ "countries").read(countrySeqR) map Some.apply
         case false =>
-          Rule(_ => Success(None))
+          Rule(_ => Valid(None))
       } map BranchesOrAgents.apply
     }
 

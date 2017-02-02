@@ -4,6 +4,7 @@ import org.joda.time.LocalDate
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import utils.DateHelper.localDateOrdering
+import cats.data.Validated.{Invalid, Valid}
 
 import scala.util.matching.Regex
 
@@ -161,7 +162,7 @@ object FormTypes {
           (__ \ "month").read(monthType) ~
           (__ \ "day").read(dayType)
         ) ((y, m, d) => s"$y-$m-$d") orElse
-        Rule[UrlFormEncoded, String](__ => Success("INVALID DATE STRING")) andThen
+        Rule[UrlFormEncoded, String](__ => Valid("INVALID DATE STRING")) andThen
         jodaLocalDateR("yyyy-MM-dd")
     }.repath(_ => Path)
 
@@ -179,9 +180,9 @@ object FormTypes {
   val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRule andThen futureDateRule
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate]{
-    case (Some(d1), d2) if d2.isAfter(d1) => Success(d2)
-    case (None, d2) => Success(d2)
-    case (Some(activityStartDate), _) => Failure(Seq(
+    case (Some(d1), d2) if d2.isAfter(d1) => Valid(d2)
+    case (None, d2) => Valid(d2)
+    case (Some(activityStartDate), _) => Invalid(Seq(
       ValidationError("error.expected.dateofchange.date.after.activitystartdate", activityStartDate.toString("dd-MM-yyyy"))))
   }
 
@@ -192,8 +193,8 @@ object FormTypes {
   }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate]{
-    case (d1, d2) if d2.isAfter(d1) => Success(d2)
-    case (startDate, _) => Failure(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
+    case (d1, d2) if d2.isAfter(d1) => Valid(d2)
+    case (startDate, _) => Invalid(Seq(ValidationError("error.expected.tp.date.after.start", startDate.toString("dd-MM-yyyy"))))
   }
 
   val premisesEndDateRule = From[UrlFormEncoded] { __ =>
@@ -203,8 +204,8 @@ object FormTypes {
   }
 
   val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
-    case (d1, d2, un) if d2.isAfter(d1) => Success(d2)
-    case (startDate, _, userName) => Failure(Seq(ValidationError("error.expected.rp.date.after.start", userName, startDate.toString("dd-MM-yyyy"))))
+    case (d1, d2, un) if d2.isAfter(d1) => Valid(d2)
+    case (startDate, _, userName) => Invalid(Seq(ValidationError("error.expected.rp.date.after.start", userName, startDate.toString("dd-MM-yyyy"))))
   }
 
   val peopleEndDateRule = From[UrlFormEncoded] { __ =>

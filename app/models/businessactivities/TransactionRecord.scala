@@ -8,6 +8,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait TransactionRecord
 
@@ -46,16 +47,16 @@ object TransactionRecord {
         case true =>
           (__ \ "transactions").read(minLengthR[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { z =>
             z.map {
-              case "01" => Rule[UrlFormEncoded, TransactionType](_ => Success(Paper))
-              case "02" => Rule[UrlFormEncoded, TransactionType](_ => Success(DigitalSpreadsheet))
+              case "01" => Rule[UrlFormEncoded, TransactionType](_ => Valid(Paper))
+              case "02" => Rule[UrlFormEncoded, TransactionType](_ => Valid(DigitalSpreadsheet))
               case "03" =>
                 (__ \ "name").read(softwareNameType) map DigitalSoftware.apply
               case _ =>
                 Rule[UrlFormEncoded, TransactionType] { _ =>
-                  Failure(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid"))))
+                  Invalid(Seq((Path \ "transactions") -> Seq(ValidationError("error.invalid"))))
                 }
             }.foldLeft[Rule[UrlFormEncoded, Set[TransactionType]]](
-              Rule[UrlFormEncoded, Set[TransactionType]](_ => Success(Set.empty))
+              Rule[UrlFormEncoded, Set[TransactionType]](_ => Valid(Set.empty))
             ) {
               case (m, n) =>
                   n flatMap { x =>
@@ -66,7 +67,7 @@ object TransactionRecord {
             } map TransactionRecordYes.apply
           }
 
-        case false => Rule.fromMapping { _ => Success(TransactionRecordNo) }
+        case false => Rule.fromMapping { _ => Valid(TransactionRecordNo) }
       }
     }
 

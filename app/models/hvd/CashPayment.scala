@@ -5,6 +5,7 @@ import org.joda.time.{DateTimeFieldType, LocalDate}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import play.api.libs.json.{Reads}
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait CashPayment
 
@@ -21,7 +22,7 @@ object CashPayment {
     (__ \ "acceptedAnyPayment").read[Boolean].withMessage("error.required.hvd.accepted.cash.payment") flatMap {
       case true =>
         (__ \ "paymentDate").read(localDateRule) map CashPaymentYes.apply
-      case false => Rule.fromMapping { _ => Success(CashPaymentNo) }
+      case false => Rule.fromMapping { _ => Valid(CashPaymentNo) }
     }
   }
 

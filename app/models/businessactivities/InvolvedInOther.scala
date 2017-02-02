@@ -4,6 +4,7 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait InvolvedInOther
 
@@ -27,7 +28,7 @@ object InvolvedInOther {
     (__ \ "involvedInOther").read[Boolean].withMessage("error.required.ba.involved.in.other") flatMap {
       case true =>
         (__ \ "details").read(OtherBusinessActivityType) map InvolvedInOtherYes.apply
-      case false => Rule.fromMapping { _ => Success(InvolvedInOtherNo) }
+      case false => Rule.fromMapping { _ => Valid(InvolvedInOtherNo) }
     }
   }
 

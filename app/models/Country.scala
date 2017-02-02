@@ -2,7 +2,7 @@ package models
 
 import jto.validation._
 import jto.validation.ValidationError
-import play.api.i18n.Messages
+import cats.data.Validated.{Invalid, Valid}
 import play.api.libs.json._
 
 case class Country(name: String, code: String) {
@@ -32,13 +32,13 @@ object Country {
 
   implicit val formRule: Rule[String, Country] =
     Rule {
-      case "" => Failure(Seq(Path -> Seq(ValidationError("error.required.country"))))
+      case "" => Invalid(Seq(Path -> Seq(ValidationError("error.required.country"))))
       case code =>
         countries.collectFirst {
           case e @ Country(_, c) if c == code =>
-            Success(e)
+            Valid(e)
         } getOrElse {
-          Failure(Seq(Path -> Seq(ValidationError("error.invalid.country"))))
+          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.country"))))
         }
     }
 

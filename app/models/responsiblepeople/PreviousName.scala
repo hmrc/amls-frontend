@@ -6,6 +6,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json.Json
 import utils.DateHelper
+import cats.data.Validated.{Invalid, Valid}
 
 case class PreviousName(
                        firstName: Option[String],
@@ -42,9 +43,9 @@ object PreviousName {
         case names @ (first, middle, last) if names.productIterator.collectFirst {
           case Some(_) => true
         }.isDefined =>
-          Success(names)
+          Valid(names)
         case _ =>
-          Failure(Seq(Path -> Seq(ValidationError("error.rp.previous.invalid"))))
+          Invalid(Seq(Path -> Seq(ValidationError("error.rp.previous.invalid"))))
       }
 
       // Defining this here because it helps out the compiler with typechecking

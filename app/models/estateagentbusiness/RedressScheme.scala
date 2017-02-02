@@ -5,6 +5,7 @@ import jto.validation.ValidationError
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait RedressScheme
 
@@ -37,7 +38,7 @@ object RedressScheme {
             (Path \ "propertyRedressScheme") -> Seq(ValidationError("error.invalid"))
         }
       }
-      case false => Rule.fromMapping { _ => Success(RedressSchemedNo) }
+      case false => Rule.fromMapping { _ => Valid(RedressSchemedNo) }
     }
   }
 

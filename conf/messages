@@ -168,7 +168,7 @@ error.required.tp.register.another.premises = Select yes or no to the question: 
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
 
-###############################  Estate Agent Business ###############################
+###############################  Estate Agency Business ###############################
 error.required.eab.redress.scheme = Select yes or no to the question: is this business registered with a redress scheme?
 error.required.eab.which.redress.scheme = Select which redress scheme.
 error.required.eab.redress.scheme.name = Enter the name of the redress scheme
@@ -747,7 +747,7 @@ estateagentbusiness.penalisedunderestateagentsact.banned = being banned from tak
 estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl = Give a brief overview of what the penalty was, and when it occurred.
 estateagentbusiness.penalisedbyprofessional.title = Has the business, or anyone in the business, ever been penalised by a professional body?
 estateagentbusiness.penalisedbyprofessional.heading = Has the business, or anyone in the business, ever been penalised by a professional body?
-estateagentbusiness.penalisedbyprofessional.subtitle = The penalty should relate to estate agent business activities. Examples of a penalty include:
+estateagentbusiness.penalisedbyprofessional.subtitle = The penalty should relate to estate agency business activities. Examples of a penalty include:
 estateagentbusiness.penalisedbyprofessional.line_1 = a fine
 estateagentbusiness.penalisedbyprofessional.line_2 = a warning
 estateagentbusiness.penalisedbyprofessional.line_3 = suspension
@@ -770,7 +770,7 @@ estateagentbusiness.redress.lbl.03 = Property Redress Scheme
 estateagentbusiness.redress.lbl.04 = Other
 estateagentbusiness.registered.redress.title = Is this business registered with a redress scheme?
 estateagentbusiness.registered.redress.heading = Is this business registered with a redress scheme?
-estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agent business and its customers.
+estateagentbusiness.registered.redress.text = A redress scheme is an independent service which resolves disputes between an estate agency business and its customers.
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.businessType.title = What’s your business structure?
@@ -861,7 +861,7 @@ bankdetails.bank.account.registered.title = Bank account registered
 bankdetails.have.registered.account.text = You have registered {0} bank account.
 bankdetails.have.registered.accounts.text = You have registered {0} bank accounts.
 bankdetails.want.to.register.another.account = Do you want to register another bank account?
-bankdetails.remove.bank.account.title = Remove bank details
+bankdetails.remove.bank.account.title = Remove bank account
 bankdetails.remove.bank.account.text = This will permanently remove {0} from your list of bank accounts.
 bankdetails.remove.bank.account.btn = Remove bank account
 
@@ -963,6 +963,7 @@ declaration.addperson.lbl.04 = Internal accountant
 declaration.addperson.lbl.05 = Nominated officer
 declaration.addperson.lbl.06 = Partner
 declaration.addperson.lbl.07 = Sole proprietor
+declaration.addperson.lbl.09 = Designated member
 declaration.addperson.lbl.08 = Other
 declaration.declaration.title = Declaration
 declaration.declaration.amendment.title = Declaration
@@ -1056,6 +1057,7 @@ responsiblepeople.position_within_business.lbl.03 = Internal accountant
 responsiblepeople.position_within_business.lbl.04 = Nominated officer
 responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
+responsiblepeople.position_within_business.lbl.07 = Designated member
 responsiblepeople.person.a.resident.title = Is this person a UK resident?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
 responsiblepeople.person.a.resident.title = Is this person a UK resident?

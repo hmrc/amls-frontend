@@ -10,19 +10,19 @@ import jto.validation.forms.PM._
 import play.api.libs.json.{JsValue, Json, JsObject}
 
 import scala.collection.{GenTraversableOnce, TraversableLike}
-
+import cats.data.Validated.{Valid, Invalid}
 object TraversableValidators {
 
   implicit def seqToOptionSeq[A]
   (implicit
    r: A => Option[A]
   ): Rule[Seq[A], Seq[Option[A]]] =
-    Rule.zero[Seq[A]] fmap {
+    Rule.zero[Seq[A]] map {
       _ map r
     }
 
   implicit def flattenR[A]: Rule[Seq[Option[A]], Seq[A]] =
-    Rule.zero[Seq[Option[A]]] fmap { _ flatten }
+    Rule.zero[Seq[Option[A]]] map { _ flatten }
 
   def minLengthR[T <: Traversable[_]](l : Int) : Rule[T, T] =
     GenericRules.validateWith[T]("error.required") {
@@ -39,15 +39,15 @@ object OptionValidators {
   def ifPresent[A](inner: Rule[A, A]): RuleLike[Option[A], Option[A]] = {
     Rule[Option[A], Option[A]] {
       case Some(a) => inner.validate(a).map(x => Some(x))
-      case None => Success(None)
+      case None => Valid(None)
     }
   }
 }
 
 object GenericValidators {
   def inList[A](validItems : Traversable[A]) : Rule[A, A] = Rule.fromMapping { item =>
-    if (validItems.exists(x => x == item)) {Success(item)}
-    else {Failure(List(ValidationError("error.not.in.list")))}
+    if (validItems.exists(x => x == item)) {Valid(item)}
+    else {Invalid(List(ValidationError("error.not.in.list")))}
   }
 }
 
@@ -121,10 +121,10 @@ trait MappingUtils {
    * Form rule implicits
    */
     implicit def toSuccessRule[A, B <: A](b: B): Rule[UrlFormEncoded, A] =
-      Rule.fromMapping { _ => Success(b) }
+      Rule.fromMapping { _ => Valid(b) }
 
     implicit def toFailureRule[A](f: (Path, Seq[ValidationError])): Rule[UrlFormEncoded, A] =
-      Rule { _ => Failure(f) }
+      Rule { _ => Invalid(f) }
 
    /*
    * Json reads implicits
@@ -153,9 +153,9 @@ trait MappingUtils {
       def validateWith(msg: String = "error.invalid")(fn: O => Boolean): Rule[I, O] =
         rule andThen Rule[O, O] {
           case a if fn(a) =>
-            Success(a)
+            Valid(a)
           case a =>
-            Failure(Seq(Path -> Seq(ValidationError(msg))))
+            Invalid(Seq(Path -> Seq(ValidationError(msg))))
         }
     }
 

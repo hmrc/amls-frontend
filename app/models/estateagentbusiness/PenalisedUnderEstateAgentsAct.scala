@@ -3,6 +3,7 @@ package models.estateagentbusiness
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Success, Write}
+import cats.data.Validated.{Invalid, Valid}
 import play.api.libs.json._
 
 sealed trait PenalisedUnderEstateAgentsAct
@@ -24,7 +25,7 @@ object PenalisedUnderEstateAgentsAct {
 
     (__ \ "penalisedUnderEstateAgentsAct").read[Boolean].withMessage("error.required.eab.penalised.under.act") flatMap {
       case true => (__ \ "penalisedUnderEstateAgentsActDetails").read(penalisedType) map PenalisedUnderEstateAgentsActYes.apply
-      case false => Rule.fromMapping { _ => Success(PenalisedUnderEstateAgentsActNo) }
+      case false => Rule.fromMapping { _ => Valid(PenalisedUnderEstateAgentsActNo) }
     }
   }
 

@@ -3,6 +3,7 @@ package utils
 import jto.validation._
 import jto.validation.ValidationError
 import play.api.libs.json.{PathNode => _, _}
+import cats.data.Validated.{Invalid, Valid}
 
 trait JsonMapping {
 
@@ -43,8 +44,8 @@ trait JsonMapping {
     Reads {
       json =>
         rule.validate(json) match {
-          case Success(x) => JsSuccess(x)
-          case Failure(error) => JsError(error)
+          case Valid(x) => JsSuccess(x)
+          case Invalid(error) => JsError(error)
         }
     }
 
@@ -77,8 +78,8 @@ trait JsonMapping {
 
     Rule[II, JsValue] { json =>
       search(p, json) match {
-        case None => Failure(Seq(Path -> Seq(ValidationError("error.required"))))
-        case Some(js) => Success(js)
+        case None => Invalid(Seq(Path -> Seq(ValidationError("error.required"))))
+        case Some(js) => Valid(js)
       }
     }.andThen(r)
   }

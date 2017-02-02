@@ -30,25 +30,26 @@ case class CompanyFormationAgent (
 object TcspTypes {
 
   import utils.MappingUtils.Implicits._
+  import cats.data.Validated.{Invalid, Valid}
 
   implicit val formReads: Rule[UrlFormEncoded, TcspTypes] = {
     From[UrlFormEncoded] { __ =>
       (__ \ "serviceProviders").read(minLengthR[Set[String]](1).withMessage("error.required.tcsp.service.providers")) flatMap { service =>
         service.map {
-          case "01" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(NomineeShareholdersProvider))
-          case "02" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(TrusteeProvider))
-          case "03" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(RegisteredOfficeEtc))
-          case "04" => Rule[UrlFormEncoded, ServiceProvider](_ => Success(CompanyDirectorEtc))
+          case "01" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(NomineeShareholdersProvider))
+          case "02" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(TrusteeProvider))
+          case "03" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(RegisteredOfficeEtc))
+          case "04" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(CompanyDirectorEtc))
           case "05" =>
             ((__ \ "onlyOffTheShelfCompsSold").read[Boolean].withMessage("error.required.tcsp.off.the.shelf.companies") ~
               (__ \ "complexCorpStructureCreation").read[Boolean].withMessage("error.required.tcsp.complex.corporate.structures")
               ) (CompanyFormationAgent.apply _)
           case _ =>
             Rule[UrlFormEncoded, ServiceProvider] { _ =>
-              Failure(Seq((Path \ "serviceProviders") -> Seq(jto.validation.ValidationError("error.invalid"))))
+              Invalid(Seq((Path \ "serviceProviders") -> Seq(jto.validation.ValidationError("error.invalid"))))
             }
         }.foldLeft[Rule[UrlFormEncoded, Set[ServiceProvider]]](
-          Rule[UrlFormEncoded, Set[ServiceProvider]](_ => Success(Set.empty))
+          Rule[UrlFormEncoded, Set[ServiceProvider]](_ => Valid(Set.empty))
         ) {
           case (m, n) =>
             n flatMap { x =>

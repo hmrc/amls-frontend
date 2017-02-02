@@ -6,6 +6,7 @@ import jto.validation.forms.Rules._
 import jto.validation._
 import jto.validation.forms._
 import play.api.libs.json.{Json, Writes, Reads}
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait AnotherBody
 
@@ -39,7 +40,7 @@ object AnotherBody {
           (__ \ "endingReason").read(reasonRule)
         ) (AnotherBodyYes.apply _)
 
-      case false => Rule.fromMapping { _ => Success(AnotherBodyNo) }
+      case false => Rule.fromMapping { _ => Valid(AnotherBodyNo) }
 
     }
   }

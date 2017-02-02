@@ -4,6 +4,7 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait BusinessUseAnIPSP
 
@@ -34,7 +35,7 @@ object BusinessUseAnIPSP {
       case true =>
         ((__ \ "name").read(nameType) ~
           (__ \ "referenceNumber").read(referenceType)) (BusinessUseAnIPSPYes.apply _)
-      case false => Rule.fromMapping { _ => Success(BusinessUseAnIPSPNo) }
+      case false => Rule.fromMapping { _ => Valid(BusinessUseAnIPSPNo) }
     }
   }
 

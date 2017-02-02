@@ -5,6 +5,7 @@ import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import jto.validation.forms.Rules._
 import utils.MappingUtils.Implicits._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait SaRegistered
 
@@ -22,7 +23,7 @@ object SaRegistered {
     (__ \ "saRegistered").read[Boolean].withMessage("error.required.sa.registration") flatMap {
       case true =>
         (__ \ "utrNumber").read(utrType) map (SaRegisteredYes.apply)
-      case false => Rule.fromMapping { _ => Success(SaRegisteredNo) }
+      case false => Rule.fromMapping { _ => Valid(SaRegisteredNo) }
     }
   }
 
