@@ -10,6 +10,7 @@ import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
+import cats.data.Validated.{Invalid, Valid}
 
 case class WhichCurrencies(currencies: Seq[String],
                            usesForeignCurrencies: Option[Boolean],
@@ -31,29 +32,29 @@ object WhichCurrencies {
   }
 
   private def nameType(fieldName: String) = {
-    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") compose
+    minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
       maxLength(140).withMessage(s"error.invalid.msb.wc.$fieldName.too-long")
   }
 
-  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) compose
-    TraversableValidators.flattenR[String] compose
-    TraversableValidators.minLengthR[Seq[String]](1) compose
+  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
+    TraversableValidators.flattenR[String] andThen
+    TraversableValidators.minLengthR[Seq[String]](1) andThen
     GenericRules.traversableR(GenericValidators.inList(currencies))
 
   private val validateMoneySources: ValidationRule[MoneySourceValidation] = Rule[MoneySourceValidation, MoneySourceValidation] {
-      case x@(Some(_), _, _) => Success(x)
-      case x@(_, Some(_), _) => Success(x)
-      case x@(_, _, Some(true)) => Success(x)
-      case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+      case x@(Some(_), _, _) => Valid(x)
+      case x@(_, Some(_), _) => Valid(x)
+      case x@(_, _, Some(true)) => Valid(x)
+      case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
     }
 
 
   private val validateWhichCurrencies: ValidationRule[WhichCurrenciesValidation] = Rule[WhichCurrenciesValidation, WhichCurrenciesValidation] {
-    case x@(Some(true), Some(b), _, _) => Success(x)
-    case x@(Some(true), _, Some(c), _) => Success(x)
-    case x@(Some(true), _, _, Some(d)) => Success(x)
-    case x@(Some(false), _, _, _) => Success((Some(false), None, None, None))
-    case _ => Failure(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
+    case x@(Some(true), Some(b), _, _) => Valid(x)
+    case x@(Some(true), _, Some(c), _) => Valid(x)
+    case x@(Some(true), _, _, Some(d)) => Valid(x)
+    case x@(Some(false), _, _, _) => Valid((Some(false), None, None, None))
+    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.msb.wc.moneySources"))))
   }
 
   implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
@@ -63,40 +64,40 @@ object WhichCurrencies {
 
     val usesForeignCurrencies = ApplicationConfig.release7 match {
       case true =>
-        (__ \ "usesForeignCurrencies").read[String] withMessage "error.required.msb.wc.foreignCurrencies" fmap {
+        (__ \ "usesForeignCurrencies").read[String] withMessage "error.required.msb.wc.foreignCurrencies" map {
           case "Yes" => Option(true)
           case _ => Option(false)
         }
-      case _ => Rule[UrlFormEncoded, Option[Boolean]](_ => Success(None))
+      case _ => Rule[UrlFormEncoded, Option[Boolean]](_ => Valid(None))
     }
 
     val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
       (__ \ "bankMoneySource").read[Option[String]] flatMap {
         case Some("Yes") => (__ \ "bankNames")
           .read(nameType("bankNames"))
-          .fmap(names => Some(BankMoneySource(names)))
-        case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Success(None))
+          .map(names => Some(BankMoneySource(names)))
+        case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Valid(None))
       }
 
     val wholesalerMoneySource: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] =
       (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
         case Some("Yes") => (__ \ "wholesalerNames")
           .read(nameType("wholesalerNames"))
-          .fmap(names => Some(WholesalerMoneySource(names)))
-        case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Success(None))
+          .map(names => Some(WholesalerMoneySource(names)))
+        case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Valid(None))
       }
 
-    val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] fmap {
+    val customerMoneySource = (__ \ "customerMoneySource").read[Option[String]] map {
       case Some("Yes") => Some(true)
       case _ => None
     }
 
     ApplicationConfig.release7 match {
-      case true => (currencies ~ ((usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateWhichCurrencies)).apply {
+      case true => (currencies ~ ((usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateWhichCurrencies)).apply {
         (a, b) => WhichCurrencies(a.toSeq, b._1, b._2, b._3, b._4)
       }
 
-      case _ => (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled compose validateMoneySources))
+      case _ => (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources))
         .apply { (a: Traversable[String], b: MoneySourceValidation) =>
           (a, b) match {
             case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, None, bms, wms, cms)

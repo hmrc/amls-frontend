@@ -3,6 +3,7 @@ package forms
 import jto.validation._
 import jto.validation.forms.{PM, UrlFormEncoded}
 import jto.validation.ValidationError
+import cats.data.Validated.{Invalid, Valid}
 import play.api.mvc.AnyContent
 
 sealed trait Form2[+A] {
@@ -67,8 +68,8 @@ object Form2 {
    rule: Rule[UrlFormEncoded, A]
     ): CompletedForm[A] =
     rule.validate(data) match {
-      case Success(a) => ValidForm(data, a)
-      case Failure(errors) => InvalidForm(data, errors)
+      case Valid(a) => ValidForm(data, a)
+      case Invalid(errors) => InvalidForm(data, errors)
     }
 
   def apply[A]

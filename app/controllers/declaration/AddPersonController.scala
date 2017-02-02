@@ -4,11 +4,14 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.status.SubmissionReadyForReview
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.ControllerHelper
+import views.html.status.status
 
 import scala.concurrent.Future
 
@@ -42,13 +45,17 @@ trait AddPersonController extends BaseController {
   }
 
   private def addPersonView(status: Status, form: Form2[AddPerson])
-                                  (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
-    statusService.getStatus map {
-      case SubmissionReadyForReview if AmendmentsToggle.feature =>
-        status(views.html.declaration.add_person(("declaration.addperson.amendment.title","submit.amendment.application"), form))
-      case _ => status(views.html.declaration.add_person(("declaration.addperson.title","submit.registration"), form))
-    }
+                           (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
 
+    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
+      val businessType = ControllerHelper.getBusinessType(bm)
+        statusService.getStatus map {
+          case SubmissionReadyForReview if AmendmentsToggle.feature =>
+            status(views.html.declaration.add_person(("declaration.addperson.amendment.title", "submit.amendment.application"), businessType, form))
+          case _ => status(views.html.declaration.add_person(("declaration.addperson.title", "submit.registration"), businessType, form))
+        }
+      }
+    }
 }
 
 object AddPersonController extends AddPersonController {

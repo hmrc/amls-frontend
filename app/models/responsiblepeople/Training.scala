@@ -5,7 +5,7 @@ import jto.validation.forms.Rules._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import jto.validation.forms.UrlFormEncoded
-
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait Training
 
@@ -28,7 +28,7 @@ object Training {
     (__ \ "training").read[Boolean].withMessage("error.required.rp.training") flatMap {
       case true =>
         (__ \ "information").read(informationType) map (TrainingYes.apply)
-      case false => Rule.fromMapping { _ => Success(TrainingNo) }
+      case false => Rule.fromMapping { _ => Valid(TrainingNo) }
     }
   }
 

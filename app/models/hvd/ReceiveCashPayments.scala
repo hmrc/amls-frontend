@@ -3,6 +3,7 @@ package models.hvd
 import jto.validation._
 import jto.validation.forms._
 import play.api.libs.json.{Writes, _}
+import cats.data.Validated.{Invalid, Valid}
 
 case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
@@ -16,8 +17,8 @@ sealed trait ReceiveCashPayments0 {
 
     (__ \ "receivePayments").read[Boolean].withMessage("error.required.hvd.receive.cash.payments") flatMap{
       case true =>
-        (__ \ "paymentMethods").read[PaymentMethods] fmap (x => ReceiveCashPayments(Some(x)))
-      case false => Rule.fromMapping { _ => Success(ReceiveCashPayments(None)) }
+        (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
+      case false => Rule.fromMapping { _ => Valid(ReceiveCashPayments(None)) }
     }
   }
 

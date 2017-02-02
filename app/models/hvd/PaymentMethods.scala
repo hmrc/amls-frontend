@@ -5,6 +5,8 @@ import jto.validation.forms._
 import jto.validation.ValidationError
 import play.api.libs.json.{Json, Reads, Writes}
 import utils.JsonMapping
+import cats.data.Validated.{Invalid, Valid}
+
 
 case class PaymentMethods(
                          courier: Boolean,
@@ -32,16 +34,16 @@ sealed trait PaymentMethods0 {
 
       def minLengthR(l: Int) = Rule.zero[String].flatMap[String] {
         case s if s.length >= l =>
-          Rule(_ => Success(s))
+          Rule(_ => Valid(s))
         case _ =>
-          Rule(_ => Failure(Seq(Path -> Seq(ValidationError("error.minLength", l)))))
+          Rule(_ => Invalid(Seq(Path -> Seq(ValidationError("error.minLength", l)))))
       }
 
       def maxLengthR(l: Int) = Rule.zero[String].flatMap[String] {
         case s if s.length <= l =>
-          Rule(_ => Success(s))
+          Rule(_ => Valid(s))
         case _ =>
-          Rule(_ => Failure(Seq(Path -> Seq(ValidationError("error.maxLength", l)))))
+          Rule(_ => Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", l)))))
       }
 
       val detailsR: Rule[String, String] =
@@ -57,7 +59,7 @@ sealed trait PaymentMethods0 {
           case true =>
             (__ \ "details").read(detailsR) map Some.apply
           case false =>
-            Rule(_ => Success(None))
+            Rule(_ => Valid(None))
         }
       )(PaymentMethods.apply _).validateWith("error.required.hvd.choose.option"){
         methods =>

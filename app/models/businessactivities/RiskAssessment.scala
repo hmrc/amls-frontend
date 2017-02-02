@@ -5,6 +5,7 @@ import jto.validation._
 import jto.validation.ValidationError
 import play.api.libs.json._
 import jto.validation.forms.Rules.{minLength => _, _}
+import cats.data.Validated.{Invalid, Valid}
 import utils.TraversableValidators.minLengthR
 
 sealed trait RiskAssessmentPolicy
@@ -24,10 +25,10 @@ object RiskAssessmentType {
   import utils.MappingUtils.Implicits._
 
   implicit val riskAssessmentFormRead = Rule[String, RiskAssessmentType] {
-    case "01" => Success(PaperBased)
-    case "02" => Success(Digital)
+    case "01" => Valid(PaperBased)
+    case "02" => Valid(Digital)
     case _ =>
-      Failure(Seq((Path \ "riskassessments") -> Seq(ValidationError("error.invalid"))))
+      Invalid(Seq((Path \ "riskassessments") -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val riskAssessmentFormWrite = Write[RiskAssessmentType, String] {
@@ -62,7 +63,7 @@ object RiskAssessmentPolicy {
           case true =>
              (__ \ "riskassessments").
                read(minLengthR[Set[RiskAssessmentType]](1).withMessage("error.required.ba.risk.assessment.format")) map RiskAssessmentPolicyYes.apply
-         case false => Rule.fromMapping { _ => Success(RiskAssessmentPolicyNo) }
+         case false => Rule.fromMapping { _ => Valid(RiskAssessmentPolicyNo) }
       }
 
   }

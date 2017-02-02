@@ -8,6 +8,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
+import cats.data.Validated.{Invalid, Valid}
 
 case class Products(items: Set[ItemType]) {
   def sorted = {
@@ -70,25 +71,25 @@ object Products{
     From[UrlFormEncoded] { __ =>
       (__ \ "products").read(minLengthR[Set[String]](1).withMessage("error.required.hvd.business.sell.atleast")) flatMap { z =>
         z.map {
-          case "01" => Rule[UrlFormEncoded, ItemType](_ => Success(Alcohol))
-          case "02" => Rule[UrlFormEncoded, ItemType](_ => Success(Tobacco))
-          case "03" => Rule[UrlFormEncoded, ItemType](_ => Success(Antiques))
-          case "04" => Rule[UrlFormEncoded, ItemType](_ => Success(Cars))
-          case "05" => Rule[UrlFormEncoded, ItemType](_ => Success(OtherMotorVehicles))
-          case "06" => Rule[UrlFormEncoded, ItemType](_ => Success(Caravans))
-          case "07" => Rule[UrlFormEncoded, ItemType](_ => Success(Jewellery))
-          case "08" => Rule[UrlFormEncoded, ItemType](_ => Success(Gold))
-          case "09" => Rule[UrlFormEncoded, ItemType](_ => Success(ScrapMetals))
-          case "10" => Rule[UrlFormEncoded, ItemType](_ => Success(MobilePhones))
-          case "11" => Rule[UrlFormEncoded, ItemType](_ => Success(Clothing))
+          case "01" => Rule[UrlFormEncoded, ItemType](_ => Valid(Alcohol))
+          case "02" => Rule[UrlFormEncoded, ItemType](_ => Valid(Tobacco))
+          case "03" => Rule[UrlFormEncoded, ItemType](_ => Valid(Antiques))
+          case "04" => Rule[UrlFormEncoded, ItemType](_ => Valid(Cars))
+          case "05" => Rule[UrlFormEncoded, ItemType](_ => Valid(OtherMotorVehicles))
+          case "06" => Rule[UrlFormEncoded, ItemType](_ => Valid(Caravans))
+          case "07" => Rule[UrlFormEncoded, ItemType](_ => Valid(Jewellery))
+          case "08" => Rule[UrlFormEncoded, ItemType](_ => Valid(Gold))
+          case "09" => Rule[UrlFormEncoded, ItemType](_ => Valid(ScrapMetals))
+          case "10" => Rule[UrlFormEncoded, ItemType](_ => Valid(MobilePhones))
+          case "11" => Rule[UrlFormEncoded, ItemType](_ => Valid(Clothing))
           case "12" =>
             (__ \ "otherDetails").read(otherDetailsType) map Other.apply
           case _ =>
             Rule[UrlFormEncoded, ItemType] { _ =>
-              Failure(Seq((Path \ "products") -> Seq(ValidationError("error.invalid"))))
+              Invalid(Seq((Path \ "products") -> Seq(ValidationError("error.invalid"))))
             }
         }.foldLeft[Rule[UrlFormEncoded, Set[ItemType]]](
-          Rule[UrlFormEncoded, Set[ItemType]](_ => Success(Set.empty))
+          Rule[UrlFormEncoded, Set[ItemType]](_ => Valid(Set.empty))
         ) {
           case (m, n) =>
             n flatMap { x =>

@@ -1,5 +1,6 @@
 @import include._
 @import forms2._
+@import config.ApplicationConfig
 @import models.businessmatching.{BusinessType, BusinessMatching}
 
 @(f: forms.Form2[_], edit: Boolean, index: Int, businessType: BusinessType)(implicit lang:Lang,  m: Messages, request: Request[_])
@@ -76,6 +77,13 @@
                             labelText = "responsiblepeople.position_within_business.lbl.04",
                             value = "04"
                         )
+                        @if(ApplicationConfig.release7 && (businessType == BusinessType.LPrLLP)) {
+                            @checkbox(
+                                f = f("positions[]"),
+                                labelText = "responsiblepeople.position_within_business.lbl.07",
+                                value = "07"
+                            )
+                        }
                     }
                 }
             }

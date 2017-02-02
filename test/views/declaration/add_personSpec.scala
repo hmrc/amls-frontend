@@ -2,10 +2,11 @@ package views.declaration
 
 import forms.{Form2, InvalidForm, ValidForm}
 import models.declaration.{AddPerson, BeneficialShareholder}
-import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import org.scalatest.MustMatchers
+import utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
+import models.businessmatching.BusinessType
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -21,7 +22,8 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", BeneficialShareholder))
 
-      def view = views.html.declaration.add_person(("string1", "string2"), form2)
+
+      def view = views.html.declaration.add_person(("string1", "string2"), Some(BusinessType.LPrLLP), form2)
 
       doc.title must startWith("string1")
     }
@@ -30,7 +32,7 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", BeneficialShareholder))
 
-      def view = views.html.declaration.add_person(("string1", "string2"), form2)
+      def view = views.html.declaration.add_person(("string1", "string2"), Some(BusinessType.LPrLLP), form2)
 
       heading.html must be(Messages("declaration.addperson.title"))
       subHeading.html must include(Messages("string2"))
@@ -47,7 +49,7 @@ class add_personSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "roleWithinBusinessOther") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
-      def view = views.html.declaration.add_person(("string1", "string2"), form2)
+      def view = views.html.declaration.add_person(("string1", "string2"), Some(BusinessType.LPrLLP), form2)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
