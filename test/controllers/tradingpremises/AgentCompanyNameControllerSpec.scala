@@ -19,12 +19,12 @@ import org.scalatestplus.play.OneAppPerSuite
 
 import scala.concurrent.Future
 
-class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentCompanyDetailsController {
+    val controller = new AgentCompanyNameController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val authConnector: AuthConnector = self.authConnector
     }
@@ -48,7 +48,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
       "display saved content" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyName("test")))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -74,8 +74,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
-            "agentCompanyName" -> "text",
-            "companyRegistrationNumber" -> "12345678"
+            "agentCompanyName" -> "text"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -92,8 +91,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
         "edit is false and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentCompanyName" -> "text",
-            "companyRegistrationNumber" -> "12345678"
+            "agentCompanyName" -> "text"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -110,8 +108,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
         "edit is true and given valid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentCompanyName" -> "text",
-            "companyRegistrationNumber" -> "12345678"
+            "agentCompanyName" -> "text"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
@@ -165,7 +162,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
+        val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text")
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremisesWithHasChangedFalse))))
@@ -183,7 +180,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             agentName = None,
-            agentCompanyDetails = Some(AgentCompanyDetails("text", Some("12345678"))),
+            agentCompanyDetails = Some(AgentCompanyName("text")),
             agentPartnership = None
           ))))(any(), any(), any())
       }
@@ -204,7 +201,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
 
   val businessStructure = SoleProprietor
   val testAgentName = AgentName("test")
-  val testAgentCompanyName = AgentCompanyDetails("test", Some("12345678"))
+  val testAgentCompanyName = AgentCompanyName("test")
   val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
     Set(

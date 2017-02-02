@@ -1,6 +1,6 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -31,12 +31,13 @@ trait BusinessStructureController extends RepeatingSection with BaseController {
   def redirectToPage(data: BusinessStructure, edit: Boolean, index: Int) = {
     data match {
       case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))
-      case LimitedLiabilityPartnership | IncorporatedBody => Redirect(routes.AgentCompanyDetailsController.get(index,edit))
+      case LimitedLiabilityPartnership | IncorporatedBody if ApplicationConfig.release7 => Redirect(routes.AgentCompanyDetailsController.get(index,edit))
       case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
       case UnincorporatedBody => edit match {
         case true => Redirect(routes.SummaryController.getIndividual(index))
         case false => Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
       }
+      case _ => Redirect(routes.AgentCompanyNameController.get(index,edit))
     }
   }
 

@@ -1,11 +1,11 @@
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.tradingpremises._
-import utils.RepeatingSection
+import utils.{FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -14,21 +14,23 @@ trait AgentCompanyDetailsController extends RepeatingSection with BaseController
 
   val dataCacheConnector: DataCacheConnector
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
+  def get(index: Int, edit: Boolean = false) = FeatureToggle(ApplicationConfig.release7) {
+    Authorised.async {
+      implicit authContext =>
+        implicit request =>
 
-        getData[TradingPremises](index) map {
+          getData[TradingPremises](index) map {
 
-          case Some(tp) => {
-            val form = tp.agentCompanyDetails match {
-              case Some(data) => Form2[AgentCompanyDetails](data)
-              case None => EmptyForm
+            case Some(tp) => {
+              val form = tp.agentCompanyDetails match {
+                case Some(data) => Form2[AgentCompanyDetails](data)
+                case None => EmptyForm
+              }
+              Ok(views.html.tradingpremises.agent_company_details(form, index, edit))
             }
-            Ok(views.html.tradingpremises.agent_company_details(form, index, edit))
+            case None => NotFound(notFoundView)
           }
-          case None => NotFound(notFoundView)
-        }
+    }
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {

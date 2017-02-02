@@ -59,4 +59,9 @@ object AgentCompanyDetails {
         (__ \ "companyRegistrationNumber").writeNullable[String]
       )(unlift(AgentCompanyDetails.unapply))
   }
+
+  implicit def conv(name: AgentCompanyName): AgentCompanyDetails ={
+    AgentCompanyDetails(name.agentCompanyName, None)
+  }
+
 }
