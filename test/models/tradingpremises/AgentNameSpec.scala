@@ -32,12 +32,22 @@ class AgentNameSpec extends PlaySpec {
 
     }
 
-    "throw error when required field is missing" in {
+    "throw error when required name field is missing" in {
+      val noContentModel = Map("agentName" -> Seq("sometext"))
+      // ++ Map(
+//        "agentDateOfBirth.day" -> Seq(""),
+//        "agentDateOfBirth.month" -> Seq(""),
+//        "agentDateOfBirth.year" -> Seq("")
+    //  )
+      AgentName.formReads.validate(noContentModel) must be(Invalid(Seq((Path \ "agentDateOfBirth", Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))))
+    }
+
+    "throw error when required date of birth field is missing" in {
       val formInput = Map("agentName" -> Seq(""))
       AgentName.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentName", Seq(ValidationError("error.required.tp.agent.name"))))))
     }
 
-    "throw error when input exceeds max length" in {
+    "throw error when name input exceeds max length" in {
       val formInput = Map("agentName" -> Seq("sometesttexttest"*11))
       AgentName.formReads.validate(formInput) must be(Invalid(Seq((Path \ "agentName") -> Seq(ValidationError("error.invalid.tp.agent.name")))))
     }
