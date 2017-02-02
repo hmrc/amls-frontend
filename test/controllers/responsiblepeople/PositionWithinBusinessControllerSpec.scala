@@ -23,8 +23,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class
-PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar {
+class PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -157,10 +156,12 @@ PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
+        val positions = Positions(Set(BeneficialOwner, Director, NominatedOfficer, DesignatedMember), startDate)
+        val responsiblePeople = ResponsiblePeople(positions = Some(positions))
 
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople())))
+          .thenReturn(Some(Seq(responsiblePeople)))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
@@ -172,9 +173,10 @@ PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar
 
         val document = Jsoup.parse(contentAsString(result))
         document.title must include(Messages("responsiblepeople.position_within_business.title"))
-        document.select("input[value=01]").hasAttr("checked") must be(false)
-        document.select("input[value=02]").hasAttr("checked") must be(false)
-        document.select("input[value=04]").hasAttr("checked") must be(false)
+        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.select("input[value=02]").hasAttr("checked") must be(true)
+        document.select("input[value=04]").hasAttr("checked") must be(true)
+        document.select("input[value=07]").hasAttr("checked") must be(true)
       }
 
       "Prepopulate form with a single saved data" in new Fixture {

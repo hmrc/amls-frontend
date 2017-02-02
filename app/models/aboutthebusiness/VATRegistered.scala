@@ -4,6 +4,7 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait VATRegistered
 
@@ -21,7 +22,7 @@ object VATRegistered {
     (__ \ "registeredForVAT").read[Boolean].withMessage("error.required.atb.registered.for.vat") flatMap {
       case true =>
         (__ \ "vrnNumber").read(vrnType) map VATRegisteredYes.apply
-      case false => Rule.fromMapping { _ => Success(VATRegisteredNo) }
+      case false => Rule.fromMapping { _ => Valid(VATRegisteredNo) }
     }
   }
 

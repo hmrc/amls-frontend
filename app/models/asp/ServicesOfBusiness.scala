@@ -4,6 +4,7 @@ import models.DateOfChange
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 import utils.TraversableValidators._
 
 case class ServicesOfBusiness(services: Set[Service], dateOfChange: Option[DateOfChange] = None)
@@ -23,13 +24,13 @@ case object FinancialOrTaxAdvice extends Service
 object Service {
 
   implicit val servicesFormRead = Rule[String, Service] {
-      case "01" => Success(Accountancy)
-      case "02" => Success(PayrollServices)
-      case "03" => Success(BookKeeping)
-      case "04" => Success(Auditing)
-      case "05" => Success(FinancialOrTaxAdvice)
+      case "01" => Valid(Accountancy)
+      case "02" => Valid(PayrollServices)
+      case "03" => Valid(BookKeeping)
+      case "04" => Valid(Auditing)
+      case "05" => Valid(FinancialOrTaxAdvice)
       case _ =>
-          Failure(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
+          Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val servicesFormWrite = Write[Service, String] {

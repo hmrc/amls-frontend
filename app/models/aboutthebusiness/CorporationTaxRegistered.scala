@@ -3,6 +3,7 @@ package models.aboutthebusiness
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import cats.data.Validated.{Invalid, Valid}
 
 sealed trait CorporationTaxRegistered
 
@@ -20,7 +21,7 @@ object CorporationTaxRegistered {
     (__ \ "registeredForCorporationTax").read[Boolean].withMessage("error.required.atb.corporation.tax") flatMap {
       case true =>
         (__ \ "corporationTaxReference").read(corporationTaxType) map CorporationTaxRegisteredYes.apply
-      case false => Rule.fromMapping { _ => Success(CorporationTaxRegisteredNo) }
+      case false => Rule.fromMapping { _ => Valid(CorporationTaxRegisteredNo) }
     }
   }
 

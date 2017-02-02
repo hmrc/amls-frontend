@@ -6,6 +6,7 @@ import jto.validation.{From, Rule, Success, Write}
 import jto.validation._
 import play.api.libs.json.{JsObject, Json, Reads, Writes}
 import utils.{TraversableValidators, JsonMapping}
+import cats.data.Validated.{Invalid, Valid}
 
 case class CustomersOutsideUK(countries: Option[Seq[Country]])
 
@@ -46,10 +47,10 @@ sealed trait CustomersOutsideUK0 {
 
       (__ \ "isOutside").read(boolR).flatMap[Option[Seq[Country]]] {
         case true =>
-          (__ \ "countries").read(countrySeqR) fmap Some.apply
+          (__ \ "countries").read(countrySeqR) map Some.apply
         case false =>
-          Rule(_ => Success(None))
-      } fmap CustomersOutsideUK.apply
+          Rule(_ => Valid(None))
+      } map CustomersOutsideUK.apply
     }
 
   private implicit def write[A]
