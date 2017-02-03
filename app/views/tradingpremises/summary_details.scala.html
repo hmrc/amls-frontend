@@ -99,11 +99,12 @@
                 editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
             ) {
 
-            <p>@x.agentName</p>
+            <p>@x.agentName,
             @x.agentDateOfBirth match {
-                case Some(y) => {<p>@DateHelper.formatDate(y)</p>}
+                case Some(y) => {born @DateHelper.formatDate(y)}
                 case None => {}
             }
+            </p>
 
             }
         }
